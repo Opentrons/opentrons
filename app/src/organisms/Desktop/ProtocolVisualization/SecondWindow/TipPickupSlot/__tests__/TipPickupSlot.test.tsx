@@ -7,12 +7,13 @@ import { CLEAN, DIRTY, EMPTY } from '@opentrons/step-generation'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { TipPickupSlot } from './'
+import { TipPickupSlot } from '..'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
+import type { RobotState } from '@opentrons/step-generation'
+import type { LabwareEntityExtended } from '../../../DeckView'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
@@ -38,12 +39,13 @@ const createMockLabwareDef = (): LabwareDefinition2 => {
   } as LabwareDefinition2
 }
 
-const createMockTiprackEntity = (): LabwareEntity => {
+const createMockTiprackEntity = (): LabwareEntityExtended => {
   return {
     id: MOCK_TIPRACK_ID,
     labwareDefURI: 'opentrons/fixture_tiprack_300_ul/1',
     def: createMockLabwareDef(),
     pythonName: 'mock_tiprack',
+    nickName: 'mockNickname',
   }
 }
 
@@ -95,7 +97,7 @@ describe('TipPickupSlot', () => {
   it('should render TipPickupSlot', () => {
     render(props)
     screen.getByText(MOCK_SLOT)
-    screen.getByText('Mock 300µL Tiprack')
+    screen.getByText('mockNickname')
     screen.getByText('mock LabwareRender')
     screen.getByTestId('robot-workspace')
   })
