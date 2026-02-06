@@ -37,14 +37,14 @@ export function CameraControls({
   const settings = useCameraSettingsValues(runId)
   const { createCameraImageSettings } = useCreateCameraImageSettings()
 
-  const returnToHomeView = (settings: CameraImageSettings): void => {
+  const returnToHomeView = (partialSettings: CameraImageSettings): void => {
     setIsLoading(true)
 
     const cameraImageSettings: CameraImageSettings = {
-      zoom: settings.zoom,
-      brightness: settings.brightness,
-      contrast: settings.contrast,
-      saturation: settings.saturation,
+      zoom: partialSettings.zoom ?? settings.zoom,
+      brightness: partialSettings.brightness ?? settings.brightness,
+      contrast: partialSettings.contrast ?? settings.contrast,
+      saturation: partialSettings.saturation ?? settings.saturation,
     }
 
     if (runId != null) {
