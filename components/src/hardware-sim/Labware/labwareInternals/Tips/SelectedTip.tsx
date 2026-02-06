@@ -1,44 +1,20 @@
 import { COLORS } from '../../../../helix-design-system'
-import { DEFAULT_TIP_SIZE } from '../Tips/constants'
-import styles from './wells.module.css'
+import { DEFAULT_TIP_SIZE } from './constants'
+import styles from './tips.module.css'
 
-export function SelectedWell(props: {
+export function SelectedTip(props: {
   size?: string
   textInsideTip?: string
   isUsed?: boolean
   isError?: boolean
-  isSelected?: boolean
-  showStroke?: boolean
 }): JSX.Element {
-  const {
-    size,
-    textInsideTip,
-    isUsed = false,
-    isError = false,
-    isSelected = true,
-    showStroke,
-  } = props
+  const { size, textInsideTip, isUsed = false, isError = false } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-  const getFillColor = (
-    isSelected: boolean,
-    isError: boolean,
-    isUsed: boolean
-  ): string => {
-    if (isError) {
-      return COLORS.red50
-    }
-    if (isUsed) {
-      return COLORS.yellow50
-    }
-    if (isSelected) {
-      return COLORS.blue50
-    }
-    return COLORS.blue35
-  }
+  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : COLORS.blue50
 
-  const shouldShowStroke = textInsideTip == null && showStroke
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
+  const showStroke = textInsideTip == null
   return (
     <svg
       width={width}
@@ -50,10 +26,10 @@ export function SelectedWell(props: {
       <circle
         cx="10"
         cy="10"
-        r={shouldShowStroke ? '9' : '10'}
-        fill={getFillColor(isSelected, isError, isUsed)}
-        stroke={shouldShowStroke ? COLORS.black90 : undefined}
-        strokeWidth={shouldShowStroke ? '2' : undefined}
+        r={showStroke ? '9' : '10'}
+        fill={fill}
+        stroke={showStroke ? COLORS.black90 : undefined}
+        strokeWidth={showStroke ? '2' : undefined}
       />
       {textInsideTip != null ? (
         <text

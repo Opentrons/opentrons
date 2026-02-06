@@ -59,7 +59,7 @@
   "unable_to_show_steps_past_errors": "Unable to show steps past errors",
   "wavelengths": "Wavelengths",
   "well_dimension": "{{number}} mm",
-  "well_name": "Well {{wellName}}",
+  "well_name": "WELL {{wellName}}",
   "well_view": "Well view",
   "well_volume": "{{volume}} µL"
 }

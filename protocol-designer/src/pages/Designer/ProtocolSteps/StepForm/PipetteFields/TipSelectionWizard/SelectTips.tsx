@@ -14,7 +14,6 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
-  TIP,
   USED,
 } from '@opentrons/components'
 import {
@@ -39,7 +38,7 @@ import {
 } from './constants'
 import { DeckOverlay } from './DeckOverlay'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
-import { SelectionLegend } from './SelectionLegend'
+import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
 import {
   getAffectedWells,
@@ -369,7 +368,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} />
+        <TipLegend />
       </div>
     </div>
   )

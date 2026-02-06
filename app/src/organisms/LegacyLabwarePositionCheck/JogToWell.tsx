@@ -48,7 +48,7 @@ import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { WellStrokeByName } from '@opentrons/components'
+import type { WellStroke } from '@opentrons/components'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 
@@ -114,7 +114,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     wellsToHighlight = ['A1']
   }
 
-  const wellStroke: WellStrokeByName = wellsToHighlight.reduce(
+  const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )

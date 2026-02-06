@@ -4,6 +4,7 @@ import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
+  PROTOCOL_ENGINE_LID_STACK_LOADNAME,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
@@ -77,6 +78,15 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
 
+        // need to special-case the PE lid stack def which
+        // is a fake def that shouldn't be properly exposed to
+        // users
+        const modifiedLabwareDisplayName =
+          labwareEntitiesExtended[id].def.parameters.loadName ===
+          PROTOCOL_ENGINE_LID_STACK_LOADNAME
+            ? 'Lid Stack'
+            : labwareEntitiesExtended[id].def.metadata.displayName
+
         return (
           <Fragment key={id}>
             <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
@@ -108,7 +118,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
               {showCommandSummary ? null : (
                 <StyledText desktopStyle="captionRegular" color={COLORS.white}>
                   {labwareEntitiesExtended[id]?.nickName ??
-                    labwareEntitiesExtended[id].def.metadata.displayName}
+                    modifiedLabwareDisplayName}
                 </StyledText>
               )}
             </DeckViewOverlay>
