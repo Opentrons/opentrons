@@ -20,6 +20,7 @@ import {
   FIXTURES_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   getAADisplayName,
+  getComboFixtureFromFixtureIds,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -296,6 +297,16 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   }
 
   const handleAddNewFixture = (newFixture: CutoutConfigMap): void => {
+    // Get the first existing fixture in this cutout (if any)
+    const matchedEntry = Object.entries(fixtures).find(
+      ([, fixture]) => fixture.cutoutId === newFixture.cutoutId
+    )
+    const matchedFixture = matchedEntry != null ? matchedEntry[1] : undefined
+
+    const matchedComboFixtureId = getComboFixtureFromFixtureIds([
+      (matchedFixture?.cutoutFixtureId as CutoutFixtureId) ?? '',
+      newFixture.cutoutFixtureId as CutoutFixtureId,
+    ])
     const filteredFixtures = Object.fromEntries(
       Object.entries(fixtures).filter(
         ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
@@ -309,6 +320,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedFixtures: Fixtures = {
       ...filteredFixtures,
+      ...(matchedFixture != null && matchedComboFixtureId != null
+        ? { [matchedComboFixtureId]: matchedFixture }
+        : {}),
       [uuid()]: {
         name:
           (mapFixtureIdToFixtureName(fixtureName) as FixtureName) ??
