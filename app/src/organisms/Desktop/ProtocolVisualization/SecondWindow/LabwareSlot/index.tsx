@@ -23,7 +23,11 @@ import { WellTooltip } from '../../WellTooltip'
 import styles from './labwareslot.module.css'
 
 import type { WellGroup } from '@opentrons/components'
-import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  Liquid,
+  LoadLidStackRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   LabwareEntities,
@@ -54,6 +58,11 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     command =>
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
+  )
+  const lidStackCommand = commands.find(
+    (command): command is LoadLidStackRunTimeCommand =>
+      command.commandType === 'loadLidStack' &&
+      command.result?.labwareIds?.includes(topLabwareOnSlotId) === true
   )
   const pipetteTemporalProperties = Object.entries(pipettes).find(
     ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
@@ -120,57 +129,48 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   )
   const topLabwareURI = labwareEntities[topLabwareOnSlotId].labwareDefURI
   const quantity =
-    hopperGroups != null
+    lidStackCommand?.params?.quantity ??
+    (hopperGroups != null
       ? hopperGroups.length
       : labware[topLabwareOnSlotId].stack.filter(
           id =>
             labware[id] != null &&
             labwareEntities[id].labwareDefURI === topLabwareURI
-        )?.length
+        )?.length)
   const adapterId = labware[topLabwareOnSlotId].stack.find(
     id =>
       labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&
       !labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('adapter')
   )
+  const stackItems =
+    labware[topLabwareOnSlotId]?.stack.filter(
+      item => item !== topLabwareOnSlotId
+    ) ?? []
+  const moduleStackItems = stackItems.filter(
+    item => moduleEntities[item] != null
+  )
+  const hasStackedLabware = stackItems.some(item => labware[item] != null)
+  const hasHopper = stackItems.includes(HOPPER_STACKER_LOCATION)
+  const showStackedIcon =
+    hasStackedLabware || (hopperGroups != null && hopperGroups.length > 1)
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         {/* header icon part */}
         <div className={styles.header_icons}>
-          {labware[topLabwareOnSlotId]?.stack
-            .filter(item => item !== topLabwareOnSlotId)
-            .reverse()
-            .map((item, index) => {
-              if (moduleEntities[item] != null) {
-                return (
-                  <RobotInfoLabel
-                    key={`${item}-${index}`}
-                    iconName={
-                      MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
-                    }
-                  />
-                )
-              } else if (labware[item] != null) {
-                return (
-                  <RobotInfoLabel key={`${item}-${index}`} iconName="stacked" />
-                )
-              } else {
-                if (item !== HOPPER_STACKER_LOCATION) {
-                  const stack = labware[topLabwareOnSlotId]?.stack
-                  const hasHopper = stack.includes(HOPPER_STACKER_LOCATION)
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      deckLabel={
-                        hasHopper ? t('stacker_slot', { slot: slot }) : slot
-                      }
-                    />
-                  )
-                }
-              }
-            })}
-          {hopperGroups != null && hopperGroups.length > 1 ? (
-            <RobotInfoLabel key="hopperGroupStackedIcon" iconName="stacked" />
+          <RobotInfoLabel
+            key="slotLabel"
+            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
+          />
+          {moduleStackItems.map((item, index) => (
+            <RobotInfoLabel
+              key={`${item}-${index}`}
+              iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
+            />
+          ))}
+          {showStackedIcon ? (
+            <RobotInfoLabel key="stackedIcon" iconName="stacked" />
           ) : null}
         </div>
         {/* header icon part */}
@@ -191,19 +191,21 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
                 {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
               </StyledText>
             ) : null}
-            {adapterId != null ? (
-              <div>
-                <Divider />
-                <StyledText desktopStyle="captionSemiBold">
-                  {labwareEntities[adapterId].def.metadata.displayName}
-                </StyledText>
-              </div>
-            ) : null}
           </div>
           {quantity > 1 ? (
-            <Tag text={t('quantity', { quantity })} type="default" />
+            <div className={styles.tag_container}>
+              <Tag text={t('quantity', { quantity })} type="default" />
+            </div>
           ) : null}
         </div>
+        {adapterId != null ? (
+          <>
+            <Divider className={styles.full_width_divider} />
+            <StyledText desktopStyle="captionSemiBold">
+              {labwareEntities[adapterId].def.metadata.displayName}
+            </StyledText>
+          </>
+        ) : null}
         {/* header text part */}
       </div>
       <div className={styles.body_container}>
