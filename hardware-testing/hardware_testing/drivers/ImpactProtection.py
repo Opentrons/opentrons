@@ -106,7 +106,7 @@ class ImpactProtectionSerial:
             self.ser.close()
             print("Serial closed")
 if __name__ == "__main__":
-    device = PipetteSerial()
+    device = ImpactProtectionSerial()
 
     try:
         device.auto_connect()

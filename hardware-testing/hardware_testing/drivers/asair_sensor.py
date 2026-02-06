@@ -101,6 +101,8 @@ def BuildAsairSensor(
                     if len(ser_id) == 8:
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
+                    sensor._th_sensor.close()  # 👈 防泄漏
+                
                 except:  # noqa: E722
                     pass
             use_sim = ui.get_user_answer("No env sensor found, use simulator?")

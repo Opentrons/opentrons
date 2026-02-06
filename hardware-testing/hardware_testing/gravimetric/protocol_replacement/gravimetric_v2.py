@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V2 add"}
+metadata = {"protocolName": "Gravimetric QC V2 wy"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -106,7 +106,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.drivers.ImpactProtectionV2 import BuildImpactProtection
   
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
@@ -179,7 +179,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    ImpactSerial_U:ImpactProtectionV2.ImpactProtectionBase
+    ImpactSerial_U: BuildImpactProtection
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -341,8 +341,6 @@ class FixtureSettings:
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
         print_info(f"Fast simulate {fast_simulate}")
-        #链接防撞工装
-        ImpactSerial = ImpactProtectionV2.BuildImpactProtection(simulate=simulating,ctx=ctx)
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
@@ -361,12 +359,18 @@ class FixtureSettings:
         scale_serial = scale.read_serial_number()
         if simulating:
             recorder.set_simulation_mass(10)
-         
+        # else:
+
+        #     ImpactSerial = ImpactProtectionSerial()
+        #     ImpactSerial.auto_connect()
+
+            
         recorder.record(in_thread=True)
         env_sensor = AsairDriver.BuildAsairSensor(simulating)
         env_serial = env_sensor.get_serial()
+
         
-        
+        # Impact_serial = ImpactSerial.get_version()
         ctx.delay(seconds= 3,msg=f"simulating {simulating} {type(simulating)}")
 
         ot3api = ctx._core.get_hardware()
@@ -417,6 +421,7 @@ class FixtureSettings:
         # do this after the set serial to overwrite where the name.
         test_report.set_robot_id(robot_serial)
         ctx.load_trash_bin("A3")
+        ImpactSerial_U = None
         return cls(
             ctx=ctx,
             name=name,
@@ -461,7 +466,7 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
-            ImpactSerial_U = ImpactSerial
+            ImpactSerial_U=ImpactSerial_U
         )
 
     def validate_settings(self) -> bool:
@@ -808,7 +813,8 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
         fixture_settings.pipette.return_tip()
     else:
         if not fixture_settings.ctx.is_simulating():
-            fixture_settings.ImpactSerial_U.close_all_gratings()
+            if fixture_settings.ImpactSerial_U != None:
+                fixture_settings.ImpactSerial_U.close_all_gratings()
         fixture_settings.pipette.drop_tip()
 
 
@@ -965,6 +971,15 @@ def aspirate_with_liquid_class(
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
+
+    # 添加这几行
+    if not fixture_settings.ctx.is_simulating():
+        swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
+        if fixture_settings.ImpactSerial_U != None:
+            impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+            if "OK" not in impp.raw_response:
+                raise RuntimeError(f"Collision avoidance switch failed to activate.")
+
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -1343,6 +1358,8 @@ def calculate_evaporation(
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
 
+    ImpactSerial_U = BuildImpactProtection(fixture_settings.ctx.is_simulating(),ctx=ctx)
+    fixture_settings.ImpactSerial_U = ImpactSerial_U
     swichvaldict = {20:"SET_LEFT_T50",
     50:"SET_LEFT_T50",
     200:"SET_LEFT_T50",
@@ -1368,11 +1385,11 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         msg=f"last_probed_tip_size {last_probed_tip_size}",
     )
     #开启针管防撞
-    
-    if not ctx.is_simulating():
-        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[last_probed_tip_size])
-        if "OK" not in impp.raw_response:
-            raise RuntimeError(f"Collision avoidance switch failed to activate.")
+    # fixture_settings
+    # if not ctx.is_simulating():
+    #     impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[last_probed_tip_size])
+    #     if "OK" not in impp.raw_response:
+    #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
 
     # if not ctx.is_simulating:
     #     impp = ""
@@ -1393,10 +1410,10 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         #     impp2 = sync_pipette_by_tip(fixture_settings,ctx, side, tip)
         #     if "OK" not in impp2:
         #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
-        if not ctx.is_simulating():
-            impp2 = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
-            if "OK" not in impp2.raw_response:
-                raise RuntimeError(f"Collision avoidance switch failed to activate.")
+        # if not ctx.is_simulating():
+        #     impp2 = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+        #     if "OK" not in impp2.raw_response:
+        #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
 
         if tip != last_probed_tip_size:
             _configure_tip_count(fixture_settings, 0)

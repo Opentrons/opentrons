@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V2 add"}
+metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -106,7 +106,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.drivers import ImpactProtectionV3
   
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
@@ -179,7 +179,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    ImpactSerial_U:ImpactProtectionV2.ImpactProtectionBase
+    ImpactSerial_U:ImpactProtectionV3.ImpactProtectionBase
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -342,7 +342,7 @@ class FixtureSettings:
         print_info(f"Running on bot {IS_ROBOT}")
         print_info(f"Fast simulate {fast_simulate}")
         #链接防撞工装
-        ImpactSerial = ImpactProtectionV2.BuildImpactProtection(simulate=simulating,ctx=ctx)
+        ImpactSerial = ImpactProtectionV3.BuildImpactProtection(simulate=simulating,ctx=ctx)
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
