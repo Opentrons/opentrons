@@ -2,7 +2,13 @@ import {
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
+  B1_NOZZLE,
+  C1_NOZZLE,
   COLUMN,
+  D1_NOZZLE,
+  E1_NOZZLE,
+  F1_NOZZLE,
+  G1_NOZZLE,
   H1_NOZZLE,
   H12_NOZZLE,
   PARTIAL,
@@ -27,6 +33,11 @@ export const partialNozzleMap: Record<PartialPrimaryNozzles, number> = {
   D1: 5,
   C1: 6,
   B1: 7,
+}
+function isPartialPrimaryNozzle(
+  nozzle: string
+): nozzle is PartialPrimaryNozzles {
+  return nozzle in partialNozzleMap
 }
 
 export const getAvailableNozzleConfigurations = (
@@ -108,7 +119,18 @@ export const getAvailablePrimaryNozzles = (
       COLUMN: [A1_NOZZLE, A12_NOZZLE],
       ALL: [A1_NOZZLE],
     },
-    8: { SINGLE: [A1_NOZZLE, H1_NOZZLE], ALL: [A1_NOZZLE] },
+    8: {
+      SINGLE: [A1_NOZZLE, H1_NOZZLE],
+      ALL: [A1_NOZZLE],
+      PARTIAL: [
+        B1_NOZZLE,
+        C1_NOZZLE,
+        D1_NOZZLE,
+        E1_NOZZLE,
+        G1_NOZZLE,
+        F1_NOZZLE,
+      ],
+    },
     1: { ALL: [A1_NOZZLE] },
   }
   const filteredAllowedNozzles =
@@ -146,33 +168,51 @@ export const getNozzleText = (
   return nozzleTextMapping[nozzleConfiguration](primaryNozzle) ?? null
 }
 
-export function getEntireLabwareRowOrColumn(
+export const getEntireWellSelection = (
   wellName: string,
   labwareDef: LabwareDefinition,
-  nozzleConfiguration: NozzleConfigurationStyle
-): string[] {
-  const wellOrdering = labwareDef.ordering
-  if (nozzleConfiguration === SINGLE) {
-    return [wellName]
-  }
-  let columnIndex = -1
-  let rowIndex = -1
-  for (let c = 0; c < wellOrdering.length; c++) {
-    const r = wellOrdering[c].indexOf(wellName)
-    if (r !== -1) {
-      columnIndex = c
-      rowIndex = r
-      break
+  nozzleConfiguration: NozzleConfigurationStyle,
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+): string[] => {
+  if (nozzleConfiguration === SINGLE) return [wellName]
+  const { ordering } = labwareDef
+  const columnIndex = ordering.findIndex(column => column.includes(wellName))
+  if (columnIndex === -1) return []
+  const rowIndex = ordering[columnIndex].indexOf(wellName)
+  switch (nozzleConfiguration) {
+    case COLUMN:
+      return ordering[columnIndex]
+    case ROW:
+      return ordering.map(column => column[rowIndex])
+    case PARTIAL: {
+      if (!isPartialPrimaryNozzle(primaryNozzle)) return []
+
+      const column = ordering[columnIndex]
+      const count = partialNozzleMap[primaryNozzle]
+      const remainingWells = column.length - rowIndex
+      const isSingleRowLabware = column.length === 1
+
+      if (!isSingleRowLabware && remainingWells < count) {
+        console.warn(
+          `Partial nozzle selection blocked. ` +
+            `Requested ${count} wells but only ${remainingWells} ` +
+            `available starting at row ${rowIndex}.`
+        )
+        return []
+      }
+
+      const end = rowIndex + count
+
+      if (isSingleRowLabware && end > column.length) {
+        console.warn(
+          `Partial nozzle selection truncated for single-row labware. ` +
+            `Requested ${count} wells but column only has ${column.length}.`
+        )
+      }
+
+      return column.slice(rowIndex, Math.min(end, column.length))
     }
+    default:
+      return []
   }
-  if (columnIndex === -1 || rowIndex === -1) {
-    return []
-  }
-  if (nozzleConfiguration === COLUMN) {
-    return wellOrdering[columnIndex]
-  }
-  if (nozzleConfiguration === ROW) {
-    return wellOrdering.map(column => column[rowIndex])
-  }
-  return []
 }

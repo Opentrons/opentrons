@@ -32,7 +32,7 @@ import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShado
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
-import { getEntireLabwareRowOrColumn } from './utils'
+import { getEntireWellSelection } from './utils'
 
 import type { WellMouseEvent, WellType } from '@opentrons/components'
 import type {
@@ -108,10 +108,11 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   const handleClickWell = (wellName: string): void => {
-    const wellsToToggle = getEntireLabwareRowOrColumn(
+    const wellsToToggle = getEntireWellSelection(
       wellName,
       labwareDef,
-      nozzleConfiguration
+      nozzleConfiguration,
+      primaryNozzle
     )
     setSelectedWells(prev => {
       const next = new Set(prev)
