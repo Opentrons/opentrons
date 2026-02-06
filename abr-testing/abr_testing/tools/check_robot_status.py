@@ -1,5 +1,7 @@
 """Check Robot(s) Current State."""
 import json
+from collections import deque
+
 import requests
 from abr_testing.automation import slack
 import configparser
@@ -32,6 +34,7 @@ def get_current_run_details_from_robot(
     running_robots: List[str],
     completed_robots: List[str],
     on_robot: bool = False,
+    past_run_status: deque = deque(),
 ) -> Tuple[List[str], List[str]]:
     """Get current run from robot."""
     # if it's being run on the robot, do not print to terminal
@@ -54,18 +57,32 @@ def get_current_run_details_from_robot(
                         print_terminal, f"Run Status of {robot_name}: {run_status}"
                     )
                     message = f"⚠️ {robot_name} is in error recovery mode ⚠️"
-                    slack_bot.send_slack_message(message)
-                    completed_robots.append(robot_name)
+
+                    # Check most recent run status isn't the same as current before slack update
+                    if on_robot:
+                        past_run_status_list: list = list(past_run_status)
+
+                        if (len(past_run_status_list) == 0) or not (
+                            past_run_status_list[-1] == run_status
+                        ):
+                            slack_bot.send_slack_message(message)
+                    else:
+                        slack_bot.send_slack_message(message)
+                        completed_robots.append(robot_name)
+
+                    past_run_status.append(run_status)
             elif run_status == "running":
                 _enable_print_to_terminal(
                     print_terminal, f"Run Status of {robot_name}: {run_status}"
                 )
                 running_robots.append(robot_name)
+                past_run_status.append(run_status)
             else:
                 _enable_print_to_terminal(
                     print_terminal, f"Run Status of {robot_name}: {run_status}"
                 )
                 completed_robots.append(robot_name)
+                past_run_status.append(run_status)
         else:
             _enable_print_to_terminal(print_terminal, f"No run active on {robot_name}")
             completed_at = most_recent_run["completedAt"]
