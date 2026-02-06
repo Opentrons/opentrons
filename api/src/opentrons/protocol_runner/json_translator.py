@@ -273,6 +273,12 @@ class JsonTranslator:
             commands_list.append(translated_obj)
         return commands_list
 
+    # Schema v8 JSON protocols introduced the first version (schema v1) of command annotations which were
+    # only specified in a top level field in the JSON protocol file.
+    # We now use Schema v2 command annotations which have a different shape and are listed in the engine commands,
+    # on top of being listed at the top level of the JSON protocol file.
+    # So we fetch the old command annotations from a schema v8 file, send them to the engine to generate annotation IDs,
+    # and then add the annotation IDs to the engine commands as part of the translation process.
     def _translate_v8_commands(
         self,
         protocol: ProtocolSchemaV8,

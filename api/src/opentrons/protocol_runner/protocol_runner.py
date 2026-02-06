@@ -62,7 +62,9 @@ class RunResult(NamedTuple):
     commands: List[Command]
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
-    command_annotations: List[CommandAnnotation]  # TODO: remove this?
+    command_annotations: List[
+        CommandAnnotation
+    ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -357,13 +359,16 @@ class JsonRunner(AbstractRunner):
 
         # In JSON V8 protocols, command annotations were external to commands.
         # Now that annotations are embedded in commands, we need to insert them into the engine,
-        # and add them to command params.
+        # and add them to the relevant commands.
         _legacy_command_annotations: List[
             CommandAnnotation
         ] = await anyio.to_thread.run_sync(
             self._json_translator.translate_legacy_command_annotations,
             protocol,
         )
+        # The legacy annotations were linked to commands using command keys.
+        # So we create a mapping from command keys to the newly generated annotation IDs
+        # and then insert the annotations into the corresponding commands during the command translation process.
         command_keys_to_annotation_ids: Dict[str, List[str]] = {}
         for annotation in _legacy_command_annotations:
             if isinstance(annotation, CustomCommandAnnotationLegacy):
@@ -375,7 +380,7 @@ class JsonRunner(AbstractRunner):
             annotation_id = self._protocol_engine.create_user_command_annotation(
                 annotation_name=annotation_name,
                 annotation_id=None,
-                description="legacy command annotation",
+                description="Legacy command annotation",
                 params=params,
             )
             for cmd_key in annotation.commandKeys:
@@ -445,7 +450,7 @@ class JsonRunner(AbstractRunner):
             commands=commands,
             state_summary=run_data,
             parameters=[],
-            command_annotations=self._command_annotations,  # TODO: remove this?
+            command_annotations=self._command_annotations,
             command_preconditions=preconditions,
         )
 

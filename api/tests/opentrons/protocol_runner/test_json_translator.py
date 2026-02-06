@@ -870,10 +870,10 @@ def test_load_liquid(
     ]
 
 
-def test_v8_command_annotations_get_uploaded_to_engine_commands(
+def test_v8_command_annotations_get_added_to_engine_commands(
     subject: JsonTranslator,
 ) -> None:
-    """It should update d legacy command annotations and ."""
+    """It should add the legacy command annotations to the engine commands during command translation."""
     test_v8_command = protocol_schema_v8.Command.model_construct(
         commandType="loadLabware",
         params={
