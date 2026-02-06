@@ -228,6 +228,7 @@ class LabwareCore(AbstractLabware[WellCore]):
             name=well_name,
             labware_id=self._labware_id,
             engine_client=self._engine_client,
+            protocol_core=self._protocol_core,
         )
 
     def get_deck_slot(self) -> Optional[DeckSlotName]:

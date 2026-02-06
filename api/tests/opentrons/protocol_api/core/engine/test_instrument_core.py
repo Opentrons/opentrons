@@ -337,6 +337,7 @@ def test_move_to_well(
         name="well-name",
         labware_id="labware-id",
         engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -466,6 +467,7 @@ def test_pick_up_tip(
         name="well-name",
         labware_id="labware-id",
         engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -546,6 +548,7 @@ def test_drop_tip_no_location(
         name="well-name",
         labware_id="labware-id",
         engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     decoy.when(mock_engine_client.state.pipettes.get_channels("abc123")).then_return(8)
 
@@ -592,6 +595,7 @@ def test_drop_tip_with_location(
         name="well-name",
         labware_id="labware-id",
         engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -726,7 +730,10 @@ def test_aspirate_from_well(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -838,7 +845,10 @@ def test_aspirate_from_meniscus(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -945,7 +955,10 @@ def test_blow_out_to_well(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(
@@ -1104,7 +1117,10 @@ def test_dispense_to_well(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
@@ -1629,7 +1645,10 @@ def test_touch_tip(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
     subject.touch_tip(
@@ -1679,7 +1698,10 @@ def test_touch_tip_with_mm_from_edge(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     subject.touch_tip(
         location=location,
@@ -1729,7 +1751,10 @@ def test_touch_tip_raises_with_radius_and_mm_from_edge(
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     with pytest.raises(ValueError):
         subject.touch_tip(
@@ -1938,7 +1963,10 @@ def test_detect_liquid_presence(
 ) -> None:
     """It should convert a height result from the engine to True/False."""
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
@@ -1969,11 +1997,15 @@ def test_detect_liquid_presence(
 def test_liquid_probe_without_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should raise an exception on an empty well and return a float on a valid well."""
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
@@ -2001,7 +2033,10 @@ def test_liquid_probe_without_recovery_unsafe(
 ) -> None:
     """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     decoy.when(
         pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]
@@ -2046,11 +2081,15 @@ def test_liquid_probe_without_recovery_unsafe(
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should not raise an exception on an empty well."""
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     loc = Location(Point(0, 0, 0), None)
     subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
@@ -2077,7 +2116,10 @@ def test_liquid_probe_with_recovery_unsafe(
 ) -> None:
     """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
     well_core = WellCore(
-        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+        name="my cool well",
+        labware_id="123abc",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     decoy.when(
         pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]

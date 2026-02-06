@@ -370,7 +370,10 @@ def test_get_uri(
 
 
 def test_get_next_tip(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: LabwareCore,
 ) -> None:
     """It should get the next available tip from the core."""
     decoy.when(
@@ -383,7 +386,10 @@ def test_get_next_tip(
     ).then_return("A2")
 
     starting_tip = WellCore(
-        name="B1", labware_id="cool-labware", engine_client=mock_engine_client
+        name="B1",
+        labware_id="cool-labware",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     result = subject.get_next_tip(
         num_tips=8, starting_tip=starting_tip, nozzle_map=None
