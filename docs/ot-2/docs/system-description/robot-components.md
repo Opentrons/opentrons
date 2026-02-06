@@ -22,9 +22,9 @@ Attached to the frame is the gantry, which is the robot's movement and positioni
 
 ![Gantry with labeled features](../images/gantry.png)
 
-The gantry moves separately along the x- and y-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm.
+The gantry moves separately along the x- and y-axis to position the pipettes at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm.
 
-In turn, the pipette carriage is attached to the gantry. The pipette carriage holds mounting points for single- and multi-channel pipettes. The mounting points move along the z-axis to position pipettes at precise locations for protocol execution.
+In turn, the pipette carriage is attached to the gantry. The pipette carriage holds mounting points for single-channel and multi-channel pipettes. The mounting points move along the z-axis to position pipettes at precise locations for protocol execution.
 
 The electronics in the gantry provide power and communications to attached pipettes.
 
@@ -39,6 +39,9 @@ The working area is the physical space on and above the deck that is accessible 
 The OT-2 deck slides in and out of the enclosure. You can pull it out part way, or remove it completely, for cleaning.
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
+
+!!! Note
+    Run a <font color="red">deck calibration</font> if you slide the deck out and replace it.
 
 ## Other connections
 
@@ -86,7 +89,7 @@ The following table lists and describes these status lights.
     <tr>
       <td><img src="../../images/ot2-other.png" alt="not yet implemented" width="50%"></td>
       <td>&mdash;</td>
-      <td>Reserved for future use.</td>
+      <td>Not used.</td>
     </tr>
   </tbody>
 </table>

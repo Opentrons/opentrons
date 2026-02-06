@@ -11,6 +11,4 @@ title: "Opentrons OT-2 Instruction Manual"
 ![OT-2 rendered cover image](images/OT2-render-HERO.png)
 
 **Opentrons Labworks Inc.**<br>
-Month Year
-
-<!-- test, remove -->
+February 2026
