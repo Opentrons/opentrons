@@ -289,6 +289,165 @@ const getWellPosition = (
 }
 
 //  util to use in step-generation for if the pipette movement is safe
+export const getIsSafePipetteMovementForAllWells = (args: {
+  robotState: RobotState
+  invariantContext: InvariantContext
+  pipetteId: string
+  labwareId: string
+  wellLocationOffset?: Point
+  wellTargetNames: string[]
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration?: NozzleConfigurationStyle
+}): boolean => {
+  const {
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset = { x: 0, y: 0, z: 0 },
+    wellTargetNames,
+    primaryNozzle,
+    nozzleConfiguration: nozzleConfigurationOverride,
+  } = args
+
+  const {
+    pipetteEntities,
+    labwareEntities,
+    stagingAreaEntities,
+    moduleEntities,
+  } = invariantContext
+  const { labware: labwareState, tipState } = robotState
+
+  const pipetteEntity = pipetteEntities[pipetteId]
+  const nozzleConfiguration =
+    nozzleConfigurationOverride ?? robotState.pipettes[pipetteId]?.nozzles
+  const { spec: pipetteSpecs } = pipetteEntity ?? {}
+
+  const displayCategory = pipetteSpecs?.displayCategory
+  const isFlexPipette = displayCategory === 'FLEX'
+  const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const deckDefinition = getDeckDefFromRobotType(robotType)
+
+  // early exit cases
+  if (
+    labwareEntities[labwareId] == null ||
+    nozzleConfiguration == null ||
+    nozzleConfiguration === ALL ||
+    wellTargetNames.length === 0
+  ) {
+    return true
+  }
+
+  const tiprackId = tipState.pipettes[pipetteId]?.tiprackURI
+  const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
+  const tiprackTipLength = tiprackEntity?.def.parameters.tipLength ?? 0
+
+  const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
+  const tipLength = pipetteHasTip ? tiprackTipLength : 0
+
+  const stagingAreaSlots = Object.values(stagingAreaEntities).map(
+    stagingArea => stagingArea.location as string
+  )
+
+  const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
+  const addressableAreaOffset = getPositionFromSlotId(
+    labwareSlot,
+    deckDefinition
+  ) ?? [0, 0, 0]
+
+  const isOnFlexThermocycler =
+    robotType === FLEX_ROBOT_TYPE &&
+    labwareState[labwareId].stack.some(
+      item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
+    )
+
+  const thermocyclerOffset = isOnFlexThermocycler
+    ? (deckDefinition.locations.addressableAreas.find(
+        area => area.id === THERMOCYCLER_MODULE_V2
+      )?.offsetFromCutoutFixture ?? [0, 0, 0])
+    : [0, 0, 0]
+
+  const fullOffset: CoordinateTuple = [
+    thermocyclerOffset[0] + addressableAreaOffset[0],
+    thermocyclerOffset[1] + addressableAreaOffset[1],
+    thermocyclerOffset[2] + addressableAreaOffset[2],
+  ]
+
+  const { channels } = pipetteEntity.spec
+  const confirmedPrimaryNozzle =
+    nozzleConfiguration === PARTIAL
+      ? A1_NOZZLE
+      : (primaryNozzle ??
+        getDefaultPrimaryNozzle({
+          nozzles: nozzleConfiguration,
+          channels,
+        }))
+
+  const tipOverlapOnNozzle =
+    tiprackEntity != null
+      ? getTipOverlap({
+          pipetteSpecs,
+          tiprackUri: tiprackEntity.labwareDefURI,
+          nozzles: nozzleConfiguration,
+        })
+      : 0
+
+  const surroundingSlots =
+    robotType === OT2_ROBOT_TYPE
+      ? getOt2SurroundingSlots(labwareSlot as OT2AddressableAreaName)
+      : getFlexSurroundingSlots(labwareSlot, stagingAreaSlots)
+
+  const slotInfos: SlotInfo[] = surroundingSlots.map(slot => ({
+    addressableArea: getAddressableAreaFromSlotId(slot, deckDefinition),
+    position: getPositionFromSlotId(slot, deckDefinition),
+  }))
+
+  // 🔑 all wells must be safe
+  return wellTargetNames.every(wellName => {
+    const wellTargetPoint = getWellPosition(
+      labwareEntities[labwareId],
+      wellName,
+      wellLocationOffset,
+      fullOffset,
+      pipetteHasTip
+    )
+
+    const pipetteBounds = getPipetteBoundsAtSpecifiedMoveToPosition(
+      pipetteEntity,
+      tipLength,
+      wellTargetPoint,
+      confirmedPrimaryNozzle,
+      tipOverlapOnNozzle
+    )
+
+    const isWithinExtents = getIsMovementWithinDeckExtents({
+      channels,
+      boundingBox: pipetteBounds,
+      robotType,
+    })
+
+    if (!isWithinExtents) return false
+
+    if (getWillCollideWithThermocyclerLid(pipetteBounds, moduleEntities)) {
+      return false
+    }
+
+    if (
+      getSlotHasPotentialCollidingObject(
+        pipetteBounds,
+        slotInfos,
+        robotState,
+        invariantContext,
+        robotType
+      )
+    ) {
+      return false
+    }
+
+    return true
+  })
+}
+
 export const getIsSafePipetteMovement = (args: {
   robotState: RobotState
   invariantContext: InvariantContext

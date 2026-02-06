@@ -233,7 +233,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           acc[wellName] = SELECTED_ERROR
         } else if (!isAccessible) {
           acc[wellName] = INACCESSIBLE
-        } else if (selectedWells.has(wellName)) {
+        } else if (selectedWells.has(wellName) || hoveredWell === wellName) {
           acc[wellName] = SELECTED
         } else {
           acc[wellName] = UNSELECTED
@@ -294,10 +294,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
         <div className={styles.well_legend_box}>
-          <SelectionLegend
-            labwareDefinition={labwareDef}
-            size={DEFAULT_TIP_SIZE}
-          />
+          <SelectionLegend selectionType={'well'} size={DEFAULT_TIP_SIZE} />
         </div>
       </div>
     </div>
