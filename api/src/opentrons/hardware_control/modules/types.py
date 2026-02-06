@@ -269,7 +269,8 @@ class FlexStackerModuleModel(StrEnum):
 
 
 class VacuumModuleModel(StrEnum):
-    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
+    VACUUM_MODULE_MILLIPORE_V1 = "vacuumModuleMilliporeV1"
+    VACUUM_MODULE_OPENTRONS_V1 = "vacuumModuleOpentronsV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

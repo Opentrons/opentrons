@@ -412,7 +412,8 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
     "absorbanceReaderV1": AbsorbanceReaderModel.ABSORBANCE_READER_V1,
     "flexStackerModuleV1": FlexStackerModuleModel.FLEX_STACKER_V1,
-    "vacuumModuleMilliporeV1": VacuumModuleModel.VACUUM_MODULE_V1,
+    "vacuumModuleMilliporeV1": VacuumModuleModel.VACUUM_MODULE_MILLIPORE_V1,
+    "vacuumModuleOpentronsV1": VacuumModuleModel.VACUUM_MODULE_OPENTRONS_V1,
 }
 
 

@@ -243,7 +243,6 @@ def _map_labware(
     labware_id: str,
 ) -> Optional[
     Tuple[Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem]
-
 ]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
     if isinstance(location_from_engine, AddressableAreaLocation):

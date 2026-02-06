@@ -167,8 +167,7 @@ class VacuumModule(mod_abc.AbstractModule):
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
-        # TODO: This needs to be addressed
-        return "vacuumModuleMilliporeV1"
+        return "vacuumModuleV1"
 
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
