@@ -18,7 +18,13 @@ import {
   useModulesQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
+import {
+  getPipetteModelSpecs,
+  LEFT,
+  RIGHT,
+  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
@@ -37,9 +43,38 @@ import type {
   BadPipette,
   GripperData,
   PipetteData,
+  VacuumModule,
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
+
+// stubbed vacuum module for testing
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const STUBBED_ATTACHED_VACUUM_MODULE: VacuumModule = {
+  moduleType: VACUUM_MODULE_TYPE,
+  moduleModel: VACUUM_MODULE_MILLIPORE_V1,
+  serialNumber: 'stub-vacuum-serial',
+  id: 'stub-vacuum-id',
+  hardwareRevision: 'stub-hardware-revision',
+  firmwareVersion: 'stub-firmware-version',
+  hasAvailableUpdate: false,
+  usbPort: {
+    port: 0,
+    path: '',
+    hub: false,
+    portGroup: 'unknown',
+  },
+  data: {
+    currentPressure: 10,
+    targetPressure: 100,
+    currentPower: 10,
+    targetPower: 100,
+    modeType: 'pressure',
+    ventStatus: 'open',
+    status: 'ramping',
+  },
+}
+
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
@@ -116,7 +151,10 @@ export function InstrumentsAndModules({
   const halfAttachedModulesSize = isFlex
     ? Math.floor(attachedModules?.length / 2)
     : Math.ceil(attachedModules?.length / 2)
-  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const leftColumnModules = [
+    ...attachedModules?.slice(0, halfAttachedModulesSize),
+    // STUBBED_ATTACHED_VACUUM_MODULE,
+  ]
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return (

@@ -13,7 +13,11 @@ import thermoModuleGen1Opened from '/app/assets/images/thermocycler_open_transpa
 import { updateModule } from '/app/redux/modules'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { ChipType } from '@opentrons/components'
+import type {
+  AttachedModule,
+  VacuumModuleStatus,
+} from '/app/redux/modules/types'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   switch (attachedModule.moduleModel) {
@@ -98,4 +102,14 @@ export function useModuleApiRequests(): [
   )
 
   return [getLatestRequestId, handleModuleApiRequests]
+}
+
+export const getPumpStatusProps = (
+  t: any,
+  status: VacuumModuleStatus
+): { text: string; type: ChipType } => {
+  if (status === 'idle') {
+    return { text: t('pump_idle'), type: 'neutral' }
+  }
+  return { text: t('pump_engaged'), type: 'info' }
 }

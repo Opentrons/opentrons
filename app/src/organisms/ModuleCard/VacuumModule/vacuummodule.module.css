@@ -1,0 +1,60 @@
+.vacuum_module_slideout_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.vacuum_module_slideout_mode_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-16);
+}
+
+.vacuum_module_slideout_mode_title_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.vacuum_module_slideout_mode_tooltip_icon_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.vacuum_module_slideout_mode_radio_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.vacuum_module_slideout_pressure_power_input_container {
+  display: flex;
+  padding: 0 var(--spacing-16);
+}
+
+.vacuum_module_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.vacuum_pump_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.vacuum_pressure_power_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.vacuum_vent_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
