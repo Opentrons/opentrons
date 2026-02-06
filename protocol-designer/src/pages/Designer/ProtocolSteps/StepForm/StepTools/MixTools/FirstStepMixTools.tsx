@@ -65,7 +65,7 @@ export function FirstStepMixTools({
                 pipettes[String(propsForFields.pipette.value)]?.spec
               }
               propsForFields={propsForFields}
-              stepType="mix"
+              stepType={formData.stepName}
             />
           </>
         ) : (

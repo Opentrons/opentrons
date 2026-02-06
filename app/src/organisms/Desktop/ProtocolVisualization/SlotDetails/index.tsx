@@ -13,11 +13,7 @@ import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
 import styles from './slotdetails.module.css'
 
-import type {
-  Liquid,
-  ProtocolAnalysisOutput,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { Liquid, ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type {
   HopperLocationMapKey,
   InvariantContext,
@@ -26,22 +22,19 @@ import type {
 
 interface SlotDetailsProps {
   slotId: string
-  command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
 export function SlotDetails(props: SlotDetailsProps): JSX.Element {
-  const { slotId, command, robotState, invariantContext, analysis, liquids } =
-    props
+  const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
     trashBinEntities,
     wasteChuteEntities,
     moduleEntities,
-    pipetteEntities,
   } = invariantContext
   const { commands } = analysis
   const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
@@ -98,10 +91,8 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             topLabwareOnSlotId={topMostLabwareOnSlot}
             labwareEntities={labwareEntities}
             commands={commands}
-            currentCommand={command}
             liquids={liquids}
             robotState={robotState}
-            pipetteEntities={pipetteEntities}
             moduleEntities={moduleEntities}
           />
         )
@@ -126,6 +117,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
               moduleId={moduleOnSlot[0]}
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
+              slotId={slotId}
             />
           ) : null}
         </div>

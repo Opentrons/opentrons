@@ -8,15 +8,11 @@ import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
 
-import type {
-  NozzleConfigurationStyle,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
-  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
@@ -42,10 +38,8 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labwareId = getLabwareId()
   const controls: JSX.Element = <></>
   const labware = deckSetup.labware[labwareId]
-
   const displayName = labware.def.metadata.displayName
   const deckDef = getDeckDefFromRobotType(robotType)
-
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
   const getWellSelectionText = (): JSX.Element => {
@@ -86,10 +80,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         )
     }
   }
+
   return (
     <div className={styles.column_wrapper}>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
-
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
         <div className={styles.well_legend_box}>

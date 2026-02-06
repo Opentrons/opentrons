@@ -115,7 +115,7 @@ export function FirstStepMoveLiquidTools({
                 pipettes[String(propsForFields.pipette.value)]?.spec
               }
               propsForFields={propsForFields}
-              stepType="transfer"
+              stepType={formData.stepName}
             />
             <Divider marginY="0" />
 
