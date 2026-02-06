@@ -26,7 +26,8 @@ class FlexStackerPage(BasePage):
         """
         self._stacker_select(stacker)
 
-        self.page.get_by_text("RefillManually fill the").click()
+        #Locator for Refill uses text from Refill description
+        self.page.get_by_text("Manually fill the stacker with more labware").click()
         spinbutton = self.page.get_by_role("spinbutton")
         spinbutton.fill(str(refill_num))
 
@@ -39,7 +40,9 @@ class FlexStackerPage(BasePage):
             message: optionally write a message to display
         """
         self._stacker_select(stacker)
-        self.page.get_by_text("EmptyManually empty all").click()
+
+        #Locator for Empty uses text from Empty description
+        self.page.get_by_text("Manually empty all labware from the stacker").click()
         self._message_box(message)
 
     def retrieve_stacker(self, stacker: str) -> None:
@@ -48,7 +51,8 @@ class FlexStackerPage(BasePage):
             stacker: select stacker from available list. e.g.,  "D4 Flex Stacker"
         """
         self._stacker_select(stacker)
-        self.page.get_by_text("RetrieveRetrieve labware from").click()
+        #Locator for Retrieve uses text from Retrieve description
+        self.page.get_by_text("Retrieve labware from the stacker onto the shuttle").click()
 
     def store_stacker(self, stacker: str) -> None:
         """
@@ -56,4 +60,6 @@ class FlexStackerPage(BasePage):
             stacker: select stacker from available list. e.g.,  "D4 Flex Stacker"
         """
         self._stacker_select(stacker)
-        self.page.get_by_text("StoreStore labware currently").click()
+
+        #Locator for Store uses text from Store description
+        self.page.get_by_text("Store labware currently on the shuttle into the stacker").click()
