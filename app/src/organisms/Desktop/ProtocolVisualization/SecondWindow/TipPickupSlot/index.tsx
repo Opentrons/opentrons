@@ -51,8 +51,11 @@ export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
     <div className={styles.container}>
       <div className={styles.header}>
         <RobotInfoLabel deckLabel={slot} />
+        {nickName != null ? (
+          <StyledText desktopStyle="captionSemiBold">{nickName}</StyledText>
+        ) : null}
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {nickName ?? def.metadata.displayName}
+          {def.metadata.displayName}
         </StyledText>
       </div>
       <div className={styles.main_content}>
