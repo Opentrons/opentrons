@@ -10,12 +10,26 @@ class FlexStackerPage(BasePage):
         super().__init__(page)
 
     def _stacker_select(self, stacker: str) -> None:
+        """Helper function to select stacker from dropdown menu of available stacker modules.
+        
+        Args:
+            stacker: select stacker from available list. e.g., "D4 Flex Stacker"
+        """ 
         self.page.get_by_test_id("moduleId_dropdownMenu").click()
         self.page.get_by_role("button", name=stacker).click()
 
     def _message_box(self, message: str) -> None:
+        """Helper function to display a message box during stacker refill/empty.
+        User can issue either command and as it executes it causes a pause and the 
+        message box appears with the inserted message
+
+        
+        Args:
+            message: message to display in message box
+        """
+
         self.page.get_by_test_id("TextAreaField").click()
-        self.page.get_by_test_id("TextAreaField").fill("message box")
+        self.page.get_by_test_id("TextAreaField").fill(message)
 
     def refill_stacker(self, stacker: str, refill_num: int, message: str) -> None:
         """
