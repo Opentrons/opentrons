@@ -35,7 +35,14 @@ import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
 import { getEntireWellSelection } from './utils'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { WellMouseEvent, WellType } from '@opentrons/components'
+import type {
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
@@ -92,8 +99,14 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
-  const displayName = labware.def.metadata.displayName
+  const labwareDef = labware.def
+  const displayName = labwareDef.metadata.displayName
+
   const deckDef = getDeckDefFromRobotType(robotType)
+  const slot = getSlotInLocationStack(labware.stack)
+  const slotPosition = getPositionFromSlotId(slot, deckDef)
+
+  const allWells = labwareDef.ordering.flat()
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
   const getWellsField = (): FieldProps | null => {
     switch (stepType) {
@@ -172,6 +185,131 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           </StyledText>
         )
     }
+  }
+  const handleHoverWell = (e: WellMouseEvent): void => {
+    const { wellName } = e
+    let transformedWellName = wellName
+    if (
+      (channels === 8 && nozzleConfiguration === ALL) ||
+      (channels === 96 && nozzleConfiguration === COLUMN)
+    ) {
+      const column = wellName.slice(1, wellName.length)
+      transformedWellName = `A${column}`
+    } else if (channels === 96 && nozzleConfiguration === ALL) {
+      transformedWellName = 'A1'
+    }
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+      leaveTimeoutRef.current = null
+    }
+    const transformedWellNames: Set<string> = new Set(
+      getEntireWellSelection(
+        wellName,
+        labwareDef,
+        nozzleConfiguration,
+        primaryNozzle
+      )
+    )
+    setHoveredWells(transformedWellNames)
+    currentHoveredWellRef.current = transformedWellName
+  }
+
+  let controls: JSX.Element = <></>
+
+  if (slotPosition == null || labwareId == null || labware == null) {
+    console.warn(`no slot position for selected tiprack ${labwareId}`)
+  } else if (robotState === null) {
+    console.warn('no robot state so unable to determine well accessibility')
+  } else {
+    const allWellsWithStatus = allWells.reduce<Record<string, number>>(
+      (acc, key) => {
+        acc[key] = getIsSafePipetteMovement({
+          robotState,
+          invariantContext,
+          pipetteId,
+          labwareId,
+          wellTargetName: key,
+          primaryNozzle,
+          nozzleConfiguration,
+        })
+          ? 0
+          : 1
+        return acc
+      },
+      {}
+    )
+
+    const allWellsWithState = allWells.reduce<Record<string, WellType>>(
+      (acc, wellName) => {
+        const wellsToUpdate = getEntireWellSelection(
+          wellName,
+          labwareDef,
+          nozzleConfiguration,
+          primaryNozzle
+        )
+        const isGroupAccessible = wellsToUpdate.every(
+          w => allWellsWithStatus[w] === 0
+        )
+        wellsToUpdate.forEach(w => {
+          if (hoveredWells.has(w) && !isGroupAccessible) {
+            acc[w] = SELECTED_ERROR
+          } else if (!isGroupAccessible) {
+            acc[w] = INACCESSIBLE
+          } else if (selectedWells.has(w) || hoveredWells.has(w)) {
+            acc[w] = SELECTED
+          } else {
+            acc[w] = UNSELECTED
+          }
+        })
+
+        return acc
+      },
+      {}
+    )
+
+    const selectedWellNames = getSelectedWells(stepType)
+    const hoveredIsSelected = [...hoveredWells].every(w =>
+      selectedWellNames.has(w)
+    )
+
+    controls = (
+      <>
+        <DeckOverlay deckDef={deckDef} />
+        <LabwareOnDeck
+          labwareOnDeck={labware}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          showHighlightedWells={false}
+          handleClickWell={handleClickWell}
+          onMouseEnterWell={handleHoverWell}
+          selectedTipsByIndex={allWellsWithStatus}
+          {...{ statusByWellName: allWellsWithState }}
+          fill={COLORS.white}
+          inWellSelectionModal={true}
+          ignoreMissingTips
+        />
+        {[...hoveredWells][0] != null ? (
+          <PipetteShadow
+            robotType={robotType}
+            pipetteSpec={pipetteSpecs}
+            slotPosition={slotPosition}
+            hoveredWell={[...hoveredWells][0]}
+            selectedLabwareId={labwareId}
+            labwareState={deckSetup.labware}
+            hasPickupsRemaining={null}
+            isHoveredWellSelected={hoveredIsSelected}
+            isAccessible={
+              allWellsWithState[[...hoveredWells][0]] !== INACCESSIBLE &&
+              allWellsWithState[[...hoveredWells][0]] !== SELECTED_ERROR
+            }
+            inaccessibleReason={INACCESSIBLE_COLLISION}
+            primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
+            nozzles={nozzleConfiguration}
+          />
+        ) : null}
+      </>
+    )
   }
 
   return (
