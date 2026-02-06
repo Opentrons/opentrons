@@ -7,6 +7,7 @@ import {
   DEFAULT_TIP_SIZE,
   INACCESSIBLE,
   SELECTED,
+  SELECTED_ERROR,
   StyledText,
   UNSELECTED,
 } from '@opentrons/components'
@@ -228,7 +229,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           primaryNozzle,
           nozzleConfiguration,
         })
-        if (!isAccessible) {
+        if (hoveredWell === wellName && !isAccessible) {
+          acc[wellName] = SELECTED_ERROR
+        } else if (!isAccessible) {
           acc[wellName] = INACCESSIBLE
         } else if (selectedWells.has(wellName)) {
           acc[wellName] = SELECTED
@@ -271,7 +274,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             isHoveredWellSelected={selectedWellNames.some(
               well => well === hoveredWell
             )}
-            isAccessible={allWellsWithState[hoveredWell] !== INACCESSIBLE}
+            isAccessible={
+              allWellsWithState[hoveredWell] !== INACCESSIBLE &&
+              allWellsWithState[hoveredWell] !== SELECTED_ERROR
+            }
             inaccessibleReason={INACCESSIBLE_COLLISION}
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}

@@ -1,4 +1,4 @@
-import { INACCESSIBLE, SELECTED } from '../Tips/constants'
+import { INACCESSIBLE, SELECTED, SELECTED_ERROR } from '../Tips/constants'
 import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'
 import { EmptyWell } from './EmptyWell'
@@ -33,6 +33,16 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
           labwareDefinition={labwareDefinition}
           isSelected={false}
           showStroke={false}
+        />
+      )
+    case SELECTED_ERROR:
+      return (
+        <SelectedWell
+          size={size}
+          labwareDefinition={labwareDefinition}
+          isSelected={false}
+          showStroke={false}
+          isError={true}
         />
       )
   }
