@@ -8,19 +8,24 @@ from fastapi import FastAPI
 
 from server_utils import systemd_utils
 
+from auth_server.oauth2.fastapi_dependencies import init_oauth2_backend
+from auth_server.oauth2.router import router as oauth2_router
+from auth_server.users.router import router as users_router
+
 _log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    init_oauth2_backend(app.state)
     systemd_utils.notify_up()
     yield
 
 
-app = FastAPI(lifespan=_lifespan)
+app = FastAPI(
+    title="Opentrons Auth Server",
+    lifespan=_lifespan,
+)
 
-
-# todo(mm, 2026-01-15): Remove this placeholder when this server has any real endpoint.
-@app.get("/auth/hello")
-def get_hello() -> str:  # noqa: D103
-    return "Hello, world."
+app.include_router(oauth2_router)
+app.include_router(users_router)
