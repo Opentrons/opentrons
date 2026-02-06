@@ -147,7 +147,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         self._engine_client.execute_command(
             cmd.ReloadLabwareParams(
                 labwareId=self._labware_id,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def get_calibrated_offset(self) -> Point:
@@ -181,7 +182,8 @@ class LabwareCore(AbstractLabware[WellCore]):
                     labwareId=self._labware_id,
                     wellNames=list(self._definition.wells),
                     tipWellState=TipRackWellState.CLEAN,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
@@ -193,7 +195,8 @@ class LabwareCore(AbstractLabware[WellCore]):
                     labwareId=self._labware_id,
                     wellNames=list(self._definition.wells),
                     tipWellState=TipRackWellState.EMPTY,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
@@ -249,7 +252,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         self._engine_client.execute_command(
             cmd.LoadLiquidParams(
                 labwareId=self._labware_id, liquidId=liquid._id, volumeByWell=volumes
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def load_empty(self, wells: List[str]) -> None:
@@ -259,7 +263,8 @@ class LabwareCore(AbstractLabware[WellCore]):
                 labwareId=self._labware_id,
                 liquidId="EMPTY",
                 volumeByWell={well: 0.0 for well in wells},
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def get_engine_definition(self) -> LabwareDefinition:

@@ -146,7 +146,8 @@ def test_set_calibration_succeeds_in_ok_location(
         mock_engine_client.execute_command(
             cmd.ReloadLabwareParams(
                 labwareId="cool-labware",
-            )
+            ),
+            command_annotations=[],
         ),
     )
 
@@ -415,7 +416,8 @@ def test_reset_tips(
                 labwareId="cool-labware",
                 wellNames=["A1", "H12"],
                 tipWellState=TipRackWellState.CLEAN,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -464,7 +466,8 @@ def test_set_empty(
                 labwareId="cool-labware",
                 wellNames=["A1", "H12"],
                 tipWellState=TipRackWellState.EMPTY,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -576,7 +579,8 @@ def test_load_liquid(
                 labwareId="cool-labware",
                 liquidId="liquid-id",
                 volumeByWell={"A1": 20, "B1": 30, "C1": 40},
-            )
+            ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -593,6 +597,7 @@ def test_load_empty(
                 labwareId="cool-labware",
                 liquidId="EMPTY",
                 volumeByWell={"A1": 0.0, "B1": 0.0, "C1": 0.0},
-            )
+            ),
+            command_annotations=[],
         )
     )
