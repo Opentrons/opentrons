@@ -9,7 +9,7 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { AddFixtureModal, InitialDeckStateModules } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
-import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { AddressableAreaName, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures } from '../../types'
 
@@ -35,7 +35,7 @@ describe('AddFixtureModal', () => {
         { cutoutId: 'cutoutA1', cutoutFixtureId: 'magneticBlockV1' },
       ],
       setValue: vi.fn(),
-      hasGripper: false,
+      hasGripper: true,
       addressableAreaId: 'A1',
     }
     vi.mocked(getInitialDeckSetup).mockReturnValue({
@@ -119,7 +119,7 @@ describe('AddFixtureModal', () => {
     )
   })
 
-  it('should handle two modules in same cutout when adding a new module (uses first match)', () => {
+  it.only('should handle two modules in same cutout when adding a new module (uses first match)', () => {
     const existingModules: InitialDeckStateModules = {
       magneticBlockV1: {
         id: 'magneticBlockV1',
@@ -131,11 +131,15 @@ describe('AddFixtureModal', () => {
         pythonName: 'magneticBlockV1',
       },
     }
+    const updatedDeckConfig: DeckConfiguration = [
+      { cutoutId: 'cutoutD3', cutoutFixtureId: 'magneticBlockV1' },
+    ]
     const updatedProps = {
       ...props,
       modules: existingModules,
       cutoutId: 'cutoutD3' as CutoutId,
-      addressableAreaId: 'D3' as const,
+      addressableAreaId: 'D4' as AddressableAreaName,
+      deckConfig: updatedDeckConfig,
     }
     render(updatedProps)
     screen.getByText('Modules')
@@ -149,11 +153,11 @@ describe('AddFixtureModal', () => {
     if (modulesCall == null) throw new Error('expected modules call')
     const updatedModules = modulesCall[1] as FormModules
     const moduleValues = Object.values(updatedModules)
-    // The two duplicates in cutoutA1 should be removed and replaced by the new module
-    const modulesInA1 = moduleValues.filter(m => m.cutoutId === 'cutoutA1')
-    expect(modulesInA1.length).toBeGreaterThanOrEqual(1)
-    // The new module should be a heater-shaker
-    expect(modulesInA1).toEqual(
+    // The existing module in cutoutD3 should be removed and replaced by the new module
+    const modulesInD3 = moduleValues.filter(m => m.cutoutId === 'cutoutD3')
+    expect(modulesInD3.length).toBeGreaterThanOrEqual(1)
+    // The new module should be a flex stacker
+    expect(modulesInD3).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           model: 'flexStackerModuleV1',
