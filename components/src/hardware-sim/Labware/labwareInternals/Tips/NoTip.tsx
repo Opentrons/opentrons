@@ -1,6 +1,6 @@
-import { DEFAULT_TIP_SIZE } from '../Tips/constants'
+import { DEFAULT_TIP_SIZE } from './constants'
 
-export function EmptyWell(props: { size?: string }): JSX.Element {
+export function NoTip(props: { size?: string }): JSX.Element {
   const { size } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE

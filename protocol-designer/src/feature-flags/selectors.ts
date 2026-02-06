@@ -47,8 +47,3 @@ export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
 )
-export const getEnableAdditionalPartialTipSelection: Selector<boolean> =
-  createSelector(
-    getFeatureFlagData,
-    flags => flags.OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION ?? false
-  )

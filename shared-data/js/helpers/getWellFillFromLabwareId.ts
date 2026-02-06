@@ -1,17 +1,18 @@
 import { parseLiquidsInLoadOrder } from './parseProtocolCommands'
 
-import type { CSSProperties } from 'react'
 import type { RunTimeCommand } from '../../protocol'
 import type { Liquid } from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
+
+export type WellFill = Record<string, string>
 
 export function getWellFillFromLabwareId(
   labwareId: string,
   liquids: Liquid[],
   labwareByLiquidId: LabwareByLiquidId,
   commands: RunTimeCommand[]
-): Record<string, CSSProperties['fill']> {
-  let labwareWellFill = {}
+): WellFill {
+  let labwareWellFill: WellFill = {}
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(liquids, commands)
   const liquidIds = Object.keys(labwareByLiquidId)
   const labwareInfo = Object.values(labwareByLiquidId)
