@@ -849,7 +849,10 @@ class ProtocolCore(
     def load_robot(self) -> RobotCore:
         """Load a robot core into the RobotContext."""
         return RobotCore(
-            engine_client=self._engine_client, sync_hardware_api=self._sync_hardware
+            engine_client=self._engine_client,
+            protocol_core=self,
+            api_version=self._api_version,
+            sync_hardware_api=self._sync_hardware,
         )
 
     def load_instrument(
