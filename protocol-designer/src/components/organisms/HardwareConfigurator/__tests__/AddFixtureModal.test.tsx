@@ -9,6 +9,8 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
+import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { Fixtures } from '../../types'
 
 vi.mock('/protocol-designer/step-forms/actions')
 vi.mock('/protocol-designer/feature-flags/selectors')
@@ -41,6 +43,7 @@ describe('AddFixtureModal', () => {
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
+    vi.resetAllMocks
   })
 
   it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {
@@ -65,5 +68,48 @@ describe('AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('Add')[1])
     expect(props.setValue).toHaveBeenCalled()
     expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
+  })
+
+  it('should use existing fixture in same cutout when adding a new fixture (one existing)', () => {
+    const existingFixtures: Fixtures = {
+      'existing-id': {
+        cutoutId: 'cutoutD3' as CutoutId,
+        name: 'stagingArea',
+        cutoutFixtureId: 'stagingAreaRightSlot',
+      },
+    }
+    const updatedDeckConfig: DeckConfiguration = [
+      { cutoutId: 'cutoutA1', cutoutFixtureId: 'magneticBlockV1' },
+      { cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaRightSlot' },
+    ]
+    const updatedProps = {
+      ...props,
+      cutoutId: 'cutoutD3' as CutoutId,
+      addressableAreaId: 'D3' as const,
+      deckConfig: updatedDeckConfig,
+      fixtures: existingFixtures,
+    }
+    render(updatedProps)
+    fireEvent.click(screen.getAllByText('Select options')[0])
+    fireEvent.click(screen.getByText('Waste chute'))
+    fireEvent.click(screen.getAllByText('Select options')[0])
+    fireEvent.click(screen.getByText('Waste Chute'))
+    fireEvent.click(screen.getAllByText('Add')[0])
+    expect(props.setValue).toHaveBeenCalled()
+    expect(props.setValue).toHaveBeenCalledWith(
+      'fixtures',
+      expect.objectContaining({
+        stagingAreaSlotWithWasteChuteRightAdapterNoCover: {
+          cutoutFixtureId: 'stagingAreaRightSlot',
+          cutoutId: 'cutoutD3',
+          name: 'stagingArea',
+        },
+        wasteChuteRightAdapterNoCover: {
+          cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
+          cutoutId: 'cutoutD3',
+          name: 'wasteChute',
+        },
+      })
+    )
   })
 })
