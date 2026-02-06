@@ -16,17 +16,18 @@ import { getMissingTips } from '../../utils/getMissingTips'
 import styles from './tippickupslot.module.css'
 
 import type { TipType } from '@opentrons/components'
-import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
+import type { RobotState } from '@opentrons/step-generation'
+import type { LabwareEntityExtended } from '../../DeckView'
 
 interface TipPickupSlotProps {
-  tiprackEntity: LabwareEntity
+  tiprackEntity: LabwareEntityExtended
   robotState: RobotState
 }
 
 export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
   const { tiprackEntity, robotState } = props
   const { t } = useTranslation('protocol_visualization')
-  const { id, def } = tiprackEntity
+  const { id, def, nickName } = tiprackEntity
   const { tipState, labware } = robotState
   const tipStateInfo = tipState.tipracks[id]
   const tipStatusByWellName =
@@ -51,7 +52,7 @@ export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
       <div className={styles.header}>
         <RobotInfoLabel deckLabel={slot} />
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {def.metadata.displayName}
+          {nickName ?? def.metadata.displayName}
         </StyledText>
       </div>
       <div className={styles.main_content}>
