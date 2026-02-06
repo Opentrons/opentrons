@@ -141,7 +141,6 @@ from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
-from opentrons.hardware_control.modules.types import VacuumModuleModel
 
 mod_log = logging.getLogger(__name__)
 

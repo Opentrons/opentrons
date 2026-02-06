@@ -236,7 +236,6 @@ def check(
     Returns:
         True if this item can be added (it will raise rather than return False)
     """
-
     restrictions: List[_DeckRestriction] = []
     # build restrictions driven by existing items
     for location, item in existing_items.items():

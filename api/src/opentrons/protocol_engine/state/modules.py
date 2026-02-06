@@ -1488,7 +1488,6 @@ class ModuleView:
         reader_slot = self.get_location(module_id)
         lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
         addressable_area = self.get_provided_addressable_area(module_id)
-        print("MOD_AA: ", addressable_area)
         assert lid_doc_slot is not None
         lid_dock_area = AddressableAreaLocation(
             addressableAreaName="VacuumModuleV1LidDock" + lid_doc_slot.value
