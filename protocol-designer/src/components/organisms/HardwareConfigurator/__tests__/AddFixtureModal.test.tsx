@@ -6,10 +6,11 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { AddFixtureModal } from '../AddFixtureModal'
+import { AddFixtureModal, InitialDeckStateModules } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures } from '../../types'
 
 vi.mock('/protocol-designer/step-forms/actions')
@@ -114,6 +115,50 @@ describe('AddFixtureModal', () => {
           cutoutId: 'cutoutD3',
           name: 'wasteChute',
         },
+      ])
+    )
+  })
+
+  it('should handle two modules in same cutout when adding a new module (uses first match)', () => {
+    const existingModules: InitialDeckStateModules = {
+      magneticBlockV1: {
+        id: 'magneticBlockV1',
+        cutoutId: 'cutoutD3' as CutoutId,
+        model: 'magneticBlockV1',
+        type: 'magneticBlockType',
+        slot: 'D3',
+        moduleState: {} as any,
+        pythonName: 'magneticBlockV1',
+      },
+    }
+    const updatedProps = {
+      ...props,
+      modules: existingModules,
+      cutoutId: 'cutoutD3' as CutoutId,
+      addressableAreaId: 'D3' as const,
+    }
+    render(updatedProps)
+    screen.getByText('Modules')
+    fireEvent.click(screen.getAllByText('Select options')[1])
+    screen.getByText('Flex Stacker Module V1')
+    fireEvent.click(screen.getAllByText('Add')[0])
+    expect(props.setValue).toHaveBeenCalled()
+    expect(props.setValue).toHaveBeenCalledWith('modules', expect.any(Object))
+    const setValue = vi.mocked(props.setValue!)
+    const modulesCall = setValue.mock.calls.find(c => c[0] === 'modules')
+    if (modulesCall == null) throw new Error('expected modules call')
+    const updatedModules = modulesCall[1] as FormModules
+    const moduleValues = Object.values(updatedModules)
+    // The two duplicates in cutoutA1 should be removed and replaced by the new module
+    const modulesInA1 = moduleValues.filter(m => m.cutoutId === 'cutoutA1')
+    expect(modulesInA1.length).toBeGreaterThanOrEqual(1)
+    // The new module should be a heater-shaker
+    expect(modulesInA1).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          model: 'flexStackerModuleV1',
+          type: 'flexStackerModuleType',
+        }),
       ])
     )
   })

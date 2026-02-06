@@ -267,11 +267,28 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     )
     if (moduleModel == null) return
 
+    // Get the first existing module in this cutout (if any) before filtering
+    const matchedModuleEntry = Object.entries(modules).find(
+      ([, module]) => module.cutoutId === newModule.cutoutId
+    )
+    const matchedModule =
+      matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
+
+    // Remove all existing modules in this cutout (handles duplicates)
     const filteredModules = Object.fromEntries(
       Object.entries(modules).filter(
         ([, module]) => module.cutoutId !== newModule.cutoutId
       )
     )
+
+    const matchedComboFixtureId =
+      matchedModule != null
+        ? getComboFixtureFromFixtureIds([
+            matchedModule.cutoutFixtureId as CutoutFixtureId,
+            newModule.cutoutFixtureId as CutoutFixtureId,
+          ])
+        : undefined
+
     const isThermocyclerModule = getCutoutFixturesForModuleModel(
       THERMOCYCLER_MODULE_V2,
       deckDef
@@ -281,6 +298,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedModules: FormModules = {
       ...filteredModules,
+      // Re-add the matched module under the combo fixture key if a combo exists
+      ...(matchedModule != null && matchedComboFixtureId != null
+        ? { [matchedComboFixtureId]: matchedModule }
+        : {}),
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel as ModuleModel),
