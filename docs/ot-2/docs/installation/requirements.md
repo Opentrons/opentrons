@@ -31,8 +31,8 @@ The total power consumption of the OT-2 varies depending on the requirements of 
 Opentrons has validated the performance of the OT-2 in conditions recommended for system operation as follows:
 
 - **Environment:** The robot is designed for indoor use only.
-- **Temperature range:** 20 °C ± 4° C (68 °F ± 7.2 °F).
-- **Relative humidity:** 40-60% (up to 80% is acceptable, but outside the recommended range).
+- **Temperature range:** 20 °C ± 4 °C (68 °F ± 7.2 °F).
+- **Relative humidity:** 40–60% (up to 80% is acceptable, but outside the recommended range).
 - **Altitude:** Up to 2,000 meters above sea level.
 
 The OT-2 is safe to use in conditions outside of the recommended specifications, but your results may vary.

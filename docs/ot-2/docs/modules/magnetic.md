@@ -10,11 +10,10 @@ The Opentrons Magnetic Module automatically moves high-strength, N52 neodymium m
 
 !!! note
     - The Magnetic Module is not compatible with Opentrons Flex. Flex relies on the [Magnetic Block](https://opentrons.com/products/opentrons-flex-magnetic-block-gen1) for bead-based purification protocols.
-    - The Magnetic Module and adapter magnets have been discontinued and are no longer available.
 
 ### Adapter magnets
 
-The Magnetic Module ships with Adapter Magnets that provide extra magnetic strength for applications that require it. Opentrons recommends using the Adapter Magnets if you are experiencing bead loss after 10 minutes with the Magnetic Module engaged. To use the Adapter Magnets, snap them into place on both sides of the permanent magnets.
+The Magnetic Module ships with adapter magnets that provide extra magnetic strength for applications that require it. Opentrons recommends using the adapter magnets if you are experiencing bead loss after 10 minutes with the Magnetic Module engaged. To use the adapter magnets, snap them into place on both sides of the permanent magnets.
 
 ## Magnetic Module specifications
 

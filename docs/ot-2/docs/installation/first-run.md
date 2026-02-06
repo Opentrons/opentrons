@@ -24,7 +24,7 @@ The OT-2 is powered by an external power supply that converts AC wall current to
 
     ![power connection alignment](../images/power-connector-alignment.png)
 
-4. Connect the power cable to the external power supply, and then connect your region-specific plug to a wall outlet.
+4. Connect the power cable to the external power supply, and then connect plug to a wall outlet. Your OT-2 ships with a power plug specific to your country or region.
 
     ![Regional IEC power plugs](../images/iec-plugs.png)
 

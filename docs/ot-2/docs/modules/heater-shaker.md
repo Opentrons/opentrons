@@ -9,7 +9,7 @@ title: "Opentrons OT-2: Heater-Shaker"
 The [Opentrons Heater-Shaker Module](https://opentrons.com/products/heater-shaker-module?sku=991-00115-FL-UN) provides on-deck heating and orbital shaking. The Heater-Shaker can heat samples to 95 °C and shake them at speeds ranging from 200 to 3000 rpm. It is compatible with the Opentrons Flex and OT-2 liquid handling robots and selected flat, deep-well, and 96-well plates. The Heater-Shaker can also be used alongside other Opentrons modules.
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Heater-Shaker Instruction Manual](https://docs.opentrons.com/heater-shaker/).
+    For complete instructions on module installation and use, see the [Heater-Shaker Instruction Manual](../../../heater-shaker/).
 
 ### Heating and shaking
 
@@ -66,7 +66,7 @@ You can purchase adapters directly from Opentrons:
 
 ### Software control
 
-The Heater-Shaker is fully programmable in Protocol Designer and the Python Protocol API. The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See [Non-blocking commands](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands) in the API documentation for details on adding parallel steps to your protocols.
+The Heater-Shaker is fully programmable in [Protocol Designer](../../../protocol-designer/) and the [Python Protocol API](../../../python-api/). The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See [Heater-Shaker Module section](../../../python-api/modules/heater-shaker/) in the API documentation for details on adding parallel steps to your protocols.
 
 Outside of protocols, the Opentrons App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
 

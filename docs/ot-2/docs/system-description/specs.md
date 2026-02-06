@@ -46,7 +46,7 @@ title: "Opentrons OT-2: System Specifications"
     </tr>
     <tr>
         <td><strong>Power supply</strong></td>
-        <td>The OT-2 uses an external <a href="https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A">Mean Well GST220A series power supply</a>. Refer to the manufacturer's data sheet (linked above) for detailed specifications.</td>
+        <td>The OT-2 uses an external Mean Well GST220A series power supply. Refer to the  <a href="https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A"> manufacturer's data sheet</a> for detailed specifications.</td>
     </tr>
     <tr>
         <td><strong>Power consumption</strong></td>
@@ -76,7 +76,7 @@ title: "Opentrons OT-2: System Specifications"
         <td><p>The Opentrons App runs on:</p>
             <ul>
                 <li>Windows 10 or later</li>
-                <li>macOS 10.16 or later</li>
+                <li>macOS 11 (Big Sur) or later</li>
                 <li>Ubuntu 20.04 or later</li>
             </ul>
         </td>

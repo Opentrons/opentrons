@@ -157,7 +157,7 @@ At this point you should have a fully assembled robot, but it isn't time to powe
 
 <div class="checklist-box">
 <ul>
-  <li>Confirm that all 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.</li>
+  <li>Confirm that all 3 transport fasteners have been removed. <strong>Warning:</strong> powering on the robot with these brackets attached can damage the robot.</li>
   <li>Confirm that you are not missing any required cables or parts. If you are missing components, contact <a href="https://opentrons.com/opentrons-support">Opentrons Support</a>.</li>
   <li>Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.</li>
   <li>Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.</li>
