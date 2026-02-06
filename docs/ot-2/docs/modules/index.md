@@ -16,7 +16,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 
 - The [HEPA Module](./hepa.md) is a positive-pressure clean air system for use with the OT-2 only. It streams purified air into the OT-2 enclosure to help displace airborne contaminants.
 
-- The [Magnetic Module](./magnetic-module.md) uses high-strength N52 neodymium to help pull particles out of suspension and hold them in a well plate during elution. This module is no longer available.
+- The [Magnetic Module](./magnetic.md) uses high-strength N52 neodymium to help pull particles out of suspension and hold them in a well plate during elution. This module is no longer available.
 
 - The [Temperature Module](./temperature.md) is a hot and cold plate module that is able to maintain steady state temperatures between 4 and 95 °C.
 

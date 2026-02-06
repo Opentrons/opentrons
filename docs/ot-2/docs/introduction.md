@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Introduction"
 ---
 
-Welcome to the instruction manual for the Opentrons OT-2 liquid handling robot. This manual will help you set up and get started with the OT-2.
+Welcome to the instruction manual for the Opentrons OT-2 liquid handling robot. This manual will help you set up and work with the OT-2.
 
 ## Description
 
@@ -16,7 +16,7 @@ This manual is organized to help you get started quickly and operate your OT-2 e
 
 - **Control the robot**: The <font color="red">Opentrons App section</font> describes how to download and use this software to operate and manage your OT-2.
 
-- **Work with Instruments and Modules**: Attaching pipettes and modules to the OT-2 gives it the flexibility to handle a range of liquid handling tasks. See the [OT-2 Pipettes section](./pipettes-ot2.md) and the [OT-2 Modules section](./modules/index.md) for technical specifications and instructions on how to attach these components to your robot.
+- **Work with Instruments and Modules**: Attaching pipettes and modules to the OT-2 gives it the flexibility to handle a range of liquid handling tasks. See the [OT-2 Pipettes section](./pipettes.md) and the [OT-2 Modules section](./modules/index.md) for technical specifications and instructions on how to attach these components to your robot.
 
 - **Use labware**: The [Labware section](./labware/index.md) describes compatible labware and how to use it in the Opentrons App and on the deck.
 
