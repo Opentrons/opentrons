@@ -138,13 +138,13 @@ describe('AddFixtureModal', () => {
       ...props,
       modules: existingModules,
       cutoutId: 'cutoutD3' as CutoutId,
-      addressableAreaId: 'D4' as AddressableAreaName,
+      addressableAreaId: 'fakeD4' as AddressableAreaName,
       deckConfig: updatedDeckConfig,
     }
     render(updatedProps)
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Select options')[1])
-    screen.getByText('Flex Stacker Module V1')
+    screen.getByText('Flex Stacker Module GEN1')
     fireEvent.click(screen.getAllByText('Add')[0])
     expect(props.setValue).toHaveBeenCalled()
     expect(props.setValue).toHaveBeenCalledWith('modules', expect.any(Object))
@@ -157,11 +157,16 @@ describe('AddFixtureModal', () => {
     const modulesInD3 = moduleValues.filter(m => m.cutoutId === 'cutoutD3')
     expect(modulesInD3.length).toBeGreaterThanOrEqual(1)
     // The new module should be a flex stacker
+    console.log('modulesInD3: ', modulesInD3)
     expect(modulesInD3).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           model: 'flexStackerModuleV1',
           type: 'flexStackerModuleType',
+        }),
+        expect.objectContaining({
+          cutoutFixtureId: 'magneticBlockV1',
+          type: 'magneticBlockType',
         }),
       ])
     )
