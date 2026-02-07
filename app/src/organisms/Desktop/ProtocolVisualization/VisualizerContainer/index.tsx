@@ -30,7 +30,10 @@ import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  ProtocolAnalysisOutput,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
@@ -368,7 +371,7 @@ export function VisualizerContainer(
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
-            if (selectedRunTimeCommand != null && selectedSlot != null) {
+            if (selectedRunTimeCommand != null && typeof slot === 'string') {
               trackEvent({
                 name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
                 properties: {},
@@ -376,7 +379,7 @@ export function VisualizerContainer(
               dispatch(
                 stepDetailViewerOpenAction({
                   protocolKey,
-                  slot: selectedSlot,
+                  slot,
                   command: selectedRunTimeCommand,
                   robotState,
                   invariantContext,
