@@ -271,8 +271,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     const matchedModuleEntry = Object.entries(modules).find(
       ([, module]) => module.cutoutId === newModule.cutoutId
     )
+    const module = matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
+    const moduleFixtureId = module != null ? getCutoutFixturesForModuleModel(module.model as ModuleModel, deckDef)[0].id : undefined
+
     const matchedModule =
-      matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
+      matchedModuleEntry != null ? getCutoutFixturesForModuleModel(matchedModuleEntry[1].model as ModuleModel, deckDef)[0] : undefined
 
     // Remove all existing modules in this cutout (handles duplicates)
     const filteredModules = Object.fromEntries(
@@ -284,7 +287,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     const matchedComboFixtureId =
       matchedModule != null
         ? getComboFixtureFromFixtureIds([
-            matchedModule.cutoutFixtureId as CutoutFixtureId,
+            moduleFixtureId as CutoutFixtureId,
             newModule.cutoutFixtureId as CutoutFixtureId,
           ])
         : undefined
@@ -298,9 +301,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedModules: FormModules = {
       ...filteredModules,
-      // Re-add the matched module under the combo fixture key if a combo exists
-      ...(matchedModule != null && matchedComboFixtureId != null
-        ? { [matchedComboFixtureId]: matchedModule }
+      ...(matchedModule != null && matchedComboFixtureId != null && matchedModuleEntry != null
+        ? { [matchedModuleEntry[0]]: matchedModuleEntry[1] }
         : {}),
       [uuid()]: {
         model: moduleModel,
