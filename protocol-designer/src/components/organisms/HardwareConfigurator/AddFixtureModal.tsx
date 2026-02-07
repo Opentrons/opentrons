@@ -271,11 +271,23 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     const matchedModuleEntry = Object.entries(modules).find(
       ([, module]) => module.cutoutId === newModule.cutoutId
     )
-    const module = matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
-    const moduleFixtureId = module != null ? getCutoutFixturesForModuleModel(module.model as ModuleModel, deckDef)[0].id : undefined
+    const module =
+      matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
+    const moduleFixtureId =
+      module != null
+        ? getCutoutFixturesForModuleModel(
+            module.model as ModuleModel,
+            deckDef
+          )[0].id
+        : undefined
 
     const matchedModule =
-      matchedModuleEntry != null ? getCutoutFixturesForModuleModel(matchedModuleEntry[1].model as ModuleModel, deckDef)[0] : undefined
+      matchedModuleEntry != null
+        ? getCutoutFixturesForModuleModel(
+            matchedModuleEntry[1].model as ModuleModel,
+            deckDef
+          )[0]
+        : undefined
 
     // Remove all existing modules in this cutout (handles duplicates)
     const filteredModules = Object.fromEntries(
@@ -301,7 +313,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedModules: FormModules = {
       ...filteredModules,
-      ...(matchedModule != null && matchedComboFixtureId != null && matchedModuleEntry != null
+      ...(matchedModule != null &&
+      matchedComboFixtureId != null &&
+      matchedModuleEntry != null
         ? { [matchedModuleEntry[0]]: matchedModuleEntry[1] }
         : {}),
       [uuid()]: {

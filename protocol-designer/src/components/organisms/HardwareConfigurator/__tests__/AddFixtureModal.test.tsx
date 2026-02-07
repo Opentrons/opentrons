@@ -9,7 +9,11 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { AddFixtureModal, InitialDeckStateModules } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
-import type { AddressableAreaName, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures } from '../../types'
 
@@ -157,17 +161,24 @@ describe('AddFixtureModal', () => {
     const modulesInD3 = moduleValues.filter(m => m.cutoutId === 'cutoutD3')
     expect(modulesInD3.length).toBeGreaterThanOrEqual(1)
     // The new module should be a flex stacker
-    console.log('modulesInD3: ', modulesInD3)
     expect(modulesInD3).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({
-          model: 'flexStackerModuleV1',
-          type: 'flexStackerModuleType',
-        }),
-        expect.objectContaining({
-          cutoutFixtureId: 'magneticBlockV1',
+        {
+          id: 'magneticBlockV1',
+          cutoutId: 'cutoutD3',
+          model: 'magneticBlockV1',
+          slot: 'D3',
           type: 'magneticBlockType',
-        }),
+          moduleState: {} as any,
+          pythonName: 'magneticBlockV1',
+        },
+        {
+          cutoutFixtureId: 'flexStackerModuleV1',
+          cutoutId: 'cutoutD3',
+          model: 'flexStackerModuleV1',
+          slot: 'D4',
+          type: 'flexStackerModuleType',
+        },
       ])
     )
   })
