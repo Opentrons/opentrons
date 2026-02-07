@@ -30,10 +30,7 @@ import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
-import type {
-  ProtocolAnalysisOutput,
-  SLOT_RENDER_HEIGHT,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
