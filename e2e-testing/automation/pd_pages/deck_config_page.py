@@ -11,6 +11,19 @@ class DeckConfigPage(BasePage):
     def __init__(self, page: Page) -> None:
         super().__init__(page)
 
+    def OT2_module_selection(self, module_name: list) -> None:
+        """Select a module for OT-2 from the module list.
+
+        Args:
+            module_name: Name of the module, e.g., "Temperature Module GEN1",
+            "Temperature Module GEN2", "Heater-Shaker Module GEN1",
+            "Magnetic Module GEN1","Magnetic Module GEN2",
+            "Thermocycler Module GEN1", "Thermocycler Module GEN2"
+        """
+        for module in module_name:
+            module_button = self.page.get_by_text(module)
+            module_button.first.click(force=True)
+
     def expect_module_overview(self) -> None:
         """Validate Step 4 deck hardware content is visible."""
 
