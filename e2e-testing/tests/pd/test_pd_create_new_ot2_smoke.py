@@ -16,7 +16,12 @@ from automation.pd_pages.tempdeck_step_form_page import _add_temperature_module_
 @pytest.mark.pdE2E
 def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     """ The Opentrons Ot-2 needs to be tested as well so we're going
-    through the onboarding flow. Then we'll have one of each step
+    through the onboarding flow, deck configuration
+    Then going through each module with basic steps
+    'Temperature Module GEN2'
+    "Heater-Shaker Module GEN1"
+    "Thermocycler Module GEN2"
+    "Magnetic Module GEN2"
     """
     # Landing Page
     landing_page = LandingPage(page)
