@@ -54,7 +54,11 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     <>
       {Object.entries(labware).map(([id, lw]) => {
         if (
-          Object.keys(modules).some(moduleId => lw.stack.includes(moduleId))
+          Object.keys(modules).some(moduleId => lw.stack.includes(moduleId)) ||
+          //  filter out the fake PE lid stack definition!
+          //  we shouldn't be exposing it to users at all
+          labwareEntitiesExtended[id].def.parameters.loadName ===
+            PROTOCOL_ENGINE_LID_STACK_LOADNAME
         ) {
           return null
         }
@@ -77,15 +81,6 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         )
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
-
-        // need to special-case the PE lid stack def which
-        // is a fake def that shouldn't be properly exposed to
-        // users
-        const modifiedLabwareDisplayName =
-          labwareEntitiesExtended[id].def.parameters.loadName ===
-          PROTOCOL_ENGINE_LID_STACK_LOADNAME
-            ? 'Lid Stack'
-            : labwareEntitiesExtended[id].def.metadata.displayName
 
         return (
           <Fragment key={id}>
@@ -118,7 +113,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
               {showCommandSummary ? null : (
                 <StyledText desktopStyle="captionRegular" color={COLORS.white}>
                   {labwareEntitiesExtended[id]?.nickName ??
-                    modifiedLabwareDisplayName}
+                    labwareEntitiesExtended[id].def.metadata.displayName}
                 </StyledText>
               )}
             </DeckViewOverlay>
