@@ -29,6 +29,7 @@ class PipetteModal(BasePage):
         """
         self.page.get_by_text(channels).click()
         self.page.get_by_text(volume).click()
+
     def OT2_select_pipette_type(self, channels: str, gen: str, volume: str) -> None:
         """Select pipette for OT-2 by channels and volume.
 

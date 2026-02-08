@@ -217,6 +217,7 @@ class ProtocolEditorPage(BasePage):
         self.page.locator('input[name="displayName"]').click()
         self.page.locator('input[name="displayName"]').fill(name)
         self.page.get_by_label("ModalShell_ModalArea").get_by_role("button", name="Save").click()
+
     def assign_liquid_to_wells(self, liquid_name: str, volume: str) -> None:
         """Assign a liquid to selected wells with a specific volume.
 
@@ -236,17 +237,20 @@ class ProtocolEditorPage(BasePage):
         button = self.page.get_by_test_id("Toolbox_confirmButton")
         self.wait_for_visible(button.first)
         button.first.click()
+
     def select_confirm_text(self) -> None:
-        '''
+        """
         Click a button with the text "Confirm".
         This is used in various places where a confirmation action is needed.
-        '''
-        self.page.get_by_text('Confirm').click()
+        """
+        self.page.get_by_text("Confirm").click()
+
     def select_save_text(self) -> None:
-        '''
+        """
         Click a button with the text "Save".
-        This is used in various places where a save action is needed.'''
-        self.page.get_by_text('Save').click()
+        This is used in various places where a save action is needed."""
+        self.page.get_by_text("Save").click()
+
     def close_toolbox(self) -> None:
         """Close the deck setup toolbox if it is open."""
 

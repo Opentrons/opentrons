@@ -1,7 +1,7 @@
 """Test OT-2 protocol creation workflow."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -15,7 +15,7 @@ from automation.pd_pages.tempdeck_step_form_page import _add_temperature_module_
 
 @pytest.mark.pdE2E
 def test_ot2_robot_modules(page: Page, base_url: str) -> None:
-    """ The Opentrons Ot-2 needs to be tested as well so we're going
+    """The Opentrons Ot-2 needs to be tested as well so we're going
     through the onboarding flow, deck configuration
     Then going through each module with basic steps
     'Temperature Module GEN2'
@@ -52,8 +52,12 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     deck_config = DeckConfigPage(page)
     print("confirmed pipette(s)")
     # We're on step 2, adding modules
-    list_of_modules = ['Temperature Module GEN2', "Heater-Shaker Module GEN1",
-                       "Magnetic Module GEN2", "Thermocycler Module GEN2"]
+    list_of_modules = [
+        "Temperature Module GEN2",
+        "Heater-Shaker Module GEN1",
+        "Magnetic Module GEN2",
+        "Thermocycler Module GEN2",
+    ]
     deck_config.OT2_module_selection(list_of_modules)
     deck_config.confirm_deck_configuration()
     editor.select_confirm_text()
@@ -84,8 +88,8 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     )
     # Add Magnetic Module
     editor.select_confirm_text()
-    editor.add_step('Magnet')
+    editor.add_step("Magnet")
     page.get_by_role("textbox").fill("10")
     editor.select_save_text()
-    editor.add_step('Magnet')
+    editor.add_step("Magnet")
     editor.select_save_text()
