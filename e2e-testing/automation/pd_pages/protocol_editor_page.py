@@ -237,8 +237,15 @@ class ProtocolEditorPage(BasePage):
         self.wait_for_visible(button.first)
         button.first.click()
     def select_confirm_text(self) -> None:
+        '''
+        Click a button with the text "Confirm".
+        This is used in various places where a confirmation action is needed.
+        '''
         self.page.get_by_text('Confirm').click()
     def select_save_text(self) -> None:
+        '''
+        Click a button with the text "Save".
+        This is used in various places where a save action is needed.'''
         self.page.get_by_text('Save').click()
     def close_toolbox(self) -> None:
         """Close the deck setup toolbox if it is open."""
