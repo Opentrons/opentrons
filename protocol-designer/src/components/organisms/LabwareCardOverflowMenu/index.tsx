@@ -17,7 +17,9 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
+  getIsSlotAHopper,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -31,15 +33,19 @@ import {
   multipleIngredientsSelector,
   openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { updateStackerModuleState } from '/protocol-designer/step-forms/actions'
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getModuleIdFromStack } from '/protocol-designer/utils'
 import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/utils/labwareModuleCompatibility'
 
+import { getStackerModuleStateFromSlot } from '../AssignLiquidsModal/utils'
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardOverflowMenuProps {
@@ -55,6 +61,7 @@ export function LabwareCardOverflowMenu(
   const navigate = useNavigate()
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
+  const { selectedSlot } = useSelector(selectors.getZoomedInSlotInfo)
   const [showNotCompatibleModal, setShowNotCompatibleModal] =
     useState<boolean>(false)
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
@@ -144,7 +151,43 @@ export function LabwareCardOverflowMenu(
     setShowDeleteEntityInUseModal(false)
   }
 
+  const isOnHopper =
+    selectedSlot?.slot != null && getIsSlotAHopper(selectedSlot.slot)
   const handleClearLabware = (e: MouseEvent): void => {
+    if (isOnHopper) {
+      const slot =
+        FAKE_HOPPER_LOCATION_MAP[selectedSlot.slot as HopperLocationMapKey]
+      const moduleOnSlot = Object.values(deckSetupModules).find(
+        module => module.slot === slot
+      )
+      const stackerModuleState = getStackerModuleStateFromSlot({
+        modules: deckSetupModules,
+        slot,
+      })
+      const { labwareInHopper } = stackerModuleState ?? {}
+      const labwaresToDelete =
+        labwareInHopper?.reduce<string[]>((acc, group) => {
+          return [...acc, ...Object.values(group).filter(id => id != null)]
+        }, []) ?? []
+      // delete all hopper labwares
+      labwaresToDelete.forEach(labware => {
+        dispatch(deleteContainer({ labwareId: labware }))
+      })
+      // un-set the stored labware details of the module
+      if (moduleOnSlot != null && stackerModuleState != null) {
+        dispatch(
+          updateStackerModuleState({
+            moduleId: moduleOnSlot.id,
+            moduleState: {
+              ...stackerModuleState,
+              storedLabwareDetails: null,
+              labwareInHopper: null,
+            },
+          })
+        )
+      }
+    }
+
     if (isLabwareOnSlotInUse) {
       setShowDeleteEntityInUseModal(true)
       e.preventDefault()

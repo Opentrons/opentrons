@@ -54,7 +54,7 @@ export function LabwareSlotContainer(
   } = props
   const { t } = useTranslation('protocol_visualization')
   const { labware, pipettes, liquidState } = robotState
-  const labwareLoadCommand = Object.values(commands).find(
+  const labwareLoadCommand = commands.find(
     command =>
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId

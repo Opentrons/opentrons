@@ -5,14 +5,17 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
+  getModuleParentOriginToChildSlotOrigin,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { DeckViewOverlay } from './DeckViewOverlay'
+import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
+  CoordinateTuple,
   DeckDefinition,
   Liquid,
   ModuleDefinition,
@@ -37,8 +40,10 @@ interface DeckViewStackerProps {
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
   showModuleCommandSummary: boolean
+  showLabwareCommandSummary: boolean
   moduleType: ModuleType
   slot: string
+  slotPosition: CoordinateTuple
   moduleDef: ModuleDefinition
   labwareLoadedOnModuleId: string
   selectedRunTimeCommand?: RunTimeCommand
@@ -56,13 +61,25 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
     hoveredSlot,
     labwareEntitiesExtended,
     showModuleCommandSummary,
+    showLabwareCommandSummary,
     moduleDef,
     selectedRunTimeCommand,
     slot,
+    slotPosition,
     moduleType,
 
     labwareLoadedOnModuleId,
   } = props
+  const childSlotOffset = getModuleParentOriginToChildSlotOrigin(
+    deckDef.otId,
+    slot,
+    moduleDef
+  )
+  const childSlotPosition: CoordinateTuple = [
+    slotPosition[0] + childSlotOffset.x,
+    slotPosition[1] + childSlotOffset.y,
+    slotPosition[2] + childSlotOffset.z,
+  ]
 
   return (
     <>
@@ -98,7 +115,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
         >
-          {showModuleCommandSummary ? null : (
+          {showModuleCommandSummary || showLabwareCommandSummary ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>
               {
                 labwareEntitiesExtended[labwareLoadedOnModuleId].def.metadata
@@ -132,7 +149,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
             selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve' &&
             selectedRunTimeCommand?.commandType !== 'flexStacker/store') ||
           (moduleType !== FLEX_STACKER_MODULE_TYPE &&
-            showModuleCommandSummary) ? null : (
+            (showModuleCommandSummary || showLabwareCommandSummary)) ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>
               {labwareEntitiesExtended[labwareLoadedOnModuleId]?.nickName ??
                 labwareEntitiesExtended[labwareLoadedOnModuleId].def.metadata
@@ -141,6 +158,14 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           )}
         </DeckViewOverlay>
       )}
+      {showLabwareCommandSummary && selectedRunTimeCommand != null ? (
+        <LabwareCommandSummary
+          commandType={selectedRunTimeCommand.commandType}
+          position={childSlotPosition}
+          labwareDef={labwareEntitiesExtended[labwareLoadedOnModuleId].def}
+          showModuleIcon={false}
+        />
+      ) : null}
     </>
   )
 }

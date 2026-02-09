@@ -6,6 +6,7 @@ import select
 import subprocess
 import time
 import urllib.request
+import uuid
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any, List
@@ -19,6 +20,9 @@ from playwright.sync_api import BrowserContext, Page, Video
 from playwright.sync_api import Error as PlaywrightError
 
 from utility import troubleshoot_and_pause
+
+# Expose fixtures defined in e2e-testing/eyes.py (e.g. the `eyes` fixture).
+pytest_plugins = ["eyes"]
 
 
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
@@ -87,9 +91,77 @@ def pytest_configure(config: Any) -> None:
     _ensure_test_results_dir()
 
 
+def _ensure_applitools_batch_env() -> None:
+    """Ensure the Applitools batch name/id are stable for a single pytest run.
+
+    Applitools defaults `APPLITOOLS_BATCH_ID` to a unique per-process UUID.
+    For pytest runs, we want one batch shared across all tests in the same run.
+    """
+
+    is_ci = os.environ.get("CI", "false").lower() == "true"
+    debug_enabled = os.environ.get("APPLITOOLS_DEBUG", "false").lower() == "true"
+    should_log = is_ci or debug_enabled
+
+    # This helper may be invoked multiple times (pytest_configure + sessionstart).
+    # Print debug info only once per process to keep CI logs readable.
+    debug_already_printed = os.environ.get("_APPLITOOLS_BATCH_DEBUG_PRINTED") == "true"
+
+    def _log(message: str) -> None:
+        if should_log and not debug_already_printed:
+            print(f"[applitools] {message}")
+
+    # Respect explicit user/CI configuration.
+    if os.getenv("APPLITOOLS_BATCH_ID") and os.getenv("APPLITOOLS_BATCH_NAME"):
+        _log("Batch env already set; leaving as-is.")
+        _log(f"APPLITOOLS_BATCH_NAME={os.getenv('APPLITOOLS_BATCH_NAME')}")
+        _log(f"APPLITOOLS_BATCH_ID={os.getenv('APPLITOOLS_BATCH_ID')}")
+        if should_log and not debug_already_printed:
+            os.environ["_APPLITOOLS_BATCH_DEBUG_PRINTED"] = "true"
+        return
+
+    # Create a stable ID for the run if one isn't already set.
+    _log(f"CI={os.environ.get('CI')}")
+    _log(f"APPLITOOLS_DEBUG={os.environ.get('APPLITOOLS_DEBUG')}")
+    _log(f"TEST_ENV={os.environ.get('TEST_ENV')}")
+    _log(f"GITHUB_HEAD_REF={os.environ.get('GITHUB_HEAD_REF')}")
+    _log(f"GITHUB_REF_NAME={os.environ.get('GITHUB_REF_NAME')}")
+    _log(f"GITHUB_REF={os.environ.get('GITHUB_REF')}")
+    _log(f"APPLITOOLS_BATCH_NAME_pre={os.getenv('APPLITOOLS_BATCH_NAME')}")
+    _log(f"APPLITOOLS_BATCH_ID_pre={os.getenv('APPLITOOLS_BATCH_ID')}")
+
+    os.environ.setdefault("APPLITOOLS_BATCH_ID", str(uuid.uuid4()))
+
+    if os.getenv("APPLITOOLS_BATCH_NAME") is not None:
+        _log("APPLITOOLS_BATCH_NAME already set; using existing value.")
+        _log(f"APPLITOOLS_BATCH_NAME={os.getenv('APPLITOOLS_BATCH_NAME')}")
+        _log(f"APPLITOOLS_BATCH_ID={os.getenv('APPLITOOLS_BATCH_ID')}")
+        if should_log and not debug_already_printed:
+            os.environ["_APPLITOOLS_BATCH_DEBUG_PRINTED"] = "true"
+        return
+
+    test_env = os.getenv("TEST_ENV", "local")
+
+    if is_ci:
+        # For pull_request events, this is the source branch name.
+        # Fallbacks cover non-PR workflows.
+        pr_branch = (
+            os.getenv("GITHUB_HEAD_REF") or os.getenv("GITHUB_REF_NAME") or os.getenv("GITHUB_REF") or "unknown-branch"
+        )
+        os.environ["APPLITOOLS_BATCH_NAME"] = f"CI | {pr_branch}"
+    else:
+        os.environ["APPLITOOLS_BATCH_NAME"] = f"dev run | {test_env}"
+
+    _log("Batch env configured.")
+    _log(f"APPLITOOLS_BATCH_NAME={os.getenv('APPLITOOLS_BATCH_NAME')}")
+    _log(f"APPLITOOLS_BATCH_ID={os.getenv('APPLITOOLS_BATCH_ID')}")
+    if should_log and not debug_already_printed:
+        os.environ["_APPLITOOLS_BATCH_DEBUG_PRINTED"] = "true"
+
+
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Ensure artifacts directory exists before tests begin."""
     _ensure_test_results_dir()
+    _ensure_applitools_batch_env()
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -127,6 +199,10 @@ def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
         headless = headless_env.lower() == "true"
     else:
         headless = True
+
+    # Expose the effective headless/headed mode to helpers that don't have
+    # access to pytestconfig (e.g. Applitools Eyes helper).
+    os.environ["PW_E2E_HEADLESS"] = "true" if headless else "false"
 
     return {
         "headless": headless,

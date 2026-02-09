@@ -798,6 +798,7 @@ export const moduleIdRequired = (
     | HydratedMagnetFormData
     | HydratedTemperatureFormData
     | HydratedHeaterShakerFormData
+    | HydratedFlexStackerFormData
 ): FormError | null => {
   const { moduleId } = fields
   if (moduleId == null) return MODULE_ID_REQUIRED

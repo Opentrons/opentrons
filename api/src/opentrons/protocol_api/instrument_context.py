@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Tuple, Union, cast
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 from typing_extensions import Unpack
 
@@ -1763,9 +1763,9 @@ class InstrumentContext(publisher.CommandPublisher):
             alternate_drop_location:
                 Whether to vary the tip drop position to prevent tips from piling up in
                 one spot.
-                
+
                 If not specified, the API will vary tip drop position by default when
-                ``location`` is ``None``, and drop the tip to a fixed position when 
+                ``location`` is ``None``, and drop the tip to a fixed position when
                 ``location`` is specified.
 
                 *New in version 2.28*

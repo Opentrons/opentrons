@@ -52,7 +52,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "04")
+    run_helpers.comment_protocol_version(protocol, "04")
 
     def transfer(
         pipette: InstrumentContext,
@@ -226,16 +226,15 @@ def run(protocol: ProtocolContext) -> None:
 
         # Initial denaturation
         thermocycler.execute_profile(
-            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4.25}],
-            repetitions=1,
+            steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
         )
 
         # 35 cycles
         thermocycler.execute_profile(
             steps=[
                 {"temperature": 95, "hold_time_seconds": 30},
-                {"temperature": 60, "hold_time_seconds": 15, "ramp_rate": 2},
-                {"temperature": 72, "hold_time_seconds": 15, "ramp_rate": 2},
+                {"temperature": 60, "hold_time_seconds": 15},
+                {"temperature": 72, "hold_time_seconds": 15},
             ],
             repetitions=35,
         )
@@ -244,12 +243,12 @@ def run(protocol: ProtocolContext) -> None:
         thermocycler.execute_profile(
             steps=[
                 {"temperature": 72, "hold_time_seconds": 300},
-                {"temperature": 20, "hold_time_seconds": 60, "ramp_rate": 2},
+                {"temperature": 20, "hold_time_seconds": 60},
             ],
             repetitions=1,
         )
 
-        thermocycler.set_block_temperature(temperature=8, ramp_rate=2)
+        thermocycler.set_block_temperature(8)
         thermocycler.open_lid()
         # Steps 7-8: Move plates
         protocol.comment("Setting up PCR2")
@@ -299,15 +298,14 @@ def run(protocol: ProtocolContext) -> None:
         thermocycler.set_lid_temperature(105)
         # Initial denaturation
         thermocycler.execute_profile(
-            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4}],
-            repetitions=1,
+            steps=[{"temperature": 95, "hold_time_seconds": 180}], repetitions=1
         )
 
         # 12 cycles
         thermocycler.execute_profile(
             steps=[
                 {"temperature": 95, "hold_time_seconds": 20},
-                {"temperature": 72, "hold_time_seconds": 15, "ramp_rate": 2},
+                {"temperature": 72, "hold_time_seconds": 15},
             ],
             repetitions=12,
         )
@@ -316,7 +314,7 @@ def run(protocol: ProtocolContext) -> None:
         thermocycler.execute_profile(
             steps=[
                 {"temperature": 72, "hold_time_seconds": 300},
-                {"temperature": 20, "hold_time_seconds": 60, "ramp_rate": 2},
+                {"temperature": 20, "hold_time_seconds": 60},
             ],
             repetitions=1,
         )

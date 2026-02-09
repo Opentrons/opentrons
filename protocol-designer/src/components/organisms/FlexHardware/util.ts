@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
@@ -32,6 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
+  ModuleOnDeck,
   SavedStepFormState,
 } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -44,7 +46,7 @@ const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutD3: 'D4',
 }
 
-interface UpdateInitialDeckSetupProps {
+export interface UpdateInitialDeckSetupProps {
   values: CutoutConfigMap[]
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame
   dispatch: ThunkDispatch<any>
@@ -63,6 +65,7 @@ interface UpdateInitialDeckSetupProps {
   savedSteps: SavedStepFormState
   makeSnackbar: MakeSnackbar
   t: any
+  handleDeleteStackerLabware: (module: ModuleOnDeck) => void
   deckConfig?: DeckConfiguration
 }
 
@@ -79,6 +82,7 @@ export const updateInitialDeckState = (
     makeSnackbar,
     t,
     deckConfig,
+    handleDeleteStackerLabware,
   } = props
   const {
     additionalEquipmentOnDeck,
@@ -174,6 +178,9 @@ export const updateInitialDeckState = (
           //   if deleting module
         } else {
           dispatch(deleteModule({ moduleId: matchingModule.id }))
+          if (matchingModule.type === FLEX_STACKER_MODULE_TYPE) {
+            handleDeleteStackerLabware(matchingModule)
+          }
           if (deckConfig != null) {
             dispatch(editDeckConfiguration({ deckConfig }))
           }
