@@ -203,6 +203,16 @@ def _merge_kwargs(
         ]
         remaining_from_parent.pop("tags", None)
         remaining_from_child.pop("tags", None)
+    if (
+        "dependencies" in remaining_from_parent
+        or "dependencies" in remaining_from_child
+    ):
+        merge_result["dependencies"] = [
+            *(remaining_from_parent.get("dependencies") or []),
+            *(remaining_from_child.get("dependencies") or []),
+        ]
+        remaining_from_parent.pop("dependencies", None)
+        remaining_from_child.pop("dependencies", None)
 
     # For any argument whose values we don't know how to merge, we can just pass it
     # along opaquely, as long as the parent and child aren't both trying to set it.
