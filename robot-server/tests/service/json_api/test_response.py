@@ -3,8 +3,8 @@ from typing import Any, Dict, NamedTuple, Optional
 import pytest
 from pydantic import BaseModel
 
-from robot_server.service.json_api.resource_links import ResourceLink
-from robot_server.service.json_api.response import (
+from server_utils.fastapi_utils.models.json_api.resource_links import ResourceLink
+from server_utils.fastapi_utils.models.json_api.response import (
     Body,
     DeprecatedMultiResponseModel,
     DeprecatedResponseModel,

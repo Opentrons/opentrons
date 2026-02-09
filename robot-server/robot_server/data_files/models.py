@@ -7,9 +7,9 @@ from pydantic import BaseModel, Field
 
 from opentrons_shared_data.data_files import DataFileSource, MimeType
 from opentrons_shared_data.errors import GeneralError
+from server_utils.fastapi_utils.models.json_api import ResourceModel
 
 from robot_server.errors.error_responses import ErrorDetails
-from robot_server.service.json_api import ResourceModel
 
 
 class DataFile(ResourceModel):

@@ -1,4 +1,6 @@
-from .request import RequestModel
+"""JSON API models for server request and response handling."""
+
+from .request import RequestDataT, RequestModel
 from .resource_links import ResourceLink, ResourceLinkKey, ResourceLinks
 from .response import (
     BaseResponseBody,
@@ -19,8 +21,9 @@ from .response import (
 )
 
 __all__ = [
-    # request body model
+    # request models
     "RequestModel",
+    "RequestDataT",
     # response models
     "PydanticResponse",
     # response body models

@@ -3,9 +3,8 @@ from typing import Any, Dict
 from pydantic import ValidationError
 from pytest import raises
 
+from server_utils.fastapi_utils.models.json_api import RequestModel
 from tests.service.helpers import ItemModel
-
-from robot_server.service.json_api.request import RequestModel
 
 
 def test_attributes_as_dict():

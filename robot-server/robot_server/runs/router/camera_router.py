@@ -19,6 +19,11 @@ from opentrons.system import camera
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..dependencies import get_run_orchestrator_store
 from ..run_models import Run
@@ -31,11 +36,6 @@ from robot_server.data_files.models import FileNotFound
 from robot_server.errors.error_responses import ErrorBody, LegacyErrorResponse
 from robot_server.hardware import get_robot_type
 from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.service.json_api import (
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-)
 from robot_server.service.legacy.models.settings import (
     CameraCaptureImageSettings,
     CameraEnable,

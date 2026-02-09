@@ -15,6 +15,14 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleMultiBody,
+)
 
 from ..command_models import (
     CommandCollectionLinks,
@@ -36,14 +44,6 @@ from ..run_store import CommandNotFoundError, RunStore
 from .base_router import RunNotFound, RunStopped
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.robot.control.dependencies import require_estop_in_good_state
-from robot_server.service.json_api import (
-    MultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-    SimpleMultiBody,
-)
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 

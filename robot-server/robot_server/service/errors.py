@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional, Sequence, Tuple, Type, TypeVar
 from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.fastapi_utils.models.json_api import ResourceLinks
 
 from robot_server.errors.error_responses import (
     ApiError,
@@ -15,7 +16,6 @@ from robot_server.errors.error_responses import (
     ErrorDetails,
     ErrorSource,
 )
-from robot_server.service.json_api import ResourceLinks
 
 
 @dataclass(frozen=True)

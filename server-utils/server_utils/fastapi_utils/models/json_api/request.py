@@ -8,4 +8,4 @@ RequestDataT = TypeVar("RequestDataT")
 class RequestModel(BaseModel, Generic[RequestDataT]):
     """ """
 
-    data: RequestDataT = Field(..., description="the document’s 'primary data'")
+    data: RequestDataT = Field(..., description="the document's 'primary data'")

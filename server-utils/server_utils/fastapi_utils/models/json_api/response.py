@@ -1,3 +1,5 @@
+"""JSON API response models."""
+
 from __future__ import annotations
 
 from typing import (
@@ -31,7 +33,7 @@ ResponseDataT = TypeVar("ResponseDataT")
 ResponseLinksT = TypeVar("ResponseLinksT")
 
 
-DESCRIPTION_DATA = "The document’s primary data"
+DESCRIPTION_DATA = "The document's primary data"
 
 DESCRIPTION_LINKS = "A links object related to the primary data."
 
@@ -104,6 +106,8 @@ class EmptyBody(BaseResponseBody, Generic[ResponseLinksT]):
 
 
 class MultiBodyMeta(BaseModel):
+    """Metadata for multi-resource responses."""
+
     cursor: int = Field(
         ...,
         description=(
@@ -173,8 +177,9 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     ) -> Callable[[DecoratedEndpoint], DecoratedEndpoint]:
         """Use this classmethod as a decorator to wrap routes that return PydanticResponses.
 
-        The route method (i.e. the .post() method of the router) is the first argument and the rest of the
-        arguments are keyword args that are forwarded to the route handler.
+        The route method (i.e. the .post() method of the router) is the first argument
+        and the rest of the arguments are keyword args that are forwarded to the route
+        handler.
 
         For instance:
         @PydanticResponse.wrap_route(
@@ -185,19 +190,24 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
         def my_some_path_handler(...) -> PydanticResponse[SimpleBody[whatever]]:
             ...
 
-        The reason this exists is that if you do not specify a response_model, pydantic will parse the return
-        value annotation and try to stuff it in a pydantic field. Pydantic fields can't handle arbitrary classes,
-        like fastapi.JSONResponse; therefore, you get an exception while parsing the file (since this all happens
-        in a decorator). The fix for this is to always specify a response_model, even if you're also doing a return
-        value annotation and/or responses={} arguments.
+        The reason this exists is that if you do not specify a response_model, pydantic
+        will parse the return value annotation and try to stuff it in a pydantic field.
+        Pydantic fields can't handle arbitrary classes, like fastapi.JSONResponse;
+        therefore, you get an exception while parsing the file (since this all happens
+        in a decorator). The fix for this is to always specify a response_model, even if
+        you're also doing a return value annotation and/or responses={} arguments.
 
-        This decorator does that for you! Just take any route handler that returns a PydanticResponse (you still have to
-        annotate it as such, and return PydanticResponse.create(...) yourself, this only handles the decorating part) and
-        replace its route decoration with this one, passing the erstwhile route decorator in.
+        This decorator does that for you! Just take any route handler that returns a
+        PydanticResponse (you still have to annotate it as such, and return
+        PydanticResponse.create(...) yourself, this only handles the decorating part)
+        and replace its route decoration with this one, passing the erstwhile route
+        decorator in.
         """
-        # our outermost function exists to capture the arguments that you want to forward to the route decorator
+        # our outermost function exists to capture the arguments that you want to
+        # forward to the route decorator
         assert "response_model" not in route_kwargs, (
-            "Do not use PydanticResponse.wrap_route if you are already specifying a response model"
+            "Do not use PydanticResponse.wrap_route if you are already specifying"
+            " a response model"
         )
 
         def decorator(
@@ -208,15 +218,17 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
             # the first arg of the outermost type is the argument to the generic,
             # in this case SimpleBody[Whatever]
             response_model = get_args(return_annotation)[0]
-            # and that's what we want to pass to the route method as response_model, so we do it and get the actual
-            # function transformer
+            # and that's what we want to pass to the route method as response_model,
+            # so we do it and get the actual function transformer
             route_decorator = route_method(  # type: ignore[call-arg]
                 **route_kwargs, response_model=response_model
             )
-            # which we then call on the endpoint method to get it registered with the router, and return the results
+            # which we then call on the endpoint method to get it registered with the
+            # router, and return the results
             return route_decorator(endpoint_method)
 
-        # and finally we return our own function transformer with the route method args closed over
+        # and finally we return our own function transformer with the route method
+        # args closed over
         return decorator
 
     def __init__(
