@@ -1466,12 +1466,7 @@
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
   "commandAnnotations": [
     {
-      "commandKeys": [
-        "1abc123",
-        "2abc123",
-        "3abc123",
-        "4abc123"
-      ],
+      "commandKeys": ["1abc123", "2abc123", "3abc123", "4abc123"],
       "annotationType": "custom"
     }
   ]
