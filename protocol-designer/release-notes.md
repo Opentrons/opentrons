@@ -12,20 +12,15 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.9.0!**
 
-This release introduces updated Thermocycler Module steps and includes other bug fixes. 
+This release introduces updated Thermocycler Module steps and includes other bug fixes.
 
 ### New Features
 
-- Your Protocol Designer protocol can now run a Thermocycler Module step, like changing the block temperature or executing a profile, while pipetting samples or running another module.
-
-  When you add any new Thermocycler Module step, Protocol Designer will ask you to choose:
-  - wait for the Thermocycler Module to finish running a profile or reaching a temperature.
-  - continue performing protocol actions while your Thermocycler Module step completes.
-
+- Your Protocol Designer protocol now runs Thermocycler Module profiles while pipetting samples or running another module.
 
 ### Bug Fixes
 
-- The Flex Stacker Module shows the correct number of labware stored inside. 
+- The Flex Stacker Module shows the correct number of labware stored inside.
 - Add or remove a Flex Stacker Module or waste chute to the robot deck without triggering protocol errors.
 
 ## Opentrons Protocol Designer Changes in 8.8.0
