@@ -61,4 +61,11 @@ export function forDispense(
       robotStateAndWarnings,
     })
   }
+  // set the entityId for dispense if it was not previously set in the previous moveToWell
+  if ('labwareId' in params) {
+    robotState.pipettes[pipetteId] = {
+      ...robotState.pipettes[pipetteId],
+      entityId: params.labwareId,
+    }
+  }
 }
