@@ -8,9 +8,25 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.9.0
+
+**Welcome to Protocol Designer 8.9.0!**
+
+This release introduces updated Thermocycler Module and liquid class features.
+
+### New Features
+
+- Your Protocol Designer protocol can now run a Thermocycler Module step, like changing the block temperature or executing a profile, while pipetting samples or running another module.
+
+  When you add any new Thermocycler Module step, Protocol Designer will ask you to choose:
+  - wait for the Thermocycler Module to finish running a profile or reaching a temperature.
+  - continue performing protocol actions while your Thermocycler Module step completes.
+
+- Customize the well location to blow out excess liquid from the pipette tip, including blowout height at a source or destination well.
+
 ## Opentrons Protocol Designer Changes in 8.8.0
 
-**Welcome to Protocol Designer 8.8.0.!**
+**Welcome to Protocol Designer 8.8.0!**
 
 This release adds support for the Flex Stacker Module in Protocol Designer, and includes other bug fixes.
 
