@@ -26,6 +26,9 @@
   border-radius: var(--border-radius-8);
   background-color: var(--grey-35);
   gap: var(--spacing-8);
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: normal;
 }
 
 .error_list {
@@ -56,4 +59,6 @@
 .contact_text {
   overflow-wrap: break-word;
   text-align: left;
+  white-space: normal;
+  word-break: normal;
 }
