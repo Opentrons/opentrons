@@ -123,7 +123,7 @@ describe('AddFixtureModal', () => {
     )
   })
 
-  it.only('should handle two modules in same cutout when adding a new module (uses first match)', () => {
+  it('should handle two modules in same cutout when adding a new module (uses first match)', () => {
     const existingModules: InitialDeckStateModules = {
       magneticBlockV1: {
         id: 'magneticBlockV1',
