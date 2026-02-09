@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from typing import (
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -1896,6 +1898,26 @@ class ProtocolContext(CommandPublisher):
                 saturation=saturation,
             )
         return None
+
+    @contextmanager
+    def group_steps(
+        self, name: str, description: Optional[str] = None
+    ) -> Iterator[None]:
+        """Group commands together for visualization in run previews and the run log.
+        This is a context manager using the `with` synatx, and all commands within this block
+        will be grouped together.
+
+        This has no effect on the execution of the protocol.
+
+        Args:
+            name: The name of the group of steps
+            description: An optional description of this group
+        """
+        annotation_id = self._core.create_user_command_annotation(name, description)
+        try:
+            yield
+        finally:
+            self._core.close_command_annotation(annotation_id)
 
 
 def _create_module_context(

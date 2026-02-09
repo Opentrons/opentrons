@@ -1268,13 +1268,14 @@ class ProtocolCore(
 
     def create_user_command_annotation(
         self, annotation_name: str, annotation_description: Optional[str]
-    ) -> None:
+    ) -> str:
         """Creates a command annotation and adds the ID to list of active command annotations."""
         annotation_id = self._engine_client.create_user_command_annotation(
             annotation_name=annotation_name,
             description=annotation_description,
         )
         self.annotation_ids.append(annotation_id)
+        return annotation_id
 
     def close_command_annotation(self, annotation_id: str) -> None:
         """Closes a command annotation by removing the annotation ID from the list of active command annotations."""

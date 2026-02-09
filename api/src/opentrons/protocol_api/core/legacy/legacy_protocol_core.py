@@ -626,7 +626,7 @@ class LegacyProtocolCore(
 
     def create_user_command_annotation(
         self, annotation_name: str, annotation_description: Optional[str]
-    ) -> None:
+    ) -> str:
         """Creates a command annotation and adds the ID to list of active command annotations."""
         assert False, "create_user_command_annotation only supported on engine core"
 

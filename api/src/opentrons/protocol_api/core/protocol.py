@@ -307,7 +307,7 @@ class AbstractProtocol(
         self,
         annotation_name: str,
         annotation_description: Optional[str],
-    ) -> None:
+    ) -> str:
         """Creates a command annotation and adds the ID to list of active command annotations."""
 
     @abstractmethod
