@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   fixture12Trough,
@@ -6,9 +6,12 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -81,6 +84,10 @@ const mockT = (key: string) => key
 const mockDeckConfig: DeckConfiguration = []
 
 describe('updateInitialDeckState', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('creates a module', () => {
     updateInitialDeckState({
       values: [
@@ -266,13 +273,13 @@ describe('updateInitialDeckState', () => {
       vi.mocked(deleteDeckFixture('trash'))
     )
   })
-  it('creates staging area and magnetic block', () => {
+  it('creates staging area and magnetic block when magnetic block on deck', () => {
     updateInitialDeckState({
       values: [
         {
           cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          addressableAreaId: 'magneticBlockV1B3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          addressableAreaId: 'B4',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -284,17 +291,8 @@ describe('updateInitialDeckState', () => {
       t: mockT,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      1,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('stagingArea', 'cutoutB3')
-    )
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      2,
-      createModule({
-        slot: 'B1',
-        model: MAGNETIC_BLOCK_V1,
-        type: MAGNETIC_BLOCK_TYPE,
-      })
     )
   })
   it('deletes staging area and magnetic block', () => {
@@ -332,7 +330,7 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
           addressableAreaId: 'B4',
         },
       ],
@@ -359,7 +357,12 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
-  it('creates staging area and waste chute', () => {
+  it('creates staging area when there is a waste chute on deck and staging area is added', () => {
+    const mockInitialDeckSetupWithWasteChute = {
+      ...mockInitialDeckSetup,
+      ...mockInitialDeckSetup.additionalEquipmentOnDeck,
+      waste: { location: 'cutoutD3', name: 'wasteChute', id: 'waste' },
+    }
     updateInitialDeckState({
       values: [
         {
@@ -369,7 +372,7 @@ describe('updateInitialDeckState', () => {
           addressableAreaId: 'D4',
         },
       ],
-      initialDeckSetup: mockEmptyIntialDeckSetup,
+      initialDeckSetup: mockInitialDeckSetupWithWasteChute,
       dispatch: mockDispatch,
       setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
       setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
@@ -378,14 +381,56 @@ describe('updateInitialDeckState', () => {
       t: mockT,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      1,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('stagingArea', 'cutoutD3')
     )
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      2,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('wasteChute', 'cutoutD3')
     )
+  })
+  it('removes waste chute from staging area + waste chute combo, leaving staging area', () => {
+    updateInitialDeckState({
+      values: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          addressableAreaId: 'D4',
+        },
+      ],
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
+    })
+    // Should only delete one fixture (waste chute), not both
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+    expect(deleteDeckFixture).toHaveBeenCalledWith('waste')
+  })
+  it('removes staging area from staging area + waste chute combo, leaving waste chute', () => {
+    updateInitialDeckState({
+      values: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: '1ChannelWasteChute',
+        },
+      ],
+      initialDeckSetup: mockInitialDeckSetup,
+      dispatch: mockDispatch,
+      setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
+      setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
+      savedSteps: mockSavedSteps,
+      makeSnackbar: mockMakeSnackbar,
+      t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
+    })
+    // Should only delete one fixture (staging area), not both
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+    expect(deleteDeckFixture).toHaveBeenCalledWith('staging2')
   })
   it('deletes staging area and waste chute', () => {
     updateInitialDeckState({
@@ -447,18 +492,30 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
-  it('tries to delete staging area and waste chute but something is in use', () => {
+  it('tries to delete staging area from waste chute + staging area combo but something is in use', () => {
+    const mockLabwareOnDeck = {
+      labware: {
+        stack: ['labware', 'D4'],
+        def: fixture12Trough as LabwareDefinition2,
+        labwareDefURI: 'mockURI',
+        id: 'labware',
+        pythonName: 'mockPythonName',
+      },
+    }
+    const mockInitialDeckSetupWithLabware = {
+      ...mockInitialDeckSetup,
+      labware: mockLabwareOnDeck,
+    }
     updateInitialDeckState({
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId:
-            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          addressableAreaId: 'D4',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: '1ChannelWasteChute',
         },
       ],
 
-      initialDeckSetup: mockInitialDeckSetup,
+      initialDeckSetup: mockInitialDeckSetupWithLabware,
       dispatch: mockDispatch,
       setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
       setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
@@ -468,6 +525,6 @@ describe('updateInitialDeckState', () => {
       deckConfig: mockDeckConfig,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
+    expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
 })

@@ -14,7 +14,6 @@ import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   ModuleEntities,
-  PipetteEntities,
   RobotState,
 } from '@opentrons/step-generation'
 
@@ -116,11 +115,6 @@ describe('LabwareSlot', () => {
       liquids: [],
       robotState: createMockRobotState(),
       moduleEntities: {} as ModuleEntities,
-      pipetteEntities: {} as PipetteEntities,
-      currentCommand: {
-        commandType: 'aspirate',
-        params: {},
-      } as RunTimeCommand,
     }
   })
 
@@ -154,19 +148,6 @@ describe('LabwareSlot', () => {
           wellName: 'A1',
         },
       },
-    }
-    props.pipetteEntities = {
-      mockPipetteId: {
-        id: 'mockPipetteId',
-        name: 'p300_single',
-        spec: {
-          liquids: {
-            default: {
-              maxVolume: 300,
-            },
-          },
-        },
-      } as any,
     }
     render(props)
     expect(screen.getByText('mock LabwareRender')).toBeInTheDocument()

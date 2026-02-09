@@ -77,6 +77,7 @@ def test_queue_command_action() -> None:
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
         params=params,
+        commandAnnotations=[],
     )
 
     subject.handle_action(action)
@@ -192,6 +193,7 @@ def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
         result=None,
         error=expected_error_occurrence,
         notes=notes,
+        commandAnnotations=[],
     )
 
     assert subject_view.get("command-id") == expected_failed_command

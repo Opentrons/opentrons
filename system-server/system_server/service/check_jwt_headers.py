@@ -16,7 +16,7 @@ async def check_registration_token_header(
     request: Request,
     authenticationBearer: str = Header(
         ...,
-        description="An authentication header bearing a token provided by the /system/register endpoint.",
+        description="An authentication header bearing a token provided by the `/system/register` endpoint.",
     ),
     signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:
@@ -47,7 +47,7 @@ async def check_authorization_token_header(
     request: Request,
     authenticationBearer: str = Header(
         ...,
-        description="An authentication header bearing a token provided by the /system/authorize endpoint.",
+        description="An authentication header bearing a token provided by the `/system/authorize` endpoint.",
     ),
     signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:

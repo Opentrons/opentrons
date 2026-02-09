@@ -6,6 +6,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { withStyleProps } from '../hocs/withStyleProps'
@@ -21,7 +22,7 @@ export type ModuleIconName =
   | 'ot-thermocycler'
   | 'ot-absorbance'
   | 'ot-flex-stacker'
-
+  | 'ot-vacuum'
 export const MODULE_ICON_NAME_BY_TYPE: {
   [type in ModuleType]: ModuleIconName
 } = {
@@ -32,6 +33,7 @@ export const MODULE_ICON_NAME_BY_TYPE: {
   [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
   [ABSORBANCE_READER_TYPE]: 'ot-absorbance',
   [FLEX_STACKER_MODULE_TYPE]: 'ot-flex-stacker',
+  [VACUUM_MODULE_TYPE]: 'ot-vacuum',
 }
 
 interface ModuleIconProps {
