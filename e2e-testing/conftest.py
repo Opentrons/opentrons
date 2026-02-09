@@ -213,6 +213,13 @@ def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
 PD_SERVER_PORTS = [4173, 4174, 4175]
 LL_SERVER_PORTS = [4176, 4177, 4178]
 
+# Substrings expected in the HTML <title> of each app.  Used by
+# ``_verify_server_identity`` to confirm the right application is serving.
+_APP_TITLE_FINGERPRINTS: dict[str, str] = {
+    "pd": "Protocol Designer",
+    "ll": "Labware Library",
+}
+
 
 def _is_http_server_running(url: str, timeout: int = 1) -> bool:
     """Check if any HTTP server is already responding at the given URL."""
@@ -223,20 +230,56 @@ def _is_http_server_running(url: str, timeout: int = 1) -> bool:
         return False
 
 
-def _find_running_server(ports_to_check: list[int]) -> str | None:
-    """Find a running server on localhost for the given port list."""
+def _verify_server_identity(url: str, app: Literal["pd", "ll"], timeout: int = 2) -> bool:
+    """Return True if the server at *url* is serving the expected application.
+
+    Fetches the root page and checks that the HTML ``<title>`` contains the
+    fingerprint string for the requested app.  This prevents one app from
+    being mistaken for the other when they happen to share ports.
+    """
+    fingerprint = _APP_TITLE_FINGERPRINTS[app]
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
+            # Read a limited chunk — the <title> is near the top of the page.
+            body = resp.read(4096).decode("utf-8", errors="replace")
+            return fingerprint.lower() in body.lower()
+    except Exception:
+        return False
+
+
+def _find_running_server(
+    ports_to_check: list[int],
+    app: Literal["pd", "ll"] | None = None,
+) -> str | None:
+    """Find a running server on localhost for the given port list.
+
+    When *app* is provided the server's HTML title is checked to confirm
+    the correct application is serving.  A server that responds but serves
+    the wrong app is skipped with a warning.
+    """
     for port in ports_to_check:
         url = f"http://localhost:{port}"
         if _is_http_server_running(url):
+            if app is not None and not _verify_server_identity(url, app):
+                print(
+                    f"\n⚠️  Server on {url} is responding but does not look like "
+                    f"{app.upper()} (expected '{_APP_TITLE_FINGERPRINTS[app]}' in "
+                    f"<title>).  Skipping."
+                )
+                continue
             return url
     return None
 
 
-def _wait_for_server_ready(ports_to_check: list[int], timeout: int = 240) -> str | None:
+def _wait_for_server_ready(
+    ports_to_check: list[int],
+    timeout: int = 240,
+    app: Literal["pd", "ll"] | None = None,
+) -> str | None:
     """Wait for a local server to become available on any of the given ports."""
     start = time.monotonic()
     while time.monotonic() - start < timeout:
-        running_server = _find_running_server(ports_to_check)
+        running_server = _find_running_server(ports_to_check, app=app)
         if running_server:
             return running_server
         time.sleep(1)
@@ -263,9 +306,9 @@ def _start_pd_server() -> Generator[str, None, None]:
     """Start or reuse a local Protocol Designer preview server."""
     skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
 
-    existing_server = _find_running_server(PD_SERVER_PORTS)
+    existing_server = _find_running_server(PD_SERVER_PORTS, app="pd")
     if existing_server:
-        print(f"\n✓ Server already running on {existing_server}, skipping startup")
+        print(f"\n✓ Protocol Designer already running on {existing_server}, skipping startup")
         os.environ["PD_SERVER_URL"] = existing_server
         yield existing_server
         return
@@ -319,6 +362,8 @@ def _start_pd_server() -> Generator[str, None, None]:
             try:
                 test_url = f"http://localhost:{port}"
                 urllib.request.urlopen(test_url, timeout=1)
+                if not _verify_server_identity(test_url, "pd"):
+                    continue
                 print(f"✅ Preview server is ready on {test_url}")
                 server_url = test_url
                 break
@@ -365,9 +410,9 @@ def _start_ll_server() -> Generator[str, None, None]:
     """Start or reuse a local Labware Library preview server."""
     skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
 
-    existing_server = _find_running_server(LL_SERVER_PORTS)
+    existing_server = _find_running_server(LL_SERVER_PORTS, app="ll")
     if existing_server:
-        print(f"\n✓ Labware Library server already running on {existing_server}, skipping startup")
+        print(f"\n✓ Labware Library already running on {existing_server}, skipping startup")
         os.environ["LL_SERVER_URL"] = existing_server
         yield existing_server
         return
@@ -393,7 +438,6 @@ def _start_ll_server() -> Generator[str, None, None]:
             "-C",
             "../labware-library",
             "serve",
-            "HOST=::",
             f"PORT={preferred_port}",
         ],
         stdout=subprocess.PIPE,
@@ -426,6 +470,8 @@ def _start_ll_server() -> Generator[str, None, None]:
             try:
                 test_url = f"http://localhost:{port}"
                 urllib.request.urlopen(test_url, timeout=1)
+                if not _verify_server_identity(test_url, "ll"):
+                    continue
                 print(f"✅ Labware Library preview server is ready on {test_url}")
                 server_url = test_url
                 break
@@ -532,7 +578,13 @@ def page(context: BrowserContext, request: FixtureRequest) -> Generator[Page, No
             raise
 
         print("\n⚠️  Connection refused, rechecking server availability...")
-        restored_url = _wait_for_server_ready(ports_to_check)
+        if suite == "pd":
+            identity_app: Literal["pd", "ll"] | None = "pd"
+        elif suite == "ll":
+            identity_app = "ll"
+        else:
+            identity_app = None
+        restored_url = _wait_for_server_ready(ports_to_check, app=identity_app)
         if not restored_url:
             raise
 
