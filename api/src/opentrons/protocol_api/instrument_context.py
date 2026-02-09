@@ -1078,7 +1078,6 @@ class InstrumentContext(publisher.CommandPublisher):
             flow_rate: The absolute flow rate in µL/s.
 
                 *New in version 2.28*
-        -->
 
         Raises:
             RuntimeError: If no location is specified and the location cache is `None`.
@@ -1233,7 +1232,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.28:*
             The API will raise an error if touching tip on a labware with the `touchTipDisabled` quirk, like reservoirs or well plates with large wells.
-        -->
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)

@@ -315,7 +315,8 @@ You can also specify a particular well as the blowout location and an absolute f
 ```python
 pipette.blow_out(
     location=plate["B1"],
-    flow_rate=50)
+    flow_rate=50
+)
 ```
 
 Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the [`InstrumentContext.trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] property:
