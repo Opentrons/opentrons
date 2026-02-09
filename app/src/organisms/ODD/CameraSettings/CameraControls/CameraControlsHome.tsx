@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Icon, ListButton, StyledText } from '@opentrons/components'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { MediumButton } from '/app/atoms/buttons'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
@@ -28,6 +29,10 @@ export function CameraControlsHome({
   runId,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const {
+    createCameraImageSettings,
+    isLoading: isCreateCameraImageSettingsLoading,
+  } = useCreateCameraImageSettings()
   const { isLoading, imgPath, takePhoto } = usePreviewImage(
     {
       zoom: settings.zoom,
@@ -47,6 +52,28 @@ export function CameraControlsHome({
     if (!isLoading) {
       takePhoto()
       setShowModal(true)
+    }
+  }
+
+  const handleRestoreToDefault = (): void => {
+    if (runId == null) {
+      if (!isCreateCameraImageSettingsLoading) {
+        createCameraImageSettings(
+          {
+            zoom: 1,
+            brightness: 50,
+            contrast: 50,
+            saturation: 50,
+          },
+          {
+            onSuccess: () => {
+              settings.restoreToDefault()
+            },
+          }
+        )
+      }
+    } else {
+      settings.restoreToDefault()
     }
   }
 
@@ -109,7 +136,10 @@ export function CameraControlsHome({
         <MediumButton
           buttonType="alert"
           buttonText={t('reset_settings_to_default')}
-          onClick={settings.restoreToDefault}
+          onClick={handleRestoreToDefault}
+          iconName={
+            isCreateCameraImageSettingsLoading ? 'ot-spinner' : undefined
+          }
         />
       </div>
     </div>

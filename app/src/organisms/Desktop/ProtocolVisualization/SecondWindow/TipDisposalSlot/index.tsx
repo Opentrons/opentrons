@@ -9,10 +9,12 @@ import type { RobotState } from '@opentrons/step-generation'
 
 interface TipDisposalSlotProps {
   robotState: RobotState
+  disposalType: 'trash' | 'wasteChute'
 }
 
 export function TipDisposalSlot({
   robotState,
+  disposalType,
 }: TipDisposalSlotProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const { tipState } = robotState
@@ -28,12 +30,16 @@ export function TipDisposalSlot({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <RobotInfoLabel deckLabel={t('trash')} />
+        <RobotInfoLabel
+          deckLabel={disposalType === 'trash' ? t('trash') : t('waste_chute')}
+        />
       </div>
       <div className={styles.main_content}>
         <div className={styles.text_container}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-            {t('tips_in_trash')}
+            {disposalType === 'trash'
+              ? t('tips_in_trash')
+              : t('tips_in_waste_chute')}
           </StyledText>
           <StyledText desktopStyle="captionRegular">
             {t('remaining_tips', { remaining: totalEmptyTips })}
