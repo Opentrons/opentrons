@@ -1,5 +1,5 @@
 ---
-title: "Opentrons OT-2: App Features Reference"
+title: "Opentrons OT-2: App Features Summary"
 ---
 
 You control the OT-2 using the Opentrons App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.
@@ -10,11 +10,13 @@ The Protocols tab is selected by default when you first launch the app. It inclu
 
 ### Protocols summary
 
+The basic protocol screen displays a summary list of all the protocols stored on your computer.
+
 <figure class="screenshot" markdown>
-![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }
+![Protocols tab showing uploaded protocols](../images/app-protocol-list.png)
 </figure>
 
-The basic protocol screen displays a summary list of all the protocols stored on your computer. Other screen elements and actions let you sort protocols, assign a protocol to a robot, and expand the protocol summary to see more information about each protocol.
+Other screen elements and actions let you sort protocols, assign a protocol to a robot, and expand the protocol summary to see more information about each protocol.
 
 <table>
   <thead>
@@ -26,29 +28,29 @@ The basic protocol screen displays a summary list of all the protocols stored on
   <tbody>
     <tr>
       <td>Sort by</td>
-      <td>Opens a drop-down menu that sorts protocol files. Options include:
+      <td>Opens a menu that sorts protocol files. Options include:
         <ul>
-            <li><strong>Alphabetical</strong></li>
-            <li><strong>Reverse alphabetical</strong></li>
-            <li><strong>Most recent updates</strong></li>
-            <li><strong>Oldest updates</strong></li>
-            <li><strong>Flex protocols first</strong></li>
-            <li><strong>OT-2 protocols first</strong></li>
+            <li>Alphabetical</li>
+            <li>Reverse alphabetical</li>
+            <li>Most recent updates</li>
+            <li>Oldest updates</li>
+            <li>Flex protocols first</li>
+            <li>OT-2 protocols first</li>
         </ul>
       </td>
     </tr>
     <tr>
-      <td><strong>Import</strong> button</td>
+      <td>Import button</td>
       <td>Opens a file picker that lets you browse to and upload other saved protocols.</td>
     </tr>
     <tr>
         <td>Three-dot (⋮) menu</td>
-        <td>Opens a pop-up menu that includes these options:
+        <td>Opens a menu that includes these options:
             <ul>
-                <li><strong>Start setup</strong>: choose a networked Opentrons robot to run a protocol.</li>
-                <li><strong>Reanalyze</strong>: runs protocol analysis on a saved or revised protocol.</li>
-                <li><strong>Show in folder</strong>: opens the file location for stored protocols.</li>
-                <li><strong>Delete</strong>: deletes a protocol. Tip: Use the "Show in folder" option to delete protocols in bulk.</li>
+                <li>Start setup: choose a networked Opentrons robot to run a protocol.</li>
+                <li>Reanalyze: runs protocol analysis on a saved or revised protocol.</li>
+                <li>Show in folder: opens the file location for stored protocols.</li>
+                <li>Delete: deletes a protocol. Tip: Use the "Show in folder" option to delete protocols in bulk.</li>
             </ul>
         </td>
     </tr>
@@ -61,13 +63,13 @@ The basic protocol screen displays a summary list of all the protocols stored on
 
 ### Protocol details
 
-You can click on any listed protocol summary to expand it. An expanded tile shows you more information about the protocol.
+You can click on any listed protocol summary to see more information about the protocol.
 
 <figure class="screenshot" markdown>
-![Protocol details tile](../images/app-protocol-details.png){ width="80%" }
+![Protocol details screen](../images/app-protocol-details.png){ #width="80%" }
 </figure>
 
-Click the **Protocols** tab to return to the default summary list view.
+Click the **Protocols** tab to return to the summary view.
 
 ## Labware tab
 
@@ -130,14 +132,15 @@ Each summary tile provides robot information as shown in the following table.
 </table>
 
 !!! tip
-    If you're using a WiFi connection and the OT-2 you want to use is unavailable, check your WiFi settings. Your OT-2 may be on a different wireless network.
+    If you're using a Wi-Fi connection and the OT-2 you want to use is unavailable, check your Wi-Fi settings. Your OT-2 may be on a different wireless network.
 
 ### Robot details
 
-You can click on any robot summary tile to expand it for more information about a particular robot. In each section, three-dot (⋮) menus provide context-specific controls for the robot, any attached instruments and modules.
+You can click on any robot summary to see more information about a particular robot. In each section, three-dot (⋮) menus provide context-specific controls for the robot, any attached instruments and modules.
 
 <figure class="screenshot" markdown>
 ![Device 3-dot menus for robot hardware controls](../images/app-device-details-hardware.png)
+<figcaption>Context menus shown for reference. Only one can be active at a time.</figcaption>
 </figure>
 
 ### Module status and controls
@@ -173,7 +176,7 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
       <td><strong>Magnetic Module</strong></td>
       <td>
         <ul>
-          <li>Set the magnet engagement height.</li>
+          <li>Set engagement height for the magnets.</li>
         </ul>
       </td>
     </tr>

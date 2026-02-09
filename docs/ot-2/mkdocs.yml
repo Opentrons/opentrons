@@ -33,11 +33,10 @@ nav:
       - Installing the App: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
-      - App Features Reference: opentrons-app/features.md
+      - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
-      - User-level Maintenance Procedures: maintenance/self-service.md
       - Instrument Services: maintenance/services.md
   - Appendices:
       - Additional Documentation: additional-docs.md
