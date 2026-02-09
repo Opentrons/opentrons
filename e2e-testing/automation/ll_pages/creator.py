@@ -11,7 +11,7 @@ from pathlib import Path
 
 from playwright.sync_api import Locator, Page, expect
 
-from automation.pd_pages.base_page import BasePage
+from automation.base_page import BasePage
 
 
 class LabwareCreator(BasePage):
