@@ -77,7 +77,7 @@
 .individual_command_text {
   overflow-wrap: anywhere;
   white-space: normal;
-  word-break: break-all;
+  word-break: normal;
 }
 
 .individual_command_text :global(ul),
