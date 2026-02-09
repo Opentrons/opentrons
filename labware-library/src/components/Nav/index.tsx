@@ -16,10 +16,7 @@ export function Nav(): JSX.Element {
             <SubdomainNav />
           </div>
         </div>
-        <div
-          className={styles.main_nav_wrapper}
-          data-testid="MainNavWrapper"
-        >
+        <div className={styles.main_nav_wrapper} data-testid="MainNavWrapper">
           <div className={styles.nav_container}>
             <MainNav />
           </div>
