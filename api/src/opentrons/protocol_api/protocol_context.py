@@ -25,6 +25,7 @@ from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from . import validation
+from ._command_annotations import GroupedSteps
 from ._liquid import Liquid, LiquidClass
 from ._liquid_properties import build_transfer_properties
 from ._parameters import Parameters
@@ -1918,6 +1919,21 @@ class ProtocolContext(CommandPublisher):
             yield
         finally:
             self._core.close_command_annotation(annotation_id)
+
+    def create_step_group(
+        self, name: str, description: Optional[str] = None
+    ) -> GroupedSteps:
+        """Starts a grouping of commands for visualization in run previews and the run log.
+        This returns a step group object which can then be closed by calling `.close_group`.
+
+        This has no effect on the execution of the protocol.
+
+        Args:
+            name: The name of the group of steps
+            description: An optional description of this group
+        """
+        annotation_id = self._core.create_user_command_annotation(name, description)
+        return GroupedSteps(annotation_id=annotation_id, protocol_core=self._core)
 
 
 def _create_module_context(
