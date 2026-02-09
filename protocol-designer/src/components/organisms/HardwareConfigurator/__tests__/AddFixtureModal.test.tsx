@@ -6,7 +6,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { AddFixtureModal, InitialDeckStateModules } from '../AddFixtureModal'
+import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 import type {
@@ -16,6 +16,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures } from '../../types'
+import type { InitialDeckStateModules } from '../AddFixtureModal'
 
 vi.mock('/protocol-designer/step-forms/actions')
 vi.mock('/protocol-designer/feature-flags/selectors')
@@ -48,7 +49,6 @@ describe('AddFixtureModal', () => {
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
-    vi.resetAllMocks
   })
 
   it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {

@@ -299,7 +299,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     const matchedComboFixtureId =
       matchedModule != null
         ? getComboFixtureFromFixtureIds([
-            moduleFixtureId as CutoutFixtureId,
+            moduleFixtureId!,
             newModule.cutoutFixtureId as CutoutFixtureId,
           ])
         : undefined
@@ -341,7 +341,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     const matchedFixture = matchedEntry != null ? matchedEntry[1] : undefined
 
     const matchedComboFixtureId = getComboFixtureFromFixtureIds([
-      (matchedFixture?.cutoutFixtureId as CutoutFixtureId) ?? '',
+      matchedFixture?.cutoutFixtureId! ?? '',
       newFixture.cutoutFixtureId as CutoutFixtureId,
     ])
     const filteredFixtures = Object.fromEntries(
