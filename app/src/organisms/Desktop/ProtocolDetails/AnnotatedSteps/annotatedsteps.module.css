@@ -80,6 +80,24 @@
   word-break: break-all;
 }
 
+.individual_command_text :global(ul),
+.individual_command_text :global(ol) {
+  padding-left: 0;
+  margin: 0;
+}
+
+.individual_command_text :global(li) {
+  position: relative;
+  padding-left: var(--spacing-10);
+  list-style: none;
+}
+
+.individual_command_text :global(li)::before {
+  position: absolute;
+  left: 0;
+  content: '•';
+}
+
 .annotated_steps_container {
   width: 100%;
   height: 100%;
