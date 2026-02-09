@@ -22,6 +22,8 @@ on:
       - 'e2e-testing/conftest.py'
       - 'e2e-testing/pytest.ini'
       - 'e2e-testing/eyes.py'
+      - 'e2e-testing/Makefile'
+      - 'e2e-testing/automation/base_page.py'
       - 'e2e-testing/automation/ll_pages/**'
   workflow_dispatch: {}
 

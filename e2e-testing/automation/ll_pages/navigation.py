@@ -10,7 +10,7 @@ import re
 
 from playwright.sync_api import Locator, Page, expect
 
-from automation.pd_pages.base_page import BasePage
+from automation.base_page import BasePage
 
 
 class DesktopNavigation(BasePage):
@@ -21,11 +21,11 @@ class DesktopNavigation(BasePage):
 
     def subdomain_nav(self) -> Locator:
         """Return the subdomain navigation wrapper."""
-        return self.page.locator("div[class*='_subdomain_nav_wrapper_']")
+        return self.page.get_by_test_id("SubdomainNavWrapper")
 
     def main_nav(self) -> Locator:
         """Return the main navigation wrapper."""
-        return self.page.locator("div[class*='_main_nav_wrapper_']")
+        return self.page.get_by_test_id("MainNavWrapper")
 
     def wait_for_loaded(self) -> None:
         """Wait for navigation wrappers to be visible."""
