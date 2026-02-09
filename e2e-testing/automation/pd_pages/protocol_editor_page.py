@@ -5,7 +5,7 @@ from typing import Sequence
 
 from playwright.sync_api import Page, TimeoutError, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class ProtocolEditorPage(BasePage):

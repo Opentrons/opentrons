@@ -5,7 +5,7 @@ from typing import List, Literal, Optional, Union
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class TransferPage(BasePage):
