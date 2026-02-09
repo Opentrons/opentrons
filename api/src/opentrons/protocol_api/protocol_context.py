@@ -1904,7 +1904,7 @@ class ProtocolContext(CommandPublisher):
         self, name: str, description: Optional[str] = None
     ) -> Iterator[None]:
         """Group commands together for visualization in run previews and the run log.
-        This is a context manager using the `with` synatx, and all commands within this block
+        This is a context manager using the `with` syntax, and all commands within this block
         will be grouped together.
 
         This has no effect on the execution of the protocol.
