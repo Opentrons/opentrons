@@ -12,7 +12,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.9.0!**
 
-This release introduces updated Thermocycler Module and liquid class features.
+This release introduces updated Thermocycler Module steps and includes other bug fixes. 
 
 ### New Features
 
@@ -22,7 +22,11 @@ This release introduces updated Thermocycler Module and liquid class features.
   - wait for the Thermocycler Module to finish running a profile or reaching a temperature.
   - continue performing protocol actions while your Thermocycler Module step completes.
 
-- Customize the well location to blow out excess liquid from the pipette tip, including blowout height at a source or destination well.
+
+### Bug Fixes
+
+- The Flex Stacker Module shows the correct number of labware stored inside. 
+- Add or remove a Flex Stacker Module or waste chute to the robot deck without triggering protocol errors.
 
 ## Opentrons Protocol Designer Changes in 8.8.0
 
