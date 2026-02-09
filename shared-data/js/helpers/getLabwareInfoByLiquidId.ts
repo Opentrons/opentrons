@@ -60,8 +60,10 @@ export function getLabwareInfoByLiquidId(
       ([liquidId, labwareArray]) => {
         labwareArray.forEach(labware => {
           Object.entries(labware.volumeByWell).forEach(([well, volume]) => {
-            wellToLabwareVolumes[well] ??= []
-            wellToLabwareVolumes[well].push({
+            // Only mix liquids in the same labware's well
+            const compositeKey = `${labware.labwareId}:${well}`
+            wellToLabwareVolumes[compositeKey] ??= []
+            wellToLabwareVolumes[compositeKey].push({
               labwareId: labware.labwareId,
               volume,
               liquidId,
@@ -77,7 +79,7 @@ export function getLabwareInfoByLiquidId(
     )
     const consolidatedWells: LabwareByLiquidId = {}
 
-    overlappingWells.forEach(([well, entries]) => {
+    overlappingWells.forEach(([compositeKey, entries]) => {
       const totalVolume = entries.reduce((sum, entry) => sum + entry.volume, 0)
       const labwareIdName = entries[0].labwareId
       const liquidIds = entries.map(e => e.liquidId).sort()
@@ -86,18 +88,22 @@ export function getLabwareInfoByLiquidId(
       consolidatedWells[mixedLiquidId] ??= [
         { labwareId: labwareIdName, volumeByWell: {} },
       ]
-      consolidatedWells[mixedLiquidId][0].volumeByWell[well] = totalVolume
+      const wellName = compositeKey.split(':')[1]
+      consolidatedWells[mixedLiquidId][0].volumeByWell[wellName] = totalVolume
     })
     // Remove consolidated wells from the original liquids
     const cleanedOriginal: LabwareByLiquidId = {}
-    const overlappingWellSet = new Set(overlappingWells.map(([well]) => well))
+    const overlappingWellSet = new Set(
+      overlappingWells.map(([compositeKey]) => compositeKey)
+    )
 
     Object.entries(liquidsByIdForLabware).forEach(
       ([liquidId, labwareArray]) => {
         labwareArray.forEach(labware => {
           const remainingWells = Object.fromEntries(
             Object.entries(labware.volumeByWell).filter(
-              ([well]) => !overlappingWellSet.has(well)
+              ([well]) =>
+                !overlappingWellSet.has(`${labware.labwareId}:${well}`)
             )
           )
 
