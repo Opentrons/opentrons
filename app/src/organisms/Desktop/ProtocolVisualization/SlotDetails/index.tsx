@@ -77,14 +77,21 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const isTrashOnSlot =
     Object.values(trashBinEntities).some(
       trash => trash.location.split('cutout')[1] === slotId
-    ) ||
-    Object.values(wasteChuteEntities).some(
-      trash => trash.location.split('cutout')[1] === slotId
-    ) ||
-    slotId === 'fixedTrash'
+    ) || slotId === 'fixedTrash'
+  const isWasteChuteOnSlot = Object.values(wasteChuteEntities).some(
+    wasteChute => wasteChute.location.split('cutout')[1] === slotId
+  )
+
+  let disposalType: 'wasteChute' | 'trash' | null = null
+
+  if (isWasteChuteOnSlot) {
+    disposalType = 'wasteChute'
+  } else if (isTrashOnSlot) {
+    disposalType = 'trash'
+  }
 
   const isSlotEmpty =
-    moduleOnSlot == null && topMostLabwareOnSlot == null && !isTrashOnSlot
+    moduleOnSlot == null && topMostLabwareOnSlot == null && disposalType == null
 
   const getLabwareType = (): 'tiprack' | 'labware' | null => {
     if (topMostLabwareOnSlot == null) {
@@ -135,7 +142,12 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
       <div className={styles.slot_container}>
         <div className={styles.slot_details}>
           {renderLabwareContent()}
-          {isTrashOnSlot ? <TipDisposalSlot robotState={robotState} /> : null}
+          {disposalType != null ? (
+            <TipDisposalSlot
+              robotState={robotState}
+              disposalType={disposalType}
+            />
+          ) : null}
           {moduleOnSlot != null ? (
             <ModuleContainer
               moduleId={moduleOnSlot[0]}
