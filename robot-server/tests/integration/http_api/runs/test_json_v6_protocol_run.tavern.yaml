@@ -55,7 +55,6 @@ stages:
           runTimeParameters: []
           outputFileIds: []
           protocolId: '{protocol_id}'
-          commandAnnotations: []
 
   - name: Execute a setup command
     request:

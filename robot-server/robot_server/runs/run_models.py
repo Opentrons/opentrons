@@ -163,10 +163,6 @@ class Run(ResourceModel):
         ...,
         description="File IDs of files output during a protocol run.",
     )
-    commandAnnotations: List[UserCommandAnnotation] = Field(
-        default_factory=list,
-        description="Annotations for commands in this run.",
-    )
     protocolId: Optional[str] = Field(
         None,
         description=(
@@ -255,10 +251,6 @@ class BadRun(ResourceModel):
     outputFileIds: List[str] = Field(
         ...,
         description="File IDs of files output during a protocol run.",
-    )
-    commandAnnotations: List[UserCommandAnnotation] = Field(
-        default_factory=list,
-        description="Annotations for commands in this run.",
     )
     protocolId: Optional[str] = Field(
         None,
