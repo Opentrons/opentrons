@@ -56,7 +56,7 @@ Other screen elements and actions let you sort protocols, assign a protocol to a
     </tr>
     <tr>
         <td>Create or download a new protocol</td>
-        <td>Links to the <a href="https://library.opentrons.com/">Protocol Library</a>, <a href="https://designer.opentrons.com/">Protocol Designer</a>, and the <a href="https://docs.opentrons.com/python-api/">Python API</a>.</td>
+        <td>Links to the <a href="https://library.opentrons.com/">Protocol Library</a>, <a href="https://designer.opentrons.com/">Protocol Designer</a>, and the <a href="../../../python-api/">Python API</a>.</td>
     </tr>
   </tbody>
 </table>

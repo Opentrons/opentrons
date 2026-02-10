@@ -105,10 +105,10 @@ See [First Run](../installation/first-run.md) for information on how to properly
 ### USB ports
 
 The OT-2 has 4 USB ports, located in the right rear of the enclosure, behind the gantry. These ports, labeled USB-1 through USB-4, are used for communication between connected Opentrons modules and the robot.
-<!-- potato quality from originals -->
+
 ![USB ports](../images/usb-ports.png)
 
-See the <font color="red">MODULES CHAPTER PLACEHOLDER AND LINK</font> for more information on connecting these devices and using them in your protocols.
+See the [OT-2 Modules section](../modules/index.md) for more information on connecting these devices and using them in your protocols.
 
 ## Serial number
 

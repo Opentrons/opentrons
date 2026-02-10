@@ -2,8 +2,6 @@
 title: "Opentrons OT-2: System Specifications"
 ---
 
-## General specifications
-
 <table>
   <thead>
     <tr>
