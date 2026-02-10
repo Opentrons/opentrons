@@ -6,7 +6,7 @@ Welcome to the instruction manual for the Opentrons OT-2 liquid handling robot. 
 
 ## Description
 
-The OT-2 automates routine liquid-handling work in your lab. It is a modular system that includes user-swappable pipettes, on-deck modules, and labware. You control the OT-2 through the [Opentrons App](https://opentrons.com/ot-app), our open-source [Python API](https://docs.opentrons.com/python-api/), and through protocols created in the [Opentrons Protocol Designer](https://docs.opentrons.com/protocol-designer/).
+The OT-2 automates routine liquid-handling work in your lab. It is a modular system that includes user-swappable pipettes, on-deck modules, and labware. You control the OT-2 through the [Opentrons App](https://opentrons.com/ot-app), our open-source [Python API](../../python-api/), and through protocols created in the [Opentrons Protocol Designer](../../protocol-designer/).
 
 ## Structure of this manual
 
@@ -22,4 +22,4 @@ This manual is organized to help you get started quickly and operate your OT-2 e
 
 - **Keep OT-2 running**: Following the user-level procedures in the [Maintenance section](./maintenance/index.md) helps ensure that your robot has a long and trouble-free life.
 
-- **And more!** For other topics, see the [Appendices section](./support.md).
+- **And more!** For other topics, see the Appendices. Here you can find more information about Opentrons and writing code to control your OT-2.
