@@ -8,7 +8,7 @@ You can control and work with Flex using either the on-device [touchscreen](../t
 
 - [Transferring Protocols](./protocol-transfer.md) explains how to import, analyze, and transfer protocols to your Flex, including options to start runs immediately or save them for later, and how to manage recent run logs.
 
-- [Protocol Visualization](../protocol-viz.md) describes visualizing protocols in the app to more effictively develop, troubleshoot, and edit your Flex protocols. 
+- [Protocol Visualization](../protocol-viz.md) describes visualizing protocols in the app to more effectively develop, troubleshoot, and edit your Flex protocols. 
 
 - [Controlling Modules](./module-control.md) describes how to view the status of connected instruments and manually control hardware, such as setting temperatures or shaking speeds, outside of a protocol run.
 
