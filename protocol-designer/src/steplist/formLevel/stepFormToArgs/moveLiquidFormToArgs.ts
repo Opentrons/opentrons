@@ -173,6 +173,7 @@ export const moveLiquidFormToArgs = (
     dispense_x_position,
     aspirate_y_position,
     dispense_y_position,
+    primaryNozzle,
     pushOut_checkbox,
     pushOut_volume,
     tip_tracking,
@@ -349,6 +350,7 @@ export const moveLiquidFormToArgs = (
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation,
     nozzles,
+    primaryNozzle,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
     aspirateZOffset:

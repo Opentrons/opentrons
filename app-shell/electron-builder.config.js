@@ -37,6 +37,7 @@ module.exports = async () => ({
     '!**/.venv',
     '!Makefile',
     '!python',
+    '!**/.venv/**',
     {
       from: '../app/dist',
       to: './ui',

@@ -55,12 +55,12 @@ export function StepDetailViewer(): JSX.Element {
     }
 
     // initial fetch
-    fetchData()
+    void fetchData()
 
     // listen for updates
     const listener = (_event: unknown, updatedKey: string): void => {
       if (updatedKey === protocolKey) {
-        fetchData()
+        void fetchData()
       }
     }
 
@@ -78,16 +78,14 @@ export function StepDetailViewer(): JSX.Element {
   if (loading) {
     return <SkeletonForSlotDetail />
   }
-  if (!data) {
+  if (data === null) {
     return <div>no data found</div>
   }
-  const { slot, command, robotState, invariantContext, analysis, liquids } =
-    data
+  const { slot, robotState, invariantContext, analysis, liquids } = data
 
   return (
     <SlotDetails
       slotId={slot}
-      command={command}
       robotState={robotState}
       invariantContext={invariantContext}
       analysis={analysis}

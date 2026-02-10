@@ -176,3 +176,62 @@ All tests automatically generate comprehensive reports and recordings:
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document with comments and print statements the steps the test is trying to take in the UI. With this additional documentation agents are much more effective at maintaining and extending tests.
+
+## Visual Snapshots (Applitools Eyes)
+
+This project includes an opt-in Applitools Eyes integration for visual snapshots.
+
+### Setup
+
+1. Create a `.env` file inside `e2e-testing/` there is an example file `.env.example` (you can just copy it):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Add your Applitools API key:
+
+   ```bash
+   APPLITOOLS_API_KEY=...your_key...
+   ```
+
+`python-dotenv` will load the nearest `.env` automatically during the test run.
+
+### Usage
+
+Use the `eyes` pytest fixture when you want to capture visual checkpoints.
+
+```python
+from playwright.sync_api import Locator, Page
+
+from eyes import Eyes
+
+
+def test_visual_checkpoint(page: Page, eyes: Eyes | None) -> None:
+   # ... navigate using page objects ...
+
+   if eyes is None:
+      # Eyes is disabled in headed mode or when APPLITOOLS_API_KEY is missing.
+      return
+
+   eyes.check("Main Page")
+
+   timeline: Locator = page.get_by_test_id("TimelineToolbox_scrollContainer")
+   eyes.check_element("Timeline Toolbox (stitched)", timeline)
+```
+
+Notes:
+
+- If `APPLITOOLS_API_KEY` is not set, the `eyes` fixture yields `None`.
+- In headed mode, the `eyes` fixture yields `None` (no visual snapshots).
+- Applitools batch name is set in `conftest.py`:
+  - Local/dev: `dev run | <TEST_ENV>`
+  - CI: `CI | <PR branch>`
+
+### Adding a new visual checkpoint
+
+When you want to add a new visual checkpoint, add a new `eyes.check("<checkpoint>")` call.
+
+If you have multiple checkpoints in the same test, they will be grouped under a single Applitools test. Make sure each checkpoint name is unique.
+
+You can run the test locally and approve the baseline but this will not be the approval for the test in CI. CI runs have a baseline with the OS set to Linux, and so is considered a separate baseline from local (macOS) runs.

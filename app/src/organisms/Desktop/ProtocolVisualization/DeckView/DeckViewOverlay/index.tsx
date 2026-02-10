@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getAddressableAreaFromSlotId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   getFlexHoverDimensions,
@@ -97,6 +98,27 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const hoverOpacity = hover != null && hover === slotId ? 0.9 : 0
 
   if (robotType === FLEX_ROBOT_TYPE) {
+    const thermocyclerModuleEntry = Object.entries(modules).find(
+      ([id, module]) =>
+        module.slot === slotMapped &&
+        moduleEntities[id]?.type === THERMOCYCLER_MODULE_TYPE
+    )
+    const thermocyclerModuleModel =
+      thermocyclerModuleEntry != null
+        ? moduleEntities[thermocyclerModuleEntry[0]]?.model
+        : null
+    const slotOffsetFromCutout = getAddressableAreaFromSlotId(
+      slotMapped,
+      deckDef
+    )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    const moduleOffsetFromCutout = deckDef.locations.addressableAreas.find(
+      area => area.id === thermocyclerModuleModel
+    )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    const thermocyclerOffsetFromSlot = [
+      moduleOffsetFromCutout[0] - slotOffsetFromCutout[0],
+      moduleOffsetFromCutout[1] - slotOffsetFromCutout[1],
+      moduleOffsetFromCutout[2] - slotOffsetFromCutout[2],
+    ]
     const { width, x, y, height } = getFlexHoverDimensions(
       stagingAreaLocations,
       cutoutId,
@@ -123,8 +145,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
           key={`${robotType.toLowerCase()}_slotOverlay`}
           width={width}
           height={height}
-          x={x}
-          y={y}
+          x={hasTCOnSlot === true ? x + thermocyclerOffsetFromSlot[0] : x}
+          y={hasTCOnSlot === true ? y + thermocyclerOffsetFromSlot[1] : y}
           flexProps={{ flex: '1' }}
           foreignObjectProps={{
             opacity: hoverOpacity,

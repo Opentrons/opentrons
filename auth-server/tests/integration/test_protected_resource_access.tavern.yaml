@@ -1,0 +1,84 @@
+test_name: Protected resource access
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Accessing the resource without a token should fail
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+    response:
+      status_code: 403
+
+  - name: Accessing the resource with a bogus token should fail
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: Bearer bogus_token_1234
+    response:
+      status_code: 403
+
+  - name: Get an access token with insufficient scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+        scope: runs.read # Omit users.write.
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: runs.read
+      save:
+        json:
+          access_token: access_token
+
+  - name: Accessing the resource with an insufficiently-scoped token should fail
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: 'Bearer {access_token}'
+    response:
+      status_code: 403
+
+  - name: Get an access token with sufficient scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+        scope: users.write
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: users.write
+      save:
+        json:
+          access_token: access_token
+
+  - name: Accessing the resource with a sufficiently-scoped token should succeed
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: 'Bearer {access_token}'
+    response:
+      status_code: 200

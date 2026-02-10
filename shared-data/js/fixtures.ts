@@ -126,7 +126,7 @@ export function getAADisplayName(
   ).displayName
 }
 
-// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead https://opentrons.atlassian.net/browse/AUTH-2736
 // mapping of OT-2 deck slots to cutouts
 export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   1: 'cutout1',
@@ -143,7 +143,7 @@ export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   fixedTrash: 'cutout12',
 }
 
-// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead https://opentrons.atlassian.net/browse/AUTH-2736
 // mapping of Flex deck slots to cutouts
 export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: CutoutId } = {
   A1: 'cutoutA1',
@@ -686,7 +686,7 @@ export function getFixtureDisplayName(
   }
 }
 
-// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead https://opentrons.atlassian.net/browse/AUTH-2736
 // TODO: Move to helpers/deckDeclarationHelpers.ts
 export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
@@ -702,7 +702,7 @@ export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
-// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead https://opentrons.atlassian.net/browse/AUTH-2736
 // TODO: Move to helpers
 export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
@@ -1162,4 +1162,53 @@ export const getCutoutConfigReplacmentForModule = (
   return getReplacementFixtureForFakeFixture(
     replacmentFixture[0].cutoutFixtureId
   )
+}
+
+// Check if thermocycler fixtures need the missing fixture added
+export const getAddedMissingThermocyclerFixtures = (
+  values: CutoutConfigMap[],
+  deckDef: DeckDefinition
+): CutoutConfigMap[] => {
+  const thermocyclerFixtures = MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]
+  const hasThermocyclerFixture = values.some(v =>
+    thermocyclerFixtures?.includes(v.cutoutFixtureId as CutoutFixtureId)
+  )
+
+  if (!hasThermocyclerFixture || thermocyclerFixtures == null) {
+    return values
+  }
+
+  const missingFixtures = thermocyclerFixtures.reduce<CutoutConfigMap[]>(
+    (acc, fixtureId) => {
+      const alreadyExists = values.some(v => v.cutoutFixtureId === fixtureId)
+      if (alreadyExists) {
+        return acc
+      }
+
+      const fixtureFromDeckDef = deckDef.cutoutFixtures.find(
+        fixture => fixture.id === fixtureId
+      )
+      const cutoutId = fixtureFromDeckDef?.mayMountTo[0]
+      if (cutoutId == null || fixtureFromDeckDef == null) {
+        return acc
+      }
+
+      // Get addressable area from providesAddressableAreas using the cutoutId
+      const addressableArea =
+        fixtureFromDeckDef.providesAddressableAreas[cutoutId]?.[0]
+
+      return [
+        ...acc,
+        {
+          cutoutId,
+          cutoutFixtureId: fixtureId as CutoutFixtureId,
+          addressableAreaId: (addressableArea ??
+            cutoutId.replace('cutout', '')) as AddressableAreaNamesWithFakes,
+        },
+      ]
+    },
+    []
+  )
+
+  return [...values, ...missingFixtures]
 }
