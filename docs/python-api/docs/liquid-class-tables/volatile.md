@@ -6,7 +6,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -14,56 +13,45 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 23.5 µL/sec</li>
-                        <li>20 µL: 35 µL/sec</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 24 µL/sec</li>
-                        <li>50 µL: 35 µL/sec</li>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
                     </ul>
                 </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.7 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -0.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -77,7 +65,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -85,56 +72,45 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 23.5 µL/sec</li>
-                        <li>20 µL: 35 µL/sec</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 24 µL/sec</li>
-                        <li>50 µL: 35 µL/sec</li>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
                     </ul>
                 </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.5 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -1.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -156,7 +132,7 @@
         <tbody>
             <tr>
                 <td>Submerge speed</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
@@ -164,55 +140,88 @@
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
                     </ul>
                 </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>
+                    <ul>
+                        <li>5 µL: 7 µL/sec</li>
+                        <li>50 µL: 50 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>100 µL: 100 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
-                <td>1 sec</td>
-                <td>0.75 sec</td>
-                <td>0.5 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -242,55 +251,88 @@
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
                     </ul>
                 </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>
+                    <ul>
+                        <li>5 µL: 7 µL/sec</li>
+                        <li>50 µL: 50 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>100 µL: 100 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -0.2 µL</li>
+                        <li>200 µL: -4.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
-                <td>1 sec</td>
-                <td>0.75 sec</td>
-                <td>0.5 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -304,7 +346,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -312,7 +353,6 @@
         <tbody>
             <tr>
                 <td>Submerge speed</td>
-                <td>100 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
@@ -320,57 +360,64 @@
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 23.5 µL/sec</li>
-                        <li>20 µL: 35 µL/sec</li>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
                     </ul>
                 </td>
-                <td>6.5 µL/sec</td>
-                <td>80 µL/sec</td>
+                <td>
+                    <ul>
+                        <li>5 µL: 7 µL/sec</li>
+                        <li>50 µL: 50 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: -0.1 µL</li>
+                        <li>5 µL: -0.35 µL</li>
+                        <li>10 µL: 0.08 µL</li>
+                        <li>50 µL: -1.34 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: 0.7 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
-                <td>0.5 sec</td>
-                <td>0.75 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1 µL: 2 µL</li>
-                        <li>50 µL: 3.5 µL</li>
-                        <li>198 µL: 2 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -397,22 +444,61 @@
                 <td>35 mm/sec</td>
             </tr>
             <tr>
-                <td>Aspirate flow rate</td>
-                <td>200 µL/sec</td>
-                <td>200 µL/sec</td>
-                <td>200 µL/sec</td>
+                <td>Aspirate flow rate by volume</td>
+                <td>
+                    <ul>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>50 µL: 30 µL/sec</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>5 µL: 7 µL/sec</li>
+                        <li>50 µL: 50 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>10 µL: 10 µL/sec</li>
+                        <li>100 µL: 100 µL/sec</li>
+                        <li>200 µL: 200 µL/sec</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.35 µL</li>
+                        <li>10 µL: 0.1 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.25 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.4 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after aspirating</td>
-                <td>0.5 sec</td>
-                <td>0.75 sec</td>
-                <td>0.5 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
@@ -422,27 +508,27 @@
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -458,7 +544,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -466,66 +551,43 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>1 µL: 10 µL/sec</li>
-                        <li>9.999 µL: 10 µL/sec</li>
-                        <li>10 µL: 10 µL/sec</li>
-                        <li>20 µL: 20 µL/sec</li>
-                    </ul>
-                </td>
-                <td>50 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>7 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.7 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -0.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>
-                    <ul>
-                        <li>1–4.999 µL: 1.5 µL</li>
-                        <li>5–20 µL: 1 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–4.999 µL: 7 µL</li>
-                        <li>5–50 µL: 2 µL</li>
-                    </ul>
-                </td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -539,7 +601,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -547,66 +608,43 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>1 µL: 55 µL/sec</li>
-                        <li>9.999 µL: 55 µL/sec</li>
-                        <li>10 µL: 55 µL/sec</li>
-                        <li>20 µL: 55 µL/sec</li>
-                    </ul>
-                </td>
-                <td>50 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>35 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.5 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -1.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>
-                    <ul>
-                        <li>1–4.999 µL: 3.5 µL</li>
-                        <li>5–20 µL: 0.5 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–4.999 µL: 7 µL</li>
-                        <li>5–50 µL: 2 µL</li>
-                    </ul>
-                </td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -628,69 +666,84 @@
         <tbody>
             <tr>
                 <td>Submerge speed</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
-                    </ul>
-                </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>300 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>5 µL</td>
-                <td>15 µL</td>
-                <td>20 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -717,64 +770,79 @@
                 <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
-                    </ul>
-                </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>300 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -0.2 µL</li>
+                        <li>200 µL: -4.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>5 µL</td>
-                <td>15 µL</td>
-                <td>20 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -788,7 +856,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -796,7 +863,6 @@
         <tbody>
             <tr>
                 <td>Submerge speed</td>
-                <td>100 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
@@ -804,62 +870,69 @@
                 <td>Dispense flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1 µL: 10 µL/sec</li>
-                        <li>9.999 µL: 10 µL/sec</li>
-                        <li>10 µL: 10 µL/sec</li>
-                        <li>20 µL: 22 µL/sec</li>
+                        <li>0 µL: 7 µL/sec</li>
+                        <li>10 µL: 60 µL/sec</li>
+                        <li>50 µL: 60 µL/sec</li>
                     </ul>
                 </td>
-                <td>80 µL/sec</td>
-                <td>80 µL/sec</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 7 µL/sec</li>
+                        <li>10 µL: 100 µL/sec</li>
+                        <li>200 µL: 100 µL/sec</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: -0.1 µL</li>
+                        <li>5 µL: -0.35 µL</li>
+                        <li>10 µL: 0.08 µL</li>
+                        <li>50 µL: -1.34 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: 0.7 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>2 µL</td>
-                <td>5 µL</td>
-                <td>5 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49 µL: 1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -887,21 +960,42 @@
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
-                <td>200 µL/sec</td>
-                <td>200 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
                 <td>200 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.35 µL</li>
+                        <li>10 µL: 0.1 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.25 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.4 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
@@ -911,33 +1005,33 @@
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
-                <td>20 µL</td>
-                <td>15 µL</td>
-                <td>20 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -953,7 +1047,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -961,37 +1054,28 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>1 µL: 22 µL/sec</li>
-                        <li>9.999 µL: 22 µL/sec</li>
-                        <li>10 µL: 57 µL/sec</li>
-                        <li>20 µL: 57 µL/sec</li>
-                    </ul>
-                </td>
-                <td>50 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>7 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.7 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -0.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -999,43 +1083,28 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -1049,7 +1118,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -1057,37 +1125,28 @@
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
-                <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>1 µL: 22 µL/sec</li>
-                        <li>9.999 µL: 22 µL/sec</li>
-                        <li>10 µL: 57 µL/sec</li>
-                        <li>20 µL: 57 µL/sec</li>
-                    </ul>
-                </td>
-                <td>50 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>35 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.5 µL</li>
+                        <li>10 µL: -0.2 µL</li>
+                        <li>50 µL: -1.5 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -1095,43 +1154,28 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
-                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49.9 µL: 0.1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -1158,41 +1202,56 @@
                 <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
-                    </ul>
-                </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>300 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -1200,58 +1259,58 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Delay after dispensing</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
+            </tr>
+            <tr>
+                <td>Retract speed</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+            </tr>
+            <tr>
+                <td>Delay after retracting</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+            </tr>
+            <tr>
+                <td>Air gap by volume</td>
+                <td>
+                    <ul>
                         <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-            </tr>
-            <tr>
-                <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Air gap by volume</td>
-                <td>
-                    <ul>
-                        <li>1–49 µL: 1 µL</li>
-                        <li>50 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -1278,41 +1337,57 @@
                 <td>100 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>5 µL: 318 µL/sec</li>
-                        <li>10 µL: 478 µL/sec</li>
-                        <li>50 µL: 478 µL/sec</li>
-                    </ul>
-                </td>
-                <td>716 µL/sec</td>
-                <td>716 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>300 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.75 µL</li>
+                        <li>10 µL: -0.7 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.5 µL</li>
+                        <li>50 µL: -0.2 µL</li>
+                        <li>200 µL: -4.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.9 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–45 µL: 5 µL</li>
+                        <li>0 µL: 0 µL</li>
+                        <li>40–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -1320,58 +1395,58 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Delay after dispensing</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
+            </tr>
+            <tr>
+                <td>Retract speed</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
+            </tr>
+            <tr>
+                <td>Delay after retracting</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+            </tr>
+            <tr>
+                <td>Air gap by volume</td>
+                <td>
+                    <ul>
                         <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-                <td>50 mm/sec</td>
-            </tr>
-            <tr>
-                <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Air gap by volume</td>
-                <td>
-                    <ul>
-                        <li>1–49 µL: 1 µL</li>
-                        <li>50 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -1385,7 +1460,6 @@
         <thead>
             <tr>
                 <th>Behavior</th>
-                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -1393,47 +1467,45 @@
         <tbody>
             <tr>
                 <td>Submerge speed</td>
-                <td>100 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
             <tr>
-                <td>Dispense flow rate by volume</td>
-                <td>
-                    <ul>
-                        <li>1 µL: 22 µL/sec</li>
-                        <li>9.999 µL: 22 µL/sec</li>
-                        <li>10 µL: 57 µL/sec</li>
-                        <li>20 µL: 57 µL/sec</li>
-                    </ul>
-                </td>
-                <td>80 µL/sec</td>
-                <td>200 µL/sec</td>
+                <td>Dispense flow rate</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -2.1 µL</li>
+                        <li>10 µL: -1.7 µL</li>
+                        <li>50 µL: -3.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -1.5 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -7.4 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -1441,10 +1513,34 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
-                        <li>1–15 µL: 5 µL</li>
-                        <li>20 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
+                <td>
+                    <ul>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Delay after dispensing</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+            </tr>
+            <tr>
+                <td>Retract speed</td>
+                <td>35 mm/sec</td>
+                <td>35 mm/sec</td>
+            </tr>
+            <tr>
+                <td>Delay after retracting</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+            </tr>
+            <tr>
+                <td>Air gap by volume</td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -1453,46 +1549,7 @@
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td>Delay after dispensing</td>
-                <td>0.2 sec</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Retract speed</td>
-                <td>50 mm/sec</td>
-                <td>35 mm/sec</td>
-                <td>35 mm/sec</td>
-            </tr>
-            <tr>
-                <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
-            </tr>
-            <tr>
-                <td>Air gap by volume</td>
-                <td>
-                    <ul>
-                        <li>1–19.9 µL: 0.1 µL</li>
-                        <li>20 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–49 µL: 1 µL</li>
-                        <li>50 µL: 0 µL</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
@@ -1520,34 +1577,55 @@
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
-                <td>200 µL/sec</td>
-                <td>200 µL/sec</td>
+                <td>100 µL/sec</td>
+                <td>100 µL/sec</td>
                 <td>200 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.35 µL</li>
+                        <li>10 µL: 0.1 µL</li>
+                        <li>50 µL: -1.3 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>5 µL: -0.25 µL</li>
+                        <li>50 µL: -2.2 µL</li>
+                        <li>200 µL: -8.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>10 µL: -0.4 µL</li>
+                        <li>100 µL: -2.6 µL</li>
+                        <li>1000 µL: -32.2 µL</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -1555,28 +1633,28 @@
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
-                        <li>1–45 µL: 5 µL</li>
-                        <li>50 µL: 0 µL</li>
+                        <li>1–40 µL: 5 µL</li>
+                        <li>45–50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
-                        <li>200 µL: 0 µL</li>
+                        <li>1–190 µL: 5 µL</li>
+                        <li>195–200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–995 µL: 5 µL</li>
-                        <li>1000 µL: 0 µL</li>
+                        <li>1–990 µL: 5 µL</li>
+                        <li>995–1000 µL: 0 µL</li>
                     </ul>
                 </td>
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>2 sec</td>
+                <td>1 sec</td>
+                <td>1 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
@@ -1586,27 +1664,27 @@
             </tr>
             <tr>
                 <td>Delay after retracting</td>
-                <td>—</td>
-                <td>—</td>
-                <td>—</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
                 <td>
                     <ul>
-                        <li>1–49 µL: 1 µL</li>
+                        <li>1–45 µL: 5 µL</li>
                         <li>50 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>1–195 µL: 5 µL</li>
+                        <li>5–190 µL: 10 µL</li>
                         <li>200 µL: 0 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        <li>10–990 µL: 10 µL</li>
+                        <li>5–188 µL: 12 µL</li>
                         <li>1000 µL: 0 µL</li>
                     </ul>
                 </td>

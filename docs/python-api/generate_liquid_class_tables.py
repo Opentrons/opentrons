@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generate Aqueous liquid class definition tables from shared-data JSON.
+"""Generate liquid class definition tables from shared-data JSON.
 
-Reads the latest water liquid class definition from shared-data and prints
-Aspirate, Dispense, and Multi-Dispense tables in the mixed markdown/HTML
-format used by the mkdocs documentation.
+Reads the latest JSON definition for each liquid class (water, ethanol_80,
+glycerol_50) from shared-data and writes Aspirate, Dispense, and Multi-Dispense
+tables in the mixed markdown/HTML format used by the mkdocs documentation.
 
 Usage:
     python generate_liquid_class_tables.py
@@ -18,14 +18,21 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
-WATER_DIR = (
+DEFINITIONS_BASE = (
     REPO_ROOT
     / "shared-data"
     / "liquid-class"
     / "definitions"
     / "1"
-    / "water"
 )
+OUTPUT_DIR = SCRIPT_DIR / "docs" / "liquid-class-tables"
+
+# Source directory name (under definitions/1/) -> output filename (under OUTPUT_DIR).
+LIQUID_CLASSES = [
+    ("water", "aqueous.md"),
+    ("ethanol_80", "volatile.md"),
+    ("glycerol_50", "viscous.md"),
+]
 
 # ---------------------------------------------------------------------------
 # Display constants
@@ -61,11 +68,11 @@ I6 = I1 * 6  # <li>
 # ---------------------------------------------------------------------------
 # JSON helpers
 # ---------------------------------------------------------------------------
-def get_latest_definition() -> dict:
-    """Load the highest-numbered JSON file from the water directory."""
-    json_files = sorted(WATER_DIR.glob("*.json"), key=lambda p: int(p.stem))
+def get_latest_definition(definitions_dir: Path) -> dict:
+    """Load the highest-numbered JSON file from the given definitions directory."""
+    json_files = sorted(definitions_dir.glob("*.json"), key=lambda p: int(p.stem))
     if not json_files:
-        raise FileNotFoundError(f"No JSON files found in {WATER_DIR}")
+        raise FileNotFoundError(f"No JSON files found in {definitions_dir}")
     with open(json_files[-1]) as f:
         return json.load(f)
 
@@ -370,13 +377,10 @@ def render_section(
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-def main():
-    data = get_latest_definition()
-
-    # Index pipettes by model name.
+def generate_tables(data: dict) -> str:
+    """Build Aspirate, Dispense, and Multi-dispense table sections from definition data."""
     by_model = {p["pipetteModel"]: p for p in data["byPipette"]}
 
-    # Build ordered list of (model, tab_name, capacities, tip_data_list).
     pipettes_data = []
     for model in PIPETTE_ORDER:
         if model not in by_model:
@@ -384,7 +388,6 @@ def main():
         p = by_model[model]
         tab_name = PIPETTE_DISPLAY_NAME.get(model, model)
 
-        # Collect non-filter tips sorted by capacity.
         non_filter = sorted(
             [
                 (tip_capacity(t["tiprack"]), t)
@@ -395,10 +398,8 @@ def main():
         )
         caps = [cap for cap, _ in non_filter]
         tips = [t for _, t in non_filter]
-
         pipettes_data.append((model, tab_name, caps, tips))
 
-    # Render and print each section.
     sections = [
         render_section("Aspirate", "aspirate", pipettes_data, aspirate_rows),
         render_section("Dispense", "singleDispense", pipettes_data, dispense_rows),
@@ -406,7 +407,19 @@ def main():
             "Multi-dispense", "multiDispense", pipettes_data, multi_dispense_rows
         ),
     ]
-    print("\n".join(sections))
+    return "\n".join(sections)
+
+
+def main():
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    for source_name, output_name in LIQUID_CLASSES:
+        definitions_dir = DEFINITIONS_BASE / source_name
+        data = get_latest_definition(definitions_dir)
+        content = generate_tables(data)
+        output_path = OUTPUT_DIR / output_name
+        output_path.write_text(content, encoding="utf-8")
+        print(f"Wrote {output_path.relative_to(SCRIPT_DIR)}")
 
 
 if __name__ == "__main__":
