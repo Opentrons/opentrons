@@ -7,7 +7,8 @@ from opentrons.protocol_api import (
 )
 from typing import Tuple, Optional
 from opentrons.protocol_api import COLUMN, ALL
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers as helpers
+from abr_testing.protocold.helpers import background_helpers
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     ThermocyclerContext,
@@ -41,6 +42,9 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
+
     # Load Parameters
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
@@ -52,7 +56,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    run_helpers.comment_protocol_version(protocol, "04")
+    helpers.comment_protocol_version(protocol, "04")
 
     def transfer(
         pipette: InstrumentContext,
