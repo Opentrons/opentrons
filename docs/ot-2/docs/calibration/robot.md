@@ -21,7 +21,7 @@ There are three positional calibrations that work together and are performed in 
 
 ## Deck calibration
 
-Deck calibration helps the OT-2 understand deck location and scale. This calibration ensures that movement distance in software equals that same physical distance across the deck. It compensates for physical variations caused by factors such as:
+Deck calibration helps the OT-2 understand deck location and scale. This calibration ensures that the distance the robot moves in software corresponds to the physical distance it moves across the deck. It compensates for physical variations caused by factors such as:
 
 * How the deck is fastened to the frame.
 * Parallelism of the gantry rails.
@@ -94,7 +94,7 @@ During calibration, the Opentrons App displays jog control screens like the exam
 <figcaption>Jog controls example</figcaption>
 </figure>
 
-You don't always need to use the jog controls to make fine adjustments. They're available to help you make robot and labware position checks more accurate.
+You may not need to use the jog controls to make fine adjustments. They are available to help you align the pipette nozzle to help ensure calibration accuracy.
 
 To use the jog controls:
 
@@ -103,7 +103,7 @@ To use the jog controls:
 1. Select a control option to set the pipette's axis of movement.
 2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm. Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette.
 3. Click an arrow to move the pipette for your selected direction and distance.
-4. Click **Confirm position** when, in your best judgement, the pipette is optimally aligned with its target.
-5. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
+4. Click **Confirm position** when, in your best judgment, the pipette is optimally aligned with its target.
+5. Continue to follow prompts and instructions in the Opentrons App to complete the robot calibration process.
 
 </div>
