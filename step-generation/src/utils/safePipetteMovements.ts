@@ -27,6 +27,7 @@ import type {
   OT2AddressableAreaName,
   PipetteChannels,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -557,7 +558,7 @@ export const getTipColumnIndex = (wellName: string): number =>
 export const getDefaultPrimaryNozzle = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
-}): string => {
+}): PrimaryNozzleConfigurationStyle => {
   const { nozzles, channels } = args
   if (channels === 8 && nozzles === SINGLE) {
     return 'H1'

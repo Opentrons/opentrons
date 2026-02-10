@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -28,6 +29,7 @@ import type {
   ModuleState,
   TemperatureModuleState,
   ThermocyclerModuleState,
+  VacuumModuleState,
 } from './types'
 
 // Temperature statuses
@@ -84,6 +86,10 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   fillCount: 1,
 }
 
+export const VACUUM_MODULE_INITIAL_STATE: VacuumModuleState = {
+  type: VACUUM_MODULE_TYPE,
+}
+
 export const MODULE_INITIAL_STATE_BY_TYPE: {
   [moduleType in ModuleType]: ModuleState
 } = {
@@ -94,6 +100,7 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
   [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_MODULE_INITIAL_STATE,
+  [VACUUM_MODULE_TYPE]: VACUUM_MODULE_INITIAL_STATE,
 } as const
 
 MODULE_INITIAL_STATE_BY_TYPE satisfies {

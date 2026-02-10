@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
   fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
@@ -31,6 +32,7 @@ describe('generateRobotStateTimeline', () => {
         errors: false,
         stepArgs: {
           stepNumber: 1,
+          primaryNozzle: A1_NOZZLE,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -107,6 +109,7 @@ describe('generateRobotStateTimeline', () => {
       b: {
         errors: false,
         stepArgs: {
+          primaryNozzle: A1_NOZZLE,
           stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
@@ -185,6 +188,7 @@ describe('generateRobotStateTimeline', () => {
         errors: false,
         stepArgs: {
           dropTipLocation: FIXED_TRASH_ID,
+          primaryNozzle: A1_NOZZLE,
           commandCreatorFnName: 'mix',
           name: 'Mix',
           description: 'description would be here 2018-03-01',

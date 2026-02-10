@@ -4,8 +4,6 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 
-import { getActiveLayer } from '../utils/getActiveLayer'
-import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
 import { ModuleCommandSummary } from './ModuleCommandSummary'
 
 import type {
@@ -34,7 +32,7 @@ export function DeckViewModuleCommandSummaries(
     selectedRunTimeCommand,
   } = props
   const { moduleEntities } = invariantContext
-  const { modules, labware } = robotState
+  const { modules } = robotState
 
   return (
     <>
@@ -44,27 +42,16 @@ export function DeckViewModuleCommandSummaries(
           console.warn(`no slot ${slot} for module ${id}`)
           return null
         }
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
-          id,
-          Object.values(labware)
-        )
-        const { isActiveLayerVisible } = getActiveLayer(
-          labwareLoadedOnModuleId,
-          selectedRunTimeCommand,
-          id
-        )
         const isStepAssociatedWithModule =
           selectedRunTimeCommand != null &&
           'moduleId' in selectedRunTimeCommand.params &&
           selectedRunTimeCommand.params.moduleId === id
-        const showLabwareCommandSummary =
-          isStepAssociatedWithModule && labwareLoadedOnModuleId != null
         const showModuleCommandSummary =
-          (isActiveLayerVisible || isStepAssociatedWithModule) &&
-          selectedRunTimeCommand != null &&
-          !showLabwareCommandSummary
+          isStepAssociatedWithModule && selectedRunTimeCommand != null
 
-        if (!showModuleCommandSummary) return null
+        if (!showModuleCommandSummary) {
+          return null
+        }
 
         const moduleDef = getModuleDef(moduleEntities[id].model)
 

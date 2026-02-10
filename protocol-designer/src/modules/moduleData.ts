@@ -6,6 +6,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -53,6 +54,7 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
   ],
   [ABSORBANCE_READER_TYPE]: [],
   [FLEX_STACKER_MODULE_TYPE]: [],
+  [VACUUM_MODULE_TYPE]: [],
 }
 
 export const ALL_MODULE_SLOTS_OT2: DropdownOption[] = [

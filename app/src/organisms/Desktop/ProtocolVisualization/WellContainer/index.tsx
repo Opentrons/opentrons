@@ -12,7 +12,7 @@ import {
 import { TipSvg } from '../TipSvg'
 import { getTipSvgInfo } from '../utils/getTipSvgInfo'
 import { getWellVolume } from '../utils/getWellVolume'
-import { WellSvg } from '../WellSvg'
+import { WELL_GEOMETRY, WELL_VIEWBOX, WellSvg } from '../WellSvg'
 import styles from './wellcontainer.module.css'
 
 import type {
@@ -22,9 +22,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LocationLiquidState } from '@opentrons/step-generation'
 
-const WELL_HEIGHT_PIXELS = 54
-const WELL_WIDTH_PIXELS = 20
-const PIXEL_DECIMALS = 2
+const SVG_DECIMALS = 2
 
 interface WellContainerProps {
   params: RunTimeCommand['params']
@@ -66,18 +64,18 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const mmFromBottom =
     getMmFromBottom(Number(zValue), reference, labwareDepth) ?? 1
 
-  const fractionOfWellHeight = mmFromBottom / labwareDepth
-  const pixelsFromBottom =
-    fractionOfWellHeight * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
-  const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-  const bottomPx = labwareDepth
-    ? roundedPixelsFromBottom * 2
-    : mmFromBottom - WELL_HEIGHT_PIXELS
+  const wellHeightSvg = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
+  const wellWidthSvg = WELL_GEOMETRY.rightX - WELL_GEOMETRY.leftX
 
-  const xPositionPixels =
-    (WELL_WIDTH_PIXELS / xLabwareWellWidth) *
-    ('wellLocation' in params ? params.wellLocation.x : 1)
-  const roundedXPositionPixels = round(xPositionPixels, PIXEL_DECIMALS)
+  const fractionOfWellHeight = labwareDepth ? mmFromBottom / labwareDepth : 0
+  const tipBottomY =
+    WELL_GEOMETRY.bottomY - fractionOfWellHeight * wellHeightSvg
+  const roundedTipBottomY = round(tipBottomY, SVG_DECIMALS)
+
+  const xPositionSvg =
+    (wellWidthSvg / xLabwareWellWidth) *
+    ('wellLocation' in params ? (params.wellLocation.x ?? 0) : 0)
+  const roundedXPositionSvg = round(xPositionSvg, SVG_DECIMALS)
 
   const { tipColor, tipCurrentVolume, airGapVolume } =
     pipetteLocationLiquidState != null
@@ -102,16 +100,6 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
           <div className={styles.well_detail_svg_positioning}>
             <div className={styles.well_detail_svg_container}>
               <div className={styles.well_detail_svg_inner}>
-                <TipSvg
-                  volume={tipCurrentVolume}
-                  maxVolume={tipMaxVolume}
-                  roundedXPositionPixels={roundedXPositionPixels}
-                  bottomPx={bottomPx}
-                  color={tipColor}
-                  setIsHovered={setIsTipHovered}
-                  isHovered={isTipHovered}
-                  airGapVolume={airGapVolume}
-                />
                 {isTipHovered ? (
                   <div className={styles.tip_details_volume}>
                     <Tag
@@ -133,13 +121,29 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   </div>
                 ) : null}
                 <div className={styles.svg_container}>
-                  <WellSvg
-                    volume={totalVolumeInWell}
-                    maxVolume={labwareWellMaxVolume}
-                    color={wellColor}
-                    setIsHovered={setIsWellHovered}
-                    isHovered={isWellHovered}
-                  />
+                  <svg
+                    viewBox={`0 0 ${WELL_VIEWBOX.width} ${WELL_VIEWBOX.height}`}
+                    className={styles.well_and_tip_svg}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <WellSvg
+                      volume={totalVolumeInWell}
+                      maxVolume={labwareWellMaxVolume}
+                      color={wellColor}
+                      setIsHovered={setIsWellHovered}
+                      isHovered={isWellHovered}
+                    />
+                    <TipSvg
+                      volume={tipCurrentVolume}
+                      maxVolume={tipMaxVolume}
+                      xOffset={roundedXPositionSvg}
+                      tipBottomY={roundedTipBottomY}
+                      color={tipColor}
+                      setIsHovered={setIsTipHovered}
+                      isHovered={isTipHovered}
+                      airGapVolume={airGapVolume}
+                    />
+                  </svg>
                 </div>
               </div>
               {labwareDepth !== null && (

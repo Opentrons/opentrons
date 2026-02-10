@@ -25,7 +25,11 @@ import { pickUpTip } from '../atomic/pickUpTip'
 import { dropTipInTrash } from './dropTipInTrash'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 
-import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  CutoutId,
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface ReplaceTipArgs {
@@ -34,6 +38,8 @@ interface ReplaceTipArgs {
   // tipRack URI with which to automatically find next tip
   tipRack: string | null
   nozzles?: NozzleConfigurationStyle
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
+
   //  we need to emit atomic commands for python
   //  if this replaceTip is for the mix compound command
   isFromMixCommand?: boolean
@@ -202,30 +208,36 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels,
-  })
-
   const curryCommand = isFromMixCommand
     ? curryCommandCreator
     : curryWithoutPython
-  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-    //  only emit the command if previous nozzle state and tiprack state are different
-    //  only check for the 96-channel since we do not support 8-channel partial tip yet
+
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] = []
+
+  // only emit the command if previous nozzle state and tiprack state are different
+  // only check for the 96-channel since we do not support 8-channel partial tip yet
+  if (
     channels !== 1 &&
     args.nozzles != null &&
     (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
-      ? [
-          curryCommandCreator(configureNozzleLayout, {
-            configurationParams: {
-              primaryNozzle,
-              style: args.nozzles,
-            },
-            pipetteId: args.pipette,
-          }),
-        ]
-      : []
+  ) {
+    const primaryNozzle =
+      args.primaryNozzle ??
+      getDefaultPrimaryNozzle({
+        nozzles: args.nozzles,
+        channels,
+      })
+
+    configureNozzleLayoutCommand.push(
+      curryCommandCreator(configureNozzleLayout, {
+        configurationParams: {
+          primaryNozzle,
+          style: args.nozzles,
+        },
+        pipetteId: args.pipette,
+      })
+    )
+  }
 
   const tipTrackingOption = tipSelectionArgs ? MANUAL : AUTOMATIC
 

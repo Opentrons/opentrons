@@ -3,6 +3,7 @@ import assert from 'assert'
 import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
 
 import { DIRTY } from '../constants'
+import { getNozzleConfig } from '../utils'
 
 import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
@@ -22,6 +23,12 @@ export function forDropTip(
   const tipState = robotState.tipState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotState.pipettes[pipetteId].nozzles
+  const nozzleConfiguration = getNozzleConfig(nozzles, pipetteSpec)
+  const getTiprackColumnForWell = (
+    ordering: string[][],
+    targetWellName: string
+  ): string[] | undefined =>
+    ordering.find(column => column.includes(targetWellName))
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
   assert(
     tiprackDef != null && getIsTiprack(tiprackDef),
@@ -29,21 +36,49 @@ export function forDropTip(
   )
 
   // TODO (nd 08/12/2025): handle tip (re)placement more elegantly depending on pipette specs and selected nozzles
-  if (pipetteSpec.channels === 1 || nozzles === SINGLE) {
+  if (nozzleConfiguration === SINGLE) {
     tipState.tipracks[labwareId][wellName] = DIRTY
-  } else if (pipetteSpec.channels === 8 || nozzles === COLUMN) {
-    const allWells = tiprackDef.ordering.find(col => col[0] === wellName) ?? []
+  } else if (nozzleConfiguration === COLUMN) {
+    const allWells =
+      getTiprackColumnForWell(tiprackDef.ordering, wellName) ?? []
     allWells.forEach(
       wellName => (tipState.tipracks[labwareId][wellName] = DIRTY)
     )
-  } else if (pipetteSpec.channels === 96 && nozzles === ALL) {
-    const allTips: string[] = tiprackDef.ordering.reduce(
-      (acc, wells) => acc.concat(wells),
-      []
-    )
-    allTips.forEach(function (wellName) {
+  } else if (nozzleConfiguration === ALL) {
+    if (pipetteSpec.channels === 96) {
+      const allTips: string[] = tiprackDef.ordering.reduce(
+        (acc, wells) => acc.concat(wells),
+        []
+      )
+      allTips.forEach(function (wellName) {
+        tipState.tipracks[labwareId][wellName] = DIRTY
+      })
+    } else {
+      const allWells =
+        getTiprackColumnForWell(tiprackDef.ordering, wellName) ?? []
+      allWells.forEach(
+        wellName => (tipState.tipracks[labwareId][wellName] = DIRTY)
+      )
+    }
+  } else {
+    // Fallback for unexpected nozzle configurations.
+    if (pipetteSpec.channels === 1) {
       tipState.tipracks[labwareId][wellName] = DIRTY
-    })
+    } else if (pipetteSpec.channels === 96) {
+      const allTips: string[] = tiprackDef.ordering.reduce(
+        (acc, wells) => acc.concat(wells),
+        []
+      )
+      allTips.forEach(function (wellName) {
+        tipState.tipracks[labwareId][wellName] = DIRTY
+      })
+    } else {
+      const allWells =
+        getTiprackColumnForWell(tiprackDef.ordering, wellName) ?? []
+      allWells.forEach(
+        wellName => (tipState.tipracks[labwareId][wellName] = DIRTY)
+      )
+    }
   }
 
   // set pipette most recently accessed labware and well
