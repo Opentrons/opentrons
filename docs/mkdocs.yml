@@ -18,6 +18,9 @@ nav:
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
 
+hooks:
+  - python-api/generate_liquid_class_tables.py
+
 plugins:
   - monorepo
   - search

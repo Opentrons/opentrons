@@ -418,8 +418,22 @@ def main():
         data = get_latest_definition(definitions_dir)
         content = generate_tables(data)
         output_path = OUTPUT_DIR / output_name
-        output_path.write_text(content, encoding="utf-8")
-        print(f"Wrote {output_path.relative_to(SCRIPT_DIR)}")
+
+        # Only write when content has changed, so that mkdocs serve
+        # doesn't detect a file-system change and enter a rebuild loop.
+        if output_path.exists() and output_path.read_text(encoding="utf-8") == content:
+            print(f"Unchanged {output_path.relative_to(SCRIPT_DIR)}")
+        else:
+            output_path.write_text(content, encoding="utf-8")
+            print(f"Wrote {output_path.relative_to(SCRIPT_DIR)}")
+
+
+# ---------------------------------------------------------------------------
+# MkDocs hook — called automatically during `mkdocs build` / `mkdocs serve`
+# when this file is listed under the `hooks` key in mkdocs.yml.
+# ---------------------------------------------------------------------------
+def on_pre_build(**kwargs):
+    main()
 
 
 if __name__ == "__main__":
