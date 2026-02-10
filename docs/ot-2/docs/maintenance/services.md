@@ -1,5 +1,5 @@
 ---
-title: "Opentrons OT-2: Instrument Services"
+title: "Opentrons OT-2: Services"
 ---
 
 Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, both of which include benefits for onboarding, maintenance, and repair. These services are available in the continental United States; Opentrons Care is also available internationally. Both services include:

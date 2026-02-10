@@ -37,10 +37,10 @@ nav:
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
-      - Instrument Services: maintenance/services.md
+      - Services: maintenance/services.md
   - Appendices:
       - Additional Documentation: additional-docs.md
-      - Open-Source Software: open-source.md
+      # - Open-Source Software: open-source.md
       - Product Support and Company Information: support.md
 
 theme:

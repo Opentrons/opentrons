@@ -44,12 +44,12 @@ To clean the exterior and interior frame and window panels of your OT-2:
 
 ## Deck cleaning
 
-To clean the deck, deck slots, and trash bin:
+To clean the deck and trash bin:
 
 <div class="instruction-list" markdown>
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
-2. Gently wipe off the deck, deck slots, and trash bin. You can remove and empty the trash bin for easier access.
+2. Gently wipe off the deck and trash bin. You can remove and empty the trash bin for easier access.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the deck and/or trash bin air dry. Replace any items that you removed for cleaning.
 
@@ -85,8 +85,6 @@ To clean a single- or multi-channel pipette:
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
 </div>
-
-<font color="red">placeholder for labeled pipette images</font>
 
 !!!warning
     - Do not disassemble OT-2 pipettes for cleaning or attempt to clean their internal electronic components.
@@ -128,15 +126,14 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 The GEN2 multi-channel (8-channel) pipettes have a rubber O-ring around their nozzles. These O-rings help tips form a good seal against the pipette. You can replace the O-rings on a GEN2 multi-channel pipette if the rings become worn or broken.
 
 !!!note
-    - OT-2 single-channel and very early model 8-channel pipettes do not have O-rings.
+    - OT-2 single-channel and GEN1 8-channel pipettes do not have O-rings.
     - OT-2 and Flex pipette O-rings are not interchangeable.
 
-Each GEN2 multi-channel pipette ships with the special tools and replacement O-rings shown here.
+Each GEN2 multi-channel pipette ships with several replacement O-rings and the special tools shown here.
 
-![Labeled O-ring tool parts](../images/o-ring-tools.jpeg)
-<!-- original image above, no Opentrons blue -->
-
-<font color="red">Might need some Jackson help with procedure illustrations below</font>
+<figure class="screenshot" markdown>
+![Labeled O-ring tool parts](../images/o-ring-tools.png)
+</figure>
 
 Follow these instructions to replace the O-rings on your OT-2 multi-channel pipette:
 
@@ -147,9 +144,17 @@ Follow these instructions to replace the O-rings on your OT-2 multi-channel pipe
     - Use the 20M side for a P20 pipette.
     - Use the 300M side for a P300 pipette.
 
+    <figure class="screenshot" markdown>
+    ![o-ring removal tool alignment](../images/o-ring-removal-tool.png){ #width="80%" }
+    </figure>
+
 2. Rotate and pull the tool gently to remove the O-ring. The O-ring may break during removal, which is common.
 
 3. Place the wide base of the conical O-ring installation tool against the pipette nozzle and roll the new O-ring onto the nozzle.
+
+    <figure class="screenshot" markdown>
+    ![Using the o-ring replacement tool](../images/o-ring-replacement-tool.png)
+    </figure>
 
 </div>
 
@@ -226,7 +231,7 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
     <tr>
       <td rowspan="2">Weekly</td>
       <td>Pipette visual check</td>
-      <td>Inspect the pipette for obvious damage if it aspireates or dispenses inaccurately or shows other signs of malfunction.</td>
+      <td>Inspect the pipette for obvious damage if it aspirates or dispenses inaccurately or shows other signs of malfunction.</td>
     </tr>
     <tr>
       <td>Robot, module, and pipette cleaning</td>
