@@ -1,15 +1,15 @@
 # This workflow runs tests and lint on pull requests that touch the api/
 # project or its CI configuration.
 
-name: 'API test/lint/deploy'
+name: 'API test/lint'
 
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
     paths:
-      - 'api/**'
+      - 'api/**/*.py'
       - 'Makefile'
-      - 'shared-data/**'
+      - 'shared-data/**/*.py'
       - '!shared-data/js/**'
       - 'hardware/**'
       - 'scripts/**.mk'
@@ -20,9 +20,9 @@ on:
       - 'package-testing/**'
   push:
     paths:
-      - 'api/**'
+      - 'api/**/*.py'
       - 'Makefile'
-      - 'shared-data/**'
+      - 'shared-data/**/*.py'
       - '!shared-data/js/**'
       - 'hardware/**'
       - 'scripts/**.mk'
@@ -169,52 +169,3 @@ jobs:
           echo "## Opentrons Package Test Results ${{matrix.os}}" >> $GITHUB_STEP_SUMMARY
           echo "### Test Outcome: Unixy ${{ steps.test.outcome }} Windows: ${{ steps.test-windows.outcome }}" >> $GITHUB_STEP_SUMMARY
           echo "[Download the test results artifact](${{steps.results.outputs.artifact-url}})" >> $GITHUB_STEP_SUMMARY
-
-  deploy:
-    name: 'deploy opentrons package'
-    needs: [test]
-    runs-on: 'ubuntu-24.04'
-    if: github.event_name == 'push'
-    permissions:
-      id-token: write # Required for OIDC
-      contents: read # Required for checkout
-    steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.22.0'
-      - name: 'set complex environment variables'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup-uv'
-        with:
-          project: 'api'
-          python-version: '3.12'
-      - name: 'build api distributables'
-        shell: bash
-        run: make -C api sdist wheel
-      # creds and repository configuration for deploying python wheels
-      - if: ${{ !env.OT_TAG }}
-        name: 'upload to test pypi'
-        uses: './.github/actions/python/pypi-deploy'
-        with:
-          project: 'api'
-          repository_url: 'https://test.pypi.org/legacy/'
-          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
-      - if: startsWith(env.OT_TAG, 'v')
-        name: 'upload to real pypi'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: api/dist/
-          repository-url: https://upload.pypi.org/legacy/

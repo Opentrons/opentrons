@@ -145,7 +145,7 @@ describe('ProtocolCard', () => {
     fireEvent.click(screen.getByText('yay mock protocol'))
     screen.getByText('mock Chip')
     screen.getByText(
-      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
+      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons OT-2 App.'
     )
     screen.getByText('Delete protocol')
     fireEvent.click(screen.getByLabelText('closeIcon'))
@@ -181,7 +181,7 @@ describe('ProtocolCard', () => {
     fireEvent.click(screen.getByText('yay mock protocol'))
     screen.getByText('Protocol analysis failed')
     screen.getByText(
-      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
+      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons OT-2 App.'
     )
     screen.getByText('Delete protocol')
   })

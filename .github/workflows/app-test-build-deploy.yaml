@@ -216,15 +216,9 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
-        target: ['desktop', 'odd']
-        exclude:
-          - os: 'windows-2022'
-            target: 'odd'
-          - os: 'macos-latest'
-            target: 'odd'
 
     runs-on: ${{ matrix.os }}
-    name: 'Build ${{matrix.variant}} ${{matrix.target}} app on ${{matrix.os}}'
+    name: 'Build ${{matrix.variant}} desktop app on ${{matrix.os}}'
     steps:
       - name: 'Get project name for variant'
         id: project
@@ -291,15 +285,14 @@ jobs:
           OT_OT2_APP_MIXPANEL_ID: ${{ secrets.OT_OT2_APP_MIXPANEL_ID }}
           OT_OT2_APP_INTERCOM_ID: ${{ secrets.OT_OT2_APP_INTERCOM_ID }}
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
-          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_BUILD_TARGET: desktop
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          OT_SENTRY_DSN: ${{ matrix.target == 'desktop' && secrets.OT_DESKTOP_SENTRY_DSN || secrets.OT_ODD_SENTRY_DSN }}
+          OT_SENTRY_DSN: secrets.OT_DESKTOP_SENTRY_DSN
         run: |
           make -C app dist
 
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
-        if: matrix.target == 'desktop'
         timeout-minutes: 60
         env:
           OT_OT2_APP_MIXPANEL_ID: ${{ secrets.OT_OT2_APP_MIXPANEL_ID }}
@@ -328,23 +321,10 @@ jobs:
           make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
       - name: 'upload github artifact'
-        if: matrix.target == 'desktop'
         uses: actions/upload-artifact@v4
         with:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
           path: app-shell/dist/publish
-
-      # build the ODD app
-      - if: matrix.target == 'odd'
-        name: 'build ${{matrix.variant}} ODD app'
-        timeout-minutes: 60
-        env:
-          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
-          OT_BUILD_TARGET: ${{ matrix.target }}
-          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          OT_SENTRY_DSN: ${{ secrets.OT_ODD_SENTRY_DSN }}
-        run: |
-          make -C app-shell-odd dist-ot3
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'

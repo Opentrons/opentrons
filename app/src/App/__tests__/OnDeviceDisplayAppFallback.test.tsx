@@ -60,7 +60,7 @@ describe('OnDeviceDisplayAppFallback', () => {
     render(props)
     screen.getByText('An unknown error has occurred')
     screen.getByText(
-      'You need to restart the touchscreen. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
+      'You need to restart the touchscreen. Then download the robot logs from the Opentrons OT-2 App and send them to support@opentrons.com for assistance.'
     )
     screen.getByText('Restart touchscreen')
   })

@@ -1,7 +1,7 @@
 # This workflow runs tests and lint on branch pushes that touch the
 # shared-data project or its CI configuration.
 
-name: 'shared-data test/lint/deploy'
+name: 'shared-data test/lint'
 
 on:
   push:
@@ -140,61 +140,6 @@ jobs:
           files: ./coverage/lcov.info
           flags: shared-data
 
-  python-deploy:
-    name: 'shared-data package deploy'
-    needs: [python-test]
-    runs-on: 'ubuntu-24.04'
-    if: github.event_name == 'push'
-    permissions:
-      id-token: write # Required for OIDC
-      contents: read # Required for checkout
-    steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.22.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: './.github/actions/python/setup-uv'
-        with:
-          project: 'shared-data'
-          python-version: '3.12'
-      - name: 'set complex environment variables'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'build shared-data wheel'
-        shell: bash
-        run: make -C shared-data dist-py
-
-      # creds and repository configuration for deploying python wheels
-      - if: ${{ !env.OT_TAG }}
-        name: 'upload to test pypi'
-        uses: './.github/actions/python/pypi-deploy'
-        with:
-          project: 'shared-data'
-          repository_url: 'https://test.pypi.org/legacy/'
-          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
-      - if: startsWith(env.OT_TAG, 'v')
-        name: 'upload to pypi'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: shared-data/dist/
-          repository-url: https://upload.pypi.org/legacy/
-
   publish-switch:
     runs-on: 'ubuntu-latest'
     name: 'Determine whether or not to publish artifacts'
@@ -214,65 +159,7 @@ jobs:
             echo "No publish for ref ${{github.ref}} and event ${{github.event_type}}"
             echo 'should_publish=false' >> $GITHUB_OUTPUT
           fi
-
-  publish-to-npm:
-    name: 'publish shared-data package to npm'
-    runs-on: 'ubuntu-latest'
-    needs: ['js-test', 'publish-switch']
-    if: needs.publish-switch.outputs.should_publish == 'true'
-    steps:
-      - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.22.0'
-          registry-url: 'https://registry.npmjs.org'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'js deps'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
-      - name: 'build typescript'
-        run: make build-ts
-      - name: 'build library'
-        run: |
-          make -C shared-data lib-js
-      # replace package.json stub version number with version from tag
-      - name: 'set version number'
-        run: |
-          npm install -g json
-          VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
-          json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
-          cd ./shared-data
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.22.0'
-          registry-url: 'https://registry.npmjs.org'
-      - name: 'publish to npm registry'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd ./shared-data && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public
-
+  
   # Notification jobs for tagged builds
   notify-success:
     name: 'Notify Build Success'
@@ -282,11 +169,8 @@ jobs:
         python-lint,
         python-test,
         js-test,
-        python-deploy,
-        publish-switch,
-        publish-to-npm,
       ]
-    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.python-lint.result == 'success' && needs.python-test.result == 'success' && needs.js-test.result == 'success' && needs.python-deploy.result == 'success' && needs.publish-switch.result == 'success' && needs.publish-to-npm.result == 'success'
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.python-lint.result == 'success' && needs.python-test.result == 'success' && needs.js-test.result == 'success'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -294,7 +178,7 @@ jobs:
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'success'
-          workflow_name: 'Shared Data test, lint, and deploy'
+          workflow_name: 'Shared Data test and lint'
           webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-failure:
@@ -305,11 +189,8 @@ jobs:
         python-lint,
         python-test,
         js-test,
-        python-deploy,
-        publish-switch,
-        publish-to-npm,
       ]
-    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'failure' || needs.python-test.result == 'failure' || needs.js-test.result == 'failure' || needs.python-deploy.result == 'failure' || needs.publish-switch.result == 'failure' || needs.publish-to-npm.result == 'failure')
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'failure' || needs.python-test.result == 'failure' || needs.js-test.result == 'failure' )
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -327,15 +208,6 @@ jobs:
           if [[ "${{ needs.js-test.result }}" == "failure" ]]; then
             failed_jobs+=("js-test")
           fi
-          if [[ "${{ needs.python-deploy.result }}" == "failure" ]]; then
-            failed_jobs+=("python-deploy")
-          fi
-          if [[ "${{ needs.publish-switch.result }}" == "failure" ]]; then
-            failed_jobs+=("publish-switch")
-          fi
-          if [[ "${{ needs.publish-to-npm.result }}" == "failure" ]]; then
-            failed_jobs+=("publish-to-npm")
-          fi
 
           IFS=','
           echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
@@ -344,7 +216,7 @@ jobs:
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'failure'
-          workflow_name: 'Shared Data test, lint, and deploy'
+          workflow_name: 'Shared Data test and lint'
           failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
           webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
@@ -356,11 +228,8 @@ jobs:
         python-lint,
         python-test,
         js-test,
-        python-deploy,
-        publish-switch,
-        publish-to-npm,
       ]
-    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'cancelled' || needs.python-test.result == 'cancelled' || needs.js-test.result == 'cancelled' || needs.python-deploy.result == 'cancelled' || needs.publish-switch.result == 'cancelled' || needs.publish-to-npm.result == 'cancelled')
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'cancelled' || needs.python-test.result == 'cancelled' || needs.js-test.result == 'cancelled' )
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -368,5 +237,5 @@ jobs:
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'cancelled'
-          workflow_name: 'Shared Data test, lint, and deploy'
+          workflow_name: 'Shared Data test and lint'
           webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

@@ -116,7 +116,7 @@ describe('RunFailedModal', () => {
     screen.getByText('Error 1000: hardwareCommunicationError')
     screen.getByText('Error with code 1000 (highest priority)')
     screen.getByText(
-      'Download the robot logs from the Opentrons App and send it to support@opentrons.com for assistance.'
+      'Download the robot logs from the Opentrons OT-2 App and send it to support@opentrons.com for assistance.'
     )
     screen.getByText('Close')
   })
