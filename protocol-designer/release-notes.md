@@ -16,7 +16,7 @@ This release introduces updated Thermocycler Module steps and includes other bug
 
 ### New Features
 
-- Your Protocol Designer protocol now runs Thermocycler Module profiles while pipetting samples or running another module.
+- Your Protocol Designer protocol can run Thermocycler Module profiles while pipetting samples or running another module.
 
 ### Bug Fixes
 
