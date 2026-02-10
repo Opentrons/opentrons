@@ -1906,14 +1906,14 @@ class ProtocolContext(CommandPublisher):
         self, name: str, description: Optional[str] = None
     ) -> Iterator[None]:
         """Group commands together for visualization in run previews and the run log.
-        This is a context manager using the `with` syntax, and all commands within this block
-        will be grouped together.
+        This method is a context manager that uses the `with` syntax. All commands within
+        this block will be grouped together.
 
-        This has no effect on the execution of the protocol.
+        Grouping steps together has no effect on protocol execution.
 
         Args:
-            name: The name of the group of steps
-            description: An optional description of this group
+            name: A name for the group of steps.
+            description: An optional description for the step group.
         """
         annotation_id = self._core.create_user_command_annotation(name, description)
         try:
@@ -1928,11 +1928,11 @@ class ProtocolContext(CommandPublisher):
         """Starts a grouping of commands for visualization in run previews and the run log.
         This returns a step group object which can then be closed by calling `.close_group`.
 
-        This has no effect on the execution of the protocol.
+        Grouping steps together has no effect on protocol execution.
 
         Args:
-            name: The name of the group of steps
-            description: An optional description of this group
+            name: A name for the group of steps.
+            description: An optional description for the step group.
         """
         annotation_id = self._core.create_user_command_annotation(name, description)
         return GroupedSteps(annotation_id=annotation_id, protocol_core=self._core)
