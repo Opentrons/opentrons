@@ -368,7 +368,7 @@ export function VisualizerContainer(
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
-            if (selectedRunTimeCommand != null && selectedSlot != null) {
+            if (selectedRunTimeCommand != null && typeof slot === 'string') {
               trackEvent({
                 name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
                 properties: {},
@@ -376,7 +376,7 @@ export function VisualizerContainer(
               dispatch(
                 stepDetailViewerOpenAction({
                   protocolKey,
-                  slot: selectedSlot,
+                  slot,
                   command: selectedRunTimeCommand,
                   robotState,
                   invariantContext,
