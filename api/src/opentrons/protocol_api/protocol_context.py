@@ -1900,6 +1900,7 @@ class ProtocolContext(CommandPublisher):
             )
         return None
 
+    @requires_version(2, 29)
     @contextmanager
     def group_steps(
         self, name: str, description: Optional[str] = None
@@ -1920,6 +1921,7 @@ class ProtocolContext(CommandPublisher):
         finally:
             self._core.close_command_annotation(annotation_id)
 
+    @requires_version(2, 29)
     def create_step_group(
         self, name: str, description: Optional[str] = None
     ) -> GroupedSteps:
