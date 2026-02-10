@@ -2126,3 +2126,52 @@ def test_capture_image_with_run_specific_defaults(
             command_annotations=[],
         )
     )
+
+
+def test_create_user_command_annotation(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should create a command annotation and return an annotation ID."""
+    decoy.when(
+        mock_engine_client.create_user_command_annotation(
+            annotation_name="err",
+            description="blah blah blah",
+        )
+    ).then_return("annotation-id")
+
+    result = subject.create_user_command_annotation(
+        annotation_name="err", annotation_description="blah blah blah"
+    )
+    assert result == "annotation-id"
+    assert result in subject.annotation_ids
+
+
+def test_create_user_command_annotation_raises_existing_annotation(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should raise if there is already an active annotation."""
+    subject._annotation_ids = ["annotation_id"]
+
+    with pytest.raises(ValueError):
+        subject.create_user_command_annotation(
+            annotation_name="oops", annotation_description="this will raise"
+        )
+
+
+def test_close_command_annotation(subject: ProtocolCore) -> None:
+    """It should remove the annotation ID from the list of annotation IDs."""
+    subject._annotation_ids = ["annotation-id"]
+    assert "annotation-id" in subject.annotation_ids
+
+    subject.close_command_annotation("annotation-id")
+    assert len(subject.annotation_ids) == 0
+
+
+def test_close_command_annotation_raises(subject: ProtocolCore) -> None:
+    """It should raise if the annotation ID does not exist."""
+    with pytest.raises(ValueError):
+        subject.close_command_annotation("annotation-id")
