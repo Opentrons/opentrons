@@ -142,10 +142,10 @@ export function ModuleContainer({
       break
     }
     case TEMPERATURE_MODULE_TYPE: {
-      const { status, targetTemperature } = moduleState
+      const { targetTemperature } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <ModuleStatusContainer title={status}>
+          <ModuleStatusContainer title="target_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })

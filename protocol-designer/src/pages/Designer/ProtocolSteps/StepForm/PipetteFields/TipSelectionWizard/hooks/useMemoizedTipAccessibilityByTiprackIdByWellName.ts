@@ -19,6 +19,7 @@ import {
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { AccessibilityStatus, InaccessibleReason } from '../types'
 
@@ -39,7 +40,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   nozzles: NozzleConfigurationStyle
   pipetteSpecs: PipetteV2Specs
   selectedTips: string[][]
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   pipetteId: string
   tiprackUri: string
 }): Record<string, Record<string, AccessibilityStatus>> => {

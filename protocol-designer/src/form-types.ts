@@ -4,6 +4,7 @@ import type {
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -309,6 +310,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   path: PathOption
   // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+
   tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
@@ -438,6 +441,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_position_reference: PositionReference
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   pushOut_volume: number | null
   pushOut_checkbox: boolean
   times?: number | null

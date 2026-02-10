@@ -14,7 +14,6 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
-  getDefaultPrimaryNozzle,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -33,7 +32,10 @@ import { getValidTiprackIds } from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { PathOption, TipTrackingOption } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../types'
@@ -124,10 +126,8 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels,
-  })
+  const primaryNozzle = propsForFields.primaryNozzle
+    .value as PrimaryNozzleConfigurationStyle
 
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({
@@ -221,6 +221,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           setShowTipSelectionModal={setShowTipSelectionModal}
           formTiprackUri={formData.tipRack as string}
           pipetteId={pipetteId}
+          primaryNozzle={primaryNozzle}
           nozzles={nozzles}
           numPickups={numPickups}
           tiprackSelected={formData.tiprack_selected}

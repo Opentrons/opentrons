@@ -65,7 +65,10 @@
   "edit_step": "Edit step",
   "ending_deck": "Ending deck",
   "engage_height": "Engage height",
+  "flexStacker": "Stacker",
   "flex_stacker": {
+    "empty": "Emptying stacker of all labware",
+    "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",
     "label": "Flex Stacker",
     "module_controls": {
       "empty_label": "Empty",
@@ -76,6 +79,7 @@
       "retrieve_label": "Retrieve",
       "retrieve_sublabel": "Retrieve labware from the stacker onto the shuttle"
     },
+    "retrieve": "<text>Retrieving</text> <tag/> <text>from stacker</text>",
     "shuttle": {
       "label": "Shuttle",
       "no_labware": "No labware on shuttle"
@@ -86,12 +90,8 @@
       "no_labware": "No labware stored on stacker",
       "quantity": "Quantity: {{count}}"
     },
-    "empty": "Emptying stacker of all labware",
-    "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",
-    "retrieve": "<text>Retrieving</text> <tag/> <text>from stacker</text>",
     "store": "<text>Storing</text> <tag/> <text>from shuttle into stacker</text>"
   },
-  "flexStacker": "Stacker",
   "flow_rate_builder": "Flow rate builder",
   "flow_type_title": "{{type}} flow rate",
   "from": "from",
@@ -133,6 +133,7 @@
   },
   "max_disposal_volume": "Max {{vol}} {{unit}}",
   "mix": "Mix",
+  "mix_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} mix wells selected",
   "mix_repetitions": "Mix repetitions",
   "mix_times": "Mix repetitions",
   "mix_volume": "Mix volume",
@@ -144,9 +145,9 @@
     "gripper": "<text>Move</text><semiBoldText>{{labware}}</semiBoldText><text>to</text><tag/><text>using gripper</text>",
     "no_gripper": "<text>Move</text><semiBoldText>{{labware}}</semiBoldText><text>to</text><tag/>"
   },
-  "multi_dispense_options": "Disposal volume",
   "multiAspirate": "Consolidate",
   "multiDispense": "Distribute",
+  "multi_dispense_options": "Disposal volume",
   "new_location": "New location",
   "no_tiprack": "No tiprack available",
   "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
@@ -271,6 +272,7 @@
   "total_stacked": "Total stacked: {{amount}}",
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
+  "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
