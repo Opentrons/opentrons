@@ -15,7 +15,7 @@ The [Opentrons Knowledge Hub](https://opentrons.com/resources/knowledge-hub/) ho
 
 ## Python Protocol API documentation
 
-The [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](https://docs.opentrons.com/v2/tutorial.html) for users writing their first Python protocol.
+The [Opentrons Python Protocol API documentation](../../python-api/) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](../../python-api/tutorial/) for users writing their first Python protocol.
 
 The Python API documentation covers writing Python code to:
 
@@ -42,4 +42,8 @@ The API reference is defined by and generated from an [OpenAPI](https://www.open
 
 ## Developer documentation
 
-For users who want to work directly with Opentrons source code, documentation is available alongside the corresponding code on GitHub. For example, the [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md) page provides a guide with opinionated instructions for setting up your computer. Working through these steps is required to run the Opentrons App or a simulated robot server from source.
+Documentation for working directly with Opentrons source code is available alongside the corresponding code on GitHub. Notable documentation pages include:
+
+- [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md): Opinionated instructions for setting up your computer to work on the software in the Opentrons/opentrons repository. These setup steps are required for running the Opentrons App or a simulated robot server from source.
+
+- [Opentrons Emulation Wiki](https://github.com/Opentrons/opentrons-emulation/wiki): Explanation and instructions for using our software that emulates Opentrons robots at the firmware or hardware level.
