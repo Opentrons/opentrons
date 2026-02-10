@@ -51,6 +51,9 @@ Set the language used by the touchscreen to Chinese or English.
 
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
+!!! Note
+    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
+
 ### Privacy
 
 Choose what data you want Flex to share with Opentrons. This information is always anonymized and we only use it to improve our products.
