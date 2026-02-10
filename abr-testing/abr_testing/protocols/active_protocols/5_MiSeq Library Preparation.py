@@ -8,7 +8,7 @@ from opentrons.protocol_api import (
 from typing import Tuple, Optional
 from opentrons.protocol_api import COLUMN, ALL
 from abr_testing.protocols.helpers import run_helpers as helpers
-from abr_testing.protocold.helpers import background_helpers
+from abr_testing.protocols.helpers import background_helpers
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     ThermocyclerContext,

@@ -920,7 +920,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                 # ========NEW HS MIX=========================
-                helpers.set_hs_speed(
+                run_helpers.set_hs_speed(
                     protocol,
                     heatershaker,
                     int(heater_shaker_speed * 0.9),
@@ -929,7 +929,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
 
                 # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
-                helpers.move_labware_from_hs_to_destination(
+                run_helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
 
@@ -1023,7 +1023,7 @@ def run(protocol: ProtocolContext) -> None:
                     protocol.delay(minutes=1)
 
                 # GRIPPER MOVE PLATE FROM MAG PLATE TO HEATER SHAKER
-                helpers.move_labware_to_hs(
+                run_helpers.move_labware_to_hs(
                     protocol, sample_plate_2, heatershaker, hs_adapter
                 )
 
@@ -1066,7 +1066,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                     if DRYRUN is False:
-                        helpers.set_hs_speed(
+                        run_helpers.set_hs_speed(
                             protocol,
                             heatershaker,
                             int(heater_shaker_speed * 0.8),
@@ -1075,7 +1075,7 @@ def run(protocol: ProtocolContext) -> None:
                         )
 
                 # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
-                helpers.move_labware_from_hs_to_destination(
+                run_helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
 
@@ -1107,18 +1107,18 @@ def run(protocol: ProtocolContext) -> None:
         ]
         protocol.move_lid(reagent_plate, lid, use_gripper=True)
         if probe_liquid_height_bool:
-            helpers.find_liquid_height_of_all_wells(
+            run_helpers.find_liquid_height_of_all_wells(
                 protocol, p50, liquids_to_probe_at_end
             )
         if deactivate_modules_bool:
-            helpers.deactivate_modules(protocol)
+            run_helpers.deactivate_modules(protocol)
 
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
