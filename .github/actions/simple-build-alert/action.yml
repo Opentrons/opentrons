@@ -15,8 +15,8 @@ inputs:
     description: 'Override default channel (optional)'
     required: false
   webhook_url:
-    description: 'Slack webhook URL'
-    required: true
+    description: 'Slack webhook URL (step is skipped if empty or unset)'
+    required: false
 
 runs:
   using: 'composite'
@@ -36,6 +36,7 @@ runs:
         fi
 
     - name: 'Send Slack Alert'
+      if: inputs.webhook_url != ''
       uses: slackapi/slack-github-action@v2.1.1
       with:
         webhook-type: 'incoming-webhook'
