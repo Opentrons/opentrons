@@ -113,15 +113,13 @@ Varying the tip drop location within a trash container can help keep tips from p
 
 ```python
 pipette.pick_up_tip() #picks up the next tip
-pipette.drop_tip(
-    alternate_drop_location=None)
+pipette.drop_tip(alternate_drop_location=True)
 pipette.pick_up_tip()
-pipette.drop_tip(
-    alternate_drop_location=None)
+pipette.drop_tip(alternate_drop_location=True)
 ```
 *New in version 2.28*
 
-In the example above, the pipette will drop each tip in a slightly different locations in the waste chute. 
+In the example above, the pipette will drop each tip in slightly different locations in the default trash container. 
 
 ## Returning a tip
 

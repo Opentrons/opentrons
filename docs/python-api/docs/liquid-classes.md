@@ -260,14 +260,20 @@ Next, edit individual liquid class properties based on your Flex pipette and tip
 ```python
 # edit aspirate submerge speed to 80 μL/sec
 custom_water_properties.aspirate.submerge.speed = 80
+
 # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
 custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)]
 custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
+
 # edit to delay for 1 sec before retracting after an aspirate
 custom_water_properties.aspirate.retract.delay.enabled = True
 custom_water_properties.aspirate.retract.delay.duration = 1.0
+
 # edit aspirate tip position 
-custom_water_properties.aspirate.aspirate_position = {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}}
+custom_water_properties.aspirate.aspirate_position = {
+    "position_reference": "well-top",
+    "offset": {"x": 1, "y": 2, "z": 3}
+}
 # use aspirate tip position to set dispense tip position
 custom_water_properties.aspirate.aspirate_position = custom_water_properties.dispense.dispense_position
 ```

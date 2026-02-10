@@ -1216,13 +1216,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Raises:
             UnexpectedTipRemovalError: If no tip is attached to the pipette.
-            RuntimeError: If no location is specified and the location cache is `None`.
-                This should happen if `touch_tip()` is called without first calling a
-                method that takes a location, like
-                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
-                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
-                              Also raises RuntimeError if location is in a labware with
-                              `touchTipDisabled` quirk.
+            RuntimeError: 
+                - If no location is specified and the location cache is `None`.
+                    This should happen if `touch_tip()` is called without first calling a
+                    method that takes a location, like
+                    [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+                    [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
+                - If location is in a labware with `touchTipDisabled` quirk.
             ValueError: If both `mm_from_edge` and `radius` are specified.
 
         Returns:
