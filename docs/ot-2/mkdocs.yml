@@ -3,11 +3,6 @@ site_name: ot-2
 nav:
   - OT-2 Instruction Manual: index.md
   - Introduction: introduction.md
-  - Safety and Regulatory Information: regulatory.md
-  - System Description:
-      - System Description: system-description/index.md
-      - Robot Components: system-description/robot-components.md
-      - System Specifications: system-description/specs.md
   - Installation and Relocation:
       - Installation and Relocation: installation/index.md
       - Installation Requirements: installation/requirements.md
@@ -15,12 +10,17 @@ nav:
       - First Run: installation/first-run.md
       - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
-  - OT-2 Pipettes: pipettes-ot2.md
+  - Safety and Regulatory Information: safety-regulatory.md
+  - System Description:
+      - System Description: system-description/index.md
+      - Robot Components: system-description/robot-components.md
+      - System Specifications: system-description/specs.md
+  - OT-2 Pipettes: pipettes.md
   - OT-2 Modules:
       - Modules: modules/index.md
       - Heater-Shaker: modules/heater-shaker.md
       - HEPA: modules/hepa.md
-      - Magnetic Module: modules/magnetic-module.md
+      - Magnetic Module: modules/magnetic.md
       - Temperature Module: modules/temperature.md
       - Thermocycler: modules/thermocycler.md
   - Labware:
@@ -32,15 +32,19 @@ nav:
       - Calibration: calibration/index.md
       - Robot Calibration: calibration/robot.md
       - Labware Calibration: calibration/labware.md
-  - Software: software.md
+  - Opentrons App:
+      - Opentrons App: opentrons-app/index.md
+      - Installing the App: opentrons-app/installation.md
+      - Importing Protocols: opentrons-app/protocol-import.md
+      - Running Protocols: opentrons-app/protocol-run.md
+      - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
-      - User-level Maintenance Procedures: maintenance/self-service.md
-      - Instrument Services: maintenance/services.md
+      - Services: maintenance/services.md
   - Appendices:
       - Additional Documentation: additional-docs.md
-      - Open-Source Software: open-source.md
+      # - Open-Source Software: open-source.md
       - Product Support and Company Information: support.md
 
 theme:

@@ -73,7 +73,7 @@ Always observe the following electrical safety warnings and cautions:
     </tr>
     <tr>
         <td><img src="../images/shock-warning.svg" alt="Yellow electrical warning triangle"></td>
-        <td><strong>Warning: </strong> The Opentrons OT-2 Liquid Handler contains AC power fuses. If a fuse requires replacement, contact <a href="https://opentrons.com/opentrons-support">Opentrons support</a>.</td>
+        <td><strong>Warning: </strong> The Opentrons OT-2 Liquid Handler contains AC power fuses. If a fuse requires replacement, contact <a href="https://opentrons.com/opentrons-support">Opentrons Support</a>.</td>
     </tr>
     <tr>
         <td><img src="../images/shock-warning.svg" alt="Yellow electrical warning triangle"></td>
@@ -117,7 +117,7 @@ To minimize the potential risk of aerosol exposure from the OT-2, it is a good p
         </tr>
         <tr>
             <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
-            <td><strong>Toxic fumes</strong>: If the user is working with volatile solvents or toxic substances an efficient laboratory ventilation system should be used to remove any vapors that may be produced.</td>
+            <td><strong>Toxic fumes</strong>: If the user is working with volatile solvents or toxic substances, an efficient laboratory ventilation system should be used to remove any vapors that may be produced.</td>
         </tr>
     </tbody>
 </table>
@@ -141,26 +141,82 @@ The OT-2 complies with all applicable requirements of the following safety and e
 
 ### Safety standards
 
-| Rule ID | Title |
-|----|----|
-| IEC/UL/CSA/EN 61010-1:2001 | Safety requirements for electrical equipment for measurement, control, and laboratory use—Part 1: General requirements |
-| IEC/UL/CSA/EN 61010-2-010:2015 Ed. 3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—Part 2-010: Particular Requirements For Laboratory Equipment For The Heating Of Materials |
-| IEC/UL/CSA/EN 61010-2-051:2015 Ed.3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—Part 2-051: Particular Requirements For Laboratory Equipment For Mixing And Stirring |
+<table>
+  <thead>
+    <tr>
+      <th>Rule ID</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IEC/<wbr>UL/<wbr>CSA/<wbr>EN 61010-1:2001</td>
+      <td>Safety requirements for electrical equipment for measurement, control, and laboratory use—<wbr>Part 1: General requirements</td>
+    </tr>
+    <tr>
+      <td>IEC/<wbr>UL/<wbr>CSA/<wbr>EN 61010-2-010:2015 Ed. 3</td>
+      <td>Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—<wbr>Part 2-010: Particular Requirements For Laboratory Equipment For The Heating Of Materials</td>
+    </tr>
+    <tr>
+      <td>IEC/<wbr>UL/<wbr>CSA/<wbr>EN 61010-2-051:2015 Ed. 3</td>
+      <td>Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—<wbr>Part 2-051: Particular Requirements For Laboratory Equipment For Mixing And Stirring</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Electromagnetic compatibility
 
-| Rule ID | Title |
-|---|---|
-| IEC 61326-1:2013 | Electrical Equipment for measurement, control, and laboratory use–EMC Requirements, Class A |
-| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)–Part 3–2: Limits–Limits for harmonic current emissions |
-| EN 61000-3-3:2013 | Electromagnetic compatibility (EMC)–Part 3–3: Limits–Limitation of voltage changes, voltage fluctuations and flicker in public low–voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection |
-| KN 61000-6-3:2012 | Electromagnetic compatibility (EMC)–Part 6–3: Generic standards–Emission standard for residential, commercial and light–industrial environments |
-| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)–Part 3–2: Limits–Limits for harmonic current emissions (equipment input current ≤ 16 A per phase) |
-| IEC 61000-3-3:2013 Ed.3+A1 | See EN 61000–3–3:2013 above |
-| IEC 61000-6-1:2016 | Electromagnetic compatibility (EMC)–Part 6–1: Generic standards–Immunity for residential, commercial and light–industrial environments |
-| EN 61000-3-3:2008 | See EN 61000–3–3:2013 above |
-| FCC Part 15 | Subpart B, Sections 15.107 and 15.109 as a Class A digital device |
-| IC ICES-003:2016Ed.6 | Information Technology Equipment (Including Digital Apparatus) Limits and Methods of Measurement |
+<table>
+  <thead>
+    <tr>
+      <th>Rule ID</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IEC 61326-1:2013</td>
+      <td>Electrical Equipment for measurement, control, and laboratory use–EMC Requirements, Class A</td>
+    </tr>
+    <tr>
+      <td>EN 61000-3-2:2014</td>
+      <td>
+        <ul>
+          <li>Electromagnetic compatibility (EMC)–<wbr>Part 3–<wbr>2: Limits–<wbr>Limits for harmonic current emissions</li>
+          <li>Electromagnetic compatibility (EMC)–<wbr>Part 3–<wbr>2: Limits–<wbr>Limits for harmonic current emissions (equipment input current ≤ 16 A per phase)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>EN 61000-3-3:2013</td>
+      <td>Electromagnetic compatibility (EMC)–<wbr>Part 3–<wbr>3: Limits–<wbr>Limitation of voltage changes, voltage fluctuations and flicker in public low–<wbr>voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection</td>
+    </tr>
+    <tr>
+      <td>KN 61000-6-3:2012</td>
+      <td>Electromagnetic compatibility (EMC)–<wbr>Part 6–<wbr>3: Generic standards–<wbr>Emission standard for residential, commercial and light–<wbr>industrial environments</td>
+    </tr>
+    <tr>
+      <td>IEC 61000-3-3:2013 Ed.3+A1</td>
+      <td>See EN 61000–<wbr>3–<wbr>3:2013 above</td>
+    </tr>
+    <tr>
+      <td>IEC 61000-6-1:2016</td>
+      <td>Electromagnetic compatibility (EMC)–<wbr>Part 6–<wbr>1: Generic standards–<wbr>Immunity for residential, commercial and light–<wbr>industrial environments</td>
+    </tr>
+    <tr>
+      <td>EN 61000-3-3:2008</td>
+      <td>See EN 61000–<wbr>3–<wbr>3:2013 above</td>
+    </tr>
+    <tr>
+      <td>FCC Part 15</td>
+      <td>Subpart B, Sections 15.107 and 15.109 as a Class A digital device</td>
+    </tr>
+    <tr>
+      <td>IC ICES-003:<wbr>2016 Ed.6</td>
+      <td>Information Technology Equipment (Including Digital Apparatus) Limits and Methods of Measurement</td>
+    </tr>
+  </tbody>
+</table>
 
 ### FCC warnings and notes
 

@@ -24,7 +24,7 @@ The OT-2 is powered by an external power supply that converts AC wall current to
 
     ![power connection alignment](../images/power-connector-alignment.png)
 
-4. Connect the power cable to the external power supply, and then connect your region-specific plug to a wall outlet.
+4. Connect the power cable to the external power supply, and then connect plug to a wall outlet. Your OT-2 ships with a power plug specific to your country or region.
 
     ![Regional IEC power plugs](../images/iec-plugs.png)
 
@@ -37,6 +37,8 @@ After turning on the power, it may take up to 45 seconds, or longer, before the 
 - The gantry will move to its home position.
 - The robot may emit other mechanical noises as it starts up.
 
+</div>
+
 !!!note
     If the blue light on the front of the robot does not turn solid after the robot has been powered on for more than five minutes, contact Opentrons Support.
 
@@ -48,10 +50,14 @@ Along with a direct connection to a computer, you can also connect the OT-2 to y
 
 If you need to connect to a Wi-Fi network that uses enterprise authentication (including [eduroam](https://eduroam.org/how/) and similar academic networks that require a username and password), first connect to the Opentrons App by Ethernet or USB to complete initial setup. Then use the Opentrons App and connect to the enterprise Wi-Fi network in the networking settings for your OT-2. To access the networking settings:
 
+<div class="instruction-list" markdown>
+
 1. Click Devices in the left sidebar of the Opentrons App.
 2. Click the three-dot menu (⋮) for your OT-2 and select **Robot Settings**.
 3. Click the Networking tab.
 4. Select your network from the dropdown menu or choose "Join other network..." and enter its SSID. Choose the enterprise authentication method that your network uses. See the following section for the supported security types.
+
+</div>
 
 ### Wi-Fi security
 

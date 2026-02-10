@@ -80,7 +80,7 @@ Try creating a custom labware definition using the [Opentrons Labware Creator](h
 
 ## Aluminum blocks
 
-The OT-2 uses [aluminum blocks on the Labware Library](https://labware.opentrons.com/#/?category=aluminumBlock) to hold sample tubes or well plates on the Temperature Module or deck.
+The OT-2 uses [aluminum blocks on the Labware Library](https://labware.opentrons.com/#/?category=aluminumBlock) to hold sample tubes or well plates on the Temperature Module.
 
 A set of OT-2 compatible aluminum blocks also ships with the Temperature Module GEN2. This includes a flat bottom plate, a 24-well block, and a 96-well block, which are also available for purchase from Opentrons.
 
