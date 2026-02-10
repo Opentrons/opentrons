@@ -1271,7 +1271,9 @@ class ProtocolCore(
     ) -> str:
         """Creates a command annotation and adds the ID to list of active command annotations."""
         if len(self._annotation_ids) > 0:
-            raise ValueError(f"Cannot start a new step grouping when one is already active.")
+            raise ValueError(
+                "Cannot start a new step grouping when one is already active."
+            )
         annotation_id = self._engine_client.create_user_command_annotation(
             annotation_name=annotation_name,
             description=annotation_description,
