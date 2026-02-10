@@ -68,6 +68,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
     labwareLoadedOnModuleId,
     renderLabware = true,
   } = props
+
   return (
     <>
       {renderLabware ? (
@@ -138,8 +139,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           hover={hoveredSlot}
         >
           {(moduleType === FLEX_STACKER_MODULE_TYPE &&
-            selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve' &&
-            selectedRunTimeCommand?.commandType !== 'flexStacker/store') ||
+            selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve') ||
           (moduleType !== FLEX_STACKER_MODULE_TYPE &&
             (showModuleCommandSummary || showLabwareCommandSummary)) ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>

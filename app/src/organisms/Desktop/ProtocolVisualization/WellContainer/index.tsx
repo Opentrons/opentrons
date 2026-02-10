@@ -104,7 +104,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   <div className={styles.tip_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: tipCurrentVolume.toString(),
+                        volume: tipCurrentVolume.toFixed(1),
                       })}
                       type="flex"
                     />
@@ -114,7 +114,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   <div className={styles.well_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: totalVolumeInWell.toString(),
+                        volume: totalVolumeInWell.toFixed(1),
                       })}
                       type="flex"
                     />
