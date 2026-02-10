@@ -69,11 +69,6 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
     renderLabware = true,
   } = props
 
-  console.log(
-    '  selectedRunTimeCommand?.commandType',
-    moduleType,
-    selectedRunTimeCommand?.commandType
-  )
   return (
     <>
       {renderLabware ? (
