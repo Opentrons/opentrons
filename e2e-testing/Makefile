@@ -91,3 +91,15 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: test-compare
+test-compare:
+	@if [ "$(HEADLESS)" = "false" ]; then \
+		uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	else \
+		HEADLESS=true uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	fi
