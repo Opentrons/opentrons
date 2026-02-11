@@ -10,12 +10,12 @@ Deployed environments: **staging** (`staging.opentrons.ai`) and **prod** (`ai.op
 
 This project uses **[uv](https://docs.astral.sh/uv/)** for Python dependency management (not pipenv, pip-tools, or poetry).
 
-| File | Role | Committed? |
-|---|---|---|
-| `pyproject.toml` | Single source of truth for dependencies AND all tool config | Yes |
-| `uv.lock` | Locked dependency graph | Yes |
-| `requirements.txt` | Generated pip-format file for Docker builds | No (gitignored) |
-| `.venv/` | Local virtual environment created by `uv sync` | No (gitignored) |
+| File               | Role                                                        | Committed?      |
+| ------------------ | ----------------------------------------------------------- | --------------- |
+| `pyproject.toml`   | Single source of truth for dependencies AND all tool config | Yes             |
+| `uv.lock`          | Locked dependency graph                                     | Yes             |
+| `requirements.txt` | Generated pip-format file for Docker builds                 | No (gitignored) |
+| `.venv/`           | Local virtual environment created by `uv sync`              | No (gitignored) |
 
 ### Key commands
 
@@ -77,11 +77,11 @@ Generate a template `.env` from defaults: `make gen-env`
 
 All linting/formatting/testing/type-checking config is consolidated in `pyproject.toml` — there are no separate config files:
 
-| Tool | Section | Purpose |
-|---|---|---|
-| ruff | `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.ruff.format]` | Linting AND formatting (replaces black + isort + flake8) |
-| mypy | `[tool.mypy]`, `[[tool.mypy.overrides]]` | Strict type checking with pydantic plugin |
-| pytest | `[tool.pytest.ini_options]` | Test runner config, markers: `unit`, `live` |
+| Tool   | Section                                                 | Purpose                                                  |
+| ------ | ------------------------------------------------------- | -------------------------------------------------------- |
+| ruff   | `[tool.ruff]`, `[tool.ruff.lint]`, `[tool.ruff.format]` | Linting AND formatting (replaces black + isort + flake8) |
+| mypy   | `[tool.mypy]`, `[[tool.mypy.overrides]]`                | Strict type checking with pydantic plugin                |
+| pytest | `[tool.pytest.ini_options]`                             | Test runner config, markers: `unit`, `live`              |
 
 Line length: **140**. Target: **Python 3.12**. Mypy is in **strict** mode.
 
@@ -91,35 +91,34 @@ All targets run from the `opentrons-ai-server/` directory.
 
 ### Development workflow
 
-| Target | What it does |
-|---|---|
-| `make setup` | Install all deps (`uv sync --frozen`) |
-| `make teardown` | Delete `.venv/` |
-| `make format` | Auto-fix lint issues + format code with ruff, then prettier for .md/.json |
-| `make lint` | Check lint (ruff) + type check (mypy) — no auto-fix |
-| `make fixup` | `format` then `lint` |
-| `make unit-test` | Run unit tests (`pytest tests -m unit`) |
-| `make pre-commit` | `fixup` + `unit-test` — run this before pushing |
+| Target            | What it does                                                              |
+| ----------------- | ------------------------------------------------------------------------- |
+| `make setup`      | Install all deps (`uv sync --frozen --extra dev`)                         |
+| `make teardown`   | Delete `.venv/`                                                           |
+| `make format`     | Auto-fix lint issues + format code with ruff, then prettier for .md/.json |
+| `make lint`       | Check lint (ruff) + type check (mypy) — no auto-fix                       |
+| `make prep`       | `format` then `lint` then `unit-test`                                     |
+| `make unit-test`  | Run unit tests (`pytest tests -m unit`)                                   |
 
 ### Running locally
 
-| Target | What it does |
-|---|---|
-| `make local-run` | Run FastAPI with uvicorn (hot reload, no Docker) |
-| `make build` | Generate requirements.txt, build Docker image |
-| `make run` | Run the Docker container (requires `.env` file) |
-| `make rebuild` | `clean` + `build` + `run` |
-| `make live-test` | Run live tests against a running server (`ENV=local` default) |
-| `make live-client` | Interactive client for testing the API |
+| Target             | What it does                                                  |
+| ------------------ | ------------------------------------------------------------- |
+| `make local-run`   | Run FastAPI with uvicorn (hot reload, no Docker)              |
+| `make build`       | Generate requirements.txt, build Docker image                 |
+| `make run`         | Run the Docker container (requires `.env` file)               |
+| `make rebuild`     | `clean` + `build` + `run`                                     |
+| `make live-test`   | Run live tests against a running server (`ENV=local` default) |
+| `make live-client` | Interactive client for testing the API                        |
 
 ### Deployment
 
-| Target | What it does |
-|---|---|
-| `make gen-requirements` | Export `uv.lock` → `requirements.txt` (production deps only) |
-| `make deploy ENV=staging` | Build, push to ECR, update ECS service |
-| `make dry-deploy ENV=staging` | Retrieve AWS data but make no changes |
-| `make build-only ENV=staging` | Build Docker image only, no push/deploy |
+| Target                        | What it does                                                 |
+| ----------------------------- | ------------------------------------------------------------ |
+| `make gen-requirements`       | Export `uv.lock` → `requirements.txt` (production deps only) |
+| `make deploy ENV=staging`     | Build, push to ECR, update ECS service                       |
+| `make dry-deploy ENV=staging` | Retrieve AWS data but make no changes                        |
+| `make build-only ENV=staging` | Build Docker image only, no push/deploy                      |
 
 ## Docker Build
 
@@ -128,7 +127,7 @@ The container does **not** use uv internally. The build flow:
 1. `make build` calls `make gen-requirements` → `uv export --no-hashes --no-dev -o requirements.txt`
 2. Dockerfile copies `requirements.txt` and installs with plain `pip`
 3. Copies `api/` source code and Opentrons API docs into the image
-4. Entrypoint: `ddtrace-run uvicorn api.handler.fast:app` (3 workers, port 8000)
+4. Entrypoint: `uvicorn api.handler.fast:app` (3 workers, port 8000)
 
 The Docker build context is the **repo root** (not `opentrons-ai-server/`) so the Dockerfile can copy `api/docs/v2` from the sibling `api/` package.
 

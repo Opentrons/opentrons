@@ -2,7 +2,7 @@
 
 .PHONY: setup
 setup:
-	uv sync --frozen
+	uv sync --frozen --extra dev
 
 .PHONY: teardown
 teardown:
@@ -10,13 +10,13 @@ teardown:
 
 .PHONY: ruff
 ruff:
-	uv run ruff check . --fix --unsafe-fixes
 	uv run ruff format .
+	uv run ruff check . --fix --unsafe-fixes
 
 .PHONY: ruff-check
 ruff-check:
-	uv run ruff check .
 	uv run ruff format . --check
+	uv run ruff check .
 
 .PHONY: mypy
 mypy:
@@ -36,12 +36,9 @@ format:
 	@echo formatting the readme with yarn prettier
 	$(MAKE) format-readme
 
-.PHONY: fixup
-fixup: format lint
-
-.PHONY: pre-commit
-pre-commit: fixup unit-test
-	@echo "pre-commit checks passed"
+.PHONY: prep
+prep: format lint unit-test
+	@echo prep is a combination of format, lint, and unit-test
 
 .PHONY: gen-env
 gen-env:
@@ -79,20 +76,19 @@ dry-deploy: gen-requirements
 prompted-deploy: gen-requirements
 	uv run python deploy.py
 
-.PHONY: direct-chat-completion
-direct-chat-completion:
-	uv run python -m api.domain.openai_predict
-
 .PHONY: print-client-settings-vars
 print-client-settings-vars:
 	uv run python -m tests.helpers.settings
 
 .PHONY: live-client
 live-client:
+	@echo "Uses the test helpers to interact with the API"
 	uv run python -m tests.helpers.client
 
 .PHONY: live-hf
 live-hf:
+	@echo "Sends a simple protocol for simulation to the"
+	@echo "Hugging Face Simulate tool to verify connectivity and auth"
 	uv run python -m tests.helpers.huggingface_client
 
 .PHONY: live-test

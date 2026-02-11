@@ -69,7 +69,7 @@ Now you are in the docker container and can inspect the environment and such.
 
 #### Direct API Interaction and Authentication
 
-> There is only 1 endpoint with the potential to call the OpenAI API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The OpenAI API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the OpenAI API.
+> There is only 1 endpoint with the potential to call the Anthropic API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The Anthropic API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the Anthropic API.
 
 To access the `/api/chat/completion` API endpoint, you will need to provide an Authorization header in your API calls.
 `"Authorization": "Bearer YOUR_TOKEN"`
@@ -100,10 +100,9 @@ The live-test target will run tests against any environment. The default is loca
 
 ## Dev process
 
-1. run the server locally `make run-local`
+1. run the server locally `make local-run`
 1. do development
-1. `make fixup` formats, lints, and runs mypy
-1. `make pre-commit` does what CI will do
+1. `make prep` formats, lints, runs mypy, and runs unit tests (matches CI expectations)
 1. `make build` to make sure that the docker container builds
 1. `make run` to make sure the docker container runs
 1. test locally `make live-test` (ENV=local is the default in the Makefile)

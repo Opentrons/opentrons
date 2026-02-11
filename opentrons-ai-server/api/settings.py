@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     If the variable is not set in the OS the default value is used (this is just for creating the .env file with default values)
     """
 
-    model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow")  # Allows extra fields
+    model_config = SettingsConfigDict(
+        env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow", protected_namespaces=("settings_",)
+    )  # Allows extra fields
     # Delete the extra=allow above
     # once we figure out why aws secret manager has a variable called protocol_designer_app_version
     # see https://github.com/Opentrons/opentrons/actions/runs/15007084098/job/42168255050
