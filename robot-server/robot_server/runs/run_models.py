@@ -30,7 +30,6 @@ from opentrons.protocol_engine.types import (
     OnDeckLabwareLocation,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.util import StrEnum
