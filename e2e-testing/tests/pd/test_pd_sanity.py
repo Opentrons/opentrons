@@ -105,7 +105,7 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     transfer_page = TransferPage(page)
     # Source labware is selected by default so we proceed to selecting the well
     transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
-    transfer_page.destination_labware_select("Axygen 96 Well Plate 500 µL")
+    transfer_page.destination_labware_select(labware_on_deck)
     transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
     transfer_page.input_volume("100")
     print("✓ Transfer step configured")
