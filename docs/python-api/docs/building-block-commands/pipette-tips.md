@@ -124,12 +124,16 @@ Beginning with API version 2.28, you can return tips with a pipette that's confi
 To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] to return used tips to an empty tip rack on the deck.
 
 ```python
+# set tiprack_1 as empty
 tiprack_1.set_empty()
+
+# return attached tips to tiprack_1
+pipette.return_tip("A1")
 ```
 
 *New in version 2.28*
 
-The example above sets `tiprack_1` to `empty`. Tips returned here are marked "used" and will be skipped in automatic tip tracking.
+The example above sets `tiprack_1` to `empty`, then returns tips attached to the pipette to the tiprack, starting with well `"A1"`. Tips returned here are marked "used" and will be skipped in automatic tip tracking.
 
 
 ## Working with used tips
