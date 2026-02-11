@@ -109,17 +109,24 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 *New in version 2.16*
 
-Varying the tip drop location within a trash container can help keep tips from piling up in a single location. Beginning with API version 2.28, use the optional `alternate_drop_location` argument to vary the tip drop location: 
+The API automatically varies the tip drop location in the default trash container, or when you haven't specified a `location`, to help keep tips from piling up. Beginning with API version 2.28, you can add the optional `alternate_drop_location` argument to control the tip drop location in a specified `location`:
 
 ```python
+trash = protocol_context.load_trash_bin("A3")
 pipette.pick_up_tip() #picks up the next tip
-pipette.drop_tip(alternate_drop_location=True)
-pipette.pick_up_tip()
-pipette.drop_tip(alternate_drop_location=True)
+
+# alternate drop tip location in the specified trash
+pipette.drop_tip(
+    location=trash,
+    alternate_drop_location=True)
+pipette.pick_up_tip() # picks up the next tip
+pipette.drop_tip(
+    location=trash,
+    alternate_drop_location=True)
 ```
 *New in version 2.28*
 
-In the example above, the pipette will drop each tip in slightly different locations in the default trash container. 
+In the example above, the pipette drops each tip in a slightly different location in the `trash`.  
 
 ## Returning a tip
 

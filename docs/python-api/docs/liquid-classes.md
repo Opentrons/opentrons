@@ -275,7 +275,7 @@ custom_water_properties.aspirate.aspirate_position = {
     "offset": {"x": 1, "y": 2, "z": 3}
 }
 # use aspirate tip position to set dispense tip position
-custom_water_properties.aspirate.aspirate_position = custom_water_properties.dispense.dispense_position
+custom_water_properties.dispense.dispense_position = custom_water_properties.aspirate.aspirate_position
 ```
 *New in version 2.24*
 

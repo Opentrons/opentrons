@@ -329,7 +329,7 @@ pipette.blow_out(pipette.trash_container)
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
 
-*Changed in version 2.28:* Add an absolute `flow_rate` for blowing out the pipette.
+*Changed in version 2.28:* Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
 
 ## Touch tip { #touch-tip-building-block }
 
