@@ -47,6 +47,7 @@ import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/s
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
+  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
@@ -315,6 +316,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   return (
     <div className={styles.column_wrapper}>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
+
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
         <div className={styles.well_legend_box}>

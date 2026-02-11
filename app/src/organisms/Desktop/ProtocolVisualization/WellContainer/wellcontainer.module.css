@@ -73,6 +73,13 @@
   padding-top: 1rem;
 }
 
+.well_and_tip_svg {
+  display: block;
+  overflow: visible;
+  width: 100%;
+  height: auto;
+}
+
 /* Width 172px up to 299px */
 @container well-view-slot-container (min-width: 172px) and (max-width: 299px) {
   .main_content {

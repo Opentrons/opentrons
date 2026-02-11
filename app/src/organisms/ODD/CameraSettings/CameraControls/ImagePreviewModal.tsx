@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
@@ -20,9 +21,13 @@ export function ImagePreviewModal({
 }: ImagePreviewModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
+  const displayTimestamp = useMemo(() => {
+    return format(new Date(), 'M/d/yy HH:mm:ss')
+  }, [])
+
   const modalHeader: OddModalHeaderBaseProps = useMemo(
     () => ({
-      title: t('image_preview_timestamp', { timestamp: Math.random() }),
+      title: t('image_preview_timestamp', { timestamp: displayTimestamp }),
       hasExitIcon: true,
       onClick: toggleModal,
     }),
