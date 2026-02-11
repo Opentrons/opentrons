@@ -129,8 +129,7 @@ async def _run_single_pump_api_cycle(pump,
                                  water_pump_fixture,
                                  target_pressure: int, cycle_index: int,
                                  sample_interval: float, output_dir: Path,
-                                 ctx: protocol_api.ProtocolContext,
-                                 loop):
+                                 ctx: protocol_api.ProtocolContext):
     """
     Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
     Relies on the driver's internal CSV logging (e.g. pump_test.csv) instead of
@@ -265,8 +264,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                                         cycle, 
                                         sample_interval, 
                                         output_dir, 
-                                        ctx,
-                                        loop)
+                                        ctx)
                 )
     pip.return_tip()
     if pump:
