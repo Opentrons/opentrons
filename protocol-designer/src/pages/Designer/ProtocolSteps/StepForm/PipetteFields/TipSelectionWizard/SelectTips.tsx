@@ -15,6 +15,7 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
+  TIP,
   USED,
 } from '@opentrons/components'
 import {
@@ -369,7 +370,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={'tip'} size={DEFAULT_TIP_SIZE} />
+        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
       </div>
     </div>
   )

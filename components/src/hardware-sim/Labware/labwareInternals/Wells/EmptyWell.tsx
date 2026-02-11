@@ -11,9 +11,9 @@ export function EmptyWell(props: {
   const firstWell = labwareDefinition.wells.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
-
+  const circularDimension = 20
   const viewBox = isCircular
-    ? size || '0 0 20 20'
+    ? size || `0 0 ${circularDimension} ${circularDimension}`
     : size || `0 0 ${width} ${height}`
 
   return (
@@ -29,8 +29,8 @@ export function EmptyWell(props: {
         maskUnits="userSpaceOnUse"
         x="0"
         y="0"
-        width={isCircular ? '20' : width}
-        height={isCircular ? '20' : height}
+        width={isCircular ? circularDimension : width}
+        height={isCircular ? circularDimension : height}
       >
         {isCircular ? (
           <circle cx="10" cy="10" r="9.5" fill="white" />

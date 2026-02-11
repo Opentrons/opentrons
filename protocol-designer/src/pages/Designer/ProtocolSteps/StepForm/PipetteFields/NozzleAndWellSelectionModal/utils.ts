@@ -78,21 +78,18 @@ export const getAvailableNozzleConfigurations = (
             ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
             : null,
         },
+        {
+          name: t('single_row_of_nozzles'),
+          value: ROW,
+          disabled: areAllTipracksOnAdapter,
+          tooltipText: areAllTipracksOnAdapter
+            ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
+            : null,
+        },
       ]
     )
   }
-  if (channels !== 8) {
-    nozzleConfigurationOptions.push({
-      name: t('single_row_of_nozzles'),
-      value: ROW,
-      disabled: areAllTipracksOnAdapter,
-      tooltipText: areAllTipracksOnAdapter
-        ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
-        : null,
-    })
-  }
   if (channels === 8) {
-    // 8-channel
     nozzleConfigurationOptions.push({
       name: t('single_nozzle'),
       value: SINGLE,
@@ -172,7 +169,8 @@ export const getEntireWellSelection = (
   wellName: string,
   labwareDef: LabwareDefinition,
   nozzleConfiguration: NozzleConfigurationStyle,
-  primaryNozzle: PrimaryNozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
+  channels: number
 ): string[] => {
   if (nozzleConfiguration === SINGLE) return [wellName]
   const { ordering } = labwareDef
@@ -180,6 +178,14 @@ export const getEntireWellSelection = (
   if (columnIndex === -1) return []
   const rowIndex = ordering[columnIndex].indexOf(wellName)
   switch (nozzleConfiguration) {
+    case ALL:
+      if (channels === 8) {
+        return ordering[columnIndex]
+      }
+      if (channels === 96) {
+        return ordering.flat()
+      }
+      return [wellName]
     case COLUMN:
       return ordering[columnIndex]
     case ROW:
@@ -208,6 +214,6 @@ export const getEntireWellSelection = (
       return column.slice(rowIndex, Math.min(end, column.length))
     }
     default:
-      return []
+      return [wellName]
   }
 }

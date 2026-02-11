@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -10,6 +10,7 @@ import {
   SELECTED_ERROR,
   StyledText,
   UNSELECTED,
+  WELL,
 } from '@opentrons/components'
 import {
   ALL,
@@ -47,7 +48,6 @@ import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/s
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
-  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
@@ -62,11 +62,30 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const { channels } = pipetteSpecs
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const currentHoveredWellRef = useRef<string | null>(null)
-
+  const getSelectedWells = (stepType: string): Set<string> => {
+    switch (stepType) {
+      case 'aspirate':
+        const aspWells = propsForFields.aspirate_wells.value as string[]
+        return new Set(aspWells)
+      case 'dispense':
+        const dspWells = propsForFields.dispense_wells.value as string[]
+        return new Set(dspWells)
+      case 'mix':
+        const mixWells = propsForFields.wells.value as string[]
+        return new Set(mixWells)
+      default:
+        return new Set()
+    }
+  }
   const [selectedWells, setSelectedWells] = useState<Set<string>>(
-    () => new Set()
+    getSelectedWells(stepType)
   )
-  const [hoveredWells, setHoveredWells] = useState<Set<string>>(() => new Set())
+
+  const [hoveredWells, setHoveredWells] = useState<Set<string>>()
+  useEffect(() => {
+    setSelectedWells(getSelectedWells(stepType))
+    setHoveredWells(new Set())
+  }, [stepType])
   const pipetteId = propsForFields.pipette.value as string
   const nozzleConfiguration = propsForFields.nozzles
     .value as NozzleConfigurationStyle
@@ -83,21 +102,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         return ''
     }
   }
-  const getSelectedWells = (stepType: string): Set<string> => {
-    switch (stepType) {
-      case 'aspirate':
-        const aspWells = propsForFields.aspirate_wells.value as string[]
-        return new Set(aspWells)
-      case 'dispense':
-        const dspWells = propsForFields.dispense_wells.value as string[]
-        return new Set(dspWells)
-      case 'mix':
-        const mixWells = propsForFields.wells.value as string[]
-        return new Set(mixWells)
-      default:
-        return new Set()
-    }
-  }
+
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
@@ -127,7 +132,8 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       wellName,
       labwareDef,
       nozzleConfiguration,
-      primaryNozzle
+      primaryNozzle,
+      channels
     )
     setSelectedWells(prev => {
       const next = new Set(prev)
@@ -208,7 +214,8 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         wellName,
         labwareDef,
         nozzleConfiguration,
-        primaryNozzle
+        primaryNozzle,
+        channels
       )
     )
     setHoveredWells(transformedWellNames)
@@ -246,17 +253,18 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           wellName,
           labwareDef,
           nozzleConfiguration,
-          primaryNozzle
+          primaryNozzle,
+          channels
         )
         const isGroupAccessible = wellsToUpdate.every(
           w => allWellsWithStatus[w] === 0
         )
         wellsToUpdate.forEach(w => {
-          if (hoveredWells.has(w) && !isGroupAccessible) {
+          if (hoveredWells?.has(w) && !isGroupAccessible) {
             acc[w] = SELECTED_ERROR
           } else if (!isGroupAccessible) {
             acc[w] = INACCESSIBLE
-          } else if (selectedWells.has(w) || hoveredWells.has(w)) {
+          } else if (selectedWells?.has(w) || hoveredWells?.has(w)) {
             acc[w] = SELECTED
           } else {
             acc[w] = UNSELECTED
@@ -269,9 +277,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     )
 
     const selectedWellNames = getSelectedWells(stepType)
-    const hoveredIsSelected = [...hoveredWells].every(w =>
-      selectedWellNames.has(w)
-    )
+    const hoveredIsSelected = hoveredWells
+      ? [...hoveredWells].every(w => selectedWellNames.has(w))
+      : false
 
     controls = (
       <>
@@ -289,7 +297,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           inWellSelectionModal={true}
           ignoreMissingTips
         />
-        {[...hoveredWells][0] != null ? (
+        {hoveredWells && [...hoveredWells][0] != null ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
@@ -316,11 +324,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   return (
     <div className={styles.column_wrapper}>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
-
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
         <div className={styles.well_legend_box}>
-          <SelectionLegend selectionType={'well'} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
         </div>
       </div>
     </div>
