@@ -1,5 +1,5 @@
 ---
-title: "Opentrons OT-2: Robot Calibration"
+title: "Opentrons OT-2: Robot Calibration Overview"
 ---
 
 Start here for an overview of the robot calibration process and instructions on how to perform these procedures.
@@ -32,9 +32,9 @@ Deck calibration helps the OT-2 understand deck location and scale. This calibra
 
 ### How it works
 
-During deck calibration, the Opentrons App guides you to manually jog the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of the physical deck.
+During deck calibration, the Opentrons App guides you to manually jog the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of these marks on the deck.
 
-### When to calibrate the deck
+### When to calibrate
 
 Deck calibration is required:
 
@@ -72,7 +72,7 @@ A pipette offset calibration is required after:
 - Running a deck calibration.
 - Running a tip length calibration.
 
-## Running robot calibrations 
+## Running robot calibrations
 
 The calibration controls are located in the Robot Settings section of the Opentrons App. To calibrate your OT-2:
 
@@ -80,30 +80,7 @@ The calibration controls are located in the Robot Settings section of the Opentr
 
 1. Click the **Devices** tab in the Opentrons App.
 2. Find your robot in the list and click on it to open the **Robot details** page.
-3. Click the three-dot menu (⋮) and select **Robot settings**. This opens the Calibration tab in the Settings screen.
+3. Click the three-dot menu (⋮) and select **Robot settings**. This opens the Calibration tab in the Settings screen. If your OT-2 has never been calibrated or you've cleared the calibration settings, the details page will show you a banner warning.
 4. Click **Launch Calibration**. Instructions and animations will guide you through the robot calibration process.
-
-</div>
-
-## Jog controls
-
-During calibration, the Opentrons App displays jog control screens like the example shown below. While the text, images, and animations vary depending on the procedure, these controls allow you to manually move the pipette to a precise location.
-
-<figure class="screenshot" markdown>
-![Example of jog controls](../images/jog-control.png)
-<figcaption>Jog controls example</figcaption>
-</figure>
-
-You may not need to use the jog controls to make fine adjustments. They are available to help you align the pipette nozzle to help ensure calibration accuracy.
-
-To use the jog controls:
-
-<div class="instruction-list" markdown>
-
-1. Select a control option to set the pipette's axis of movement.
-2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm. Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette.
-3. Click an arrow to move the pipette for your selected direction and distance.
-4. Click **Confirm position** when, in your best judgment, the pipette is optimally aligned with its target.
-5. Continue to follow prompts and instructions in the Opentrons App to complete the robot calibration process.
 
 </div>

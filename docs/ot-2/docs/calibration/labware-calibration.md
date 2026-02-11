@@ -1,6 +1,8 @@
 ---
-title: "Opentrons OT-2: Labware Offsets and Position Checking"
+title: "Opentrons OT-2: Labware Calibration"
 ---
+
+Also known as labware offsets and Labware Position Check.
 
 ## Labware offsets
 
