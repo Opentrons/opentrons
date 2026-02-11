@@ -2,6 +2,8 @@ import asyncio
 import re
 from typing import Optional
 
+from serial.tools import list_ports
+
 from .abstract import AbstractVacuumModuleDriver
 from .errors import VacuumModuleErrorCodes
 from .types import (
@@ -113,6 +115,23 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             error_codes=VacuumModuleErrorCodes,
         )
         return cls(connection)
+
+    @classmethod
+    async def create_from_sn(
+        cls, sn: str, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> "VacuumModuleDriver":
+        """Create a Vacuum Module driver using its serial number.."""
+        port_name = None
+        for port in list_ports.comports():
+            if port.serial_number == sn:
+                port_name = port.device
+                break
+        if not port_name:
+            raise ValueError(
+                f"Could not find connected vacuum module with serial number {sn}"
+            )
+
+        return await cls.create(port=port_name, loop=loop)
 
     def __init__(self, connection: AsyncResponseSerialConnection) -> None:
         """
