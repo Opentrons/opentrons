@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -54,6 +55,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   } = props
   const { labware, pipettes, liquidState, modules } = robotState
   const { t } = useTranslation('protocol_visualization')
+  const [hoveredWellName, setHoveredWellName] = useState<string | null>(null)
   const labwareLoadCommand = Object.values(commands).find(
     command =>
       'labwareId' in command.result &&
@@ -116,6 +118,12 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     activeWellName != null
       ? {
           [activeWellName]: null,
+        }
+      : null
+  const hoveredWellGroup: WellGroup | null =
+    hoveredWellName != null
+      ? {
+          [hoveredWellName]: null,
         }
       : null
 
@@ -226,12 +234,15 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
                         definition={labwareDef}
                         positioningMode="passThrough"
                         wellFill={wellFill}
-                        highlightedWells={wellGroup}
+                        highlightedWells={hoveredWellGroup}
+                        selectedWells={wellGroup}
                         onMouseLeaveWell={mouseEventArgs => {
+                          setHoveredWellName(null)
                           handleMouseLeaveWell(mouseEventArgs)
                           handleMouseLeaveWell(mouseEventArgs.event)
                         }}
                         onMouseEnterWell={({ wellName, event }) => {
+                          setHoveredWellName(wellName)
                           if (wellContents != null) {
                             makeHandleMouseEnterWell(
                               wellName,
