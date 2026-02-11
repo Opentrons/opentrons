@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  padding: 0 var(--spacing-24) var(--spacing-24);
+  padding: var(--spacing-24) var(--spacing-24) var(--spacing-24);
   gap: var(--spacing-8);
 }
 

@@ -12,6 +12,7 @@ import {
   PipetteField,
   TiprackField,
   VolumeField,
+  WellSelectionField,
 } from '../../PipetteFields'
 import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
@@ -67,10 +68,26 @@ export function FirstStepMixTools({
             />
           </>
         ) : (
-          <PartialTipField
-            {...propsForFields.nozzles}
-            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
-          />
+          <>
+            <PartialTipField
+              {...propsForFields.nozzles}
+              pipetteSpecs={
+                pipettes[String(propsForFields.pipette.value)]?.spec
+              }
+            />
+            <Divider marginY="0" />
+            <WellSelectionField
+              {...propsForFields.wells}
+              labwareId={formData.labware}
+              pipetteId={formData.pipette}
+              nozzles={
+                typeof propsForFields.nozzles.value === 'string'
+                  ? propsForFields.nozzles.value
+                  : null
+              }
+              hasFormError={propsForFields.wells.errorToShow != null}
+            />
+          </>
         )
       ) : null}
 
