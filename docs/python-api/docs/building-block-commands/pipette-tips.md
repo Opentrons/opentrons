@@ -128,12 +128,12 @@ To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol
 tiprack_1.set_empty()
 
 # return attached tips to tiprack_1
-pipette.return_tip("A1")
+pipette.return_tip()
 ```
 
 *New in version 2.28*
 
-The example above sets `tiprack_1` to `empty`, then returns tips attached to the pipette to the tiprack, starting with well `"A1"`. Tips returned here are marked "used" and will be skipped in automatic tip tracking.
+The example above sets `tiprack_1` to `empty`, then returns tips attached to the pipette to their original position in the tiprack. Tips returned here are marked "used" and will be skipped in automatic tip tracking.
 
 
 ## Working with used tips
