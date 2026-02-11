@@ -1,4 +1,4 @@
-test_name: Successful Create User flow
+test_name: Successful Create, delete, and update User flow
 
 marks:
   - usefixtures:
@@ -36,3 +36,34 @@ stages:
           fullName: Test New User
           userName: test_new_user
           scopes: [users.write]
+
+  - name: Update the user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user'
+      json:
+        data:
+          fullName: Test New User Updated
+          accountType: admin
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user
+          scopes: [users.write]
+
+  - name: Delete the user
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/auth/users/test_new_user'
+    response:
+      status_code: 204
+
+  # - name: Try to get the deleted user
+  #   request:
+  #     method: GET
+  #     url: '{run_server.base_url}/auth/users/test_new_user'
+  #   response:
+  #     status_code: 404

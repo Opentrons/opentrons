@@ -7,6 +7,7 @@ from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
     SimpleBody,
+    SimpleEmptyBody,
 )
 
 from auth_server.oauth2.backend import Backend
@@ -22,6 +23,13 @@ class UserCreate(BaseModel):
 
     userName: str
     password: str = Field(..., description="The password for the user.")
+    fullName: str = Field(..., description="The full name of the user.")
+    accountType: str = Field(..., description="The type of account for the user.")
+
+
+class UpdateUser(BaseModel):
+    """Request body for updating a user."""
+
     fullName: str = Field(..., description="The full name of the user.")
     accountType: str = Field(..., description="The type of account for the user.")
 
@@ -84,6 +92,7 @@ async def post_users(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
         )
+    # once we store it in the db we can have a unique id as well.
     new_user = User(
         username=user_name,
         password=password,
@@ -140,6 +149,80 @@ async def get_user(
                 fullName=user.full_name,
                 accountType=user.account_type,
                 scopes=[scope.value for scope in user.scopes],
+            )
+        ),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.delete,
+    path="/auth/users/{userName}",
+    summary="Delete a user",
+    description="Delete a specific user by its unique identifier.",
+    responses={
+        fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
+    },
+)
+async def delete_user(
+    request: fastapi.Request,
+    userName: str,
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Delete a user by its unique identifier."""
+    user = next(
+        (user for user in TEST_USERS if user.username == userName),
+        None,
+    )
+    if user is None:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
+    TEST_USERS.remove(user)
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_204_NO_CONTENT,
+        content=SimpleEmptyBody(),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.patch,
+    path="/auth/users/{userName}",
+    summary="Update a user",
+    description="Update a specific user by its unique identifier.",
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
+    },
+)
+async def update_user(
+    request: fastapi.Request,
+    request_body: RequestModel[UpdateUser],
+    userName: str,
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+) -> PydanticResponse[SimpleBody[UserResponse]]:
+    """Update a user by its unique identifier."""
+    user = next(
+        (user for user in TEST_USERS if user.username == userName),
+        None,
+    )
+    if user is None:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
+    # if the userName is the unique identifier cannot update it.
+    # how should we handle password update?
+    updated_user = User(
+        username=user.username,
+        password=user.password,
+        full_name=request_body.data.fullName,
+        account_type=AccountType(request_body.data.accountType),
+        scopes=user.scopes,
+    )
+    idx = TEST_USERS.index(user)
+    TEST_USERS[idx] = updated_user
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(
+            data=UserResponse(
+                userName=updated_user.username,
+                fullName=updated_user.full_name,
+                accountType=updated_user.account_type,
+                scopes=[scope.value for scope in updated_user.scopes],
             )
         ),
     )
