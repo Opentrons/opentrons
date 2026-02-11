@@ -59,11 +59,11 @@ stages:
       method: DELETE
       url: '{run_server.base_url}/auth/users/test_new_user'
     response:
-      status_code: 204
+      status_code: 200
 
-  # - name: Try to get the deleted user
-  #   request:
-  #     method: GET
-  #     url: '{run_server.base_url}/auth/users/test_new_user'
-  #   response:
-  #     status_code: 404
+  - name: Try to get the deleted user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user'
+    response:
+      status_code: 404

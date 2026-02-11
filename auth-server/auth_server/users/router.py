@@ -13,7 +13,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from auth_server.oauth2.backend import Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.scopes import Scope
-from auth_server.users.store import TEST_USERS, AccountType, User
+from auth_server.users.store import TEST_USERS, AccountType, User, hash_password
 
 router = fastapi.APIRouter()
 
@@ -95,7 +95,7 @@ async def post_users(
     # once we store it in the db we can have a unique id as well.
     new_user = User(
         username=user_name,
-        password=password,
+        password=hash_password(password),
         full_name=full_name,
         account_type=AccountType(account_type),
         scopes={Scope.USERS_WRITE},
@@ -177,8 +177,8 @@ async def delete_user(
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
     TEST_USERS.remove(user)
     return await PydanticResponse.create(
-        status_code=fastapi.status.HTTP_204_NO_CONTENT,
-        content=SimpleEmptyBody(),
+        content=SimpleEmptyBody.model_construct(),
+        status_code=fastapi.status.HTTP_200_OK,
     )
 
 
