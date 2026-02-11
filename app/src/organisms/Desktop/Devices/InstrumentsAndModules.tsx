@@ -71,7 +71,7 @@ const STUBBED_ATTACHED_VACUUM_MODULE: VacuumModule = {
     targetPower: 100,
     modeType: 'pressure',
     ventStatus: 'open',
-    status: 'ramping',
+    status: 'idle',
   },
 }
 
@@ -153,7 +153,7 @@ export function InstrumentsAndModules({
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = [
     ...attachedModules?.slice(0, halfAttachedModulesSize),
-    // STUBBED_ATTACHED_VACUUM_MODULE,
+    STUBBED_ATTACHED_VACUUM_MODULE,
   ]
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 

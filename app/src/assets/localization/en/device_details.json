@@ -104,6 +104,7 @@
   "magdeck_gen1_height": "Height: {{height}}",
   "magdeck_gen2_height": "Height: {{height}} mm",
   "max_engage_height": "Max Engage Height",
+  "mbar": "mbar",
   "missing_fixture": "missing {{num}} fixture",
   "missing_fixtures_plural": "missing {{count}} fixtures",
   "missing_hardware": "missing hardware",

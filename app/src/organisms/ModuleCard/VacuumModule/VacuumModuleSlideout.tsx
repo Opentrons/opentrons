@@ -23,6 +23,10 @@ import styles from './vacuummodule.module.css'
 import type { VacuumModule } from '@opentrons/api-client'
 import type { VacuumMode } from '/app/redux/modules/api-types'
 
+// TODO: get from module definition or equivalent
+const MAX_PRESSURE = 1000
+const MIN_PRESSURE = 0
+
 interface VacuumModuleSlideoutProps {
   module: VacuumModule
   onCloseClick: () => unknown
@@ -111,15 +115,18 @@ export function VacuumModuleSlideout(
           {modeType === 'pressure' && (
             <InputField
               title={t('gauge_pressure')}
-              caption={t('valid_range', { min: 0, max: 1000 })}
+              caption={t('valid_range', {
+                min: MIN_PRESSURE,
+                max: MAX_PRESSURE,
+              })}
               units={t('mbar')}
               type="number"
               onChange={e => {
                 setPressure(e.target.valueAsNumber)
               }}
               value={pressure}
-              max={1000}
-              min={0}
+              max={MAX_PRESSURE}
+              min={MIN_PRESSURE}
             />
           )}
           {modeType === 'power' && (

@@ -474,7 +474,7 @@ export function useModuleOverflowMenu(
       },
     ],
     vacuumModuleType: [
-      module.data.status !== 'idle'
+      module.data.status === 'idle'
         ? {
             setSetting: t('overflow_menu_set_vacuum'),
             isSecondary: false,
