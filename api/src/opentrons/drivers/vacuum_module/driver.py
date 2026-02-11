@@ -1,6 +1,8 @@
 import asyncio
 import re
-from typing import Optional
+from typing import Optional, Dict
+import time
+import csv
 
 from .abstract import AbstractVacuumModuleDriver
 from .errors import VacuumModuleErrorCodes
@@ -14,6 +16,7 @@ from .types import (
     VacuumModuleInfo,
     VentState,
 )
+import dataclasses
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 VM_BAUDRATE = 115200
@@ -114,7 +117,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         )
         return cls(connection)
 
-    def __init__(self, connection: AsyncResponseSerialConnection) -> None:
+    def __init__(self, connection: AsyncResponseSerialConnection, csv_path: str = "pump_test.csv") -> None:
         """
         Constructor
 
@@ -122,6 +125,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             connection: connection to the vacuum module
         """
         self._connection = connection
+        self._stop_requested = False
+        self._csv_initialized = False
+        self.csv_path = csv_path
+        self.st = time.perf_counter()
 
     async def connect(self) -> None:
         """Connect to vacuum module."""
@@ -280,3 +287,70 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")
+
+    async def _write_to_csv(self, timestamp: float, data: Dict) -> None:
+        """Append a data line to the CSV file (offloaded to a thread).
+
+        Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
+        Adds the current `pressure_set` as the last column (may be None).
+        """
+        if len(data) < 7:
+            # Skip malformed/short lines quietly; caller should already filter, but be defensive
+            return
+
+        def _append() -> None:
+            write_header = not self._csv_initialized
+            with open(self.csv_path, "a", newline="") as f:
+                writer = csv.writer(f)
+                if write_header:
+                    writer.writerow([
+                        "timestamp",
+                        "target_guage_pressure",
+                        "current_guage_pressure",
+                        "pressure_abs_a",
+                        "pressure_abs_b",
+                        "pressure_atm",
+                        "vacuum_enabled",
+                        "vent_state"
+                                     ])
+                    self._csv_initialized = True
+                writer.writerow([
+                    f"{timestamp:.2f}",
+                    f"{data['target_guage_pressure']}",
+                    f"{data['current_guage_pressure']}",
+                    f"{data['pressure_abs_a']}",
+                    f"{data['pressure_abs_b']}",
+                    f"{data['pressure_atm']}",
+                    f"{data['vacuum_enabled']}",
+                    f"{data['vent_state']}"
+                ])
+
+        await asyncio.to_thread(_append)
+    
+    def set_csv_filename(self, new_path: str) -> None:
+        """Set a new CSV file path for subsequent continuous logging.
+
+        Resets header initialization so the next write creates a header.
+        """
+        # If unchanged, do nothing
+        if new_path == self.csv_path:
+            return
+        self.csv_path = new_path
+        self._csv_initialized = False
+
+    async def read_continuous_data(self):
+        """Read and print continuous data from the vacuum pump for the specified timeout duration."""
+        try:
+            while True:
+                line = await self.get_vacuum_state()
+                pressure_dict = dataclasses.asdict(line)
+                # Timestamp
+                ts = time.perf_counter() - self.st
+                # Record Pressure Data
+                await self._write_to_csv(ts, pressure_dict)
+        except Exception as e:
+            raise(e)
+        
+
+
+    
