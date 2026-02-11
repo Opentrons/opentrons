@@ -12,6 +12,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
@@ -471,6 +472,49 @@ export function useModuleOverflowMenu(
         menuButtons: [aboutModuleBtn, setupBtn],
         onClick: homeShuttle,
       },
+    ],
+    vacuumModuleType: [
+      module.data.status === 'idle'
+        ? {
+            setSetting: t('overflow_menu_set_vacuum'),
+            isSecondary: false,
+            isSettingDisabled: isDisabled,
+            menuButtons: [],
+            onClick: () => {
+              handleSlideoutClick(false)
+            },
+          }
+        : {
+            setSetting: t('overflow_menu_deactivate_vacuum'),
+            isSecondary: false,
+            isSettingDisabled: isDisabled,
+            menuButtons: [],
+            onClick: () => {
+              // TODO: add vacuum module deactivate command
+              // handleDeactivationCommand('vacuumModule/deactivate')
+              console.log('TODO: deactivate vacuum')
+            },
+          },
+      module.moduleType === VACUUM_MODULE_TYPE &&
+      module.data.ventStatus === 'closed'
+        ? {
+            setSetting: t('overflow_menu_open_vent'),
+            isSecondary: false,
+            isSettingDisabled: isDisabled,
+            menuButtons: [aboutModuleBtn],
+            onClick: () => {
+              console.log('TODO: open vent')
+            },
+          }
+        : {
+            setSetting: t('overflow_menu_close_vent'),
+            isSecondary: false,
+            isSettingDisabled: isDisabled,
+            menuButtons: [aboutModuleBtn],
+            onClick: () => {
+              console.log('TODO: close vent')
+            },
+          },
     ],
   }
 
