@@ -367,7 +367,6 @@ async def test_create(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=[bool_parameter, file_parameter],
         outputFileIds=engine_state_summary.files,
-        commandAnnotations=engine_state_summary.commandAnnotations,
     )
     decoy.verify(
         mock_file_provider.set_run_metadata(
@@ -488,7 +487,6 @@ async def test_get_current_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
-        commandAnnotations=engine_state_summary.commandAnnotations,
     )
     assert subject.current_run_id == run_id
 
@@ -533,7 +531,6 @@ async def test_get_historical_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
-        commandAnnotations=engine_state_summary.commandAnnotations,
     )
 
 
@@ -579,7 +576,6 @@ async def test_get_historical_run_no_data(
         liquidClasses=[],
         runTimeParameters=run_time_parameters,
         outputFileIds=[],
-        commandAnnotations=[],
     )
 
 
@@ -699,7 +695,6 @@ async def test_get_all_runs(
             liquidClasses=historical_run_data.liquidClasses,
             runTimeParameters=historical_run_time_parameters,
             outputFileIds=historical_run_data.files,
-            commandAnnotations=historical_run_data.commandAnnotations,
         ),
         Run(
             current=True,
@@ -718,7 +713,6 @@ async def test_get_all_runs(
             liquidClasses=current_run_data.liquidClasses,
             runTimeParameters=current_run_time_parameters,
             outputFileIds=current_run_data.files,
-            commandAnnotations=current_run_data.commandAnnotations,
         ),
     ]
 
@@ -828,7 +822,6 @@ async def test_update_current(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
-        commandAnnotations=engine_state_summary.commandAnnotations,
     )
 
 
@@ -887,7 +880,6 @@ async def test_update_current_noop(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
-        commandAnnotations=engine_state_summary.commandAnnotations,
     )
 
 

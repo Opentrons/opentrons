@@ -100,7 +100,6 @@ stages:
           outputFileIds: []
           modules: []
           pipettes: []
-          commandAnnotations: []
           status: 'idle'
 
   - name: Play the run

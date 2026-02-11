@@ -156,7 +156,6 @@ async def test_create_run(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
     decoy.when(
@@ -246,7 +245,6 @@ async def test_create_protocol_run(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
     decoy.when(mock_data_files_store.get("file-id")).then_return(
@@ -418,7 +416,6 @@ async def test_get_run_data_from_url(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -468,7 +465,6 @@ async def test_get_run() -> None:
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -517,7 +513,6 @@ async def test_get_runs_not_empty(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -536,7 +531,6 @@ async def test_get_runs_not_empty(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -618,7 +612,6 @@ async def test_update_run_to_not_current(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 
@@ -656,7 +649,6 @@ async def test_update_current_none_noop(
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
-        commandAnnotations=[],
         hasEverEnteredErrorRecovery=False,
     )
 

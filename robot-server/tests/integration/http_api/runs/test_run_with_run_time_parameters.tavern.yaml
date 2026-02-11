@@ -70,7 +70,6 @@ stages:
           modules: []
           labware: []
           labwareOffsets: []
-          commandAnnotations: []
           runTimeParameters:
             - displayName: Sample count
               variableName: sample_count
