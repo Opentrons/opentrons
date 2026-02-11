@@ -73,6 +73,7 @@ export function VisualizerContainer(
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
   )
+  console.log('analysisOutput', analysisOutput)
 
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -302,7 +303,7 @@ export function VisualizerContainer(
       })
     }
   }, [])
-
+console.log('groupedCommands',groupedCommands)
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}

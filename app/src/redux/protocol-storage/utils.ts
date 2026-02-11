@@ -8,40 +8,49 @@ export const getGroupedCommands = (
   mostRecentAnalysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
 ): GroupedCommands => {
   const annotations = mostRecentAnalysis?.commandAnnotations ?? []
-  return mostRecentAnalysis.commands.reduce<GroupedCommands>((acc, c) => {
-    const foundAnnotationIndex = annotations.findIndex(
-      a => c.key != null && a.commandKeys.includes(c.key)
-    )
-    const lastAccNode = acc[acc.length - 1]
-    if (
-      acc.length > 0 &&
-      c.key != null &&
-      'annotationIndex' in lastAccNode &&
-      lastAccNode.annotationIndex != null &&
-      annotations[lastAccNode.annotationIndex]?.commandKeys.includes(c.key)
-    ) {
-      return [
-        ...acc.slice(0, -1),
-        {
-          ...lastAccNode,
-          subCommands: [
-            ...lastAccNode.subCommands,
-            { command: c, isHighlighted: false },
-          ],
-          isHighlighted: false,
-        },
-      ]
-    } else if (foundAnnotationIndex >= 0) {
-      return [
-        ...acc,
-        {
-          annotationIndex: foundAnnotationIndex,
-          subCommands: [{ command: c, isHighlighted: false }],
-          isHighlighted: false,
-        },
-      ]
-    } else {
+
+  // optional: build lookup map for annotation metadata
+  const annotationMap = new Map(annotations.map(a => [a.annotationId, a]))
+
+  return mostRecentAnalysis.commands.reduce<GroupedCommands>(
+    (acc: GroupedCommands, c: RunTimeCommand) => {
+      const annotationId = c.commandAnnotations?.[0] // assuming single annotation per command
+
+      const lastAccNode = acc[acc.length - 1]
+
+      if (
+        lastAccNode != null &&
+        annotationId != null &&
+        'annotationId' in lastAccNode &&
+        lastAccNode.annotationId === annotationId
+      ) {
+        return [
+          ...acc.slice(0, -1),
+          {
+            ...lastAccNode,
+            subCommands: [
+              ...lastAccNode.subCommands,
+              { command: c, isHighlighted: false },
+            ],
+            isHighlighted: false,
+          },
+        ]
+      }
+
+      if (annotationId != null) {
+        return [
+          ...acc,
+          {
+            annotationId,
+            annotation: annotationMap.get(annotationId), // optional metadata
+            subCommands: [{ command: c, isHighlighted: false }],
+            isHighlighted: false,
+          },
+        ]
+      }
+
       return [...acc, { command: c, isHighlighted: false }]
-    }
-  }, [])
+    },
+    []
+  )
 }

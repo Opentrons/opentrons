@@ -9,6 +9,7 @@ import { useRobot } from '/app/redux-resources/robots'
 import {
   fetchProtocols,
   getStoredProtocol,
+  getStoredProtocolGroupedCommands,
   // getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
 
@@ -30,9 +31,9 @@ export function ProtocolVisualization(): JSX.Element {
 
   // this is used for step grouping which won't be introduced until
   // PV phase 2
-  // const groupedCommands = useSelector((state: State) =>
-  //   getStoredProtocolGroupedCommands(state, protocolKey)
-  // )
+  const groupedCommands = useSelector((state: State) =>
+    getStoredProtocolGroupedCommands(state, protocolKey)
+  )
 
   useEffect(() => {
     dispatch(fetchProtocols())
@@ -43,7 +44,7 @@ export function ProtocolVisualization(): JSX.Element {
       <VisualizerContainer
         analysisOutput={storedProtocol.mostRecentAnalysis}
         runId={runId}
-        groupedCommands={null}
+        groupedCommands={groupedCommands}
         protocolKey={protocolKey}
         srcFileNames={storedProtocol.srcFileNames}
       />
