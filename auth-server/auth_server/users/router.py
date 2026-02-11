@@ -107,36 +107,39 @@ async def post_users(
     )
 
 
-# @PydanticResponse.wrap_route(
-#     router.get,
-#     path=f"/auth/users/{userName}",
-#     summary="Get a user information",
-#     description="Get a specific user by its unique identifier.",
-#     responses={
-#         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
-#         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
-#     },
-# )
-# async def get_users(
-#     request: fastapi.Request,
-#     userName: str,
-#     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
-# ) -> PydanticResponse[SimpleBody[UserResponse]]:
-# """Get all users."""
-# user = next(
-#     (
-#         user
-#         for user in TEST_USERS
-#         if user.username == userName
-#     ),
-#     None,
-# )
-# return await PydanticResponse.create(
-#     status_code=fastapi.status.HTTP_200_OK,
-#     content=SimpleBody.model_construct(data=UserResponse(
-#         userName=user.username,
-#         fullName=user.full_name,
-#         accountType=user.account_type,
-#         scopes=[scope.value for scope in user.scopes],
-#     )),
-# )
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users/{userName}",
+    summary="Get a user information",
+    description="Get a specific user by its unique identifier.",
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
+    },
+)
+async def get_user(
+    request: fastapi.Request,
+    userName: str,
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+) -> PydanticResponse[SimpleBody[UserResponse]]:
+    """Get a user by its unique identifier."""
+    user = next(
+        (user for user in TEST_USERS if user.username == userName),
+        None,
+    )
+    if user is None:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(
+            data=UserResponse(
+                userName=user.username,
+                fullName=user.full_name,
+                accountType=user.account_type,
+                scopes=[scope.value for scope in user.scopes],
+            )
+        ),
+    )
