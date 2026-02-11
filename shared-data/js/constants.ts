@@ -879,3 +879,6 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
 // a labware location when something has been used already on the deck
 // and moves to a new location that isn't accessible on or off the deck
 export const SYSTEM_LOCATION = 'systemLocation'
+
+export const PROTOCOL_ENGINE_LID_STACK_LOADNAME =
+  'protocol_engine_lid_stack_object'

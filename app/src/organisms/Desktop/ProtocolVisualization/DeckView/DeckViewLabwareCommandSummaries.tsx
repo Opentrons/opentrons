@@ -1,10 +1,14 @@
+import { Fragment } from 'react'
+
 import {
+  getAddressableAreaFromSlotId,
   getModuleDef,
   getModuleParentOriginToChildSlotOrigin,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
+import { getActiveLayer } from '../utils/getActiveLayer'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 
 import type { DeckDefinition, RunTimeCommand } from '@opentrons/shared-data'
@@ -18,6 +22,12 @@ interface DeckViewLabwareCommandSummariesProps {
   labwareEntitiesExtended: Record<string, LabwareEntityExtended>
   selectedRunTimeCommand?: RunTimeCommand
 }
+const STACKER_MOVE_MAP: Record<string, string> = {
+  A4: 'A3',
+  B4: 'B3',
+  C4: 'C3',
+  D4: 'D3',
+}
 
 export function DeckViewLabwareCommandSummaries(
   props: DeckViewLabwareCommandSummariesProps
@@ -30,30 +40,45 @@ export function DeckViewLabwareCommandSummaries(
     selectedRunTimeCommand,
   } = props
   const { moduleEntities } = invariantContext
-  const { modules, labware } = robotState
+  const { modules, labware, pipettes } = robotState
 
   return (
     <>
-      {Object.entries(modules).map(([id, { slot }]) => {
-        const isStepAssociatedWithModule =
-          selectedRunTimeCommand != null &&
-          'moduleId' in selectedRunTimeCommand.params &&
-          selectedRunTimeCommand.params.moduleId === id
-        if (!isStepAssociatedWithModule) return null
-
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
-          id,
-          Object.values(labware)
+      {Object.entries(labware).map(([id, lw]) => {
+        if (
+          !Object.keys(modules).some(moduleId => lw.stack.includes(moduleId))
+        ) {
+          return null
+        }
+        const moduleUnderLabware = lw.stack.find(id => modules[id] != null)
+        const slot = getSlotInLocationStack(lw.stack)
+        // all other labware on module will be filtered out in line 49
+        // so this is a special-case scenario for the stacker
+        const stackerInSlot = Object.values(modules).some(
+          moduleTempProperties => moduleTempProperties.slot === slot
         )
-        if (labwareLoadedOnModuleId == null) return null
-
-        const slotPosition = getPositionFromSlotId(slot, deckDef)
-        if (slotPosition == null) {
-          console.warn(`no slot ${slot} for module ${id}`)
+        const slotForPositionMap = stackerInSlot ? STACKER_MOVE_MAP[slot] : slot
+        const slotPosition = getPositionFromSlotId(slotForPositionMap, deckDef)
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
+        if (slotPosition == null || slotBoundingBox == null) {
+          console.warn(
+            `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
+          )
           return null
         }
 
-        const moduleDef = getModuleDef(moduleEntities[id].model)
+        const moduleDef =
+          moduleUnderLabware != null
+            ? getModuleDef(moduleEntities[moduleUnderLabware].model)
+            : null
+
+        if (moduleDef == null) {
+          console.warn(`expected to find a moduleDef assosciated with ${id}`)
+          return null
+        }
         const childSlotOffset = getModuleParentOriginToChildSlotOrigin(
           deckDef.otId,
           slot,
@@ -65,14 +90,25 @@ export function DeckViewLabwareCommandSummaries(
           slotPosition[2] + childSlotOffset.z,
         ]
 
+        const { isActiveLayerVisible } = getActiveLayer(
+          id,
+          pipettes,
+          selectedRunTimeCommand
+        )
+        const showCommandSummary =
+          isActiveLayerVisible && selectedRunTimeCommand != null
+
         return (
-          <LabwareCommandSummary
-            key={`labware_command_summary_${id}`}
-            commandType={selectedRunTimeCommand.commandType}
-            position={childSlotPosition}
-            labwareDef={labwareEntitiesExtended[labwareLoadedOnModuleId].def}
-            showModuleIcon={false}
-          />
+          <Fragment key={id}>
+            {showCommandSummary ? (
+              <LabwareCommandSummary
+                commandType={selectedRunTimeCommand.commandType}
+                position={childSlotPosition}
+                labwareDef={labwareEntitiesExtended[id].def}
+                showModuleIcon={false}
+              />
+            ) : null}
+          </Fragment>
         )
       })}
     </>

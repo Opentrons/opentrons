@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, StyledText } from '@opentrons/components'
+import { Chip, RobotInfoLabel, StyledText } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -21,12 +21,14 @@ interface ModuleContainerProps {
   moduleId: string
   moduleEntities: ModuleEntities
   moduleRobotState: RobotState['modules']
+  slotId: string
 }
 
 export function ModuleContainer({
   moduleId,
   moduleEntities,
   moduleRobotState,
+  slotId,
 }: ModuleContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const { model } = moduleEntities[moduleId]
@@ -47,8 +49,17 @@ export function ModuleContainer({
           })
           break
         case 'profile':
-          // todo(mm, 2025-12-12): As a placeholder, this is showing the block as 'deactivated' when there's a profile ongoing.
-          blockTemperatureText = t('deactivated')
+          const profileElements = currentBlockActivity.profileElements
+          const lastElement = profileElements[profileElements.length - 1]
+
+          const endingTemp =
+            'celsius' in lastElement
+              ? lastElement.celsius
+              : lastElement.steps[lastElement.steps.length - 1]?.celsius
+
+          blockTemperatureText = t('temperature', {
+            temp: endingTemp,
+          })
           break
         case 'blockDeactivated':
           blockTemperatureText = t('idle')
@@ -131,10 +142,10 @@ export function ModuleContainer({
       break
     }
     case TEMPERATURE_MODULE_TYPE: {
-      const { status, targetTemperature } = moduleState
+      const { targetTemperature } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <ModuleStatusContainer title={status}>
+          <ModuleStatusContainer title="target_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })
@@ -212,9 +223,11 @@ export function ModuleContainer({
         `ran into the default moduleContainer moduleState with module ${moduleDisplayName}`
       )
   }
+
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>
+        <RobotInfoLabel deckLabel={slotId} />
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {moduleDisplayName}
         </StyledText>

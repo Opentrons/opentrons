@@ -198,6 +198,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         labwareOnSlot != null
                           ? getActiveLayer(
                               labwareOnSlot[0],
+                              pipettes,
                               selectedRunTimeCommand
                             )
                           : { isActiveLayerVisible: false }
@@ -213,6 +214,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                             getIsCutoutA1Active(
                               labware,
                               modules,
+                              pipettes,
                               cutoutId,
                               selectedRunTimeCommand
                             )
