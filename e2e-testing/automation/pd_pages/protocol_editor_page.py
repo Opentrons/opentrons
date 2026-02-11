@@ -249,7 +249,7 @@ class ProtocolEditorPage(BasePage):
         """
         Click a button with the text "Save".
         This is used in various places where a save action is needed."""
-        self.page.get_by_text("Save").click()
+        self.page.get_by_text("Save", exact=True).click()
 
     def close_toolbox(self) -> None:
         """Close the deck setup toolbox if it is open."""
