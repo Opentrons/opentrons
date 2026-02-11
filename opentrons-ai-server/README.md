@@ -32,9 +32,9 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
 1. select the python version `pyenv local 3.12.6`.
    1. This will create a `.python-version` file in this directory.
 1. select the node version with `nvs` or `nvm` currently 22.11\*.
-1. Install pipenv and python dependencies using `make setup`.
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and python dependencies using `make setup`.
 1. Install docker if you plan to run and build the docker container locally.
-1. `make teardown` will remove the virtual environment but requires pipenv to be installed.
+1. `make teardown` will remove the virtual environment.
 
 ### Run locally
 
@@ -114,16 +114,16 @@ The live-test target will run tests against any environment. The default is loca
 
 ## Install a dev dependency
 
-`python -m pipenv install pytest==8.2.0 --dev`
+`uv add --dev pytest==8.2.0`
 
 ## Install a production dependency
 
-`python -m pipenv install openai==1.25.1`
+`uv add openai==1.25.1`
 
 ## Upgrade a dependency
 
-1. alter the `Pipfile` to the new pinned version
-1. run `make setup` to update the `Pipfile.lock`
+1. update the version in `pyproject.toml` (or use `uv add <package>==<version>`)
+1. run `uv lock` to update `uv.lock`
 
 ## Google Sheets Integration
 

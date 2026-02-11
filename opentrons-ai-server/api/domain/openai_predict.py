@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import List, Tuple
 
 import structlog
-from ddtrace import tracer
 from llama_index.core import Settings as li_settings
 from llama_index.core import StorageContext, load_index_from_storage
 from llama_index.embeddings.openai import OpenAIEmbedding
@@ -39,7 +38,6 @@ class OpenAIPredict:
             model_name="text-embedding-3-large", api_key=self.settings.openai_api_key.get_secret_value()
         )
 
-    @tracer.wrap()
     def get_docs_all(self, query: str) -> Tuple[str, str, str]:
         commands = self.extract_atomic_description(query)
         logger.info("Commands", extra={"commands": commands})
@@ -52,7 +50,7 @@ class OpenAIPredict:
         labware_api_path = standard_labware_api
 
         # retrieve example commands
-        example_commands = f"\n\n{'='*15} EXAMPLE COMMANDS {'='*15}\n"
+        example_commands = f"\n\n{'=' * 15} EXAMPLE COMMANDS {'=' * 15}\n"
         storage_context = StorageContext.from_defaults(persist_dir=example_command_path)
         index = load_index_from_storage(storage_context)
         retriever = index.as_retriever(similarity_top_k=1)
@@ -72,7 +70,7 @@ class OpenAIPredict:
         retriever = index.as_retriever(similarity_top_k=2)
         nodes = retriever.retrieve(query)
         docs = "\n".join(node.text.strip() for node in nodes)
-        docs = f"\n{'='*15} DOCUMENTATION {'='*15}\n\n" + docs
+        docs = f"\n{'=' * 15} DOCUMENTATION {'=' * 15}\n\n" + docs
 
         # retrieve reference
         storage_context = StorageContext.from_defaults(persist_dir=documentation_ref_path)
@@ -80,14 +78,13 @@ class OpenAIPredict:
         retriever = index.as_retriever(similarity_top_k=2)
         nodes = retriever.retrieve(query)
         docs_ref = "\n".join(node.text.strip() for node in nodes)
-        docs_ref = f"\n{'='*15} DOCUMENTATION REFERENCE {'='*15}\n\n" + docs_ref
+        docs_ref = f"\n{'=' * 15} DOCUMENTATION REFERENCE {'=' * 15}\n\n" + docs_ref
 
         # standard api names
-        standard_api_names = f"\n{'='*15} STANDARD API NAMES {'='*15}\n\n" + labware_api_path
+        standard_api_names = f"\n{'=' * 15} STANDARD API NAMES {'=' * 15}\n\n" + labware_api_path
 
         return example_commands, docs + docs_ref, standard_api_names
 
-    @tracer.wrap()
     def extract_atomic_description(self, protocol_description: str) -> List[str]:
         class atomic_descr(BaseModel):
             """
@@ -109,7 +106,6 @@ class OpenAIPredict:
                 descriptions.append(x)
         return descriptions
 
-    @tracer.wrap()
     def refine_response(self, assistant_message: str) -> str:
         if assistant_message is None:
             return ""
@@ -133,7 +129,6 @@ class OpenAIPredict:
 
         return response.choices[0].message.content if response.choices[0].message.content is not None else ""
 
-    @tracer.wrap()
     def predict(self, prompt: str, chat_completion_message_params: List[ChatCompletionMessageParam] | None = None) -> None | str:
 
         prompt = refine_characters(prompt)

@@ -179,7 +179,6 @@ class Deploy:
         task_definition = self.ecs_client.describe_task_definition(taskDefinition=task_definition_arn)["taskDefinition"]
         container_definitions = task_definition["containerDefinitions"]
         for container_definition in container_definitions:
-            # ENV--datadog-agent container has one secret and 2 environment variables
             # ENV--log-router container has no secrets or environment variables
             # These are managed in the infra repo, NOT here
             if container_definition["name"] == self.config.CONTAINER_NAME:
@@ -191,10 +190,10 @@ class Deploy:
                         # Secrets are not set here
                         # They are set in the secrets key of the containerDefinition
                         environment_variables = self.update_environment_variables(environment_variables, key, value)
-                # Overwrite the DD_VERSION environment variable
+                # Overwrite the SERVICE_VERSION environment variable
                 # with the current deployment tag
                 # this is what we are using for version currently
-                environment_variables = self.update_environment_variables(environment_variables, "DD_VERSION", self.config.TAG)
+                environment_variables = self.update_environment_variables(environment_variables, "SERVICE_VERSION", self.config.TAG)
                 container_definition["environment"] = environment_variables
                 # Update the secrets in the container definition
                 self.update_secrets_in_container_definition(container_definition)

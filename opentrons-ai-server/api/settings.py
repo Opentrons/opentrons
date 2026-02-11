@@ -35,9 +35,8 @@ class Settings(BaseSettings):
     auth0_api_audience: str = "sandbox-ai-api"
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
-    dd_version: str = "hardcoded_default_from_settings"
+    service_version: str = "hardcoded_default_from_settings"
     allowed_origins: str = "*"
-    dd_trace_enabled: str = "false"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
@@ -48,7 +47,6 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr = SecretStr("default_openai_api_key")
     huggingface_api_key: SecretStr = SecretStr("default_huggingface_api_key")
     google_credentials_json: SecretStr = SecretStr("default_google_credentials_json")
-    datadog_api_key: SecretStr = SecretStr("default_datadog_api_key")
     anthropic_api_key: SecretStr = SecretStr("default_anthropic_api_key")
     wandb_api_key: SecretStr = SecretStr("default_wandb_api_key")
 
