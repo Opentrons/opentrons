@@ -1,7 +1,19 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
+from pwdlib.hashers.bcrypt import BcryptHasher
+
 from .scopes import Scope
+
+password_hash = PasswordHash(
+    (
+        # can we use default hashers? PasswordHash.recommended()
+        Argon2Hasher(),
+        BcryptHasher(),
+    )
+)
 
 
 class AccountType(StrEnum):
@@ -42,3 +54,8 @@ TEST_USERS = [
         account_type=AccountType.USER,
     ),
 ]
+
+
+def hash_password(password: str) -> str:
+    """Hash a password using the recommended hashers."""
+    return password_hash.hash(password)
