@@ -24,13 +24,15 @@ stages:
           accountType: user
           scopes: [users.write]
 
-# stages:
-#   - name: Get a user information
-#     request:
-#       method: GET
-#       url: '{run_server.base_url}/auth/users/test_new_user'
-#     response:
-#       status_code: 200
-#       json:
-#         userName: test_new_user
-#         fullName: Test New User
+  - name: Get a user information
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: user
+          fullName: Test New User
+          userName: test_new_user
+          scopes: [users.write]
