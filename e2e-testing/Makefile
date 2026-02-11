@@ -91,6 +91,15 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
 .PHONY: test-compare
 test-compare:
-	HEADLESS=false SKIP_SERVER_START=true uv run pytest -m compare_versions --browser chromium -n 2 --dist=each tests/pd/test_pd_sanity.py $(PYTEST_ARGS)
+	@if [ "$(HEADLESS)" = "false" ]; then \
+		uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	else \
+		HEADLESS=true uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	fi
