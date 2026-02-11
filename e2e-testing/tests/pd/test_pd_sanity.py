@@ -89,7 +89,8 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     editor = ProtocolEditorPage(page)
     editor.add_labware_to_slot("D2")
     editor.select_labware_category(2)
-    editor.select_labware_by_name("Axygen 96 Well Plate 500 µL")
+    labware_on_deck = "Axygen 96 Well Plate 500 µL"
+    editor.select_labware_by_name(labware_on_deck)
 
     editor.edit_liquid()
     editor.select_first_well()
@@ -103,8 +104,8 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     editor.add_step("Transfer")
     transfer_page = TransferPage(page)
     transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
+    transfer_page.destination_labware_select("Axygen 96 Well Plate 500 µL")
     transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
     transfer_page.input_volume("100")
     print("✓ Transfer step configured")
-
     print("\n✅ Full onboarding flow completed successfully!")
