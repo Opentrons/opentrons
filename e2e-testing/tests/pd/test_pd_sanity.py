@@ -103,6 +103,7 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     editor.confirm_liquid_setup()  # Close labware setup
     editor.add_step("Transfer")
     transfer_page = TransferPage(page)
+    # Source labware is selected by default so we proceed to selecting the well
     transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
     transfer_page.destination_labware_select("Axygen 96 Well Plate 500 µL")
     transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
