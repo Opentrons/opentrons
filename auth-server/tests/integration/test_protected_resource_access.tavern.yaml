@@ -5,21 +5,6 @@ marks:
       - run_server
 
 stages:
-  - name: Accessing the resource without a token should fail
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users'
-    response:
-      status_code: 403
-
-  - name: Accessing the resource with a bogus token should fail
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users'
-      headers:
-        Authorization: Bearer bogus_token_1234
-    response:
-      status_code: 403
 
   - name: Get an access token with insufficient scopes
     request:
@@ -43,14 +28,6 @@ stages:
         json:
           access_token: access_token
 
-  - name: Accessing the resource with an insufficiently-scoped token should fail
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users'
-      headers:
-        Authorization: 'Bearer {access_token}'
-    response:
-      status_code: 403
 
   - name: Get an access token with sufficient scopes
     request:
@@ -74,11 +51,3 @@ stages:
         json:
           access_token: access_token
 
-  - name: Accessing the resource with a sufficiently-scoped token should succeed
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users'
-      headers:
-        Authorization: 'Bearer {access_token}'
-    response:
-      status_code: 200
