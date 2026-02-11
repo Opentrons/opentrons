@@ -56,6 +56,12 @@ def _validate_user_create_input(
             detail="User name and password are required",
         )
 
+    if len(password) < 8:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters long",
+        )
+
 
 @PydanticResponse.wrap_route(
     router.post,
