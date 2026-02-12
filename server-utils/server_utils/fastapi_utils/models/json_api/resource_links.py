@@ -23,7 +23,9 @@ except ImportError:
 
 
 class ResourceLink(BaseModel):
-    """https://jsonapi.org/format/#document-links"""
+    """A resource link."""
+
+    """See https://jsonapi.org/format/#document-links"""
 
     href: str = Field(..., description="The link's URL")
     meta: typing.Optional[typing.Dict[str, typing.Any]] = Field(

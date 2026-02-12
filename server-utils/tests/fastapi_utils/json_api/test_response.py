@@ -1,3 +1,5 @@
+"""Test the response models."""
+
 from typing import Any, Dict, NamedTuple, Optional
 
 import pytest
@@ -127,4 +129,5 @@ RESPONSE_SPECS = [
 
 @pytest.mark.parametrize(ResponseSpec._fields, RESPONSE_SPECS)
 def test_response_to_dict(subject: BaseModel, expected: Dict[str, Any]) -> None:
+    """Test that the response to dict serialization is correct."""
     assert subject.model_dump() == expected
