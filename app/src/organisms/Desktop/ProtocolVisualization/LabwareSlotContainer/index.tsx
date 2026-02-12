@@ -153,7 +153,7 @@ export function LabwareSlotContainer(
         <WellContainer
           wells={wells}
           params={params}
-          activeWellName={selectedWellName}
+          selectedWellName={selectedWellName}
           wellColor={wellFill[selectedWellName]}
           labwareLocationLiquidState={labwareLocationLiquidState}
           pipetteLocationLiquidState={pipetteLocationLiquidState}

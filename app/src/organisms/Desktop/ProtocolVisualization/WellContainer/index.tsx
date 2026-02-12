@@ -26,7 +26,7 @@ const SVG_DECIMALS = 2
 
 interface WellContainerProps {
   params: RunTimeCommand['params']
-  activeWellName: string
+  selectedWellName: string
   wellColor: string
   wells: LabwareWellMap
   pipetteLocationLiquidState: LocationLiquidState | null
@@ -37,7 +37,7 @@ interface WellContainerProps {
 export function WellContainer(props: WellContainerProps): JSX.Element {
   const {
     params,
-    activeWellName,
+    selectedWellName,
     wellColor,
     wells,
     liquids,
@@ -103,7 +103,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
       <div className={styles.header}>
         <Tag text={t('well_view')} type="default" shrinkToContent />
         <RobotInfoLabel
-          deckLabel={t('well_name', { wellName: activeWellName })}
+          deckLabel={t('well_name', { wellName: selectedWellName })}
         />
       </div>
       <div>
