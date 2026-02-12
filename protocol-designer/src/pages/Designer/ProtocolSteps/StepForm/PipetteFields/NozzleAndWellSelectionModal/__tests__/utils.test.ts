@@ -34,7 +34,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -60,7 +60,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -74,7 +74,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8
@@ -89,7 +89,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8

@@ -1,0 +1,159 @@
+import { Dispatch, SetStateAction } from 'react'
+
+import {
+  COLORS,
+  INACCESSIBLE,
+  SELECTED,
+  StrokedNozzles,
+  UNSELECTED,
+  WellType,
+} from '@opentrons/components'
+import {
+  A1_NOZZLE,
+  ALL,
+  COLUMN,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  ROW,
+} from '@opentrons/shared-data'
+
+import { EightChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/EightChannelFlexShadow'
+import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/EightChannelOT2Shadow'
+import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
+import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
+import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
+import styles from './nozzleandwellwizard.module.css'
+import { getAvailablePrimaryNozzles, getEntireWellSelection } from './utils'
+
+import type { Channels } from '@opentrons/components'
+import type {
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { FieldPropsByName } from '../../types'
+import type { PipetteShadowProps } from '../TipSelectionWizard/types'
+
+const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
+  RobotType,
+  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
+> = {
+  [OT2_ROBOT_TYPE]: {
+    1: SingleChannelOT2Shadow,
+    8: EightChannelOT2Shadow,
+    96: () => {
+      console.warn('96-channel not supported on OT-2')
+      return <></>
+    },
+  },
+  [FLEX_ROBOT_TYPE]: {
+    1: SingleChannelFlexShadow,
+    8: EightChannelFlexShadow,
+    96: NinetySixChannelFlexShadow,
+  },
+}
+
+interface NozzleRenderProps {
+  robotType: RobotType
+  pipetteSpecs: PipetteV2Specs
+  propsForFields: FieldPropsByName
+  selectedNozzle: string[]
+  setSelectedNozzle: Dispatch<SetStateAction<string[]>>
+}
+
+export function NozzleRender(props: NozzleRenderProps): JSX.Element {
+  const {
+    robotType,
+    pipetteSpecs,
+    propsForFields,
+    selectedNozzle,
+    setSelectedNozzle,
+  } = props
+  const { channels, pipetteBoundingBoxOffsets, nozzleMap, orderedColumns } =
+    pipetteSpecs
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    A1_NOZZLE
+  const nozzleConfiguration =
+    (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
+
+  const OutlineComponent =
+    SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
+  const is96Channel = channels === 96
+  const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
+  const width = frontRightCorner[0] - backLeftCorner[0]
+  const height = backLeftCorner[1] - frontRightCorner[1]
+  const outlineProps = {
+    fill: COLORS.white,
+    stroke: COLORS.grey50,
+    x: 0,
+    y: 0,
+    width: width,
+    height: height,
+    rotate: is96Channel,
+  }
+  const availableNozzlesOptions = getAvailablePrimaryNozzles(
+    channels,
+    nozzleConfiguration
+  )
+  const allNozzles = Object.keys(nozzleMap)
+
+  const nozzles = availableNozzlesOptions.map(nozzle => nozzle.value)
+  const wellOrdering = Object.values(orderedColumns).map(
+    column => column.orderedNozzles
+  )
+  let availableNozzles: string[]
+  if (nozzleConfiguration === ALL) {
+    availableNozzles = allNozzles
+  } else if (nozzleConfiguration === COLUMN || nozzleConfiguration === ROW) {
+    availableNozzles = nozzles.flatMap(nozzle =>
+      getEntireWellSelection(
+        nozzle,
+        wellOrdering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+    )
+  } else {
+    availableNozzles = nozzles
+  }
+
+  const nozzleStatus: Record<string, WellType> = Object.fromEntries(
+    Object.entries(nozzleMap).map(([wellName]) => [
+      wellName,
+      selectedNozzle?.includes(wellName)
+        ? SELECTED
+        : availableNozzles.includes(wellName)
+          ? UNSELECTED
+          : INACCESSIBLE,
+    ])
+  )
+
+  const handleClickNozzle = (nozzleName: string): void => {
+    const nozzlesToSelect = getEntireWellSelection(
+      nozzleName,
+      wellOrdering,
+      nozzleConfiguration,
+      primaryNozzle,
+      channels
+    )
+
+    setSelectedNozzle(nozzlesToSelect)
+
+    propsForFields.primaryNozzle.updateValue(nozzleName)
+  }
+  return (
+    <div className={styles.nozzle_render}>
+      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+        <OutlineComponent {...outlineProps} />
+        <StrokedNozzles
+          pipetteSpecs={pipetteSpecs}
+          nozzleStatus={nozzleStatus}
+          handleClickNozzle={handleClickNozzle}
+        />
+      </svg>
+    </div>
+  )
+}

@@ -167,32 +167,33 @@ export const getNozzleText = (
 
 export const getEntireWellSelection = (
   wellName: string,
-  labwareDef: LabwareDefinition,
+  wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
   channels: number
 ): string[] => {
   if (nozzleConfiguration === SINGLE) return [wellName]
-  const { ordering } = labwareDef
-  const columnIndex = ordering.findIndex(column => column.includes(wellName))
+  const columnIndex = wellOrdering.findIndex(column =>
+    column.includes(wellName)
+  )
   if (columnIndex === -1) return []
-  const rowIndex = ordering[columnIndex].indexOf(wellName)
+  const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
   switch (nozzleConfiguration) {
     case ALL:
       if (channels === 8) {
-        return ordering[columnIndex]
+        return wellOrdering[columnIndex]
       }
       if (channels === 96) {
-        return ordering.flat()
+        return wellOrdering.flat()
       }
       return [wellName]
     case COLUMN:
-      return ordering[columnIndex]
+      return wellOrdering[columnIndex]
     case ROW:
-      return ordering.map(column => column[rowIndex])
+      return wellOrdering.map(column => column[rowIndex])
     case PARTIAL: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) return []
-      const column = ordering[columnIndex]
+      const column = wellOrdering[columnIndex]
       const count = partialNozzleMap[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1

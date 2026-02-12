@@ -130,7 +130,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const handleClickWell = (wellName: string): void => {
     const wellsToToggle = getEntireWellSelection(
       wellName,
-      labwareDef,
+      labwareDef.ordering,
       nozzleConfiguration,
       primaryNozzle,
       channels
@@ -150,7 +150,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       if (wellsField != null) {
         wellsField.updateValue(Array.from(next))
       }
-
       return next
     })
   }
@@ -212,7 +211,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     const transformedWellNames: Set<string> = new Set(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         channels
@@ -251,7 +250,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       (acc, wellName) => {
         const wellsToUpdate = getEntireWellSelection(
           wellName,
-          labwareDef,
+          labwareDef.ordering,
           nozzleConfiguration,
           primaryNozzle,
           channels

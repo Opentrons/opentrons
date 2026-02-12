@@ -26,6 +26,7 @@
 .column_wrapper{
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .nozzle_selection_text {
@@ -42,6 +43,11 @@
   border-radius: var(--border-radius-12);
   background-color: var(--grey-20);
   gap: var(--spacing-16);
+}
+
+.nozzle_render {
+align-items: center;
+ padding:  var(--spacing-24) var(--spacing-24)  var(--spacing-24);
 }
 
 .select_well_alignment {

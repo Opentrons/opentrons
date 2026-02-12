@@ -10,7 +10,7 @@ import styles from './tipselectionwizard.module.css'
 import { useLegendItems } from './useLegendItems'
 
 import type { TipType, WellType } from '@opentrons/components'
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectionLegendProps {
   selectionType: 'tip' | 'well'
@@ -21,12 +21,12 @@ export function SelectionLegend({
   selectionType,
   size,
 }: SelectionLegendProps): JSX.Element {
-  let labwareDefinition: LabwareDefinition
+  let labwareWellMap: LabwareWellMap
   const isTipSelection = selectionType === 'tip'
   if (isTipSelection) {
-    labwareDefinition = fixtureTiprack1000ul as LabwareDefinition
+    labwareWellMap = fixtureTiprack1000ul.wells as LabwareWellMap
   } else {
-    labwareDefinition = fixture96Plate as LabwareDefinition
+    labwareWellMap = fixture96Plate.wells as LabwareWellMap
   }
   const legendItems = useLegendItems(selectionType)
 
@@ -37,13 +37,13 @@ export function SelectionLegend({
           {isTipSelection ? (
             <TipStatus
               type={type as TipType}
-              labwareDefinition={labwareDefinition}
+              wellMap={labwareWellMap}
               size={size}
             />
           ) : (
             <WellStatus
               type={type as WellType}
-              labwareDefinition={labwareDefinition}
+              wellMap={labwareWellMap}
               size={size}
             />
           )}
