@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import fastapi
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -21,17 +21,21 @@ router = fastapi.APIRouter()
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    userName: str
-    password: str = Field(..., description="The password for the user.")
-    fullName: str = Field(..., description="The full name of the user.")
-    accountType: str = Field(..., description="The type of account for the user.")
+    userName: Annotated[str, Field(..., description="The username of the user.")]
+    password: Annotated[SecretStr, Field(..., description="The password for the user.")]
+    fullName: Annotated[str, Field(..., description="The full name of the user.")]
+    accountType: Annotated[
+        str, Field(..., description="The type of account for the user.")
+    ]
 
 
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    fullName: str = Field(..., description="The full name of the user.")
-    accountType: str = Field(..., description="The type of account for the user.")
+    fullName: Annotated[str, Field(..., description="The full name of the user.")]
+    accountType: Annotated[
+        str, Field(..., description="The type of account for the user.")
+    ]
 
 
 class UserResponse(BaseModel):
@@ -44,19 +48,28 @@ class UserResponse(BaseModel):
 
 
 def _validate_user_create_input(
-    user_name: str,
-    password: str,
-    full_name: str,
-    account_type: str,
+    user_name: str | None = None,
+    password: str | None = None,
+    full_name: str | None = None,
+    account_type: str | None = None,
 ) -> None:
     """Validate required fields for user creation. Raises HTTPException if any are empty."""
-    if user_name == "" or password == "" or full_name == "" or account_type == "":
+    if (
+        user_name is not None
+        and user_name == ""
+        or password is not None
+        and password == ""
+        or full_name is not None
+        and full_name == ""
+        or account_type is not None
+        and account_type == ""
+    ):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="User name and password are required",
+            detail="Bad request",
         )
 
-    if len(password) < 8:
+    if password is not None and len(password) < 8:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="Password must be at least 8 characters long",
@@ -78,19 +91,15 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    user_name = request_body.data.userName if request_body is not None else ""
-    password = request_body.data.password if request_body is not None else ""
-    full_name = request_body.data.fullName if request_body is not None else ""
-    account_type = (
-        request_body.data.accountType if request_body is not None else AccountType.USER
+    user_create = request_body.data
+    _validate_user_create_input(
+        user_create.userName,
+        user_create.password.get_secret_value(),
+        user_create.fullName,
+        user_create.accountType,
     )
-    _validate_user_create_input(user_name, password, full_name, account_type)
     user = next(
-        (
-            user
-            for user in TEST_USERS
-            if user.username == user_name and user.password == password
-        ),
+        (user for user in TEST_USERS if user.username == user_create.userName),
         None,
     )
     if user is not None:
@@ -100,10 +109,10 @@ async def post_users(
         )
     # once we store it in the db we can have a unique id as well.
     new_user = User(
-        username=user_name,
-        password=hash_password(password),
-        full_name=full_name,
-        account_type=AccountType(account_type),
+        username=user_create.userName,
+        password=hash_password(user_create.password.get_secret_value()),
+        full_name=user_create.fullName,
+        account_type=AccountType(user_create.accountType),
         scopes={Scope.USERS_WRITE},
     )
 
@@ -204,6 +213,11 @@ async def update_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
+    update_user = request_body.data
+    _validate_user_create_input(
+        full_name=update_user.fullName,
+        account_type=update_user.accountType,
+    )
     user = next(
         (user for user in TEST_USERS if user.username == userName),
         None,
