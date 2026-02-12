@@ -168,7 +168,7 @@ class VacuumModule(mod_abc.AbstractModule):
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
-        return "vacuumModuleV1"
+        return "vacuumModuleMilliporeV1"
 
     def model(self) -> str:
         if isinstance(self._driver, SimulatingDriver):
