@@ -1,6 +1,5 @@
 from .core.common import ProtocolCore
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
 
 
 class GroupedSteps:
@@ -14,7 +13,7 @@ class GroupedSteps:
         self._api_version = api_version
         self._annotation_closed = False
 
-    @requires_version(2, 29)
+    # TODO(jbl, 2026-02-12) when feature flag is removed add a version check decorator
     def close_group(self) -> None:
         if not self._annotation_closed:
             self._protocol_core.end_step_grouping(annotation_id=self._annotation_id)
