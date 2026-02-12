@@ -7,7 +7,7 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import { PARTIAL } from '@opentrons/shared-data'
+import { A1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
@@ -88,6 +88,8 @@ export function PipetteNozzleSelector(
                 <NozzleRender
                   robotType={robotType}
                   pipetteSpecs={pipetteSpecs}
+                  nozzleConfiguration={nozzleMode}
+                  primaryNozzle={A1_NOZZLE}
                 />
               )}
             </div>
@@ -99,6 +101,8 @@ export function PipetteNozzleSelector(
                 <NozzleRender
                   robotType={robotType}
                   pipetteSpecs={pipetteSpecs}
+                  nozzleConfiguration={nozzleMode}
+                  primaryNozzle={A1_NOZZLE}
                 />
               )}
               <StyledText

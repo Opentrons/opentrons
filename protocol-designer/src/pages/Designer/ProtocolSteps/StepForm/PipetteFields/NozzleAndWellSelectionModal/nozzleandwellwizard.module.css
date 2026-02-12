@@ -46,6 +46,7 @@
 .nozzle_render {
 align-items: center;
 }
+
 .select_well_alignment {
   display: flex;
   flex-direction: row;

@@ -1,24 +1,30 @@
 import { memo } from 'react'
-import map from 'lodash/map'
 
-import { COLORS, Well } from '../..'
-import type { CSSProperties } from 'styled-components'
-import type { MemoExoticComponent, ReactNode } from 'react'
+import { SELECTED } from '@opentrons/components'
+
+import { WellStatus } from '../..'
+
+import type { MemoExoticComponent } from 'react'
 import type { LabwareWell, PipetteV2Specs } from '@opentrons/shared-data'
- import { WellStrokeByName } from '../..'
+import type { WellType } from '../..'
+
 export interface StrokedNozzleProps {
   pipetteSpecs: PipetteV2Specs
- strokeByWell: WellStrokeByName
+  nozzleStatus: Record<string, WellType>
 }
 
 export function StrokedNozzlesComponent(
   props: StrokedNozzleProps
 ): JSX.Element {
-  const { pipetteSpecs, strokeByWell } = props
-  const { nozzleMap, pipetteBoundingBoxOffsets, channels} = pipetteSpecs
+  const { pipetteSpecs, nozzleStatus } = props
+  const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpecs
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const leftBound = Math.abs(backLeftCorner[0])
   const frontBound = Math.abs(frontRightCorner[1])
+
+  const handleClickNozzle = (wellName: string): void => {
+    nozzleStatus[wellName] = SELECTED
+  }
   const wells = Object.fromEntries(
     Object.entries(nozzleMap).map(([wellName, coordinates]) => {
       const [xOffset, yOffset, zOffset] = coordinates
@@ -26,7 +32,7 @@ export function StrokedNozzlesComponent(
         wellName,
         {
           shape: 'circular',
-          diameter: 6,
+          diameter: 3,
           x: leftBound - Math.abs(xOffset),
           y: frontBound - Math.abs(yOffset),
           z: 0,
@@ -37,21 +43,15 @@ export function StrokedNozzlesComponent(
   )
   return (
     <>
-      {map<Record<string, CSSProperties['stroke']>, ReactNode>(
-        strokeByWell,
-        (color: CSSProperties['stroke'], wellName: string): JSX.Element => {
-          return (
-            <Well
-              key={wellName}
-              wellName={wellName}
-              well={wells[wellName]}
-              stroke={color}
-              fill={COLORS.white}
-              strokeWidth="0.6"
-            />
-          )
-        }
-      )}
+      {Object.entries(nozzleStatus).map(([key, wellType]) => (
+        <svg
+          x={wells[key].x}
+          y={wells[key].y}
+          onClick={() => handleClickNozzle}
+        >
+          <WellStatus type={wellType} size={'6'} />
+        </svg>
+      ))}
     </>
   )
 }
