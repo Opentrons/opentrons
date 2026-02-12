@@ -6,18 +6,18 @@ from typing import Annotated
 from fastapi import Depends, status
 
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from ..dependencies import get_run_data_manager
 from ..error_recovery_models import ErrorRecoveryPolicy
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from .base_router import RunStopped
 from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.json_api.request import RequestModel
-from robot_server.service.json_api.response import (
-    PydanticResponse,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 
 error_recovery_policy_router = LightRouter()
 

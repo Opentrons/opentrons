@@ -71,7 +71,7 @@ export function TipPickupContainer(
                 definition={def}
                 positioningMode="passThrough"
                 missingTips={missingTips}
-                tipStatusByWellName={tipStatusByWellName}
+                statusByWellName={tipStatusByWellName}
               />
             </g>
           )}

@@ -5,6 +5,15 @@ interface ActiveLayer {
   isActiveLayerVisible: boolean
 }
 
+// omitting dropTipInPlace because
+// we know that happens over a trashBin or wasteChute
+const IN_PLACE_COMMANDS = [
+  'aspirateInPlace',
+  'blowoutInPlace',
+  'dispenseInPlace',
+  'airGapInPlace',
+]
+
 export const getActiveLayer = (
   id: string,
   pipetteState: {
@@ -30,7 +39,9 @@ export const getActiveLayer = (
   const isStepAssosciatedWithLabware =
     isStepAssosciatedWithLabwareId ||
     isMoveStepAssosciatedWithLabwareId ||
-    pipetteEntityId != null
+    (pipetteEntityId != null &&
+      selectedRunTimeCommand != null &&
+      IN_PLACE_COMMANDS.includes(selectedRunTimeCommand?.commandType))
 
   const isStepAssociatedWithModuleId =
     moduleId != null &&

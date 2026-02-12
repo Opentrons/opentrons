@@ -20,6 +20,7 @@ describe('TipDisposalSlot', () => {
   let props: ComponentProps<typeof TipDisposalSlot>
   beforeEach(() => {
     props = {
+      disposalType: 'trash',
       robotState: {
         labware: {},
         liquidState: {} as any,

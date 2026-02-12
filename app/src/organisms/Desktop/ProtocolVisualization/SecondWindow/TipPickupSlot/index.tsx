@@ -69,7 +69,7 @@ export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
                 definition={def}
                 positioningMode="offsetInSlot"
                 missingTips={missingTips}
-                tipStatusByWellName={tipStatusByWellName}
+                statusByWellName={tipStatusByWellName}
               />
             </g>
           )}

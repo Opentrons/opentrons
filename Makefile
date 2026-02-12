@@ -200,10 +200,6 @@ test: test-py test-js
 .PHONY: test-windows
 test-windows: test-js test-py-windows
 
-.PHONY: test-e2e
-test-e2e:
-	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
-
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
 WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
 

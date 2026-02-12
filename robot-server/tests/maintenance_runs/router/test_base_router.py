@@ -12,6 +12,11 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.types import DeckSlotName
+from server_utils.fastapi_utils.models.json_api import (
+    RequestModel,
+    ResourceLink,
+    SimpleEmptyBody,
+)
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -36,11 +41,6 @@ from robot_server.maintenance_runs.router.base_router import (
     remove_run,
 )
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.service.json_api import (
-    RequestModel,
-    ResourceLink,
-    SimpleEmptyBody,
-)
 
 
 def mock_notify_publishers() -> None:

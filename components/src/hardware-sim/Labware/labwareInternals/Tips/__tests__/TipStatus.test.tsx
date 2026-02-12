@@ -1,11 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { fixtureTiprack1000ul } from '@opentrons/shared-data'
+
 import { EmptyWell, SelectedWell } from '../../Wells'
 import { InaccessibleTip } from '../InaccessibleTip'
 import { NewTip } from '../NewTip'
 import { TipStatus } from '../TipStatus'
 import { UsedTip } from '../UsedTip'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../NewTip')
 vi.mock('../UsedTip')
@@ -25,27 +29,52 @@ describe('TipStatus', () => {
   })
 
   it('should render new tip', () => {
-    render(<TipStatus type="new" />)
+    render(
+      <TipStatus
+        type="new"
+        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+      />
+    )
     screen.getByText('New tip')
   })
 
   it('should render used tip', () => {
-    render(<TipStatus type="used" />)
+    render(
+      <TipStatus
+        type="used"
+        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+      />
+    )
     screen.getByText('Used tip')
   })
 
   it('should render selected tip', () => {
-    render(<TipStatus type="selected" />)
+    render(
+      <TipStatus
+        type="selected"
+        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+      />
+    )
     screen.getByText('Selected well')
   })
 
   it('should render no tip', () => {
-    render(<TipStatus type="no" />)
+    render(
+      <TipStatus
+        type="no"
+        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+      />
+    )
     screen.getByText('Empty well')
   })
 
   it('should render inaccessible tip', () => {
-    render(<TipStatus type="inaccessible" />)
+    render(
+      <TipStatus
+        type="inaccessible"
+        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+      />
+    )
     screen.getByText('Inaccessible tip')
   })
 })

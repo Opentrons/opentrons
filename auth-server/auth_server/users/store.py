@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .scopes import Scope
+from server_utils.auth.scopes import Scope
 
 
 @dataclass(frozen=True)

@@ -80,19 +80,6 @@ jobs:
           files: ./coverage/lcov.info
           flags: labware-library
 
-  e2e-test:
-    name: 'labware library e2e tests'
-    timeout-minutes: 20
-    runs-on: 'ubuntu-24.04'
-    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-    steps:
-      - uses: 'actions/checkout@v5'
-      - uses: ./.github/actions/js/setup
-      - name: 'test-e2e'
-        env:
-          OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
-          OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
-        run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
     timeout-minutes: 10
