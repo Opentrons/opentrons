@@ -13,6 +13,13 @@ from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
 
 from ..protocols.dependencies import (
     get_file_hasher,
@@ -45,13 +52,6 @@ from robot_server.runs.router.base_router import RunNotFound
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleBody,
-    SimpleEmptyBody,
-    SimpleMultiBody,
-)
 from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,

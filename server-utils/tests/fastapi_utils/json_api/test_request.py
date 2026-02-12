@@ -1,28 +1,39 @@
+"""Test the request models."""
+
 from typing import Any, Dict
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 from pytest import raises
 
-from tests.service.helpers import ItemModel
-
-from robot_server.service.json_api.request import RequestModel
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 
-def test_attributes_as_dict():
-    DictRequest = RequestModel[dict]
+class ItemModel(BaseModel):
+    """An item model."""
+
+    name: str
+    quantity: int
+    price: float
+
+
+def test_attributes_as_dict() -> None:
+    """Test that the attributes are as a dict."""
+    DictRequest = RequestModel[dict]  # type: ignore[type-arg]
     obj_to_validate = {"data": {"some_data": 1}}
     my_request_obj = DictRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == {"data": {"some_data": 1}}
 
 
-def test_attributes_as_item_model():
+def test_attributes_as_item_model() -> None:
+    """Test that the attributes are as an item model."""
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
     my_request_obj = ItemRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == obj_to_validate
 
 
-def test_attributes_as_item_model_empty_dict():
+def test_attributes_as_item_model_empty_dict() -> None:
+    """Test that the attributes are as an item model with an empty dict."""
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate: Dict[str, Any] = {"data": {}}
     with raises(ValidationError) as e:
@@ -34,27 +45,28 @@ def test_attributes_as_item_model_empty_dict():
             "msg": "Field required",
             "type": "missing",
             "input": {},
-            "url": "https://errors.pydantic.dev/2.11/v/missing",
+            "url": "https://errors.pydantic.dev/2.12/v/missing",
         },
         {
             "loc": ("data", "quantity"),
             "msg": "Field required",
             "type": "missing",
             "input": {},
-            "url": "https://errors.pydantic.dev/2.11/v/missing",
+            "url": "https://errors.pydantic.dev/2.12/v/missing",
         },
         {
             "loc": ("data", "price"),
             "msg": "Field required",
             "type": "missing",
             "input": {},
-            "url": "https://errors.pydantic.dev/2.11/v/missing",
+            "url": "https://errors.pydantic.dev/2.12/v/missing",
         },
     ]
 
 
-def test_attributes_required():
-    MyRequest = RequestModel[dict]
+def test_attributes_required() -> None:
+    """Test that the attributes are required."""
+    MyRequest = RequestModel[dict]  # type: ignore[type-arg]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
         MyRequest.model_validate(obj_to_validate)
@@ -64,14 +76,15 @@ def test_attributes_required():
             "loc": ("data",),
             "msg": "Input should be a valid dictionary",
             "input": None,
-            "url": "https://errors.pydantic.dev/2.11/v/dict_type",
+            "url": "https://errors.pydantic.dev/2.12/v/dict_type",
             "type": "dict_type",
         },
     ]
 
 
-def test_data_required():
-    MyRequest = RequestModel[dict]
+def test_data_required() -> None:
+    """Test that the data is required."""
+    MyRequest = RequestModel[dict]  # type: ignore[type-arg]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
         MyRequest.model_validate(obj_to_validate)
@@ -81,14 +94,15 @@ def test_data_required():
             "loc": ("data",),
             "msg": "Input should be a valid dictionary",
             "input": None,
-            "url": "https://errors.pydantic.dev/2.11/v/dict_type",
+            "url": "https://errors.pydantic.dev/2.12/v/dict_type",
             "type": "dict_type",
         },
     ]
 
 
-def test_request_with_id():
-    MyRequest = RequestModel[dict]
+def test_request_with_id() -> None:
+    """Test that the request with an id is validated correctly."""
+    MyRequest = RequestModel[dict]  # type: ignore[type-arg]
     obj_to_validate = {
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
     }

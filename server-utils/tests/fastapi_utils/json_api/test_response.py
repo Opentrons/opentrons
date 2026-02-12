@@ -1,10 +1,12 @@
+"""Test the response models."""
+
 from typing import Any, Dict, NamedTuple, Optional
 
 import pytest
 from pydantic import BaseModel
 
-from robot_server.service.json_api.resource_links import ResourceLink
-from robot_server.service.json_api.response import (
+from server_utils.fastapi_utils.models.json_api.resource_links import ResourceLink
+from server_utils.fastapi_utils.models.json_api.response import (
     Body,
     DeprecatedMultiResponseModel,
     DeprecatedResponseModel,
@@ -127,4 +129,5 @@ RESPONSE_SPECS = [
 
 @pytest.mark.parametrize(ResponseSpec._fields, RESPONSE_SPECS)
 def test_response_to_dict(subject: BaseModel, expected: Dict[str, Any]) -> None:
+    """Test that the response to dict serialization is correct."""
     assert subject.model_dump() == expected

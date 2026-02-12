@@ -5,8 +5,7 @@ import typing
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.deck.types import RobotModel
-
-from robot_server.service.json_api import BaseResponseBody
+from server_utils.fastapi_utils.models.json_api import BaseResponseBody
 
 
 class DiskDetails(BaseModel):

@@ -26,12 +26,12 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import commands
 from opentrons.util.helpers import utc_now
 from opentrons_shared_data.util import StrEnum
-
-from robot_server.service.json_api import (
+from server_utils.fastapi_utils.models.json_api import (
     DeprecatedResponseDataModel,
     DeprecatedResponseModel,
     RequestModel,
 )
+
 from robot_server.service.session.models.command_definitions import (
     CalibrationCommand,
     CheckCalibrationCommand,
