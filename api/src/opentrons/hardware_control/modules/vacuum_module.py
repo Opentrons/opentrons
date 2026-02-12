@@ -78,12 +78,13 @@ class VacuumModule(mod_abc.AbstractModule):
         Returns:
             VacuumModule instance
         """
+
         driver: AbstractVacuumModuleDriver
         if not simulating:
             driver = await VacuumModuleDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
         else:
-            driver = SimulatingDriver(serial_number=sim_serial_number)
+            driver = SimulatingDriver(model=sim_model, serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
 
         reader = VacuumModuleReader(driver=driver)
@@ -94,7 +95,7 @@ class VacuumModule(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=(await driver.get_device_info()).to_dict(),
+            device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
@@ -170,7 +171,11 @@ class VacuumModule(mod_abc.AbstractModule):
         return "vacuumModuleV1"
 
     def model(self) -> str:
-        return self._model_from_revision(self._device_info.get("model"))
+        if isinstance(self._driver, SimulatingDriver):
+            return self._driver.model()
+        else:
+            rev = self.device_info["model"]
+            return self._model_from_revision(rev)
 
     @property
     def initialized(self) -> bool:

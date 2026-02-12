@@ -1,6 +1,6 @@
-from typing import Optional, Protocol
+from typing import Dict, Optional, Protocol
 
-from .types import LEDColor, LEDPattern, PressureState, PumpState, VacuumModuleInfo
+from .types import LEDColor, LEDPattern, PressureState, PumpState
 
 
 class AbstractVacuumModuleDriver(Protocol):
@@ -18,7 +18,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Check connection to vacuum module."""
         ...
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         ...
 

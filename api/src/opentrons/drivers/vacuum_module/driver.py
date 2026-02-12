@@ -1,6 +1,6 @@
 import asyncio
 import re
-from typing import Optional
+from typing import Dict, Optional
 
 from serial.tools import list_ports
 
@@ -8,12 +8,10 @@ from .abstract import AbstractVacuumModuleDriver
 from .errors import VacuumModuleErrorCodes
 from .types import (
     GCODE,
-    HardwareRevision,
     LEDColor,
     LEDPattern,
     PressureState,
     PumpState,
-    VacuumModuleInfo,
     VentState,
 )
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
@@ -41,7 +39,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     """Driver for Opentrons Vacuum Module."""
 
     @classmethod
-    def parse_device_info(cls, response: str) -> VacuumModuleInfo:
+    def parse_device_info(cls, response: str) -> Dict[str, str]:
         """Parse vacuum module info."""
         _RE = re.compile(
             f"^{GCODE.GET_DEVICE_INFO} FW:(?P<fw>\\S+) HW:Opentrons-vacuum-module-(?P<hw>\\S+) SerialNo:(?P<sn>\\S+)$"
@@ -49,9 +47,12 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         m = _RE.match(response)
         if not m:
             raise ValueError(f"Incorrect Response for device info: {response}")
-        return VacuumModuleInfo(
-            m.group("fw"), HardwareRevision(m.group("hw")), m.group("sn")
-        )
+
+        return {
+            "serial": m.group("sn"),
+            "version": m.group("fw"),
+            "model": m.group("hw"),
+        }
 
     @classmethod
     def parse_reset_reason(cls, response: str) -> int:
@@ -159,7 +160,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self._connection._serial.reset_input_buffer()
         self._connection._serial.reset_output_buffer()
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         response = await self._connection.send_command(
             GCODE.GET_DEVICE_INFO.build_command()
@@ -169,7 +170,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             GCODE.GET_RESET_REASON.build_command()
         )
         reason = self.parse_reset_reason(reason_resp)
-        device_info.rr = reason
+        device_info["reset_reason"] = str(reason)
         return device_info
 
     async def enter_programming_mode(self) -> None:
