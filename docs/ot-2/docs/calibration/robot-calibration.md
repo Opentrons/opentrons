@@ -120,3 +120,16 @@ The calibration controls are located in the Robot Settings section of the Opentr
 5. Click **Calibrate**. Instructions and animations will guide you through the robot calibration process.
 
 </div>
+
+## Post-calibration
+
+Upon completion, the Robot Settings screen updates the calibration status of your OT-2.
+
+- The status banner shows "Calibration complete."
+- The app updates the calibration date and timestamps for the deck, pipette offsets, and and tip length sections.
+
+<figure class="screenshot" markdown>
+![Robot Settings showing updated date/time stamps for a calibrated robot](../images/calibration-complete.png)
+<figcaption>Robot Settings screen after calibration.</figcaption>
+
+Your OT-2 is ready to run protocols or perform any labware position checks, as required.
