@@ -2036,26 +2036,30 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.close_lid()
                 if DRYRUN is False:
                     profile_TAGSTOP: List[ThermocyclerStep] = [
-                        {"temperature": 98, "hold_time_minutes": 5},
-                        {"temperature": 97, "hold_time_minutes": 1},
-                        {"temperature": 95, "hold_time_minutes": 1},
-                        {"temperature": 93, "hold_time_minutes": 1},
-                        {"temperature": 91, "hold_time_minutes": 1},
-                        {"temperature": 89, "hold_time_minutes": 1},
-                        {"temperature": 87, "hold_time_minutes": 1},
-                        {"temperature": 85, "hold_time_minutes": 1},
-                        {"temperature": 83, "hold_time_minutes": 1},
-                        {"temperature": 81, "hold_time_minutes": 1},
-                        {"temperature": 79, "hold_time_minutes": 1},
-                        {"temperature": 77, "hold_time_minutes": 1},
-                        {"temperature": 75, "hold_time_minutes": 1},
-                        {"temperature": 73, "hold_time_minutes": 1},
-                        {"temperature": 71, "hold_time_minutes": 1},
-                        {"temperature": 69, "hold_time_minutes": 1},
-                        {"temperature": 67, "hold_time_minutes": 1},
-                        {"temperature": 65, "hold_time_minutes": 1},
-                        {"temperature": 63, "hold_time_minutes": 1},
-                        {"temperature": 62, "hold_time_minutes": HYBRIDTIME * 60},
+                        {"temperature": 98, "hold_time_minutes": 5, "ramp_rate": 4},
+                        {"temperature": 97, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 95, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 93, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 91, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 89, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 87, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 85, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 83, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 81, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 79, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 77, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 75, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 73, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 71, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 69, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 67, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 65, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {"temperature": 63, "hold_time_minutes": 1, "ramp_rate": 2},
+                        {
+                            "temperature": 62,
+                            "hold_time_minutes": HYBRIDTIME * 60,
+                            "ramp_rate": 2,
+                        },
                     ]
                     thermocycler.execute_profile(
                         steps=profile_TAGSTOP, repetitions=1, block_max_volume=100
@@ -2064,7 +2068,9 @@ def run(protocol: ProtocolContext) -> None:
                     if HYBRID_PAUSE:
                         protocol.comment("HYBRIDIZATION PAUSED")
                     protocol.wait_for_tasks([block_task])
-                    thermocycler.start_set_block_temperature(10)
+                    thermocycler.start_set_block_temperature(
+                        temperature=10, ramp_rate=2
+                    )
                 thermocycler.open_lid()
             else:
                 protocol.comment(
@@ -2079,7 +2085,9 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
                 if ONDECK_THERMO:
-                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(
+                        temperature=58, ramp_rate=4
+                    )
                     tc_lid_task = thermocycler.start_set_lid_temperature(58)
                     protocol.wait_for_tasks([tc_block_task, tc_lid_task])
             # ============================================================================================
@@ -2558,15 +2566,15 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.close_lid()
                 if DRYRUN is False:
                     profile_PCR_1: List[ThermocyclerStep] = [
-                        {"temperature": 98, "hold_time_seconds": 45}
+                        {"temperature": 98, "hold_time_seconds": 45, "ramp_rate": 4}
                     ]
                     thermocycler.execute_profile(
                         steps=profile_PCR_1, repetitions=1, block_max_volume=50
                     )
                     profile_PCR_2: List[ThermocyclerStep] = [
                         {"temperature": 98, "hold_time_seconds": 30},
-                        {"temperature": 60, "hold_time_seconds": 30},
-                        {"temperature": 72, "hold_time_seconds": 30},
+                        {"temperature": 60, "hold_time_seconds": 30, "ramp_rate": 2},
+                        {"temperature": 72, "hold_time_seconds": 30, "ramp_rate": 4},
                     ]
                     thermocycler.execute_profile(
                         steps=profile_PCR_2, repetitions=12, block_max_volume=50
@@ -2577,7 +2585,7 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_PCR_3, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.set_block_temperature(10)
+                    thermocycler.set_block_temperature(temperature=10, ramp_rate=2)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:

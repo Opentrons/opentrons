@@ -437,12 +437,12 @@ def run(protocol: ProtocolContext) -> None:
                 if DRYRUN is False:
                     profile_FRERAT: List[ThermocyclerStep] = [
                         {"temperature": 32, "hold_time_minutes": FRAGTIME},
-                        {"temperature": 65, "hold_time_minutes": 30},
+                        {"temperature": 65, "hold_time_minutes": 30, "ramp_rate": 4},
                     ]
                     thermocycler.execute_profile(
                         steps=profile_FRERAT, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.start_set_block_temperature(4)
+                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate=1)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:
@@ -503,12 +503,12 @@ def run(protocol: ProtocolContext) -> None:
                 if DRYRUN is False:
                     profile_ERAT: List[ThermocyclerStep] = [
                         {"temperature": 20, "hold_time_minutes": 30},
-                        {"temperature": 65, "hold_time_minutes": 30},
+                        {"temperature": 65, "hold_time_minutes": 30, "ramp_rate": 4},
                     ]
                     thermocycler.execute_profile(
                         steps=profile_ERAT, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.start_set_block_temperature(4)
+                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate=2)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:
@@ -609,7 +609,7 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_LIG, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.start_set_block_temperature(4)
+                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate=4)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:
@@ -1092,8 +1092,8 @@ def run(protocol: ProtocolContext) -> None:
                     )
                     profile_PCR_2: List[ThermocyclerStep] = [
                         {"temperature": 98, "hold_time_seconds": 15},
-                        {"temperature": 60, "hold_time_seconds": 30},
-                        {"temperature": 72, "hold_time_seconds": 30},
+                        {"temperature": 60, "hold_time_seconds": 30, "ramp_rate": 2},
+                        {"temperature": 72, "hold_time_seconds": 30, "ramp_rate": 4},
                     ]
                     thermocycler.execute_profile(
                         steps=profile_PCR_2, repetitions=PCRCYCLES, block_max_volume=50
@@ -1104,7 +1104,7 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_PCR_3, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.start_set_block_temperature(4)
+                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate=2)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:
