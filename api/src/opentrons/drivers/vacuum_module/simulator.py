@@ -1,21 +1,22 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from .abstract import AbstractVacuumModuleDriver
 from .types import (
-    HardwareRevision,
     LEDColor,
     LEDPattern,
     PressureState,
     PumpState,
-    VacuumModuleInfo,
     VentState,
 )
 from opentrons.util.async_helpers import ensure_yield
 
 
 class SimulatingDriver(AbstractVacuumModuleDriver):
-    def __init__(self, serial_number: Optional[str] = None) -> None:
-        self._serial_number = serial_number or "dummySerialFS"
+    def __init__(
+        self, model: Optional[str] = None, serial_number: Optional[str] = None
+    ) -> None:
+        self._serial_number = serial_number or "dummySerialVM"
+        self._model = model if model else "vacuumModuleV1"
         self.vent_state = VentState.OPENED
         self.vacuum_on = False
         self.pump_enabled = False
