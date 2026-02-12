@@ -1,8 +1,8 @@
 import pytest
 
 from server_utils.auth.scopes import (
-    UnrecognizedScopeError,
     Scope,
+    UnrecognizedScopeError,
     parse_scopes,
     serialize_scopes,
 )

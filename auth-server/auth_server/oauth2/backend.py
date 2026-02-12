@@ -9,7 +9,7 @@ import oauthlib.common
 import oauthlib.oauth2
 import pydantic
 
-from server_utils.auth.scopes import UnrecognizedScopeError, Scope, serialize_scopes
+from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
 from auth_server.users.store import TEST_USERS, User
 
