@@ -44,7 +44,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    run_helpers.comment_protocol_version(protocol, "08")
+    run_helpers.comment_protocol_version(protocol, "09")
     if not protocol.is_simulating():
         slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -145,6 +145,7 @@ def run(protocol: ProtocolContext) -> None:
             p50.configure_for_volume(50)
             p50.blow_out()
         p50.return_tip()
+        protocol.capture_image(True)
 
         # adding Mastermix
         protocol.comment("\n\n----------ADDING MASTERMIX----------\n")
@@ -192,6 +193,7 @@ def run(protocol: ProtocolContext) -> None:
             p50.drop_tip()
         if p50.has_tip:
             p50.return_tip()
+            protocol.capture_image(True)
 
         # adding DNA
         protocol.comment("\n\n----------ADDING DNA----------\n")
@@ -264,6 +266,11 @@ def run(protocol: ProtocolContext) -> None:
             if disposable_lid:
                 protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
             p50.return_tip()
+            protocol.capture_image(
+                home_before=True,
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
             p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
             mmx_pic.append(water)
         # Empty plates into liquid waste
@@ -275,7 +282,10 @@ def run(protocol: ProtocolContext) -> None:
         run_helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
         if deactivate_modules_bool:
             run_helpers.deactivate_modules(protocol)
-        protocol.capture_image(filename="end_of_run")
+        protocol.capture_image(
+            filename="end_of_run",
+            resolution=(1280, 720),
+            zoom=1)
         if not protocol.is_simulating():
             run_helpers.send_slack_message_with_image(
                 slack_bot, metadata["protocolName"]

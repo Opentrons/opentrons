@@ -17,6 +17,12 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
+# Options used by primary developer to describe blowout position options
+BLOWOUT_OPTIONS = {
+	"trash": {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
+	"source": {"position_reference": "well-center", "offset": {"x": 1, "y": 2, "z": 3}},
+	"destination": {"position_reference": "well-bottom", "offset": {"x": 1, "y": 2, "z": 3}},
+}
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
@@ -25,24 +31,41 @@ def add_parameters(parameters: ParameterContext) -> None:
     run_helpers.create_meniscus_z_parameter(parameters)
     run_helpers.create_error_capture_duration_duration(parameters)
 
+    parameters.add_str(
+	    variable_name="blowout_option",
+	    display_name="Blowout Option",
+	    choices=[
+	        {"display_name": "Trash (well-top + offset )", "value": "trash"},
+	        {"display_name": "Source (well-center + offset)", "value": "source"},
+	        {"display_name": "Dest (well-bottom + offset)", "value": "destination"}
+	    ],
+	    default="destination",
+	)
+
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     if not protocol.is_simulating():
         background_helpers.launch_background_tasks()
 
+
+    blowout_selection = protocol.params.blowout_option
+
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
-    run_helpers.comment_protocol_version(protocol, "06")
+    run_helpers.comment_protocol_version(protocol, "08")
     if not protocol.is_simulating():
         slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
-    protocol.capture_image(filename="start_of_run")
+    protocol.capture_image(
+        filename="start_of_run",
+        resolution=(1280, 720),
+        zoom=1)
     protocol.comment("THIS IS A NO MODULE RUN")
     tiprack_x_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
     tiprack_x_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -97,6 +120,11 @@ def run(protocol: ProtocolContext) -> None:
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
     }
     water = protocol.get_liquid_class("water")
+    water_blowout_properties = water.get_for(p1000, tiprack_x_1).dispense.retract.blowout
+    water_blowout_properties.enabled = True
+    water_blowout_properties.location = blowout_selection
+    water_blowout_properties.blowout_position = BLOWOUT_OPTIONS[blowout_selection]
+
     lm = "liquid-meniscus"
     tip_racks = [tiprack_x_2, tiprack_x_3]
     for tip in tip_racks:
@@ -169,6 +197,11 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.touch_tip()
                 current += 1
             p1000.return_tip()
+            protocol.capture_image(
+                home_before=True,
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
             protocol.comment("Changing pipette configuration to 8ch.")
 
@@ -309,7 +342,10 @@ def run(protocol: ProtocolContext) -> None:
         run_helpers.find_liquid_height_of_all_wells(
             protocol, p1000_single, [waste_reservoir["A1"]]
         )
-        protocol.capture_image(filename="end_of_run")
+        protocol.capture_image(
+            filename="end_of_run",
+            resolution=(1280, 720),
+            zoom=1)
         if not protocol.is_simulating():
             run_helpers.send_slack_message_with_image(
                 slack_bot, metadata["protocolName"]
