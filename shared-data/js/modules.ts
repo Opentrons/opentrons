@@ -35,7 +35,7 @@ import type {
 
 // TODO(bc, 2021-09-18): generate typescript types directly from JSON schema
 // having to maintain TS types side by side with the schema is a liability
-// TODO(ba, 2026-02-11): this needs to take in the varient as well
+// TODO(ba, 2026-02-11): this needs to take in the variant as well
 export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:

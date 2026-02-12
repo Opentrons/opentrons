@@ -1,8 +1,7 @@
 {
   "$otSharedSchema": "module/schemas/3",
   "moduleType": "vacuumModuleType",
-  "model": "vacuumModuleV1",
-  "variant": "Millipore",
+  "model": "vacuumModuleOpentronsV1",
   "labwareOffset": {
     "x": 0,
     "y": 0,
@@ -57,7 +56,7 @@
       }
     }
   },
-  "displayName": "Vacuum Module Millipore GEN1",
+  "displayName": "Vacuum Module Opentrons GEN1",
   "quirks": [],
   "slotTransforms": {},
   "orientation": {

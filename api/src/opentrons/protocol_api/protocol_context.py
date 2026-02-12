@@ -918,6 +918,7 @@ class ProtocolContext(CommandPublisher):
         module_name: str,
         location: Optional[DeckLocation] = None,
         configuration: Optional[str] = None,
+        variant: Optional[str] = None,
     ) -> ModuleTypes:
         """
         Load a module onto the deck, given its name or model.
@@ -955,6 +956,9 @@ class ProtocolContext(CommandPublisher):
                 *Removed in version 2.14:*
                 This parameter dangerously modified the protocol's geometry system,
                 and it didn't function properly, so it was removed.
+
+            variant: Physical geometry variant when multiple definitions exist
+                for the same electronic model (e.g. 'Opentrons' or 'Millipore').
 
         Returns:
             The loaded and initialized module: a
@@ -1038,6 +1042,7 @@ class ProtocolContext(CommandPublisher):
             model=requested_model,
             deck_slot=deck_slot,
             configuration=configuration,
+            variant=variant,
         )
 
         module_context = _create_module_context(

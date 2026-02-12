@@ -158,6 +158,7 @@ class AbstractProtocol(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
+        variant: Optional[str] = None,
     ) -> ModuleCoreType: ...
 
     @abstractmethod

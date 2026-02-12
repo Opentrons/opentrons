@@ -39,6 +39,13 @@ class CutoutFixture(pydantic.BaseModel):
         ),
         default=None,
     )
+    variant: Optional[str] = pydantic.Field(
+        description=(
+            "The physical geometry variant of this module"
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
+        ),
+        default=None,
+    )
 
 
 class DeckConfigurationRequest(pydantic.BaseModel):

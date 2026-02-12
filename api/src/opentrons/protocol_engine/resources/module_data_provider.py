@@ -1,6 +1,6 @@
 """Module data resource provider."""
 
-from typing import Dict
+from typing import Dict, Optional
 
 from opentrons_shared_data.module import load_definition
 
@@ -21,9 +21,12 @@ class ModuleDataProvider:
     """Module data provider."""
 
     @staticmethod
-    def get_definition(model: ModuleModel) -> ModuleDefinition:
+    def get_definition(
+        model: ModuleModel, variant: Optional[str] = None
+    ) -> ModuleDefinition:
         """Get the module definition."""
-        data = load_definition(model_or_loadname=model.value, version="3")
+        definition_name = model.as_variant(variant)
+        data = load_definition(model_or_loadname=definition_name, version="3")
         return ModuleDefinition.model_validate(data)
 
     @staticmethod

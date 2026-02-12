@@ -78,7 +78,12 @@ class DeckConfigurationStore:  # noqa: D101
         """Get the robot's current deck configuration in an expected typing."""
         to_convert = await self.get()
         converted = [
-            (item.cutoutId, item.cutoutFixtureId, item.opentronsModuleSerialNumber)
+            (
+                item.cutoutId,
+                item.cutoutFixtureId,
+                item.opentronsModuleSerialNumber,
+                item.variant,
+            )
             for item in to_convert.cutoutFixtures
         ]
         return converted
@@ -146,6 +151,7 @@ def _http_types_to_storage_types(
             cutout_fixture_id=http_element.cutoutFixtureId,
             cutout_id=http_element.cutoutId,
             opentrons_module_serial_number=http_element.opentronsModuleSerialNumber,
+            variant=http_element.variant,
         )
         for http_element in http_val.cutoutFixtures
     ]
@@ -161,6 +167,7 @@ def _storage_types_to_http_types(
             cutoutFixtureId=storage_element.cutout_fixture_id,
             cutoutId=storage_element.cutout_id,
             opentronsModuleSerialNumber=storage_element.opentrons_module_serial_number,
+            variant=storage_element.variant,
         )
         for storage_element in storage_cutout_fixtures
     ]

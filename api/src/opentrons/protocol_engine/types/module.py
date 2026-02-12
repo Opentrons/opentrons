@@ -31,6 +31,13 @@ from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
 
+_MODULE_VARIANTS: dict[str, dict[str, str]] = {
+    "vacuumModuleV1": {
+        "Opentrons": "vacuumModuleOpentronsV1",
+        "Millipore": "vacuumModuleMilliporeV1",
+    },
+}
+
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
 class ModuleModel(StrEnum):
@@ -73,6 +80,12 @@ class ModuleModel(StrEnum):
             return ModuleType.VACUUM_MODULE
 
         assert False, f"Invalid ModuleModel {self}"
+
+    def as_variant(self, variant: str | None = None) -> str:
+        default = variant or ""
+        if ModuleModel.is_vacuum_module(self):
+            default = variant or "Millipore"
+        return _MODULE_VARIANTS.get(self.value, {}).get(default, self.value)
 
     @classmethod
     def is_temperature_module_model(
@@ -188,6 +201,8 @@ class ModuleDefinition(BaseModel):
 
     model: ModuleModel = Field(...)
 
+    variant: Optional[str] = Field(default=None)
+
     labwareOffset: LabwareOffsetVector = Field(...)
 
     dimensions: ModuleDimensions = Field(...)
@@ -238,6 +253,7 @@ class LoadedModule(BaseModel):
     model: ModuleModel
     location: Optional[DeckSlotLocation] = None
     serialNumber: Optional[str] = None
+    variant: Optional[str] = None
 
 
 class SpeedRange(NamedTuple):

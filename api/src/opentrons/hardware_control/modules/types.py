@@ -215,7 +215,9 @@ class ModuleType(StrEnum):
             return cls.VACUUM_MODULE
 
     @classmethod
-    def to_module_fixture_id(cls, module_type: ModuleType) -> str:
+    def to_module_fixture_id(
+        cls, module_type: ModuleType, variant: Optional[str] = None
+    ) -> str:
         if module_type == ModuleType.THERMOCYCLER:
             # Thermocyclers are "loaded" in B1 only
             return "thermocyclerModuleV2Front"
@@ -230,7 +232,8 @@ class ModuleType(StrEnum):
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
         if module_type == ModuleType.VACUUM_MODULE:
-            return "vacuumModuleV1"
+            default = variant or "Millipore"
+            return f"vacuumModule{default}V1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."

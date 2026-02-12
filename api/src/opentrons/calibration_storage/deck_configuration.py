@@ -11,6 +11,7 @@ class _CutoutFixturePlacementModel(pydantic.BaseModel):
     cutoutId: str
     cutoutFixtureId: str
     opentronsModuleSerialNumber: Optional[str] = None
+    variant: Optional[str] = None
 
 
 class _DeckConfigurationModel(pydantic.BaseModel):
@@ -56,6 +57,7 @@ def deserialize_deck_configuration(
                 cutout_id=e.cutoutId,
                 cutout_fixture_id=e.cutoutFixtureId,
                 opentrons_module_serial_number=e.opentronsModuleSerialNumber,
+                variant=e.variant,
             )
             for e in parsed.cutoutFixtures
         ]

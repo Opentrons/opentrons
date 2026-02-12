@@ -1093,6 +1093,10 @@ class ModuleView:
                 f"Cannot get lid height of {definition.moduleType}"
             )
 
+    def get_variant(self, module_id: str) -> str:
+        """Get the geometric variant of this module."""
+        return self.get_definition(module_id).variant
+
     @staticmethod
     def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:
         """Return a Magnetic Module's home offset.
@@ -1420,9 +1424,7 @@ class ModuleView:
         return deck_type not in [DeckType.OT2_STANDARD, DeckType.OT2_SHORT_TRASH]
 
     def ensure_and_convert_module_fixture_location(
-        self,
-        deck_slot: DeckSlotName,
-        model: ModuleModel,
+        self, deck_slot: DeckSlotName, model: ModuleModel, variant: Optional[str] = None
     ) -> str:
         """Ensure module fixture load location is valid.
 
@@ -1464,7 +1466,8 @@ class ModuleView:
         elif model in [ModuleModel.VACUUM_MODULE_V1]:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
-            return f"{model.value}{deck_slot.value}"
+            default = variant or "Millipore"
+            return f"vacuumModule{default}V1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."

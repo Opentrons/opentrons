@@ -30,11 +30,11 @@ def run(ctx: ProtocolContext) -> None:
     # Create a virtual vm if one does not exist
     vm = [m for m in ctx._hw_manager.hardware.attached_modules if m.serial_number == "VMA1020250119002"]
     if not vm:
-        ctx._hw_manager.hardware.create_simulating_module(VacuumModuleModel.VACUUM_MODULE_MILLIPORE_V1, "VMA1020250119002")
+        ctx._hw_manager.hardware.create_simulating_module(VacuumModuleModel.VACUUM_MODULE_V1, "VMA1020250119002")
 
     # Load Modules
-    vm_mod  = ctx.load_module( module_name="vacuumModuleMilliporeV1", location="A3")
-    abs_mod = ctx.load_module( module_name="absorbanceReaderV1", location="D3")
+    vm_mod  = ctx.load_module(module_name="vacuumModuleV1", location="A3", variant="Millipore")
+    abs_mod = ctx.load_module(module_name="absorbanceReaderV1", location="D3")
     abs_mod.open_lid()
 
     # Load Tipracks

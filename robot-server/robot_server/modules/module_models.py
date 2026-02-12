@@ -96,6 +96,9 @@ class _GenericModule(BaseModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     moduleOffset: Optional[ModuleCalibrationData] = Field(
         None, description="The calibrated module offset."
     )
+    moduleVariant: Optional[str] = Field(
+        None, description="The physical variant of the device."
+    )
     compatibleWithRobot: bool = Field(
         ..., description="Whether the detected module is compatible with this robot."
     )

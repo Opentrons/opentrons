@@ -43,3 +43,4 @@ class CutoutFixturePlacement:
     cutout_fixture_id: str
     cutout_id: str
     opentrons_module_serial_number: typing.Optional[str]
+    variant: typing.Optional[str]

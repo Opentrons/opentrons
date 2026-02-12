@@ -75,6 +75,7 @@ class ModuleDataMapper:
         live_data: LiveData,
         usb_port: HardwareUSBPort,
         module_offset: Optional[ModuleCalibrationData],
+        module_variant: Optional[str],
     ) -> AttachedModule:
         """Map hardware control data to an attached module response."""
         module_model = ModuleModel(model)
@@ -82,7 +83,9 @@ class ModuleDataMapper:
 
         module_cls: Type[AttachedModule]
         module_data: AttachedModuleData
-        module_definition = load_definition(model_or_loadname=model, version="3")
+        # TODO: variant should be dynamic
+        load_name = module_model.as_variant()
+        module_definition = load_definition(model_or_loadname=load_name, version="3")
         compatible_with_robot = (
             self.deck_type.value not in module_definition["incompatibleWithDecks"]
         )
@@ -231,4 +234,5 @@ class ModuleDataMapper:
             moduleModel=module_model,  # type: ignore[arg-type]
             data=module_data,  # type: ignore[arg-type]
             moduleOffset=module_offset,
+            moduleVariant=module_variant,
         )

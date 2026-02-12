@@ -72,6 +72,11 @@ class LoadModuleParams(BaseModel):
         json_schema_extra=_remove_default,
     )
 
+    variant: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Physical geometry variant when multiple definitions exist for the same electronic model (e.g. 'Opentrons' or 'Millipore').",
+    )
+
 
 class LoadModuleResult(BaseModel):
     """The results of loading a module."""
@@ -101,6 +106,12 @@ class LoadModuleResult(BaseModel):
         "Will be `None` if a module is not electrically connected to the robot (like the Magnetic Block).",
     )
 
+    variant: Optional[str] = Field(
+        None,
+        description="Physical geometry variant when multiple definitions exist"
+        "for the same electronic model (e.g. 'Opentrons' or 'Millipore').",
+    )
+
 
 class LoadModuleImplementation(
     AbstractCommandImpl[LoadModuleParams, SuccessData[LoadModuleResult]]
@@ -118,13 +129,16 @@ class LoadModuleImplementation(
         state_update = StateUpdate()
 
         module_type = params.model.as_type()
-        self._ensure_module_location(params.location.slotName, module_type)
+        self._ensure_module_location(
+            params.location.slotName, module_type, params.variant
+        )
 
         if self._state_view.modules.get_deck_supports_module_fixtures():
             addressable_area_module_reference = (
                 self._state_view.modules.ensure_and_convert_module_fixture_location(
                     deck_slot=params.location.slotName,
                     model=params.model,
+                    variant=params.variant,
                 )
             )
         else:
@@ -156,6 +170,7 @@ class LoadModuleImplementation(
                     addressableAreaName=addressable_area_module_reference
                 ),
                 module_id=params.moduleId,
+                variant=params.variant,
             )
 
         state_update.set_load_module(
@@ -171,12 +186,13 @@ class LoadModuleImplementation(
                 moduleId=loaded_module.module_id,
                 serialNumber=loaded_module.serial_number,
                 model=loaded_module.definition.model,
+                variant=params.variant,
             ),
             state_update=state_update,
         )
 
     def _ensure_module_location(
-        self, slot: DeckSlotName, module_type: ModuleType
+        self, slot: DeckSlotName, module_type: ModuleType, variant: Optional[str] = None
     ) -> None:
         # todo(mm, 2024-12-03): Theoretically, we should be able to deal with
         # addressable areas and deck configurations the same way between OT-2 and Flex.
@@ -189,7 +205,7 @@ class LoadModuleImplementation(
                     f"A {module_type.value} cannot be loaded into slot {slot}"
                 )
         else:
-            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
+            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type, variant)
             module_fixture = deck_configuration_provider.get_cutout_fixture(
                 cutout_fixture_id,
                 self._state_view.labware.get_deck_definition(),

@@ -1105,17 +1105,12 @@ class GeometryView:
                         and labware_definition is not None
                     ):
                         # TODO: Fix
-                        # EXCEPTION: If the module is a Vacuum Module and we are loading
+                        # If the module is a Vacuum Module and we are loading
                         # into its designated staging dock, do NOT raise.
                         is_vacuum_module = "vacuumModule" in module_at_location.model
                         is_staging_area = any(
                             char in location.addressableAreaName for char in "4"
                         )
-                        quirks = labware_definition.parameters.quirks
-                        if is_vacuum_module and quirks is not None:
-                            name = f"{module_at_location.model}Dock{location.addressableAreaName}"
-                            is_dock = f"{module_at_location.model}" in list(quirks)
-
                         if not (is_vacuum_module and is_staging_area):
                             # Otherwise, proceed with standard standard collision check
                             self._modules.raise_if_module_in_location(

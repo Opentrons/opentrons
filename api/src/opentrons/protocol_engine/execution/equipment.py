@@ -489,6 +489,7 @@ class EquipmentHandler:
         model: ModuleModel,
         location: AddressableAreaLocation,
         module_id: Optional[str],
+        variant: Optional[str] = None,
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
 
@@ -515,7 +516,7 @@ class EquipmentHandler:
                 HardwareModule(
                     serial_number=hw_mod.device_info["serial"],
                     definition=self._module_data_provider.get_definition(
-                        ModuleModel(hw_mod.model())
+                        ModuleModel(hw_mod.model()), variant=variant
                     ),
                 )
                 for hw_mod in self._hardware_api.attached_modules

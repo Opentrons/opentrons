@@ -12,6 +12,10 @@ from server_utils.fastapi_utils.light_router import LightRouter
 from .module_data_mapper import ModuleDataMapper
 from .module_identifier import ModuleIdentifier
 from .module_models import AttachedModule, ModuleCalibrationData
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.hardware import get_hardware
 from robot_server.service.json_api import (
     MultiBodyMeta,
@@ -40,6 +44,9 @@ async def get_attached_modules(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     module_identifier: Annotated[ModuleIdentifier, Depends(ModuleIdentifier)],
     module_data_mapper: Annotated[ModuleDataMapper, Depends(ModuleDataMapper)],
+    deck_configuration_store: Annotated[
+        DeckConfigurationStore, Depends(get_deck_configuration_store)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[AttachedModule]]:
     """Get a list of all attached modules."""
     if requested_version <= 2:
@@ -56,10 +63,19 @@ async def get_attached_modules(
         mod.module_id: mod for mod in module_calibration.load_all_module_calibrations()
     }
 
+    # Load any module variants from deck configuration
+    module_variants: Dict[str, str] = {}
+    deck_configuration = await deck_configuration_store.get_deck_configuration()
+    for fixture in deck_configuration:
+        _, _, sn, variant = fixture
+        if sn and variant:
+            module_variants[sn] = variant
+
     response_data: List[AttachedModule] = []
     for mod in hardware.attached_modules:
         serial_number = mod.device_info["serial"]
         calibrated = module_calibrations.get(serial_number)
+        variant = module_variants.get(serial_number)
         module_identity = module_identifier.identify(mod.device_info)
 
         response_data.append(
@@ -81,6 +97,7 @@ async def get_attached_modules(
                 )
                 if calibrated
                 else None,
+                module_variant=variant,
             )
         )
 

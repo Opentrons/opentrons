@@ -1862,9 +1862,11 @@ class VacuumModuleContext(ModuleContext):
         """Load a collar adapter to the vacuum module dock."""
 
         base_slot = self._core.get_deck_slot().id
-        area_name = f"{self.model}Dock{base_slot[0]}4"
+        # TODO: Make this get_variant()
+        variant = "Millipore"
+        base, ver = self.model.split("V")
+        area_name = f"{base}{variant}V{ver}Dock{base_slot[0]}4"
         location = AddressableAreaLocation(addressableAreaName=area_name)
-        # location = StagingSlotName.from_primitive(f"{self._core.get_deck_slot().id[0]}4")
         labware_core = self._protocol_core.load_adapter(
             load_name=name,
             namespace=namespace,
@@ -1906,7 +1908,12 @@ class VacuumModuleContext(ModuleContext):
             if drop_offset
             else None
         )
-        location = AddressableAreaLocation(addressableAreaName=f"{self.model}DockA4")
+        # TODO: Make this dynamic
+        variant = "Millipore"
+        base_slot = self._core.get_deck_slot().id
+        base, ver = self.model.split("V")
+        area_name = f"{base}{variant}V{ver}Dock{base_slot[0]}4"
+        location = AddressableAreaLocation(addressableAreaName=area_name)
         self._protocol_core.move_labware(
             labware._core,
             new_location=location,

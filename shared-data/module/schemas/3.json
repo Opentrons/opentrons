@@ -136,7 +136,11 @@
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule|vacuumModuleMillipore)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule|vacuumModule)V[0-9]+$"
+    },
+    "variant": {
+      "type": "string",
+      "pattern": "^(Millipore|Opentrons)+$"
     },
     "labwareOffset": {
       "$ref": "#/definitions/coordinates",

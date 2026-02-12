@@ -68,8 +68,8 @@ class AddressableArea:
 # TODO make the below some sort of better type
 # TODO This should instead contain a proper cutout fixture type
 DeckConfigurationType = List[
-    Tuple[str, str, Optional[str]]
-]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
+    Tuple[str, str, Optional[str], Optional[str]]
+]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number, variant
 
 
 # TODO(mm, 2023-05-10): Deduplicate with constants in

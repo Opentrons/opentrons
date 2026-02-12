@@ -714,6 +714,7 @@ class ProtocolCore(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
+        variant: Optional[str] = None,
     ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
@@ -737,10 +738,15 @@ class ProtocolCore(
             cmd.LoadModuleParams(
                 model=EngineModuleModel(model),
                 location=DeckSlotLocation(slotName=normalized_deck_slot),
+                variant=variant,
+                moduleId=None,
             )
         )
 
-        module_core = self._get_module_core(load_module_result=result, model=model)
+        module_core = self._get_module_core(
+            load_module_result=result,
+            model=model,
+        )
 
         # FIXME(mm, 2023-02-21):
         # We're wrongly doing this conflict check *after* we've already loaded the
