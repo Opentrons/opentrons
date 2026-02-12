@@ -24,6 +24,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
+from ..config import feature_flags
 from . import validation
 from ._command_annotations import GroupedSteps
 from ._liquid import Liquid, LiquidClass
@@ -1914,6 +1915,8 @@ class ProtocolContext(CommandPublisher):
             name: A name for the group of steps.
             description: An optional description for the step group.
         """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
         annotation_id = self._core.start_step_grouping(name, description)
         try:
             yield
@@ -1932,6 +1935,8 @@ class ProtocolContext(CommandPublisher):
             name: A name for the group of steps.
             description: An optional description for the step group.
         """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
         annotation_id = self._core.start_step_grouping(name, description)
         return GroupedSteps(
             annotation_id=annotation_id,
