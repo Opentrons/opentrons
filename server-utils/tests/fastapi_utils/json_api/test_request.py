@@ -1,27 +1,32 @@
 from typing import Any, Dict
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 from pytest import raises
 
 from server_utils.fastapi_utils.models.json_api import RequestModel
-from tests.service.helpers import ItemModel
 
 
-def test_attributes_as_dict():
+class ItemModel(BaseModel):
+    name: str
+    quantity: int
+    price: float
+
+
+def test_attributes_as_dict() -> None:
     DictRequest = RequestModel[dict]
     obj_to_validate = {"data": {"some_data": 1}}
     my_request_obj = DictRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == {"data": {"some_data": 1}}
 
 
-def test_attributes_as_item_model():
+def test_attributes_as_item_model() -> None:
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
     my_request_obj = ItemRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == obj_to_validate
 
 
-def test_attributes_as_item_model_empty_dict():
+def test_attributes_as_item_model_empty_dict() -> None:
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate: Dict[str, Any] = {"data": {}}
     with raises(ValidationError) as e:
@@ -52,7 +57,7 @@ def test_attributes_as_item_model_empty_dict():
     ]
 
 
-def test_attributes_required():
+def test_attributes_required() -> None:
     MyRequest = RequestModel[dict]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
@@ -69,7 +74,7 @@ def test_attributes_required():
     ]
 
 
-def test_data_required():
+def test_data_required() -> None:
     MyRequest = RequestModel[dict]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
@@ -86,7 +91,7 @@ def test_data_required():
     ]
 
 
-def test_request_with_id():
+def test_request_with_id() -> None:
     MyRequest = RequestModel[dict]
     obj_to_validate = {
         "data": {"type": "item", "attributes": {}, "id": "abc123"},

@@ -8,7 +8,7 @@ class ThingWithLink(BaseModel):
     links: ResourceLinks
 
 
-def test_follows_structure():
+def test_follows_structure() -> None:
     structure_to_validate = {
         "links": {
             "self": {"href": "/items/1", "meta": None},
@@ -18,7 +18,7 @@ def test_follows_structure():
     assert validated.model_dump() == structure_to_validate
 
 
-def test_must_be_self_key_with_string_value():
+def test_must_be_self_key_with_string_value() -> None:
     invalid_structure_to_validate = {
         "invalid": {
             "key": "value",
