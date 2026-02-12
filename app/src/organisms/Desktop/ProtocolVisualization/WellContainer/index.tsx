@@ -62,12 +62,11 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
       ? POSITION_REFERENCE_TOP
       : POSITION_REFERENCE_BOTTOM
     : POSITION_REFERENCE_BOTTOM
+  const zOffset = params.wellLocation.offset?.z ?? 1
+  const xOffset = params.wellLocation.offset?.x ?? 0
+
   const mmFromBottom = hasWellLocation
-    ? getMmFromBottom(
-        Number(params.wellLocation.z ?? 1),
-        reference,
-        labwareDepth
-      )
+    ? getMmFromBottom(zOffset, reference, labwareDepth)
     : null
 
   const wellHeightSvg = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
@@ -82,8 +81,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const roundedTipBottomY = lastTipBottomYRef.current
 
   if (hasWellLocation && xLabwareWellWidth != null && xLabwareWellWidth > 0) {
-    const xPositionSvg =
-      (wellWidthSvg / xLabwareWellWidth) * (params.wellLocation.x ?? 0)
+    const xPositionSvg = (wellWidthSvg / xLabwareWellWidth) * xOffset
     lastXPositionSvgRef.current = round(xPositionSvg, SVG_DECIMALS)
   }
   const roundedXPositionSvg = lastXPositionSvgRef.current
