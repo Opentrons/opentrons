@@ -1922,7 +1922,7 @@ class ProtocolContext(CommandPublisher):
             self._core.end_step_grouping(annotation_id)
 
     @requires_version(2, 29)
-    def create_step_group(
+    def create_and_start_step_group(
         self, name: str, description: Optional[str] = None
     ) -> GroupedSteps:
         """Starts a grouping of commands for visualization in run previews and the run log.

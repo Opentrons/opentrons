@@ -2273,7 +2273,7 @@ def test_group_steps(
     decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 
-def test_create_step_group(
+def test_create_and_start_step_group(
     decoy: Decoy,
     mock_core: ProtocolCore,
     subject: ProtocolContext,
@@ -2282,7 +2282,7 @@ def test_create_step_group(
     decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
         "my-annotation-id"
     )
-    step_group = subject.create_step_group("name", "desc")
+    step_group = subject.create_and_start_step_group("name", "desc")
     step_group.close_group()
     decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 

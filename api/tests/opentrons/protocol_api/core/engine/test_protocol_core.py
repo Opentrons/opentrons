@@ -2128,7 +2128,7 @@ def test_capture_image_with_run_specific_defaults(
     )
 
 
-def test_create_user_command_annotation(
+def test_start_step_grouping(
     decoy: Decoy,
     subject: ProtocolCore,
     mock_engine_client: EngineClient,
@@ -2148,7 +2148,7 @@ def test_create_user_command_annotation(
     assert result in subject.annotation_ids
 
 
-def test_create_user_command_annotation_raises_existing_annotation(
+def test_start_step_grouping_raises_existing_annotation(
     decoy: Decoy,
     subject: ProtocolCore,
     mock_engine_client: EngineClient,
@@ -2162,7 +2162,7 @@ def test_create_user_command_annotation_raises_existing_annotation(
         )
 
 
-def test_close_command_annotation(subject: ProtocolCore) -> None:
+def test_end_step_grouping(subject: ProtocolCore) -> None:
     """It should remove the annotation ID from the list of annotation IDs."""
     subject._annotation_ids = ["annotation-id"]
     assert "annotation-id" in subject.annotation_ids
@@ -2171,7 +2171,7 @@ def test_close_command_annotation(subject: ProtocolCore) -> None:
     assert len(subject.annotation_ids) == 0
 
 
-def test_close_command_annotation_raises(subject: ProtocolCore) -> None:
+def test_end_step_grouping_raises(subject: ProtocolCore) -> None:
     """It should raise if the annotation ID does not exist."""
     with pytest.raises(ValueError):
         subject.end_step_grouping("annotation-id")
