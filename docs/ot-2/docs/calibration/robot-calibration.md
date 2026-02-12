@@ -133,4 +133,4 @@ Upon completion, the Robot Settings screen updates the calibration status of you
 <figcaption>Robot Settings screen after calibration.</figcaption>
 
 
-Your OT-2 is now calibrated. For even greater precision, you can also calibrate the robot to any labware used in protocols. See the [Labware Calibration section](./labware-calibration.md) for more information.
+Your OT-2 is now calibrated. For even greater precision, you can also run Labware Position Check. This check aligns the robot to labware used in protocols. See the [Labware Calibration section](./labware-calibration.md) for more information.
