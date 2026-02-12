@@ -4,16 +4,19 @@ import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
+import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
+import { getNozzleText, partialNozzleMap } from './utils'
 
-import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { FieldProps, FieldPropsByName } from '../../types'
 
@@ -25,134 +28,92 @@ interface ExtendedPartialTipFieldProps extends FieldProps {
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
 ): JSX.Element {
-  const { updateValue, pipetteSpecs, propsForFields, stepType } = props
+  const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
-
+  const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
   const handleOpen = (): void => {
     setIsNozzleAndWellModalOpen(true)
   }
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
+  const nozzleConfiguration =
+    (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
+  const partialNozzleCount =
+    partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
-  const { channels } = pipetteSpecs
-  const tipracks = Object.values(deckSetup.labware).filter(
-    labware => labware.def.parameters.isTiprack
-  )
-  const tipracksNotOnAdapter = tipracks.filter(
-    tiprack => tiprack.stack.length === 2
-  )
-  const areAllTipracksOnAdapter = tipracksNotOnAdapter.length === 0
-
-  const options: DropdownOption[] = [
-    {
-      name: t('all_nozzles'),
-      value: ALL,
-    },
-  ]
-  if (channels === 96) {
-    options.push(
-      ...[
-        {
-          name: t('single_nozzle'),
-          value: SINGLE,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-        {
-          name: t('single_column_of_nozzles'),
-          value: COLUMN,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-      ]
-    )
-  }
-  if (channels !== 8) {
-    options.push({
-      name: t('single_row_of_nozzles'),
-      value: ROW,
-      disabled: areAllTipracksOnAdapter,
-      tooltipText: areAllTipracksOnAdapter
-        ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
-        : null,
-    })
-  }
-  if (channels === 8) {
-    // 8-channel
-    options.push({
-      name: t('single_nozzle'),
-      value: SINGLE,
-    })
-    options.push({
-      name: t('partial_nozzles'),
-      value: PARTIAL,
-    })
-  }
-  let aspWellsLength: number
-  let dspWellsLength: number
+  let aspWells: string[] = []
   switch (stepType) {
     case 'mix':
-      aspWellsLength =
-        deckSetup.labware[
-          propsForFields.labware.value as string
-        ].def.ordering.flat().length
-      dspWellsLength = 0
+      aspWells = propsForFields.wells
+        ? (propsForFields.wells.value as [])
+        : aspWells
       break
     case 'transfer':
-      aspWellsLength =
-        deckSetup.labware[
-          propsForFields.aspirate_labware.value as string
-        ]?.def.ordering.flat().length ?? 0
-      dspWellsLength =
-        deckSetup.labware[
-          propsForFields.dispense_labware.value as string
-        ]?.def.ordering.flat().length ?? 0
+      aspWells = propsForFields.aspirate_wells.value as []
       break
-    default:
-      aspWellsLength = 0
-      dspWellsLength = 0
   }
+  const aspWellsLength = aspWells.length
+  const dspWells = propsForFields.dispense_wells
+    ? (propsForFields.dispense_wells.value as [])
+    : []
+  const dspWellsLength = dspWells.length
 
-  const [selectedValue, setSelectedValue] =
-    useState<NozzleConfigurationStyle>(ALL)
-  const nozzle = 'A1'
-  const getNozzleWellText = (): string => {
-    switch (selectedValue) {
+  function getNozzleWellText(
+    primaryNozzle: PrimaryNozzleConfigurationStyle,
+    nozzleConfiguration: NozzleConfigurationStyle,
+    stepType: string
+  ): string {
+    const nozzleText = getNozzleText(
+      primaryNozzle,
+      nozzleConfiguration,
+      partialNozzleCount
+    )
+    if (
+      nozzleText === null ||
+      aspWells.length === 0 ||
+      (stepType !== 'Mix' && dspWells.length === 0)
+    ) {
+      return t('no_nozzles_and_wells_selected')
+    }
+
+    switch (nozzleConfiguration) {
       case ROW:
       case COLUMN:
-        const selectedValueText = selectedValue.toLowerCase() + 's'
-        return t('nozzles_selected', {
-          nozzleSelection: 'Left' + selectedValueText + ' nozzles',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: selectedValueText,
-        })
+        const selectedValueText = nozzleConfiguration.toLowerCase()
+        if (stepType === 'transfer') {
+          return t('transfer_nozzles_selected', {
+            nozzleSelection: nozzleText + selectedValueText + ' nozzles',
+            aspWells: aspWellsLength,
+            dispWells: dspWellsLength,
+            positionType: selectedValueText,
+          })
+        } else {
+          return t('mix_nozzles_selected', {
+            nozzleSelection: nozzleText + selectedValueText + ' nozzles',
+            aspWells: aspWellsLength,
+          })
+        }
+
       case ALL:
-        return t('nozzles_selected', {
-          nozzleSelection: 'All nozzles',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: 'wells',
-        })
       case SINGLE:
-        return t('nozzles_selected', {
-          nozzleSelection: nozzle + ' nozzle',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: 'wells',
-        })
       case PARTIAL:
-        return t('nozzles_selected', {
-          nozzleSelection: nozzle.length + ' nozzles',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: 'wells',
-        })
+        if (stepType === 'transfer') {
+          return t('transfer_nozzles_selected', {
+            nozzleSelection: nozzleText,
+            aspWells: aspWellsLength,
+            dispWells: dspWellsLength,
+            positionType: 'wells',
+          })
+        } else {
+          return t('mix_nozzles_selected', {
+            nozzleSelection: nozzleText + ' nozzles',
+            aspWells: aspWellsLength,
+          })
+        }
       default:
         return t('no_nozzles_and_wells_selected')
     }
@@ -162,7 +123,7 @@ export function ExtendedPartialTipField(
       <div className={styles.nozzle_selection_text}>
         <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
-            {getNozzleWellText()}
+            {getNozzleWellText(primaryNozzle, nozzleConfiguration, stepType)}
           </StyledText>
         </ListButton>
       </div>
@@ -171,13 +132,9 @@ export function ExtendedPartialTipField(
           showModal={setIsNozzleAndWellModalOpen}
           totalSteps={3}
           pipetteSpecs={pipetteSpecs}
-          updateValue={updateValue}
-          setSelectedValue={setSelectedValue}
-          options={options}
           deckSetup={deckSetup}
           propsForFields={propsForFields}
           stepType={stepType}
-          value={selectedValue as NozzleConfigurationStyle}
         />
       ) : null}
     </>

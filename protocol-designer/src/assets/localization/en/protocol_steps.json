@@ -150,6 +150,7 @@
   "multi_dispense_options": "Disposal volume",
   "new_location": "New location",
   "no_tiprack": "No tiprack available",
+  "no_nozzles_and_wells_selected": "No nozzles and wells selected",
   "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "num_nozzles": "{{num}} nozzles",
   "number_of_nozzles_used": "Number of nozzles used",
