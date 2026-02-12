@@ -7,45 +7,17 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  PARTIAL,
-} from '@opentrons/shared-data'
+import { PARTIAL } from '@opentrons/shared-data'
 
-import { EightChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/EightChannelFlexShadow'
-import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/EightChannelOT2Shadow'
-import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
-import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
-import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
 import styles from './nozzleandwellwizard.module.css'
+import { NozzleRender } from './NozzleRender'
 
-import type { Channels, DropdownOption } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
   RobotType,
 } from '@opentrons/shared-data'
-import type { PipetteShadowProps } from '../TipSelectionWizard/types'
-
-const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
-  RobotType,
-  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
-> = {
-  [OT2_ROBOT_TYPE]: {
-    1: SingleChannelOT2Shadow,
-    8: EightChannelOT2Shadow,
-    96: () => {
-      console.warn('96-channel not supported on OT-2')
-      return <></>
-    },
-  },
-  [FLEX_ROBOT_TYPE]: {
-    1: SingleChannelFlexShadow,
-    8: EightChannelFlexShadow,
-    96: NinetySixChannelFlexShadow,
-  },
-}
 
 interface PipetteNozzleSelectorProps {
   pipetteSpecs: PipetteV2Specs
@@ -67,25 +39,10 @@ export function PipetteNozzleSelector(
     value: nozzleMode,
     setSelectedValue,
   } = props
-  const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
-  const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
+  const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
 
   const [partialNozzleCount, setPartialNozzleCount] = useState<string>('2')
-
-  const width = frontRightCorner[0] - backLeftCorner[0]
-  const height = backLeftCorner[1] - frontRightCorner[1]
-
-  const outlineProps = {
-    fill: COLORS.white,
-    stroke: COLORS.grey50,
-    x: -16,
-    y: -41.5,
-    width: width,
-    height: height,
-    rotate: false,
-  }
-
   const is96Channel = channels === 96
   const nozzles = Array.from({ length: 6 }, (_, i) => String(i + 2))
 
@@ -94,8 +51,6 @@ export function PipetteNozzleSelector(
     value: num,
   }))
 
-  const OutlineComponent =
-    SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
   const isPartialNozzle = nozzleMode === PARTIAL
   return (
     <>
@@ -129,15 +84,23 @@ export function PipetteNozzleSelector(
             className={is96Channel ? styles.column_wrapper : styles.row_wrapper}
           >
             <div style={{ height: '100%' }}>
-              {!is96Channel && <OutlineComponent {...outlineProps} />}
+              {!is96Channel && (
+                <NozzleRender
+                  robotType={robotType}
+                  pipetteSpecs={pipetteSpecs}
+                />
+              )}
             </div>
-
             <div className={styles.column_wrapper}>
               <StyledText desktopStyle="bodyLargeSemiBold">
                 {displayName}
               </StyledText>
-
-              {is96Channel && <OutlineComponent {...outlineProps} />}
+              {is96Channel && (
+                <NozzleRender
+                  robotType={robotType}
+                  pipetteSpecs={pipetteSpecs}
+                />
+              )}
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={isPartialNozzle ? COLORS.grey60 : COLORS.black90}

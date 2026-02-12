@@ -43,7 +43,9 @@
   background-color: var(--grey-20);
   gap: var(--spacing-16);
 }
-
+.nozzle_render {
+align-items: center;
+}
 .select_well_alignment {
   display: flex;
   flex-direction: row;
