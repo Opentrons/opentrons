@@ -73,6 +73,14 @@ export function LabwareSlotContainer(
       ? labwareLoadCommandParams.displayName
       : null
   const { params } = currentCommand
+  const commandWellName =
+    'wellName' in params && typeof params.wellName === 'string'
+      ? params.wellName
+      : null
+  const commandLabwareId =
+    'labwareId' in params && typeof params.labwareId === 'string'
+      ? params.labwareId
+      : null
   const labwareDef = labwareEntities[topLabwareOnSlotId].def
   const labwareDisplayName = labwareDef.metadata.displayName
 
@@ -93,10 +101,14 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
+  const selectedWellName =
+    commandLabwareId === topLabwareOnSlotId && commandWellName != null
+      ? commandWellName
+      : activeWellName
   const wellGroup: WellGroup | null =
-    activeWellName != null
+    selectedWellName != null
       ? {
-          [activeWellName]: null,
+          [selectedWellName]: null,
         }
       : null
   const hoveredWellGroup: WellGroup | null =
@@ -112,8 +124,8 @@ export function LabwareSlotContainer(
       ? liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
       : null
   const labwareLocationLiquidState =
-    activeWellName != null
-      ? liquidState.labware[topLabwareOnSlotId]?.[activeWellName]
+    selectedWellName != null
+      ? liquidState.labware[topLabwareOnSlotId]?.[selectedWellName]
       : null
 
   const tipMaxVolume =
@@ -137,12 +149,12 @@ export function LabwareSlotContainer(
 
   return (
     <>
-      {activeWellName != null ? (
+      {selectedWellName != null ? (
         <WellContainer
           wells={wells}
           params={params}
-          activeWellName={activeWellName}
-          wellColor={wellFill[activeWellName]}
+          activeWellName={selectedWellName}
+          wellColor={wellFill[selectedWellName]}
           labwareLocationLiquidState={labwareLocationLiquidState}
           pipetteLocationLiquidState={pipetteLocationLiquidState}
           liquids={liquids}
