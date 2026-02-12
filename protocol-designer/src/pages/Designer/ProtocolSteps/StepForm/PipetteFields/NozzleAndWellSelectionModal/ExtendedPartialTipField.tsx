@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
+import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -30,44 +31,36 @@ export function ExtendedPartialTipField(
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
-
+  const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
   const handleOpen = (): void => {
     setIsNozzleAndWellModalOpen(true)
   }
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
-
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
+  const nozzleConfiguration =
+    (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
   const partialNozzleCount =
     partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
-  let aspWellsLength: number
-  let dspWellsLength: number
+  let aspWells: string[] = []
   switch (stepType) {
     case 'mix':
-      aspWellsLength =
-        deckSetup.labware[
-          propsForFields.labware.value as string
-        ].def.ordering.flat().length
-      dspWellsLength = 0
+      aspWells = propsForFields.wells
+        ? (propsForFields.wells.value as [])
+        : aspWells
       break
     case 'transfer':
-      aspWellsLength =
-        deckSetup.labware[
-          propsForFields.aspirate_labware.value as string
-        ]?.def.ordering.flat().length ?? 0
-      dspWellsLength =
-        deckSetup.labware[
-          propsForFields.dispense_labware.value as string
-        ]?.def.ordering.flat().length ?? 0
+      aspWells = propsForFields.aspirate_wells.value as []
       break
-    default:
-      aspWellsLength = 0
-      dspWellsLength = 0
   }
+  const aspWellsLength = aspWells.length
+  const dspWells = propsForFields.dispense_wells
+    ? (propsForFields.dispense_wells.value as [])
+    : []
+  const dspWellsLength = dspWells.length
 
   function getNozzleWellText(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
@@ -79,9 +72,14 @@ export function ExtendedPartialTipField(
       nozzleConfiguration,
       partialNozzleCount
     )
-    if (nozzleText === null) {
+    if (
+      nozzleText === null ||
+      aspWells.length === 0 ||
+      (stepType !== 'Mix' && dspWells.length === 0)
+    ) {
       return t('no_nozzles_and_wells_selected')
     }
+
     switch (nozzleConfiguration) {
       case ROW:
       case COLUMN:

@@ -180,6 +180,46 @@ const mockFlexStacker = {
   usbPort: { hub: 1, port: 3, path: '/dev/ot_module_flexstacker0' },
 } as any
 
+const mockVacuumModule = {
+  id: 'vacuum_id',
+  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleType: 'vacuumModuleType',
+  serialNumber: 'vac123',
+  hardwareRevision: 'vacuum_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: false,
+  data: {
+    currentPressure: null,
+    targetPressure: null,
+    currentPower: null,
+    targetPower: null,
+    ventStatus: 'closed',
+    modeType: 'pressure',
+    status: 'idle',
+  },
+  usbPort: { hub: 1, port: 4, path: '/dev/ot_module_vacuum0' },
+} as any
+
+const mockVacuumModuleActive = {
+  id: 'vacuum_id_active',
+  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleType: 'vacuumModuleType',
+  serialNumber: 'vac456',
+  hardwareRevision: 'vacuum_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: false,
+  data: {
+    currentPressure: 500,
+    targetPressure: 500,
+    currentPower: null,
+    targetPower: null,
+    ventStatus: 'open',
+    modeType: 'pressure',
+    status: 'running',
+  },
+  usbPort: { hub: 1, port: 4, path: '/dev/ot_module_vacuum0' },
+} as any
+
 describe('useLatchControls', () => {
   const store: Store<any> = legacy_createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
@@ -673,6 +713,69 @@ describe('useModuleOverflowMenu', () => {
     })
 
     expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
+  })
+
+  it.only('should return vacuum module menu items and call handleSlideoutClick when module is idle', () => {
+    const mockHandleSlideoutClick = vi.fn()
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
+      children,
+    }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    console.log('mockVacuumModule', mockVacuumModule)
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockVacuumModule,
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          mockHandleSlideoutClick,
+          false,
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const vacuumMenu = menuOverflowItemsByModuleType.vacuumModuleType
+
+    expect(vacuumMenu).toHaveLength(2)
+    act(() => vacuumMenu[0].onClick(false))
+    expect(mockHandleSlideoutClick).toHaveBeenCalled()
+  })
+
+  it('should return vacuum module menu with close vent option when vent is open', () => {
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
+      children,
+    }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockVacuumModuleActive,
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          false,
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const vacuumMenu = menuOverflowItemsByModuleType.vacuumModuleType
+
+    expect(vacuumMenu).toHaveLength(2)
+    expect(vacuumMenu[1].menuButtons).toHaveLength(1)
   })
 })
 

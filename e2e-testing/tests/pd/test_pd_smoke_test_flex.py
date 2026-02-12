@@ -29,7 +29,7 @@ PROTOCOL_PATH = "fixtures/protocol/9/smoke_flex_setup.py"
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
+def test_pd_combined_smoke_flow(page: Page, pd_base_url: str) -> None:
     """Run a compact smoke flow that covers the requested module interactions.
 
     Steps:

@@ -2,9 +2,10 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.scopes import Scope
+
 from auth_server.oauth2.backend import Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
-from auth_server.users.scopes import Scope
 
 router = fastapi.APIRouter()
 
@@ -23,7 +24,7 @@ async def post_users(
         http_method=request.method,  # type: ignore[arg-type]
         body=(await request.body()).decode("utf-8"),
         headers=dict(request.headers),
-        scopes=scopes_required,
+        scopes=[scope.api_name for scope in scopes_required],
     )
     if valid:
         return fastapi.Response(status_code=fastapi.status.HTTP_200_OK)

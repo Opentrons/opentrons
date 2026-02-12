@@ -3,7 +3,12 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ModalShell, PrimaryButton, WizardHeader } from '@opentrons/components'
+import {
+  ModalShell,
+  PrimaryButton,
+  SecondaryButton,
+  WizardHeader,
+} from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -47,6 +52,9 @@ export function NozzleAndWellSelectionModal(
   const handleContinue = (): void => {
     setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
   }
+  const handleBack = (): void => {
+    setCurrentStepIndex(currentStepIndex => currentStepIndex - 1)
+  }
   const handleClose = (): void => {
     showModal(false)
   }
@@ -57,6 +65,7 @@ export function NozzleAndWellSelectionModal(
   const wellSelectorBaseProps = {
     ...nozzleAndWellSelectionBaseModalProps,
     deckSetup,
+    pipetteSpecs,
   }
   function getStepComponent(): JSX.Element {
     switch (currentStepIndex) {
@@ -99,6 +108,12 @@ export function NozzleAndWellSelectionModal(
     : false
   const footerElement = (
     <div className={styles.modal_footer}>
+      {currentStepIndex !== 0 ? (
+        <SecondaryButton onClick={handleBack}>
+          {t('shared:go_back')}
+        </SecondaryButton>
+      ) : null}
+
       <PrimaryButton
         onClick={isLastStep || isLastStepOfMix ? handleClose : handleContinue}
       >

@@ -8,7 +8,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  ALL,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   PARTIAL,
@@ -176,8 +175,7 @@ export function PipetteNozzleSelector(
                   }
                 />
               )}
-              {nozzleConfiguration !== ALL &&
-              nozzleConfiguration !== PARTIAL ? (
+              {nozzleConfiguration !== PARTIAL ? (
                 <>
                   <StyledText>
                     {'Placeholder primary nozzle selector'}

@@ -9,6 +9,7 @@ from decoy import Decoy
 from fastapi.responses import FileResponse
 
 from opentrons.protocol_engine import EngineStatus
+from server_utils.fastapi_utils.models.json_api.request import RequestModel
 
 from robot_server.runs.router.camera_router import (
     add_camera_capture_image_settings,
@@ -17,7 +18,6 @@ from robot_server.runs.router.camera_router import (
 )
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
 

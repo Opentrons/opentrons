@@ -50,9 +50,7 @@ class SyncClient:
         self._transport = transport
 
     def execute_command(
-        self,
-        params: commands.CommandParams,
-        command_annotations: Optional[list[str]] = None,
+        self, params: commands.CommandParams, command_annotations: list[str]
     ) -> None:
         """Execute a ProtocolEngine command, including error recovery.
 
@@ -72,7 +70,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadLabwareParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadLabwareResult:
         pass
 
@@ -80,7 +78,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.CreateTimerParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.CreateTimerResult:
         pass
 
@@ -88,7 +86,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.temperature_module.SetTargetTemperatureParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.temperature_module.SetTargetTemperatureResult:
         pass
 
@@ -96,7 +94,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.thermocycler.StartRunExtendedProfileParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.thermocycler.StartRunExtendedProfileResult:
         pass
 
@@ -104,7 +102,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.heater_shaker.SetTargetTemperatureParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.heater_shaker.SetTargetTemperatureResult:
         pass
 
@@ -112,7 +110,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.heater_shaker.SetShakeSpeedParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.heater_shaker.SetShakeSpeedResult:
         pass
 
@@ -120,7 +118,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.thermocycler.SetTargetBlockTemperatureParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
         pass
 
@@ -128,7 +126,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.thermocycler.SetTargetLidTemperatureParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.thermocycler.SetTargetLidTemperatureResult:
         pass
 
@@ -136,7 +134,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadModuleParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadModuleResult:
         pass
 
@@ -144,7 +142,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadPipetteParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadPipetteResult:
         pass
 
@@ -152,7 +150,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadLidStackParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadLidStackResult:
         pass
 
@@ -160,7 +158,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadLidParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadLidResult:
         pass
 
@@ -168,7 +166,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LiquidProbeParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LiquidProbeResult:
         pass
 
@@ -176,7 +174,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.TryLiquidProbeParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.TryLiquidProbeResult:
         pass
 
@@ -184,7 +182,7 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.LoadLiquidClassParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.LoadLiquidClassResult:
         pass
 
@@ -192,14 +190,14 @@ class SyncClient:
     def execute_command_without_recovery(
         self,
         params: commands.GetNextTipParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.GetNextTipResult:
         pass
 
     def execute_command_without_recovery(
         self,
         params: commands.CommandParams,
-        command_annotations: Optional[list[str]] = None,
+        command_annotations: list[str],
     ) -> commands.CommandResult:
         """Execute a ProtocolEngine command.
 
@@ -256,4 +254,18 @@ class SyncClient:
             "set_pipette_movement_speed",
             pipette_id=pipette_id,
             speed=speed,
+        )
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str] = None,
+    ) -> str:
+        """Creates a command annotation and returns the annotation ID."""
+        return self._transport.call_method(  # type: ignore[no-any-return]
+            "create_user_command_annotation",
+            annotation_name=annotation_name,
+            description=description,
+            annotation_id=annotation_id,
         )

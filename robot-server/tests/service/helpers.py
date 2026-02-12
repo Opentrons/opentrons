@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 
-from robot_server.service.json_api import DeprecatedResponseDataModel
-from robot_server.service.json_api.request import RequestModel
+from server_utils.fastapi_utils.models.json_api import (
+    DeprecatedResponseDataModel,
+    RequestModel,
+)
 
 
 class ItemModel(BaseModel):

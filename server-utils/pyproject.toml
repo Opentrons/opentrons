@@ -55,8 +55,7 @@ max-complexity = 9
 "server_utils/util.py" = ["ANN", "D"]
 "server_utils/fastapi_utils/service/*" = ["ANN", "D"]
 "server_utils/_version.py" = ["I"]
-"tests/fastapi_utils/service/*" = ["ANN", "D"]
-"tests/test_util.py" = ["ANN", "D"]
+"tests/*" = ["D"]
 [tool.ruff.lint.isort]
 known-local-folder = ["server_utils"]
 
