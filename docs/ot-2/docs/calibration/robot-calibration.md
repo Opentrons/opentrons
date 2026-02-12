@@ -31,7 +31,7 @@ Deck calibration helps the OT-2 understand deck location and size. This calibrat
   <tbody>
     <tr>
       <th>How it works</th>
-      <td>During deck calibration, the Opentrons App guides you to <a href="../jog-controls">manually jog</a> the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of these marks on the deck.</td>
+      <td>During deck calibration, the Opentrons App shows you how to use the <a href="../jog-controls/">jog controls</a> to move the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of these marks on the deck.</td>
     </tr>
     <tr>
       <th>When to calibrate</th>
@@ -77,7 +77,7 @@ Pipette offset calibration calculates the precise X, Y, and Z position of the pi
   <tbody>
     <tr>
       <th>How it works</th>
-      <td>During pipette offset calibration, the robot moves the pipette to a known slot on the deck. You manually jog the pipette until the nozzle is perfectly centered over a specific reference point. The OT-2 saves this adjustment (the "offset") and applies it to every movement that pipette makes.</td>
+      <td>During pipette offset calibration, the robot moves the pipette to a known slot on the deck. You manually <a href="../jog-controls/">jog the pipette</a> until the nozzle is perfectly centered over a specific reference point. The OT-2 saves this adjustment (the "offset") and applies it to every movement that pipette makes.</td>
     </tr>
     <tr>
       <th>When to calibrate</th>
@@ -101,13 +101,13 @@ The calibration controls are located in the Robot Settings section of the Opentr
 
 1. Click the **Devices** tab in the Opentrons App.
 
-2. Find your robot in the list and click on it to open the **Robot details** page.
+2. Find your OT-2 in the devices list and click on it to open the robot details page.
 
-3. Click the three-dot menu (⋮) and select **Robot settings**. This opens the Calibration tab in the Settings screen. Note: if your robot has never been calibrated or the calibration data was reset, the robot shows a small warning label, "Missing calibration data."
+3. Click the three-dot menu (⋮) and select **Robot settings**. This opens the Calibration tab in the Robot Settings screen.
 
     <figure class="screenshot" markdown>
     ![Robot settings showing calibration status and action button](../images/calibration-launch.png)
-    <figcaption>Starting the robot calibration process.</figcaption>
+    <figcaption>Robot Settings showing that an OT-2 needs calibration.</figcaption>
     </figure>
 
 4. Click **Launch Calibration**. This opens the calibration status dashboard.
@@ -125,11 +125,12 @@ The calibration controls are located in the Robot Settings section of the Opentr
 
 Upon completion, the Robot Settings screen updates the calibration status of your OT-2.
 
-- The status banner shows "Calibration complete."
-- The app updates the calibration date and timestamps for the deck, pipette offsets, and and tip length sections.
+- The status changes to "Calibration complete."
+- The app updates the calibration date/timestamps for the deck, pipette offsets, and tip length sections.
 
 <figure class="screenshot" markdown>
 ![Robot Settings showing updated date/time stamps for a calibrated robot](../images/calibration-complete.png)
 <figcaption>Robot Settings screen after calibration.</figcaption>
 
-Your OT-2 is ready to run protocols or perform any labware position checks, as required.
+
+Your OT-2 is now calibrated. For even greater precision, you can also calibrate the robot to any labware used in protocols. See the [Labware Calibration section](./labware-calibration.md) for more information.
