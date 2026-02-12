@@ -174,6 +174,8 @@ def offset_for_channel(channel: int, layout: str) -> Point:
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+    if ctx.params.return_tip and ctx.params.layout is not "Full":  # type: ignore [attr-defined]
+        raise RuntimeError("Don't use return tip with anything but full layout")
     dial = None
     if IS_ROBOT and not ctx.is_simulating():
         dial = find_dial()
