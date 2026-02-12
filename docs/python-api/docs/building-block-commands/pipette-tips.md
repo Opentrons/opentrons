@@ -117,16 +117,16 @@ pipette.pick_up_tip() #picks up the next tip
 
 # alternate drop tip location in the specified trash
 pipette.drop_tip(
-    location=trash,
+    location=secondary_trash,
     alternate_drop_location=True)
 pipette.pick_up_tip() # picks up the next tip
 pipette.drop_tip(
-    location=trash,
+    location=secondary_trash,
     alternate_drop_location=True)
 ```
 *New in version 2.28*
 
-In the example above, the pipette drops each tip in a slightly different location in the `trash`.  
+In the example above, the pipette drops each tip in a slightly different location in the `secondary_trash`.  
 
 ## Returning a tip
 
