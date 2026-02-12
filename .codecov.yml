@@ -30,7 +30,6 @@ ignore:
   - '**/build/**/*'
   - '**/dist/**/*'
   - '**/node_modules/**/*'
-  - '**/cypress/**/*'
   - '**/{test,tests,__tests__,__mocks__,mocks}/**/*'
   - '**/*.{md,yaml,yml,json,rst}'
   - '**/Makefile'
