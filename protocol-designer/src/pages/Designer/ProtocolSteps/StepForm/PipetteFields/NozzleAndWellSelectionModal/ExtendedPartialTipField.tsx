@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  PARTIAL,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
+import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -30,17 +37,17 @@ export function ExtendedPartialTipField(
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
-
+  const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
   const handleOpen = (): void => {
     setIsNozzleAndWellModalOpen(true)
   }
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
-
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
+  const nozzleConfiguration =
+    (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
   const partialNozzleCount =
     partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
