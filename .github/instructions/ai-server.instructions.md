@@ -91,14 +91,14 @@ All targets run from the `opentrons-ai-server/` directory.
 
 ### Development workflow
 
-| Target            | What it does                                                              |
-| ----------------- | ------------------------------------------------------------------------- |
-| `make setup`      | Install all deps (`uv sync --frozen --extra dev`)                         |
-| `make teardown`   | Delete `.venv/`                                                           |
-| `make format`     | Auto-fix lint issues + format code with ruff, then prettier for .md/.json |
-| `make lint`       | Check lint (ruff) + type check (mypy) — no auto-fix                       |
-| `make prep`       | `format` then `lint` then `unit-test`                                     |
-| `make unit-test`  | Run unit tests (`pytest tests -m unit`)                                   |
+| Target           | What it does                                                              |
+| ---------------- | ------------------------------------------------------------------------- |
+| `make setup`     | Install all deps (`uv sync --frozen --extra dev`)                         |
+| `make teardown`  | Delete `.venv/`                                                           |
+| `make format`    | Auto-fix lint issues + format code with ruff, then prettier for .md/.json |
+| `make lint`      | Check lint (ruff) + type check (mypy) — no auto-fix                       |
+| `make prep`      | `format` then `lint` then `unit-test`                                     |
+| `make unit-test` | Run unit tests (`pytest tests -m unit`)                                   |
 
 ### Running locally
 
