@@ -101,6 +101,7 @@ class TransferPage(BasePage):
 
     def transfer_continue_to_next_step(self) -> None:
         """Click continue to next step button in transfer step."""
+        self.dismiss_release_notes_toast()
         self.page.get_by_text("Continue").click()
 
     def go_back_to_previous_step(self) -> None:
