@@ -54,16 +54,16 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
   const labwareWellMaxVolume = wells.A1.totalLiquidVolume
-  const hasWellLocation = 'wellLocation' in params
+  const wellLocation = 'wellLocation' in params ? params.wellLocation : null
+  const hasWellLocation = wellLocation != null
 
   //  TODO: add support for rest of references
-  const reference = hasWellLocation
-    ? params.wellLocation.origin === 'top'
+  const reference =
+    wellLocation?.origin === 'top'
       ? POSITION_REFERENCE_TOP
       : POSITION_REFERENCE_BOTTOM
-    : POSITION_REFERENCE_BOTTOM
-  const zOffset = params.wellLocation.offset?.z ?? 1
-  const xOffset = params.wellLocation.offset?.x ?? 0
+  const zOffset = wellLocation?.offset?.z ?? 1
+  const xOffset = wellLocation?.offset?.x ?? 0
 
   const mmFromBottom = hasWellLocation
     ? getMmFromBottom(zOffset, reference, labwareDepth)
