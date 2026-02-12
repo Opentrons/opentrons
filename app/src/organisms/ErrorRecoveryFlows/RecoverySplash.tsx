@@ -208,6 +208,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             <StepInfo
               {...props}
               oddStyle="level3HeaderBold"
+              display="-webkit-box"
               overflow="hidden"
               overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
               color={COLORS.white}
@@ -263,6 +264,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
               <StepInfo
                 {...props}
                 desktopStyle="bodyDefaultRegular"
+                display="-webkit-box"
                 overflow="hidden"
                 overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
                 textAlign={TEXT_ALIGN_CENTER}

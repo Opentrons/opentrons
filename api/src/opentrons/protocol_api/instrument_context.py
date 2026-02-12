@@ -1075,11 +1075,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 position.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
-        <!-- TODO: uncomment when 2.28 is released
             flow_rate: The absolute flow rate in µL/s.
 
                 *New in version 2.28*
-        -->
 
         Raises:
             RuntimeError: If no location is specified and the location cache is `None`.
@@ -1218,13 +1216,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Raises:
             UnexpectedTipRemovalError: If no tip is attached to the pipette.
-            RuntimeError: If no location is specified and the location cache is `None`.
-                This should happen if `touch_tip()` is called without first calling a
-                method that takes a location, like
-                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
-                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
-                              Also raises RuntimeError if location is in a labware with
-                              `touchTipDisabled` quirk.
+            RuntimeError: 
+                - If no location is specified and the location cache is `None`.
+                    This should happen if `touch_tip()` is called without first calling a
+                    method that takes a location, like
+                    [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+                    [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
+                - If location is in a labware with `touchTipDisabled` quirk.
             ValueError: If both `mm_from_edge` and `radius` are specified.
 
         Returns:
@@ -1232,10 +1230,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.24:* Added the `mm_from_edge` parameter.
 
-        <!-- TODO: uncomment when 2.28 is released
         *Changed in version 2.28:*
-            Raises an error if touching tip on a labware with the `touchTipDisabled` quirk.
-        -->
+            The API will raise an error if touching tip on a labware with the `touchTipDisabled` quirk, like reservoirs or well plates with large wells.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)

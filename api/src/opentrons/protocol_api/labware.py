@@ -1385,6 +1385,7 @@ class Labware:
         be available to pick up via automatic tip tracking. If an empty well is filled with tips,
         [`reset()`][opentrons.protocol_api.Labware.reset] can be called to treat it as
         a fresh tip rack.
+        be available to pick up via automatic tip tracking.
 
         The API will raise an error if the labware is not a tip rack.
         """
