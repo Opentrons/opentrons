@@ -40,7 +40,7 @@ app.include_router(users_router)
 # uses a fragile version tag.
 # https://github.com/Redocly/redoc/issues/2743
 # https://github.com/fastapi/fastapi/pull/9700
-@app.get("/redoc", include_in_schema=False)
+@app.get("/auth/redoc", include_in_schema=False)
 async def redoc_html() -> HTMLResponse:  # noqa: D103
     if app.openapi_url is None:
         raise RuntimeError(
