@@ -145,7 +145,7 @@ export type FlexModuleCutoutFixtureId =
   | 'absorbanceReaderV1'
   | 'flexStackerModuleV1'
   | 'flexStackerModuleV1WithMagneticBlockV1'
-  | 'vacuumModuleMilliporeV1'
+  | 'vacuumModuleV1'
 
 export type OT2SingleStandardSlot = 'singleStandardSlot'
 

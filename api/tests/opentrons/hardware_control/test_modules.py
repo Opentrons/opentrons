@@ -122,7 +122,7 @@ async def test_module_caching() -> None:
         (HeaterShakerModuleModel.HEATER_SHAKER_V1, HeaterShaker),
         (AbsorbanceReaderModel.ABSORBANCE_READER_V1, AbsorbanceReader),
         (FlexStackerModuleModel.FLEX_STACKER_V1, FlexStacker),
-        (VacuumModuleModel.VACUUM_MODULE_MILLIPORE_V1, VacuumModule),
+        (VacuumModuleModel.VACUUM_MODULE_V1, VacuumModule),
     ],
 )
 async def test_create_simulating_module(

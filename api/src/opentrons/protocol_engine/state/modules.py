@@ -1461,10 +1461,7 @@ class ModuleView:
             # loaded to column 3 but the addressable area is in column 4
             assert deck_slot.value[-1] == "3"
             return f"flexStackerModuleV1{deck_slot.value[0]}4"
-        elif model in [
-            ModuleModel.VACUUM_MODULE_MILLIPORE_V1,
-            ModuleModel.VACUUM_MODULE_OPENTRONS_V1,
-        ]:
+        elif model in [ModuleModel.VACUUM_MODULE_V1]:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
             return f"{model.value}{deck_slot.value}"

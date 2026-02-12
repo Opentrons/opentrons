@@ -23,7 +23,7 @@ import {
   THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
 } from './constants'
 
 import type {
@@ -35,6 +35,7 @@ import type {
 
 // TODO(bc, 2021-09-18): generate typescript types directly from JSON schema
 // having to maintain TS types side by side with the schema is a liability
+// TODO(ba, 2026-02-11): this needs to take in the varient as well
 export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:
@@ -67,7 +68,7 @@ export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
     case FLEX_STACKER_MODULE_V1:
       return flexStackerModuleV1 as unknown as ModuleDefinition
 
-    case VACUUM_MODULE_MILLIPORE_V1:
+    case VACUUM_MODULE_V1:
       return vacuumModuleMilloporeV1 as unknown as ModuleDefinition
 
     default:

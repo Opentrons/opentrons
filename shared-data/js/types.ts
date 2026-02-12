@@ -40,7 +40,7 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
   VACUUM_MODULE_TYPE,
 } from './constants'
 import type { PipetteName } from './pipettes'
@@ -401,7 +401,7 @@ export type AbsorbanceReaderModel = typeof ABSORBANCE_READER_V1
 
 export type FlexStackerModuleModel = typeof FLEX_STACKER_MODULE_V1
 
-export type VacuumModuleModel = typeof VACUUM_MODULE_MILLIPORE_V1
+export type VacuumModuleModel = typeof VACUUM_MODULE_V1
 
 export type ModuleModel =
   | MagneticModuleModel

@@ -3224,7 +3224,7 @@
         "magneticBlockV1",
         "absorbanceReaderV1",
         "flexStackerModuleV1",
-        "vacuumModuleMilliporeV1"
+        "vacuumModuleV1"
       ],
       "title": "ModuleModel",
       "type": "string"
