@@ -1927,7 +1927,8 @@ class ProtocolContext(CommandPublisher):
         self, name: str, description: Optional[str] = None
     ) -> GroupedSteps:
         """Starts a grouping of commands for visualization in run previews and the run log.
-        This returns a step group object which can then be closed by calling `.close_group`.
+        This returns a step group object which can then be closed by calling
+        [`close_group()`][opentrons.protocol_api.GroupedSteps.close_group].
 
         Grouping steps together has no effect on protocol execution.
 
