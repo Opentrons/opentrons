@@ -2288,7 +2288,7 @@ def test_create_and_start_step_group(
         "my-annotation-id"
     )
     step_group = subject.create_and_start_step_group("name", "desc")
-    step_group.close_group()
+    step_group.end_group()
     decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 

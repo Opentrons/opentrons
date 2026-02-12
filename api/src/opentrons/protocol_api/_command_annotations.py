@@ -14,7 +14,7 @@ class GroupedSteps:
         self._annotation_closed = False
 
     # TODO(jbl, 2026-02-12) when feature flag is removed add a version check decorator
-    def close_group(self) -> None:
+    def end_group(self) -> None:
         if not self._annotation_closed:
             self._protocol_core.end_step_grouping(annotation_id=self._annotation_id)
             self._annotation_closed = True

@@ -1906,7 +1906,7 @@ class ProtocolContext(CommandPublisher):
         self, name: str, description: Optional[str] = None
     ) -> Iterator[None]:
         """Group commands together for visualization in run previews and the run log.
-        This method is a [`context manager`](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement)
+        This method is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement)
         that uses the `with` syntax. All commands within this block will be grouped together.
 
         Grouping steps together has no effect on protocol execution.
@@ -1928,7 +1928,7 @@ class ProtocolContext(CommandPublisher):
     ) -> GroupedSteps:
         """Starts a grouping of commands for visualization in run previews and the run log.
         This returns a step group object which can then be closed by calling
-        [`close_group()`][opentrons.protocol_api.GroupedSteps.close_group].
+        [`end_group()`][opentrons.protocol_api.GroupedSteps.close_group].
 
         Grouping steps together has no effect on protocol execution.
 

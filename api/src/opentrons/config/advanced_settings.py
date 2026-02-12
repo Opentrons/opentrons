@@ -246,7 +246,7 @@ settings = [
     ),
     SettingDefinition(
         _id="allowStepGrouping",
-        title="Allow to creation of step groups via command annotations.",
+        title="Allow creation of step groups via command annotations.",
         description=(
             "Do not enable."
             " This is an Opentrons internal setting to allow using in-development"
