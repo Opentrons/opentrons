@@ -1,44 +1,79 @@
-import { DEFAULT_TIP_SIZE } from '../Tips/constants'
+import { getWidthAndHeightOfWellSVG } from './utils'
 
-export function EmptyWell(props: { size?: string }): JSX.Element {
-  const { size } = props
-  const width = size ?? DEFAULT_TIP_SIZE
-  const height = size ?? DEFAULT_TIP_SIZE
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
+export function EmptyWell(props: {
+  size?: string
+  labwareDefinition: LabwareDefinition
+}): JSX.Element {
+  const { size, labwareDefinition } = props
+
+  const firstWell = labwareDefinition.wells.A1
+  const isCircular = firstWell.shape === 'circular'
+  const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
+  const circularDimension = 20
+  const viewBox = isCircular
+    ? size || `0 0 ${circularDimension} ${circularDimension}`
+    : size || `0 0 ${width} ${height}`
+
   return (
     <svg
-      width={width}
-      height={height}
+      width={size ?? width}
+      height={size ?? height}
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
     >
       <mask
-        id="mask0_2315_3507"
-        style={{ maskType: 'alpha' }}
+        id="emptyWellMask"
         maskUnits="userSpaceOnUse"
         x="0"
         y="0"
-        width="20"
-        height="20"
+        width={isCircular ? circularDimension : width}
+        height={isCircular ? circularDimension : height}
       >
-        <path
-          d="M10 0.5C15.2467 0.5 19.5 4.7533 19.5 10C19.5 15.2467 15.2467 19.5 10 19.5C4.7533 19.5 0.5 15.2467 0.5 10C0.5 4.7533 4.7533 0.5 10 0.5Z"
-          fill="#CBCCCC"
-          stroke="black"
-        />
+        {isCircular ? (
+          <circle cx="10" cy="10" r="9.5" fill="white" />
+        ) : (
+          <rect
+            x="0.5"
+            y="0.5"
+            width={width}
+            height={height}
+            rx="2"
+            fill="white"
+          />
+        )}
       </mask>
-      <g mask="url(#mask0_2315_3507)">
-        <path
-          d="M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z"
-          fill="#CBCCCC"
-          stroke="#737578"
-          strokeWidth="2"
-        />
+
+      <g mask="url(#emptyWellMask)">
+        {isCircular ? (
+          <circle
+            cx="10"
+            cy="10"
+            r="9"
+            fill="#CBCCCC"
+            stroke="#737578"
+            strokeWidth="2"
+          />
+        ) : (
+          <rect
+            x="1"
+            y="1"
+            width={width}
+            height={height}
+            rx="2"
+            fill="#CBCCCC"
+            stroke="#737578"
+            strokeWidth="2"
+          />
+        )}
+
         <line
-          x1="24.7071"
-          y1="-4.29289"
-          x2="-3.29289"
-          y2="23.7071"
+          x1={isCircular ? 24.7071 : width + 4.7071}
+          y1={isCircular ? -4.29289 : -4.29289}
+          x2={isCircular ? -3.29289 : -3.29289}
+          y2={isCircular ? 23.7071 : height + 3.7071}
           stroke="#737578"
           strokeWidth="2"
         />

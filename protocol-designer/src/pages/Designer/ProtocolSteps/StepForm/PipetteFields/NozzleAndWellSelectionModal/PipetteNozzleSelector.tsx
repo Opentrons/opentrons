@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   COLORS,
@@ -13,19 +13,30 @@ import {
   PARTIAL,
 } from '@opentrons/shared-data'
 
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
 import { EightChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/EightChannelFlexShadow'
 import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/EightChannelOT2Shadow'
 import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
 import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
 import styles from './nozzleandwellwizard.module.css'
+import {
+  getAvailableNozzleConfigurations,
+  getAvailablePrimaryNozzles,
+  partialNozzleMap,
+} from './utils'
 
+import type { TFunction } from 'i18next'
 import type { Channels, DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
+import type { FieldPropsByName } from '../../types'
 import type { PipetteShadowProps } from '../TipSelectionWizard/types'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
@@ -50,53 +61,56 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
 interface PipetteNozzleSelectorProps {
   pipetteSpecs: PipetteV2Specs
   robotType: RobotType
-  options: DropdownOption[]
-  updateValue: (arg: unknown) => void
-  value: NozzleConfigurationStyle
-  setSelectedValue: any
+  propsForFields: FieldPropsByName
 }
 
 export function PipetteNozzleSelector(
   props: PipetteNozzleSelectorProps
 ): JSX.Element {
-  const {
-    pipetteSpecs,
-    robotType,
-    options,
-    updateValue,
-    value: nozzleMode,
-    setSelectedValue,
-  } = props
+  const { pipetteSpecs, robotType, propsForFields } = props
   const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const { t } = useTranslation('protocol_steps')
 
-  const [partialNozzleCount, setPartialNozzleCount] = useState<string>('2')
-
+  const nozzleConfiguration = propsForFields.nozzles
+    .value as NozzleConfigurationStyle
+  const primaryNozzle = propsForFields.primaryNozzle
+    .value as PrimaryNozzleConfigurationStyle
   const width = frontRightCorner[0] - backLeftCorner[0]
   const height = backLeftCorner[1] - frontRightCorner[1]
-
   const outlineProps = {
     fill: COLORS.white,
     stroke: COLORS.grey50,
-    x: -16,
-    y: -41.5,
     width: width,
     height: height,
     rotate: false,
+    x: 0,
+    y: 0,
   }
+  const deckSetup = useSelector(getInitialDeckSetup)
 
   const is96Channel = channels === 96
-  const nozzles = Array.from({ length: 6 }, (_, i) => String(i + 2))
 
-  const partialOptions: DropdownOption[] = nozzles.map(num => ({
-    name: t('num_nozzles', { num }),
-    value: num,
-  }))
+  const nozzleConfigurationOptions = getAvailableNozzleConfigurations(
+    channels,
+    deckSetup,
+    t as TFunction
+  )
 
+  const partialOptions: DropdownOption[] = Object.entries(partialNozzleMap).map(
+    ([nozzle, num]) => ({
+      name: t('num_nozzles', { num }),
+      value: nozzle as PartialPrimaryNozzles,
+    })
+  )
+
+  const placeholderPrimaryNozzles = getAvailablePrimaryNozzles(
+    channels,
+    nozzleConfiguration
+  )
   const OutlineComponent =
     SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
-  const isPartialNozzle = nozzleMode === PARTIAL
+  const isPartialNozzle = nozzleConfiguration === PARTIAL
   return (
     <>
       <div className={styles.header_text_wrapper}>
@@ -107,16 +121,15 @@ export function PipetteNozzleSelector(
 
       <div className={styles.row_wrapper}>
         <div className={styles.nozzle_selection_text}>
-          {options.map(({ value, name }) => {
+          {nozzleConfigurationOptions.map(({ value, name }) => {
             return (
               <RadioButton
                 key={`${name}_${value}`}
                 buttonLabel={name}
                 buttonValue={value}
-                isSelected={nozzleMode === value}
+                isSelected={nozzleConfiguration === value}
                 onChange={() => {
-                  updateValue(value)
-                  setSelectedValue(value)
+                  propsForFields.nozzles.updateValue(value)
                 }}
                 largeDesktopBorderRadius
               />
@@ -149,18 +162,39 @@ export function PipetteNozzleSelector(
 
               {isPartialNozzle && (
                 <DropdownMenu
+                  key="partialTipDropDown"
                   dropdownType="neutral"
                   filterOptions={partialOptions}
                   onClick={value => {
-                    setPartialNozzleCount(value)
+                    propsForFields.primaryNozzle.updateValue(value)
                   }}
                   currentOption={
                     partialOptions.find(
-                      option => option.value === partialNozzleCount
+                      option => option.value === primaryNozzle
                     ) ?? partialOptions[0]
                   }
                 />
               )}
+              {nozzleConfiguration !== PARTIAL ? (
+                <>
+                  <StyledText>
+                    {'Placeholder primary nozzle selector'}
+                  </StyledText>
+
+                  <DropdownMenu
+                    dropdownType="neutral"
+                    filterOptions={placeholderPrimaryNozzles}
+                    onClick={value => {
+                      propsForFields.primaryNozzle.updateValue(value)
+                    }}
+                    currentOption={
+                      placeholderPrimaryNozzles.find(
+                        option => option.value === primaryNozzle
+                      ) ?? placeholderPrimaryNozzles[0]
+                    }
+                  />
+                </>
+              ) : null}
             </div>
           </div>
         </div>

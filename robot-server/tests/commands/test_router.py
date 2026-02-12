@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from opentrons.protocol_runner import RunOrchestrator
+from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, RequestModel
 
 from robot_server.commands.router import (
     create_command,
@@ -21,7 +22,6 @@ from robot_server.commands.router import (
     get_commands_list,
 )
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, RequestModel
 
 
 @pytest.fixture()

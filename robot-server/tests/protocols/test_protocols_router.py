@@ -29,6 +29,11 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    SimpleEmptyBody,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
@@ -77,7 +82,6 @@ from robot_server.protocols.router import (
     get_protocol_ids,
     get_protocols,
 )
-from robot_server.service.json_api import MultiBodyMeta, RequestModel, SimpleEmptyBody
 
 
 @pytest.fixture
