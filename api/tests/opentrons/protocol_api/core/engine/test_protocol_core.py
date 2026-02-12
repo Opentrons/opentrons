@@ -2141,7 +2141,7 @@ def test_create_user_command_annotation(
         )
     ).then_return("annotation-id")
 
-    result = subject.create_user_command_annotation(
+    result = subject.start_step_grouping(
         annotation_name="err", annotation_description="blah blah blah"
     )
     assert result == "annotation-id"
@@ -2157,7 +2157,7 @@ def test_create_user_command_annotation_raises_existing_annotation(
     subject._annotation_ids = ["annotation_id"]
 
     with pytest.raises(ValueError):
-        subject.create_user_command_annotation(
+        subject.start_step_grouping(
             annotation_name="oops", annotation_description="this will raise"
         )
 
@@ -2167,11 +2167,11 @@ def test_close_command_annotation(subject: ProtocolCore) -> None:
     subject._annotation_ids = ["annotation-id"]
     assert "annotation-id" in subject.annotation_ids
 
-    subject.close_command_annotation("annotation-id")
+    subject.end_step_grouping("annotation-id")
     assert len(subject.annotation_ids) == 0
 
 
 def test_close_command_annotation_raises(subject: ProtocolCore) -> None:
     """It should raise if the annotation ID does not exist."""
     with pytest.raises(ValueError):
-        subject.close_command_annotation("annotation-id")
+        subject.end_step_grouping("annotation-id")

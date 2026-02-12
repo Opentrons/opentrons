@@ -303,16 +303,16 @@ class AbstractProtocol(
         "Capture an image using a camera."
 
     @abstractmethod
-    def create_user_command_annotation(
+    def start_step_grouping(
         self,
         annotation_name: str,
         annotation_description: Optional[str],
     ) -> str:
-        """Creates a command annotation and adds the ID to list of active command annotations."""
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
 
     @abstractmethod
-    def close_command_annotation(self, annotation_id: str) -> None:
-        """Closes a command annotation by removing the annotation ID from the list of active command annotations."""
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
 
     @abstractmethod
     def load_robot(self) -> AbstractRobot:

@@ -1915,11 +1915,11 @@ class ProtocolContext(CommandPublisher):
             name: A name for the group of steps.
             description: An optional description for the step group.
         """
-        annotation_id = self._core.create_user_command_annotation(name, description)
+        annotation_id = self._core.start_step_grouping(name, description)
         try:
             yield
         finally:
-            self._core.close_command_annotation(annotation_id)
+            self._core.end_step_grouping(annotation_id)
 
     @requires_version(2, 29)
     def create_step_group(
@@ -1934,8 +1934,12 @@ class ProtocolContext(CommandPublisher):
             name: A name for the group of steps.
             description: An optional description for the step group.
         """
-        annotation_id = self._core.create_user_command_annotation(name, description)
-        return GroupedSteps(annotation_id=annotation_id, protocol_core=self._core)
+        annotation_id = self._core.start_step_grouping(name, description)
+        return GroupedSteps(
+            annotation_id=annotation_id,
+            protocol_core=self._core,
+            api_version=self._api_version,
+        )
 
 
 def _create_module_context(

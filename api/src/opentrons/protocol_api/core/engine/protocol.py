@@ -1266,10 +1266,10 @@ class ProtocolCore(
             command_annotations=self._annotation_ids,
         )
 
-    def create_user_command_annotation(
+    def start_step_grouping(
         self, annotation_name: str, annotation_description: Optional[str]
     ) -> str:
-        """Creates a command annotation and adds the ID to list of active command annotations."""
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
         if len(self._annotation_ids) > 0:
             raise ValueError(
                 "Cannot start a new step grouping when one is already active."
@@ -1281,8 +1281,8 @@ class ProtocolCore(
         self.annotation_ids.append(annotation_id)
         return annotation_id
 
-    def close_command_annotation(self, annotation_id: str) -> None:
-        """Closes a command annotation by removing the annotation ID from the list of active command annotations."""
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
         try:
             self._annotation_ids.remove(annotation_id)
         except ValueError:

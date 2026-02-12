@@ -624,14 +624,14 @@ class LegacyProtocolCore(
         "Capture an image using a camera."
         assert False, "capture_image only supported on engine core"
 
-    def create_user_command_annotation(
+    def start_step_grouping(
         self, annotation_name: str, annotation_description: Optional[str]
     ) -> str:
-        """Creates a command annotation and adds the ID to list of active command annotations."""
-        assert False, "create_user_command_annotation only supported on engine core"
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+        assert False, "start_step_grouping only supported on engine core"
 
-    def close_command_annotation(self, annotation_id: str) -> None:
-        """Closes a command annotation by removing the annotation ID from the list of active command annotations."""
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
         assert False, "close_command_annotation only supported on engine core"
 
     def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:

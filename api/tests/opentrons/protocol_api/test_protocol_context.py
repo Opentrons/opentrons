@@ -2265,12 +2265,12 @@ def test_group_steps(
     subject: ProtocolContext,
 ) -> None:
     """It should create a command annotation during the lifetime of the context."""
-    decoy.when(mock_core.create_user_command_annotation("name", "desc")).then_return(
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
         "my-annotation-id"
     )
     with subject.group_steps("name", "desc"):
         subject.comment("I'm being annotated!")
-    decoy.verify(mock_core.close_command_annotation("my-annotation-id"))
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 
 def test_create_step_group(
@@ -2279,12 +2279,12 @@ def test_create_step_group(
     subject: ProtocolContext,
 ) -> None:
     """It should create a command annotation and return a step group object, which can close the annotation."""
-    decoy.when(mock_core.create_user_command_annotation("name", "desc")).then_return(
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
         "my-annotation-id"
     )
     step_group = subject.create_step_group("name", "desc")
     step_group.close_group()
-    decoy.verify(mock_core.close_command_annotation("my-annotation-id"))
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 
 def test_bundled_data(
