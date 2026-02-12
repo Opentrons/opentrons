@@ -296,6 +296,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           fill={COLORS.white}
           inWellSelectionModal={true}
           ignoreMissingTips
+          wellLabelOptions={'SHOW_LABEL_INSIDE'}
         />
         {hoveredWells && [...hoveredWells][0] != null ? (
           <PipetteShadow
