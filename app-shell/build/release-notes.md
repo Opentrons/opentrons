@@ -34,7 +34,8 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 ### Known Issues
 
-- You can't open protocol visualization when re-running a completed protocol, if the protocol was started on a different computer. Open visualization from the protocol details page instead.
+- You can't open protocol visualization when re-running a completed protocol, only if the protocol was started on a different computer. Open visualization from the protocol details page instead.
+- Protocol visualization will produce an error for protocols that dispose of tips into a standard labware instead of a trash container.
 
 ---
 
