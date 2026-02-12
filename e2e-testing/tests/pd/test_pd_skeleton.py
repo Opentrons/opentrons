@@ -8,7 +8,7 @@ from automation.pd_pages import LandingPage
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_pd_skeleton(page: Page, base_url: str) -> None:
+def test_pd_skeleton(page: Page, pd_base_url: str) -> None:
     """Test complete Flex onboarding workflow.
     Put a nice description of the test here.
     With goals of the test.

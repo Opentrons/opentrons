@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from playwright.sync_api import Locator, Page, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class CreateProtocolWizard(BasePage):

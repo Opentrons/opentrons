@@ -12,6 +12,10 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
+# Vite server configuration (override at invocation time)
+HOST ?= ::
+PORT ?=
+
 
 .PHONY: all
 all: clean dist
@@ -30,12 +34,12 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	vite serve --host=::
+	vite serve --host=$(HOST) $(if $(PORT),--port $(PORT),)
 
 # production assets server
 .PHONY: serve
 serve: all
-	vite preview --host=::
+	vite preview --host=$(HOST) $(if $(PORT),--port $(PORT),)
 
 .PHONY: clean-downloads
 clean-downloads:
