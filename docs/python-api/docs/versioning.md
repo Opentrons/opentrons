@@ -104,7 +104,6 @@ This table lists the correspondence between Protocol API versions and robot soft
 ### Version 2.28
 
 - Return tips to the tip rack with a pipette that's configured to use [partial tip pickup](pipettes/partial-tip-pickup.md).
-- Use the [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as `empty`, letting the pipette return tips to that rack.
 - Adds additional tools to customize pipette blowouts: 
     - an absolute `flow_rate`.
     - a blowout position for a liquid class transfer.
