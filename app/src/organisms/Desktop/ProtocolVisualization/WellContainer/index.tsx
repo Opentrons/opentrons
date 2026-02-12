@@ -62,8 +62,10 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
     wellLocation?.origin === 'top'
       ? POSITION_REFERENCE_TOP
       : POSITION_REFERENCE_BOTTOM
-  const zOffset = wellLocation?.offset?.z ?? 1
-  const xOffset = wellLocation?.offset?.x ?? 0
+  const zOffset: number =
+    typeof wellLocation?.offset?.z === 'number' ? wellLocation.offset.z : 1
+  const xOffset: number =
+    typeof wellLocation?.offset?.x === 'number' ? wellLocation.offset.x : 0
 
   const mmFromBottom = hasWellLocation
     ? getMmFromBottom(zOffset, reference, labwareDepth)
