@@ -12,7 +12,7 @@ from opentrons.protocol_api.core.engine import (
 )
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
-metadata = {"protocolName": "test overlap 2"}
+metadata = {"protocolName": "test overlap 2 - multi"}
 
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
@@ -175,12 +175,11 @@ def run(ctx: ProtocolContext) -> None:
         pipette.move_to(
             well.top().move(offset_for_channel(channel, "Full"))  # type: ignore [attr-defined]
         )
+        if IS_ROBOT and not ctx.is_simulating():
+            nozzle_results[channel] = dial.read_stable()  # type: ignore [union-attr]
         pipette.move_to(
             well.top().move(offset_for_channel(channel, "Full")).move(Point(0, 0, 5))  # type: ignore [attr-defined]
         )
-        if IS_ROBOT and not ctx.is_simulating():
-            nozzle_results[channel] = dial.read_stable()  # type: ignore [union-attr]
-
     results = {i: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] for i in range(ctx.params.trials)}  # type: ignore [attr-defined]
     for trial in range(ctx.params.trials):  # type: ignore [attr-defined]
         pipette.configure_nozzle_layout(
@@ -197,11 +196,11 @@ def run(ctx: ProtocolContext) -> None:
             pipette.move_to(
                 well.top().move(offset_for_channel(channel, ctx.params.layout))  # type: ignore [attr-defined]
             )
+            if IS_ROBOT and not ctx.is_simulating():
+                results[trial][channel] = nozzle_results[channel] - dial.read_stable()  # type: ignore [union-attr]
             pipette.move_to(
                 well.top().move(offset_for_channel(channel, ctx.params.layout)).move(Point(0, 0, 5))  # type: ignore [attr-defined]
             )
-            if IS_ROBOT and not ctx.is_simulating():
-                results[trial][channel] = nozzle_results[channel] - dial.read_stable()  # type: ignore [union-attr]
         if ctx.params.return_tip:  # type: ignore [attr-defined]
             pipette.return_tip()
         else:
@@ -212,7 +211,7 @@ def run(ctx: ProtocolContext) -> None:
         dial.disconnect()  # type: ignore [union-attr]
         formatted_time = time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime(time.time()))
         test_name = f"overlap-P{ctx.params.pipette_volume}M-{ctx.params.layout}-{formatted_time}"  # type: ignore [attr-defined]
-        filename = f"/data/testing-data/overlap/{test_name}.csv"
+        filename = f"/data/testing_data/overlap/{test_name}.csv"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "w") as f:
             writer = csv.writer(f)
@@ -229,5 +228,6 @@ def run(ctx: ProtocolContext) -> None:
                     "Nozzle 8",
                 ]
             )
+            writer.writerow(["bare_nozzles"] + nozzle_results)
             for trial in range(ctx.params.trials):  # type: ignore [attr-defined]
                 writer.writerow([trial] + results[trial])
