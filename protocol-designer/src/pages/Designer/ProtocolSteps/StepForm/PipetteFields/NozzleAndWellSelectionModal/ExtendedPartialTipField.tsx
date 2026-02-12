@@ -3,13 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
-import {
-  ALL,
-  COLUMN,
-  PARTIAL,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
