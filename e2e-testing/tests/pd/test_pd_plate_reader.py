@@ -23,6 +23,7 @@ def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str, eyes: Eyes |
     # Configure deck hardware
     ## Snapshot: Validate Absorbance Plate Reader module configuration option
     plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
+    plate_reader_page.button_selection("Confirm")
     create_protocol.name_protocol("test")
     plate_reader_page.button_selection("Confirm")
 

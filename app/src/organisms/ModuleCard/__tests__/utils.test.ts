@@ -12,7 +12,11 @@ import {
 } from '/app/redux/modules/__fixtures__'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import { getModuleCardImage, useModuleApiRequests } from '../utils'
+import {
+  getModuleCardImage,
+  getPumpStatusProps,
+  useModuleApiRequests,
+} from '../utils'
 
 vi.mock('/app/redux/robot-api')
 
@@ -138,4 +142,29 @@ describe('useModuleApiRequests', () => {
     )
     expect(result.current[0]('NON_EXISTENT_SERIAL')).toBeNull()
   })
+})
+
+describe('getPumpStatusProps', () => {
+  const mockT = (key: string): string => {
+    const translations: Record<string, string> = {
+      pump_idle: 'Pump idle',
+      pump_engaged: 'Pump engaged',
+    }
+    return translations[key] ?? key
+  }
+
+  it.each<[string, { text: string; type: string }]>([
+    ['idle', { text: 'Pump idle', type: 'neutral' }],
+    ['ramping', { text: 'Pump engaged', type: 'info' }],
+    ['holding', { text: 'Pump engaged', type: 'info' }],
+    ['venting', { text: 'Pump engaged', type: 'info' }],
+    ['complete', { text: 'Pump engaged', type: 'info' }],
+    ['error', { text: 'Pump engaged', type: 'info' }],
+  ])(
+    'should return the correct props for the pump status',
+    (status, expected) => {
+      const result = getPumpStatusProps(mockT, status as any)
+      expect(result).toEqual(expected)
+    }
+  )
 })

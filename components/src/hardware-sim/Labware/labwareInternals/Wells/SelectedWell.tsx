@@ -1,8 +1,11 @@
 import { COLORS } from '../../../../helix-design-system'
-import { DEFAULT_TIP_SIZE } from '../Tips/constants'
+import { getWidthAndHeightOfWellSVG } from './utils'
 import styles from './wells.module.css'
 
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
 export function SelectedWell(props: {
+  labwareDefinition: LabwareDefinition
   size?: string
   textInsideTip?: string
   isUsed?: boolean
@@ -11,6 +14,7 @@ export function SelectedWell(props: {
   showStroke?: boolean
 }): JSX.Element {
   const {
+    labwareDefinition,
     size,
     textInsideTip,
     isUsed = false,
@@ -18,8 +22,10 @@ export function SelectedWell(props: {
     isSelected = true,
     showStroke,
   } = props
-  const width = size ?? DEFAULT_TIP_SIZE
-  const height = size ?? DEFAULT_TIP_SIZE
+
+  const firstWell = labwareDefinition.wells.A1
+  const isWellCircular = firstWell.shape === 'circular'
+  const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
   const getFillColor = (
     isSelected: boolean,
     isError: boolean,
@@ -39,22 +45,38 @@ export function SelectedWell(props: {
 
   const shouldShowStroke = textInsideTip == null && showStroke
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
+  const viewBox =
+    size || isWellCircular ? '0 0 20 20' : `0 0 ${width} ${height}`
   return (
     <svg
-      width={width}
-      height={height}
-      viewBox="0 0 20 20"
+      width={size ?? width}
+      height={size ?? height}
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle
-        cx="10"
-        cy="10"
-        r={shouldShowStroke ? '9' : '10'}
-        fill={getFillColor(isSelected, isError, isUsed)}
-        stroke={shouldShowStroke ? COLORS.black90 : undefined}
-        strokeWidth={shouldShowStroke ? '2' : undefined}
-      />
+      {isWellCircular ? (
+        <circle
+          cx="10"
+          cy="10"
+          r={shouldShowStroke ? 9 : 10}
+          fill={getFillColor(isSelected, isError, isUsed)}
+          stroke={shouldShowStroke ? COLORS.black90 : undefined}
+          strokeWidth={shouldShowStroke ? 2 : undefined}
+        />
+      ) : (
+        <rect
+          x={shouldShowStroke ? 1 : 0}
+          y={shouldShowStroke ? 1 : 0}
+          width={width}
+          height={height}
+          rx={2} // subtle rounding; remove if you want sharp corners
+          fill={getFillColor(isSelected, isError, isUsed)}
+          stroke={shouldShowStroke ? COLORS.black90 : undefined}
+          strokeWidth={shouldShowStroke ? 2 : undefined}
+        />
+      )}
+
       {textInsideTip != null ? (
         <text
           x="10"
@@ -63,7 +85,6 @@ export function SelectedWell(props: {
           dominantBaseline="middle"
           fill={COLORS.white}
           transform="scale(1, -1)"
-          // needed to refactor `transform-origin` to CSS modules for passing lint checks
           className={styles.selected_tip_text}
         >
           {textInsideTip}
