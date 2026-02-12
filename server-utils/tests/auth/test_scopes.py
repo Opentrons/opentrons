@@ -1,7 +1,7 @@
 import pytest
 
 from server_utils.auth.scopes import (
-    InvalidScopeError,
+    UnrecognizedScopeError,
     Scope,
     parse_scopes,
     serialize_scopes,
@@ -27,7 +27,7 @@ def test_parse() -> None:
 
     assert parse_scopes("runs.write runs.read") == {Scope.RUNS_WRITE, Scope.RUNS_READ}
 
-    with pytest.raises(InvalidScopeError) as exception:
+    with pytest.raises(UnrecognizedScopeError) as exception:
         parse_scopes("these are not valid scopes")
     assert exception.value.invalid_scope == "these"
 

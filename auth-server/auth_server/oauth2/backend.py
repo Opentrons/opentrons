@@ -9,7 +9,7 @@ import oauthlib.common
 import oauthlib.oauth2
 import pydantic
 
-from server_utils.auth.scopes import InvalidScopeError, Scope, serialize_scopes
+from server_utils.auth.scopes import UnrecognizedScopeError, Scope, serialize_scopes
 
 from auth_server.users.store import TEST_USERS, User
 
@@ -107,7 +107,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         try:
             for scope in scopes:
                 Scope.from_api_name(scope)
-        except InvalidScopeError:
+        except UnrecognizedScopeError:
             unrecognized_scope = True
         else:
             unrecognized_scope = False

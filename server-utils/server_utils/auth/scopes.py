@@ -67,7 +67,7 @@ class Scope(enum.Enum):
             # __new__() messes with the type checking here.
             return cls(api_name)  # type: ignore[call-arg]
         except ValueError:
-            raise InvalidScopeError(invalid_api_name=api_name) from None
+            raise UnrecognizedScopeError(invalid_api_name=api_name) from None
 
 
 def parse_scopes(scopes: str) -> set[Scope]:
@@ -87,7 +87,7 @@ def serialize_scopes(scopes: set[Scope]) -> str:
     return " ".join(sorted(scope.api_name for scope in scopes))
 
 
-class InvalidScopeError(ValueError):
+class UnrecognizedScopeError(ValueError):
     """Raised when trying to parse an unrecognized scope string."""
 
     def __init__(self, invalid_api_name: str) -> None:
