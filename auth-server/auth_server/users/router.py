@@ -92,7 +92,7 @@ async def post_users(
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
     scopes_required = [Scope.USERS_WRITE]
-    valid, _ = oauth2_backend.verify_request(
+    valid, oauth_request = oauth2_backend.verify_request(
         str(request.url),
         http_method=request.method,  # type: ignore[arg-type]
         body=request_body.model_dump_json(),
@@ -104,7 +104,9 @@ async def post_users(
             status_code=fastapi.status.HTTP_403_FORBIDDEN,
             detail="Forbidden",
         )
-    user_create = request_body.data  # _.body.data
+    assert isinstance(oauth_request.body, (str, bytes, bytearray))
+    sanitized_body = RequestModel[UserCreate].model_validate_json(oauth_request.body)
+    user_create = sanitized_body.data
     _validate_user_create_input(
         user_create.userName,
         user_create.password.get_secret_value(),
