@@ -23,7 +23,7 @@ lint:
 
 .PHONY: typecheck
 typecheck:
-	uv run mypy automation tests conftest.py electron_fixtures.py
+	uv run mypy automation tests conftest.py
 
 .PHONY: prep
 prep: 
@@ -91,14 +91,6 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
-
-.PHONY: test-app
-test-app:
-	uv run pytest -m appE2E $(PYTEST_ARGS)
-
-.PHONY: test-app-headed
-test-app-headed:
-	HEADLESS=false uv run pytest -m appE2E $(PYTEST_ARGS)
 
 .PHONY: test-ll-local
 test-ll-local:

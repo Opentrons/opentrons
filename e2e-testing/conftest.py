@@ -21,9 +21,8 @@ from playwright.sync_api import Error as PlaywrightError
 
 from utility import troubleshoot_and_pause
 
-# Expose fixtures defined in e2e-testing/eyes.py (e.g. the `eyes` fixture)
-# and electron_fixtures.py (Electron app launch fixtures).
-pytest_plugins = ["eyes", "electron_fixtures"]
+# Expose fixtures defined in e2e-testing/eyes.py (e.g. the `eyes` fixture).
+pytest_plugins = ["eyes"]
 
 
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
