@@ -56,11 +56,6 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const { labware, pipettes, liquidState, modules } = robotState
   const { t } = useTranslation('protocol_visualization')
   const [hoveredWellName, setHoveredWellName] = useState<string | null>(null)
-  const labwareLoadCommand = Object.values(commands).find(
-    command =>
-      'labwareId' in command.result &&
-      command.result.labwareId === topLabwareOnSlotId
-  )
   const lidStackCommand = commands.find(
     (command): command is LoadLidStackRunTimeCommand =>
       command.commandType === 'loadLidStack' &&
@@ -82,18 +77,36 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       : null
   const hopperGroups =
     stackerModuleState != null ? stackerModuleState.labwareInHopper : null
-
+  const isTopLabwareLid =
+    labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('lid')
+  const topLabwareStack = labware[topLabwareOnSlotId].stack
+  const labwareIdUnderLid = topLabwareStack.find(
+    id =>
+      id !== topLabwareOnSlotId &&
+      labware[id] != null &&
+      labwareEntities[id]?.def.allowedRoles?.includes('lid') !== true
+  )
+  const hasRenderableWellsUnderLid =
+    labwareIdUnderLid != null
+      ? Object.keys(labwareEntities[labwareIdUnderLid].def.wells).length > 0
+      : false
+  const adjustedTopLabwareId =
+    isTopLabwareLid && hasRenderableWellsUnderLid
+      ? (labwareIdUnderLid ?? topLabwareOnSlotId)
+      : topLabwareOnSlotId
+  const labwareLoadCommand = Object.values(commands).find(
+    command =>
+      command.result != null &&
+      'labwareId' in command.result &&
+      (command.result.labwareId === topLabwareOnSlotId ||
+        command.result.labwareId === adjustedTopLabwareId)
+  )
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname: string | null =
     labwareLoadCommandParams != null &&
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const isTopLabwareLid =
-    labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('lid')
-  const adjustedTopLabwareId = isTopLabwareLid
-    ? labware[topLabwareOnSlotId].stack[1]
-    : topLabwareOnSlotId
   const labwareDef = labwareEntities[adjustedTopLabwareId].def
   const labwareDisplayName = labwareDef.metadata.displayName
 
@@ -136,15 +149,16 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     {}
   )
   const topLabwareURI = labwareEntities[topLabwareOnSlotId].labwareDefURI
+  const stackQuantity = labware[topLabwareOnSlotId].stack.filter(
+    id =>
+      labware[id] != null && labwareEntities[id].labwareDefURI === topLabwareURI
+  ).length
   const quantity =
-    lidStackCommand?.params?.quantity ??
-    (hopperGroups != null
+    hopperGroups != null
       ? hopperGroups.length
-      : labware[topLabwareOnSlotId].stack.filter(
-          id =>
-            labware[id] != null &&
-            labwareEntities[id].labwareDefURI === topLabwareURI
-        )?.length)
+      : stackQuantity > 0
+        ? stackQuantity
+        : (lidStackCommand?.params?.quantity ?? 1)
   const adapterId = labware[topLabwareOnSlotId].stack.find(
     id =>
       labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&
