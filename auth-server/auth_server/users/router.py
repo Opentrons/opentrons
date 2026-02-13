@@ -47,6 +47,27 @@ class UserResponse(BaseModel):
     scopes: list[str]
 
 
+def _verify_scopes(
+    request: fastapi.Request,
+    oauth2_backend: Backend,
+    scopes: list[Scope],
+    body: str = "",
+) -> None:
+    """Verify OAuth2 scopes. Raises 403 if invalid."""
+    valid, _ = oauth2_backend.verify_request(
+        str(request.url),
+        http_method=request.method,  # type: ignore[arg-type]
+        body=body,
+        headers=dict(request.headers),
+        scopes=scopes,
+    )
+    if not valid:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_403_FORBIDDEN,
+            detail="Forbidden",
+        )
+
+
 def _validate_user_create_input(
     user_name: str | None = None,
     password: str | None = None,
@@ -91,22 +112,8 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    scopes_required = [Scope.USERS_WRITE]
-    valid, oauth_request = oauth2_backend.verify_request(
-        str(request.url),
-        http_method=request.method,  # type: ignore[arg-type]
-        body=request_body.model_dump_json(),
-        headers=dict(request.headers),
-        scopes=scopes_required,
-    )
-    if not valid:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_403_FORBIDDEN,
-            detail="Forbidden",
-        )
-    assert isinstance(oauth_request.body, (str, bytes, bytearray))
-    sanitized_body = RequestModel[UserCreate].model_validate_json(oauth_request.body)
-    user_create = sanitized_body.data
+    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
+    user_create = request_body.data
     _validate_user_create_input(
         user_create.userName,
         user_create.password.get_secret_value(),
@@ -162,6 +169,7 @@ async def get_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
+    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     user = next(
         (user for user in TEST_USERS if user.username == userName),
         None,
@@ -199,6 +207,7 @@ async def delete_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
+    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     user = next(
         (user for user in TEST_USERS if user.username == userName),
         None,
@@ -228,6 +237,7 @@ async def update_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
+    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_user = request_body.data
     _validate_user_create_input(
         full_name=update_user.fullName,
