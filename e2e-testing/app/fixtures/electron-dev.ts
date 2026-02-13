@@ -18,7 +18,7 @@
  *   SKIP_SHELL_BUILD      – Set to "true" to skip `vite build` in app-shell (if already built)
  */
 
-import { type ChildProcess, exec, spawn } from 'node:child_process'
+import { type ChildProcess, exec, execSync, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -95,6 +95,54 @@ function runCommand(command: string, cwd: string): Promise<void> {
     })
     proc.on('error', reject)
   })
+}
+
+/**
+ * Resolve the Python 3.12 executable from the api/ project's uv environment.
+ *
+ * This mirrors the `PYTHON_OVERRIDE_COMMAND` in app-shell/Makefile:
+ *   cd ../api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))"
+ *
+ * Can be overridden with the `PYTHON_PATH_OVERRIDE` environment variable.
+ */
+function resolvePythonPath(monorepoRoot: string): string {
+  const explicit = process.env.PYTHON_PATH_OVERRIDE
+  if (explicit) {
+    if (!existsSync(explicit)) {
+      throw new Error(
+        `PYTHON_PATH_OVERRIDE is set to '${explicit}' but the path does not exist.`,
+      )
+    }
+    console.log(`→ Using PYTHON_PATH_OVERRIDE: ${explicit}`)
+    return explicit
+  }
+
+  const apiDir = resolve(monorepoRoot, 'api')
+  console.log(`→ Resolving Python 3.12 path from ${apiDir} …`)
+
+  try {
+    const pythonPath = execSync(
+      'uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))"',
+      { cwd: apiDir, encoding: 'utf-8', timeout: 30_000 },
+    ).trim()
+
+    if (!existsSync(pythonPath)) {
+      throw new Error(
+        `Resolved Python path '${pythonPath}' does not exist.\n` +
+          'Run `cd api && make setup` to set up the Python environment.',
+      )
+    }
+
+    console.log(`✓ Python 3.12 resolved: ${pythonPath}`)
+    return pythonPath
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    throw new Error(
+      `Failed to resolve Python 3.12 from api/ project.\n` +
+        `Ensure 'uv' is installed and run 'cd api && make setup'.\n` +
+        `Error: ${msg}`,
+    )
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -187,6 +235,9 @@ export const test = base.extend<object, DevAppFixtures>({
       // 3. Launch Electron with dev flags ----------------------------------
       console.log('→ Launching Electron in dev mode …')
 
+      // Resolve Python so the app can analyse protocols.
+      const pythonPath = resolvePythonPath(monorepoRoot)
+
       // On CI (Linux without root), the SUID sandbox cannot be configured.
       // Pass --no-sandbox to work around this.
       const electronArgs = [
@@ -196,6 +247,7 @@ export const test = base.extend<object, DevAppFixtures>({
         '--disable_ui.webPreferences.webSecurity',
         `--ui.url.protocol=http:`,
         `--ui.url.path=localhost:${port}`,
+        `--python.pathToPythonOverride=${pythonPath}`,
       ]
       if (process.env.CI) {
         electronArgs.push('--no-sandbox')

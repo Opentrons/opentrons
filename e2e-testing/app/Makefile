@@ -60,6 +60,26 @@ test-dev-skip-build: ## Run dev-mode tests, skip app-shell rebuild
 	SKIP_SHELL_BUILD=true pnpm test:dev
 
 # ---------------------------------------------------------------------------
+# Testing – Protocol Visualization (dev)
+# ---------------------------------------------------------------------------
+
+.PHONY: test-dev-viz
+test-dev-viz: ## Run protocol visualization tests (headless)
+	pnpm test:dev:viz
+
+.PHONY: test-dev-viz-headed
+test-dev-viz-headed: ## Run protocol visualization tests (headed)
+	pnpm test:dev:viz:headed
+
+.PHONY: test-dev-viz-debug
+test-dev-viz-debug: ## Run protocol visualization tests with Inspector
+	pnpm test:dev:viz:debug
+
+.PHONY: test-dev-viz-skip-build
+test-dev-viz-skip-build: ## Run visualization tests, skip app-shell rebuild
+	SKIP_SHELL_BUILD=true pnpm test:dev:viz
+
+# ---------------------------------------------------------------------------
 # Testing – All
 # ---------------------------------------------------------------------------
 
