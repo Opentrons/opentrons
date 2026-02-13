@@ -52,7 +52,7 @@ export function MultiDeckLabelTagBtns({
   colThreeSecondaryBtn,
 }: MultiDeckLabelTagBtnsProps): JSX.Element {
   return (
-    <Flex css={CONTAINER_STYLE}>
+    <Flex display={DISPLAY_GRID} css={CONTAINER_STYLE}>
       <Flex css={LABEL_CONTAINER_STYLE}>
         {colOneDeckInfoLabels
           .slice(0, MAX_SUPPORTED_LABELS)
