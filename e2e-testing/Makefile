@@ -123,3 +123,15 @@ test-ll-staging-headed:
 .PHONY: test-ll-prod
 test-ll-prod:
 	TEST_ENV=prod uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-compare
+test-compare:
+	@if [ "$(HEADLESS)" = "false" ]; then \
+		uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	else \
+		HEADLESS=true uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	fi
