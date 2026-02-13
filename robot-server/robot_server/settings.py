@@ -1,4 +1,3 @@
-import logging
 import typing
 from functools import lru_cache
 from pathlib import Path
@@ -9,8 +8,6 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from opentrons.config import infer_config_base_dir
-
-log = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=1)
