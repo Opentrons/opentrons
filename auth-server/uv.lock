@@ -136,7 +136,7 @@ robot = [
 requires-dist = [
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "oauthlib", specifier = ">=3.3.1,<4" },
-    { name = "pwdlib", extras = ["argon2", "bcrypt"] },
+    { name = "pwdlib", extras = ["argon2", "bcrypt"], specifier = "==0.3.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
     { name = "server-utils", editable = "../server-utils" },
