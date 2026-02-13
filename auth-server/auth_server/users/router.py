@@ -91,7 +91,20 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    user_create = request_body.data
+    # scopes_required = [Scope.USERS_WRITE]
+    # valid, _ = oauth2_backend.verify_request(
+    #     str(request.url),
+    #     http_method=request.method,  # type: ignore[arg-type]
+    #     body=request_body,
+    #     headers=dict(request.headers),
+    #     scopes=scopes_required,
+    # )
+    # if not valid:
+    #     raise fastapi.HTTPException(
+    #         status_code=fastapi.status.HTTP_403_FORBIDDEN,
+    #         detail="Forbidden",
+    #     )
+    user_create = request_body.data  # _.body.data
     _validate_user_create_input(
         user_create.userName,
         user_create.password.get_secret_value(),
@@ -110,7 +123,7 @@ async def post_users(
     # once we store it in the db we can have a unique id as well.
     new_user = User(
         username=user_create.userName,
-        password=hash_password(user_create.password.get_secret_value()),
+        hashed_password=hash_password(user_create.password.get_secret_value()),
         full_name=user_create.fullName,
         account_type=AccountType(user_create.accountType),
         scopes={Scope.USERS_WRITE},
@@ -228,7 +241,7 @@ async def update_user(
     # how should we handle password update?
     updated_user = User(
         username=user.username,
-        password=user.password,
+        hashed_password=user.hashed_password,
         full_name=request_body.data.fullName,
         account_type=AccountType(request_body.data.accountType),
         scopes=user.scopes,
