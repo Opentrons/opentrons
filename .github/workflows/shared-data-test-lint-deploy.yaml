@@ -118,18 +118,20 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache pnpm cache'
+      - name: 'cache yarn cache'
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/.pnpm-cache
+            ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'js deps'
-        id: 'setup-js'
-        uses: ./.github/actions/js/setup
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
       - name: 'Upload coverage report'
@@ -235,18 +237,20 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache pnpm cache'
+      - name: 'cache yarn cache'
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/.pnpm-cache
+            ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'js deps'
-        id: 'setup-js'
-        uses: ./.github/actions/js/setup
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'
