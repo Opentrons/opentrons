@@ -10,7 +10,7 @@ import oauthlib.oauth2
 import pydantic
 
 from auth_server.users.scopes import Scope
-from auth_server.users.store import TEST_USERS, User
+from auth_server.users.store import TEST_USERS, User, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -151,7 +151,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         for user in TEST_USERS:
-            if user.username == username and user.hashed_password == password:
+            if user.username == username and password_hash.verify(
+                password, user.hashed_password
+            ):
                 # Set `.user` per the oauthlib docs.
                 request.user = user  # type: ignore[attr-defined]
                 return True

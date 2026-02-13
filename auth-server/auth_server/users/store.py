@@ -16,6 +16,11 @@ password_hash = PasswordHash(
 )
 
 
+def hash_password(password: str) -> str:
+    """Hash a password using the recommended hashers."""
+    return password_hash.hash(password)
+
+
 class AccountType(StrEnum):
     """The type of account."""
 
@@ -40,21 +45,16 @@ class User:
 TEST_USERS = [
     User(
         username="test_admin",
-        hashed_password="test_admin_password",
+        hashed_password=hash_password("test_admin_password"),
         scopes=set(Scope),
         full_name="Test Admin",
         account_type=AccountType.ADMIN,
     ),
     User(
         username="test_user",
-        hashed_password="test_user_password",
+        hashed_password=hash_password("test_user_password"),
         scopes={Scope.RUNS_WRITE, Scope.RUNS_READ},
         full_name="Test User",
         account_type=AccountType.USER,
     ),
 ]
-
-
-def hash_password(password: str) -> str:
-    """Hash a password using the recommended hashers."""
-    return password_hash.hash(password)
