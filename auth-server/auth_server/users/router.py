@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 import fastapi
 from pydantic import BaseModel, Field, SecretStr
@@ -32,10 +32,18 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    fullName: Annotated[str, Field(..., description="The full name of the user.")]
+    userName: Annotated[
+        Optional[str], Field(..., description="The username of the user.")
+    ] = None
+    password: Annotated[
+        Optional[SecretStr], Field(..., description="The password for the user.")
+    ] = None
+    fullName: Annotated[
+        Optional[str], Field(..., description="The full name of the user.")
+    ] = None
     accountType: Annotated[
-        str, Field(..., description="The type of account for the user.")
-    ]
+        Optional[str], Field(..., description="The type of account for the user.")
+    ] = None
 
 
 class UserResponse(BaseModel):
@@ -240,6 +248,10 @@ async def update_user(
     _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_user = request_body.data
     _validate_user_create_input(
+        user_name=update_user.userName,
+        password=update_user.password.get_secret_value()
+        if update_user.password is not None
+        else None,
         full_name=update_user.fullName,
         account_type=update_user.accountType,
     )
@@ -249,13 +261,18 @@ async def update_user(
     )
     if user is None:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-    # if the userName is the unique identifier cannot update it.
-    # how should we handle password update?
+
     updated_user = User(
-        username=user.username,
-        hashed_password=user.hashed_password,
-        full_name=request_body.data.fullName,
-        account_type=AccountType(request_body.data.accountType),
+        username=update_user.userName or user.username,
+        hashed_password=(
+            hash_password(update_user.password.get_secret_value())
+            if update_user.password is not None
+            else user.hashed_password
+        ),
+        full_name=update_user.fullName or user.full_name,
+        account_type=AccountType(update_user.accountType)
+        if update_user.accountType
+        else user.account_type,
         scopes=user.scopes,
     )
     idx = TEST_USERS.index(user)
