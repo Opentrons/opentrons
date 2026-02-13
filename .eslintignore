@@ -49,3 +49,6 @@ opentrons-ai-server/api/storage/
 
 # CSS files should not be linted by ESLint (CSS files are linted by stylelint)
 **/*.css
+
+# e2e-testing/app uses its own toolchain (Biome) and is not part of the monorepo lint/format pipeline
+e2e-testing/app/**

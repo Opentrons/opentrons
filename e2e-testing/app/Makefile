@@ -24,20 +24,48 @@ teardown: ## Remove node_modules
 	@echo "✓ node_modules removed"
 
 # ---------------------------------------------------------------------------
-# Testing
+# Testing – Installed (production) app
 # ---------------------------------------------------------------------------
 
 .PHONY: test
-test: ## Run all tests (headless)
+test: ## Run installed-app tests (headless)
 	pnpm test
 
 .PHONY: test-headed
-test-headed: ## Run all tests (headed – visible window)
+test-headed: ## Run installed-app tests (headed – visible window)
 	pnpm test:headed
 
 .PHONY: test-debug
-test-debug: ## Run tests with Playwright Inspector
+test-debug: ## Run installed-app tests with Playwright Inspector
 	pnpm test:debug
+
+# ---------------------------------------------------------------------------
+# Testing – Dev app (from source)
+# ---------------------------------------------------------------------------
+
+.PHONY: test-dev
+test-dev: ## Run dev-mode tests (headless, builds + launches from source)
+	pnpm test:dev
+
+.PHONY: test-dev-headed
+test-dev-headed: ## Run dev-mode tests (headed – visible window)
+	pnpm test:dev:headed
+
+.PHONY: test-dev-debug
+test-dev-debug: ## Run dev-mode tests with Playwright Inspector
+	pnpm test:dev:debug
+
+.PHONY: test-dev-skip-build
+test-dev-skip-build: ## Run dev-mode tests, skip app-shell rebuild
+	SKIP_SHELL_BUILD=true pnpm test:dev
+
+# ---------------------------------------------------------------------------
+# Testing – All
+# ---------------------------------------------------------------------------
+
+.PHONY: test-all
+test-all: ## Run all tests (installed + dev)
+	pnpm test:all
 
 .PHONY: test-ui
 test-ui: ## Run tests in Playwright UI mode

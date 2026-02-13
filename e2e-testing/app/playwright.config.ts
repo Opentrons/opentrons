@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test'
 
 /**
  * Playwright configuration for Opentrons desktop app (Electron) E2E tests.
@@ -20,7 +20,10 @@ export default defineConfig({
   workers: 1,
 
   /* Reporter configuration. */
-  reporter: [['list'], ['html', { open: 'never', outputFolder: 'test-results/html-report' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: 'test-results/html-report' }],
+  ],
 
   /* Shared settings for all projects. */
   use: {
@@ -48,7 +51,11 @@ export default defineConfig({
   projects: [
     {
       name: 'electron-app',
-      testMatch: '**/*.spec.ts',
+      testMatch: '**/app-smoke.spec.ts',
+    },
+    {
+      name: 'electron-dev',
+      testMatch: '**/dev-app-smoke.spec.ts',
     },
   ],
-});
+})
