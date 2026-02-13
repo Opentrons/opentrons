@@ -184,7 +184,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         )
 
       default:
-        console.warn(`Unhandled step type ${stepType} for ${displayName}`)
         return (
           <StyledText desktopStyle="headingMediumBold">
             {displayName}
@@ -279,7 +278,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     const hoveredIsSelected = hoveredWells
       ? [...hoveredWells].every(w => selectedWellNames.has(w))
       : false
-
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />

@@ -11,9 +11,10 @@ export function EmptyWell(props: {
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
   const circularDimension = 20
-  const viewBox = isCircular
-    ? size || `0 0 ${circularDimension} ${circularDimension}`
-    : size || `0 0 ${width} ${height}`
+  const viewBox =
+    size || isCircular
+      ? `0 0 ${circularDimension} ${circularDimension}`
+      : `0 0 ${width} ${height}`
 
   return (
     <svg

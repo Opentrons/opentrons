@@ -10,7 +10,7 @@ import styles from './tipselectionwizard.module.css'
 import { useLegendItems } from './useLegendItems'
 
 import type { TipType, WellType } from '@opentrons/components'
-import type { LabwareDefinition, LabwareWellMap } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectionLegendProps {
   selectionType: 'tip' | 'well'

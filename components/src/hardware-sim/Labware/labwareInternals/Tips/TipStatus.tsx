@@ -12,8 +12,8 @@ import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
 import { UsedTip } from './UsedTip'
 
-import type { TipType } from '../types'
 import type { LabwareWellMap } from '@opentrons/shared-data'
+import type { TipType } from '../types'
 
 export function TipStatus(props: {
   type: TipType
@@ -28,13 +28,7 @@ export function TipStatus(props: {
     case USED:
       return <UsedTip size={size} />
     case SELECTED:
-      return (
-        <SelectedWell
-          size={size}
-          textInsideTip={text}
-          wellMap={wellMap}
-        />
-      )
+      return <SelectedWell size={size} textInsideTip={text} wellMap={wellMap} />
     case NO:
       return <EmptyWell size={size} wellMap={wellMap} />
     case INACCESSIBLE:

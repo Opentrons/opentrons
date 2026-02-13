@@ -39,15 +39,15 @@
 .nozzle_background_square {
   width: 558px;
   height: 497px;
-  padding:  var(--spacing-16) var(--spacing-16)  var(--spacing-16);
+  padding:  var(--spacing-16);
   border-radius: var(--border-radius-12);
   background-color: var(--grey-20);
   gap: var(--spacing-16);
 }
 
 .nozzle_render {
-align-items: center;
- padding:  var(--spacing-24) var(--spacing-24)  var(--spacing-24);
+  padding: var(--spacing-24);
+  gap: var(--spacing-8)
 }
 
 .select_well_alignment {

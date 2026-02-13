@@ -3,16 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, partialNozzleMap } from './utils'
+import { getNozzleText, getWellGroupLength, partialNozzleMap } from './utils'
 
 import type {
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PipetteV2Specs,
@@ -46,21 +47,45 @@ export function ExtendedPartialTipField(
     partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
+  let aspLabwareDef: LabwareDefinition | null = null
   switch (stepType) {
     case 'mix':
       aspWells = propsForFields.wells
         ? (propsForFields.wells.value as [])
         : aspWells
+      aspLabwareDef = deckSetup.labware[propsForFields.labware.value as string]
+        .def as LabwareDefinition
       break
     case 'transfer':
       aspWells = propsForFields.aspirate_wells.value as []
+      aspLabwareDef = deckSetup.labware[
+        propsForFields.aspirate_labware.value as string
+      ].def as LabwareDefinition
+
       break
   }
-  const aspWellsLength = aspWells.length
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
-  const dspWellsLength = dspWells.length
+  const dspLabwareDef = deckSetup.labware[
+    propsForFields.dispense_labware.value as string
+  ].def as LabwareDefinition
+
+  const aspWellsLength = aspLabwareDef
+    ? getWellGroupLength(
+        aspWells.length,
+        aspLabwareDef.ordering,
+        nozzleConfiguration
+      )
+    : 0
+
+  const dspWellsLength = dspLabwareDef
+    ? getWellGroupLength(
+        dspWells.length,
+        dspLabwareDef.ordering,
+        nozzleConfiguration
+      )
+    : 0
 
   function getNozzleWellText(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
@@ -72,52 +97,39 @@ export function ExtendedPartialTipField(
       nozzleConfiguration,
       partialNozzleCount
     )
-    if (
-      nozzleText === null ||
-      aspWells.length === 0 ||
-      (stepType !== 'Mix' && dspWells.length === 0)
-    ) {
+    const isTransfer = stepType === 'transfer'
+    const isRowOrColumn =
+      nozzleConfiguration === ROW || nozzleConfiguration === COLUMN
+    const hasRequiredWells =
+      aspWells.length > 0 && (!isTransfer || dspWells.length > 0)
+    if (!nozzleText || !hasRequiredWells) {
       return t('no_nozzles_and_wells_selected')
     }
+    const positionType = isRowOrColumn
+      ? nozzleConfiguration.toLowerCase() + 's'
+      : 'wells'
 
-    switch (nozzleConfiguration) {
-      case ROW:
-      case COLUMN:
-        const selectedValueText = nozzleConfiguration.toLowerCase()
-        if (stepType === 'transfer') {
-          return t('transfer_nozzles_selected', {
-            nozzleSelection: nozzleText + selectedValueText + ' nozzles',
-            aspWells: aspWellsLength,
-            dispWells: dspWellsLength,
-            positionType: selectedValueText,
-          })
-        } else {
-          return t('mix_nozzles_selected', {
-            nozzleSelection: nozzleText + selectedValueText + ' nozzles',
-            aspWells: aspWellsLength,
-          })
-        }
+    const nozzleSelection = isRowOrColumn
+      ? `${nozzleText}${positionType} nozzles`
+      : isTransfer
+        ? nozzleText
+        : `${nozzleText} nozzles`
 
-      case ALL:
-      case SINGLE:
-      case PARTIAL:
-        if (stepType === 'transfer') {
-          return t('transfer_nozzles_selected', {
-            nozzleSelection: nozzleText,
-            aspWells: aspWellsLength,
-            dispWells: dspWellsLength,
-            positionType: 'wells',
-          })
-        } else {
-          return t('mix_nozzles_selected', {
-            nozzleSelection: nozzleText + ' nozzles',
-            aspWells: aspWellsLength,
-          })
-        }
-      default:
-        return t('no_nozzles_and_wells_selected')
+    if (isTransfer) {
+      return t('transfer_nozzles_selected', {
+        nozzleSelection,
+        aspWells: aspWellsLength,
+        dispWells: dspWellsLength,
+        positionType,
+      })
     }
+
+    return t('mix_nozzles_selected', {
+      nozzleSelection,
+      aspWells: aspWellsLength,
+    })
   }
+
   return (
     <>
       <div className={styles.nozzle_selection_text}>

@@ -9,7 +9,7 @@ import { NewTip } from '../NewTip'
 import { TipStatus } from '../TipStatus'
 import { UsedTip } from '../UsedTip'
 
-import type { LabwareDefinition, LabwareWellMap } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
 vi.mock('../NewTip')
 vi.mock('../UsedTip')

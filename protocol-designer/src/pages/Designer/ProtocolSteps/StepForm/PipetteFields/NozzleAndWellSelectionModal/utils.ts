@@ -19,7 +19,6 @@ import {
 import type { TFunction } from 'i18next'
 import type { DropdownOption } from '@opentrons/components'
 import type {
-  LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
@@ -216,5 +215,22 @@ export const getEntireWellSelection = (
     }
     default:
       return [wellName]
+  }
+}
+
+export function getWellGroupLength(
+  totalSelected: number,
+  ordering: string[][],
+  nozzleConfiguration: NozzleConfigurationStyle
+): number {
+  const rows = ordering.length
+  const columns = ordering[0]?.length ?? 0
+  switch (nozzleConfiguration) {
+    case ROW:
+      return totalSelected / rows
+    case COLUMN:
+      return totalSelected / columns
+    default:
+      return totalSelected / 1
   }
 }

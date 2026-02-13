@@ -1,12 +1,9 @@
-import { Dispatch, SetStateAction } from 'react'
-
 import {
   COLORS,
   INACCESSIBLE,
   SELECTED,
   StrokedNozzles,
   UNSELECTED,
-  WellType,
 } from '@opentrons/components'
 import {
   A1_NOZZLE,
@@ -14,6 +11,7 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  PARTIAL,
   ROW,
 } from '@opentrons/shared-data'
 
@@ -25,7 +23,8 @@ import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/Si
 import styles from './nozzleandwellwizard.module.css'
 import { getAvailablePrimaryNozzles, getEntireWellSelection } from './utils'
 
-import type { Channels } from '@opentrons/components'
+import type { Dispatch, SetStateAction } from 'react'
+import type { Channels, WellType } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
@@ -91,14 +90,14 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
     y: 0,
     width: width,
     height: height,
-    rotate: is96Channel,
+    rotate: !is96Channel,
   }
   const availableNozzlesOptions = getAvailablePrimaryNozzles(
     channels,
     nozzleConfiguration
   )
   const allNozzles = Object.keys(nozzleMap)
-
+  const isPartial = nozzleConfiguration === PARTIAL
   const nozzles = availableNozzlesOptions.map(nozzle => nozzle.value)
   const wellOrdering = Object.values(orderedColumns).map(
     column => column.orderedNozzles
@@ -107,15 +106,15 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
   if (nozzleConfiguration === ALL) {
     availableNozzles = allNozzles
   } else if (nozzleConfiguration === COLUMN || nozzleConfiguration === ROW) {
-    availableNozzles = nozzles.flatMap(nozzle =>
-      getEntireWellSelection(
+    availableNozzles = nozzles.flatMap(nozzle => {
+      return getEntireWellSelection(
         nozzle,
         wellOrdering,
         nozzleConfiguration,
         primaryNozzle,
         channels
       )
-    )
+    })
   } else {
     availableNozzles = nozzles
   }
@@ -125,28 +124,31 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
       wellName,
       selectedNozzle?.includes(wellName)
         ? SELECTED
-        : availableNozzles.includes(wellName)
+        : availableNozzles.includes(wellName) && !isPartial
           ? UNSELECTED
           : INACCESSIBLE,
     ])
   )
 
   const handleClickNozzle = (nozzleName: string): void => {
-    const nozzlesToSelect = getEntireWellSelection(
-      nozzleName,
-      wellOrdering,
-      nozzleConfiguration,
-      primaryNozzle,
-      channels
-    )
-
-    setSelectedNozzle(nozzlesToSelect)
-
-    propsForFields.primaryNozzle.updateValue(nozzleName)
+    const isAccessible = nozzleStatus[nozzleName] !== INACCESSIBLE
+    if (isAccessible && !isPartial) {
+      const nozzlesToSelect = getEntireWellSelection(
+        nozzleName,
+        wellOrdering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+      setSelectedNozzle(nozzlesToSelect)
+      propsForFields.primaryNozzle.updateValue(nozzlesToSelect[0])
+    }
   }
+  const viewBox = `0 0 ${width} ${height}`
+
   return (
     <div className={styles.nozzle_render}>
-      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+      <svg width="100%" height="100%" viewBox={viewBox}>
         <OutlineComponent {...outlineProps} />
         <StrokedNozzles
           pipetteSpecs={pipetteSpecs}
