@@ -174,14 +174,14 @@ def offset_for_channel(channel: int, layout: str) -> Point:
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-    if ctx.params.return_tip and ctx.params.layout is not "Full":  # type: ignore [attr-defined]
+    if ctx.params.return_tip and ctx.params.layout != "Full":  # type: ignore [attr-defined]
         raise RuntimeError("Don't use return tip with anything but full layout")
     dial = None
     if IS_ROBOT and not ctx.is_simulating():
         dial = find_dial()
         assert dial is not None, "could not find dial"
     ctx.load_trash_bin("A3")
-    tipracks=  []
+    tipracks = []
     for slot in LAYOUT_TO_RACK_SLOTS[ctx.params.layout]:  # type: ignore [attr-defined]
         tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter="opentrons_flex_96_tiprack_adapter"))  # type: ignore [attr-defined]
     pipette = ctx.load_instrument(
