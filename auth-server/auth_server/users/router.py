@@ -91,19 +91,19 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    # scopes_required = [Scope.USERS_WRITE]
-    # valid, _ = oauth2_backend.verify_request(
-    #     str(request.url),
-    #     http_method=request.method,  # type: ignore[arg-type]
-    #     body=request_body,
-    #     headers=dict(request.headers),
-    #     scopes=scopes_required,
-    # )
-    # if not valid:
-    #     raise fastapi.HTTPException(
-    #         status_code=fastapi.status.HTTP_403_FORBIDDEN,
-    #         detail="Forbidden",
-    #     )
+    scopes_required = [Scope.USERS_WRITE]
+    valid, _ = oauth2_backend.verify_request(
+        str(request.url),
+        http_method=request.method,  # type: ignore[arg-type]
+        body=request_body,
+        headers=dict(request.headers),
+        scopes=scopes_required,
+    )
+    if not valid:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_403_FORBIDDEN,
+            detail="Forbidden",
+        )
     user_create = request_body.data  # _.body.data
     _validate_user_create_input(
         user_create.userName,
