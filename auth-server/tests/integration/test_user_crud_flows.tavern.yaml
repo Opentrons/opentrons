@@ -5,6 +5,28 @@ marks:
       - run_server
 
 stages:
+  - name: Get an access token with sufficient scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+        scope: users.write
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: users.write
+      save:
+        json:
+          access_token: access_token
+
   - name: Create a new user
     request:
       method: POST
@@ -15,6 +37,8 @@ stages:
           password: securepassword123
           fullName: Test New User
           accountType: user
+      headers:  
+        Authorization: 'Bearer {access_token}'
     response:
       status_code: 201
       json:
@@ -28,6 +52,8 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      headers:  
+        Authorization: 'Bearer {access_token}'
       json:
         data:
           userName: test_new_user_password_less_than_8_characters

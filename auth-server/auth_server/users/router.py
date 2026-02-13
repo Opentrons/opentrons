@@ -95,7 +95,7 @@ async def post_users(
     valid, _ = oauth2_backend.verify_request(
         str(request.url),
         http_method=request.method,  # type: ignore[arg-type]
-        body=request_body,
+        body=request_body.model_dump_json(),
         headers=dict(request.headers),
         scopes=scopes_required,
     )
