@@ -23,7 +23,10 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '22.22.0'
-        cache: 'yarn'
+        cache: 'pnpm'
+        cache-dependency-path: |
+          pnpm-lock.yaml
+          components-testing/pnpm-lock.yaml
 
     - name: 'Setup Python'
       uses: actions/setup-python@v4
