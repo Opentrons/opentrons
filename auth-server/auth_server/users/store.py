@@ -39,7 +39,7 @@ class User:
     hashed_password: str
     full_name: str
     account_type: AccountType
-    scopes: set[Scope]
+    scopes: list[Scope]
 
 
 # todo(mm, 2026-01-29): Delete these placeholder users when we have a real DB to store real users.
@@ -47,14 +47,14 @@ TEST_USERS = [
     User(
         username="test_admin",
         hashed_password=hash_password("test_admin_password"),
-        scopes=set(Scope),
+        scopes=list(Scope),
         full_name="Test Admin",
         account_type=AccountType.ADMIN,
     ),
     User(
         username="test_user",
         hashed_password=hash_password("test_user_password"),
-        scopes={Scope.RUNS_WRITE, Scope.RUNS_READ},
+        scopes=[Scope.RUNS_WRITE, Scope.RUNS_READ],
         full_name="Test User",
         account_type=AccountType.USER,
     ),
