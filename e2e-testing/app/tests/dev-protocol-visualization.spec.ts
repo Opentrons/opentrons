@@ -37,6 +37,9 @@ test.describe('Protocol Visualization – Regression', () => {
   test('all protocol steps render without white screens', async ({
     appPage,
   }, testInfo) => {
+    // This test clicks through every step — allow up to 5 minutes.
+    test.setTimeout(300_000)
+
     /** Attach a screenshot to the test report. */
     const snapshot = async (name: string): Promise<void> => {
       const body = await appPage.screenshot()

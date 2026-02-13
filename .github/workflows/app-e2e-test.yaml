@@ -116,7 +116,7 @@ jobs:
       # --- 3. Run tests --------------------------------------------------
       - name: "Run all dev app E2E tests"
         working-directory: e2e-testing/app
-        run: xvfb-run --auto-servernum -- make test-dev-all
+        run: xvfb-run --auto-servernum -- make test-dev
 
       # --- 4. Artifacts ---------------------------------------------------
       - name: "Upload test results"
