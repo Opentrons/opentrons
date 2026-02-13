@@ -32,12 +32,11 @@ class Environment(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
 
-# If you update this, also update the generated settings_schema.json.
 class RobotServerSettings(BaseSettings):
     """Robot server settings.
 
     To override any of these create an environment variable with prefix
-    OT_ROBOT_SERVER_.
+    OT_ROBOT_SERVER_, e.g. OT_ROBOT_SERVER_persistence_directory.
     """
 
     simulator_configuration_file_path: typing.Optional[str] = Field(
