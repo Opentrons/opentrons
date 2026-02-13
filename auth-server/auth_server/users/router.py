@@ -67,7 +67,7 @@ def _verify_scopes(
         http_method=request.method,  # type: ignore[arg-type]
         body=body,
         headers=dict(request.headers),
-        scopes=scopes,
+        scopes=[scope.api_name for scope in scopes],
     )
     if not valid:
         raise fastapi.HTTPException(
@@ -128,7 +128,8 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
+    scopes_required = [Scope.USERS_WRITE]
+    _verify_scopes(request, oauth2_backend, scopes_required)
     user_create = request_body.data
     _validate_user_create_input(
         user_create.userName,
@@ -147,7 +148,7 @@ async def post_users(
         hashed_password=hash_password(user_create.password.get_secret_value()),
         full_name=user_create.fullName,
         account_type=AccountType(user_create.accountType),
-        scopes={Scope.USERS_WRITE},
+        scopes=scopes_required,
     )
 
     TEST_USERS.append(new_user)
@@ -159,7 +160,7 @@ async def post_users(
                 userName=new_user.username,
                 fullName=new_user.full_name,
                 accountType=new_user.account_type,
-                scopes=[scope.value for scope in new_user.scopes],
+                scopes=[scope.api_name for scope in scopes_required],
             )
         ),
     )
