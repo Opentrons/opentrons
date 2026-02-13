@@ -1,5 +1,4 @@
 import functools
-import re
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
