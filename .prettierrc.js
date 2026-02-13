@@ -1,6 +1,5 @@
 'use strict'
 
-// We define the order here as a variable, but we ONLY use it inside the override.
 const importOrder = [
   '^(react)(.*)$',
   '<THIRD_PARTY_MODULES>',
@@ -50,11 +49,9 @@ module.exports = {
         plugins: [require.resolve('@ianvs/prettier-plugin-sort-imports')],
 
         // 2. Apply the options ONLY for these files
-        importOrder: importOrder,
+        importOrder,
         importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
       },
     },
-    // We do NOT need an override for *.md/*.json anymore because
-    // the global config is now clean.
   ],
 }

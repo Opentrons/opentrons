@@ -12,13 +12,12 @@ runs:
     - uses: ./.github/actions/git/resolve-tag
     - uses: ./.github/actions/environment/complex-variables
 
-    # 1. Install pnpm explicitly (Must be BEFORE Setup Node)
+    # must install pnpm directly before setup-node
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
         version: 10.22.0
 
-    # 2. Setup Node with pnpm caching enabled
     - name: 'Setup Node'
       uses: actions/setup-node@v4
       with:
