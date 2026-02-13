@@ -33,7 +33,7 @@ clean:
 
 .PHONY: build
 build: export NODE_ENV := production
-build: export NODE_OPTIONS := --max-old-space-size=8192
+build: export NODE_OPTIONS := --max-old-space-size=5120
 build:
 	vite build
 	git rev-parse HEAD > dist/.commit
