@@ -21,6 +21,25 @@ export class AppPage {
     await this.page.waitForLoadState('domcontentloaded', { timeout })
   }
 
+  /**
+   * Dismiss any modals that appear automatically on a fresh app launch.
+   *
+   * Currently handles:
+   * - **SystemLanguagePreferenceModal** — shown when no language preference
+   *   is stored (first boot). Dismissed by clicking "Continue".
+   */
+  async dismissStartupModals(): Promise<void> {
+    // SystemLanguagePreferenceModal — "Continue" button on first boot.
+    const continueButton = this.page.getByRole('button', { name: 'Continue' })
+    try {
+      await continueButton.click({ timeout: 10_000 })
+      console.log('Dismissed language preference modal')
+    } catch {
+      // Modal didn't appear — that's fine (not a fresh install).
+      console.log('No language preference modal to dismiss')
+    }
+  }
+
   // ---------------- Queries ----------------------------------------------
 
   /** Return the document title of the app window. */

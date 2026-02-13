@@ -47,6 +47,7 @@ test.describe('Protocol Visualization – Regression', () => {
     // ---- Setup: wait for the app to be ready ----------------------------
     const app = new AppPage(appPage)
     await app.waitForReady()
+    await app.dismissStartupModals()
     console.log('App is ready')
 
     // ---- Step 1: Navigate to the protocols page -------------------------

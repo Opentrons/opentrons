@@ -44,9 +44,9 @@ env:
 
 jobs:
   e2e-dev-app:
-    name: "E2E smoke tests (dev app)"
+    name: "E2E tests (dev app)"
     runs-on: "ubuntu-24.04"
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       # --- 1. Checkout ----------------------------------------------------
       - name: "Checkout repository"
@@ -113,100 +113,17 @@ jobs:
         working-directory: e2e-testing/app
         run: npx playwright install --with-deps chromium
 
-      # --- 3. Run smoke tests --------------------------------------------
-      - name: "Run dev app smoke tests"
+      # --- 3. Run tests --------------------------------------------------
+      - name: "Run all dev app E2E tests"
         working-directory: e2e-testing/app
-        run: xvfb-run --auto-servernum -- make test-dev
+        run: xvfb-run --auto-servernum -- make test-dev-all
 
       # --- 4. Artifacts ---------------------------------------------------
       - name: "Upload test results"
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: app-e2e-smoke-results
-          path: |
-            e2e-testing/app/test-results/
-          retention-days: 7
-          if-no-files-found: warn
-
-  e2e-dev-viz:
-    name: "E2E visualization regression (dev app)"
-    runs-on: "ubuntu-24.04"
-    timeout-minutes: 45
-    steps:
-      # --- 1. Checkout ----------------------------------------------------
-      - name: "Checkout repository"
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: "Overlay app source from target branch"
-        if: ${{ inputs.app-branch != '' }}
-        run: |
-          echo "→ Overlaying app source from branch: ${{ inputs.app-branch }}"
-          cp -r e2e-testing /tmp/e2e-testing-save
-
-          git fetch origin ${{ inputs.app-branch }}
-          git checkout origin/${{ inputs.app-branch }} -- \
-            app/ \
-            app-shell/ \
-            app-shell-odd/ \
-            api/ \
-            shared-data/ \
-            hardware/ \
-            step-generation/ \
-            components/ \
-            react-api-client/ \
-            api-client/ \
-            discovery-client/ \
-            server-utils/ \
-            scripts/ \
-            Makefile \
-            package.json \
-            yarn.lock \
-            tsconfig*.json
-
-          rm -rf e2e-testing
-          cp -r /tmp/e2e-testing-save e2e-testing
-          echo "✓ App source overlaid from ${{ inputs.app-branch }}"
-
-      # --- 2. Environment setup -------------------------------------------
-      - name: "Setup JS environment"
-        uses: ./.github/actions/js/setup
-
-      - name: "Setup pnpm (for e2e-testing/app)"
-        run: npm install -g pnpm@latest
-
-      - name: "Setup Python 3.12 + API environment"
-        uses: ./.github/actions/python/setup-uv
-        with:
-          project: api
-
-      - name: "Export Python path for Electron"
-        run: |
-          PYTHON_PATH=$(cd api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))")
-          echo "✓ Python resolved: ${PYTHON_PATH}"
-          echo "PYTHON_PATH_OVERRIDE=${PYTHON_PATH}" >> "$GITHUB_ENV"
-
-      - name: "Install E2E app test dependencies"
-        working-directory: e2e-testing/app
-        run: make setup
-
-      - name: "Install Playwright Electron deps"
-        working-directory: e2e-testing/app
-        run: npx playwright install --with-deps chromium
-
-      # --- 3. Run visualization tests ------------------------------------
-      - name: "Run protocol visualization tests"
-        working-directory: e2e-testing/app
-        run: xvfb-run --auto-servernum -- make test-dev-viz
-
-      # --- 4. Artifacts ---------------------------------------------------
-      - name: "Upload test results (with screenshots)"
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: app-e2e-viz-results
+          name: app-e2e-results
           path: |
             e2e-testing/app/test-results/
           retention-days: 14
