@@ -21,5 +21,9 @@ export type TipType =
 export const WELL: 'well' = 'well'
 export const TIP: 'tip' = 'tip'
 
-export type WellType = typeof SELECTED | typeof INACCESSIBLE | typeof UNSELECTED
+export type WellType =
+  | typeof SELECTED
+  | typeof INACCESSIBLE
+  | typeof UNSELECTED
+  | typeof SELECTED_ERROR
 export type SelectionType = typeof WELL | typeof TIP

@@ -38,7 +38,7 @@ check: lint typecheck
 test-pd-local:
 	@# Always print the summary banner, but preserve pytest's exit code.
 	@status=0; \
-	TEST_ENV=local uv run pytest $(PYTEST_ARGS) || status=$$?; \
+	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS) || status=$$?; \
 	echo ""; \
 	echo "---------------------------------------------------------"; \
 	echo "🧪 Tests Finished!"; \
@@ -91,3 +91,39 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: test-ll-local
+test-ll-local:
+	TEST_ENV=local uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll
+test-ll:
+	TEST_ENV=$(TEST_ENV) uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-local-headed
+test-ll-local-headed:
+	TEST_ENV=local HEADLESS=false uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-staging
+test-ll-staging:
+	TEST_ENV=staging uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-staging-headed
+test-ll-staging-headed:
+	TEST_ENV=staging HEADLESS=false uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-prod
+test-ll-prod:
+	TEST_ENV=prod uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-compare
+test-compare:
+	@if [ "$(HEADLESS)" = "false" ]; then \
+		uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	else \
+		HEADLESS=true uv run pytest -m compare_versions \
+		  --browser chromium \
+		  tests/pd $(PYTEST_ARGS) -s; \
+	fi

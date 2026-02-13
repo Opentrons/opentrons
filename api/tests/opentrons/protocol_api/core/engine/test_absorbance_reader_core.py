@@ -38,7 +38,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncAbsorbanceReaderHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture
@@ -91,6 +93,7 @@ def test_initialize(
                 sampleWavelengths=[350],
                 referenceWavelength=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -107,6 +110,7 @@ def test_initialize(
                 sampleWavelengths=[350],
                 referenceWavelength=450,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -123,6 +127,7 @@ def test_initialize(
                 sampleWavelengths=[350, 400, 450],
                 referenceWavelength=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -173,6 +178,7 @@ def test_read(
                 moduleId="1234",
                 fileName=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )

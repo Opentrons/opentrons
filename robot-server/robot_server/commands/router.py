@@ -9,17 +9,17 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from opentrons.protocol_runner import RunOrchestrator
 from opentrons_shared_data.errors import ErrorCodes
 from server_utils.fastapi_utils.light_router import LightRouter
-
-from .get_default_orchestrator import RunActive, get_default_orchestrator
-from .stateless_commands import StatelessCommand, StatelessCommandCreate
-from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.service.json_api import (
+from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     PydanticResponse,
     RequestModel,
     SimpleBody,
     SimpleMultiBody,
 )
+
+from .get_default_orchestrator import RunActive, get_default_orchestrator
+from .stateless_commands import StatelessCommand, StatelessCommandCreate
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 

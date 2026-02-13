@@ -109,6 +109,25 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 *New in version 2.16*
 
+The API automatically varies the tip drop location in the default trash container, or when you haven't specified a `location`, to help keep tips from piling up. Beginning with API version 2.28, you can add the optional `alternate_drop_location` argument to control the tip drop location in a specified `location`:
+
+```python
+trash = protocol_context.load_trash_bin("A3")
+pipette.pick_up_tip() #picks up the next tip
+
+# alternate drop tip location in the specified trash
+pipette.drop_tip(
+    location=secondary_trash,
+    alternate_drop_location=True)
+pipette.pick_up_tip() # picks up the next tip
+pipette.drop_tip(
+    location=secondary_trash,
+    alternate_drop_location=True)
+```
+*New in version 2.28*
+
+In the example above, the pipette drops each tip in a slightly different location in the `secondary_trash`.  
+
 ## Returning a tip
 
 To return a tip to its original location, call the [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] method with no arguments:
@@ -119,11 +138,34 @@ pipette.return_tip()
 
 *New in version 2.0*
 
-!!! note
-    You can't return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). This restriction ensures that the pipette has clear access to unused tips. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is empty.
+Beginning with API version 2.28, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). 
 
-    If you call `return_tip()` while using partial tip pickup, the API will raise an error. Use `drop_tip()` to dispose the tips instead.
+When you return tips to their original position in the tip rack, you'll need to consider which tips, if any, you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. When you call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] again, the robot won't be able to access unused tips in column 2.
 
+You can still pick up the used tips again from their original location by explictly specifying their location in the tip rack. See below for details.
+
+<!--------
+
+To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] to return used tips to an empty tip rack on the deck.
+
+Start by specifying and placing an empty tip rack on the deck:
+
+```python
+# set tiprack_1 as empty
+tiprack_1.set_empty()
+
+# pick up a tip from the pipette's assigned tip rack
+pipette.pick_up_tip()
+
+# return attached tips to the empty tiprack_1
+pipette.drop_tip(tiprack_1["A1"])
+```
+
+*New in version 2.28*
+
+In the example above, the pipette uses automatic tip tracking to pick up the next available tip in its assigned tip rack. Then, it drops the attached tip in well A1 of the empty `tiprack_1`.
+
+----->
 ## Working with used tips
 
 Currently, the API considers tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example:

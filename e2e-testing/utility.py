@@ -94,3 +94,45 @@ def _dismiss_migration_modal(page: Page) -> None:
     else:
         print("Migration modal did not appear, proceeding with test.")
         pass
+
+
+def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+    """Create a new protocol from the landing page."""
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+
+    landing.click_create_protocol()
+    create_new_protocol_flow(pipette, gripper, tc, waste_chute, page)
+
+
+def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+    page.get_by_text("Add a pipette").click()
+    page.get_by_text(pipette).click()
+    page.get_by_text("50 µL").click()
+    page.get_by_role("checkbox", name="Tip Rack 50 µL", exact=True).click()
+    page.get_by_role("button", name="Save").click()
+    page.get_by_text("Yes", exact=True).click()
+    if gripper:
+        page.get_by_test_id("BasicsButtons_gripper_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_gripper_no").get_by_text("No").click()
+    if tc:
+        page.get_by_test_id("BasicsButtons_thermocycler_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
+    if waste_chute:
+        page.get_by_test_id("BasicsButtons_wasteChute_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
+    confirm_button = page.get_by_role("button", name="Confirm")
+    confirm_button.click()
+
+
+def start_new_create_protocol(page: Page) -> None:
+    """
+    Create a a new protocol from banner bar.
+    This will open a browser dialog box to verify you'll lose your current progress.
+    """
+    page.on("dialog", lambda dialog: dialog.accept())
+    page.get_by_test_id("basic_button_Create new").click()

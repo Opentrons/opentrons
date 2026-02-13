@@ -4,10 +4,14 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
 from starlette import status as http_status_codes
 
+from server_utils.fastapi_utils.models.json_api import ResourceLink
+from server_utils.fastapi_utils.models.json_api.resource_links import (
+    ResourceLinkKey,
+    ResourceLinks,
+)
+
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import CommonErrorDef, RobotServerError
-from robot_server.service.json_api import ResourceLink
-from robot_server.service.json_api.resource_links import ResourceLinkKey, ResourceLinks
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import BaseSession, SessionManager
 from robot_server.service.session.models.command import CommandRequest, CommandResponse

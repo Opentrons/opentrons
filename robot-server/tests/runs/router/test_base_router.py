@@ -36,6 +36,13 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
@@ -79,13 +86,6 @@ from robot_server.runs.run_models import (
     TipState,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 
 
 def mock_notify_publishers() -> None:

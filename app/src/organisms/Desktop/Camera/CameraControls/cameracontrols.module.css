@@ -9,6 +9,18 @@
   gap: var(--spacing-24);
 }
 
+.controls_section_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.controls_section_text_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
 .save_button {
   display: flex;
   flex-direction: row;

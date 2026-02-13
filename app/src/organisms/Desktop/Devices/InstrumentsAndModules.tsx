@@ -40,6 +40,9 @@ import type {
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
+
+// stubbed vacuum module for testing
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
@@ -116,7 +119,10 @@ export function InstrumentsAndModules({
   const halfAttachedModulesSize = isFlex
     ? Math.floor(attachedModules?.length / 2)
     : Math.ceil(attachedModules?.length / 2)
-  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const leftColumnModules = [
+    ...attachedModules?.slice(0, halfAttachedModulesSize),
+    // STUBBED_ATTACHED_VACUUM_MODULE,
+  ]
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return (

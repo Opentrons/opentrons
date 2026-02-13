@@ -6,6 +6,11 @@ from typing import Annotated, Literal
 import fastapi
 
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from robot_server.client_data.store import (
     ClientData,
@@ -13,8 +18,6 @@ from robot_server.client_data.store import (
     get_client_data_store,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.service.json_api.request import RequestModel
-from robot_server.service.json_api.response import SimpleBody, SimpleEmptyBody
 from robot_server.service.notifications.publishers.client_data_publisher import (
     ClientDataPublisher,
     get_client_data_publisher,

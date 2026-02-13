@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  ALIGN_CENTER,
   ALIGN_START,
   Banner,
   BORDERS,
@@ -36,6 +37,7 @@ import {
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -78,6 +80,8 @@ import { TestShakeSlideout } from './TestShakeSlideout'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
+import { VacuumModuleData } from './VacuumModule/VacuumModuleData'
+import { VacuumModuleSlideout } from './VacuumModule/VacuumModuleSlideout'
 
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -272,6 +276,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       moduleData = <FlexStackerModuleData moduleData={module.data} />
       break
     }
+
+    case VACUUM_MODULE_TYPE: {
+      moduleData = <VacuumModuleData moduleData={module.data} />
+      break
+    }
   }
 
   const handleMenuItemClick = (isSecondary: boolean = false): void => {
@@ -453,14 +462,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
+                  gridGap={SPACING.spacing4}
                 >
-                  <ModuleIcon
-                    moduleType={module.moduleType}
-                    size="1rem"
-                    marginTop={SPACING.spacing2}
-                    marginRight={SPACING.spacing4}
-                    color={COLORS.grey60}
-                  />
+                  <Flex alignItems={ALIGN_CENTER}>
+                    <ModuleIcon
+                      moduleType={module.moduleType}
+                      size="1rem"
+                      color={COLORS.grey60}
+                    />
+                  </Flex>
                   <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
                     {getModuleDisplayName(module.moduleModel)}
                   </StyledText>
@@ -563,6 +573,14 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
     return (
       <HeaterShakerSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  } else if (module.moduleType === VACUUM_MODULE_TYPE) {
+    return (
+      <VacuumModuleSlideout
         module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
