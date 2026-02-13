@@ -3,6 +3,7 @@ from typing import Annotated, Optional
 import fastapi
 from pydantic import BaseModel, Field, SecretStr
 
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
@@ -10,11 +11,8 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.oauth2.backend import Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
-from auth_server.users.scopes import Scope
 from auth_server.users.store import TEST_USERS, AccountType, User, hash_password
 
 router = fastapi.APIRouter()
@@ -245,6 +243,7 @@ async def update_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
+    scopes_required = [Scope.USERS_WRITE]
     _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_user = request_body.data
     _validate_user_create_input(
