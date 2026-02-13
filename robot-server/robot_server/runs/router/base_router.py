@@ -25,6 +25,17 @@ from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocati
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    Body,
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
 
 from ..dependencies import (
     get_run_auto_deleter,
@@ -73,17 +84,6 @@ from robot_server.protocols.protocol_store import (
 from robot_server.protocols.router import ProtocolNotFound
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    Body,
-    MultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-    SimpleMultiBody,
-)
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)

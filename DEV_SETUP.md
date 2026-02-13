@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.12.12
-- Node.js v22.21.1
+- Node.js v22.22.0
 - [uv][] (Python package manager) - required for all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`)
 
 ### macOS
@@ -259,7 +259,7 @@ Once you are inside the repository for the first time, you should do two things:
 3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.12.12`. Then check `python --version` again.
 
 ```shell
-# confirm Node v22.21.1 or greater
+# confirm Node v22.22.0 or greater
 node --version
 
 # set Python version, and confirm

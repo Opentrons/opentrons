@@ -14,7 +14,6 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
@@ -85,8 +84,6 @@ export function CameraCard({
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
 
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
-
   return (
     <div className={styles.card_container}>
       <div className={styles.card_content_container}>
@@ -136,11 +133,7 @@ export function CameraCard({
       </div>
       {showControls &&
         createPortal(
-          <CameraControls
-            onClose={toggleControls}
-            runId={null}
-            postCameraImageSettings={createCameraImageSettings}
-          />,
+          <CameraControls onClose={toggleControls} runId={null} />,
           getTopPortalEl()
         )}
     </div>
@@ -181,6 +174,7 @@ function CameraCardOverflowMenu({
           onClick={() => {
             handleItemClick(toggleControls)
           }}
+          disabled={!cameraEnabled}
         >
           {t('edit_settings')}
         </MenuItem>

@@ -8,9 +8,24 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.9.0
+
+**Welcome to Protocol Designer 8.9.0!**
+
+This release introduces updated Thermocycler Module steps and includes other bug fixes.
+
+### New Features
+
+- Your Protocol Designer protocol can run Thermocycler Module profiles while pipetting samples or running another module.
+
+### Bug Fixes
+
+- The Flex Stacker Module shows the correct number of labware stored inside.
+- Add or remove a Flex Stacker Module or waste chute to the robot deck without triggering protocol errors.
+
 ## Opentrons Protocol Designer Changes in 8.8.0
 
-**Welcome to Protocol Designer 8.8.0.!**
+**Welcome to Protocol Designer 8.8.0!**
 
 This release adds support for the Flex Stacker Module in Protocol Designer, and includes other bug fixes.
 
@@ -20,8 +35,13 @@ This release adds support for the Flex Stacker Module in Protocol Designer, and 
 
 ### Bug Fixes
 
-- Add tip rack lids to tip racks placed inside Flex 96-channel adapters.
 - Protocol Designer properly displays tip racks and their lids on the deck.
+- When you choose to mix liquids from the center of a well, Protocol Designer properly exports this location in your finished protocol.
+
+### Known Issues
+
+- Removing a Stacker Module from the deck can also remove other attached hardware. Click **Deck hardware** in the upper left to edit or re-add hardware to the Flex deck.
+- Adding a lid to a tiprack placed inside the Flex 96-channel adapter can cause your Protocol Designer protocol to fail analysis in the Opentrons App. In the starting deck, remove the lid from the tip rack before adding to the adapter.
 
 Running a protocol created in Protocol Designer requires Opentrons App version 8.8.0 or newer.
 

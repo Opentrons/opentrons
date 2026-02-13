@@ -4,28 +4,29 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-API_DIR := api
 API_CLIENT_DIR := api-client
+API_DIR := api
 APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
+AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 G_CODE_TESTING_DIR := g-code-testing
+HARDWARE_DIR := hardware
 LABWARE_LIBRARY_DIR := labware-library
+NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 PROTOCOL_DESIGNER_DIR := protocol-designer
-SHARED_DATA_DIR := shared-data
-UPDATE_SERVER_DIR := update-server
 REACT_API_CLIENT_DIR := react-api-client
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+SHARED_DATA_DIR := shared-data
 STEP_GENERATION_DIR := step-generation
 SYSTEM_SERVER_DIR := system-server
-HARDWARE_DIR := hardware
+UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
-NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR) $(SYSTEM_SERVER_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -116,6 +117,18 @@ clean-py: $(PYTHON_CLEAN_TARGETS)
 $(SHARED_DATA_DIR)-py-clean:
 	$(MAKE) -C $(SHARED_DATA_DIR) clean-py
 
+PYTHON_LOCK_TARGETS := $(addsuffix -py-lock, $(PYTHON_DIRS))
+
+.PHONY: lock-py
+lock-py: $(PYTHON_LOCK_TARGETS)
+
+%-py-lock:
+	$(MAKE) -C $* lock
+
+# Specialize the %-py-lock pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-lock:
+	$(MAKE) -C $(SHARED_DATA_DIR) lock-py
+
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
 deploy-py: export pypi_username = $(pypi_username)
@@ -164,6 +177,7 @@ push-ot3:
 	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
+	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -183,10 +197,6 @@ test: test-py test-js
 # tests that may be run on windows
 .PHONY: test-windows
 test-windows: test-js test-py-windows
-
-.PHONY: test-e2e
-test-e2e:
-	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
 WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)

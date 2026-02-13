@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from typing import (
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
@@ -23,7 +24,9 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
+from ..config import feature_flags
 from . import validation
+from ._command_annotations import GroupedSteps
 from ._liquid import Liquid, LiquidClass
 from ._liquid_properties import build_transfer_properties
 from ._parameters import Parameters
@@ -41,6 +44,7 @@ from .core.module import (
     AbstractMagneticModuleCore,
     AbstractTemperatureModuleCore,
     AbstractThermocyclerCore,
+    AbstractVacuumModuleCore,
 )
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
@@ -55,6 +59,7 @@ from .module_contexts import (
     ModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
+    VacuumModuleContext,
 )
 from .robot_context import HardwareManager, RobotContext
 from .tasks import Task
@@ -103,6 +108,7 @@ ModuleTypes = Union[
     MagneticBlockContext,
     AbsorbanceReaderContext,
     FlexStackerContext,
+    VacuumModuleContext,
 ]
 
 
@@ -1859,8 +1865,8 @@ class ProtocolContext(CommandPublisher):
         Args:
             home_before (bool): If `True`, homes the pipette before capturing an image.
             filename (str): Custom name to use when saving the captured image as a file. The custom name
-                is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, 
-                the step number, and a timestamp for the command running when the image was captured. 
+                is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run,
+                the step number, and a timestamp for the command running when the image was captured.
             resolution (Tuple[int, int]): Accepts a width and height (as a tuple) to determine the camera's resolution
                 when capturing an image.
             zoom (float): Zoom level the camera will use. Defaults to a minimum of 1x zoom (`1.0`) and
@@ -1895,6 +1901,50 @@ class ProtocolContext(CommandPublisher):
             )
         return None
 
+    @contextmanager
+    def group_steps(
+        self, name: str, description: Optional[str] = None
+    ) -> Iterator[None]:
+        """Group commands together for visualization in run previews and the run log.
+        This method is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement)
+        that uses the `with` syntax. All commands within this block will be grouped together.
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
+        annotation_id = self._core.start_step_grouping(name, description)
+        try:
+            yield
+        finally:
+            self._core.end_step_grouping(annotation_id)
+
+    def create_and_start_step_group(
+        self, name: str, description: Optional[str] = None
+    ) -> GroupedSteps:
+        """Starts a grouping of commands for visualization in run previews and the run log.
+        This returns a step group object which can then be closed by calling
+        [`end_group()`][opentrons.protocol_api.GroupedSteps.close_group].
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
+        annotation_id = self._core.start_step_grouping(name, description)
+        return GroupedSteps(
+            annotation_id=annotation_id,
+            protocol_core=self._core,
+            api_version=self._api_version,
+        )
+
 
 def _create_module_context(
     module_core: Union[ModuleCore, NonConnectedModuleCore],
@@ -1918,6 +1968,8 @@ def _create_module_context(
         module_cls = AbsorbanceReaderContext
     elif isinstance(module_core, AbstractFlexStackerCore):
         module_cls = FlexStackerContext
+    elif isinstance(module_core, AbstractVacuumModuleCore):
+        module_cls = VacuumModuleContext
     else:
         assert False, "Unsupported module type"
 

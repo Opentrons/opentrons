@@ -5,7 +5,7 @@ from typing import Literal
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class PlateReaderPage(BasePage):
@@ -24,7 +24,6 @@ class PlateReaderPage(BasePage):
         self.page.get_by_test_id(slot).click()
         self.page.get_by_test_id("Modules").click()
         self.page.get_by_test_id(module).click()
-        self.button_selection("Confirm")
 
     def dimiss_deck_hardware_modal(self) -> None:
         """Dismiss the deck hardware modal if it appears."""
@@ -74,6 +73,13 @@ class PlateReaderPage(BasePage):
     def save_pr_step(self) -> None:
         """Click save transfer step button in transfer step."""
         self.page.get_by_text("Save", exact=True).click()
+
+    def wait_for_save_banner_gone(self) -> None:
+        """Wait for the save banner to disappear."""
+        banner_message = "Absorbance Plate Reader has been saved"
+        banner = self.page.get_by_test_id("Snackbar").get_by_text(banner_message, exact=True).first
+        banner.wait_for(state="visible")
+        banner.wait_for(state="detached")
 
     def button_selection(self, button_name: str) -> None:
         self.page.get_by_role("button", name=button_name).click()

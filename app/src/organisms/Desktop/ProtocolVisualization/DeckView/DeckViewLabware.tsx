@@ -4,6 +4,7 @@ import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
+  PROTOCOL_ENGINE_LID_STACK_LOADNAME,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
@@ -48,12 +49,16 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     hoveredSlot,
     selectedRunTimeCommand,
   } = props
-  const { labware, modules } = robotState
+  const { labware, modules, pipettes } = robotState
   return (
     <>
       {Object.entries(labware).map(([id, lw]) => {
         if (
-          Object.keys(modules).some(moduleId => lw.stack.includes(moduleId))
+          Object.keys(modules).some(moduleId => lw.stack.includes(moduleId)) ||
+          //  filter out the fake PE lid stack definition!
+          //  we shouldn't be exposing it to users at all
+          labwareEntitiesExtended[id].def.parameters.loadName ===
+            PROTOCOL_ENGINE_LID_STACK_LOADNAME
         ) {
           return null
         }
@@ -71,10 +76,12 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         }
         const { isActiveLayerVisible } = getActiveLayer(
           id,
+          pipettes,
           selectedRunTimeCommand
         )
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
+
         return (
           <Fragment key={id}>
             <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>

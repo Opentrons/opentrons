@@ -103,9 +103,9 @@ export function createStepDetailViewerUi({
   const stepDetailViewerWindow = new BrowserWindow({
     ...SECONDARY_WINDOW_OPTS,
     width: 500,
-    height: 450,
+    height: 464,
     minWidth: 500,
-    minHeight: 450,
+    minHeight: 464,
   })
 
   stepDetailViewerWindow.once('ready-to-show', () => {

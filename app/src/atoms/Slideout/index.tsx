@@ -36,6 +36,7 @@ export interface SlideoutProps {
   isExpanded?: boolean
   footer?: ReactNode
   multiSlideoutSpecs?: MultiSlideoutSpecs
+  childrenPadding?: string
 }
 
 const SHARED_STYLE = css`
@@ -124,6 +125,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
     children,
     footer,
     multiSlideoutSpecs,
+    childrenPadding = SPACING.spacing16,
   } = props
   const { t } = useTranslation('shared')
   const slideOutRef = useRef<HTMLDivElement>(null)
@@ -227,7 +229,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           )}
           <Divider marginY={0} color={COLORS.grey30} />
           <Box
-            padding={SPACING.spacing16}
+            padding={childrenPadding}
             flex="1 1 auto"
             overflowY="auto"
             data-testid={`Slideout_body_${

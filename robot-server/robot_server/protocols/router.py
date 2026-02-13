@@ -33,6 +33,15 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    Body,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
 
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 from .analysis_models import (
@@ -71,15 +80,6 @@ from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFo
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.hardware import get_robot_type
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    Body,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-    SimpleEmptyBody,
-    SimpleMultiBody,
-)
 
 log = logging.getLogger(__name__)
 

@@ -660,6 +660,19 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class CommandAnnotationNotFoundError(ProtocolEngineError):
+    """Raised when command annotation cannot be found or resolved."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandAnnotationNotFoundError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class ResumeFromRecoveryNotAllowedError(ProtocolEngineError):
     """Raised when attempting to resume a run from recovery that has a fixit command in the queue."""
 

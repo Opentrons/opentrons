@@ -25,14 +25,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
+        uses: 'actions/checkout@v6'
 
-      - name: Setup Python
-        uses: 'actions/setup-python@v5'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.12'
-          cache: 'pipenv'
-          cache-dependency-path: opentrons-ai-server/Pipfile.lock
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: "./opentrons-ai-server/uv.lock"
       - name: Setup
         id: install
         working-directory: ./opentrons-ai-server

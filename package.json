@@ -26,7 +26,7 @@
   },
   "packageManager": "pnpm@10.22.0",
   "engines": {
-    "node": ">=22.21.1"
+    "node": ">=22.22.0"
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
@@ -40,6 +40,7 @@
     "@eslint-react/eslint-plugin": "1.52.2",
     "@ianvs/prettier-plugin-sort-imports": "4.7.0",
     "@octokit/rest": "^19.0.5",
+    "@sentry/vite-plugin": "4.3.0",
     "@storybook/addon-actions": "8.6.14",
     "@storybook/addon-essentials": "8.6.14",
     "@storybook/addon-links": "8.6.14",
@@ -76,8 +77,6 @@
     "conventional-changelog": "^3.1.25",
     "core-js": "^3.6.4",
     "css-loader": "^3.2.0",
-    "cypress": "13.7.1",
-    "cypress-file-upload": "3.5.3",
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
@@ -88,7 +87,6 @@
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-formatter-summary-chart": "0.3.0",
-    "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-n": "^16.6.2",

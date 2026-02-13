@@ -163,7 +163,7 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 def command_annotations() -> List[pe_types.CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotation(
+        pe_types.SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
             params={"abc": "123"},
             machineReadableName="hello world",

@@ -33,10 +33,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.util import StrEnum
+from server_utils.fastapi_utils.models.json_api import ResourceModel
 
 from .action_models import RunAction
 from robot_server.errors.error_responses import ErrorDetails
-from robot_server.service.json_api import ResourceModel
 
 
 class RunDataError(ErrorDetails):

@@ -17,11 +17,13 @@ import type {
   PipetteName,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   ShakeSpeedParams,
   StackerStoredLabwareDefinitionURIs,
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -66,6 +68,8 @@ export interface PipetteTemporalProperties {
   tiprackId?: string
   //  last primary tip well accessed (used for return tip)
   tipWell?: string
+  // primary nozzle to use
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -165,6 +169,11 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
+// TODO (nd: 02/04/2026): configure this type for vacuum module
+export interface VacuumModuleState {
+  type: typeof VACUUM_MODULE_TYPE
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -173,6 +182,7 @@ export type ModuleState =
   | MagneticBlockState
   | AbsorbanceReaderState
   | FlexStackerModuleState
+  | VacuumModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -231,6 +241,7 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
+
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
@@ -344,6 +355,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
+
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -501,15 +514,16 @@ export type MixArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
-  /**  z offset from bottom of well in mm */
-  offsetFromBottomMm: number
+  /** mix position offset relative to this PositionReference */
+  positionReference: PositionReference
   /** x offset */
   xOffset: number
   /** y offset */
   yOffset: number
-  /** flow rates in uL/sec */
+  /** z offset */
   zOffset: number
-  positionReference: PositionReference
+
+  /** flow rates in uL/sec */
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
@@ -519,6 +533,7 @@ export type MixArgs = CommonArgs & {
   tipTracking: TipTrackingOption
   tipsSelected: string[][]
   tiprackSelected: string | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export type PauseArgs = CommonArgs & {

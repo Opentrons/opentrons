@@ -195,7 +195,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <Divider borderColor={COLORS.grey40} />
             {info.liquidIndex != null
               ? fullWellsByLiquid[info.liquidIndex]
-                  .sort((a, b) =>
+                  ?.sort((a, b) =>
                     orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
                   )
                   .map((wellName, wellliquidIndex) => {

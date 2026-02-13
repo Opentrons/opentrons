@@ -11,7 +11,9 @@ PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_drag_drop_steps(page: Page, base_url: str) -> None:
+def test_drag_drop_steps(page: Page, pd_base_url: str) -> None:
+    editor = ProtocolEditorPage(page)
+
     _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
     editor = ProtocolEditorPage(page)
@@ -30,3 +32,4 @@ def test_drag_drop_steps(page: Page, base_url: str) -> None:
 
     ## Drag Move Labware Step down the Step Form, from step 7 (index 6) to step 11 (becomes step 10)
     editor.drag_and_drop(6, 11)
+    editor.select_step(0, "Show Thermocycler Profile")

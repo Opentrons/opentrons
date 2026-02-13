@@ -42,14 +42,18 @@ export const ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST 
   'openLabwareCreatorFromBottomOfLabwareLibraryList'
 export const ANALYTICS_SENT_TO_FLEX = 'sendToFlex' // This would be changed
 
-export const ANALYTICS_ODD_APP_ERROR = 'oddError'
-export const ANALYTICS_DESKTOP_APP_ERROR = 'desktopAppError'
 export const ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR =
   'notificationPortBlockError'
+
+/**
+ * Protocol Visualization Analytics
+ */
 export const ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION =
   'launchProtocolVisualization'
 export const ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW =
   'launchProtocolVisualizationSpotlightWindow'
+export const ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES =
+  'notificationProtocolVisualizationViewportSizes'
 
 const ANALYTICS_PROTOCOL_PROCEED_BUTTON_TEXT = [
   ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP,
@@ -97,7 +101,6 @@ export const ANALYTICS_RECOVERY_RUN_RESULT = 'recoveryRunResultAfterError'
  * Quick Transfer Analytics
  */
 
-export const ANALYTICS_QUICK_TRANSFER_TAB_SELECTED = 'quickTransferTab'
 export const ANALYTICS_QUICK_TRANSFER_FLOW_STARTED = 'quickTransferFlowStarted'
 export const ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION =
   'quickTransferWellSelectionDuration'

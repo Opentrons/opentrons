@@ -6,6 +6,8 @@ from playwright.sync_api import Page, TimeoutError, expect
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
 
+# Todo add from eyes import eyes_check
+
 
 def _find_page_in_args(*args, **kwargs) -> Page | None:
     """Helper function to find the Playwright Page object in function arguments."""
@@ -77,30 +79,59 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: 
     return ProtocolEditorPage(page)
 
 
+def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> None:
+    """Edit the step form for a specific snapshot."""
+    # Todo add eyes_check(page, test_name, checkpoint_name)
+
+
 def _dismiss_migration_modal(page: Page) -> None:
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    overlay.wait_for(state="visible", timeout=5000)
+    if overlay.is_visible():
+        page.get_by_role("button", name="Import", exact=True).click()
+        expect(overlay).not_to_be_visible()
+    else:
+        print("Migration modal did not appear, proceeding with test.")
+        pass
 
-    try:
-        overlay.wait_for(state="visible", timeout=2000)
-        print("✓ Migration modal detected")
-    except Exception:
-        print("✗ Migration modal not found")
-        return
 
-    import_buttons = overlay.locator('button[class*="PrimaryButton"]').filter(
-        has_text=re.compile(r"^Import$", re.IGNORECASE)
-    )
+def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+    """Create a new protocol from the landing page."""
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
 
-    button_count = import_buttons.count()
-    print(f"Found {button_count} Import buttons")
+    landing.click_create_protocol()
+    create_new_protocol_flow(pipette, gripper, tc, waste_chute, page)
 
-    if button_count > 0:
-        migration_import_btn = import_buttons.nth(button_count - 1)
-        migration_import_btn.wait_for(state="visible", timeout=2000)
-        page.wait_for_timeout(100)
 
-        print("Clicking Import button...")
-        migration_import_btn.click(force=True)
+def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+    page.get_by_text("Add a pipette").click()
+    page.get_by_text(pipette).click()
+    page.get_by_text("50 µL").click()
+    page.get_by_role("checkbox", name="Tip Rack 50 µL", exact=True).click()
+    page.get_by_role("button", name="Save").click()
+    page.get_by_text("Yes", exact=True).click()
+    if gripper:
+        page.get_by_test_id("BasicsButtons_gripper_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_gripper_no").get_by_text("No").click()
+    if tc:
+        page.get_by_test_id("BasicsButtons_thermocycler_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
+    if waste_chute:
+        page.get_by_test_id("BasicsButtons_wasteChute_yes").get_by_text("Yes").click()
+    else:
+        page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
+    confirm_button = page.get_by_role("button", name="Confirm")
+    confirm_button.click()
 
-        overlay.wait_for(state="hidden", timeout=5000)
-        print("✓ Modal dismissed successfully")
+
+def start_new_create_protocol(page: Page) -> None:
+    """
+    Create a a new protocol from banner bar.
+    This will open a browser dialog box to verify you'll lose your current progress.
+    """
+    page.on("dialog", lambda dialog: dialog.accept())
+    page.get_by_test_id("basic_button_Create new").click()

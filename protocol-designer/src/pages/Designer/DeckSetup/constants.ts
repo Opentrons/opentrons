@@ -25,6 +25,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -125,7 +126,12 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_200ul_flat',
+    // Opentrons-branded reservoirs
+    'opentrons_tough_12_reservoir_22ml',
+    'opentrons_tough_1_reservoir_300ml',
+    'opentrons_tough_4_reservoir_72ml',
   ],
+  [VACUUM_MODULE_TYPE]: [],
 }
 
 export const MOAM_MODELS_WITH_FF: ModuleModel[] = [TEMPERATURE_MODULE_V2]

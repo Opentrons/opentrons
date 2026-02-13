@@ -172,8 +172,6 @@ class LandingPage(BasePage):
 3. `get_by_text()` - Visible text
 4. `get_by_label()` - Form labels
 
-When porting scenarios from the legacy Cypress suite, mirror the selectors used in `protocol-designer/cypress/support/**` first, before digging through product source. Those support helpers are the single source of truth for module, labware, and slot identifiers.
-
 **Avoid:**
 
 - CSS selectors (brittle, implementation-dependent)
@@ -218,6 +216,38 @@ assert "Protocol Designer" in page.title()
 from playwright.sync_api import expect
 expect(page.get_by_text("Success")).to_be_visible()
 ```
+
+## Visual Snapshots (Applitools Eyes)
+
+This suite supports opt-in Applitools visual checks.
+
+- Use the `eyes` pytest fixture defined in [e2e-testing/eyes.py](e2e-testing/eyes.py) (it is exposed via `pytest_plugins` in `conftest.py`).
+- `python-dotenv` loads a local `.env` file. Configure `APPLITOOLS_API_KEY` to enable checks.
+
+Preferred usage in tests:
+
+```python
+from playwright.sync_api import Page
+
+from eyes import Eyes
+
+
+def test_my_feature(page: Page, base_url: str, eyes: Eyes | None) -> None:
+    # ... use page objects to navigate ...
+    if eyes is None:
+        return
+
+    eyes.check("After navigation")
+```
+
+Behavior:
+
+- If `APPLITOOLS_API_KEY` is missing, the `eyes` fixture yields `None`.
+- If the run is headed (non-headless), the `eyes` fixture yields `None`.
+- Multiple `eyes.check(...)` calls in the same pytest test function are grouped under one Applitools test.
+- Batch naming (set in `conftest.py`) is:
+  - Local/dev: `dev run | <TEST_ENV>`
+  - CI: `CI | <PR branch>`
 
 ## Common Patterns
 

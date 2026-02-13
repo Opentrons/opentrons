@@ -566,7 +566,7 @@ export const forFlexStackerRetrieve = (
           ]
         if (labwareId != null) {
           runningStack.unshift(labwareId)
-          robotState.labware[labwareId].stack = runningStack
+          robotState.labware[labwareId].stack = [...runningStack]
         }
       }
     }
@@ -580,8 +580,8 @@ export const forFlexStackerStore = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
-  const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
+  const moduleSlot = robotState.modules[moduleId].slot
   if (moduleState != null) {
     const { labwareOnShuttle } = moduleState
     if (labwareOnShuttle != null) {

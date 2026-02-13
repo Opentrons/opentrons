@@ -140,16 +140,16 @@ export function ProtocolSteps({
         dispatch(saveProtocolFile())
       },
     })
-
   let currentStep: FormData | null
-  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+  if (formData?.stepType === 'flexStacker') {
+    currentStep = formData
+  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
-
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
@@ -200,7 +200,10 @@ export function ProtocolSteps({
         })
         setViewBox(zoomedInViewBox)
       }
-    } else if (zoomedInOnOffDeck) {
+    } else if (
+      zoomedInOnOffDeck &&
+      selectedTerminalItemId! === START_TERMINAL_ITEM_ID
+    ) {
       setDeckView(rightString)
     }
   }, [zoomedInSlot, labware, zoomedInOnOffDeck])
@@ -260,7 +263,6 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
-                zIndex={showDefineLiquidModal ? 1 : 1000}
               >
                 <ExportButton onClick={handleExportClick} />
               </Flex>

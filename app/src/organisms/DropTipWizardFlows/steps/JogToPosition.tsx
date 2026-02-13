@@ -4,15 +4,12 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 
 import { JogControls } from '/app/molecules/JogControls'
 
-import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
 import type { DropTipWizardContainerProps } from '../types'
@@ -33,19 +30,6 @@ export const JogToPosition = ({
 
   return (
     <>
-      <Flex css={TITLE_SECTION_STYLE}>
-        <StyledText
-          desktopStyle="headingSmallBold"
-          oddStyle="level4HeaderSemiBold"
-        >
-          {t('position_the_pipette')}
-        </StyledText>
-        <LegacyStyledText forwardedAs="p">
-          {currentRoute === DT_ROUTES.BLOWOUT
-            ? t('position_and_blowout')
-            : t('position_and_drop_tip')}
-        </LegacyStyledText>
-      </Flex>
       <Flex
         css={
           modalStyle === 'simple'
@@ -53,11 +37,8 @@ export const JogToPosition = ({
             : INTERVENTION_CONTENT_SECTION_STYLE
         }
       >
-        <JogControls
-          jog={handleJog}
-          isOnDevice={isOnDevice}
-          height={isOnDevice ? '80%' : '100%'}
-        />
+        <JogControls jog={handleJog} isOnDevice={isOnDevice} />
+
         <DropTipFooterButtons
           primaryBtnOnClick={proceed}
           primaryBtnTextOverride={t('shared:confirm_position')}
@@ -67,15 +48,6 @@ export const JogToPosition = ({
     </>
   )
 }
-
-const TITLE_SECTION_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing16};
-
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    display: none;
-  }
-`
 
 const SHARED_CONTENT_SECTION_STYLE = `
   flex-direction: ${DIRECTION_COLUMN};

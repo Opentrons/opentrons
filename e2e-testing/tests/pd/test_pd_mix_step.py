@@ -13,7 +13,7 @@ TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 
 
 @pytest.mark.pdE2E
-def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
+def test_import_protocol_and_enter_edit_mode(page: Page, pd_base_url: str) -> None:
     """Verify we can import a protocol and reach the editor."""
 
     _import_protocol_and_open_editor(page)
@@ -21,7 +21,7 @@ def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
 
 
 @pytest.mark.pdE2E
-def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
+def test_mix_step_configuration_workflow(page: Page, pd_base_url: str) -> None:
     """Replicate the complete mixSettings Cypress test using Playwright."""
 
     editor = _import_protocol_and_open_editor(page)
@@ -40,16 +40,21 @@ def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
         "Pipette",
         "Tiprack",
         "Labware",
+    ]:
+        print(f"Expecting text: {label}")
+        mix_form.expect_text(label)
+
+    mix_form.select_pipette(PIPETTE_OPTION)
+    mix_form.select_tiprack(TIPRACK_OPTION)
+    mix_form.select_labware(LABWARE_OPTION)
+
+    for label in [
         "Select wells",
         "Volume per well",
         "Mix repetitions",
     ]:
         mix_form.expect_text(label)
 
-    mix_form.select_pipette(PIPETTE_OPTION)
-    mix_form.select_tiprack(TIPRACK_OPTION)
-
-    mix_form.select_labware(LABWARE_OPTION)
     mix_form.open_well_selector()
     mix_form.expect_well_selector_modal()
     mix_form.select_wells(["A1", "A2"])

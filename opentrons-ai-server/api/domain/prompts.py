@@ -4,7 +4,6 @@ from typing import Any, Dict, Iterable
 
 import requests
 import structlog
-from ddtrace import tracer
 from openai.types.chat import ChatCompletionToolParam
 
 from api.settings import Settings
@@ -18,7 +17,6 @@ def generate_unique_name() -> str:
     return unique_name
 
 
-@tracer.wrap()
 def send_post_request(payload: str) -> str:
     url = "https://Opentrons-simulator.hf.space/protocol"
     protocol_name: str = generate_unique_name()

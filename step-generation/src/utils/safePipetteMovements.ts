@@ -1,4 +1,5 @@
 import {
+  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -10,6 +11,7 @@ import {
   getPositionFromSlotId,
   getRobotDefFromRobotType,
   OT2_ROBOT_TYPE,
+  PARTIAL,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -27,6 +29,7 @@ import type {
   OT2AddressableAreaName,
   PipetteChannels,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -73,7 +76,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
-  primaryNozzle: string,
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
   tipOverlapOnNozzle: number
 ): Point[] => {
   const { nozzleMap, nozzleOffset, pipetteBoundingBoxOffsets } =
@@ -293,7 +296,7 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
-  primaryNozzle?: string
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
   nozzleConfiguration?: NozzleConfigurationStyle
 }): boolean => {
   const {
@@ -303,7 +306,7 @@ export const getIsSafePipetteMovement = (args: {
     labwareId,
     wellLocationOffset = { x: 0, y: 0, z: 0 },
     wellTargetName,
-    primaryNozzle: primaryNozzleOverride,
+    primaryNozzle,
     nozzleConfiguration: nozzleConfigurationOverride,
   } = args
   const {
@@ -374,12 +377,14 @@ export const getIsSafePipetteMovement = (args: {
   )
 
   const { channels } = pipetteEntity.spec
-  const primaryNozzle =
-    primaryNozzleOverride ??
-    getDefaultPrimaryNozzle({
-      nozzles: nozzleConfiguration,
-      channels,
-    })
+  const confirmedPrimaryNozzle =
+    nozzleConfiguration === PARTIAL
+      ? A1_NOZZLE
+      : (primaryNozzle ??
+        getDefaultPrimaryNozzle({
+          nozzles: nozzleConfiguration,
+          channels,
+        }))
 
   const tipOverlapOnNozzle =
     tiprackEntity != null
@@ -393,7 +398,7 @@ export const getIsSafePipetteMovement = (args: {
     pipetteEntity,
     tipLength,
     wellTargetPoint,
-    primaryNozzle,
+    confirmedPrimaryNozzle,
     tipOverlapOnNozzle
   )
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
@@ -557,7 +562,7 @@ export const getTipColumnIndex = (wellName: string): number =>
 export const getDefaultPrimaryNozzle = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
-}): string => {
+}): PrimaryNozzleConfigurationStyle => {
   const { nozzles, channels } = args
   if (channels === 8 && nozzles === SINGLE) {
     return 'H1'

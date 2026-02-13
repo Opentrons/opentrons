@@ -18,6 +18,7 @@ from .core.common import (
     ProtocolCore,
     TemperatureModuleCore,
     ThermocyclerCore,
+    VacuumModuleCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -699,11 +700,17 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
+            ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                in °C/second. The acceptable range is 0.01–2 °C/second
+                to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                the block will heat or cool as quickly as possible to reach the set temperature.
 
-                *Changed in version 2.27:* After API
-                version 2.27 it will attempt to use the liquid tracking of the
-                labware first and then fall back to the 25 if there is no
-                probed or loaded liquid.
+                *Changed in version 2.27:* In API version
+                2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+                liquid information.
+
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+                the block heats or cools.
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -715,6 +722,10 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
+            # because the argument was always there but didn't work, continue to swallow this arg on
+            # old api versions.
+            ramp_rate = None
         self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
@@ -743,14 +754,25 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
+            ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                in °C/second. The acceptable range is 0.01–2 °C/second
+                to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                the block will heat or cool as quickly as possible to reach the set temperature.
 
         *Changed in version 2.27:* In API version
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
+
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        the block heats or cools.
         """
 
         if block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
+            # because the argument was always there but didn't work, continue to swallow this arg on
+            # old api versions.
+            ramp_rate = None
         task = self._core.start_set_target_block_temperature(
             celsius=temperature,
             block_max_volume=block_max_volume,
@@ -1117,9 +1139,9 @@ class HeaterShakerContext(ModuleContext):
         Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Allows the protocol to proceed while the module reaches the target temperature. 
+        waiting for the target to be reached. Allows the protocol to proceed while the module reaches the target temperature.
 
-    
+
         Use [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
         to delay protocol execution for API levels below 2.27.
 
@@ -1823,3 +1845,20 @@ class FlexStackerContext(ModuleContext):
         [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve].
         """
         return self._cores_to_labware(self._core.get_stored_labware())
+
+
+class VacuumModuleContext(ModuleContext):
+    """An object representing a connected Vacuum Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    """
+
+    _core: VacuumModuleCore
+
+    @property
+    @requires_version(2, 28)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()

@@ -18,6 +18,7 @@ from opentrons.system import camera
 from opentrons.system.camera import PREVIEW_IMAGE, StreamConfigurationKeys
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.camera.settings.store import (
     CameraSettingStore,
@@ -29,7 +30,6 @@ from robot_server.hardware import get_robot_type
 from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.runs.dependencies import get_run_data_manager
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import (
     CameraCaptureImageSettings,
     CameraEnable,
