@@ -42,7 +42,7 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
       if (!port.isOpen && !port.opening) port.open()
       return port
     }
-  )
+  ) as unknown as http.Agent
 
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
