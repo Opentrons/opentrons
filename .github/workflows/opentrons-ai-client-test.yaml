@@ -65,9 +65,10 @@ jobs:
             ${{ github.workspace }}/.pnpm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
       - name: 'setup-js'
-        id: 'setup-js'
-        uses: ./.github/actions/js/setup
-
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
+          make setup-js
       - name: 'test frontend packages'
         run: |
           make -C opentrons-ai-client test-cov
