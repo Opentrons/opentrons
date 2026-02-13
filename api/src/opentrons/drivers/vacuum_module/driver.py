@@ -338,14 +338,16 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self.csv_path = new_path
         self._csv_initialized = False
 
-    async def read_continuous_data(self):
+    async def read_continuous_data(self, run_time):
         """Read and print continuous data from the vacuum pump for the specified timeout duration."""
+        start_time = time.perf_counter()
         try:
-            while True:
+            while time.perf_counter() - start_time < run_time:
                 line = await self.get_vacuum_state()
+                await asyncio.sleep(1)
                 pressure_dict = dataclasses.asdict(line)
                 # Timestamp
-                ts = time.perf_counter() - self.st
+                ts = time.perf_counter() - start_time
                 # Record Pressure Data
                 await self._write_to_csv(ts, pressure_dict)
         except Exception as e:

@@ -9,7 +9,7 @@ metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 # Tunables (can move some to parameters)
-SETTLE_SEC = 1
+SETTLE_SEC = 21
 RUN_SEC = 60*2
 DECAY_SEC = 25
 VENT_SEC = 5
@@ -139,12 +139,10 @@ async def _run_single_pump_api_cycle(pump,
     # Start the filling of the water pump while the vacuum is running
     asyncio.create_task(water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time))
     # Set Pressure and Vacuum to target for x amount of time. 
-    await asyncio.wait_for(pump.set_vacuum_state(enable_vacuum = True,
-                                                        guage_pressure_mbar = target_to_pump,
-                                                        duration = None,
-                                                        ),
-                                                        timeout=20
-                                                        )
+    await pump.set_vacuum_state(enable_vacuum = True,
+                                guage_pressure_mbar = target_to_pump,
+                                duration = None,
+                                )
                                                     
     await asyncio.sleep(SETTLE_SEC)
     ctx.comment(f"[cycle {cycle_index}] pump started at target {target_pressure} mbar")
@@ -161,7 +159,7 @@ async def _run_single_pump_api_cycle(pump,
         ctx.comment(f"[cycle {cycle_index}] failed to set CSV filename: {e}")
     # Run the continuous data reader for RUN_SEC seconds.
     try:
-        await asyncio.wait_for(pump.read_continuous_data(), timeout=RUN_SEC)
+        await pump.read_continuous_data(RUN_SEC)
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         ctx.comment(f"[cycle {cycle_index}] continuous read duration reached ({RUN_SEC}s)")
@@ -172,13 +170,10 @@ async def _run_single_pump_api_cycle(pump,
     await pump.set_vent_state(False)
     await asyncio.sleep(VENT_SEC)
     # Stop the pump
-    await asyncio.wait_for(pump.set_vacuum_state(enable_vacuum = False,
+    await pump.set_vacuum_state(enable_vacuum = False,
                                                     guage_pressure_mbar = target_to_pump,
                                                     duration = None,
-                                                    ),
-                                                    timeout=1
                                                     )
-    
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     await asyncio.sleep(DECAY_SEC)

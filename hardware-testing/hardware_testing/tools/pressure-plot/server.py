@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from time import time
 from typing import List, Any
+import os
 
 from hardware_testing.data import create_folder_for_test_data
 
@@ -42,7 +43,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         else:
             _file_name = self.path_elements[-1]
         file_path = Path(__file__).parent / _file_name
-        print(file_path)
+        print(f'file_path: {file_path}')
         with open(file_path, "rb") as f:
             file = f.read(-1)
         if ".html" in _file_name:
@@ -77,30 +78,46 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         req_cmd = self.path_elements[1]
         if req_cmd != "latest":
             raise NotImplementedError(f"unable to process command: {req_cmd}")
-        path_list_grav = self._list_file_paths_in_directory(
-            self.plot_directory, "GravimetricRecorder"
-        )
-        print(f'Plot list grav: {path_list_grav}')
-        path_list_pip = self._list_file_paths_in_directory(
-            self.plot_directory, "CSVReport"
-        )
+
+        # Debug: Log the plot directory
+        print(f"Plot directory: {self.plot_directory}")
+
+        # Find the latest CSV file in the plot directory
+        path_list = self._list_file_paths_in_directory(self.plot_directory, "PressureData")
+
+        # Debug: Log the files found in the directory
+        print(f"Files in directory: {[f.name for f in self.plot_directory.iterdir()]}")
+        print(f"Filtered files: {path_list}")
+
         response_data = {
             "directory": str(self.plot_directory.resolve()),
             "files": [],
             "name": "",
             "csv": "",
-            "csvPipette": "",
+            "Time": [],
+            "Pressure": []
         }
-        if path_list_grav:
-            file_name_grav = path_list_grav[0]
-            response_data["name"] = str(file_name_grav.stem)
-            with open(file_name_grav, "r") as f:
-                response_data["csv"] = f.read()
-        if path_list_pip:
-            file_name_pip = path_list_pip[0]
-            with open(file_name_pip, "r") as f:
-                response_data["csvPipette"] = f.read()
+
+        if path_list:
+            file_name = path_list[0]
+            response_data["name"] = str(file_name.stem)
+            print(f'file_name: {file_name.stem}')
+            with open(file_name, "r") as f:
+                csv_data = f.readlines()
+                print(f'csv_data: {csv_data}')
+            # Parse the CSV file
+            header = csv_data[0].strip().split(",")
+            time_idx = header.index("Time")
+            pressure_idx = header.index("Pressure")
+
+            for line in csv_data[1:]:
+                if line.strip():
+                    values = line.strip().split(",")
+                    response_data["Time"].append(float(values[time_idx]))
+                    response_data["Pressure"].append(float(values[pressure_idx]))
+
         response_str = json.dumps({req_cmd: response_data})
+        print(f'response_str: {response_str}')
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def _respond_to_new_name_request(self) -> None:
@@ -109,13 +126,15 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         else:
             new_name = self.path_elements[1]
             dir_path = create_folder_for_test_data(new_name)
-            self._set_plot_directory(dir_path)
+            print(f'{dir_path}')
             response_str = json.dumps({"name": new_name})
+            print(f'resp: {response_str}')
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def do_GET(self) -> None:
         """Do GET."""
         try:
+            print(f'path_elements: {self.path_elements}')
             if len(self.path_elements) > 1 and self.path_elements[0] == "data":
                 self._respond_to_data_request()
             elif len(self.path_elements) > 0 and self.path_elements[0] == "name":
