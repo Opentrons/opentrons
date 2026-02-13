@@ -151,7 +151,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         for user in TEST_USERS:
-            if user.username == username and user.password == password:
+            if user.username == username and user.hashed_password == password:
                 # Set `.user` per the oauthlib docs.
                 request.user = user  # type: ignore[attr-defined]
                 return True
