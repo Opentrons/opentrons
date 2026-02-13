@@ -12,13 +12,8 @@
 name: "App E2E Tests"
 
 on:
-  push:
-    branches:
-      - "edge"
-      - "e2e-app-start"
   pull_request:
     branches:
-      - "edge"
       - "e2e-app-start"
   workflow_dispatch:
     inputs:
@@ -50,7 +45,7 @@ jobs:
     steps:
       # --- 1. Checkout ----------------------------------------------------
       - name: "Checkout repository"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

@@ -28,19 +28,14 @@ export class ProtocolsPage {
 
   // ---------------- Import -----------------------------------------------
 
-  /** Click the "Import" button to open the import slideout. */
-  async openImportSlideout(): Promise<void> {
-    const importButton = this.page.getByRole('button', { name: 'Import' })
-    await expect(importButton).toBeVisible({ timeout: 10_000 })
-    await importButton.click()
-    console.log('Opened import slideout')
-  }
-
   /**
    * Import a protocol file into the app.
    *
-   * Uses Playwright's file chooser interception to set the file on
-   * the hidden `<input type="file">`.
+   * Handles two UI states:
+   * - **Empty state** (no protocols): The upload input is displayed
+   *   directly on the page — no slideout needed.
+   * - **List state** (protocols exist): Click the "Import" button to
+   *   open the slideout, then set the file.
    *
    * @param filePath - Absolute or relative path to the protocol file.
    *   Relative paths are resolved from the e2e-testing/app directory.
@@ -49,10 +44,17 @@ export class ProtocolsPage {
     const absolutePath = resolve(filePath)
     console.log(`Importing protocol: ${absolutePath}`)
 
-    // The "Choose File" button triggers a hidden <input type="file">.
-    // We intercept the file chooser event to set the file.
-    const fileInput = this.page.getByTestId('file_input')
+    // If the Import button is visible, click it to open the slideout.
+    // In the empty state the file input is already on the page.
+    const importButton = this.page.getByRole('button', { name: 'Import' })
+    if (await importButton.isVisible()) {
+      await importButton.click()
+      console.log('Opened import slideout')
+    } else {
+      console.log('Empty state — file input already on page')
+    }
 
+    const fileInput = this.page.getByTestId('file_input')
     await fileInput.setInputFiles(absolutePath)
     console.log('Protocol file selected for upload')
   }
