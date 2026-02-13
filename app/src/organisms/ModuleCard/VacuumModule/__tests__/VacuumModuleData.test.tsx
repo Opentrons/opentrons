@@ -119,6 +119,6 @@ describe('VacuumModuleData', () => {
     props.moduleData.status = 'error'
     render(props)
 
-    expect(screen.getByText('Engaged')).toBeInTheDocument()
+    expect(screen.getByText('Error')).toBeInTheDocument()
   })
 })
