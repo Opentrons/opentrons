@@ -146,7 +146,7 @@ export const test = base.extend<object, DevAppFixtures>({
       console.log(`\n→ Starting Vite dev-server on port ${port} …`)
       const viteProc: ChildProcess = spawn(
         'npx',
-        ['vite', 'serve', '--port', String(port)],
+        ['vite', 'serve', '--port', String(port), '--strictPort'],
         {
           cwd: appDir,
           stdio: ['ignore', 'pipe', 'pipe'],
@@ -186,45 +186,57 @@ export const test = base.extend<object, DevAppFixtures>({
 
       // 3. Launch Electron with dev flags ----------------------------------
       console.log('→ Launching Electron in dev mode …')
-      const app = await _electron.launch({
-        args: [
-          '.',
-          '--devtools',
-          '--log.level.console=debug',
-          '--disable_ui.webPreferences.webSecurity',
-          `--ui.url.protocol=http:`,
-          `--ui.url.path=localhost:${port}`,
-        ],
-        cwd: appShellDir,
-        timeout: startupTimeout,
-        env: {
-          ...process.env,
-          NODE_ENV: 'development',
-        },
-      })
-      console.log('✓ Electron dev app launched')
 
-      await use(app)
+      // On CI (Linux without root), the SUID sandbox cannot be configured.
+      // Pass --no-sandbox to work around this.
+      const electronArgs = [
+        '.',
+        '--devtools',
+        '--log.level.console=debug',
+        '--disable_ui.webPreferences.webSecurity',
+        `--ui.url.protocol=http:`,
+        `--ui.url.path=localhost:${port}`,
+      ]
+      if (process.env.CI) {
+        electronArgs.push('--no-sandbox')
+      }
 
-      // --- Teardown -------------------------------------------------------
-      console.log('\n→ Closing dev Electron app …')
-      await app.close()
-      console.log('✓ Electron app closed')
-
-      console.log('→ Stopping Vite dev-server …')
-      viteProc.kill('SIGTERM')
-      // Give it a moment, then force-kill
-      await new Promise<void>(resolve => {
-        const timer = setTimeout(() => {
-          viteProc.kill('SIGKILL')
-          resolve()
-        }, 5000)
-        viteProc.on('exit', () => {
-          clearTimeout(timer)
-          resolve()
+      let app: ElectronApplication | undefined
+      try {
+        app = await _electron.launch({
+          args: electronArgs,
+          cwd: appShellDir,
+          timeout: startupTimeout,
+          env: {
+            ...process.env,
+            NODE_ENV: 'development',
+          },
         })
-      })
-      console.log('✓ Vite dev-server stopped')
+        console.log('✓ Electron dev app launched')
+
+        await use(app)
+      } finally {
+        // --- Teardown (runs even if launch or tests fail) -----------------
+        if (app) {
+          console.log('\n→ Closing dev Electron app …')
+          await app.close()
+          console.log('✓ Electron app closed')
+        }
+
+        console.log('→ Stopping Vite dev-server …')
+        viteProc.kill('SIGTERM')
+        await new Promise<void>(resolve => {
+          const timer = setTimeout(() => {
+            viteProc.kill('SIGKILL')
+            resolve()
+          }, 5000)
+          viteProc.on('exit', () => {
+            clearTimeout(timer)
+            resolve()
+          })
+        })
+        console.log('✓ Vite dev-server stopped')
+      }
     },
     { scope: 'worker' },
   ],
