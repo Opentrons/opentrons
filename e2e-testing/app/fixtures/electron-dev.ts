@@ -20,6 +20,7 @@
 
 import { type ChildProcess, exec, execSync, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
+import { createServer } from 'node:net'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -78,6 +79,26 @@ async function waitForUrl(
     await new Promise(r => setTimeout(r, interval))
   }
   throw new Error(`Timed out waiting for ${url} after ${timeout}ms`)
+}
+
+/** Find an available TCP port. Prefers `preferred` if it's free. */
+async function findFreePort(preferred: number): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const server = createServer()
+    server.once('error', () => {
+      // preferred port is taken — let the OS pick one
+      const fallback = createServer()
+      fallback.once('error', reject)
+      fallback.listen(0, () => {
+        const addr = fallback.address()
+        const port = typeof addr === 'object' && addr ? addr.port : 0
+        fallback.close(() => resolve(port))
+      })
+    })
+    server.listen(preferred, () => {
+      server.close(() => resolve(preferred))
+    })
+  })
 }
 
 /** Run a shell command and return a promise that resolves on exit 0. */
@@ -184,7 +205,8 @@ export const test = base.extend<object, DevAppFixtures>({
       const appDir = resolve(monorepoRoot, 'app')
       const appShellDir = resolve(monorepoRoot, 'app-shell')
 
-      const port = Number(process.env.DEV_PORT ?? 5173)
+      const preferredPort = Number(process.env.DEV_PORT ?? 5173)
+      const port = await findFreePort(preferredPort)
       const startupTimeout = Number(process.env.APP_STARTUP_TIMEOUT ?? 60_000)
       const skipShellBuild = process.env.SKIP_SHELL_BUILD === 'true'
 
@@ -204,7 +226,7 @@ export const test = base.extend<object, DevAppFixtures>({
             PORT: String(port),
           },
           // Ensure the child runs in its own process group so we can kill it
-          detached: false,
+          detached: true,
         },
       )
 
@@ -276,10 +298,26 @@ export const test = base.extend<object, DevAppFixtures>({
         }
 
         console.log('→ Stopping Vite dev-server …')
-        viteProc.kill('SIGTERM')
+        // Kill the process tree (Vite may spawn children).
+        const pid = viteProc.pid
+        if (pid) {
+          try {
+            // Kill the whole process group on Unix
+            process.kill(-pid, 'SIGTERM')
+          } catch {
+            viteProc.kill('SIGTERM')
+          }
+        } else {
+          viteProc.kill('SIGTERM')
+        }
         await new Promise<void>(resolve => {
           const timer = setTimeout(() => {
-            viteProc.kill('SIGKILL')
+            try {
+              if (pid) process.kill(-pid, 'SIGKILL')
+              else viteProc.kill('SIGKILL')
+            } catch {
+              // already dead
+            }
             resolve()
           }, 5000)
           viteProc.on('exit', () => {

@@ -60,7 +60,6 @@ test.describe('Protocol Visualization – Regression', () => {
     await snapshot('01-protocols-page')
 
     // ---- Step 2: Import the regression test protocol --------------------
-    await protocolsPage.openImportSlideout()
     await protocolsPage.importProtocol(PROTOCOL_FILE)
 
     // Wait for the protocol to appear in the list (analysis may take time).
