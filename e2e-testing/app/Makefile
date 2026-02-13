@@ -60,6 +60,14 @@ test-dev-skip-build: ## Run dev-mode tests, skip app-shell rebuild
 	SKIP_SHELL_BUILD=true pnpm test:dev
 
 # ---------------------------------------------------------------------------
+# Testing – All dev tests (smoke + visualization)
+# ---------------------------------------------------------------------------
+
+.PHONY: test-dev-all
+test-dev-all: ## Run all dev-mode tests (smoke + visualization, headless)
+	pnpm test:dev:all
+
+# ---------------------------------------------------------------------------
 # Testing – Protocol Visualization (dev)
 # ---------------------------------------------------------------------------
 
