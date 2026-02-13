@@ -250,7 +250,7 @@ lint-json:
 
 .PHONY: lint-css
 lint-css:
-	pnpm exec stylelint "**/*.css" "**/*.js"
+	pnpm stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py format-css
