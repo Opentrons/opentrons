@@ -6,7 +6,7 @@ from typing import Iterable, Sequence
 
 from playwright.sync_api import Locator, Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class MixStepForm(BasePage):

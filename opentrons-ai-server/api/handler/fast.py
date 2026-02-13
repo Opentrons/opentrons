@@ -8,8 +8,6 @@ import structlog
 from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
-from ddtrace import tracer
-from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Query, Request, Response, Security, UploadFile, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -61,7 +59,7 @@ claude: AnthropicPredict = AnthropicPredict(settings)
 app = FastAPI(
     title="Opentrons AI API",
     description="An API for generating chat responses.",
-    version=os.getenv("DD_VERSION", "local"),
+    version=os.getenv("SERVICE_VERSION", "local"),
     openapi_url="/api/openapi.json",
 )
 
@@ -149,13 +147,6 @@ async def logging_middleware(request: Request, call_next) -> Response:  # type: 
 # Answer: middlewares are applied in the reverse order of when they are added (you can verify this
 # by debugging `app.middleware_stack` and recursively drilling down the `app` property).
 app.add_middleware(CorrelationIdMiddleware)
-
-tracing_middleware = next((m for m in app.user_middleware if m.cls == TraceMiddleware), None)
-if tracing_middleware is not None:
-    app.user_middleware = [m for m in app.user_middleware if m.cls != TraceMiddleware]
-    structlog.stdlib.get_logger("api.datadog_patch").info("Patching Datadog tracing middleware to be the outermost middleware...")
-    app.user_middleware.insert(0, tracing_middleware)
-    app.middleware_stack = app.build_middleware_stack()
 
 
 # Models
@@ -356,7 +347,6 @@ def _format_response(
     return ChatResponse(reply=response, fake=bool(is_fake), file_token_warning=file_token_warning)
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/completion",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -420,7 +410,6 @@ async def create_chat_completion(
         ) from e
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/completion-multipart",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -542,7 +531,6 @@ def _determine_protocol_action(body: ChatRequest) -> str:
     return protocol_action
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/createProtocol",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -613,7 +601,6 @@ async def create_protocol(
         ) from e
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/updateProtocol",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -680,10 +667,9 @@ async def get_health(request: Request) -> Status:
         pass  # This is a health check from the load balancer
     else:
         logger.info(f"{request.method} {request.url.path}", extra={"requestMethod": request.method, "requestPath": request.url.path})
-    return Status(status="ok", version=settings.dd_version)
+    return Status(status="ok", version=settings.service_version)
 
 
-@tracer.wrap()
 @app.get("/api/timeout", response_model=TimeoutResponse)
 async def timeout_endpoint(request: Request, seconds: conint(ge=1, le=300) = Query(..., description="Number of seconds to wait")):  # type: ignore # noqa: B008
     """

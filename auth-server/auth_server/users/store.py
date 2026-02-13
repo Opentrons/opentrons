@@ -5,7 +5,7 @@ from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
 from pwdlib.hashers.bcrypt import BcryptHasher
 
-from .scopes import Scope
+from server_utils.auth.scopes import Scope
 
 password_hash = PasswordHash(
     (

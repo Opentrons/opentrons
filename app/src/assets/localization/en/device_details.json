@@ -169,6 +169,7 @@
   "protocol_analysis_stale": "Protocol analysis out of date. ",
   "protocol_details_page_reanalyze": "Go to the <navlink>protocol details</navlink> screen to reanalyze.",
   "pump_engaged": "Engaged",
+  "pump_error": "Error",
   "pump_idle": "Idle",
   "pump_power": "Pump power",
   "ready": "Ready",

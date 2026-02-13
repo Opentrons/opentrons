@@ -10,6 +10,7 @@ import {
 import { getPumpStatusProps } from '../utils'
 import styles from './vacuummodule.module.css'
 
+import type { TFunction } from 'i18next'
 import type { VacuumModuleData as VacuumModuleDataType } from '/app/redux/modules/api-types'
 
 interface VacuumModuleDataProps {
@@ -36,7 +37,7 @@ export function VacuumModuleData(props: VacuumModuleDataProps): JSX.Element {
           {t('vacuum_pump')}
         </StyledText>
         <Chip
-          {...getPumpStatusProps(t, status)}
+          {...getPumpStatusProps(t as TFunction, status)}
           iconName="connection-status"
           chipSize="small"
           width={FLEX_MAX_CONTENT}

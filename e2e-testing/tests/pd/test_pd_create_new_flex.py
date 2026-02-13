@@ -20,7 +20,7 @@ from automation.pd_pages import LandingPage
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_onboarding_workflow(page: Page, base_url: str) -> None:
+def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
     """Test complete Flex onboarding workflow.
 
     This test replicates the Cypress createNewFlex.cy.ts test:

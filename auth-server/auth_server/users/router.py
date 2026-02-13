@@ -10,6 +10,8 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
+from server_utils.auth.scopes import Scope
+
 from auth_server.oauth2.backend import Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.scopes import Scope
@@ -279,7 +281,7 @@ async def update_user(
                 userName=updated_user.username,
                 fullName=updated_user.full_name,
                 accountType=updated_user.account_type,
-                scopes=[scope.value for scope in updated_user.scopes],
+                scopes=[scope.api_name for scope in scopes_required],
             )
         ),
     )
