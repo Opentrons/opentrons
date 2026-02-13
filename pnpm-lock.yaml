@@ -1367,6 +1367,9 @@ importers:
 
   usb-bridge/node-client:
     dependencies:
+      '@serialport/bindings-cpp':
+        specifier: 10.8.0
+        version: 10.8.0
       agent-base:
         specifier: ^6.0.0
         version: 6.0.2
