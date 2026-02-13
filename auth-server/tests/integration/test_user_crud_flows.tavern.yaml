@@ -69,6 +69,8 @@ stages:
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user'
+      headers:  
+        Authorization: 'Bearer {access_token}'
     response:
       status_code: 200
       json:
@@ -86,6 +88,8 @@ stages:
         data:
           fullName: Test New User Updated
           accountType: admin
+      headers:  
+        Authorization: 'Bearer {access_token}'
     response:
       status_code: 200
       json:
@@ -99,6 +103,8 @@ stages:
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/users/test_new_user'
+      headers:  
+        Authorization: 'Bearer {access_token}'
     response:
       status_code: 200
 
@@ -106,5 +112,7 @@ stages:
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user'
+      headers:  
+        Authorization: 'Bearer {access_token}'
     response:
       status_code: 404
