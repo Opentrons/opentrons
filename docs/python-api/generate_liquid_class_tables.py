@@ -437,7 +437,7 @@ def main(hide_20ul: bool = False):
 # when this file is listed under the `hooks` key in mkdocs.yml.
 # ---------------------------------------------------------------------------
 def on_pre_build(**kwargs):
-    main(hide_20ul=True)
+    main(hide_20ul=False)
 
 
 if __name__ == "__main__":
