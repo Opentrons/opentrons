@@ -1,1 +1,1 @@
-export { AppPage } from './app-page';
+export { AppPage } from './app-page'

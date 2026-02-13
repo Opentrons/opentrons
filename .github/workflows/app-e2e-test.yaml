@@ -1,0 +1,68 @@
+# App E2E Tests (Electron) using Playwright
+
+name: "App E2E Tests"
+
+on:
+  push:
+    branches:
+      - "e2e-app-start"
+  pull_request:
+    branches:
+      - "e2e-app-start"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: "true"
+
+jobs:
+  e2e-dev-app:
+    name: "E2E tests dev app"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 20
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: "Setup JS Environment"
+        uses: ./.github/actions/js/setup
+
+      - name: "Setup pnpm"
+        run: npm install -g pnpm@latest
+
+      - name: "Install E2E app test dependencies"
+        working-directory: e2e-testing/app
+        env:
+          COREPACK_ENABLE_STRICT: "0"
+        run: make setup
+
+      - name: "Install Playwright Electron deps"
+        working-directory: e2e-testing/app
+        env:
+          COREPACK_ENABLE_STRICT: "0"
+        run: npx playwright install --with-deps chromium
+
+      - name: "Run dev app E2E tests"
+        working-directory: e2e-testing/app
+        env:
+          COREPACK_ENABLE_STRICT: "0"
+        run: xvfb-run --auto-servernum -- make test-dev
+
+      - name: "Upload test results"
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: app-e2e-test-results
+          path: |
+            e2e-testing/app/test-results/
+          retention-days: 7
+          if-no-files-found: warn

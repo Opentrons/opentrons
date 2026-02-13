@@ -9,10 +9,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --headed --debug",
-    "test:ui": "playwright test --ui",
+    "test": "playwright test --project=electron-app",
+    "test:headed": "playwright test --project=electron-app --headed",
+    "test:debug": "playwright test --project=electron-app --headed --debug",
+    "test:ui": "playwright test --project=electron-app --ui",
+    "test:dev": "playwright test --project=electron-dev",
+    "test:dev:headed": "playwright test --project=electron-dev --headed",
+    "test:dev:debug": "playwright test --project=electron-dev --headed --debug",
+    "test:all": "playwright test",
     "report": "playwright show-report test-results/html-report",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
