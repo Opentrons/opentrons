@@ -194,7 +194,7 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_1.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                 p1000.blow_out(location=waste_reservoir["A1"])
-                p1000.touch_tip()
+                #p1000.touch_tip()
                 current += 1
             p1000.return_tip()
             protocol.capture_image(
@@ -242,7 +242,7 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    p1000_single.touch_tip()
+                    #p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
@@ -282,7 +282,7 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    p1000_single.touch_tip()
+                    #p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
@@ -326,7 +326,7 @@ def run(protocol: ProtocolContext) -> None:
                     if DilutionVol > 20:
                         wells.append(sample_plate_4.wells_by_name()[CurrentWell])
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    p1000_single.touch_tip()
+                    #p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
