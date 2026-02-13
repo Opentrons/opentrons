@@ -16,7 +16,7 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
-const REQUIRED_APP_VERSION = '8.8.0'
+const REQUIRED_APP_VERSION = '8.8.0' // PD requires this robot stack version or higher
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })
@@ -50,13 +50,16 @@ export default defineConfig(async (): Promise<UserConfig> => {
     await latestLabwareVersions(REQUIRED_APP_VERSION)
 
   return {
+    // this makes imports relative rather than absolute
     base: '',
     build: {
+      // Relative to the root
       outDir: 'dist',
       sourcemap: true,
       rollupOptions: {
         external: ['react/compiler-runtime'],
         output: {
+          // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
           manualChunks(id) {
             if (id.includes('node_modules')) return 'vendor'
           },
@@ -109,6 +112,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
       sentryVitePlugin({
         telemetry: false,
         reactComponentAnnotation: { enabled: true },
+        // Local opt-in behavior:
+        // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
+        // - Use the `local-dev` release name
+        // CI continues to upload via getsentry/action-release.
         release: {
           name: enableSentryLocalSourcemapUpload
             ? 'local-dev'
@@ -144,8 +151,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
     ],
     optimizeDeps: {
       esbuildOptions: { target: 'es2020' },
-      include: ['tslib'], // Restored to your original specific list
     },
+    // For unknown reasons, PD whitescreens on launch unless we have this.
     css: {
       postcss: {
         plugins: [
@@ -158,6 +165,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       },
     },
     define: {
+      // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
       _FF_ENV_VARS_: getFeatureFlagEnvVars(),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
@@ -180,6 +188,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     resolve: {
       conditions: ['browser'],
+      // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
         tslib: path.resolve('node_modules/tslib'),
@@ -199,6 +208,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
 })
 
 function getFeatureFlagEnvVars(): Record<string, string | undefined> {
+  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
+  //   // scrape process.env instead of having this explicit list. We don't want to scrape
+  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
+  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
   const envVarNames = new Set([
     'OT_PD_PRERELEASE_MODE',
     'OT_PD_DISABLE_MODULE_RESTRICTIONS',
