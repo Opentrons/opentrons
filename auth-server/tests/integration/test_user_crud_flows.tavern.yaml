@@ -99,10 +99,29 @@ stages:
           userName: test_new_user
           scopes: [users.write]
 
+  - name: Update the username and password
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user'
+      json:
+        data:
+          userName: test_new_user_updated
+          password: securepassword123
+      headers:  
+        Authorization: 'Bearer {access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          scopes: [users.write]
+
   - name: Delete the user
     request:
       method: DELETE
-      url: '{run_server.base_url}/auth/users/test_new_user'
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
       headers:  
         Authorization: 'Bearer {access_token}'
     response:
@@ -111,7 +130,7 @@ stages:
   - name: Try to get the deleted user
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_new_user'
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
       headers:  
         Authorization: 'Bearer {access_token}'
     response:
