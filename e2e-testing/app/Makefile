@@ -44,28 +44,24 @@ test-debug: ## Run installed-app tests with Playwright Inspector
 # ---------------------------------------------------------------------------
 
 .PHONY: test-dev
-test-dev: ## Run dev-mode tests (headless, builds + launches from source)
+test-dev: ## Run all dev-mode tests (smoke + viz, headless)
 	pnpm test:dev
 
 .PHONY: test-dev-headed
-test-dev-headed: ## Run dev-mode tests (headed – visible window)
+test-dev-headed: ## Run all dev-mode tests (headed – visible window)
 	pnpm test:dev:headed
 
 .PHONY: test-dev-debug
-test-dev-debug: ## Run dev-mode tests with Playwright Inspector
+test-dev-debug: ## Run all dev-mode tests with Playwright Inspector
 	pnpm test:dev:debug
 
 .PHONY: test-dev-skip-build
-test-dev-skip-build: ## Run dev-mode tests, skip app-shell rebuild
+test-dev-skip-build: ## Run all dev-mode tests, skip app-shell rebuild
 	SKIP_SHELL_BUILD=true pnpm test:dev
 
-# ---------------------------------------------------------------------------
-# Testing – All dev tests (smoke + visualization)
-# ---------------------------------------------------------------------------
-
-.PHONY: test-dev-all
-test-dev-all: ## Run all dev-mode tests (smoke + visualization, headless)
-	pnpm test:dev:all
+.PHONY: test-dev-smoke
+test-dev-smoke: ## Run only dev-mode smoke tests (headless)
+	pnpm test:dev:smoke
 
 # ---------------------------------------------------------------------------
 # Testing – Protocol Visualization (dev)
