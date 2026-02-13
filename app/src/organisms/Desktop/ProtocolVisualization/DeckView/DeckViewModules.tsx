@@ -107,7 +107,8 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
           !showLabwareCommandSummary
         return (
           <Fragment key={id}>
-            {isThermocyclerLidClosed && labwareLoadedOnModuleId != null ? (
+            {moduleType !== THERMOCYCLER_MODULE_TYPE &&
+            labwareLoadedOnModuleId != null ? (
               <CenterLabwareInModuleChildSlot
                 deckId={deckDef.otId}
                 slotId={slot}
