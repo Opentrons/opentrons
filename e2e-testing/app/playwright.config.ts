@@ -57,5 +57,10 @@ export default defineConfig({
       name: 'electron-dev',
       testMatch: '**/dev-app-smoke.spec.ts',
     },
+    {
+      name: 'electron-dev-viz',
+      testMatch: '**/dev-protocol-visualization.spec.ts',
+      timeout: 300_000,
+    },
   ],
 })

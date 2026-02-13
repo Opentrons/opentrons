@@ -1,18 +1,37 @@
 # App E2E Tests (Electron) using Playwright
+#
+# Runs the dev-mode Electron app E2E tests (smoke + protocol visualization).
+#
+# The workflow_dispatch trigger accepts an optional `app-branch` input.
+# When supplied, the app source code (app/, app-shell/, api/, shared-data/,
+# hardware/, step-generation/, etc.) is checked out from that branch while
+# the e2e test code (e2e-testing/) stays on the current/workflow branch.
+# This lets you merge test infrastructure to `edge` and run it against any
+# feature or release branch (e.g. chore_release-9.0.0).
 
 name: "App E2E Tests"
 
 on:
   push:
     branches:
+      - "edge"
       - "e2e-app-start"
   pull_request:
     branches:
+      - "edge"
       - "e2e-app-start"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      app-branch:
+        description: >
+          Branch to use for app/api source code (app/, app-shell/, api/,
+          shared-data/, hardware/, etc.). Leave empty to use the current branch.
+        required: false
+        default: ""
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.app-branch || 'default' }}
   cancel-in-progress: true
 
 defaults:
@@ -21,48 +40,174 @@ defaults:
 
 env:
   CI: "true"
+  COREPACK_ENABLE_STRICT: "0"
 
 jobs:
   e2e-dev-app:
-    name: "E2E tests dev app"
+    name: "E2E smoke tests (dev app)"
     runs-on: "ubuntu-24.04"
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
-      - name: "Checkout Repository"
+      # --- 1. Checkout ----------------------------------------------------
+      - name: "Checkout repository"
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: "Setup JS Environment"
+      - name: "Overlay app source from target branch"
+        if: ${{ inputs.app-branch != '' }}
+        run: |
+          echo "→ Overlaying app source from branch: ${{ inputs.app-branch }}"
+          # Save our e2e test code
+          cp -r e2e-testing /tmp/e2e-testing-save
+
+          # Fetch and checkout the target branch for everything else
+          git fetch origin ${{ inputs.app-branch }}
+          git checkout origin/${{ inputs.app-branch }} -- \
+            app/ \
+            app-shell/ \
+            app-shell-odd/ \
+            api/ \
+            shared-data/ \
+            hardware/ \
+            step-generation/ \
+            components/ \
+            react-api-client/ \
+            api-client/ \
+            discovery-client/ \
+            server-utils/ \
+            scripts/ \
+            Makefile \
+            package.json \
+            yarn.lock \
+            tsconfig*.json
+
+          # Restore our e2e test code
+          rm -rf e2e-testing
+          cp -r /tmp/e2e-testing-save e2e-testing
+          echo "✓ App source overlaid from ${{ inputs.app-branch }}"
+
+      # --- 2. Environment setup -------------------------------------------
+      - name: "Setup JS environment"
         uses: ./.github/actions/js/setup
 
-      - name: "Setup pnpm"
+      - name: "Setup pnpm (for e2e-testing/app)"
         run: npm install -g pnpm@latest
+
+      - name: "Setup Python 3.12 + API environment"
+        uses: ./.github/actions/python/setup-uv
+        with:
+          project: api
+
+      - name: "Export Python path for Electron"
+        run: |
+          PYTHON_PATH=$(cd api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))")
+          echo "✓ Python resolved: ${PYTHON_PATH}"
+          echo "PYTHON_PATH_OVERRIDE=${PYTHON_PATH}" >> "$GITHUB_ENV"
 
       - name: "Install E2E app test dependencies"
         working-directory: e2e-testing/app
-        env:
-          COREPACK_ENABLE_STRICT: "0"
         run: make setup
 
       - name: "Install Playwright Electron deps"
         working-directory: e2e-testing/app
-        env:
-          COREPACK_ENABLE_STRICT: "0"
         run: npx playwright install --with-deps chromium
 
-      - name: "Run dev app E2E tests"
+      # --- 3. Run smoke tests --------------------------------------------
+      - name: "Run dev app smoke tests"
         working-directory: e2e-testing/app
-        env:
-          COREPACK_ENABLE_STRICT: "0"
         run: xvfb-run --auto-servernum -- make test-dev
 
+      # --- 4. Artifacts ---------------------------------------------------
       - name: "Upload test results"
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: app-e2e-test-results
+          name: app-e2e-smoke-results
           path: |
             e2e-testing/app/test-results/
           retention-days: 7
+          if-no-files-found: warn
+
+  e2e-dev-viz:
+    name: "E2E visualization regression (dev app)"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 45
+    steps:
+      # --- 1. Checkout ----------------------------------------------------
+      - name: "Checkout repository"
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: "Overlay app source from target branch"
+        if: ${{ inputs.app-branch != '' }}
+        run: |
+          echo "→ Overlaying app source from branch: ${{ inputs.app-branch }}"
+          cp -r e2e-testing /tmp/e2e-testing-save
+
+          git fetch origin ${{ inputs.app-branch }}
+          git checkout origin/${{ inputs.app-branch }} -- \
+            app/ \
+            app-shell/ \
+            app-shell-odd/ \
+            api/ \
+            shared-data/ \
+            hardware/ \
+            step-generation/ \
+            components/ \
+            react-api-client/ \
+            api-client/ \
+            discovery-client/ \
+            server-utils/ \
+            scripts/ \
+            Makefile \
+            package.json \
+            yarn.lock \
+            tsconfig*.json
+
+          rm -rf e2e-testing
+          cp -r /tmp/e2e-testing-save e2e-testing
+          echo "✓ App source overlaid from ${{ inputs.app-branch }}"
+
+      # --- 2. Environment setup -------------------------------------------
+      - name: "Setup JS environment"
+        uses: ./.github/actions/js/setup
+
+      - name: "Setup pnpm (for e2e-testing/app)"
+        run: npm install -g pnpm@latest
+
+      - name: "Setup Python 3.12 + API environment"
+        uses: ./.github/actions/python/setup-uv
+        with:
+          project: api
+
+      - name: "Export Python path for Electron"
+        run: |
+          PYTHON_PATH=$(cd api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))")
+          echo "✓ Python resolved: ${PYTHON_PATH}"
+          echo "PYTHON_PATH_OVERRIDE=${PYTHON_PATH}" >> "$GITHUB_ENV"
+
+      - name: "Install E2E app test dependencies"
+        working-directory: e2e-testing/app
+        run: make setup
+
+      - name: "Install Playwright Electron deps"
+        working-directory: e2e-testing/app
+        run: npx playwright install --with-deps chromium
+
+      # --- 3. Run visualization tests ------------------------------------
+      - name: "Run protocol visualization tests"
+        working-directory: e2e-testing/app
+        run: xvfb-run --auto-servernum -- make test-dev-viz
+
+      # --- 4. Artifacts ---------------------------------------------------
+      - name: "Upload test results (with screenshots)"
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: app-e2e-viz-results
+          path: |
+            e2e-testing/app/test-results/
+          retention-days: 14
           if-no-files-found: warn
