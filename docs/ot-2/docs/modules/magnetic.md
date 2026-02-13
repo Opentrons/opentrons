@@ -9,7 +9,6 @@ title: "Opentrons OT-2: Magnetic Module"
 The Opentrons Magnetic Module automatically moves high-strength, N52 neodymium magnetic bars to and from seated well plates for magnetic bead-based purification protocols using 96-well plates. It comes with two separate adjustable plate brackets for supporting standard and deep well labware. The magnetic plate supports many different magnetic bead products for extraction and purification of nucleic acids in the labware.
 
 The Magnetic Module has been discontinued, but some may remain in inventory. Contact [Opentrons Sales](https://opentrons.com/contact) for more information.
-[//]: # (True story, bro. A few may remain, but are no longer sold.)
 
 !!! note
     - The Magnetic Module is not compatible with Opentrons Flex. Flex uses the [Magnetic Block](https://opentrons.com/products/opentrons-flex-magnetic-block-gen1) for bead-based purification protocols.
