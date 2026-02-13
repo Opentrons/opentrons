@@ -12,7 +12,7 @@
 name: "App E2E Tests"
 
 on:
-  pull_request:
+  push:
     branches:
       - "e2e-app-start"
   workflow_dispatch:
