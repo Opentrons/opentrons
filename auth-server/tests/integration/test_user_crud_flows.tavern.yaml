@@ -118,6 +118,28 @@ stages:
           userName: test_new_user_updated
           scopes: [users.write]
 
+  - name: Get a new access token with the updated username and password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_new_user_updated
+        password: securepassword123
+        scope: users.write
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: users.write
+      save:
+        json:
+          access_token: access_token
+
   - name: Delete the user
     request:
       method: DELETE
