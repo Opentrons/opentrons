@@ -36,6 +36,8 @@ class RobotServerSettings(BaseSettings):
     OT_ROBOT_SERVER_, e.g. OT_ROBOT_SERVER_persistence_directory.
     """
 
+    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
+
     simulator_configuration_file_path: typing.Optional[str] = Field(
         default=None,
         description="Path to a json file that describes the hardware simulator.",
@@ -116,8 +118,6 @@ class RobotServerSettings(BaseSettings):
             " currently exists."
         ),
     )
-
-    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
     maximum_quick_transfer_protocols: int = Field(
         default=20,
