@@ -76,6 +76,14 @@ def _verify_scopes(
         )
 
 
+def _get_user(username: str) -> User | None:
+    """Look up a user by username. Returns the User or None."""
+    return next(
+        (user for user in TEST_USERS if user.username == username),
+        None,
+    )
+
+
 def _validate_user_create_input(
     user_name: str | None = None,
     password: str | None = None,
@@ -128,11 +136,7 @@ async def post_users(
         user_create.fullName,
         user_create.accountType,
     )
-    user = next(
-        (user for user in TEST_USERS if user.username == user_create.userName),
-        None,
-    )
-    if user is not None:
+    if _get_user(user_create.userName) is not None:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
@@ -178,10 +182,7 @@ async def get_user(
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
     _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
-    user = next(
-        (user for user in TEST_USERS if user.username == userName),
-        None,
-    )
+    user = _get_user(userName)
     if user is None:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
@@ -216,10 +217,7 @@ async def delete_user(
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
     _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
-    user = next(
-        (user for user in TEST_USERS if user.username == userName),
-        None,
-    )
+    user = _get_user(userName)
     if user is None:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
     TEST_USERS.remove(user)
@@ -255,10 +253,7 @@ async def update_user(
         full_name=update_user.fullName,
         account_type=update_user.accountType,
     )
-    user = next(
-        (user for user in TEST_USERS if user.username == userName),
-        None,
-    )
+    user = _get_user(userName)
     if user is None:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
 
