@@ -1,7 +1,7 @@
 """Request and response models for the `/settings` endpoints."""
 
 from textwrap import dedent
-from typing import Annotated
+from typing import Annotated, Literal
 
 import pydantic
 
@@ -34,11 +34,14 @@ class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings."""
 
     accessControlEnabled: Annotated[
-        bool | None,
+        Literal[True] | None,
         pydantic.Field(
-            description=(
-                "The new value of `accessControlEnabled`."
-                " Omit or set to `null` to leave it unchanged."
+            description=dedent(
+                """
+                Set to `true` to enable access control. Omit or set to `null` to leave it unchanged.
+
+                **Warning:** Once enabled, access control cannot be disabled without assistance from Opentrons!
+                """
             )
         ),
     ]
