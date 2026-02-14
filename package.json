@@ -16,7 +16,8 @@
       "react-api-client",
       "shared-data",
       "step-generation",
-      "usb-bridge/node-client"
+      "usb-bridge/node-client",
+      "web-viz"
     ]
   },
   "config": {
