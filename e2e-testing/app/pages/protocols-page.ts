@@ -19,8 +19,11 @@ export class ProtocolsPage {
 
   /** Navigate to the protocols page via the left-hand nav. */
   async navigateToProtocols(): Promise<void> {
-    // Click the "Protocols" link in the desktop nav sidebar.
-    const protocolsLink = this.page.getByRole('link', { name: 'Protocols' })
+    // Target the sidebar nav link specifically — a breadcrumb link with the
+    // same name may also be present when viewing a protocol detail page.
+    const protocolsLink = this.page
+      .getByRole('link', { name: 'Protocols' })
+      .first()
     await expect(protocolsLink).toBeVisible({ timeout: 15_000 })
     await protocolsLink.click()
     console.log('Navigated to Protocols page')
@@ -59,11 +62,39 @@ export class ProtocolsPage {
     console.log('Protocol file selected for upload')
   }
 
+  // ---------------- Sorting ------------------------------------------------
+
+  /**
+   * Open the sort-by dropdown and select "Most recent updates".
+   *
+   * This ensures the most recently imported protocol appears first,
+   * which is useful when the exact protocol display name is unknown.
+   */
+  async setSortByMostRecent(): Promise<void> {
+    const sortButton = this.page.getByTestId('ProtocolList_SortByMenu')
+    await expect(sortButton).toBeVisible({ timeout: 15_000 })
+    await sortButton.click()
+
+    const option = this.page.getByRole('button', { name: 'Most recent updates' })
+    await expect(option).toBeVisible({ timeout: 5_000 })
+    await option.click()
+    console.log('Sort set to "Most recent updates"')
+  }
+
   // ---------------- Protocol Cards ---------------------------------------
 
   /** Return the locator for a protocol card by its display name. */
   getProtocolCard(protocolName: string): Locator {
     return this.page.getByTestId(`ProtocolCard_${protocolName}`)
+  }
+
+  /**
+   * Return the locator for the first protocol card in the list,
+   * regardless of its name. Matches any test ID starting with
+   * `ProtocolCard_` that is an `<h3>` heading element.
+   */
+  getFirstProtocolCard(): Locator {
+    return this.page.locator('[data-testid^="ProtocolCard_"] h3').first()
   }
 
   /** Click a protocol card to navigate to its detail page. */
@@ -72,6 +103,19 @@ export class ProtocolsPage {
     await expect(card).toBeVisible({ timeout: 15_000 })
     await card.click()
     console.log(`Opened protocol: ${protocolName}`)
+  }
+
+  /**
+   * Click the first protocol card in the list.
+   *
+   * Best used after {@link setSortByMostRecent} so that the most
+   * recently imported protocol is at the top.
+   */
+  async openFirstProtocol(): Promise<void> {
+    const card = this.page.locator('[data-testid^="ProtocolCard_"]').first()
+    await expect(card).toBeVisible({ timeout: 15_000 })
+    await card.click()
+    console.log('Opened first protocol card')
   }
 
   // ---------------- Assertions -------------------------------------------
@@ -91,5 +135,18 @@ export class ProtocolsPage {
     const card = this.getProtocolCard(protocolName).first()
     await expect(card).toBeVisible({ timeout: 30_000 })
     console.log(`Protocol "${protocolName}" is visible`)
+  }
+
+  /**
+   * Wait for any protocol card to appear in the list.
+   *
+   * Useful after importing a protocol when the exact display name
+   * is not known ahead of time (e.g. bundled protocols whose
+   * analysis-derived name may differ from the metadata).
+   */
+  async expectAnyProtocolVisible(): Promise<void> {
+    const card = this.page.locator('[data-testid^="ProtocolCard_"]').first()
+    await expect(card).toBeVisible({ timeout: 30_000 })
+    console.log('At least one protocol card is visible')
   }
 }

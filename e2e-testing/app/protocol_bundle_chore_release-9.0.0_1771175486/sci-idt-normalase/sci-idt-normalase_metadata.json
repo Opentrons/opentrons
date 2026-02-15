@@ -1,0 +1,131 @@
+{
+  "slug": "sci-idt-normalase",
+  "name": "NGS Library Normalization with IDT xGEN Normalase Module",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.9",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "sample_quant_csv",
+      "type": "textFile",
+      "label": ".CSV File",
+      "default": "Sample_Plate, Sample_well,Target_well\nsample_plate,A1,A12"
+    },
+    {
+      "name": "SAMPLES",
+      "type": "dropDown",
+      "label": "Number of Samples",
+      "options": [
+        {
+          "label": "8",
+          "value": "8x"
+        },
+        {
+          "label": "16",
+          "value": "16x"
+        },
+        {
+          "label": "24",
+          "value": "24x"
+        }
+      ]
+    },
+    {
+      "name": "DRYRUN",
+      "type": "dropDown",
+      "label": "Dry Run",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "NOMODULES",
+      "type": "dropDown",
+      "label": "Use Modules?",
+      "options": [
+        {
+          "label": "Yes, use modules",
+          "value": "NO"
+        },
+        {
+          "label": "No, do not use modules",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "name": "OFFSET",
+      "type": "dropDown",
+      "label": "Use protocol specific z-offsets?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "NGSMAG",
+      "type": "dropDown",
+      "label": "Use NGS Magnetic Block?",
+      "options": [
+        {
+          "label": "Yes, use mag block",
+          "value": "YES"
+        },
+        {
+          "label": "No, do not use",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "p20S_mount",
+      "type": "dropDown",
+      "label": "P20 Single-Channel Mount",
+      "options": [
+        {
+          "label": "Right",
+          "value": "right"
+        },
+        {
+          "label": "Left",
+          "value": "left"
+        }
+      ]
+    },
+    {
+      "name": "p20M_mount",
+      "type": "dropDown",
+      "label": "P20 Multi-Channel Mount",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

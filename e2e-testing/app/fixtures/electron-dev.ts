@@ -16,6 +16,7 @@
  *   APP_STARTUP_TIMEOUT   – ms to wait for the first window (default: 60 000)
  *   MONOREPO_ROOT         – Path to the opentrons monorepo root (default: auto-detected)
  *   SKIP_SHELL_BUILD      – Set to "true" to skip `vite build` in app-shell (if already built)
+ *   CUSTOM_LABWARE_DIR    – Path to a custom labware directory (passed as --labware.directory)
  */
 
 import { type ChildProcess, exec, execSync, spawn } from 'node:child_process'
@@ -271,6 +272,20 @@ export const test = base.extend<object, DevAppFixtures>({
         `--ui.url.path=localhost:${port}`,
         `--python.pathToPythonOverride=${pythonPath}`,
       ]
+
+      // Point the app at a custom labware directory if specified.
+      const customLabwareDir = process.env.CUSTOM_LABWARE_DIR
+      if (customLabwareDir) {
+        const resolvedLabwareDir = resolve(customLabwareDir)
+        if (!existsSync(resolvedLabwareDir)) {
+          throw new Error(
+            `CUSTOM_LABWARE_DIR is set to '${customLabwareDir}' but the path does not exist.`,
+          )
+        }
+        electronArgs.push(`--labware.directory=${resolvedLabwareDir}`)
+        console.log(`→ Custom labware directory: ${resolvedLabwareDir}`)
+      }
+
       if (process.env.CI) {
         electronArgs.push('--no-sandbox')
       }

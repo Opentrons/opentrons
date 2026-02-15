@@ -84,6 +84,54 @@ test-dev-viz-skip-build: ## Run visualization tests, skip app-shell rebuild
 	SKIP_SHELL_BUILD=true pnpm test:dev:viz
 
 # ---------------------------------------------------------------------------
+# Testing – Protocol Bundle (dev)
+# ---------------------------------------------------------------------------
+
+# Path to the protocol bundle's shared custom labware directory.
+# Tests auto-detect this, but it can be overridden here.
+CUSTOM_LABWARE_DIR ?= $(CURDIR)/protocol_bundle_chore_release-9.0.0_1771175486/custom_labware
+
+.PHONY: test-dev-bundle
+test-dev-bundle: ## Run all protocol bundle tests (Flex + OT-2, headless)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle
+
+.PHONY: test-dev-bundle-headed
+test-dev-bundle-headed: ## Run all protocol bundle tests (headed)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle:headed
+
+.PHONY: test-dev-bundle-skip-build
+test-dev-bundle-skip-build: ## Run all bundle tests, skip app-shell rebuild
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) SKIP_SHELL_BUILD=true pnpm test:dev:bundle
+
+.PHONY: test-dev-bundle-flex
+test-dev-bundle-flex: ## Run Flex protocol bundle tests (headless)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle:flex
+
+.PHONY: test-dev-bundle-flex-headed
+test-dev-bundle-flex-headed: ## Run Flex protocol bundle tests (headed)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle:flex:headed
+
+.PHONY: test-dev-bundle-ot2
+test-dev-bundle-ot2: ## Run OT-2 protocol bundle tests (headless)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle:ot2
+
+.PHONY: test-dev-bundle-ot2-headed
+test-dev-bundle-ot2-headed: ## Run OT-2 protocol bundle tests (headed)
+	CUSTOM_LABWARE_DIR=$(CUSTOM_LABWARE_DIR) pnpm test:dev:bundle:ot2:headed
+
+.PHONY: bundle-results
+bundle-results: ## Print protocol bundle pass/fail results
+	npx tsx scripts/bundle-results.ts
+
+.PHONY: bundle-failures
+bundle-failures: ## Print only protocol bundle failures
+	npx tsx scripts/bundle-results.ts --failures
+
+.PHONY: bundle-clear
+bundle-clear: ## Clear all protocol bundle pass/fail results
+	npx tsx scripts/bundle-clear.ts
+
+# ---------------------------------------------------------------------------
 # Testing – All
 # ---------------------------------------------------------------------------
 

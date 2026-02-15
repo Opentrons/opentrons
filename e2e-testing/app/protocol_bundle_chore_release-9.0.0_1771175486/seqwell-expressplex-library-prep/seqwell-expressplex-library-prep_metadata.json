@@ -1,0 +1,46 @@
+{
+  "slug": "seqwell-expressplex-library-prep",
+  "name": "seqWell ExpressPlex Library Preparation Part 1 of 2",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 1,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.15",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "DryRun",
+      "type": "dropDown",
+      "label": "Is this a test run?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": true
+        },
+        {
+          "label": "No",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "Plates",
+      "type": "dropDown",
+      "label": "How many plates are being processed?",
+      "options": [
+        {
+          "label": "1",
+          "value": "1"
+        },
+        {
+          "label": "2",
+          "value": "2"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

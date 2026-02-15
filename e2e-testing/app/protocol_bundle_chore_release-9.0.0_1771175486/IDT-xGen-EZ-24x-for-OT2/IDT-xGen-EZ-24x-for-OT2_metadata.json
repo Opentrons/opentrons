@@ -1,0 +1,272 @@
+{
+  "slug": "IDT-xGen-EZ-24x-for-OT2",
+  "name": "IDT xGen EZ 24x for OT2",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.11",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "SAMPLES",
+      "type": "dropDown",
+      "label": "Number of Samples",
+      "options": [
+        {
+          "label": "8",
+          "value": "8x"
+        },
+        {
+          "label": "16",
+          "value": "16x"
+        },
+        {
+          "label": "24",
+          "value": "24x"
+        }
+      ]
+    },
+    {
+      "name": "FRAGTIME",
+      "type": "int",
+      "label": "Fragmentation Time (minutes)",
+      "default": 30
+    },
+    {
+      "name": "PCRCYCLES",
+      "type": "int",
+      "label": "PCR Cycles",
+      "default": 4
+    },
+    {
+      "name": "DRYRUN",
+      "type": "dropDown",
+      "label": "Dry Run",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "NOMODULES",
+      "type": "dropDown",
+      "label": "Use Modules?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "NO"
+        },
+        {
+          "label": "NO",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "name": "TIPREUSE",
+      "type": "dropDown",
+      "label": "Reuse Tips?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "OFFSET",
+      "type": "dropDown",
+      "label": "Use protocol specific z-offsets?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "STEP_FRERAT",
+      "type": "dropDown",
+      "label": "Include Fragmentation / End-Repair / A-Tailing Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_FRERATDECK",
+      "type": "dropDown",
+      "label": "If yes, Fragmentation / End-Repair / A-Tailing on deck or off deck?",
+      "options": [
+        {
+          "label": "On Deck",
+          "value": "1"
+        },
+        {
+          "label": "Off Deck",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_LIG",
+      "type": "dropDown",
+      "label": "Include Ligation Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_LIGDECK",
+      "type": "dropDown",
+      "label": "If yes, ligation Step on or off deck?",
+      "options": [
+        {
+          "label": "On deck",
+          "value": "1"
+        },
+        {
+          "label": "Off deck",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_POSTLIG",
+      "type": "dropDown",
+      "label": "Include Post Ligation Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_PCR",
+      "type": "dropDown",
+      "label": "Include PCR Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_PCRDECK",
+      "type": "dropDown",
+      "label": "If yes, PCR step on or off deck?",
+      "options": [
+        {
+          "label": "On Deck",
+          "value": "1"
+        },
+        {
+          "label": "Off Deck",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_POSTPCR1",
+      "type": "dropDown",
+      "label": "Include First Post PCR Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "STEP_POSTPCR2",
+      "type": "dropDown",
+      "label": "Include Second Post PCR Step?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "1"
+        },
+        {
+          "label": "No",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "p20_mount",
+      "type": "dropDown",
+      "label": "P20 Multi-Channel Mount",
+      "options": [
+        {
+          "label": "Right",
+          "value": "right"
+        },
+        {
+          "label": "Left",
+          "value": "left"
+        }
+      ]
+    },
+    {
+      "name": "p300_mount",
+      "type": "dropDown",
+      "label": "P300 Multi-Channel Mount",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

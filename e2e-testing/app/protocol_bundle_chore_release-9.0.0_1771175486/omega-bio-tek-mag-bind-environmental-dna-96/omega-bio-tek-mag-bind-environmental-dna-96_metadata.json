@@ -1,0 +1,128 @@
+{
+  "slug": "omega-bio-tek-mag-bind-environmental-dna-96",
+  "name": "Omega Bio-Tek Mag-Bind Environmental DNA 96 Kit",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 1,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.15",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "_num_samps",
+      "type": "int",
+      "label": "Number of Samples",
+      "default": 16
+    },
+    {
+      "name": "lw_deepwell_plate",
+      "type": "dropDown",
+      "label": "Wellplate type",
+      "options": [
+        {
+          "label": "NEST 96 Deep Well Plate 2mL",
+          "value": "nest_96_wellplate_2ml_deep"
+        },
+        {
+          "label": "Thermo Scientific Nunc 96 Well Plate 2000 uL",
+          "value": "thermoscientificnunc_96_wellplate_2000ul"
+        },
+        {
+          "label": "USA Scientific 96 Deep Well Plate 2.4 mL",
+          "value": "usascientific_96_wellplate_2.4ml_deep"
+        }
+      ]
+    },
+    {
+      "name": "lw_deepwell_plate_open",
+      "type": "str",
+      "label": "Wellplate type (if not listed in dropdown above)",
+      "default": ""
+    },
+    {
+      "name": "_m300_mount",
+      "type": "dropDown",
+      "label": "Pipette Mount",
+      "options": [
+        {
+          "label": "Right",
+          "value": "right"
+        },
+        {
+          "label": "Left",
+          "value": "left"
+        }
+      ]
+    },
+    {
+      "name": "vol_xp1",
+      "type": "float",
+      "label": "XP1 buffer volume (in ul)",
+      "default": 320
+    },
+    {
+      "name": "vol_removal",
+      "type": "float",
+      "label": "XP1/Mag-Bind removal volume (in ul)",
+      "default": 700
+    },
+    {
+      "name": "_mag_time",
+      "type": "float",
+      "label": "MagDeck Incubation (minutes)",
+      "default": 5
+    },
+    {
+      "name": "_air_dry",
+      "type": "int",
+      "label": "Air Dry Time (minutes)",
+      "default": 10
+    },
+    {
+      "name": "_elution_vol",
+      "type": "int",
+      "label": "Elution Volume (in \u00b5L)",
+      "default": 100
+    },
+    {
+      "name": "flow_rate_wash",
+      "type": "float",
+      "label": "wash flow rates (in ul/second)",
+      "default": 150
+    },
+    {
+      "name": "_off_deck",
+      "type": "dropDown",
+      "label": "Perform Resuspension Off-Deck",
+      "options": [
+        {
+          "label": "No",
+          "value": 0
+        },
+        {
+          "label": "Yes",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "_music",
+      "type": "dropDown",
+      "label": "Play Custom Music at Pause",
+      "options": [
+        {
+          "label": "No",
+          "value": 0
+        },
+        {
+          "label": "Yes",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

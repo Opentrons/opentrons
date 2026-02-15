@@ -1,0 +1,60 @@
+{
+  "slug": "seqwell-expressplex-pooling",
+  "name": "seqWell ExpressPlex Library Preparation Part 2 of 2",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.15",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "DryRun",
+      "type": "dropDown",
+      "label": "Is this a test run?",
+      "options": [
+        {
+          "label": "No",
+          "value": false
+        },
+        {
+          "label": "Yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "Plates",
+      "type": "dropDown",
+      "label": "How many plates are being processed?",
+      "options": [
+        {
+          "label": "4",
+          "value": "4"
+        },
+        {
+          "label": "3",
+          "value": "3"
+        },
+        {
+          "label": "2",
+          "value": "2"
+        },
+        {
+          "label": "1",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "columns",
+      "type": "int",
+      "label": "If pooling only 1 plate, how many columns on the plate will be pooled?",
+      "default": 12
+    }
+  ],
+  "error_with_params": false
+}

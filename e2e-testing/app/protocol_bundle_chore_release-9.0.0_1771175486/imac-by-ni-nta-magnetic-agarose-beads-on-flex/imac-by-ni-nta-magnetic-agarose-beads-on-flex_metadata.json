@@ -1,0 +1,15 @@
+{
+  "slug": "imac-by-ni-nta-magnetic-agarose-beads-on-flex",
+  "name": "IMAC by Ni-NTA Magnetic Agarose Beads on Flex",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": false,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.18",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [],
+  "error_with_params": null
+}

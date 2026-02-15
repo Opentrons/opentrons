@@ -1,0 +1,69 @@
+{
+  "slug": "dinosaur",
+  "name": "Dinosaur",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.9",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "p300_mount",
+      "type": "dropDown",
+      "label": "P300 Single Channel GEN2 Mount Position",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    },
+    {
+      "name": "tip_type",
+      "type": "dropDown",
+      "label": "Tip Rack Type",
+      "options": [
+        {
+          "label": "Opentrons 96 Tip Rack 300 uL",
+          "value": "opentrons_96_tiprack_300ul"
+        },
+        {
+          "label": "Opentrons 96 Filter Tip Rack 200 uL",
+          "value": "opentrons_96_filtertiprack_200ul"
+        }
+      ]
+    },
+    {
+      "name": "plate_type",
+      "type": "dropDown",
+      "label": "Plate Type",
+      "options": [
+        {
+          "label": "Bio-Rad 96 Well Plate 200 uL PCR",
+          "value": "biorad_96_wellplate_200ul_pcr"
+        },
+        {
+          "label": "NEST 96 Well Plate 100 uL PCR Full Skirt",
+          "value": "nest_96_wellplate_100ul_pcr_full_skirt"
+        },
+        {
+          "label": "Corning 96 Well Plate 360 \u00b5L Flat",
+          "value": "corning_96_wellplate_360ul_flat"
+        },
+        {
+          "label": "NEST 96 Well Plate 200 \u00b5L Flat",
+          "value": "nest_96_wellplate_200ul_flat"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

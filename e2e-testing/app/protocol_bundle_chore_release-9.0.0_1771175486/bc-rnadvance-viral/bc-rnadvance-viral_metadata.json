@@ -1,0 +1,34 @@
+{
+  "slug": "bc-rnadvance-viral",
+  "name": "Beckman Coulter RNAdvance Viral RNA Isolation Kit",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.9",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "num_samples",
+      "type": "int",
+      "label": "number of samples + controls (1-96)",
+      "default": 96
+    },
+    {
+      "name": "starting_vol",
+      "type": "float",
+      "label": "starting volume (100-400\u00b5l)",
+      "default": 200
+    },
+    {
+      "name": "elution_vol",
+      "type": "int",
+      "label": "elution volume (40-100\u00b5l)",
+      "default": 40
+    }
+  ],
+  "error_with_params": false
+}

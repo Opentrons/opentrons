@@ -40,6 +40,25 @@ export class AppPage {
     }
   }
 
+  // ---------------- Recovery ----------------------------------------------
+
+  /**
+   * Click "Reload app" if the error boundary fallback is visible.
+   *
+   * After a white-screen crash, the app shows a `DesktopAppFallback`
+   * with a "Reload app" button. Clicking it reloads the Electron
+   * BrowserWindow and returns the app to a working state.
+   */
+  async reloadAppIfCrashed(): Promise<void> {
+    const reloadButton = this.page.getByRole('button', { name: 'Reload app' })
+    if (await reloadButton.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      console.log('App crash detected — clicking "Reload app"')
+      await reloadButton.click()
+      await this.page.waitForLoadState('domcontentloaded', { timeout: 30_000 })
+      console.log('App reloaded successfully')
+    }
+  }
+
   // ---------------- Queries ----------------------------------------------
 
   /** Return the document title of the app window. */

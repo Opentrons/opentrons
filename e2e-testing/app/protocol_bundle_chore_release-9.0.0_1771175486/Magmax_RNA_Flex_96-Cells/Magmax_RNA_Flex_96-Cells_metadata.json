@@ -1,0 +1,142 @@
+{
+  "slug": "Magmax_RNA_Flex_96-Cells",
+  "name": "Applied Biosystems MagMAX-96 Total RNA Isolation Kit",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.16",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "trash_chute",
+      "type": "dropDown",
+      "label": "Trash Chute Present?",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "USE_GRIPPER",
+      "type": "dropDown",
+      "label": "Use Gripper",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "dry_run",
+      "type": "dropDown",
+      "label": "Dry Run",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "temp_mod",
+      "type": "dropDown",
+      "label": "Temperature Module Present?",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "heater_shaker",
+      "type": "dropDown",
+      "label": "Heater-Shaker Module Present?",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "tip_mixing",
+      "type": "dropDown",
+      "label": "Tip Mixing? (will heater-shaker be replaced with tip mixing-if h-s is present, this will be false)",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "wash_vol",
+      "type": "int",
+      "label": "Wash Volumes",
+      "default": 150
+    },
+    {
+      "name": "lysis_vol",
+      "type": "int",
+      "label": "Lysis Volume",
+      "default": 140
+    },
+    {
+      "name": "sample_vol",
+      "type": "int",
+      "label": "Sample Starting Volume",
+      "default": 10
+    },
+    {
+      "name": "stop_vol",
+      "type": "int",
+      "label": "Stop Solution Volume",
+      "default": 100
+    },
+    {
+      "name": "dnase_vol",
+      "type": "int",
+      "label": "DNAseI Volume",
+      "default": 50
+    },
+    {
+      "name": "elution_vol",
+      "type": "int",
+      "label": "Elution Volume",
+      "default": 50
+    }
+  ],
+  "error_with_params": false
+}

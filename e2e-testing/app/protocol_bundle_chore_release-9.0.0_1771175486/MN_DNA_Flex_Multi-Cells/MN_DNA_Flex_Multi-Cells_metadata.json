@@ -1,0 +1,15 @@
+{
+  "slug": "MN_DNA_Flex_Multi-Cells",
+  "name": "MACHEREY-NAGEL NucleoMag Tissue DNA Extraction Kit - Mammalian Cells",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": false,
+  "custom_labware_count": 1,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.19",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [],
+  "error_with_params": null
+}
