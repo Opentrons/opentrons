@@ -1,0 +1,15 @@
+{
+  "slug": "genelute-tubes",
+  "name": "GenElute\u2122 -E Single Spin Blood DNA 96 Kit - Tube Input",
+  "is_active": true,
+  "oem_name": "Millipore",
+  "has_lp": false,
+  "custom_labware_count": 2,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.21",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [],
+  "error_with_params": null
+}

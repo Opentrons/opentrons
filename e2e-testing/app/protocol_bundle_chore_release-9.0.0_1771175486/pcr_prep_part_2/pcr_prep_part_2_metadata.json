@@ -1,0 +1,104 @@
+{
+  "slug": "pcr_prep_part_2",
+  "name": "PCR Prep",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.2",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "number_of_samples",
+      "type": "int",
+      "label": "sample number",
+      "default": 96
+    },
+    {
+      "name": "right_pipette",
+      "type": "dropDown",
+      "label": "right pipette type",
+      "options": [
+        {
+          "label": "GEN2 P300 Multi",
+          "value": "p300_multi_gen2"
+        },
+        {
+          "label": "GEN2 P20 Multi",
+          "value": "p20_multi_gen2"
+        },
+        {
+          "label": "GEN1 P1000 Multi",
+          "value": "p1000_multi"
+        },
+        {
+          "label": "GEN1 P300 Multi",
+          "value": "p300_multi"
+        },
+        {
+          "label": "GEN1 P50 Multi",
+          "value": "p50_multi"
+        },
+        {
+          "label": "GEN1 P10 Multi",
+          "value": "p10_multi"
+        },
+        {
+          "label": "none",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "left_pipette",
+      "type": "dropDown",
+      "label": "left pipette type",
+      "options": [
+        {
+          "label": "GEN2 P300 Multi",
+          "value": "p300_multi_gen2"
+        },
+        {
+          "label": "GEN2 P20 Multi",
+          "value": "p20_multi_gen2"
+        },
+        {
+          "label": "GEN1 P1000 Multi",
+          "value": "p1000_multi"
+        },
+        {
+          "label": "GEN1 P300 Multi",
+          "value": "p300_multi"
+        },
+        {
+          "label": "GEN1 P50 Multi",
+          "value": "p50_multi"
+        },
+        {
+          "label": "GEN1 P10 Multi",
+          "value": "p10_multi"
+        },
+        {
+          "label": "none",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "mastermix_volume",
+      "type": "float",
+      "label": "mastermix volume (in ul)",
+      "default": 18
+    },
+    {
+      "name": "DNA_volume",
+      "type": "float",
+      "label": "DNA volume (in ul)",
+      "default": 2
+    }
+  ],
+  "error_with_params": false
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "agar_plate_method_bacteria",
+  "name": "Automated Agar Plate Method for Viable Bacteria Assessment",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 2,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.16",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "DILUTION_PREP_ON_DECK",
+      "type": "dropDown",
+      "label": "Prepare sample dilutions on Flex (serial 10-fold dilution x6 and control x2)?",
+      "default": 1,
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "NUM_SAMPLES",
+      "type": "dropDown",
+      "label": "Number of samples to be assayed?",
+      "default": 6,
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

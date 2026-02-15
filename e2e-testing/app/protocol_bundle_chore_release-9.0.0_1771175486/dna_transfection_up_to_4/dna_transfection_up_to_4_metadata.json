@@ -1,0 +1,186 @@
+{
+  "slug": "dna_transfection_up_to_4",
+  "name": "DNA Transfection (up to 4 plates)",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.15",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "TRANSFECTION_TYPE",
+      "type": "dropDown",
+      "label": "Conventional or Reverse Transfection?",
+      "options": [
+        {
+          "label": "Conventional",
+          "value": 1
+        },
+        {
+          "label": "Reverse",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "PIPET_LOCATION",
+      "type": "dropDown",
+      "label": "P300 pipet on the left or right?",
+      "options": [
+        {
+          "label": "Left",
+          "value": 1
+        },
+        {
+          "label": "Right",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "plate_type_1",
+      "type": "dropDown",
+      "label": "Type of plate on Slot 11 (Plate #1)",
+      "options": [
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "0, if no plate",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "plate_mm_1",
+      "type": "int",
+      "label": "Number of master mixes (up to 6) - Plate #1 ",
+      "default": 6
+    },
+    {
+      "name": "plate_repl_1",
+      "type": "int",
+      "label": "Number of replicates - Plate #1 ",
+      "default": 4
+    },
+    {
+      "name": "plate_type_2",
+      "type": "dropDown",
+      "label": "Type of plate on Slot 8 (Plate #2)",
+      "options": [
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "0, if no plate",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "plate_mm_2",
+      "type": "int",
+      "label": "Number of master mixes (up to 6) - Plate #2",
+      "default": 6
+    },
+    {
+      "name": "plate_repl_2",
+      "type": "int",
+      "label": "Number of replicates - Plate #2",
+      "default": 4
+    },
+    {
+      "name": "plate_type_3",
+      "type": "dropDown",
+      "label": "Type of plate on Slot 5 (Plate #3)",
+      "options": [
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "0, if no plate",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "plate_mm_3",
+      "type": "int",
+      "label": "Number of master mixes (up to 6) - Plate #3",
+      "default": 6
+    },
+    {
+      "name": "plate_repl_3",
+      "type": "int",
+      "label": "Number of replicates - Plate #3 ",
+      "default": 4
+    },
+    {
+      "name": "plate_type_4",
+      "type": "dropDown",
+      "label": "Type of plate on Slot 2 (Plate #4)",
+      "options": [
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "0, if no plate",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "plate_mm_4",
+      "type": "int",
+      "label": "Number of master mixes (up to 6) - Plate #4",
+      "default": 6
+    },
+    {
+      "name": "plate_repl_4",
+      "type": "int",
+      "label": "Number of replicates - Plate #4 ",
+      "default": 4
+    }
+  ],
+  "error_with_params": false
+}

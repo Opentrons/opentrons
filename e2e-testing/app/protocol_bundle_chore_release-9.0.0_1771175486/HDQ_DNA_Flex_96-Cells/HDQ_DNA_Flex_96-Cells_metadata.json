@@ -1,0 +1,136 @@
+{
+  "slug": "HDQ_DNA_Flex_96-Cells",
+  "name": "Omega Bio-tek Mag-Bind Blood & Tissue DNA HDQ 96 Kit- Mammalian Cells",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.16",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "trash_chute",
+      "type": "dropDown",
+      "label": "Trash Chute Present?",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "USE_GRIPPER",
+      "type": "dropDown",
+      "label": "Use Gripper",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "dry_run",
+      "type": "dropDown",
+      "label": "Dry Run",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "temp_mod",
+      "type": "dropDown",
+      "label": "Temperature Module Present?",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "heater_shaker",
+      "type": "dropDown",
+      "label": "Heater-Shaker Module Present?",
+      "options": [
+        {
+          "label": "yes",
+          "value": true
+        },
+        {
+          "label": "no",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "tip_mixing",
+      "type": "dropDown",
+      "label": "Tip Mixing? (will heater-shaker be replaced with tip mixing-if h-s is present, this will be false)",
+      "options": [
+        {
+          "label": "no",
+          "value": false
+        },
+        {
+          "label": "yes",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "wash_vol",
+      "type": "int",
+      "label": "Wash Volume",
+      "default": 600
+    },
+    {
+      "name": "AL_vol",
+      "type": "int",
+      "label": "AL Volume",
+      "default": 230
+    },
+    {
+      "name": "sample_vol",
+      "type": "int",
+      "label": "Sample Starting Volume",
+      "default": 180
+    },
+    {
+      "name": "bind_vol",
+      "type": "int",
+      "label": "Binding Buffer Volume",
+      "default": 320
+    },
+    {
+      "name": "elution_vol",
+      "type": "int",
+      "label": "Elution Volume",
+      "default": 100
+    }
+  ],
+  "error_with_params": false
+}

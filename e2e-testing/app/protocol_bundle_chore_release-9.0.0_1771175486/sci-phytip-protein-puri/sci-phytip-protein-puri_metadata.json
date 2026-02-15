@@ -1,0 +1,37 @@
+{
+  "slug": "sci-phytip-protein-puri",
+  "name": "Biotage Dual Flow Chromatography Protein Purification",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 2,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.11",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "num_samp",
+      "type": "int",
+      "label": "Number of Samples",
+      "default": 96
+    },
+    {
+      "name": "m300_mount",
+      "type": "dropDown",
+      "label": "P300 Multi-Channel Mount",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

@@ -1,0 +1,15 @@
+{
+  "slug": "transient_transfection_of_HeLacells_Protocol_1",
+  "name": "Transient Transfection of HeLa cells Protocol 1",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": false,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.13",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [],
+  "error_with_params": null
+}

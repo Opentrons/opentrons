@@ -1,0 +1,60 @@
+{
+  "slug": "immunoprecipitation-by-dynabeads-on-flex-96ch",
+  "name": "Immunoprecipitation by Dynabeads on Flex with 96 Channel Pipette",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.16",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "NUM_COL",
+      "type": "int",
+      "label": "Columns of Samples (96-well Plate, up to 12)",
+      "default": 12
+    },
+    {
+      "name": "INCUBATION_ON_DECK",
+      "type": "dropDown",
+      "label": "Incubation on Flex",
+      "default": 1,
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "INCUBATION_MIN",
+      "type": "int",
+      "label": "If Incubation on Flex, Incubation Time (in minutes)?",
+      "default": 60
+    },
+    {
+      "name": "READY_FOR_SDSPAGE",
+      "type": "dropDown",
+      "label": "Eluates Ready for SDS-PAGE?",
+      "default": 1,
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

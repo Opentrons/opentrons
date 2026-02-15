@@ -1,0 +1,15 @@
+{
+  "slug": "IDT-xGen-EZ-48x",
+  "name": "IDT xGen EZ 48x",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": false,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.26",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [],
+  "error_with_params": null
+}

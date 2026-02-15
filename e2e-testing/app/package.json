@@ -1,0 +1,46 @@
+{
+  "name": "@opentrons/e2e-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end tests for the Opentrons desktop application (Electron)",
+  "packageManager": "pnpm@10.6.5",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "playwright test --project=electron-app",
+    "test:headed": "playwright test --project=electron-app --headed",
+    "test:debug": "playwright test --project=electron-app --headed --debug",
+    "test:ui": "playwright test --project=electron-app --ui",
+    "test:dev": "playwright test --project=electron-dev",
+    "test:dev:headed": "playwright test --project=electron-dev --headed",
+    "test:dev:debug": "playwright test --project=electron-dev --headed --debug",
+    "test:dev:smoke": "playwright test --project=electron-dev -g 'smoke'",
+    "test:dev:viz": "playwright test --project=electron-dev -g 'Visualization'",
+    "test:dev:viz:headed": "playwright test --project=electron-dev -g 'Visualization' --headed",
+    "test:dev:viz:debug": "playwright test --project=electron-dev -g 'Visualization' --headed --debug",
+    "test:dev:bundle": "playwright test --project=electron-dev -g 'Protocol Bundle'",
+    "test:dev:bundle:headed": "playwright test --project=electron-dev -g 'Protocol Bundle' --headed",
+    "test:dev:bundle:debug": "playwright test --project=electron-dev -g 'Protocol Bundle' --headed --debug",
+    "test:dev:bundle:flex": "playwright test --project=electron-dev -g 'Protocol Bundle – Flex'",
+    "test:dev:bundle:flex:headed": "playwright test --project=electron-dev -g 'Protocol Bundle – Flex' --headed",
+    "test:dev:bundle:ot2": "playwright test --project=electron-dev -g 'Protocol Bundle – OT-2'",
+    "test:dev:bundle:ot2:headed": "playwright test --project=electron-dev -g 'Protocol Bundle – OT-2' --headed",
+    "test:all": "playwright test",
+    "report": "playwright show-report test-results/html-report",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check . && tsc --noEmit",
+    "prep": "biome check --fix . && biome format --write . && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.15",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

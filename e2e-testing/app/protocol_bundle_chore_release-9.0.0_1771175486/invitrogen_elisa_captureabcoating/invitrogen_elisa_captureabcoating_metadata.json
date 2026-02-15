@@ -1,0 +1,78 @@
+{
+  "slug": "invitrogen_elisa_captureabcoating",
+  "name": "Invitrogen Uncoated ELISA on Flex (1/3) - Capture Antibody Coating (up to 6 targets)",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-3 Standard",
+  "robot_name": "Flex",
+  "api_level": "2.16",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "NUM_TARGETS",
+      "type": "dropDown",
+      "label": "Number of capture antibodies coated on ELISA plate?",
+      "default": 2,
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "name": "NUM_SAMPLES",
+      "type": "int",
+      "label": "Number of samples to be assayed (in duplicate)?",
+      "default": 8
+    },
+    {
+      "name": "PLATE_SEALED",
+      "type": "dropDown",
+      "label": "ELISA plate covered with a pierceable sealing film?",
+      "default": 1,
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "PLATE_COATING_ON_DECK",
+      "type": "dropDown",
+      "label": "Plate coating incubation on deck?",
+      "default": 1,
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "sci-lucif-assay3",
+  "name": "Luciferase Reporter Assay for NF-kB Activation - Protocol 3: Treatment",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.13",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "p300_mount",
+      "type": "dropDown",
+      "label": "P300 8-channel GEN2 pipette mount",
+      "options": [
+        {
+          "label": "right",
+          "value": "right"
+        },
+        {
+          "label": "left",
+          "value": "left"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

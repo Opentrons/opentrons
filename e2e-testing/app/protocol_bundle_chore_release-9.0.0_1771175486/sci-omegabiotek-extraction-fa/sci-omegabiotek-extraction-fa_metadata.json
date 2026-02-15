@@ -1,0 +1,109 @@
+{
+  "slug": "sci-omegabiotek-extraction-fa",
+  "name": "Omega Bio-tek Mag-Bind Blood & Tissue DNA HDQ 96",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.4",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "num_samples",
+      "type": "int",
+      "label": "Number of Samples",
+      "default": 96
+    },
+    {
+      "name": "deepwell_type",
+      "type": "dropDown",
+      "label": "Deepwell Type",
+      "options": [
+        {
+          "label": "NEST 96 Wellplate 2mL",
+          "value": "nest_96_wellplate_2ml_deep"
+        },
+        {
+          "label": "USA Scientific 96 Wellplate 2.4mL",
+          "value": "usascientific_96_wellplate_2.4ml_deep"
+        }
+      ]
+    },
+    {
+      "name": "res_type",
+      "type": "dropDown",
+      "label": "Reservoir Type",
+      "options": [
+        {
+          "label": "NEST 12 Reservoir 15mL",
+          "value": "nest_12_reservoir_15ml"
+        },
+        {
+          "label": "USA Scientific 12 Reservoir 22mL",
+          "value": "usascientific_12_reservoir_22ml"
+        }
+      ]
+    },
+    {
+      "name": "starting_vol",
+      "type": "int",
+      "label": "Starting Volume",
+      "default": 430
+    },
+    {
+      "name": "elution_vol",
+      "type": "int",
+      "label": "Elution Volume",
+      "default": 50
+    },
+    {
+      "name": "park_tips",
+      "type": "dropDown",
+      "label": "Park Tips?",
+      "options": [
+        {
+          "label": "Yes, park tips",
+          "value": true
+        },
+        {
+          "label": "No, do not park tips",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "mag_gen",
+      "type": "dropDown",
+      "label": "Mag Deck Generation",
+      "options": [
+        {
+          "label": "GEN1",
+          "value": "magdeck"
+        },
+        {
+          "label": "GEN2",
+          "value": "magnetic module gen2"
+        }
+      ]
+    },
+    {
+      "name": "m300_mount",
+      "type": "dropDown",
+      "label": "P300 Multi Mount",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}

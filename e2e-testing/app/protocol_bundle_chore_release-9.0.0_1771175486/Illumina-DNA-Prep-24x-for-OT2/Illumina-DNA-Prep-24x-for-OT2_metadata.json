@@ -1,0 +1,215 @@
+{
+  "slug": "Illumina-DNA-Prep-24x-for-OT2",
+  "name": "Illumina DNA Prep 24x for OT2",
+  "is_active": true,
+  "oem_name": "Opentrons",
+  "has_lp": true,
+  "custom_labware_count": 0,
+  "robot_type": "OT-2 Standard",
+  "robot_name": "OT-2",
+  "api_level": "2.9",
+  "is_private": false,
+  "verification_opentrons": true,
+  "protocol_library_parameters": [
+    {
+      "name": "SAMPLES",
+      "type": "dropDown",
+      "label": "Number of samples",
+      "options": [
+        {
+          "label": "24 samples",
+          "value": "24x"
+        },
+        {
+          "label": "16 samples",
+          "value": "16x"
+        },
+        {
+          "label": "8 samples",
+          "value": "8x"
+        }
+      ]
+    },
+    {
+      "name": "DRYRUN",
+      "type": "dropDown",
+      "label": "Do a dry run?",
+      "options": [
+        {
+          "label": "No",
+          "value": "NO"
+        },
+        {
+          "label": "Yes",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "name": "NOMODULES",
+      "type": "dropDown",
+      "label": "Use modules?",
+      "options": [
+        {
+          "label": "No",
+          "value": "NO"
+        },
+        {
+          "label": "Yes",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "name": "TIPREUSE",
+      "type": "dropDown",
+      "label": "Tip reuse?",
+      "options": [
+        {
+          "label": "No",
+          "value": "NO"
+        },
+        {
+          "label": "Yes",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "name": "OFFSET",
+      "type": "dropDown",
+      "label": "Offset?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": "YES"
+        },
+        {
+          "label": "No",
+          "value": "NO"
+        }
+      ]
+    },
+    {
+      "name": "STEP_TAG",
+      "type": "dropDown",
+      "label": "Include tagmentation step in protocol run?",
+      "options": [
+        {
+          "label": "Include",
+          "value": 1
+        },
+        {
+          "label": "Skip",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_TAGDECK",
+      "type": "dropDown",
+      "label": "Run tagmentation incubation on the deck thermocycler?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_TSB",
+      "type": "dropDown",
+      "label": "Run TSB step?",
+      "options": [
+        {
+          "label": "Include",
+          "value": 1
+        },
+        {
+          "label": "Skip",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_TSBDECK",
+      "type": "dropDown",
+      "label": "Run TSB incubation step on the deck thermocycler",
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_WASH",
+      "type": "dropDown",
+      "label": "Run tagmentation wash with TWB step",
+      "options": [
+        {
+          "label": "Include",
+          "value": 1
+        },
+        {
+          "label": "Skip",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_PCR",
+      "type": "dropDown",
+      "label": "Run PCR cycle step",
+      "options": [
+        {
+          "label": "Include",
+          "value": 1
+        },
+        {
+          "label": "Skip",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_PCRDECK",
+      "type": "dropDown",
+      "label": "Run PCR step on deck thermocycler?",
+      "options": [
+        {
+          "label": "Yes",
+          "value": 1
+        },
+        {
+          "label": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "STEP_POSTPCR",
+      "type": "dropDown",
+      "label": "Run post PCR cleanup step",
+      "options": [
+        {
+          "label": "Include",
+          "value": 1
+        },
+        {
+          "label": "Skip",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "error_with_params": false
+}
