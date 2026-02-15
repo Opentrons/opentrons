@@ -737,7 +737,11 @@ class ProtocolCore(
         configuration: Optional[str],
     ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
-        assert configuration is None, "Module `configuration` is deprecated"
+        is_semi = (
+            configuration is not None
+            and configuration.lower() == "semi"
+            and ModuleType.from_model(model) == ModuleType.THERMOCYCLER
+        )
 
         module_type = ModuleType.from_model(model)
         # TODO(mc, 2022-10-20): move to public ProtocolContext
@@ -763,6 +767,11 @@ class ProtocolCore(
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
+
+        # Register semi-configured Thermocyclers so the deck conflict
+        # checker knows to only block slots 7 and 10 (not 8 and 11).
+        if is_semi:
+            deck_conflict.register_semi_tc_module(result.moduleId)
 
         # FIXME(mm, 2023-02-21):
         # We're wrongly doing this conflict check *after* we've already loaded the

@@ -953,12 +953,21 @@ class ProtocolContext(CommandPublisher):
                 *Changed in version 2.15:*
                 You can now specify a deck slot as a coordinate, like `"D1"`.
 
-            configuration: Configure a Thermocycler to be in the `semi` position.
-                This parameter does not work. Do not use it.
+            configuration: Configure a Thermocycler to be in the ``semi`` position.
+                When set to ``"semi"``, the Thermocycler only occupies slots 7 and
+                10, freeing slots 8 and 11 for additional labware. A labware X-offset
+                of -23.28 mm is applied automatically to account for the physical
+                shift of the Thermocycler.
+
+                .. warning::
+                    Ensure your physical Thermocycler setup genuinely clears slots 8
+                    and 11 before using this configuration.
 
                 *Removed in version 2.14:*
-                This parameter dangerously modified the protocol's geometry system,
-                and it didn't function properly, so it was removed.
+                Temporarily removed due to geometry reliability issues.
+
+                *Restored in version 2.18:*
+                Re-enabled with proper engine-backed geometry support.
 
         Returns:
             The loaded and initialized module: a
@@ -990,11 +999,21 @@ class ProtocolContext(CommandPublisher):
                     until_version="2.4",
                     current_version=f"{self._api_version}",
                 )
-            if self._api_version >= ENGINE_CORE_API_VERSION:
+            # Semi-configuration was unsupported in 2.14-2.17 due to
+            # geometry issues in the legacy system. Restored in 2.18+
+            # with proper engine-backed support and automatic offset.
+            if (
+                self._api_version >= ENGINE_CORE_API_VERSION
+                and self._api_version < APIVersion(2, 18)
+            ):
                 raise UnsupportedAPIError(
                     api_element="The configuration parameter of load_module",
                     since_version=f"{ENGINE_CORE_API_VERSION}",
                     current_version=f"{self._api_version}",
+                    extra_message=(
+                        "Use API version 2.18 or later to use"
+                        " configuration='semi'."
+                    ),
                 )
 
         requested_model = validation.ensure_module_model(module_name)

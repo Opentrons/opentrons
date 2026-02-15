@@ -58,6 +58,20 @@ class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
 
 _log = logging.getLogger(__name__)
 
+# Module-level registry of Thermocycler module IDs loaded in semi-configuration.
+# This is populated by ProtocolCore.load_module() when configuration='semi'
+# is passed, and consulted by _map_module() to set is_semi_configuration.
+_semi_tc_module_ids: set[str] = set()
+
+
+def register_semi_tc_module(module_id: str) -> None:
+    """Register a Thermocycler module as being in semi-configuration.
+
+    When a TC is registered here, the deck conflict checker will only mark
+    slots 7 and 10 as occupied (freeing slots 8 and 11).
+    """
+    _semi_tc_module_ids.add(module_id)
+
 _FLEX_TC_LID_BACK_LEFT_PT = Point(
     x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
     y=FLEX_TC_LID_COLLISION_ZONE["back_left"]["y"],
@@ -350,9 +364,7 @@ def _map_module(
             wrapped_deck_conflict.ThermocyclerModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
-                # Python Protocol API >=v2.14 never allows loading a Thermocycler in
-                # its semi configuration.
-                is_semi_configuration=False,
+                is_semi_configuration=(module_id in _semi_tc_module_ids),
             ),
         )
     elif module_type == ModuleType.FLEX_STACKER:

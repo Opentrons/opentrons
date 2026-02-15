@@ -356,6 +356,70 @@ def test_maps_different_module_models(
     ("robot_type", "deck_type"),
     [
         ("OT-2 Standard", DeckType.OT2_STANDARD),
+    ],
+)
+@pytest.mark.parametrize(
+    "module_model",
+    [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2],
+)
+def test_maps_semi_configured_thermocycler(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    module_model: ModuleModel,
+) -> None:
+    """It should map a semi-configured Thermocycler with is_semi_configuration=True.
+
+    When a Thermocycler module ID is registered via register_semi_tc_module(),
+    the deck conflict mapper should produce a ThermocyclerModule with
+    is_semi_configuration=True, which causes the wrapped deck conflict checker
+    to only block slots 7 and 10 (freeing 8 and 11).
+    """
+    tc_module_id = "tc-semi-module-id"
+
+    # Register the TC as semi-configured
+    deck_conflict.register_semi_tc_module(tc_module_id)
+
+    decoy.when(
+        mock_state_view.modules.get_connected_model(tc_module_id)
+    ).then_return(module_model)
+    decoy.when(
+        mock_state_view.labware.get_id_by_module(tc_module_id)
+    ).then_raise(LabwareNotLoadedOnModuleError())
+    decoy.when(
+        mock_state_view.modules.get_overall_height(tc_module_id)
+    ).then_return(98.0)
+    decoy.when(
+        mock_state_view.modules.get_location(tc_module_id)
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_7))
+
+    deck_conflict.check(
+        engine_state=mock_state_view,
+        existing_labware_ids=[],
+        existing_module_ids=[],
+        existing_disposal_locations=[],
+        new_module_id=tc_module_id,
+    )
+    decoy.verify(
+        wrapped_deck_conflict.check(
+            existing_items={},
+            new_item=wrapped_deck_conflict.ThermocyclerModule(
+                name_for_errors=module_model.value,
+                highest_z_including_labware=98.0,
+                is_semi_configuration=True,
+            ),
+            new_location=DeckSlotName.SLOT_7,
+            robot_type=mock_state_view.config.robot_type,
+        )
+    )
+
+    # Clean up the module-level registry to avoid polluting other tests
+    deck_conflict._semi_tc_module_ids.discard(tc_module_id)
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
         ("OT-3 Standard", DeckType.OT3_STANDARD),
     ],
 )
