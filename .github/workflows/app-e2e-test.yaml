@@ -14,7 +14,7 @@ name: "App E2E Tests"
 on:
   push:
     branches:
-      - "e2e-app-start"
+      - "e2e-app-start-chore_release-9.0.0"
   workflow_dispatch:
     inputs:
       app-branch:
