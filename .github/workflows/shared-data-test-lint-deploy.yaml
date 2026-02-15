@@ -113,6 +113,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: 'actions/checkout@v4'
+      - uses: 'pnpm/action-setup@v4'
+        with:
+          version: 10.22.0
       - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.22.0'
@@ -225,6 +228,9 @@ jobs:
     if: needs.publish-switch.outputs.should_publish == 'true'
     steps:
       - uses: 'actions/checkout@v4'
+      - uses: 'pnpm/action-setup@v4'
+        with:
+          version: 10.22.0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
