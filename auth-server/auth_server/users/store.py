@@ -2,18 +2,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from pwdlib import PasswordHash
-from pwdlib.hashers.argon2 import Argon2Hasher
-from pwdlib.hashers.bcrypt import BcryptHasher
 
 from server_utils.auth.scopes import Scope
 
-password_hash = PasswordHash(
-    (
-        # can we use default hashers? PasswordHash.recommended()
-        Argon2Hasher(),
-        BcryptHasher(),
-    )
-)
+password_hash = PasswordHash.recommended()
 
 
 def hash_password(password: str) -> str:
@@ -58,3 +50,60 @@ TEST_USERS = [
         account_type=AccountType.USER,
     ),
 ]
+
+
+def get(username: str) -> User | None:
+    """Look up a user by username. Returns the User or None."""
+    return next(
+        (user for user in TEST_USERS if user.username == username),
+        None,
+    )
+
+
+def build_user(
+    username: str,
+    password: str,
+    full_name: str,
+    account_type: str,
+    scopes: list[Scope],
+) -> User:
+    """Build a User from raw input values, hashing the password."""
+    return User(
+        username=username,
+        hashed_password=hash_password(password),
+        full_name=full_name,
+        account_type=AccountType(account_type),
+        scopes=scopes,
+    )
+
+
+def add(user: User) -> None:
+    """Add a user to the TEST_USERS list."""
+    TEST_USERS.append(user)
+
+
+def remove(user: User) -> None:
+    """Remove a user from the TEST_USERS list."""
+    TEST_USERS.remove(user)
+
+
+def update(
+    user: User,
+    username: str | None = None,
+    password: str | None = None,
+    full_name: str | None = None,
+    account_type: str | None = None,
+) -> User:
+    """Update a user in the TEST_USERS list and return the updated User."""
+    updated_user = User(
+        username=username or user.username,
+        hashed_password=(
+            hash_password(password) if password is not None else user.hashed_password
+        ),
+        full_name=full_name or user.full_name,
+        account_type=AccountType(account_type) if account_type else user.account_type,
+        scopes=user.scopes,
+    )
+    idx = TEST_USERS.index(user)
+    TEST_USERS[idx] = updated_user
+    return updated_user
