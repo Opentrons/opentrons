@@ -3,8 +3,6 @@ from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.users.store import AccountType
 
 

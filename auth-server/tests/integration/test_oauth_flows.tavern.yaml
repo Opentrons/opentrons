@@ -21,7 +21,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: &default_scope auth_settings.write runs.write users.read users.write
+        scope: runs.read runs.write users.read users.write
       save:
         json:
           initial_access_token: access_token
@@ -39,7 +39,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: runs.read runs.write users.read users.write
 
   - name: Introspect the refresh token to confirm that it's active
     request:
@@ -53,7 +53,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: runs.read runs.write users.read users.write
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -70,7 +70,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: *default_scope
+        scope: runs.read runs.write users.read users.write
       save:
         json:
           refreshed_access_token: access_token
@@ -88,7 +88,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: runs.read runs.write users.read users.write
 
   - name: Introspect the new refresh token to confirm that it's active
     request:
@@ -102,7 +102,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: runs.read runs.write users.read users.write
 
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
