@@ -1,5 +1,5 @@
 ---
-description: CSS Modules file conventions, design tokens, stylelint rules, and patterns
+description: CSS Modules file conventions, stylelint rules, and patterns
 globs: '**/*.module.css'
 alwaysApply: false
 ---
@@ -49,7 +49,7 @@ export function MyComponent(): JSX.Element {
 }
 ```
 
-## Conditional Classes with `clsx`
+## Dynamic Styling with `clsx`
 
 Use [clsx](https://github.com/lukeed/clsx) for combining or conditionally applying classes:
 

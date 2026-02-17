@@ -10,7 +10,7 @@ General TypeScript, React, styling, testing, import, and tooling conventions are
 
 ## Project Overview
 
-Protocol Designer (PD) is a React + Redux + TypeScript web app for designing Opentrons liquid-handling protocols. It depends on `@opentrons/components`, `@opentrons/shared-data`, and `@opentrons/step-generation`.
+Protocol Designer (PD) is a React + Redux + React Router + TypeScript web app for designing Opentrons liquid-handling protocols. It depends on `@opentrons/components`, `@opentrons/shared-data`, and `@opentrons/step-generation`.  It follows an atomic design system.
 
 ## Redux Architecture
 
@@ -118,7 +118,12 @@ Common namespaces: `'starting_deck_state'`, `'protocol_steps'`, `'shared'`, `'ap
 
 ```typescript
 const { t } = useTranslation(['protocol_steps', 'shared'])
-return <span>{t('protocol_steps:step_title')}</span>
+return (
+  <>
+    <span>{t('step_title')}</span>
+   <span>{t('shared:step_body')}</span>
+  </>
+ )
 ```
 
 Always use translation keys for user-facing strings — never hardcode display text.

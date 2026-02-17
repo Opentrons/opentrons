@@ -41,7 +41,7 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 | Target | Description |
 | --- | --- |
 | `make setup` | Install all JS and Python dependencies |
-| `make setup-js` | Yarn install + app-shell setup |
+| `make setup-js` | Setup all JS projects (yarn install) |
 | `make setup-py` | Setup all robot Python packages (pipenv/uv per project) |
 
 ### Teardown (uninstall dependencies)

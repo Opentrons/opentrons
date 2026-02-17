@@ -17,7 +17,6 @@ General TypeScript, React, styling, testing, and import conventions are in the `
    - `components/src/atoms/`, `components/src/molecules/`, `components/src/organisms/` (shared library)
    - `<project>/src/components/atoms/`, `molecules/`, `organisms/` (project-local)
 3. If an existing component can be extended or composed, prefer that over creating a new one
-4. Use primitives from `@opentrons/components` (`Flex`, `StyledText`, `Icon`, `Btn`) as building blocks
 
 ## Component File Structure
 
