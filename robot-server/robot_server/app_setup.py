@@ -10,6 +10,9 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
+from server_utils.auth.resource_server.fastapi_dependencies import (
+    set_up_authorization_checker,
+)
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from .errors.exception_handlers import exception_handlers
@@ -90,6 +93,14 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             ],
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
+
+        await exit_stack.enter_async_context(
+            set_up_authorization_checker(
+                app.state,
+                auth_server_uds=settings.auth_server_uds,
+                auth_server_url=settings.auth_server_url,
+            )
+        )
 
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
