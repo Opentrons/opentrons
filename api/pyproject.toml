@@ -211,6 +211,8 @@ filterwarnings = [
 plugins = ["pydantic.mypy", "decoy.mypy", "numpy.typing.mypy_plugin"]
 show_error_codes = true
 warn_unused_configs = true
+explicit_package_bases = true
+mypy_path = "src"
 strict = true
 
 [tool.pydantic-mypy]
