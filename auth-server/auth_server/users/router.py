@@ -114,14 +114,7 @@ async def post_users(
     add(new_user)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
-        content=SimpleBody(
-            data=UserResponse(
-                userName=new_user.username,
-                fullName=new_user.full_name,
-                accountType=new_user.account_type,
-                scopes=[scope.api_name for scope in scopes_required],
-            )
-        ),
+        content=SimpleBody(data=UserResponse.from_user(new_user)),
     )
 
 
@@ -150,14 +143,7 @@ async def get_user(
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(
-            data=UserResponse(
-                userName=user.username,
-                fullName=user.full_name,
-                accountType=user.account_type,
-                scopes=[scope.value for scope in user.scopes],
-            )
-        ),
+        content=SimpleBody(data=UserResponse.from_user(user)),
     )
 
 
@@ -203,7 +189,6 @@ async def update_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
-    scopes_required = [Scope.USERS_WRITE]
     _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_user = request_body.data
     _validate_user_create_input(
@@ -229,12 +214,5 @@ async def update_user(
     )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(
-            data=UserResponse(
-                userName=updated_user.username,
-                fullName=updated_user.full_name,
-                accountType=updated_user.account_type,
-                scopes=[scope.api_name for scope in scopes_required],
-            )
-        ),
+        content=SimpleBody(data=UserResponse.from_user(updated_user)),
     )

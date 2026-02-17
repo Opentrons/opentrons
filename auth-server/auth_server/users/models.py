@@ -1,9 +1,13 @@
-from dataclasses import dataclass
-from typing import Annotated, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
 from auth_server.users.store import AccountType
+
+if TYPE_CHECKING:
+    from auth_server.users.store import User
 
 
 class UserCreate(BaseModel):
@@ -42,3 +46,13 @@ class UserResponse(BaseModel):
     fullName: str
     accountType: AccountType
     scopes: list[str]
+
+    @classmethod
+    def from_user(cls, user: User) -> UserResponse:
+        """Build a UserResponse from a store User."""
+        return cls(
+            userName=user.username,
+            fullName=user.full_name,
+            accountType=user.account_type,
+            scopes=[scope.api_name for scope in user.scopes],
+        )
