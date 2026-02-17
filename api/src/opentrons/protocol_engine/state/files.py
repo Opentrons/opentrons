@@ -1,11 +1,14 @@
 """Basic protocol engine create file data state and store."""
 
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List
+
+from opentrons_shared_data.data_files.types import DataFileInfo
 
 from ..actions import Action
 from ._abstract_store import HandlesActions, HasState
 from opentrons.protocol_engine.actions.get_state_update import get_state_updates
+from opentrons.protocol_engine.errors.exceptions import CSVFileNotFoundError
 from opentrons.protocol_engine.state import update_types
 
 
@@ -14,6 +17,7 @@ class FileState:
     """State of Engine created files."""
 
     file_ids: List[str]
+    csv_files: Dict[str, DataFileInfo]
 
 
 class FileStore(HasState[FileState], HandlesActions):
@@ -23,7 +27,7 @@ class FileStore(HasState[FileState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a File store and its state."""
-        self._state = FileState(file_ids=[])
+        self._state = FileState(file_ids=[], csv_files={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -33,6 +37,10 @@ class FileStore(HasState[FileState], HandlesActions):
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
         if state_update.files_added != update_types.NO_CHANGE:
             self._state.file_ids.extend(state_update.files_added.file_ids)
+        if state_update.csv_file_updated != update_types.NO_CHANGE:
+            self._state.csv_files[state_update.csv_file_updated.file_info.id] = (
+                state_update.csv_file_updated.file_info
+            )
 
 
 class FileView:
@@ -55,3 +63,11 @@ class FileView:
     def get_file_id_list(self) -> List[str]:
         """Get the list of files by file ID created by the protocol."""
         return self._state.file_ids
+
+    def get_csv_file_info(self, file_id: str) -> DataFileInfo:
+        """Get the fileinfo for a created csv file."""
+        if file_id not in self._state.csv_files.keys():
+            raise CSVFileNotFoundError(
+                f"No file with file id {file_id} found in this run."
+            )
+        return self._state.csv_files[file_id]
