@@ -951,6 +951,10 @@ class CommandView:
                 f"Could not find command annotation with ID {annotation_id}."
             )
 
+    def get_all_command_annotations(self) -> List[UserCommandAnnotation]:
+        """Return a list of all commands annotated so far."""
+        return [annotation for annotation in self._state.command_annotations.values()]
+
     def get_recovery_target(self) -> Optional[CommandPointer]:
         """Return the command currently undergoing error recovery, if any."""
         recovery_target = self._state.recovery_target

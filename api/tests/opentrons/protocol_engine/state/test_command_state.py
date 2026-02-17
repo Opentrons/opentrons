@@ -1375,8 +1375,8 @@ def test_get_errors_slice() -> None:
     )
 
 
-def test_create_and_close_command_annotations() -> None:
-    """It should create an enabled command annotation."""
+def test_handle_create_command_annotation_action() -> None:
+    """It should handle a create command annotation action."""
     subject = CommandStore(
         config=_make_config(),
         error_recovery_policy=_placeholder_error_recovery_policy,
@@ -1401,3 +1401,37 @@ def test_create_and_close_command_annotations() -> None:
         userSpecifiedDescription="foo",
         params={"a": 1},
     )
+
+
+def test_get_all_command_annotations() -> None:
+    """It should get all command annotations in state."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+
+    for ann_id in ["ann_id_1", "ann_id_2"]:
+        subject.handle_action(
+            actions.CreateUserCommandAnnotation(
+                annotation_id=ann_id,
+                user_defined_name="bar",
+                user_description="foo",
+                params={"a": 1},
+            )
+        )
+    assert subject_view.get_all_command_annotations() == [
+        UserCommandAnnotation(
+            annotationId="ann_id_1",
+            userSpecifiedName="bar",
+            userSpecifiedDescription="foo",
+            params={"a": 1},
+        ),
+        UserCommandAnnotation(
+            annotationId="ann_id_2",
+            userSpecifiedName="bar",
+            userSpecifiedDescription="foo",
+            params={"a": 1},
+        ),
+    ]
