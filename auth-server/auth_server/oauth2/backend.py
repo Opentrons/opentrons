@@ -11,7 +11,8 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.users.store import TEST_USERS, User, password_hash
+from auth_server.users.models import User
+from auth_server.users.store import get, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -162,13 +163,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
-        for user in TEST_USERS:
-            if user.username == username and password_hash.verify(
-                password, user.hashed_password
-            ):
-                # Set `.user` per the oauthlib docs.
-                request.user = user  # type: ignore[attr-defined]
-                return True
+        user = get(username)
+        if user is not None and password_hash.verify(password, user.hashed_password):
+            request.user = user  # type: ignore[attr-defined]
+            return True
         return False
 
     @override
@@ -277,9 +275,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=_now()
         )
         if issuance is not None:
-            user = next(
-                user for user in TEST_USERS if user.username == issuance.username
-            )
+            user = get(issuance.username)
             # Set `.user` per the oauthlib docs.
             request.user = user  # type: ignore[attr-defined]
             return True
