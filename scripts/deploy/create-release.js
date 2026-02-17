@@ -33,7 +33,7 @@ const USAGE =
 const ALLOWED_VERSION_TYPES = ['alpha', 'beta', 'candidate', 'production']
 const REPO_DETAILS = {
   owner: 'Opentrons',
-  repo: 'opentrons',
+  repo: 'opentrons-ot2',
 }
 
 // The release kind is normally just the semver preproduction stage, but we need to account

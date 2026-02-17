@@ -46,10 +46,13 @@ concurrency:
 
 env:
   CI: 'true'
-  _APP_DEPLOY_BUCKET_ROBOTSTACK: builds.opentrons.com
+  _APP_DEPLOY_BUCKET_ROBOTSTACK: ot2.builds.opentrons.com
   _APP_DEPLOY_FOLDER_ROBOTSTACK: app
-  _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
+  _APP_DEPLOY_BUCKET_OT3: ot2-development.builds.opentrons.com
   _APP_DEPLOY_FOLDER_OT3: app
+
+permissions:
+  contents: read
 
 jobs:
   js-unit-test-shards:
@@ -244,41 +247,6 @@ jobs:
           python-version: '3.12'
       - name: check make version
         run: make --version
-      - name: 'Configure Windows code signing environment'
-        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
-        shell: bash
-        run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_V2 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-          echo "${{ secrets.WINDOWS_CSC_B64_V2 }}" | base64 --decode > /d/opentrons_labworks_inc.crt
-          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
-          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
-          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
-
-      - name: 'Setup Windows code signing helpers'
-        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
-        shell: cmd
-        env:
-          SM_HOST: ${{ secrets.SM_HOST_V2 }}
-          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
-          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
-          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
-        run: |
-          REM Download DigiCert Keylocker Tools installer (quiet curl: -s silent, -S show errors, -f fail on HTTP errors, -L follow redirects)
-          curl -sSfL ^
-            --retry 5 --retry-all-errors ^
-            --connect-timeout 30 --max-time 120 ^
-            -X GET ^
-            -H "x-api-key:%SM_API_KEY%" ^
-            -o Keylockertools-windows-x64.msi ^
-            --write-out "Download complete: %%{filename_effective} (%%{size_download} bytes) in %%{time_total}s @ %%{speed_download} bytes/s\n" ^
-            "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download"
-          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
-          smksp_registrar.exe list
-          smctl.exe keypair ls
-          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
-          smksp_cert_sync.exe
-          smctl.exe healthcheck --all
-
       # Do the frontend dist bundle
       - name: 'bundle ${{matrix.variant}} frontend'
         env:
@@ -298,23 +266,19 @@ jobs:
           OT_OT2_APP_MIXPANEL_ID: ${{ secrets.OT_OT2_APP_MIXPANEL_ID }}
           OT_OT2_APP_INTERCOM_ID: ${{ secrets.OT_OT2_APP_INTERCOM_ID }}
           WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
-          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V3}}
-          SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V3}}
-          SM_HOST: ${{ secrets.SM_HOST_V2 }}
-          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
-          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
-          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
-          WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
-          CSC_LINK: ${{ secrets.OT_OT2_APP_CSC_MACOS_V2 }}
-          CSC_KEY_PASSWORD: ${{ secrets.OT_OT2_APP_CSC_KEY_MACOS_V2 }}
-          APPLE_ID: ${{ secrets.OT_OT2_APP_APPLE_ID_V2 }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_OT2_APP_APPLE_ID_PASSWORD_V2 }}
-          APPLE_TEAM_ID: ${{ secrets.OT_OT2_APP_APPLE_TEAM_ID_V2 }}
+          AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
+          AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+          AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
+          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_OT2_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
           OT_OT2_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
-          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_BUILD_TARGET: desktop
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           OT_SENTRY_DSN: ${{ secrets.OT_DESKTOP_SENTRY_DSN }}
         run: |
@@ -331,6 +295,11 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
+    permissions:
+      # GH release creation
+      contents: write
+      # OIDC token creation
+      id-token: write
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
@@ -347,25 +316,28 @@ jobs:
               cp ${variant_pattern}/* ./to_upload_${variant}/
               echo "Moved $(ls ./to_upload_${variant})"
           done
-      - name: 'configure s3 deploy creds'
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.S3_OT3_APP_DEPLOY_KEY_ID }} --profile identity
-          aws configure set aws_secret_access_key ${{ secrets.S3_OT3_APP_DEPLOY_SECRET }} --profile identity
-          aws configure set region us-east-2 --profile identity
-          aws configure set output json --profile identity
-          aws configure set region us-east-2 --profile deploy
-          aws configure set role_arn ${{ secrets.OT_OT2_APP_OT3_DEPLOY_ROLE }} --profile deploy
-          aws configure set source_profile identity --profile deploy
-        shell: bash
+      - name: 'configure s3 deploy creds for release'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN_RELEASE }}
+          aws-region: us-east-1
       - name: 'deploy release builds to s3'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
-          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+          aws s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+      - name: 'configure s3 deploy creds for internal-release'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN_INTERNAL_RELEASE }}
+          aws-region: us-east-1
       - name: 'deploy internal-release release builds to s3'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
-          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
-
+          aws s3 sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
       - name: 'upload windows artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@v1.20.0'
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -376,7 +348,7 @@ jobs:
           artifacts: ./artifacts/*/*.exe
           artifactContentType: application/vnd.microsoft.portable-executable
       - name: 'upload macos artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@v1.20.0'
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -387,7 +359,7 @@ jobs:
           artifacts: ./artifacts/*/*.dmg
           artifactContentType: application/octet-stream
       - name: 'upload linux artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@v1.20.0'
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -451,16 +423,16 @@ jobs:
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
-          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json || true
+          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot2-development.builds.opentrons.com/app/
+          aws s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
 
       - name: 'update release releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
-          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json || true
+          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://ot2.opentrons.com/app/
+          aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
 
   # Notification jobs for tagged builds
   notify-success:

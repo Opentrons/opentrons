@@ -71,14 +71,12 @@ module.exports = async () => ({
     target: ['nsis'],
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
     forceCodeSigning: WINDOWS_SIGN,
-    signtoolOptions: WINDOWS_SIGN
-      ? {
-          publisherName: ['Opentrons Labworks Inc.', 'OPENTRONS LABWORKS INC.'],
-          rfc3161TimeStampServer: 'http://timestamp.digicert.com',
-          sign: 'scripts/windows-custom-sign.js',
-          signingHashAlgorithms: ['sha256'],
-        }
-      : undefined,
+    azureSignOptions: {
+      publisherName: 'OPENTRONS LABWORKS INC.',
+      codeSigningAccountName: 'desktop-app-signing',
+      certificateProfileName: 'OpentronsDesktopApp',
+      endpoint: 'https://eus.codesigning.azure.net',
+    },
   },
   nsis: {
     oneClick: false,
