@@ -1,4 +1,3 @@
-import logging
 import typing
 from functools import lru_cache
 from pathlib import Path
@@ -9,8 +8,6 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from opentrons.config import infer_config_base_dir
-
-log = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=1)
@@ -32,13 +29,14 @@ class Environment(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
 
-# If you update this, also update the generated settings_schema.json.
 class RobotServerSettings(BaseSettings):
     """Robot server settings.
 
     To override any of these create an environment variable with prefix
-    OT_ROBOT_SERVER_.
+    OT_ROBOT_SERVER_, e.g. OT_ROBOT_SERVER_persistence_directory.
     """
+
+    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
     simulator_configuration_file_path: typing.Optional[str] = Field(
         default=None,
@@ -120,8 +118,6 @@ class RobotServerSettings(BaseSettings):
             " currently exists."
         ),
     )
-
-    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
     maximum_quick_transfer_protocols: int = Field(
         default=20,
