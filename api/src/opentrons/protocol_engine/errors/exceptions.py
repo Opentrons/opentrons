@@ -1317,6 +1317,19 @@ class FileNameInvalidError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
 
 
+class CSVFileNotFoundError(ProtocolEngineError):
+    """Raise when attempting to reference a file that has not been created."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an CSVFileNotFoundError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
+
+
 class LiquidClassDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a liquid class that has not been loaded."""
 

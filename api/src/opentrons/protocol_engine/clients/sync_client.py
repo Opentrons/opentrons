@@ -194,6 +194,12 @@ class SyncClient:
     ) -> commands.GetNextTipResult:
         pass
 
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.CreateCSVParams
+    ) -> commands.CreateCSVResult:
+        pass
+
     def execute_command_without_recovery(
         self,
         params: commands.CommandParams,

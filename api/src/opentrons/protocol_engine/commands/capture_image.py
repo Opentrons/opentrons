@@ -268,6 +268,7 @@ class CaptureImageImpl(
                     base_filename=params.fileName,
                     command_id=this_cmd_id or "",
                     prev_command_id=prev_cmd_id or "",
+                    file_id=None,
                 ),
             )
             file_id = file_info.id

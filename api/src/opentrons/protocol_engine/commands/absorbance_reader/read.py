@@ -179,6 +179,7 @@ class ReadAbsorbanceImpl(
                             wavelength=measurement.wavelength,
                             command_id=this_cmd_id or "",
                             prev_command_id=prev_cmd_id or "",
+                            file_id=None,
                         ),
                     )
                     file_ids.append(file_info.id)

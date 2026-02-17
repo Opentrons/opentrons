@@ -263,6 +263,7 @@ class CommandExecutor:
                             step_number=len(commands),
                             base_filename=None,
                             command_timestamp=running_command.createdAt,
+                            file_id=None,
                         ),
                     )
                     log.info(
