@@ -19,9 +19,21 @@ class Scope(enum.Enum):
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
 
-    AUTH_SETTINGS_WRITE = (
-        "auth_settings.write",
-        "Edit settings related to authentication, authorization, and access control.",
+    # todo(mm, 2026-01-28): Replace these placeholder scopes with real ones.
+
+    USERS_READ = (
+        "users.read",
+        "Read users.",
+    )
+
+    USERS_WRITE = (
+        "users.write",
+        "Read, write, and edit users.",
+    )
+
+    RUNS_READ = (
+        "runs.read",
+        "Retrieve information about protocol runs.",
     )
 
     RUNS_WRITE = (

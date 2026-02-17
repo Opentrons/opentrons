@@ -14,7 +14,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: users.write
+        scope: users.write users.read
     response:
       status_code: 200
       json:
@@ -22,10 +22,10 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: users.write
+        scope: users.write users.read
       save:
         json:
-          access_token: access_token
+          first_access_token: access_token
 
   - name: Create a new user
     request:
@@ -38,7 +38,7 @@ stages:
           fullName: Test New User
           accountType: user
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
     response:
       status_code: 201
       json:
@@ -53,7 +53,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/users'
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
       json:
         data:
           userName: test_new_user_password_less_than_8_characters
@@ -70,7 +70,7 @@ stages:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user'
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
     response:
       status_code: 200
       json:
@@ -89,7 +89,7 @@ stages:
           fullName: Test New User Updated
           accountType: admin
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
     response:
       status_code: 200
       json:
@@ -108,7 +108,7 @@ stages:
           userName: test_new_user_updated
           password: securepassword123
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
     response:
       status_code: 200
       json:
@@ -154,6 +154,6 @@ stages:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user_updated'
       headers:  
-        Authorization: 'Bearer {access_token}'
+        Authorization: 'Bearer {first_access_token}'
     response:
       status_code: 404
