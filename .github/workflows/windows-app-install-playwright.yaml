@@ -53,7 +53,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+
+      - name: 'Fetch tags for versioning'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Fetch git tags"
+          git fetch --force --tags --prune --depth=1
+          Write-Host "Recent tags:"
+          git tag --list | Select-Object -Last 20 | Out-Host
+          Write-Host "::endgroup::"
 
       - uses: ./.github/actions/js/setup
 
@@ -277,3 +287,18 @@ jobs:
           "- Artifacts page: $artifactUrl" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           "Note: GitHub Actions job summaries can't reliably render private artifact images inline, so the screenshot is uploaded as an artifact instead." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - name: 'Shutdown app'
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Write-Host "::group::Shutdown app"
+          $pid = "${{ steps.launch.outputs.pid }}"
+          if ($pid) {
+            Write-Host "Stopping PID $pid (tree)"
+            taskkill /PID $pid /T /F | Out-Host
+          } else {
+            Write-Host "No PID captured; nothing to stop."
+          }
+          Write-Host "::endgroup::"
