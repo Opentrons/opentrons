@@ -69,7 +69,8 @@ _validate_call_config: pydantic.ConfigDict = {
 class _RequestValidator(oauthlib.oauth2.RequestValidator):
     """Our main bindings to oauthlib.
 
-    oauthlib calls these methods internally. We implement them with
+    oauthlib calls these methods internally. We implement them with our customizations
+    for storage and validation.
 
     oauthlib has poor support for type checking, even with the stubs from Typeshed.
     So we use `@pydantic.validate_call` liberally to protect ourselves from
