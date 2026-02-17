@@ -18,6 +18,7 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ImageCaptureCmdFileNameMetadata,
     ReadCmdFileNameMetadata,
+    UserDefinedCSVCmdFileNameMetadata,
 )
 from opentrons_shared_data.data_files import (
     CmdDataFileInfo,
@@ -75,10 +76,7 @@ class FileProviderExecutor:
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
 
-    async def write_file_cb(
-        self,
-        file_data: FileData,
-    ) -> DataFileInfo:
+    async def write_file_cb(self, file_data: FileData) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file.
 
         Raises:
@@ -100,7 +98,12 @@ class FileProviderExecutor:
             )
 
         async with self._lock:
-            file_id = await get_unique_id()
+            file_exists = file_data.command_metadata.file_id is not None
+            file_id = (
+                file_data.command_metadata.file_id
+                if file_data.command_metadata.file_id is not None
+                else await get_unique_id()
+            )
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
@@ -110,8 +113,10 @@ class FileProviderExecutor:
             prev_command_id = file_data.command_metadata.prev_command_id
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
-
-            with open(file=final_filepath, mode="wb") as f:
+            mode = "wb"
+            if file_exists:
+                mode = "ab"
+            with open(file=final_filepath, mode=mode) as f:
                 f.write(file_data.data)
 
             created_at = await get_current_time()
@@ -132,9 +137,9 @@ class FileProviderExecutor:
                     command_id=command_id, prev_command_id=prev_command_id
                 ),
             )
-
-            await self._data_files_store.insert(file_info)
-            await self._data_files_store.insert_output_file(output_file_info)
+            if not file_exists:
+                await self._data_files_store.insert(file_info)
+                await self._data_files_store.insert_output_file(output_file_info)
 
             if file_data.mime_type == MimeType.IMAGE_JPEG:
                 self._publisher.publish_run_images(file_data.run_metadata.run_id)
@@ -187,7 +192,11 @@ class FileProviderExecutor:
                 + str(cmd_metadata.command_timestamp.strftime("%Y%m%d-%H%M%S"))
                 + ".jpeg"
             )
-
+        elif isinstance(file_data.command_metadata, UserDefinedCSVCmdFileNameMetadata):
+            filename = file_data.command_metadata.filename
+            if not filename.endswith(".csv"):
+                filename = f"{filename}.csv"
+            return filename
         else:
             return f"{file_id}.dat"
 

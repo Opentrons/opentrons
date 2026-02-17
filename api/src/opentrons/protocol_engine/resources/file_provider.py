@@ -45,6 +45,7 @@ class FileNameCmdMetadata:
 
     command_id: str
     prev_command_id: str
+    file_id: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -64,7 +65,18 @@ class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     base_filename: Optional[str]
 
 
-CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata
+@dataclass(frozen=True)
+class UserDefinedCSVCmdFileNameMetadata(FileNameCmdMetadata):
+    """Data for a user-defined csv file."""
+
+    filename: str
+
+
+CommandFileNameMetadata = (
+    ReadCmdFileNameMetadata
+    | ImageCaptureCmdFileNameMetadata
+    | UserDefinedCSVCmdFileNameMetadata
+)
 
 
 class FileData:
