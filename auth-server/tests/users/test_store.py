@@ -9,7 +9,6 @@ from auth_server.users.store import (
     add,
     build_user,
     get,
-    hash_password,
     password_hash,
     remove,
     update,
@@ -33,7 +32,7 @@ def test_get_returns_dynamically_added_user() -> None:
     """get should find a user that was added via add()."""
     new_user = User(
         username="dynamic_user",
-        hashed_password=hash_password("dynamicpassword"),
+        hashed_password=password_hash.hash("dynamicpassword"),
         full_name="Dynamic User",
         account_type=AccountType.SERVICE,
         scopes=[],
@@ -89,7 +88,7 @@ def test_add_and_get_user() -> None:
     assert len(TEST_USERS) == count_before + 1
 
 
-def test_remove_makes_user_unfindable() -> None:
+def test_remove_and_get_user() -> None:
     """remove should delete the user so get returns None."""
     user = build_user(
         username="remove_test_user",
