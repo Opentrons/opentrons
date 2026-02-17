@@ -28,7 +28,7 @@ def _verify_scopes(
     request: fastapi.Request,
     oauth2_backend: Backend,
     scopes: list[Scope],
-    body: str = "",
+    body: str | None = None,
 ) -> None:
     """Verify OAuth2 scopes. Raises 403 if invalid."""
     valid, _ = oauth2_backend.verify_request(
@@ -141,7 +141,7 @@ async def get_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
+    _verify_scopes(request, oauth2_backend, [Scope.USERS_READ])
     user = get(userName)
     if user is None:
         raise fastapi.HTTPException(
