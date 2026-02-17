@@ -7,8 +7,8 @@ Modules are a class of deck or externally mounted hardware. You can use an OT-2 
 This chapter summarizes the functions and physical specifications of modules that are compatible with the OT-2.
 
 !!! tip
-    - For complete instructions on module installation and use, refer to the guide that shipped with your unit.
-    - For information about integrating modules into your protocols, see the [Protocol Designer Instruction Manual](https://docs.opentrons.com/protocol-designer/) or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
+    - For complete instructions on module installation, refer to the guide that shipped with your unit or the [online modules documentation](../../../modules/).
+    - For information about integrating modules into your protocols, see the [Protocol Designer Instruction Manual](../../../protocol-designer/) or the [Hardware Modules section](../../../python-api/modules/) of our Python API documentation.
 
 ## Supported modules
 

@@ -11,11 +11,11 @@ After creating and uploading a protocol, it's time to run it on your OT-2. Follo
 3. Click the three-dot (⋮) menu for that protocol and click **Start setup**.
 
     <figure class="screenshot" markdown>
-    ![Start setup contextual menu](../images/protocol-start-setup.png)
+    ![Start setup contextual menu](../images/protocol-start-setup-2.png)
     </figure>
 
 4. The app will show you a list of available robots. Select the OT-2 that you want to use and click **Proceed to setup**.
-5. Review all the instruments and settings used by your protocol. For example, you can calibrate instruments, perform a Labware Position Check, turn the camera on or off, and examine your protocol step by step.
+5. Review all the instruments and settings used by your protocol. For example, you can calibrate instruments, perform Labware Position Check, turn the camera on or off, and examine your protocol step by step.
 
     <figure class="screenshot" markdown>
     ![Protocol details showing instruments, offsets, labware, and camera settings](../images/protocol-first-run.png)

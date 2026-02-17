@@ -176,7 +176,7 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
       <td><strong>Magnetic Module</strong></td>
       <td>
         <ul>
-          <li>Set engagement height for the magnets.</li>
+          <li>Set engage height/Disengage module</li>
         </ul>
       </td>
     </tr>

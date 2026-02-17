@@ -167,16 +167,20 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 
 At this point you should have a fully assembled robot, but it isn't time to power it up and start running protocols, at least not yet. Before going forward, check your work against the items in this list:
 
-<div class="checklist-box">
-<ul>
-  <li>Confirm that all 3 transport fasteners have been removed. <strong>Warning:</strong> powering on the robot with these brackets attached can damage the robot.</li>
-  <li>Confirm that you are not missing any required cables or parts. If you are missing components, contact <a href="https://opentrons.com/opentrons-support">Opentrons Support</a>.</li>
-  <li>Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.</li>
-  <li>Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.</li>
-  <li>Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Opentrons Support.</li>
-  <li><a href="../../maintenance/cleaning/">Clean and sanitize</a> the robot.</li>
-</ul>
-</div>
+- Confirm that all 3 transport fasteners have been removed.
+
+!!! warning
+    Turning on the power with these brackets attached can damage the robot.
+
+- Confirm that you are not missing any required cables or parts. If you are missing components, contact Opentrons Support.
+
+- Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
+
+- Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
+
+- Move the pipette head in the X and Y directions; if it makes any loud/abnormal noises or is difficult to move, contact Opentrons Support.
+
+- [Clean and sanitize](../maintenance/cleaning.md) the robot prior to use.
 
 !!!note
     During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
