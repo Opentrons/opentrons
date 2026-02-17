@@ -160,13 +160,9 @@ export function forMoveLabware(
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
     //  NOTE: this special-case is only for PV. PD should not
-    //  be affected because the newLocation shouldn't include the moduleId
-    //  for PD stacking/moveLabware architecture when moving labware
-    //  into the stacker shuttle.
-    //  example: for PD moving labware to shuttle -> [labwareId, slot]
-    //  for PV moving labware to shuttle -> [labwareId, moduleId, slot] by default
-    //  (by default due to the PE architecture!!!!!!!)
-    //  so we have to special-case it here to be [labwareId, slot]
+    //  be affected. PV's newLocation comes from the command.params
+    //  which includes moduleId when moving a labware onto the stacker shuttle
+    //  but for PD, the newLocation does not include the moduleId
     if (
       modules[newLocation.moduleId].moduleState.type ===
       FLEX_STACKER_MODULE_TYPE
