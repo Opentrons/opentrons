@@ -16,9 +16,9 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.types import (
-    CommandAnnotation,
     CommandPreconditions,
     CSVRunTimeParamFilesType,
+    LegacyCommandAnnotation,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
@@ -201,7 +201,7 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-    commandAnnotations: List[CommandAnnotation] = Field(
+    commandAnnotations: List[LegacyCommandAnnotation] = Field(
         default_factory=list,
         description="Optional annotations for commands in this run.",
     )

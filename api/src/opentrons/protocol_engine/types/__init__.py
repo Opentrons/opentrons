@@ -6,7 +6,7 @@ from opentrons_shared_data.pipette.types import LabwareUri
 
 from .automatic_tip_selection import NextTipInfo, NoTipAvailable, NoTipReason
 from .command_annotations import (
-    CommandAnnotation,
+    LegacyCommandAnnotation,
     CustomCommandAnnotationLegacy,
     SecondOrderCommandAnnotationLegacy,
 )
@@ -169,7 +169,7 @@ __all__ = [
     # Command annotations
     "SecondOrderCommandAnnotationLegacy",
     "CustomCommandAnnotationLegacy",
-    "CommandAnnotation",
+    "LegacyCommandAnnotation",
     # Command preconditions
     "PreconditionTypes",
     "CommandPreconditions",

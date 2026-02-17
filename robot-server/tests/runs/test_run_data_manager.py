@@ -160,8 +160,8 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def command_annotations() -> List[pe_types.CommandAnnotation]:
-    """Get a CommandAnnotation list."""
+def command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
+    """Get a LegacyCommandAnnotation list."""
     return [
         pe_types.SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
@@ -739,7 +739,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.CommandAnnotation],
+    command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -888,7 +888,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.CommandAnnotation],
+    command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,

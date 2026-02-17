@@ -41,7 +41,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
+from opentrons.protocol_engine.types import LegacyCommandAnnotation, CommandPreconditions
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
     ProtocolSource,
@@ -58,7 +58,7 @@ class RunResult(NamedTuple):
     commands: List[Command]
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
-    command_annotations: List[CommandAnnotation]
+    command_annotations: List[LegacyCommandAnnotation]
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -98,7 +98,7 @@ class AbstractRunner(ABC):
         return []
 
     @property
-    def command_annotations(self) -> List[CommandAnnotation]:
+    def command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Command annotations defined by protocol, if any. Currently only for json protocols."""
         return []
 
@@ -329,10 +329,10 @@ class JsonRunner(AbstractRunner):
 
         hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
-        self._command_annotations: List[CommandAnnotation] = []
+        self._command_annotations: List[LegacyCommandAnnotation] = []
 
     @property
-    def command_annotations(self) -> List[CommandAnnotation]:
+    def command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Command annotations defined by protocol, if any."""
         return self._command_annotations
 

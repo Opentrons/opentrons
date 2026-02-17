@@ -79,6 +79,6 @@ class CustomCommandAnnotationLegacy(BaseCommandAnnotationLegacy):
     model_config = ConfigDict(extra="allow")
 
 
-CommandAnnotation = Union[
+LegacyCommandAnnotation = Union[
     SecondOrderCommandAnnotationLegacy, CustomCommandAnnotationLegacy
 ]

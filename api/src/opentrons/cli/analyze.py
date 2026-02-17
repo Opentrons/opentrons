@@ -47,7 +47,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import (
-    CommandAnnotation,
+    LegacyCommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     EngineStatus,
@@ -553,5 +553,5 @@ class AnalyzeResults(BaseModel):
     liquids: List[Liquid]
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
-    commandAnnotations: List[CommandAnnotation]
+    commandAnnotations: List[LegacyCommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]

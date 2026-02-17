@@ -28,7 +28,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
-from opentrons.protocol_engine.types import CommandAnnotation, HexColor
+from opentrons.protocol_engine.types import LegacyCommandAnnotation, HexColor
 from opentrons.types import MountType
 
 
@@ -44,8 +44,8 @@ class CommandTranslatorError(Exception):
 LabwareLocationAdapter: TypeAdapter[LoadableLabwareLocation] = TypeAdapter(
     LoadableLabwareLocation
 )
-CommandAnnotationAdapter: TypeAdapter[CommandAnnotation] = TypeAdapter(
-    CommandAnnotation
+CommandAnnotationAdapter: TypeAdapter[LegacyCommandAnnotation] = TypeAdapter(
+    LegacyCommandAnnotation
 )
 
 
@@ -304,12 +304,12 @@ class JsonTranslator:
     def translate_command_annotations(
         self,
         protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
-    ) -> List[CommandAnnotation]:
+    ) -> List[LegacyCommandAnnotation]:
         """Translate command annotations in json protocol schema v8."""
         if isinstance(protocol, (ProtocolSchemaV6, ProtocolSchemaV7)):
             return []
         elif protocol.commandAnnotationSchemaId == "opentronsCommandAnnotationSchemaV1":
-            command_annotations: List[CommandAnnotation] = [
+            command_annotations: List[LegacyCommandAnnotation] = [
                 CommandAnnotationAdapter.validate_python(
                     command_annotation.model_dump(),
                 )

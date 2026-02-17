@@ -19,9 +19,9 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import (
-    CommandAnnotation,
     CommandPreconditions,
     CSVParameter,
+    LegacyCommandAnnotation,
     RunTimeParameter,
 )
 from opentrons_shared_data.errors import ErrorCodes
@@ -159,7 +159,7 @@ class AnalysisStore:
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
         liquidClasses: List[LiquidClassRecordWithId],
-        command_annotations: List[CommandAnnotation],
+        command_annotations: List[LegacyCommandAnnotation],
         command_preconditions: Optional[CommandPreconditions] = None,
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
