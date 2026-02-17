@@ -141,7 +141,13 @@ export function PipetteNozzleSelector(
               />
             )}
 
-            <div className={styles.column_wrapper}>
+            <div
+              className={
+                is96Channel
+                  ? styles.column_wrapper
+                  : styles.column_wrapper_fixed_width
+              }
+            >
               <StyledText
                 desktopStyle="bodyLargeSemiBold"
                 color={COLORS.black90}

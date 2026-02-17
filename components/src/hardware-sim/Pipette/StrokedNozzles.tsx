@@ -17,16 +17,15 @@ export function StrokedNozzlesComponent(
   const { pipetteSpecs, nozzleStatus, handleClickNozzle } = props
   const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpecs
   const { backLeftCorner } = pipetteBoundingBoxOffsets
-  const leftBound = Math.abs(backLeftCorner[0])
-
+  const nozzleDiameter = 20
   const wells = Object.fromEntries(
     Object.entries(nozzleMap).map(([wellName, coordinates]) => {
       const [xOffset, yOffset] = coordinates
       const wellParams = {
         shape: 'circular',
-        diameter: 20,
-        x: leftBound + xOffset,
-        y: Math.abs(yOffset),
+        diameter: nozzleDiameter,
+        x: xOffset - backLeftCorner[0],
+        y: backLeftCorner[1] - yOffset,
         z: 0,
         geometryDefinitionId: 'conicalWell',
       }

@@ -132,7 +132,7 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
 
   const handleClickNozzle = (nozzleName: string): void => {
     const isAccessible = nozzleStatus[nozzleName] !== INACCESSIBLE
-    if (isAccessible && !isPartial) {
+    if (isAccessible) {
       const nozzlesToSelect = getEntireWellSelection(
         nozzleName,
         wellOrdering,

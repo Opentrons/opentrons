@@ -320,7 +320,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   return (
-    <div className={styles.column_wrapper}>
+    <>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
@@ -328,6 +328,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
         </div>
       </div>
-    </div>
+    </>
   )
 }
