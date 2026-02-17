@@ -15,7 +15,6 @@ from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.models import UpdateUser, UserCreate, UserResponse
 from auth_server.users.store import (
     add,
-    build_user,
     get,
     remove,
     update,
@@ -104,14 +103,13 @@ async def post_users(
             detail="User already exists",
         )
     # once we store it in the db we can have a unique id as well.
-    new_user = build_user(
+    new_user = add(
         username=user_create.userName,
         password=user_create.password.get_secret_value(),
         full_name=user_create.fullName,
         account_type=user_create.accountType,
         scopes=scopes_required,
     )
-    add(new_user)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(data=UserResponse.from_user(new_user)),
