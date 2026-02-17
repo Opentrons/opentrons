@@ -107,6 +107,20 @@ make test-pd TEST_ENV=staging   # Equivalent to make test-pd-staging
 make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
 ```
 
+## CLI Scripts
+
+Interactive Rich CLI tools for probing live robots. These read `ROBOT_IP` from `.env` or accept it as a CLI argument.
+
+### check_auth — Auth-server health check
+
+```bash
+make check-auth                          # prompts for IP (or reads ROBOT_IP from .env)
+make check-auth ROBOT_IP=10.0.0.42       # pass IP directly
+uv run python scripts/check_auth.py      # run the script directly
+```
+
+Checks connectivity to auth-server and robot-server, displays auth settings, attempts token exchange for both test users, and introspects the tokens. Useful for quickly verifying a robot's auth-server is alive and configured correctly.
+
 ## Directory Layout
 
 - `automation/` — Page objects, clients, and shared helpers
@@ -114,6 +128,8 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
   - `auth_client.py` — httpx-based OAuth 2 client for auth-server E2E tests
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
+- `scripts/` — Interactive CLI tools for probing live robots
+  - `check_auth.py` — Auth-server connectivity and OAuth 2 flow check
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)

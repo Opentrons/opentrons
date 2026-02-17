@@ -18,6 +18,7 @@ dependencies = [
     "pytest-playwright>=0.6.2",
     "pytest-timeout>=2.3.1",
     "python-dotenv>=1.2.1",
+    "rich>=13.0.0",
     "ruff>=0.14.2",
 ]
 

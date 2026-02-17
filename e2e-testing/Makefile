@@ -23,7 +23,7 @@ lint:
 
 .PHONY: typecheck
 typecheck:
-	uv run mypy automation tests conftest.py
+	uv run mypy automation tests scripts conftest.py
 
 .PHONY: prep
 prep: 
@@ -124,6 +124,10 @@ test-ll-prod:
 .PHONY: test-auth
 test-auth:
 	uv run pytest -m authE2E $(PYTEST_ARGS)
+
+.PHONY: check-auth
+check-auth:
+	uv run python scripts/check_auth.py $(ROBOT_IP)
 
 .PHONY: test-compare
 test-compare:
