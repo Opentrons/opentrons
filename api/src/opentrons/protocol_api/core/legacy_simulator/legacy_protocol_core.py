@@ -6,6 +6,7 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 )
 from opentrons_shared_data.pipette.types import PipetteGenerationType, PipetteNameType
 
+from ..csv import AbstractCSV
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ..legacy.legacy_module_core import LegacyModuleCore
 from ..legacy.legacy_protocol_core import LegacyProtocolCore
@@ -92,3 +93,7 @@ class LegacyProtocolCoreSimulator(
         def create_timer(self, seconds: float) -> LegacyTaskCore:
             """Create a timer task that runs in the background."""
             assert False, "create_timer only supported on engine core"
+
+        def create_csv(self, filename: str, columns: int) -> AbstractCSV:
+            """Create a new csv file"""
+            assert False, "create_csv only supported on engine core"

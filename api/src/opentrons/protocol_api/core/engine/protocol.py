@@ -29,6 +29,7 @@ from . import (
     load_labware_params,
     overlap_versions,
 )
+from .csv import CSVCore
 from .exceptions import InvalidModuleLocationError
 from .instrument import InstrumentCore
 from .labware import LabwareCore
@@ -1289,6 +1290,17 @@ class ProtocolCore(
             raise ValueError(
                 f"Could not find command annotation with ID: '{annotation_id}'"
             )
+
+    def create_csv(self, filename: str, columns: int) -> CSVCore:
+        """Create a new csv file"""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.CreateCSVParams(fileName=filename, columns=columns)
+        )
+        return CSVCore(
+            file_id=result.fileId,
+            columns=result.columns,
+            engine_client=self._engine_client,
+        )
 
     def _convert_labware_location(
         self,

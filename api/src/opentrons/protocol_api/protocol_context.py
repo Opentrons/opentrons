@@ -46,6 +46,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractVacuumModuleCore,
 )
+from .csv_context import CSVContext
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
 from .instrument_context import InstrumentContext
@@ -1944,6 +1945,21 @@ class ProtocolContext(CommandPublisher):
             protocol_core=self._core,
             api_version=self._api_version,
         )
+
+    @requires_version(2, 27)
+    def create_csv(
+        self, filename: str, columns: Optional[int]=None, title_row: List[str] = None
+    ) -> CSVContext:
+        if not columns and not title_row:
+            raise ValueError("You must supply either columns or title_row.")
+        if columns and title_row:
+            raise ValueError("Use title row OR columns but not both")
+        csv_core = self._core.create_csv(
+            filename=filename, columns=columns if columns else len(title_row)
+        )
+        if title_row:
+            csv_core.write_row(title_row)
+        return CSVContext(core=csv_core, api_version=self._api_version)
 
 
 def _create_module_context(

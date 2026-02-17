@@ -13,6 +13,7 @@ from opentrons_shared_data.robot.types import RobotType
 from .._liquid import Liquid, LiquidClass
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
+from .csv import AbstractCSV
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
@@ -317,3 +318,7 @@ class AbstractProtocol(
     @abstractmethod
     def load_robot(self) -> AbstractRobot:
         """Load a Robot Core context into a protocol"""
+
+    @abstractmethod
+    def create_csv(self, filename: str, columns: int) -> AbstractCSV:
+        """Create a new csv file"""
