@@ -55,26 +55,19 @@ def get(username: str) -> User | None:
     )
 
 
-def build_user(
-    username: str,
-    password: str,
-    full_name: str,
-    account_type: str,
-    scopes: list[Scope],
+def add(
+    username: str, password: str, full_name: str, account_type: str, scopes: list[Scope]
 ) -> User:
-    """Build a User from raw input values, hashing the password."""
-    return User(
+    """Add a user to the TEST_USERS list."""
+    new_user = User(
         username=username,
         hashed_password=password_hash.hash(password),
         full_name=full_name,
         account_type=AccountType(account_type),
         scopes=scopes,
     )
-
-
-def add(user: User) -> None:
-    """Add a user to the TEST_USERS list."""
-    TEST_USERS.append(user)
+    TEST_USERS.append(new_user)
+    return new_user
 
 
 def remove(user: User) -> None:
