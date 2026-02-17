@@ -118,7 +118,7 @@ marks:
       - run_server
 
 stages:
-  - name: PATCH to enable access control
+  - name: PATCH to change some settings
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -131,7 +131,7 @@ stages:
         data:
           accessControlEnabled: true
 
-  - name: DELETE /auth/settings resets to defaults
+  - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
@@ -139,9 +139,9 @@ stages:
       status_code: 200
       json:
         data:
-          accessControlEnabled: false
+          accessControlEnabled: true
 
-  - name: GET after DELETE returns default settings
+  - name: GET after DELETE returns the newly reset settings
     request:
       method: GET
       url: '{run_server.base_url}/auth/settings'
@@ -149,4 +149,4 @@ stages:
       status_code: 200
       json:
         data:
-          accessControlEnabled: false
+          accessControlEnabled: true

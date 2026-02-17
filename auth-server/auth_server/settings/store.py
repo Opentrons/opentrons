@@ -37,7 +37,10 @@ class SettingsStore:
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
-        self._settings = _DEFAULT_SETTINGS
+        new_settings = _DEFAULT_SETTINGS.model_copy()
+        # accessControlEnabled is special and is excluded from the reset.
+        new_settings.accessControlEnabled = self._settings.accessControlEnabled
+        self._settings = new_settings
         return self.get()
 
 
