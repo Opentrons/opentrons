@@ -8,11 +8,6 @@ from server_utils.auth.scopes import Scope
 password_hash = PasswordHash.recommended()
 
 
-def hash_password(password: str) -> str:
-    """Hash a password using the recommended hashers."""
-    return password_hash.hash(password)
-
-
 class AccountType(StrEnum):
     """The type of account."""
 
@@ -37,14 +32,14 @@ class User:
 TEST_USERS = [
     User(
         username="test_admin",
-        hashed_password=hash_password("test_admin_password"),
+        hashed_password=password_hash.hash("test_admin_password"),
         scopes=list(Scope),
         full_name="Test Admin",
         account_type=AccountType.ADMIN,
     ),
     User(
         username="test_user",
-        hashed_password=hash_password("test_user_password"),
+        hashed_password=password_hash.hash("test_user_password"),
         scopes=[Scope.RUNS_WRITE, Scope.RUNS_READ],
         full_name="Test User",
         account_type=AccountType.USER,
@@ -70,7 +65,7 @@ def build_user(
     """Build a User from raw input values, hashing the password."""
     return User(
         username=username,
-        hashed_password=hash_password(password),
+        hashed_password=password_hash.hash(password),
         full_name=full_name,
         account_type=AccountType(account_type),
         scopes=scopes,
@@ -98,7 +93,9 @@ def update(
     updated_user = User(
         username=username or user.username,
         hashed_password=(
-            hash_password(password) if password is not None else user.hashed_password
+            password_hash.hash(password)
+            if password is not None
+            else user.hashed_password
         ),
         full_name=full_name or user.full_name,
         account_type=AccountType(account_type) if account_type else user.account_type,
