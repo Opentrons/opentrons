@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  A1_NOZZLE,
   FIXED_TRASH_ID,
   fixtureTiprack300ul,
   getLabwareDefURI,
@@ -32,6 +33,7 @@ describe('getCustomLiquidClassProperties', () => {
           ...getFlowRateAndOffsetParamsTransferLike(),
           commandCreatorFnName: 'transfer',
           name: 'Transfer Test',
+          primaryNozzle: A1_NOZZLE,
           description: 'test blah blah',
           liquidClass: null,
           pushOut: 0,
@@ -199,6 +201,7 @@ describe('getCustomLiquidClassProperties', () => {
           description: 'test blah blah',
           liquidClass: null,
           pushOut: 0,
+          primaryNozzle: A1_NOZZLE,
           touchTipAfterDispenseSpeed: 5,
           touchTipAfterDispenseMmFromEdge: 3,
           aspirateSubmergeDelay: { seconds: 5 },

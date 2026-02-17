@@ -1,72 +1,71 @@
 """Tests for RunDataManager."""
 
 from datetime import datetime
-from typing import Optional, List, Dict
-from unittest.mock import sentinel, Mock
+from typing import Dict, List, Optional
+from unittest.mock import Mock, sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons import config
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
-    EngineStatus,
-    StateSummary,
-    commands,
-    types as pe_types,
-    CommandSlice,
     CommandErrorSlice,
     CommandPointer,
+    CommandSlice,
+    EngineStatus,
     ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
     LabwareOffset,
     Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    StateSummary,
+    commands,
 )
-from opentrons import config
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import (
     BooleanParameter,
-    CSVParameter,
     CommandPreconditions,
+    CSVParameter,
 )
+from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
+from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
+from robot_server.camera.provider import CameraProviderWrapper
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.file_provider.provider import (
+    FileProviderExecutor,
+)
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
-from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
+    PreSerializedCommandsNotAvailableError,
     RunDataManager,
     RunNotCurrentError,
-    PreSerializedCommandsNotAvailableError,
 )
-from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
+from robot_server.runs.run_models import BadRun, Run, RunDataError, RunNotFoundError
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
     RunConflictError,
+    RunOrchestratorStore,
 )
 from robot_server.runs.run_store import (
-    RunStore,
-    RunResource,
-    CommandNotFoundError,
     BadStateSummary,
+    CommandNotFoundError,
+    RunResource,
+    RunStore,
 )
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
-from opentrons.protocol_engine.resources import FileProvider
-from robot_server.file_provider.provider import (
-    FileProviderExecutor,
-)
-from opentrons.protocol_reader import ProtocolSource
-from opentrons.protocol_engine.resources import CameraProvider
-from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -164,7 +163,7 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 def command_annotations() -> List[pe_types.CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotation(
+        pe_types.SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
             params={"abc": "123"},
             machineReadableName="hello world",

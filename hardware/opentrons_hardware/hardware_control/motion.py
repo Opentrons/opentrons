@@ -1,16 +1,20 @@
 """A collection of motions that define a single move."""
 
-from typing import List, Dict, Iterable, Union, Optional
 from dataclasses import dataclass
-import numpy as np
-from logging import getLogger
 from enum import Enum, unique
+from logging import getLogger
+from typing import Dict, Iterable, List, Optional, Union
+
+import numpy as np
+
+from opentrons_hardware.firmware_bindings.constants import (
+    MoveStopCondition as MoveStopCondition,
+)
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteTipActionType,
-    MoveStopCondition as MoveStopCondition,
-    SensorType,
     SensorId,
+    SensorType,
 )
 
 LOG = getLogger(__name__)

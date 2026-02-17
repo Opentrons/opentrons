@@ -2,7 +2,6 @@
 
 from . import models
 
-
 _for_flex = models.DeckConfigurationRequest.model_construct(
     cutoutFixtures=[
         models.CutoutFixture.model_construct(

@@ -1,6 +1,9 @@
 .detail_container {
   display: flex;
-  height: 100%;
+
+  /* height: 100%; */
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
   border-radius: var(--border-radius-8);
   background-color: var(--white);
@@ -9,6 +12,10 @@
 }
 
 .command_step {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
   border-radius: var(--border-radius-8);
   background-color: var(--white);
 }
@@ -30,8 +37,12 @@
 }
 
 .command_step_groups {
+  overflow: hidden;
   height: 100%;
   min-height: 0;
   flex: 1;
-  overflow-y: auto;
+}
+
+.at_bottom {
+  padding-bottom: var(--spacing-8);
 }

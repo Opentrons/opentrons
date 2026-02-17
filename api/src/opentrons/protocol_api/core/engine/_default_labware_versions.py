@@ -1,8 +1,8 @@
 """The versions of standard labware that the Protocol API should load by default."""
 
 from typing import TypeAlias
-from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.api_support.types import APIVersion
 
 DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 

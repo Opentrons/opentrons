@@ -1,20 +1,21 @@
 # TODO(mc, 2021-05-10): delete this file; these models have been moved to
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
 # Note: (2024-07-18): this file does not actually seem to be safe to delete
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, Optional, Sequence, Tuple, TypeVar, Type
+from typing import Any, Dict, Optional, Sequence, Tuple, Type, TypeVar
+
 from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.fastapi_utils.models.json_api import ResourceLinks
 
 from robot_server.errors.error_responses import (
     ApiError,
-    ErrorSource,
-    ErrorDetails,
     ErrorBody,
+    ErrorDetails,
+    ErrorSource,
 )
-from robot_server.service.json_api import ResourceLinks
 
 
 @dataclass(frozen=True)

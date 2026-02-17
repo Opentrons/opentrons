@@ -75,13 +75,11 @@ export function TimelineToolbox({
     const { key, altKey: altIsPressed } = e
 
     if (altIsPressed) {
-      let delta = 0
       if (key === 'ArrowUp') {
-        delta = -1
+        dispatch(stepsActions.reorderSelectedStep('up'))
       } else if (key === 'ArrowDown') {
-        delta = 1
+        dispatch(stepsActions.reorderSelectedStep('down'))
       }
-      dispatch(stepsActions.reorderSelectedStep(delta))
     }
   }
 
@@ -123,6 +121,7 @@ export function TimelineToolbox({
       height="100%"
       maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
       width={`${sidebarWidth / 16}rem`}
+      childrenContainerTestId="TimelineToolbox_scrollContainer"
       title={
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText

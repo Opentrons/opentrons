@@ -20,7 +20,6 @@ import type {
 } from '../../../types'
 
 const moduleId = 'flexStackerId'
-const gripperId = 'gripperId'
 vi.mock('../../../robotStateSelectors')
 
 describe('flexStackerEmpty', () => {
@@ -33,9 +32,6 @@ describe('flexStackerEmpty', () => {
       type: FLEX_STACKER_MODULE_TYPE,
       model: FLEX_STACKER_MODULE_V1,
       pythonName: 'mock_flex_stacker_1',
-    }
-    invariantContext.gripperEntities[gripperId] = {
-      id: gripperId,
     }
 
     robotState = getInitialRobotStateStandard(invariantContext)
@@ -57,6 +53,7 @@ describe('flexStackerEmpty', () => {
       {
         moduleId,
         strategy: 'logical',
+        message: 'Take everything out of the Stacker',
       },
       invariantContext,
       robotState
@@ -69,12 +66,13 @@ describe('flexStackerEmpty', () => {
           params: {
             moduleId,
             strategy: 'logical',
-            message: undefined,
+            message: 'Take everything out of the Stacker',
             count: undefined,
           },
         },
       ],
-      python: 'mock_flex_stacker_1.empty()',
+      python:
+        'mock_flex_stacker_1.empty(message="Take everything out of the Stacker")',
     })
   })
   it('creates returns error if bad module state', () => {
@@ -90,21 +88,6 @@ describe('flexStackerEmpty', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',
-    })
-  })
-  it('creates returns error if no gripper', () => {
-    invariantContext.gripperEntities = {}
-    const result = flexStackerEmpty(
-      {
-        moduleId,
-        strategy: 'logical',
-      },
-      invariantContext,
-      robotState
-    )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'FLEX_STACKER_NO_GRIPPER',
     })
   })
 })

@@ -1,17 +1,21 @@
 """Tests for the /system router."""
 
+from datetime import datetime, timezone
 from typing import Iterator
 
 import pytest
 from mock import MagicMock, patch
-from datetime import datetime, timezone
-from starlette.testclient import TestClient
 from pydantic import TypeAdapter
+from starlette.testclient import TestClient
 
-from robot_server.service.json_api import ResourceLink, ResourceLinks, ResourceLinkKey
-from robot_server.system import errors, router
-
+from server_utils.fastapi_utils.models.json_api import (
+    ResourceLink,
+    ResourceLinkKey,
+    ResourceLinks,
+)
 from tests.conftest import datetime_to_zulu_iso8601
+
+from robot_server.system import errors, router
 
 
 @pytest.fixture

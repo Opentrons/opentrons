@@ -10,7 +10,6 @@ import structlog
 import weave
 from anthropic import Anthropic
 from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam
-from ddtrace import tracer
 from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
@@ -24,7 +23,6 @@ MessageType = Literal["create", "update"]
 _weave_initialized = False
 
 
-@tracer.wrap()
 def setup_weave_analytics(enable_analytics: bool) -> None:
     """Setup Weave initialization only (thread-safe, request-agnostic)."""
     global _weave_initialized
@@ -43,7 +41,6 @@ def setup_weave_analytics(enable_analytics: bool) -> None:
             _weave_initialized = True
 
 
-@tracer.wrap()
 def get_tracing_context(enable_analytics: bool) -> ContextManager[None]:
     """Get context manager that controls Weave tracing for this specific request."""
     return set_tracing_enabled(enable_analytics)
@@ -119,7 +116,6 @@ class AnthropicPredict:
             },
         ]
 
-    @tracer.wrap()
     def get_system_prompt_pd(self) -> List[TextBlockParam]:
         """
         Get the system prompt for the PD model
@@ -155,7 +151,6 @@ class AnthropicPredict:
         ]
         return system_content
 
-    @tracer.wrap()
     def get_docs(self) -> str:
         """
         Processes documents from a directory and returns their content wrapped in XML tags.
@@ -192,7 +187,6 @@ class AnthropicPredict:
         xml_output.append("</system_documentation>")
         return "\n".join(xml_output)
 
-    @tracer.wrap()
     def get_api_docs(self) -> str:
         """
         Read Python API v2 docs and return as string
@@ -202,7 +196,6 @@ class AnthropicPredict:
             v2_doc_content = f.read()
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
-    @tracer.wrap()
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
@@ -238,7 +231,6 @@ class AnthropicPredict:
         xml_content += "</relevant_file_content>"
         return xml_content
 
-    @tracer.wrap()
     def get_relevant_api_docs(self, query: str, user_id: str) -> str:
         """
         Get relevant API docs based on the user's prompt
@@ -248,7 +240,6 @@ class AnthropicPredict:
             extra={
                 "user_id": user_id,
                 "query_preview": query[:100] if query else "empty",
-                "called_from": "tool" if "tool" in str(tracer.current_span()) else "direct",
             },
         )
 
@@ -284,7 +275,6 @@ class AnthropicPredict:
         xml_content = self.parse_relevant_files_and_get_content(files_content)
         return xml_content
 
-    @tracer.wrap()
     def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
         """
         Internal method to handle message processing with different system prompts.
@@ -315,7 +305,9 @@ class AnthropicPredict:
         return response
 
     def _create_file_attachment_blocks(
-        self, file_references: Optional[List[Dict[str, str]]], user_id: str  # noqa: ARG002
+        self,
+        file_references: Optional[List[Dict[str, str]]],
+        user_id: str,  # noqa: ARG002
     ) -> List[ContentBlockParam]:
         """
         Create content blocks with file attachments using appropriate format for each file type
@@ -346,7 +338,7 @@ class AnthropicPredict:
                 # Fallback if content is missing
                 text_block = TextBlockParam(
                     type="text",
-                    text=f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                    text=f'<user_file name="{filename}" type="{file_type}" id="{file_ref.get("id", "unknown")}">\n'
                     f"Filename: {filename}\n"
                     f"[File content is empty or missing]\n"
                     f"</user_file>\n\n",
@@ -360,7 +352,7 @@ class AnthropicPredict:
                 logger.info(f"Creating PDF document block with title: '{filename}'")
 
                 # Add a text block to start the user file wrapper with prominent filename
-                pdf_intro_text = f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                pdf_intro_text = f'<user_file name="{filename}" type="{file_type}" id="{file_ref.get("id", "unknown")}">\n'
                 pdf_intro_text += f"Filename: {filename}\n"
                 filename_text_block = TextBlockParam(type="text", text=pdf_intro_text)
                 content_blocks.append(filename_text_block)
@@ -381,7 +373,7 @@ class AnthropicPredict:
                 # CSV and Python files are sent as text blocks
                 text_block = TextBlockParam(
                     type="text",
-                    text=f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                    text=f'<user_file name="{filename}" type="{file_type}" id="{file_ref.get("id", "unknown")}">\n'
                     f"Filename: {filename}\n"
                     f"{file_content}\n"
                     f"</user_file>\n\n",
@@ -399,7 +391,7 @@ class AnthropicPredict:
         attachment_keys = list(attachment.keys())
         attachment_name = attachment.get("name")
         attachment_filename = attachment.get("filename")
-        logger.info(f"Processing historical attachment: keys={attachment_keys}, " f"name={attachment_name}, filename={attachment_filename}")
+        logger.info(f"Processing historical attachment: keys={attachment_keys}, name={attachment_name}, filename={attachment_filename}")
 
         return {
             "id": attachment.get("id", ""),
@@ -455,7 +447,6 @@ class AnthropicPredict:
 
         return {"role": "user", "content": current_user_content}
 
-    @tracer.wrap()
     def process_chat_with_attachments(
         self,
         user_id: str,
@@ -539,7 +530,6 @@ class AnthropicPredict:
         }
         return type_mapping.get(file_type, "text/plain")
 
-    @tracer.wrap()
     def process_message(
         self,
         user_id: str,
@@ -612,7 +602,6 @@ class AnthropicPredict:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
 
-    @tracer.wrap()
     def process_message_pd(
         self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
@@ -643,15 +632,12 @@ class AnthropicPredict:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
 
-    @tracer.wrap()
     def create(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message(user_id, prompt, history, "create")
 
-    @tracer.wrap()
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
-    @tracer.wrap()
     def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
         """
         Safely navigate nested dictionaries using a sequence of keys.
@@ -672,7 +658,6 @@ class AnthropicPredict:
                 return default if default is not None else {}
         return current
 
-    @tracer.wrap()
     def standardize(self, protocol: Dict[str, Any]) -> Dict[str, Any]:
         """
         Reorganize the data structure according to the standard schema while preserving content.
@@ -834,7 +819,6 @@ class AnthropicPredict:
 
         return standard
 
-    @tracer.wrap()
     def fillup_pd(self, json_str: str) -> str:  # noqa: C901
         """
         Fill up the JSON protocol with the missing fields.
@@ -884,11 +868,9 @@ class AnthropicPredict:
         except (FileNotFoundError, json.JSONDecodeError, KeyError):
             return ""
 
-    @tracer.wrap()
     def update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message(user_id, prompt, history, "update")
 
-    @tracer.wrap()
     def handle_tool_use(self, func_name: str, func_params: Dict[str, Any], user_id: str) -> str:
         logger.info("Tool use invoked", extra={"tool_name": func_name, "user_id": user_id, "params": func_params})
 
@@ -920,7 +902,6 @@ class AnthropicPredict:
         logger.error("Unknown tool", extra={"tool": func_name})
         raise ValueError(f"Unknown tool: {func_name}")
 
-    @tracer.wrap()
     def simulate_protocol(self, protocol: str) -> str:
         url = "https://Opentrons-simulator.hf.space/protocol"
         protocol_name = str(uuid.uuid4()) + ".py"

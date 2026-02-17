@@ -7,20 +7,19 @@ Summary of changes from schema 7:
 """
 
 import json
-from pathlib import Path
 from contextlib import ExitStack
+from pathlib import Path
 
 import sqlalchemy
 
-from ._util import add_column, copy_contents
-from ..database import sql_engine_ctx
-from ..tables import schema_08
 from .._folder_migrator import Migration
-
+from ..database import sql_engine_ctx
 from ..file_and_directory_names import (
     DB_FILE,
 )
+from ..tables import schema_08
 from ..tables.schema_08 import CommandStatusSQLEnum
+from ._util import add_column, copy_contents
 
 
 class Migration7to8(Migration):  # noqa: D101

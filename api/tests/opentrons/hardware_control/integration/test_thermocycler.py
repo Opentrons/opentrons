@@ -5,12 +5,11 @@ from typing import AsyncGenerator, List
 import anyio
 import pytest
 
+from .build_module import build_module
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.modules.types import TemperatureStatus, ThermocyclerStep
-
-from .build_module import build_module
 
 
 @pytest.fixture

@@ -34,7 +34,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  useDeleteRunMutation,
   useErrorRecoverySettings,
   useHost,
   useProtocolQuery,
@@ -96,7 +95,6 @@ export function RunSummary(): JSX.Element {
     },
   })
   const isRunCurrent = useIsRunCurrent(runId)
-  const { deleteRun } = useDeleteRunMutation()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
@@ -246,13 +244,6 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
 
-  const returnToQuickTransfer = (): void => {
-    closeCurrentRunIfValid(() => {
-      deleteRun(runId)
-      navigate('/quick-transfer')
-    })
-  }
-
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
@@ -296,8 +287,6 @@ export function RunSummary(): JSX.Element {
           })
         },
       })
-    } else if (isQuickTransfer) {
-      returnToQuickTransfer()
     } else {
       closeCurrentRunIfValid(() => {
         navigate('/dashboard')
@@ -343,12 +332,9 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
-  const buildReturnToCopy = (): string =>
-    isQuickTransfer ? t('return_to_quick_transfer') : t('return_to_dashboard')
-
   const buildReturnToWithSpinnerText = (): JSX.Element => (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="16rem">
-      {buildReturnToCopy()}
+      {t('return_to_dashboard')}
       <Icon
         name="ot-spinner"
         aria-label="icon_ot-spinner"
@@ -474,7 +460,7 @@ export function RunSummary(): JSX.Element {
               buttonText={
                 showReturnToSpinner
                   ? buildReturnToWithSpinnerText()
-                  : buildReturnToCopy()
+                  : t('return_to_dashboard')
               }
               css={showReturnToSpinner ? RETURN_TO_CLICKED_STYLE : undefined}
             />
@@ -622,4 +608,5 @@ const EqualWidthButton = styled(LargeButton)`
   flex: 1;
   min-width: 0;
   height: 17rem;
+  text-wrap: wrap;
 `

@@ -3,95 +3,94 @@
 Ports `transferSettings.cy.ts` from the Cypress suite to Playwright.
 """
 
-from __future__ import annotations
-
 import pytest
 from playwright.sync_api import Page
 
 from automation.pd_pages import (
-    CreateProtocolWizard,
-    DeckConfigPage,
-    LandingPage,
-    ModuleConfigPage,
-    PipetteModal,
     ProtocolEditorPage,
+    TransferPage,
 )
+from eyes import Eyes
+from utility import _import_protocol_and_open_editor
 
-LIQUID_NAME = "My liquid!"
-LABWARE_NAME = "Bio-Rad 96 Well Plate"
+SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> None:
-    """Replicate the Cypress transferSettings single-channel test using Playwright."""
-
-    landing = LandingPage(page)
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_create_protocol()
-
-    wizard = CreateProtocolWizard(page)
-    wizard.wait_for_step(1)
-    wizard.select_robot("Opentrons Flex")
-    wizard.expect_robot_selected("Opentrons Flex")
-    wizard.select_robot("Opentrons OT-2")
-    wizard.expect_robot_selected("Opentrons OT-2")
-    wizard.select_robot("Opentrons Flex")
-    wizard.expect_add_pipette_prompt()
-    wizard.click_add_pipette()
-
-    pipette_modal = PipetteModal(page)
-    pipette_modal.wait_for_modal_open()
-    pipette_modal.select_pipette_type("1-Channel", "50 µL")
-    pipette_modal.select_tip_racks(["Tip Rack 50 µL"])
-    pipette_modal.save_pipette_selection()
-
-    wizard.expect_pipette_summary("Flex 1-Channel 50 µL", "Opentrons Flex 96 Tip Rack 50 µL")
-    wizard.expect_gripper_question()
-
-    module_config = ModuleConfigPage(page)
-    module_config.select_gripper(True)
-    module_config.select_thermocycler(False)
-    module_config.select_waste_chute(False)
-    module_config.confirm_module_selection()
-
-    deck = DeckConfigPage(page)
-    deck.expect_module_overview()
-    deck.select_slot("B1")
-    deck.select_module("Thermocycler Module GEN2")
-    deck.select_slot("D1")
-    deck.select_module("Heater-Shaker Module GEN1")
-    deck.select_slot("B2")
-    deck.select_module("Magnetic Block GEN1")
-    deck.select_slot("C1")
-    deck.select_module("Temperature Module GEN2")
-    deck.confirm_deck_configuration()
-    deck.confirm_deck_configuration()
-    deck.enter_edit_mode()
-
+def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
+    _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py", migration=True)
     editor = ProtocolEditorPage(page)
-
-    editor.add_labware_to_slot("C2")
-    editor.select_labware_by_name(LABWARE_NAME)
-    editor.confirm_toolbox()
-
-    editor.open_slot_tools("C2")
-    editor.click_add_liquid_button()
-    editor.open_liquid_tab()
-    editor.expect_liquid_panel()
-    editor.define_liquid(LIQUID_NAME)
-    editor.select_wells(["A1", "A2"])
-    editor.assign_liquid_to_wells(LIQUID_NAME, "150")
-    editor.confirm_toolbox()
-    editor.close_toolbox()
-
-    editor.add_labware_to_slot("C3")
-    editor.select_labware_by_name(LABWARE_NAME)
-    editor.confirm_toolbox()
-    editor.close_toolbox()
-
     editor.open_add_step_menu()
-    editor.verify_add_step_menu_options()
-    editor.select_step_type("Transfer")
-    editor.expect_transfer_form()
+    editor.add_step()
+    transfer_page = TransferPage(page)
+    # transfer_page.tip_rack_page_1_transfer_select()
+    transfer_page.source_labware_select(SOURCE_LABWARE)
+    transfer_page.destination_labware_select("Greiner 384 Well Plate 240 µL")
+    transfer_page.wells_select("Destination", "A1")
+    transfer_page.pipette_path_select("Single transfer")
+    transfer_page.input_volume("30")
+    transfer_page.transfer_continue_to_next_step()
+    """
+    Regressions steps for Liquid Class settings
+    """
+    liquid_classes = ["Aqueous", "Viscous", "Volatile"]
+
+    for liquid in liquid_classes:
+        # todo 12/24/25 add no liquid class when implementing snapshot
+        transfer_page.part_2_transfer_form_liquid_class(liquid)
+
+        transfer_page.transfer_continue_to_next_step()
+        # Take snapshot here for visual regression testing: {liquid}
+        if liquid != "Aqueous":
+            transfer_page.update_or_keep_liquid_class_settings("Update settings")
+        else:
+            pass
+
+        transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
+        # Take snapshot here for visual regression testing: {liquid}
+        transfer_page.select_aspirate_or_dispense_advanced_settings("Aspirate")
+        # Take snapshot here for visual regression testing: {liquid}
+
+        transfer_page.go_back_to_previous_step()
+
+    transfer_page.transfer_continue_to_next_step()
+
+    transfer_page.set_flow_rate_aspirate(150)
+    transfer_page.set_submerge_and_retract(
+        aspirate=True, submerge_speed=25, submerge_delay=0.5, retract_speed=25, retract_delay=0.5
+    )
+    transfer_page.advanced_settings(
+        Aspirate=True,
+        Pre_wetting=True,
+        Touch_tip=False,
+        Air_gap=True,
+        Air_gap_volume=5,
+        Delay=True,
+        Delay_time=1,
+    )
+    transfer_page.tip_position_asp_disp(aspirate=True, xyz=(1, 2, 0))
+    transfer_page.tip_position_submerge_retract(aspirate=True, submerge=True, xyz=(1, 1, 0))
+    transfer_page.tip_position_submerge_retract(aspirate=True, submerge=False, xyz=(-1, -1, 0.5))
+    transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=True)
+    transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
+    transfer_page.advanced_settings(
+        Aspirate=False,
+        Pre_wetting=True,
+        Touch_tip=True,
+        Touch_tip_speed=30,
+        Touch_tip_distance_from_edge=1.0,
+        Air_gap=True,
+        Air_gap_volume=30,
+        Delay=True,
+        Delay_time=1,
+        set_blowout=True,
+        blowout_location="Source well",
+        blowout_flow_rate=150,
+    )
+    if eyes is not None:
+        eyes.check(checkpoint_name="Dispense Advanced Settings")
+    transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
+    transfer_page.transfer_continue_to_next_step()
+    transfer_page.tip_change_strategy("Once", drop_location="Tip rack")
+    transfer_page.save_transfer_step()

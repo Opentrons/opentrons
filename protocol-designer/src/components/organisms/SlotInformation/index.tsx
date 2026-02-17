@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -21,17 +22,14 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import {
-  FAKE_HOPPER_LOCATION_MAP,
-  getIsSlotAHopper,
-} from '@opentrons/step-generation'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
 
 interface SlotInformationProps {
   location: string
@@ -65,7 +63,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = tcDisplayLocation
   } else if (getIsSlotAHopper(location)) {
     modifiedLocation = t('stacker', {
-      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+      slot: getColumnFromWellName(location),
     })
   }
 
@@ -92,7 +90,11 @@ export const SlotInformation: FC<SlotInformationProps> = ({
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   textAlign={TYPOGRAPHY.textAlignRight}
-                  css={LINE_CLAMP_TEXT_STYLE(2, true)}
+                  className={clsx(
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_normal
+                  )}
+                  style={{ WebkitLineClamp: 2 }}
                 >
                   {liquids.join(', ')}
                 </StyledText>
@@ -183,7 +185,11 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
                 ? TYPOGRAPHY.textAlignLeft
                 : TYPOGRAPHY.textAlignRight
             }
-            css={LINE_CLAMP_TEXT_STYLE(3, true)}
+            className={clsx(
+              lineClampStyles.line_clamp,
+              lineClampStyles.word_normal
+            )}
+            style={{ WebkitLineClamp: 3 }}
           >
             {stackInformation ?? t('none')}
           </StyledText>

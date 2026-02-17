@@ -102,7 +102,6 @@ export function useActionButtonProperties({
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
-  console.log('🚀 ~ handlePlay ~ runStatus:', runStatus)
 
   const handlePlay = (): void => {
     play()
@@ -143,6 +142,7 @@ export function useActionButtonProperties({
     protocolRunControls,
     runHeaderModalContainerUtils,
     isCameraReadyToRun,
+    numberOfAtomicCommands: 0,
   })
 
   if (isProtocolNotReady) {

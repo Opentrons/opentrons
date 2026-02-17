@@ -1,10 +1,11 @@
 from enum import Enum
-from typing import Dict
 from string import Template
-from opentrons.drivers.utils import parse_key_values
+from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
+from opentrons.drivers.utils import parse_key_values
 
 
 class GetPlateTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):

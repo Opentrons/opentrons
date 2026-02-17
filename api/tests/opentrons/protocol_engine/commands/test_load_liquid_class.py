@@ -1,11 +1,12 @@
 """Test load-liquid command."""
 
-from decoy import Decoy
 import pytest
+from decoy import Decoy
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.load_liquid_class import (
     LoadLiquidClassImplementation,

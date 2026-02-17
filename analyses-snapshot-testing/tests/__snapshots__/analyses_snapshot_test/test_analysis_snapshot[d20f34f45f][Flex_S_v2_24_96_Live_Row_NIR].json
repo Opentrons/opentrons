@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31,6 +33,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -45,6 +48,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -59,6 +63,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -73,6 +78,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1251,6 +1257,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1270,6 +1277,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1284,6 +1292,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1298,6 +1307,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1316,6 +1326,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2726,6 +2737,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4135,6 +4147,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4161,13 +4174,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 47.85,
+        "tipLength": 48.971000000000004,
         "tipVolume": 200.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4182,6 +4196,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4517,6 +4532,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4549,6 +4565,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4565,6 +4582,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4579,6 +4597,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4611,6 +4630,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4644,6 +4664,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4663,6 +4684,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4677,6 +4699,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4710,6 +4733,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4729,6 +4753,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4743,6 +4768,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4775,6 +4801,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4795,6 +4822,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4828,6 +4856,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4848,6 +4877,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4881,6 +4911,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4895,6 +4926,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5230,6 +5262,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5262,6 +5295,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5278,6 +5312,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5292,6 +5327,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5324,6 +5360,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5357,6 +5394,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5376,6 +5414,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5390,6 +5429,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5423,6 +5463,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5442,6 +5483,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5456,6 +5498,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5488,6 +5531,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5508,6 +5552,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5541,6 +5586,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5561,6 +5607,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5594,6 +5641,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5608,6 +5656,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5627,6 +5676,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5641,6 +5691,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5673,6 +5724,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5693,6 +5745,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5709,6 +5762,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5723,6 +5777,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5755,6 +5810,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5788,6 +5844,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5807,6 +5864,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5821,6 +5879,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5854,6 +5913,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5873,6 +5933,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5887,6 +5948,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5919,6 +5981,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5939,6 +6002,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5972,6 +6036,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5992,6 +6057,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6025,6 +6091,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6039,6 +6106,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6374,6 +6442,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6406,6 +6475,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6422,6 +6492,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6436,6 +6507,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6468,6 +6540,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6501,6 +6574,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6520,6 +6594,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6534,6 +6609,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6567,6 +6643,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6586,6 +6663,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6600,6 +6678,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6632,6 +6711,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6652,6 +6732,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6685,6 +6766,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6705,6 +6787,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6738,6 +6821,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6752,6 +6836,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6771,6 +6856,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6785,6 +6871,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6817,6 +6904,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6837,6 +6925,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6853,6 +6942,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6867,6 +6957,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6899,6 +6990,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6932,6 +7024,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6951,6 +7044,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6965,6 +7059,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6998,6 +7093,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7017,6 +7113,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7031,6 +7128,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7063,6 +7161,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7083,6 +7182,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7116,6 +7216,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7136,6 +7237,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7169,6 +7271,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7183,6 +7286,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7197,6 +7301,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7592,6 +7697,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7624,6 +7730,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7640,6 +7747,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7654,6 +7762,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7686,6 +7795,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7719,6 +7829,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7738,6 +7849,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7752,6 +7864,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7785,6 +7898,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7799,6 +7913,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7818,6 +7933,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7832,6 +7948,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7864,6 +7981,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7884,6 +8002,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7898,6 +8017,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7931,6 +8051,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7951,6 +8072,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7965,6 +8087,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7998,6 +8121,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8012,6 +8136,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8407,6 +8532,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8439,6 +8565,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8455,6 +8582,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8469,6 +8597,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8501,6 +8630,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8534,6 +8664,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8553,6 +8684,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8567,6 +8699,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8600,6 +8733,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8614,6 +8748,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8633,6 +8768,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8647,6 +8783,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8679,6 +8816,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8699,6 +8837,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8713,6 +8852,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8746,6 +8886,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8766,6 +8907,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8780,6 +8922,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8813,6 +8956,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8827,6 +8971,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8846,6 +8991,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8860,6 +9006,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8892,6 +9039,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8912,6 +9060,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8926,6 +9075,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8942,6 +9092,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8956,6 +9107,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8988,6 +9140,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9021,6 +9174,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9040,6 +9194,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9054,6 +9209,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9087,6 +9243,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9101,6 +9258,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9120,6 +9278,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9134,6 +9293,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9166,6 +9326,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9186,6 +9347,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9200,6 +9362,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9233,6 +9396,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9253,6 +9417,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9267,6 +9432,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9300,6 +9466,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9314,6 +9481,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9709,6 +9877,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9741,6 +9910,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9757,6 +9927,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9771,6 +9942,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9803,6 +9975,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9836,6 +10009,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9855,6 +10029,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9869,6 +10044,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9902,6 +10078,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9916,6 +10093,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9935,6 +10113,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9949,6 +10128,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9981,6 +10161,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10001,6 +10182,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10015,6 +10197,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10048,6 +10231,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10068,6 +10252,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10082,6 +10267,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10115,6 +10301,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10129,6 +10316,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10148,6 +10336,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10162,6 +10351,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10194,6 +10384,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10214,6 +10405,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10228,6 +10420,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10244,6 +10437,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10258,6 +10452,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10290,6 +10485,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10323,6 +10519,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10342,6 +10539,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10356,6 +10554,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10389,6 +10588,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10403,6 +10603,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10422,6 +10623,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10436,6 +10638,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10468,6 +10671,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10488,6 +10692,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10502,6 +10707,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10535,6 +10741,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10555,6 +10762,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10569,6 +10777,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10602,6 +10811,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10616,6 +10826,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10630,6 +10841,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10993,6 +11205,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11025,6 +11238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11041,6 +11255,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11055,6 +11270,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11087,6 +11303,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11120,6 +11337,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11139,6 +11357,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11153,6 +11372,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11186,6 +11406,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11218,6 +11439,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11251,6 +11473,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11271,6 +11494,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11285,6 +11509,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11318,6 +11543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11332,6 +11558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11695,6 +11922,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11727,6 +11955,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11743,6 +11972,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11757,6 +11987,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11789,6 +12020,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11822,6 +12054,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11841,6 +12074,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11855,6 +12089,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11888,6 +12123,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11920,6 +12156,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11953,6 +12190,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11973,6 +12211,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11987,6 +12226,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12020,6 +12260,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12034,6 +12275,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12066,6 +12308,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12082,6 +12325,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12096,6 +12340,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12128,6 +12373,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12161,6 +12407,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12180,6 +12427,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12194,6 +12442,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12227,6 +12476,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12259,6 +12509,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12292,6 +12543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12312,6 +12564,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12326,6 +12579,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12359,6 +12613,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12373,6 +12628,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12736,6 +12992,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12768,6 +13025,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12784,6 +13042,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12798,6 +13057,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12830,6 +13090,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12863,6 +13124,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12882,6 +13144,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12896,6 +13159,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12929,6 +13193,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12961,6 +13226,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12994,6 +13260,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13014,6 +13281,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13028,6 +13296,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13061,6 +13330,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13075,6 +13345,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13107,6 +13378,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13123,6 +13395,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13137,6 +13410,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13169,6 +13443,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13202,6 +13477,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13221,6 +13497,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13235,6 +13512,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13268,6 +13546,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13300,6 +13579,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13333,6 +13613,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13353,6 +13634,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13367,6 +13649,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13400,6 +13683,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13414,6 +13698,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13442,6 +13727,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

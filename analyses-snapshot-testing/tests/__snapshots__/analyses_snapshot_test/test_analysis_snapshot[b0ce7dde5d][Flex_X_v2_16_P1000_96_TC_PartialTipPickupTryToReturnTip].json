@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1195,6 +1197,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1214,6 +1217,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2394,6 +2398,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3574,6 +3579,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3592,6 +3598,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3618,13 +3625,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.61,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3659,6 +3667,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3704,7 +3713,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.28.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3713,7 +3722,7 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+          "detail": "Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.28.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "UnexpectedProtocolError",

@@ -65,6 +65,10 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: teardown
 teardown:
 	$(SHX) rm -rf .venv
@@ -129,6 +133,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format opentrons_hardware tests
+	$(ruff) check --select I --fix opentrons_hardware tests
 
 # launch hardware controller in dev mode
 .PHONY: dev

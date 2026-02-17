@@ -77,6 +77,11 @@ module.exports = {
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
           },
+          {
+            name: 'lodash',
+            message:
+              'Use a granular import, like `import isEqual from "lodash/isEqual"`, instead of like `import { isEqual } from "lodash"`',
+          },
         ],
       },
     ],
@@ -174,13 +179,6 @@ module.exports = {
       rules: {
         'import/no-default-export': 'off',
         '@typescript-eslint/consistent-type-assertions': 'off',
-      },
-    },
-    {
-      files: ['**/cypress/**'],
-      extends: ['plugin:cypress/recommended'],
-      rules: {
-        'cypress/unsafe-to-chain-command': 'warn',
       },
     },
     // Allow HTTP hooks in notification wrappers and tests

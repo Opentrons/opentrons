@@ -1,32 +1,37 @@
 import datetime
 import os
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
 import pytest
 from mock import MagicMock, call, patch
-from typing import List, Tuple, Dict, Any
+
 from opentrons import config
-from pathlib import Path
-from opentrons_shared_data.pipette import (
-    mutable_configurations,
-    pipette_load_name_conversions as pipette_load_name,
-)
-from opentrons.calibration_storage import helpers, types as CSTypes
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage import types as CSTypes
 from opentrons.calibration_storage.ot2 import models
-from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api import labware
-
+from opentrons.types import Mount, Point
 from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+)
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 
-from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command_definitions import CalibrationCommand
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetCalibrationState as POCState,
+)
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetWithTipLengthCalibrationState as POWTState,
+)
 from robot_server.robot.calibration.pipette_offset.user_flow import (
     PipetteOffsetCalibrationUserFlow,
 )
-from robot_server.robot.calibration.pipette_offset.constants import (
-    PipetteOffsetCalibrationState as POCState,
-    PipetteOffsetWithTipLengthCalibrationState as POWTState,
-)
-
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.models.command_definitions import CalibrationCommand
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 

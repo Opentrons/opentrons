@@ -5,72 +5,71 @@ Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
 
-import pytest
-from math import isclose
-from pytest_lazy_fixtures import lf as lazy_fixture
-
 from contextlib import nullcontext as does_not_raise
+from math import isclose
 from typing import (
+    Any,
     ContextManager,
     Dict,
+    List,
     NamedTuple,
     Optional,
+    Set,
     Type,
     Union,
-    Any,
-    List,
-    Set,
     cast,
 )
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+import pytest
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType, Point
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    LoadedModule,
-    DeckSlotLocation,
-    ModuleDefinition,
-    ModuleModel,
-    LabwareOffsetVector,
-    DeckType,
-    ModuleOffsetData,
-    HeaterShakerLatchStatus,
-    AddressableArea,
-    DeckConfigurationType,
-    PotentialCutoutFixture,
-)
-from opentrons.protocol_engine.state.modules import (
-    ModuleView,
-    ModuleState,
-    HardwareModule,
-)
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
-)
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
+from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
+)
 from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-    MagneticModuleSubState,
-    MagneticModuleId,
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
     FlexStackerId,
     FlexStackerSubState,
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
     ModuleSubStateType,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
 )
-from opentrons_shared_data.deck import load as load_deck
+from opentrons.protocol_engine.state.modules import (
+    HardwareModule,
+    ModuleState,
+    ModuleView,
+)
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    LabwareOffsetVector,
+    LoadedModule,
+    ModuleDefinition,
+    ModuleModel,
+    ModuleOffsetData,
+    PotentialCutoutFixture,
+)
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
-from opentrons.protocol_engine.resources import deck_configuration_provider
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
+from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture(scope="session")
@@ -1694,6 +1693,31 @@ def test_thermocycler_validate_target_lid_temperature(
     result = subject.validate_target_lid_temperature(input_temperature)
 
     assert result == input_temperature
+
+
+def test_thermocycler_validate_ramp_rate(
+    module_view_with_thermocycler: ModuleView,
+) -> None:
+    """It should return a valid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    # Make sure we pass before any block temp is set.
+
+    result = subject.validate_ramp_rate(ramp_rate=1.0, target_temp=100)
+    assert result == 1.0
+
+    # exceeding the max while heating.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=5.0, target_temp=100)
+
+    # exceeding the max while cooling.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=3.6, target_temp=0)
+
+    # must be positive.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=-0.1, target_temp=0)
 
 
 @pytest.mark.parametrize("input_temperature", [36.999, 110.001])

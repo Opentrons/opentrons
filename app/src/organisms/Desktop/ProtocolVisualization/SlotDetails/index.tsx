@@ -1,45 +1,74 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getFullStackFromLabwares } from '@opentrons/step-generation'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getFullStackFromLabwares,
+  HOPPER_FAKE_LOCATIONS,
+} from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
+import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
-import { TipDisposalContainer } from '../TipDisposalContainer'
 import styles from './slotdetails.module.css'
 
 import type {
   Liquid,
+  LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import type {
+  HopperLocationMapKey,
+  InvariantContext,
+  RobotState,
+} from '@opentrons/step-generation'
+import type { LabwareEntityExtended } from '../DeckView'
 
 interface SlotDetailsProps {
   slotId: string
-  command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
 export function SlotDetails(props: SlotDetailsProps): JSX.Element {
-  const { slotId, command, robotState, invariantContext, analysis, liquids } =
-    props
+  const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
     trashBinEntities,
     wasteChuteEntities,
     moduleEntities,
-    pipetteEntities,
   } = invariantContext
   const { commands } = analysis
-  const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
-  const moduleOnSlot = Object.entries(modules).find(
-    ([id, module]) => module.slot === slotId
+  const loadLabwareCommands = commands.filter(
+    command => command.commandType === 'loadLabware'
   )
+  const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
+  const isHopperSlot = HOPPER_FAKE_LOCATIONS.includes(slotId)
+  const mappedSlot = isHopperSlot
+    ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
+    : slotId
+  const moduleOnSlot = Object.entries(modules).find(
+    ([id, module]) => module.slot === mappedSlot
+  )
+  const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
+    (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
+      const matchingCommand =
+        loadLabwareCommands.find(
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.result?.labwareId === entity.id
+        ) ?? null
+      acc[key] = {
+        ...entity,
+        nickName: matchingCommand?.params?.displayName ?? null,
+      }
+      return acc
+    },
+    {}
+  )
+
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
   const isTopmostLabwareATiprack =
@@ -48,14 +77,21 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const isTrashOnSlot =
     Object.values(trashBinEntities).some(
       trash => trash.location.split('cutout')[1] === slotId
-    ) ||
-    Object.values(wasteChuteEntities).some(
-      trash => trash.location.split('cutout')[1] === slotId
-    ) ||
-    slotId === 'fixedTrash'
+    ) || slotId === 'fixedTrash'
+  const isWasteChuteOnSlot = Object.values(wasteChuteEntities).some(
+    wasteChute => wasteChute.location.split('cutout')[1] === slotId
+  )
+
+  let disposalType: 'wasteChute' | 'trash' | null = null
+
+  if (isWasteChuteOnSlot) {
+    disposalType = 'wasteChute'
+  } else if (isTrashOnSlot) {
+    disposalType = 'trash'
+  }
 
   const isSlotEmpty =
-    moduleOnSlot == null && topMostLabwareOnSlot == null && !isTrashOnSlot
+    moduleOnSlot == null && topMostLabwareOnSlot == null && disposalType == null
 
   const getLabwareType = (): 'tiprack' | 'labware' | null => {
     if (topMostLabwareOnSlot == null) {
@@ -76,7 +112,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
       case 'tiprack':
         return (
           <TipPickupSlot
-            tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
+            tiprackEntity={labwareEntitiesExtended[topMostLabwareOnSlot]}
             robotState={robotState}
           />
         )
@@ -86,10 +122,8 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             topLabwareOnSlotId={topMostLabwareOnSlot}
             labwareEntities={labwareEntities}
             commands={commands}
-            currentCommand={command}
             liquids={liquids}
             robotState={robotState}
-            pipetteEntities={pipetteEntities}
             moduleEntities={moduleEntities}
           />
         )
@@ -108,14 +142,18 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
       <div className={styles.slot_container}>
         <div className={styles.slot_details}>
           {renderLabwareContent()}
-          {isTrashOnSlot ? (
-            <TipDisposalContainer robotState={robotState} />
+          {disposalType != null ? (
+            <TipDisposalSlot
+              robotState={robotState}
+              disposalType={disposalType}
+            />
           ) : null}
           {moduleOnSlot != null ? (
             <ModuleContainer
               moduleId={moduleOnSlot[0]}
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
+              slotId={mappedSlot}
             />
           ) : null}
         </div>

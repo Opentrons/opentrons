@@ -1,40 +1,38 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast, Tuple, Sequence
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import (
-    DeckSlotName,
-    StagingSlotName,
-    Location,
-    Mount,
-    Point,
-)
-from opentrons.util.broker import Broker
+from ..._liquid import Liquid, LiquidClass
+from ..._types import OffDeckType
+from ...disposal_locations import TrashBin, WasteChute
+from ...labware import Labware
+from ..labware import LabwareLoadParams
+from ..protocol import AbstractProtocol
+from . import legacy_module_core, module_geometry
+from .deck import Deck
+from .labware_offset_provider import AbstractLabwareOffsetProvider
+from .legacy_instrument_core import LegacyInstrumentCore
+from .legacy_labware_core import LegacyLabwareCore
+from .load_info import InstrumentLoadInfo, LabwareLoadInfo, LoadInfo, ModuleLoadInfo
+from .tasks import LegacyTaskCore
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
-
-from ...labware import Labware
-from ...disposal_locations import TrashBin, WasteChute
-from ..._liquid import Liquid, LiquidClass
-from ..._types import OffDeckType
-from ..protocol import AbstractProtocol
-from ..labware import LabwareLoadParams
-
-from . import legacy_module_core, module_geometry
-from .deck import Deck
-from .legacy_instrument_core import LegacyInstrumentCore
-from .labware_offset_provider import AbstractLabwareOffsetProvider
-from .legacy_labware_core import LegacyLabwareCore
-from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
-from .tasks import LegacyTaskCore
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError, AxisMaxSpeeds
+from opentrons.types import (
+    DeckSlotName,
+    Location,
+    Mount,
+    Point,
+    StagingSlotName,
+)
+from opentrons.util.broker import Broker
 
 logger = logging.getLogger(__name__)
 
@@ -625,6 +623,16 @@ class LegacyProtocolCore(
     ) -> None:
         "Capture an image using a camera."
         assert False, "capture_image only supported on engine core"
+
+    def start_step_grouping(
+        self, annotation_name: str, annotation_description: Optional[str]
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+        assert False, "start_step_grouping only supported on engine core"
+
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
+        assert False, "close_command_annotation only supported on engine core"
 
     def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
         """Wait for list of tasks to complete before executing subsequent commands."""

@@ -1,59 +1,61 @@
 """Tests for the /protocols router."""
 
 import io
-
-import pytest
 from datetime import datetime
-from decoy import Decoy, matchers
-from fastapi import HTTPException, UploadFile
 from pathlib import Path
 
+import pytest
+from decoy import Decoy, matchers
+from fastapi import HTTPException, UploadFile
+
 from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    NumberParameter,
     CSVParameter,
     CSVRuntimeParamPaths,
     FileInfo,
+    NumberParameter,
+    PrimitiveRunTimeParamValuesType,
 )
-from opentrons.protocols.api_support.types import APIVersion
-
 from opentrons.protocol_reader import (
-    FileReaderWriter,
+    BufferedFile,
     FileHasher,
+    FileReaderWriter,
+    JsonProtocolConfig,
+    ProtocolFileRole,
+    ProtocolFilesInvalidError,
     ProtocolReader,
     ProtocolSource,
     ProtocolSourceFile,
-    ProtocolFileRole,
-    JsonProtocolConfig,
     PythonProtocolConfig,
-    ProtocolFilesInvalidError,
-    BufferedFile,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    SimpleEmptyBody,
 )
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.analyses_manager import AnalysesManager
-from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
-from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta, RequestModel
-from robot_server.protocols.analysis_store import (
-    AnalysisStore,
-    AnalysisNotFoundError,
-    AnalysisIsPendingError,
-)
-from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.analysis_models import (
+    AnalysisRequest,
+    AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
     CompletedAnalysis,
     PendingAnalysis,
-    AnalysisResult,
-    AnalysisRequest,
 )
-
+from robot_server.protocols.analysis_store import (
+    AnalysisIsPendingError,
+    AnalysisNotFoundError,
+    AnalysisStore,
+)
+from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.protocol_models import (
     Metadata,
     Protocol,
@@ -62,24 +64,23 @@ from robot_server.protocols.protocol_models import (
     ProtocolType,
 )
 from robot_server.protocols.protocol_store import (
-    ProtocolStore,
-    ProtocolResource,
     ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
     ProtocolUsedByRunError,
 )
-
 from robot_server.protocols.router import (
     ProtocolLinks,
     create_protocol,
     create_protocol_analysis,
-    get_protocols,
-    get_protocol_ids,
-    get_protocol_by_id,
     delete_protocol_by_id,
     get_protocol_analyses,
-    get_protocol_analysis_by_id,
     get_protocol_analysis_as_document,
+    get_protocol_analysis_by_id,
+    get_protocol_by_id,
     get_protocol_data_files,
+    get_protocol_ids,
+    get_protocols,
 )
 
 
@@ -1459,7 +1460,7 @@ async def test_delete_protocol_not_found(
     """It should 404 if the protocol to delete is not found."""
     not_found_error = ProtocolNotFoundError("protocol-id")
 
-    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(
+    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(  # type: ignore[func-returns-value]
         not_found_error
     )
 
@@ -1476,7 +1477,7 @@ async def test_delete_protocol_run_exists(
     """It should 404 if the protocol to delete is not found."""
     run_exists_error = ProtocolUsedByRunError("protocol-id")
 
-    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(
+    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(  # type: ignore[func-returns-value]
         run_exists_error
     )
 

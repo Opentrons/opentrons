@@ -1,117 +1,118 @@
 """Geometry state getters."""
 
-from logging import getLogger
 import enum
-from numpy import array, dot, double as npdouble
-from numpy.typing import NDArray
-from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
 from dataclasses import dataclass
 from functools import cached_property
+from logging import getLogger
+from typing import Dict, List, Optional, Set, Tuple, TypeVar, Union, cast
 
-from opentrons.types import (
-    Point,
-    DeckSlotName,
-    StagingSlotName,
-    MountType,
-    MeniscusTrackingTarget,
-)
+from numpy import array, dot
+from numpy import double as npdouble
+from numpy.typing import NDArray
 
+from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.errors.exceptions import (
     InvalidStoredData,
     PipetteLiquidNotFoundError,
 )
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
+    InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
-    InnerWellGeometry,
 )
-from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
 
 from .. import errors
 from ..errors import (
+    InvalidLabwarePositionError,
+    LabwareMovementNotAllowedError,
     LabwareNotLoadedError,
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
-    LabwareMovementNotAllowedError,
-    InvalidLabwarePositionError,
     LabwareNotOnDeckError,
 )
 from ..errors.exceptions import (
     InvalidLiquidHeightFound,
 )
 from ..resources import (
-    fixture_validation,
     deck_configuration_provider,
+    fixture_validation,
 )
 from ..types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
-    LoadedLabware,
-    LoadedModule,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    DropTipWellLocation,
-    PickUpTipWellLocation,
-    WellOrigin,
-    DropTipWellOrigin,
-    WellOffset,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    ModuleOffsetData,
-    CurrentWell,
-    CurrentPipetteLocation,
-    TipGeometry,
-    InStackerHopperLocation,
     WASTE_CHUTE_LOCATION,
     AccessibleByGripperLocation,
-    OnDeckLabwareLocation,
+    AddressableArea,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    StagingSlotLocation,
-    LabwareOffsetLocationSequence,
-    OnModuleOffsetLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnLabwareLocationSequenceComponent,
-    ModuleModel,
-    PotentialCutoutFixture,
-    LabwareLocationSequence,
-    OnModuleLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
-    OnCutoutFixtureLocationSequenceComponent,
-    NotOnDeckLocationSequenceComponent,
     AreaType,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    GripperMoveType,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareLocationSequence,
+    LabwareOffsetLocationSequence,
+    LiquidHandlingWellLocation,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+    ModuleModel,
+    ModuleOffsetData,
+    NotOnDeckLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    OnDeckLabwareLocation,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    PickUpTipWellLocation,
+    PotentialCutoutFixture,
+    StagingSlotLocation,
+    TipGeometry,
+    WellLocation,
+    WellLocationFunction,
+    WellLocationType,
+    WellOffset,
+    WellOrigin,
     labware_location_is_off_deck,
     labware_location_is_system,
-    WellLocationType,
-    WellLocationFunction,
-    GripperMoveType,
-    AddressableArea,
 )
-from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
-from .config import Config
-from .labware import LabwareView
-from .wells import WellView
-from .modules import ModuleView
-from .pipettes import PipetteView
+from ..types.liquid_level_detection import LiquidTrackingType, SimulatedProbeResult
+from ._well_math import nozzles_per_well, wells_covered_by_pipette_configuration
 from .addressable_areas import AddressableAreaView
+from .config import Config
 from .inner_well_math_utils import (
     find_height_inner_well_geometry,
-    find_volume_inner_well_geometry,
     find_height_user_defined_volumes,
+    find_volume_inner_well_geometry,
     find_volume_user_defined_volumes,
 )
-from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
+from .labware import LabwareView
 from .labware_origin_math.stackup_origin_to_labware_origin import (
-    get_stackup_origin_to_labware_origin,
     LabwareOriginContext,
     LabwareStackupAncestorDefinition,
+    get_stackup_origin_to_labware_origin,
+)
+from .modules import ModuleView
+from .pipettes import PipetteView
+from .wells import WellView
+from opentrons.types import (
+    DeckSlotName,
+    MeniscusTrackingTarget,
+    MountType,
+    Point,
+    StagingSlotName,
 )
 
 _LOG = getLogger(__name__)
@@ -772,20 +773,26 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
-        partially_configured: bool = False,
+        api_version_allows_partial_return_tip: bool = True,
         override_default_offset: float | None = None,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
+
+        In API levels before 2.28, we did not support dropping tips in a tip rack
+        while in a partial configuration. The boolean variable `api_version_allows_partial_return_tip`
+        will be set to False if called by a protocol API layer and the API level is both below
+        v2.28 and the pipette is partially configured.
         """
         if (
-            self._labware.get_definition(labware_id).parameters.isTiprack
-            and partially_configured
+            not api_version_allows_partial_return_tip
+            and self._labware.get_definition(labware_id).parameters.isTiprack
         ):
             raise errors.UnexpectedProtocolError(
-                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+                "Cannot return tip to a tip rack while the pipette is"
+                " configured for partial tip before API version 2.28."
             )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
@@ -1888,6 +1895,7 @@ class GeometryView:
         #   position of the liquid or doing dynamic tracking, return the initial height
         if (
             well_location.origin == WellOrigin.MENISCUS
+            and hasattr(well_location, "volumeOffset")
             and not well_location.volumeOffset
         ):
             return initial_handling_height

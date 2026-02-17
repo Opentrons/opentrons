@@ -3,25 +3,24 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.protocol_engine.errors import (
-    InvalidTargetTemperatureError,
-    InvalidBlockVolumeError,
-    InvalidRampRateError,
-    NoTargetTemperatureSetError,
-    InvalidHoldTimeError,
-)
-
 # TODO(mc, 2022-04-25): move to module definition
 # https://github.com/Opentrons/opentrons/issues/9800
 from opentrons.drivers.thermocycler.driver import (
-    BLOCK_TARGET_MIN,
     BLOCK_TARGET_MAX,
-    BLOCK_VOL_MIN,
+    BLOCK_TARGET_MIN,
     BLOCK_VOL_MAX,
-    LID_TARGET_MIN,
+    BLOCK_VOL_MIN,
     LID_TARGET_MAX,
+    LID_TARGET_MIN,
 )
 from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
+from opentrons.protocol_engine.errors import (
+    InvalidBlockVolumeError,
+    InvalidHoldTimeError,
+    InvalidRampRateError,
+    InvalidTargetTemperatureError,
+    NoTargetTemperatureSetError,
+)
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
 
@@ -167,7 +166,12 @@ class ThermocyclerModuleSubState:
         if ramp_rate is None:
             return ramp_rate
 
-        heating = target_temp > self.get_target_block_temperature()
+        if self.target_block_temperature:
+            heating = target_temp > self.get_target_block_temperature()
+        else:
+            # When we're simulating we don't load the TC from live data so there is no default
+            # target temperature.
+            heating = target_temp > 20
         if (heating and ramp_rate > MAX_HEATING_RATE) or (
             not heating and ramp_rate > MAX_COOLING_RATE
         ):

@@ -48,9 +48,6 @@ clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
 # Uvicorn command to run the robot server in dev mode.
 #
-# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
-# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
-#
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
 #   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
@@ -63,7 +60,7 @@ clean_all_cmd = $(clean_cmd) dist
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
+run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --reload --reload-dir robot_server
 
 .PHONY: all
 all: clean wheel
@@ -83,6 +80,10 @@ setup-ot2:
 	@$(uv_sync_dev)
 	@$(UV) pip uninstall python-can
 	@$(UV) pip list
+
+.PHONY: lock
+lock:
+	$(UV) lock
 
 .PHONY: clean
 clean:
@@ -107,9 +108,13 @@ wheel: $(ot_sources)
 test:
 	$(pytest) $(tests) $(test_opts)
 
-.PHONY: test-cov
-test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+.PHONY: test-unit-cov
+test-unit-cov:
+	$(pytest) $(tests) $(test_opts) -m 'not integration' $(cov_opts)
+
+.PHONY: test-integration-cov
+test-integration-cov:
+	$(pytest) tests/integration $(test_opts) $(cov_opts)
 
 .PHONY: test-fast
 test-fast:
@@ -118,11 +123,12 @@ test-fast:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
-	$(ruff) check $(ruff_opts) .
+	$(ruff) check .
 
 .PHONY: format
 format:
-	$(ruff) format $(ruff_opts) .
+	$(ruff) format .
+	$(ruff) check --select I --fix .
 
 .PHONY: _dev
 _dev:

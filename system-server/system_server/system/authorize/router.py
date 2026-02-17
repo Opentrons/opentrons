@@ -1,28 +1,41 @@
 """Router for all /system/ endpoints."""
 
-from fastapi import APIRouter, Depends, status, Response, Query
-from uuid import UUID
+from textwrap import dedent
 from typing import List, Optional
+from uuid import UUID
 
-from system_server.persistence import get_persistent_uuid, get_authorization_tracker
-from system_server.service.check_jwt_headers import (
-    check_registration_token_header,
-    get_registration_token_header,
-    check_authorization_token_header,
-    get_authorization_token_header,
-)
-from system_server.connection import AuthorizationTracker
-from system_server.jwt import registrant_from_jwt, expiration_from_jwt
-from .models import PostAuthorizeResponse
+from fastapi import APIRouter, Depends, Query, Response, status
+
 from .authorization import authorize_token
-
+from .models import PostAuthorizeResponse
+from system_server.connection import AuthorizationTracker
+from system_server.jwt import expiration_from_jwt, registrant_from_jwt
+from system_server.persistence import get_authorization_tracker, get_persistent_uuid
+from system_server.service.check_jwt_headers import (
+    check_authorization_token_header,
+    check_registration_token_header,
+    get_authorization_token_header,
+    get_registration_token_header,
+)
 
 authorize_router = APIRouter()
 
 
 @authorize_router.post(
     "/system/authorize",
-    summary="Obtain an authorization token for this session.",
+    deprecated=True,
+    summary="Obtain an authorization token for this session",
+    description=dedent(
+        """\
+        This was part of an experimental set of endpoints for authorization.
+        It's kept for compatibility reasons. Do not use it in new code.
+        Use the `/auth` endpoints instead.
+
+        Given a valid registration token from `/system/register`,
+        this returns a new authorization token, which is not used for anything.
+        It also adds an entry to `/system/connected`.
+        """
+    ),
     response_model=PostAuthorizeResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(check_registration_token_header)],
@@ -44,7 +57,8 @@ async def authorize(
 
 @authorize_router.get(
     "/system/authorize",
-    summary="Verify an authorization token.",
+    deprecated=True,
+    summary="Verify an authorization token",
     dependencies=[Depends(check_authorization_token_header)],
     responses={
         status.HTTP_200_OK: {

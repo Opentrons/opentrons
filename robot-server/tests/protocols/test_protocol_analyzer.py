@@ -1,40 +1,44 @@
 """Tests for the ProtocolAnalyzer."""
 
-import pytest
-from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.pipette.types import PipetteNameType
+import pytest
+from decoy import Decoy
 
-from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import (
-    StateSummary,
-    EngineStatus,
-    commands as pe_commands,
-    errors as pe_errors,
-    types as pe_types,
-)
 import opentrons.protocol_runner as protocol_runner
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
+import opentrons.util.helpers as datetime_helper
+from opentrons.protocol_engine import (
+    EngineStatus,
+    StateSummary,
+)
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
 from opentrons.protocol_reader import (
-    ProtocolSource,
     JsonProtocolConfig,
+    ProtocolSource,
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, MountType
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
-import opentrons.util.helpers as datetime_helper
-
+import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
-import robot_server.errors.error_mappers as em
-
-from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 
 
 @pytest.fixture(autouse=True)
@@ -166,7 +170,9 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    command_annotation = pe_types.CustomCommandAnnotationLegacy(
+        commandKeys=["abc", "xyz"]
+    )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)

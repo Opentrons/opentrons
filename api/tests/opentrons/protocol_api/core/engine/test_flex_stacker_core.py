@@ -14,22 +14,21 @@ from opentrons.hardware_control.modules import FlexStacker
 from opentrons.hardware_control.modules.types import (
     ModuleType,
 )
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import (
-    OverlapOffset,
-    StackerStoredLabwareGroup,
-    StackerFillEmptyStrategy,
-)
-from opentrons.protocol_api.core.engine.module_core import FlexStackerCore
-from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.engine import load_labware_params
 from opentrons.protocol_api.core.engine.labware import LabwareCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
+from opentrons.protocol_api.core.engine.module_core import FlexStackerCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
 )
-
+from opentrons.protocol_engine.types import (
+    OverlapOffset,
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
+)
 
 SyncFlexStackerHardware = SynchronousAdapter[FlexStacker]
 
@@ -49,7 +48,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncFlexStackerHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture(autouse=True)
@@ -163,7 +164,8 @@ def test_set_stored_labware_all_elements(
                     version=20,
                 ),
                 poolOverlapOverride=2.0,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -209,7 +211,8 @@ def test_set_stored_labware_only_checks_load_name_for_lid_and_adapter_valid(
                 ),
                 lidLabware=None,
                 adapterLabware=None,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -548,7 +551,8 @@ def test_set_stored_labware_items_happypath_primary_only(
                 ),
                 adapterLabware=None,
                 lidLabware=None,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -596,7 +600,8 @@ def test_set_stored_labware_items_happypath_no_adapter(
                 lidLabware=cmd.flex_stacker.StackerStoredLabwareDetails(
                     loadName="lid-loadname", namespace="lid-namespace", version=1
                 ),
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -646,7 +651,8 @@ def test_set_stored_labware_items_happypath_no_lid(
                     version=1,
                 ),
                 lidLabware=None,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -704,7 +710,8 @@ def test_set_stored_labware_items_happypath_all_elements(
                 lidLabware=cmd.flex_stacker.StackerStoredLabwareDetails(
                     loadName="lid-loadname", namespace="lid-namespace", version=1
                 ),
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -753,6 +760,7 @@ def test_fill_items_happypath(
                     for idx in range(5)
                 ],
                 message="hello",
-            )
+            ),
+            command_annotations=[],
         )
     )

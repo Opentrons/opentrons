@@ -2,14 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getBatchEditFormHasUnsavedChanges,
-  getBonusStepModalType,
   getEquippedPipetteOptions,
   getNextUserVisibleStepNumber,
   getUserVisibleStepNumbers,
 } from '../selectors'
 
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
-import type { FormData } from '../../form-types'
 
 vi.mock('../../steplist/fieldLevel')
 vi.mock('../utils/getProfileItemsHaveErrors')
@@ -99,87 +97,6 @@ describe('getBatchEditFormHasUnsavedChanges', () => {
   })
   it('should return false if there are no unsaved changes ', () => {
     expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
-  })
-})
-
-describe('getBonusStepModalType', () => {
-  it('should handle temperature module set temp form', () => {
-    const formData: FormData = {
-      id: 'step_123',
-      stepType: 'temperature',
-      targetTemperature: 33,
-    }
-    const mockIsPresaved = true
-
-    const resultWithoutConcurrentModuleActions =
-      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
-    expect(resultWithoutConcurrentModuleActions).toEqual(
-      'optionallyWaitForTemp'
-    )
-
-    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
-      formData,
-      mockIsPresaved,
-      true
-    )
-    expect(resultWithConcurrentModuleActions).toEqual(
-      'explainWaitForTemperatureModuleTemp'
-    )
-  })
-  it('should handle heater shaker set temp form', () => {
-    const formData: FormData = {
-      id: 'step_123',
-      stepType: 'heaterShaker',
-      targetHeaterShakerTemperature: '10',
-    }
-    const mockIsPresaved = true
-
-    const resultWithoutConcurrentModuleActions =
-      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
-    expect(resultWithoutConcurrentModuleActions).toEqual(
-      'optionallyWaitForTemp'
-    )
-
-    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
-      formData,
-      mockIsPresaved,
-      true
-    )
-    expect(resultWithConcurrentModuleActions).toEqual(
-      'explainWaitForHeaterShakerTemp'
-    )
-  })
-  it('should handle thermocycler profile form', () => {
-    const formData: FormData = {
-      id: 'step_123',
-      stepType: 'thermocycler',
-      thermocyclerFormType: 'thermocyclerProfile',
-    }
-    const mockIsPresaved = true
-
-    const resultWithoutConcurrentModuleActions =
-      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
-    expect(resultWithoutConcurrentModuleActions).toEqual(null)
-
-    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
-      formData,
-      mockIsPresaved,
-      true
-    )
-    expect(resultWithConcurrentModuleActions).toEqual(
-      'explainWaitForThermocyclerProfile'
-    )
-  })
-  it('should return null when formData is null', () => {
-    const formData: FormData | null = null
-    const mockIsPresaved = true
-    const mockEnableConcurrentModuleActions = false
-    const result = getBonusStepModalType.resultFunc(
-      formData,
-      mockIsPresaved,
-      mockEnableConcurrentModuleActions
-    )
-    expect(result).toEqual(null)
   })
 })
 

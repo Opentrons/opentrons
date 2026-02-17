@@ -184,6 +184,13 @@ function startUp(): void {
 
   initializeMenu()
 
+  ipcMain.on('secondary-window:close-self', event => {
+    const senderWindow = BrowserWindow.fromWebContents(event.sender)
+    if (senderWindow != null && !senderWindow.isDestroyed()) {
+      senderWindow.close()
+    }
+  })
+
   ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })
 

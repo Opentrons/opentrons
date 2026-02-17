@@ -29,6 +29,7 @@ import {
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
 import type { ModuleEntity } from '@opentrons/step-generation'
+import type { SaveStepFormAction } from '/protocol-designer/ui/steps/actions/thunks'
 import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
@@ -73,37 +74,246 @@ afterEach(() => {
 })
 describe('orderedStepIds reducer', () => {
   it('should add a saved step when that step is new', () => {
-    const state = ['99']
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: {
-        id: '123',
-        stepType: 'moveLiquid',
+    const state: Partial<RootState> = {
+      orderedStepIds: ['99'],
+      savedStepForms: {
+        '99': {
+          id: '99',
+          stepType: 'moveLiquid',
+        },
       },
     }
-    expect(orderedStepIds(state, action)).toEqual(['99', '123'])
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+      },
+    }
+    expect(orderedStepIds(state as RootState, action)).toEqual(['99', '123'])
   })
   it('should not update when an existing step is saved', () => {
-    const state = ['99', '123', '11']
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: {
-        id: '123',
-        stepType: 'moveLiquid',
+    const state: Partial<RootState> = {
+      orderedStepIds: ['99', '123', '11'],
+      savedStepForms: {
+        '99': {
+          id: '99',
+          stepType: 'moveLiquid',
+        },
+        '123': {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        '11': {
+          id: '11',
+          stepType: 'moveLiquid',
+        },
       },
     }
-    expect(orderedStepIds(state, action)).toBe(state)
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+      },
+    }
+    expect(orderedStepIds(state as RootState, action)).toBe(
+      state.orderedStepIds
+    )
+  })
+  it('should also add a pause step when a new thermocycler profile step is created', () => {
+    const state: Partial<RootState> = {
+      orderedStepIds: ['id-1'],
+      savedStepForms: {
+        'id-1': {
+          id: 'id-1',
+          stepType: 'moveLiquid',
+        },
+      },
+    }
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: 'id-2',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerProfile',
+          moduleId: 'thermocyclerModuleId',
+        },
+        thermocyclerPauseStepId: 'id-3',
+      },
+    }
+    const expectedOrder = ['id-1', 'id-2', 'id-3']
+    expect(orderedStepIds(state as RootState, action)).toEqual(expectedOrder)
+  })
+  it('should create a pause step when a non-TC-profile step is edited to become a TC profile step', () => {
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3'],
+      savedStepForms: {
+        '1': {
+          id: '1',
+          stepType: 'moveLiquid',
+        },
+        '2': {
+          id: '2',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerState',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '3': {
+          id: '3',
+          stepType: 'moveLiquid',
+        },
+      },
+    }
+
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '2',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerProfile',
+          moduleId: 'thermocyclerModuleId',
+        },
+        thermocyclerPauseStepId: 'pause-for-2',
+      },
+    }
+
+    expect(orderedStepIds(state as RootState, action)).toEqual([
+      '1',
+      '2',
+      'pause-for-2',
+      '3',
+    ])
+  })
+  it('should handle a non-TC-profile, which is inside a TC profile, being edited to also become a TC profile', () => {
+    // Since we can't allow TC profiles to nest, the edited step should get moved
+    // so it's outside the profile that was enclosing it.
+    const state: Partial<RootState> = {
+      orderedStepIds: [
+        '1',
+        '2-begin-profile',
+        '3',
+        '4',
+        '5',
+        '6-pause-for-2',
+        '7',
+      ],
+      savedStepForms: {
+        '1': { id: '1', stepType: 'moveLiquid' },
+        '2-begin-profile': {
+          id: '2-begin-profile',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerProfile',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '3': { id: '3', stepType: 'moveLiquid' },
+        '4': {
+          id: '4',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerState',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '5': { id: '5', stepType: 'moveLiquid' },
+        '6-pause-for-2': {
+          id: '6-pause-for-2',
+          stepType: 'pause',
+          pauseAction: 'untilThermocyclerProfileComplete',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '7': { id: '7', stepType: 'moveLiquid' },
+      },
+    }
+
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '4',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerProfile',
+          moduleId: 'thermocyclerModuleId',
+        },
+        thermocyclerPauseStepId: 'pause-for-4',
+      },
+    }
+
+    expect(orderedStepIds(state as RootState, action)).toEqual([
+      '1',
+      '2-begin-profile',
+      '3',
+      '5',
+      '6-pause-for-2',
+      '4',
+      'pause-for-4',
+      '7', // Non-TC step
+    ])
+  })
+  it('should delete the paired pause step when a TC profile step is edited to become a non-TC-profile step', () => {
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3', 'pause-for-2', '4'],
+      savedStepForms: {
+        '1': { id: '1', stepType: 'moveLiquid' },
+        '2': {
+          id: '2',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerProfile',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '3': { id: '3', stepType: 'moveLiquid' },
+        'pause-for-2': {
+          id: 'pause-for-2',
+          stepType: 'pause',
+          pauseAction: 'untilThermocyclerProfileComplete',
+          moduleId: 'thermocyclerModuleId',
+        },
+        '4': { id: '4', stepType: 'moveLiquid' },
+      },
+    }
+
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '2',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerState',
+          moduleId: 'thermocyclerModuleId',
+        },
+        thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+      },
+    }
+
+    expect(orderedStepIds(state as RootState, action)).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+    ])
   })
   it('should remove multiple saved steps when multiple steps are deleted', () => {
-    const state = ['1', '2', '3']
-    const action = {
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3'],
+      savedStepForms: {},
+    }
+    const action: DeleteMultipleStepsAction = {
       type: 'DELETE_MULTIPLE_STEPS',
       payload: ['1', '3'],
     }
-    expect(orderedStepIds(state, action)).toEqual(['2'])
+    expect(orderedStepIds(state as RootState, action)).toEqual(['2'])
   })
   it('should set the new step order when steps are duplicated', () => {
-    const state = ['1', '2', '3']
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3'],
+      savedStepForms: {},
+    }
     const action: DuplicateSelectedStepsAction = {
       type: 'DUPLICATE_SELECTED_STEPS',
       payload: {
@@ -116,85 +326,12 @@ describe('orderedStepIds reducer', () => {
         newStepOrder: ['1', 'dup_1', '2', '3'],
       },
     }
-    expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
-  })
-  describe('reorder steps', () => {
-    const state = ['1', '2', '3', '4']
-    const testCases = [
-      {
-        label: '+1 to first',
-        payload: {
-          delta: 1,
-          stepId: '1',
-        },
-        expected: ['2', '1', '3', '4'],
-      },
-      {
-        label: '+0 to first: no change',
-        payload: {
-          delta: 0,
-          stepId: '1',
-        },
-        expected: state,
-      },
-      {
-        label: '-1 to first: no change',
-        payload: {
-          delta: -1,
-          stepId: '1',
-        },
-        expected: state,
-      },
-      {
-        label: '-10 to first: no change',
-        payload: {
-          delta: -10,
-          stepId: '1',
-        },
-        expected: state,
-      },
-      {
-        label: '-1 to second',
-        payload: {
-          delta: -1,
-          stepId: '2',
-        },
-        expected: ['2', '1', '3', '4'],
-      },
-      {
-        label: '-10 to second',
-        payload: {
-          delta: -10,
-          stepId: '2',
-        },
-        expected: ['2', '1', '3', '4'],
-      },
-      {
-        label: '+1 to last: no change',
-        payload: {
-          delta: 1,
-          stepId: '4',
-        },
-        expected: state,
-      },
-      {
-        label: '+10 to last: no change',
-        payload: {
-          delta: 10,
-          stepId: '4',
-        },
-        expected: state,
-      },
-    ]
-    testCases.forEach(({ label, payload, expected }) => {
-      it(label, () => {
-        const action = {
-          type: 'REORDER_SELECTED_STEP',
-          payload,
-        }
-        expect(orderedStepIds(state, action)).toEqual(expected)
-      })
-    })
+    expect(orderedStepIds(state as RootState, action)).toEqual([
+      '1',
+      'dup_1',
+      '2',
+      '3',
+    ])
   })
 })
 describe('labwareInvariantProperties reducer', () => {
@@ -1273,6 +1410,173 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }
       expect(savedStepForms(prevState, action)).toEqual(
         expectedSavedStepFormState
+      )
+    })
+  })
+  describe('thermocycler profile pause step handling', () => {
+    it('should also add a pause step when a thermocycler profile step is created from scratch', () => {
+      const otherForm: FormData = {
+        id: 'otherFormId',
+        stepType: 'moveLiquid',
+      }
+      const tcProfileForm: FormData = {
+        id: 'tcProfileFormId',
+        stepType: 'thermocycler',
+        thermocyclerFormType: 'thermocyclerProfile',
+        moduleId: 'thermocyclerModuleId',
+      }
+      const state: Partial<RootState> = {
+        orderedStepIds: [otherForm.id],
+        savedStepForms: {
+          [otherForm.id]: otherForm,
+        },
+      }
+
+      const pauseStepFormId = 'pauseFormId'
+      const expectedPauseStepForm: FormData = {
+        id: pauseStepFormId,
+        stepType: 'pause',
+        stepName: 'pause',
+        stepDetails: '',
+        pauseAction: 'untilThermocyclerProfileComplete',
+        moduleId: tcProfileForm.moduleId,
+      }
+
+      const action: SaveStepFormAction = {
+        type: 'SAVE_STEP_FORM',
+        payload: {
+          form: tcProfileForm,
+          thermocyclerPauseStepId: pauseStepFormId,
+        },
+      }
+
+      const expectedSavedStepForms = {
+        [otherForm.id]: otherForm,
+        [tcProfileForm.id]: tcProfileForm,
+        [expectedPauseStepForm.id]: expectedPauseStepForm,
+      }
+
+      expect(savedStepForms(state as RootState, action)).toEqual(
+        expectedSavedStepForms
+      )
+    })
+    it('should create a pause step when a non-TC-profile step is edited to become a TC profile step', () => {
+      const form1: FormData = {
+        id: '1',
+        stepType: 'moveLiquid',
+      }
+      const form2ThermocyclerState: FormData = {
+        id: '2',
+        stepType: 'thermocycler',
+        thermocyclerFormType: 'thermocyclerState',
+        moduleId: 'thermocyclerModuleId',
+      }
+      const form3: FormData = {
+        id: '3',
+        stepType: 'moveLiquid',
+      }
+      const state: Partial<RootState> = {
+        orderedStepIds: [form1.id, form2ThermocyclerState.id, form3.id],
+        savedStepForms: {
+          [form1.id]: form1,
+          [form2ThermocyclerState.id]: form2ThermocyclerState,
+          [form3.id]: form3,
+        },
+      }
+
+      const form2ThermocyclerProfile: FormData = {
+        id: '2',
+        stepType: 'thermocycler',
+        thermocyclerFormType: 'thermocyclerProfile',
+        moduleId: 'thermocyclerModuleId',
+      }
+
+      const pauseFormId = 'pauseFormId'
+      const expectedPauseForm: FormData = {
+        id: pauseFormId,
+        stepType: 'pause',
+        stepName: 'pause',
+        stepDetails: '',
+        pauseAction: 'untilThermocyclerProfileComplete',
+        moduleId: 'thermocyclerModuleId',
+      }
+
+      const action: SaveStepFormAction = {
+        type: 'SAVE_STEP_FORM',
+        payload: {
+          form: form2ThermocyclerProfile,
+          thermocyclerPauseStepId: pauseFormId,
+        },
+      }
+
+      const expectedSavedStepForms = {
+        [form1.id]: form1,
+        [form2ThermocyclerProfile.id]: form2ThermocyclerProfile,
+        [expectedPauseForm.id]: expectedPauseForm,
+        [form3.id]: form3,
+      }
+
+      expect(savedStepForms(state as RootState, action)).toEqual(
+        expectedSavedStepForms
+      )
+    })
+    it('should delete the paired pause step when a TC profile step is edited to become a non-TC-profile step', () => {
+      const form1: FormData = { id: '1', stepType: 'moveLiquid' }
+      const form2ThermocyclerState: FormData = {
+        id: '2',
+        stepType: 'thermocycler',
+        thermocyclerFormType: 'thermocyclerState',
+        moduleId: 'thermocyclerModuleId',
+      }
+      const form2ThermocyclerProfile: FormData = {
+        id: '2',
+        stepType: 'thermocycler',
+        thermocyclerFormType: 'thermocyclerProfile',
+        moduleId: 'thermocyclerModuleId',
+      }
+      const pauseForm: FormData = {
+        id: 'pause-for-2',
+        stepType: 'pause',
+        pauseAction: 'untilThermocyclerProfileComplete',
+        moduleId: 'thermocyclerModuleId',
+      }
+      const form3: FormData = { id: '3', stepType: 'moveLiquid' }
+      const form4: FormData = { id: '4', stepType: 'moveLiquid' }
+
+      const state: Partial<RootState> = {
+        orderedStepIds: [
+          form1.id,
+          form2ThermocyclerProfile.id,
+          form3.id,
+          pauseForm.id,
+          form4.id,
+        ],
+        savedStepForms: {
+          [form1.id]: form1,
+          [form2ThermocyclerProfile.id]: form2ThermocyclerProfile,
+          [form3.id]: form3,
+          [pauseForm.id]: pauseForm,
+          [form4.id]: form4,
+        },
+      }
+
+      const action: SaveStepFormAction = {
+        type: 'SAVE_STEP_FORM',
+        payload: {
+          form: form2ThermocyclerState,
+          thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+        },
+      }
+
+      const expectedSavedStepForms = {
+        [form1.id]: form1,
+        [form2ThermocyclerState.id]: form2ThermocyclerState,
+        [form3.id]: form3,
+        [form4.id]: form4,
+      }
+
+      expect(savedStepForms(state as RootState, action)).toEqual(
+        expectedSavedStepForms
       )
     })
   })

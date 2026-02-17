@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { DIRTY, getDefaultPrimaryNozzle } from '@opentrons/step-generation'
+import { DIRTY } from '@opentrons/step-generation'
 
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -22,7 +22,10 @@ import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type {
   AccessibilityStatus,
   TipSelectionBannerReason,
@@ -36,6 +39,7 @@ interface TipSelectionWizardProps {
   setShowTipSelectionModal: Dispatch<SetStateAction<boolean>>
   pipetteId: string
   nozzles: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   numPickups: number
   tiprackSelected: string | null
   updateFormTiprackSelected: Dispatch<SetStateAction<string | null>>
@@ -62,6 +66,7 @@ export function TipSelectionWizard(
     setSelectedTips,
     validTiprackIds,
     tipAccessibilityStatus,
+    primaryNozzle,
   } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
@@ -81,11 +86,6 @@ export function TipSelectionWizard(
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
-
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels: pipetteSpecs.channels,
-  })
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -162,6 +162,7 @@ export function TipSelectionWizard(
     pipetteSpecs,
     nozzles,
     pipetteId,
+    primaryNozzle,
   }
 
   let currentComponent: JSX.Element
@@ -175,7 +176,6 @@ export function TipSelectionWizard(
       currentComponent = (
         <SelectTips
           {...baseProps}
-          primaryNozzle={primaryNozzle}
           selectedTips={selectedTips}
           setSelectedTips={setSelectedTips}
           setShowErrorBanner={setShowErrorBanner}

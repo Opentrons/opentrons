@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -12,10 +11,13 @@ import styles from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCa
 
 import type { JSX } from 'react'
 
-export function RobotSettingsCameraControls(): JSX.Element {
+export function RobotSettingsCameraControls({
+  disabled,
+}: {
+  disabled: boolean
+}): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -34,7 +36,7 @@ export function RobotSettingsCameraControls(): JSX.Element {
             {t('configure_camera_settings')}
           </StyledText>
         </div>
-        <TertiaryButton onClick={toggleControls}>
+        <TertiaryButton onClick={toggleControls} disabled={disabled}>
           <StyledText desktopStyle="captionSemiBold">
             {t('edit_settings')}
           </StyledText>
@@ -42,11 +44,7 @@ export function RobotSettingsCameraControls(): JSX.Element {
       </div>
       {showControls &&
         createPortal(
-          <CameraControls
-            onClose={toggleControls}
-            runId={null}
-            postCameraImageSettings={createCameraImageSettings}
-          />,
+          <CameraControls onClose={toggleControls} runId={null} />,
           getTopPortalEl()
         )}
     </div>

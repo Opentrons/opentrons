@@ -1,5 +1,5 @@
-from opentrons_shared_data.load import get_shared_data_root
 from opentrons_shared_data.command import known_schema_ids
+from opentrons_shared_data.load import get_shared_data_root
 
 
 def test_known_schema_ids() -> None:

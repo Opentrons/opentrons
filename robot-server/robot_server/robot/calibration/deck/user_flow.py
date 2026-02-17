@@ -15,63 +15,62 @@ from typing import (
 
 from opentrons.calibration_storage import (
     helpers,
-    types as cal_types,
 )
-
-from opentrons.calibration_storage.ot2.tip_length import (
-    load_tip_length_calibration,
+from opentrons.calibration_storage import (
+    types as cal_types,
 )
 from opentrons.calibration_storage.ot2.pipette_offset import (
     clear_pipette_offset_calibrations,
 )
-
-from opentrons.hardware_control import robot_calibration as robot_cal
+from opentrons.calibration_storage.ot2.tip_length import (
+    load_tip_length_calibration,
+)
 from opentrons.hardware_control import (
-    HardwareControlAPI,
-    OT2HardwareControlAPI,
     API,
     CriticalPoint,
+    HardwareControlAPI,
+    OT2HardwareControlAPI,
     Pipette,
 )
+from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons.types import Mount, Point, Location
+from opentrons.types import Location, Mount, Point
 from opentrons.util import linal
-
 from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
+import robot_server.robot.calibration.util as uf
+from ..errors import CalibrationError
+from ..helper_classes import AttachedPipette, RequiredLabware, SupportedCommands
+from .constants import (
+    MOVE_POINT_STATE_MAP,
+    SAVE_POINT_STATE_MAP,
+    TIP_RACK_SLOT,
+)
+from .constants import (
+    DeckCalibrationState as State,
+)
+from .dev_types import ExpectedPoints, SavedPoints
+from .state_machine import DeckCalibrationStateMachine
+from robot_server.robot.calibration.constants import (
+    JOG_TO_DECK_SLOT,
+    MOVE_TO_DECK_SAFETY_BUFFER,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+    POINT_ONE_ID,
+    POINT_THREE_ID,
+    POINT_TWO_ID,
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
+)
 from robot_server.service.errors import RobotServerError
-
 from robot_server.service.session.models.command_definitions import (
     CalibrationCommand,
     DeckCalibrationCommand,
 )
-from robot_server.robot.calibration.constants import (
-    MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
-    POINT_ONE_ID,
-    POINT_TWO_ID,
-    POINT_THREE_ID,
-    JOG_TO_DECK_SLOT,
-)
-import robot_server.robot.calibration.util as uf
-from .constants import (
-    DeckCalibrationState as State,
-    TIP_RACK_SLOT,
-    MOVE_POINT_STATE_MAP,
-    SAVE_POINT_STATE_MAP,
-)
-from .state_machine import DeckCalibrationStateMachine
-from .dev_types import SavedPoints, ExpectedPoints
-from ..errors import CalibrationError
-from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-
 
 MODULE_LOG = logging.getLogger(__name__)
 

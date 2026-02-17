@@ -16,10 +16,10 @@ from typing import Dict, Optional
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers import utils
-from opentrons.drivers.types import Temperature
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import SerialConnection, UnhandledGcode
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver
+from opentrons.drivers.types import Temperature
 
 log = logging.getLogger(__name__)
 

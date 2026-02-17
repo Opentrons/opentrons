@@ -1,10 +1,9 @@
-from typing import Any, List
 from math import trunc
-
-from opentrons.drivers import utils
-from opentrons.hardware_control.modules import ThermocyclerStep
+from typing import Any, List
 
 from . import types as command_types
+from opentrons.drivers import utils
+from opentrons.hardware_control.modules import ThermocyclerStep
 
 
 def magdeck_engage() -> command_types.MagdeckEngageCommand:

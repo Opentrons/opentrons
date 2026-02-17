@@ -64,6 +64,7 @@ describe('form casting', () => {
       pipette: {} as PipetteEntity,
       preWetTip: false,
       volume: 5,
+      primaryNozzle: 'A1',
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
       nozzles: null,
@@ -122,6 +123,7 @@ describe('form casting', () => {
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
+      primaryNozzle: 'A1',
       mix_position_reference: POSITION_REFERENCE_BOTTOM,
     }
 
@@ -227,18 +229,11 @@ describe('form casting', () => {
       profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,
       blockTargetTemp: 24,
       lidTargetTemp: 44,
-      blockTargetTempHold: 0,
-      lidTargetTempHold: 0,
     })
   })
 })

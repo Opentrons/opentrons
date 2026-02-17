@@ -1,5 +1,5 @@
-from typing_extensions import Protocol
 from aiohttp import web
+from typing_extensions import Protocol
 
 
 class Handler(Protocol):

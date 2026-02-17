@@ -2,13 +2,14 @@
 
 import asyncio
 import logging
-from typing import Dict, Tuple, Union, cast
 from datetime import datetime, timezone
-from opentrons.util.helpers import utc_now
-from opentrons.config import IS_ROBOT
+from typing import Dict, Tuple, Union
 
-from robot_server.system import errors
+from opentrons.config import IS_ROBOT
+from opentrons.util.helpers import utc_now
+
 from robot_server.service.errors import CommonErrorDef
+from robot_server.system import errors
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def _str_to_dict(res_str: str) -> Dict[str, Union[str, bool]]:
             except (ValueError, IndexError) as e:
                 log.error(f"Error converting timedatectl status line {line}:  {e}")
 
-    return cast(Dict[str, Union[str, bool]], res_dict)
+    return res_dict
 
 
 async def _time_status() -> Dict[str, Union[str, bool]]:

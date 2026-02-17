@@ -1,55 +1,57 @@
 """Unit tests for the deck_conflict module."""
 
-import pytest
-from typing import ContextManager, Any, NamedTuple, List, Tuple, Literal, cast
-from decoy import Decoy, matchers
 from contextlib import nullcontext as does_not_raise
+from typing import Any, ContextManager, List, Literal, NamedTuple, Tuple, cast
+
+import pytest
+from decoy import Decoy, matchers
+
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
+from ... import versions_at_or_above, versions_below
 from opentrons.hardware_control import CriticalPoint
-from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
+from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine import deck_conflict, pipette_movement_conflict
 from opentrons.protocol_api.disposal_locations import (
+    _TRASH_BIN_CUTOUT_FIXTURE,
     TrashBin,
     WasteChute,
-    _TRASH_BIN_CUTOUT_FIXTURE,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.engine import deck_conflict, pipette_movement_conflict
 from opentrons.protocol_engine import (
     Config,
     DeckSlotLocation,
     ModuleModel,
     StateView,
 )
-from opentrons.protocol_engine.state.geometry import _AbsoluteRobotExtents
-from opentrons.protocol_engine.state.pipettes import PipetteBoundingBoxOffsets
-
 from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
-from opentrons.types import (
-    DeckSlotName,
-    Point,
-    StagingSlotName,
-    MountType,
-    NozzleConfigurationType,
-)
-
+from opentrons.protocol_engine.state.geometry import _AbsoluteRobotExtents
+from opentrons.protocol_engine.state.pipettes import PipetteBoundingBoxOffsets
 from opentrons.protocol_engine.types import (
     DeckType,
+    Dimensions,
+    DropTipWellLocation,
     LoadedLabware,
     LoadedModule,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
     OnDeckLabwareLocation,
     OnLabwareLocation,
-    Dimensions,
     StagingSlotLocation,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import (
+    DeckSlotName,
+    MountType,
+    NozzleConfigurationType,
+    Point,
+    StagingSlotName,
 )
 
 
@@ -463,7 +465,9 @@ def _provide_item_in_state(
         module_id = f"module-id-{_mod_index}"
         _mod_index += 1
         decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
-            item_type
+            # this type ignore makes up for a narrowing failure - mypy thinks item_type can
+            # still be one of the literals
+            item_type  # type: ignore[arg-type]
         )
         decoy.when(mock_state_view.modules.get_location(module_id)).then_return(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
@@ -614,7 +618,7 @@ def test_maps_allows_stacker_labware_double_occupancy(
             new_location=matchers.Anything(),
             robot_type=matchers.Anything(),
         )
-    ).then_return(None)
+    ).then_return(True)
     setup_a = {k: [i for i in v] for k, v in occupancy_check_state_setup1.items()}
     for k, v in occupancy_check_state_setup2.items():
         setup_a[k].extend(v)
@@ -767,6 +771,7 @@ module = LoadedModule(
 def test_deck_conflict_raises_for_bad_pipette_move(
     decoy: Decoy,
     mock_state_view: StateView,
+    api_version: APIVersion,
     pipette_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
     y_value: float,
@@ -860,6 +865,9 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     )
     decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_B3)).then_return(
         stacker
+    )
+    decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_C2)).then_return(
+        None
     )
     decoy.when(mock_state_view.modules.is_column_4_module(stacker.model)).then_return(
         True
@@ -968,6 +976,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            version=api_version,
         )
 
 
@@ -978,6 +987,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
 def test_deck_conflict_raises_for_collision_with_tc_lid(
     decoy: Decoy,
     mock_state_view: StateView,
+    api_version: APIVersion,
 ) -> None:
     """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
     destination_well_point = Point(x=123, y=123, z=123)
@@ -1075,6 +1085,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            version=api_version,
         )
 
 
@@ -1264,3 +1275,309 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
             pipette_id="pipette-id",
             labware_id="labware-id",
         )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    api_version: APIVersion,
+) -> None:
+    """It should pass when location is a well and API version is at or over 2.28."""
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured("pipette-id")
+    ).then_return(True)
+
+    decoy.when(
+        mock_state_view.geometry.get_checked_tip_drop_location(
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_location=DropTipWellLocation(),
+            api_version_allows_partial_return_tip=True,
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
+
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            pipette_id="pipette-id",
+        )
+    ).then_return(Point(x=123, y=123, z=123))
+
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A12"
+    )
+    decoy.when(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware(
+            "destination-labware-id"
+        )
+    ).then_return(None)
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id",
+            destination_position=Point(x=123, y=123, z=123),
+            critical_point=None,
+        )
+    ).then_return(
+        (
+            Point(x=50, y=150, z=60),
+            Point(x=150, y=50, z=60),
+            Point(x=150, y=150, z=60),
+            Point(x=50, y=50, z=60),
+        )
+    )
+    decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
+        _AbsoluteRobotExtents(
+            front_left={
+                MountType.LEFT: Point(13.5, -60.5, 0.0),
+                MountType.RIGHT: Point(-40.5, -60.5, 0.0),
+            },
+            back_right={
+                MountType.LEFT: Point(463.7, 433.3, 0.0),
+                MountType.RIGHT: Point(517.7, 433.3),
+            },
+            deck_extents=Point(477.2, 493.8, 0.0),
+            padding_rear=-181.21,
+            padding_front=55.8,
+            padding_left_side=31.88,
+            padding_right_side=-80.32,
+        )
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+    decoy.when(
+        adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
+    ).then_return(
+        _MixedTypeSlots(
+            regular_slots=[
+                DeckSlotName.SLOT_D1,
+                DeckSlotName.SLOT_D2,
+                DeckSlotName.SLOT_C1,
+                DeckSlotName.SLOT_B3,
+            ],
+            staging_slots=[StagingSlotName.SLOT_C4],
+        )
+    )
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="C1", do_compatibility_check=False
+        )
+    ).then_return(Point(0, 100, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="D1", do_compatibility_check=False
+        )
+    ).then_return(Point(0, 0, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="D2", do_compatibility_check=False
+        )
+    ).then_return(Point(100, 0, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="C4", do_compatibility_check=False
+        )
+    ).then_return(Point(200, 100, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="C4", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            StagingSlotLocation(slotName=StagingSlotName.SLOT_C4)
+        )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Point(150, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+    for slot_name in [DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, DeckSlotName.SLOT_D2]:
+        decoy.when(
+            mock_state_view.geometry.get_highest_z_in_slot(
+                DeckSlotLocation(slotName=slot_name)
+            )
+        ).then_return(50)
+        decoy.when(
+            mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+                addressable_area_name=slot_name.id, do_compatibility_check=False
+            )
+        ).then_return(Dimensions(90, 90, 0))
+
+    pipette_movement_conflict.check_safe_for_pipette_movement(
+        engine_state=mock_state_view,
+        pipette_id="pipette-id",
+        labware_id="destination-labware-id",
+        well_name="A2",
+        well_location=DropTipWellLocation(),
+        version=api_version,
+    )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+@pytest.mark.parametrize(
+    "api_version", versions_below(APIVersion(2, 28), flex_only=True)
+)
+def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    api_version: APIVersion,
+) -> None:
+    """It should pass when location is a well and API version is below 2.28."""
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured("pipette-id")
+    ).then_return(True)
+
+    decoy.when(
+        mock_state_view.geometry.get_checked_tip_drop_location(
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_location=DropTipWellLocation(),
+            api_version_allows_partial_return_tip=False,
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
+
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            pipette_id="pipette-id",
+        )
+    ).then_return(Point(x=123, y=123, z=123))
+
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A12"
+    )
+    decoy.when(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware(
+            "destination-labware-id"
+        )
+    ).then_return(None)
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id",
+            destination_position=Point(x=123, y=123, z=123),
+            critical_point=None,
+        )
+    ).then_return(
+        (
+            Point(x=50, y=150, z=60),
+            Point(x=150, y=50, z=60),
+            Point(x=150, y=150, z=60),
+            Point(x=50, y=50, z=60),
+        )
+    )
+    decoy.when(mock_state_view.geometry.absolute_deck_extents).then_return(
+        _AbsoluteRobotExtents(
+            front_left={
+                MountType.LEFT: Point(13.5, -60.5, 0.0),
+                MountType.RIGHT: Point(-40.5, -60.5, 0.0),
+            },
+            back_right={
+                MountType.LEFT: Point(463.7, 433.3, 0.0),
+                MountType.RIGHT: Point(517.7, 433.3),
+            },
+            deck_extents=Point(477.2, 493.8, 0.0),
+            padding_rear=-181.21,
+            padding_front=55.8,
+            padding_left_side=31.88,
+            padding_right_side=-80.32,
+        )
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+    decoy.when(
+        adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
+    ).then_return(
+        _MixedTypeSlots(
+            regular_slots=[
+                DeckSlotName.SLOT_D1,
+                DeckSlotName.SLOT_D2,
+                DeckSlotName.SLOT_C1,
+                DeckSlotName.SLOT_B3,
+            ],
+            staging_slots=[StagingSlotName.SLOT_C4],
+        )
+    )
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="C1", do_compatibility_check=False
+        )
+    ).then_return(Point(0, 100, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="D1", do_compatibility_check=False
+        )
+    ).then_return(Point(0, 0, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="D2", do_compatibility_check=False
+        )
+    ).then_return(Point(100, 0, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="C4", do_compatibility_check=False
+        )
+    ).then_return(Point(200, 100, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="C4", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            StagingSlotLocation(slotName=StagingSlotName.SLOT_C4)
+        )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Point(150, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+    for slot_name in [DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, DeckSlotName.SLOT_D2]:
+        decoy.when(
+            mock_state_view.geometry.get_highest_z_in_slot(
+                DeckSlotLocation(slotName=slot_name)
+            )
+        ).then_return(50)
+        decoy.when(
+            mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+                addressable_area_name=slot_name.id, do_compatibility_check=False
+            )
+        ).then_return(Dimensions(90, 90, 0))
+
+    pipette_movement_conflict.check_safe_for_pipette_movement(
+        engine_state=mock_state_view,
+        pipette_id="pipette-id",
+        labware_id="destination-labware-id",
+        well_name="A2",
+        well_location=DropTipWellLocation(),
+        version=api_version,
+    )

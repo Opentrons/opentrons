@@ -1,55 +1,54 @@
 """Shared code for managing pipette configuration and storage."""
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import (
+    Any,
     Dict,
+    List,
     Optional,
     Tuple,
-    Any,
-    cast,
-    List,
     TypeVar,
+    cast,
 )
-from typing_extensions import Final
+
 import numpy
-from opentrons_shared_data.pipette.types import UlPerMmAction
+from typing_extensions import Final
 
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    UnexpectedTipRemovalError,
+    CommandPreconditionViolated,
     UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
 )
 from opentrons_shared_data.pipette.pipette_definition import (
-    liquid_class_for_volume_between_default_and_defaultlowvolume,
-    PressFitPickUpTipConfiguration,
     CamActionPickUpTipConfiguration,
+    PressFitPickUpTipConfiguration,
+    liquid_class_for_volume_between_default_and_defaultlowvolume,
 )
+from opentrons_shared_data.pipette.types import UlPerMmAction
 
+from .instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
+    check_instrument_offset_reasonability,
+)
+from .pipette import Pipette
 from opentrons import types as top_types
+from opentrons.hardware_control.constants import (
+    DROP_TIP_RELEASE_DISTANCE,
+    SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    SHAKE_OFF_TIPS_SPEED,
+)
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import (
+    Axis,
     CriticalPoint,
     HardwareAction,
-    Axis,
     OT3Mount,
     TipScrapeType,
 )
-from opentrons.hardware_control.constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
-    DROP_TIP_RELEASE_DISTANCE,
-    SHAKE_OFF_TIPS_DROP_DISTANCE,
-)
-
-from opentrons.hardware_control.dev_types import PipetteDict
-from .pipette import Pipette
-from .instrument_calibration import (
-    PipetteOffsetSummary,
-    PipetteOffsetByPipetteMount,
-    check_instrument_offset_reasonability,
-)
-
 
 MOD_LOG = logging.getLogger(__name__)
 

@@ -1,5 +1,8 @@
+import chunk from 'lodash/chunk'
+
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -216,4 +219,44 @@ export const createModuleEntityAndChangeForm: (
         })
       )
     })
+  }
+
+interface CreateLabwareAndQueueForHopperArgs {
+  fillLabwareIds: string[]
+  moduleId: string
+  isLidConfigured: boolean
+}
+
+export const createLabwareAndQueueForHopper =
+  (args: CreateLabwareAndQueueForHopperArgs): ThunkAction<any> =>
+  async (dispatch, getState) => {
+    const { fillLabwareIds, moduleId, isLidConfigured } = args
+    dispatch(stackerLabwareCreationStart())
+    const chunkLength = isLidConfigured ? 2 : 1
+    const chunks = chunk(fillLabwareIds, chunkLength)
+
+    const state = getState()
+    const deckSetup = getDeckSetupForActiveItem(state)
+    const { modules } = deckSetup
+    const module = modules[moduleId]
+
+    if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+      // collect all container creation promises
+      const containerPromises = chunks.map(chunk => {
+        const ids = chunk.map(labwareId => labwareId.split(':')[0])
+        const uris = chunk.map(labwareId => labwareId.split(':')[1])
+        return dispatch(
+          createContainer({
+            labwareDefURIStack: uris,
+            slot: 'offDeck',
+            uuids: ids,
+          })
+        )
+      })
+
+      // wait for all containers to finish
+      await Promise.all(containerPromises).then(() => {
+        dispatch(stackerLabwareCreationFinish())
+      })
+    }
   }

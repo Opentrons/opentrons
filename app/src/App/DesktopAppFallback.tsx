@@ -14,10 +14,6 @@ import {
 } from '@opentrons/components'
 
 import { useSentryReport } from '/app/App/hooks'
-import {
-  ANALYTICS_DESKTOP_APP_ERROR,
-  useTrackEvent,
-} from '/app/redux/analytics'
 import { reloadUi } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'
@@ -25,14 +21,9 @@ import type { Dispatch } from '/app/redux/types'
 
 export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   const { t } = useTranslation('app_settings')
-  const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const navigate = useNavigate()
   const handleReloadClick = (): void => {
-    trackEvent({
-      name: ANALYTICS_DESKTOP_APP_ERROR,
-      properties: { errorMessage: error.message },
-    })
     // route to the root page and initiate an electron browser window reload via app-shell
     navigate('/', { replace: true })
     dispatch(reloadUi(error.message as string))

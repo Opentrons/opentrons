@@ -1,26 +1,30 @@
 """Tests for Protocol API thermocycler module contexts."""
 
 import inspect
+from typing import Optional
+
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
-from opentrons.protocol_api.tasks import Task
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ThermocyclerContext,
+)
+from opentrons.protocol_api import (
     validation as mock_validation,
 )
 from opentrons.protocol_api.core.common import (
+    LabwareCore,
     ProtocolCore,
     ThermocyclerCore,
-    LabwareCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.tasks import Task
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture(autouse=True)
@@ -774,6 +778,35 @@ def test_deactivate(
             "command",
             matchers.DictMatching({"$": "after"}),
         ),
+    )
+
+
+@pytest.mark.parametrize(
+    "this_api_version,ramp_rate", [(APIVersion(2, 27), None), (APIVersion(2, 28), 3.0)]
+)
+def test_ramp_rate_(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_core: ThermocyclerCore,
+    subject: ThermocyclerContext,
+    this_api_version: APIVersion,
+    ramp_rate: Optional[float],
+) -> None:
+    """It should delete the ramp rate argument on pre 2.28 versions."""
+    subject._api_version = this_api_version
+    decoy.when(
+        mock_validation.ensure_hold_time_seconds(seconds=None, minutes=None)
+    ).then_return(0)
+    decoy.when(subject._get_current_labware_max_vol()).then_return(None)
+    subject.set_block_temperature(temperature=100, ramp_rate=3.0)
+
+    decoy.verify(
+        mock_core.set_target_block_temperature(
+            celsius=100,
+            hold_time_seconds=0,
+            block_max_volume=None,
+            ramp_rate=ramp_rate,
+        )
     )
 
 

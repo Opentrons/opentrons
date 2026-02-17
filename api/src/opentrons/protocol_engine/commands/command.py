@@ -3,30 +3,29 @@
 from __future__ import annotations
 
 import dataclasses
+import enum
 from abc import ABC, abstractmethod
 from datetime import datetime
-import enum
 from typing import (
     TYPE_CHECKING,
-    Generic,
-    Optional,
-    TypeVar,
-    List,
-    Type,
-    Union,
     Any,
     Dict,
+    Generic,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
 )
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.state.update_types import StateUpdate
-
-from ..resources import ModelUtils
 from ..errors import ErrorOccurrence
 from ..notes import CommandNote, CommandNoteAdder
+from ..resources import ModelUtils
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
@@ -110,6 +109,10 @@ class BaseCommandCreate(
             " If a value is not provided, one will be generated."
         ),
         json_schema_extra=_pop_default,
+    )
+    commandAnnotations: List[str] = Field(
+        default_factory=list,
+        description="A list of command annotation IDs (if any) that apply to this command.",
     )
 
 
@@ -283,6 +286,10 @@ class BaseCommand(
             "Information not critical to the execution of the command derived from either"
             " the command's execution or the command's generation."
         ),
+    )
+    commandAnnotations: List[str] = Field(
+        default_factory=list,
+        description="A list of command annotation IDs (if any) that apply to this command.",
     )
     failedCommandId: Optional[str] = Field(
         None,

@@ -1,34 +1,36 @@
 """Test status bar integration."""
 
 from __future__ import annotations
+
+from typing import List, Optional, Type
+
 import pytest
 from mock import AsyncMock
-from typing import List, Type, Optional
 
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt16Field
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    LightAnimationTypeField,
-    LightTransitionTypeField,
-)
 from opentrons_hardware.firmware_bindings.binary_constants import (
     LightAnimationType,
     LightTransitionType,
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    BinaryMessageDefinition,
     Ack,
-    StartLightAction,
-    ClearLightActionStagingQueue,
     AddLightActionRequest,
+    BinaryMessageDefinition,
+    ClearLightActionStagingQueue,
+    StartLightAction,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    LightAnimationTypeField,
+    LightTransitionTypeField,
+)
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt16Field
 from opentrons_hardware.hardware_control.status_bar import (
-    StatusBar,
-    Color,
-    ColorStep,
-    RED,
     BLUE,
     GREEN,
+    RED,
+    Color,
+    ColorStep,
+    StatusBar,
 )
 
 

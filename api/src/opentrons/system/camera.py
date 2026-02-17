@@ -1,20 +1,26 @@
 import asyncio
-import os
-from pathlib import Path
 import logging
+import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Dict, Optional
-from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
-from opentrons_shared_data.errors.exceptions import CommunicationError
+
 from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons.config import IS_ROBOT
-from opentrons_shared_data.util import StrEnum
+from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.util import StrEnum
+
+from opentrons.config import (
+    ARCHITECTURE,
+    IS_ROBOT,
+    SystemArchitecture,
+    get_opentrons_path,
+)
 from opentrons.protocol_engine.resources.camera_provider import (
-    CameraProvider,
-    ImageParameters,
     CameraError,
+    CameraProvider,
     CameraSettings,
+    ImageParameters,
 )
 from opentrons.system import ffmpeg
 

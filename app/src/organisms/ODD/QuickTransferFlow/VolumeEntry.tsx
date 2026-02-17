@@ -12,7 +12,7 @@ import {
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import { CONSOLIDATE, DISTRIBUTE } from './constants'
+import { ACTIONS, CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
@@ -55,7 +55,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
     // the button will be disabled if this values is null
     if (volumeAsNumber != null) {
       dispatch({
-        type: 'SET_VOLUME',
+        type: ACTIONS.SET_VOLUME,
         volume: volumeAsNumber,
       })
       onNext()

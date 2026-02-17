@@ -1,22 +1,21 @@
 """Test Heater Shaker open labware latch command implementation."""
 
-from decoy import Decoy
 import pytest
+from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.open_labware_latch import (
     OpenLabwareLatchImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import MotorAxis
 
 

@@ -1,7 +1,6 @@
 import pytest
 import typeguard
 
-
 from opentrons_shared_data.robot import load
 from opentrons_shared_data.robot.types import RobotDefinition, RobotType
 

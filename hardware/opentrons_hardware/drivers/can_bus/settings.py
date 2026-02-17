@@ -1,13 +1,12 @@
 """Driver settings."""
 
-from typing_extensions import Final, TypedDict
+from math import floor
 from typing import Optional
-from pydantic import Field
 
 from opentrons_shared_data.errors.exceptions import CANBusConfigurationError
-
-from math import floor
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import Final, TypedDict
 
 DEFAULT_INTERFACE: Final = "socketcan"
 

@@ -1,11 +1,11 @@
 # TODO(mc, 2022-07-07): these tests are very coupled to the implementation
 # both the tests and the code under test likely needs to be rewritten
 # if we want useful unit test coverage
-from mock import patch, AsyncMock  # type: ignore[attr-defined]
 import pytest
+from mock import AsyncMock, patch  # type: ignore[attr-defined]
 
 from robot_server.service.session.errors import SessionCreationException
-from robot_server.service.session.manager import SessionMetaData, BaseSession
+from robot_server.service.session.manager import BaseSession, SessionMetaData
 from robot_server.service.session.models.common import create_identifier
 from robot_server.service.session.models.session import SessionType
 

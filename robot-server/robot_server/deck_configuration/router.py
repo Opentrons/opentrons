@@ -5,21 +5,21 @@ from typing import Annotated, Union
 
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
+from . import models, validation, validation_mapping
+from .fastapi_dependencies import get_deck_configuration_store
+from .store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.hardware import get_deck_definition
 from robot_server.service.dependencies import get_current_time
-from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
-
-from . import models
-from . import validation
-from . import validation_mapping
-from .fastapi_dependencies import get_deck_configuration_store
-from .store import DeckConfigurationStore
-
 
 router = LightRouter()
 

@@ -177,16 +177,18 @@ function LiquidToolbox({
   }
 
   const handleClearAllWells: () => void = () => {
-    if (labwareId != null && activeItemHasLiquids) {
-      if (
-        global.confirm(t('application:are_you_sure_clear_all_wells') as string)
-      ) {
-        dispatch(
-          removeWellsContents({
-            labwareId,
-            wells: allWellsForActiveItem,
-          })
-        )
+    if (
+      global.confirm(t('application:are_you_sure_clear_all_wells') as string)
+    ) {
+      for (const labwareId of selectedLabwareIds) {
+        if (labwareId != null && activeItemHasLiquids) {
+          dispatch(
+            removeWellsContents({
+              labwareId,
+              wells: allWellsForActiveItem,
+            })
+          )
+        }
       }
     }
   }
@@ -555,7 +557,7 @@ export function LiquidToolboxContainer({
   const selectedLabwareId = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
-  const labwareId = multipleSelectedLabwareIds?.[0] ?? selectedLabwareId
+  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
   const liquidLocations = useSelector(
@@ -598,7 +600,9 @@ export function LiquidToolboxContainer({
       showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
       selectedLabwareIds={
-        multipleSelectedLabwareIds ?? [selectedLabwareId ?? '']
+        !multipleSelectedLabwareIds?.includes(selectedLabwareId ?? '')
+          ? [selectedLabwareId ?? '']
+          : multipleSelectedLabwareIds
       }
     />
   )

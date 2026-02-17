@@ -2,22 +2,21 @@
 
 from typing import List
 
+import pytest
 from mock import MagicMock
 
-import pytest
-
-from opentrons_hardware.firmware_bindings.message import (
-    CanMessage,
-)
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.message import (
+    CanMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     GetStatusResponsePayload,
 )
 from opentrons_hardware.scripts import can_comm
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 
 
 @pytest.fixture

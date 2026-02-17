@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
@@ -13,6 +14,10 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import {
+  FLEX_STACKER_IN_HOPPER_ACTIONS,
+  HOPPER_LABWARE_X_OFFSET,
+} from '/protocol-designer/constants'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -34,11 +39,16 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type {
+  FlexStackerFormType,
+  FormData,
+} from '/protocol-designer/form-types'
 import type { Fixture } from './constants'
 
 interface HighlightItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
+  currentStep: FormData | null
 }
 //  TODO(ja, 1/13/25): get actual coordinates from thermocycler and deck definitions
 const FLEX_TC_POSITION: CoordinateTuple = [-20, 282, 0]
@@ -56,7 +66,7 @@ const SLOTS = [
 ]
 
 export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
-  const { robotType, deckDef } = props
+  const { robotType, deckDef, currentStep } = props
   const { t } = useTranslation('application')
   const { labware, modules, additionalEquipmentOnDeck } = useSelector(
     getDeckSetupForActiveItem
@@ -154,7 +164,8 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
   const moduleItems = highlightItems.highlightModuleItems.reduce<JSX.Element[]>(
     (acc, { module: moduleOnDeck, selection, isSelected = false }) => {
-      const { text } = selection
+      let text = ''
+
       if (moduleOnDeck == null) {
         return acc
       }
@@ -162,7 +173,25 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         moduleOnDeck.id,
         Object.values(labware)
       )
-      const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+      const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+
+      const stepType: FlexStackerFormType | null =
+        currentStep?.flexStackerFormType ?? null
+      if (stepType != null) {
+        text = stepType.charAt(0).toUpperCase() + stepType.slice(1)
+      } else {
+        text = selection.text ?? ''
+      }
+      const onHopperActions =
+        stepType != null &&
+        (FLEX_STACKER_IN_HOPPER_ACTIONS as string[]).includes(stepType)
+      const isActionOnShuttle = isStacker && !onHopperActions
+
+      const position = getPositionFromSlotId(
+        moduleOnDeck.slot,
+        deckDef,
+        ...(isStacker && !isActionOnShuttle ? [HOPPER_LABWARE_X_OFFSET] : [])
+      )
       if (position != null) {
         return [
           ...acc,
@@ -191,7 +220,9 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     if (hoveredItemTrash != null || selectedItemTrash != null) {
       const selectedTrashOnDeck =
         selectedItemTrash?.id != null
-          ? additionalEquipmentOnDeck[selectedItemTrash.id]
+          ? (Object.values(additionalEquipmentOnDeck).find(
+              e => e.location === selectedItemTrash.id
+            ) ?? null)
           : null
       const trashOnDeck = hoveredItemTrash ?? selectedTrashOnDeck
 
@@ -250,69 +281,51 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   const getDeckItems = (): JSX.Element[] => {
     const items: JSX.Element[] = []
 
-    if (hoveredDeckItem != null || selectedItemSlot != null) {
-      const slot = hoveredDeckItem ?? selectedItemSlot?.id
+    const slot = hoveredDeckItem ?? selectedItemSlot?.id
+    if (!slot) return items
 
-      if (hoveredItemTrash != null || selectedItemTrash != null) {
-        if (slot === WASTE_CHUTE_CUTOUT) {
-          items.push(
-            <FixtureRender
-              key={`${slot}_wasteChute_selected`}
-              fixture={'wasteChute' as Fixture}
-              cutout={WASTE_CHUTE_CUTOUT as CutoutId}
-              robotType={robotType}
-              deckDef={deckDef}
-              showHighlight={true}
-              tagInfo={[
-                {
-                  text: t('new_location'),
-                  isSelected: selectedItemSlot?.id != null,
-                  isLast: true,
-                  isZoomed: false,
-                },
-              ]}
-            />
-          )
-        } else if (slot != null) {
-          items.push(
-            <FixtureRender
-              key={`${slot}_trashBin_selected`}
-              fixture={'trashBin' as Fixture}
-              cutout={'cutoutA3' as CutoutId}
-              robotType={robotType}
-              deckDef={deckDef}
-              showHighlight={true}
-              tagInfo={[
-                {
-                  text: t('new_location'),
-                  isSelected: true,
-                  isLast: true,
-                  isZoomed: false,
-                },
-              ]}
-            />
-          )
-        }
-      } else {
-        const addressableArea =
-          slot != null && slot !== WASTE_CHUTE_CUTOUT
-            ? getAddressableAreaFromSlotId(slot, deckDef)
-            : null
+    const hasTrashContext =
+      hoveredItemTrash != null || selectedItemTrash != null
 
-        if (!addressableArea) {
-          console.warn(
-            `addressableArea was null as ${addressableArea}, expected to find a matching entity`
-          )
-          return []
-        }
-        items.push(
-          <DeckItemHighlight
-            slotBoundingBox={addressableArea.boundingBox}
-            slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
-            itemId={addressableArea.id}
-          />
+    if (hasTrashContext && slot === WASTE_CHUTE_CUTOUT) {
+      items.push(
+        <FixtureRender
+          key={`${slot}_wasteChute_selected`}
+          fixture={'wasteChute' as Fixture}
+          cutout={WASTE_CHUTE_CUTOUT as CutoutId}
+          robotType={robotType}
+          deckDef={deckDef}
+          showHighlight={true}
+          tagInfo={[
+            {
+              text: t('new_location'),
+              isSelected: selectedItemSlot?.id != null,
+              isLast: true,
+              isZoomed: false,
+            },
+          ]}
+        />
+      )
+      return items
+    }
+
+    if (slot !== WASTE_CHUTE_CUTOUT) {
+      const addressableArea = getAddressableAreaFromSlotId(slot, deckDef)
+
+      if (!addressableArea) {
+        console.warn(
+          `addressableArea was null for slot ${slot}, expected to find a matching entity`
         )
+        return items
       }
+
+      items.push(
+        <DeckItemHighlight
+          slotBoundingBox={addressableArea.boundingBox}
+          slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
+          itemId={addressableArea.id}
+        />
+      )
     }
 
     return items

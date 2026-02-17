@@ -1,29 +1,29 @@
 import logging
-from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, cast
+
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import (
-    helpers,
-    types as cal_types,
-    get_robot_deck_attitude,
-    save_robot_deck_attitude,
     get_custom_tiprack_definition_for_tlc,
+    get_robot_deck_attitude,
+    helpers,
     mark_bad_calibration,
+    save_robot_deck_attitude,
 )
-
+from opentrons.calibration_storage import (
+    types as cal_types,
+)
 from opentrons.calibration_storage.ot2 import (
-    get_pipette_offset,
-    save_pipette_calibration,
-    load_tip_length_calibration,
     create_tip_length_data,
+    get_pipette_offset,
+    load_tip_length_calibration,
+    save_pipette_calibration,
     save_tip_length_calibration,
 )
-
 from opentrons.calibration_storage.ot2.models import v1 as cal_models
-from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
-    HardwareControlAPI,
     CriticalPoint,
+    HardwareControlAPI,
     Pipette,
     robot_calibration,
     util,
@@ -34,53 +34,52 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-
+from opentrons.types import Location, Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition2
 
-from robot_server.robot.calibration.constants import (
-    MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
-    JOG_TO_DECK_SLOT,
-    CAL_BLOCK_SETUP_CAL_CHECK,
-)
 import robot_server.robot.calibration.util as uf
-from robot_server.robot.calibration.helper_classes import (
-    RobotHealthCheck,
-    PipetteRank,
-    PipetteInfo,
-    RequiredLabware,
-    SupportedCommands,
-)
-
-from robot_server.service.session.models.command_definitions import (
-    CalibrationCommand,
-    DeckCalibrationCommand,
-    CheckCalibrationCommand,
-)
-from robot_server.service.errors import RobotServerError
-
-from .util import (
-    PointTypes,
-    ReferencePoints,
-    ComparisonStatePerCalibration,
-    ComparisonStatePerPipette,
-)
-from .models import (
-    ComparisonStatus,
-    CheckAttachedPipette,
-    TipComparisonMap,
-    PipetteOffsetComparisonMap,
-    DeckComparisonMap,
-)
-from .state_machine import CalibrationCheckStateMachine
-
+from ..errors import CalibrationError
 from .constants import (
-    PIPETTE_TOLERANCES,
     MOVE_POINT_STATE_MAP,
-    CalibrationCheckState as State,
+    PIPETTE_TOLERANCES,
     TIPRACK_SLOT,
 )
-from ..errors import CalibrationError
+from .constants import (
+    CalibrationCheckState as State,
+)
+from .models import (
+    CheckAttachedPipette,
+    ComparisonStatus,
+    DeckComparisonMap,
+    PipetteOffsetComparisonMap,
+    TipComparisonMap,
+)
+from .state_machine import CalibrationCheckStateMachine
+from .util import (
+    ComparisonStatePerCalibration,
+    ComparisonStatePerPipette,
+    PointTypes,
+    ReferencePoints,
+)
+from robot_server.robot.calibration.constants import (
+    CAL_BLOCK_SETUP_CAL_CHECK,
+    JOG_TO_DECK_SLOT,
+    MOVE_TO_DECK_SAFETY_BUFFER,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+)
+from robot_server.robot.calibration.helper_classes import (
+    PipetteInfo,
+    PipetteRank,
+    RequiredLabware,
+    RobotHealthCheck,
+    SupportedCommands,
+)
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.models.command_definitions import (
+    CalibrationCommand,
+    CheckCalibrationCommand,
+    DeckCalibrationCommand,
+)
 
 MODULE_LOG = logging.getLogger(__name__)
 

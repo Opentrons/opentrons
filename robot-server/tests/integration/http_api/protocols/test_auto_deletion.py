@@ -5,8 +5,8 @@ from typing import List, Optional
 import pytest
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol
+from tests.integration.robot_client import RobotClient
 
 
 @pytest.mark.slow

@@ -334,6 +334,7 @@ describe('getLoadLabware', () => {
   it('should generate load_labware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
+        {},
         mockModuleEntities,
         mockLabwareEntities,
         labwareRobotState,
@@ -364,10 +365,51 @@ well_plate_3 = protocol.load_labware_from_definition(
     )
   })
 
+  it('should generate load_labware for 1 labware on the stacker shuttle', () => {
+    expect(
+      getLoadLabware(
+        {
+          [moduleId]: {
+            moduleState: { type: FLEX_STACKER_MODULE_TYPE } as any,
+            slot: 'B2',
+          },
+        },
+        {
+          [moduleId]: {
+            id: moduleId,
+            model: FLEX_STACKER_MODULE_V1,
+            type: FLEX_STACKER_MODULE_TYPE,
+            pythonName: 'flex_stacker_1',
+          },
+        },
+        {
+          [labwareId1]: {
+            id: labwareId1,
+            labwareDefURI: 'opentrons/fixture_96_plate/1',
+            def: opentrons96Plate,
+            pythonName: 'well_plate_1',
+          },
+        },
+        { [labwareId1]: { stack: [labwareId1, 'B2'] } },
+        mockLabwareNicknames
+      )
+    ).toBe(
+      `
+# Load Labware:
+well_plate_1 = flex_stacker_1.load_labware(
+    "fixture_96_plate",
+    label="Fixture Flex 96 Tip Rack Adapter",
+    namespace="opentrons",
+    version=1,
+)`.trimStart()
+    )
+  })
+
   describe('getLoadLabware off-deck', () => {
     it('should generate loadLabware for off-deck', () => {
       expect(
         getLoadLabware(
+          {},
           {},
           {
             plateId: {
@@ -402,6 +444,7 @@ well_plate_5 = protocol.load_labware(
     }
     expect(
       getLoadLabware(
+        {},
         mockModuleEntities,
         mockLabwareEntities,
         labwareRobotStateWithLids,
@@ -429,7 +472,7 @@ well_plate_3 = protocol.load_labware_from_definition(
     )
   })
 
-  it('should generate loadLabware for a flex stacker', () => {
+  it('should generate loadLabware for a flex stacker for labware on the hopper', () => {
     const mockModuleEntitiesWithFlexStackerModule = {
       ...mockModuleEntities,
       [moduleId4]: {
@@ -455,16 +498,77 @@ well_plate_3 = protocol.load_labware_from_definition(
       },
     }
 
+    const mockModuleState: TimelineFrame['modules'] = {
+      [moduleId4]: {
+        slot: 'A4',
+        moduleState: {} as any,
+      },
+    }
+
     const setStoredLabware = getSetStoredLabware(
       mockModuleEntitiesWithFlexStackerModule,
       mockLabwareEntitiesWithFlexStackerLabware,
-      mockLabwareRobotStateWithFlexStackerLabware
+      mockLabwareRobotStateWithFlexStackerLabware,
+      mockModuleState,
+      { timeline: [] }
     )
 
     expect(setStoredLabware).toBe(
       `# Set Stored Labware:
 flex_stacker_1.set_stored_labware_items(
     labware=[well_plate_4],
+)`.trimStart()
+    )
+  })
+
+  it('should generate loadLabware for a flex stacker for labware on the shuttle', () => {
+    const mockModuleEntitiesWithFlexStackerModule = {
+      ...mockModuleEntities,
+      [moduleId4]: {
+        ...mockModuleEntities[moduleId4],
+        id: moduleId4,
+        model: FLEX_STACKER_MODULE_V1,
+        type: FLEX_STACKER_MODULE_TYPE,
+        pythonName: 'flex_stacker_1',
+      },
+    }
+    const mockLabwareEntitiesWithFlexStackerLabware = {
+      [flexStackerLabwareId]: {
+        id: flexStackerLabwareId,
+        labwareDefURI: 'opentrons/fixture_96_plate/1',
+        def: opentrons96Plate as LabwareDefinition2,
+        pythonName: 'well_plate_4',
+      },
+    }
+
+    const mockLabwareRobotStateWithFlexStackerLabware = {
+      [flexStackerLabwareId]: {
+        stack: [flexStackerLabwareId, 'A4'],
+      },
+    }
+
+    const mockModuleState: TimelineFrame['modules'] = {
+      [moduleId4]: {
+        slot: 'A4',
+        moduleState: {} as any,
+      },
+    }
+
+    const setStoredLabware = getSetStoredLabware(
+      mockModuleEntitiesWithFlexStackerModule,
+      mockLabwareEntitiesWithFlexStackerLabware,
+      mockLabwareRobotStateWithFlexStackerLabware,
+      mockModuleState,
+      { timeline: [] }
+    )
+
+    expect(setStoredLabware).toBe(
+      `# Set Stored Labware:
+flex_stacker_1.set_stored_labware(
+    load_name="fixture_96_plate",
+    namespace="opentrons",
+    version=1,
+    count=0
 )`.trimStart()
     )
   })

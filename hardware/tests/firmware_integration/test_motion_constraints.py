@@ -1,20 +1,20 @@
 """Test device info."""
 
 import asyncio
+
 import pytest
+
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetMotionConstraints,
     GetMotionConstraintsRequest,
     GetMotionConstraintsResponse,
+    SetMotionConstraints,
 )
-
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     MotionConstraintsPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import Int32Field
-
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 def filter_func(arb: ArbitrationId) -> bool:

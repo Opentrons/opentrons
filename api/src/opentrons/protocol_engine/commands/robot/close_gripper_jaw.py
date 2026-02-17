@@ -1,13 +1,11 @@
 """Command models for opening a gripper jaw."""
 
 from __future__ import annotations
-from typing import Literal, Type, Optional, Any, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Any, Literal, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
 from ..command import (
     AbstractCommandImpl,
@@ -15,7 +13,9 @@ from ..command import (
     BaseCommandCreate,
     SuccessData,
 )
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
+from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
 if TYPE_CHECKING:
     from ...state.state import StateView

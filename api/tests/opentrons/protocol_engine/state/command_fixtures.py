@@ -1,24 +1,27 @@
 """Command factories to use in tests as data fixtures."""
 
 from datetime import datetime
+from typing import Dict, Optional, cast
+
 from pydantic import BaseModel
-from typing import Optional, cast, Dict
 
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons.types import MountType
-from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
+
+from opentrons.protocol_engine import ErrorOccurrence
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
     DeckPoint,
-    ModuleModel,
-    ModuleDefinition,
-    MovementAxis,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    LoadableLabwareLocation,
     DeckSlotLocation,
     LabwareMovementStrategy,
-    AddressableOffsetVector,
+    LiquidHandlingWellLocation,
+    LoadableLabwareLocation,
+    ModuleDefinition,
+    ModuleModel,
+    MovementAxis,
+    WellLocation,
 )
+from opentrons.types import MountType
 
 
 class FixtureModel(BaseModel):

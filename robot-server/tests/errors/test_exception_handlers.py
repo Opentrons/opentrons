@@ -1,11 +1,12 @@
 """Tests for the server's exception handlers."""
 
+from typing import List
+
 import pytest
 from decoy import matchers
 from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from typing import List
 
 from robot_server.constants import V1_TAG
 from robot_server.errors.error_responses import ApiError

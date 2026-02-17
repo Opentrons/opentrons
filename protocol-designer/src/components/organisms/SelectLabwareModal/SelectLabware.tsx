@@ -109,6 +109,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   return (
     <>
       {ORDERED_CATEGORIES.map(category => {
+        const isLidValid = category === 'tipRack' || !isOnHopper
         if (filteredLabwareByCategory[category].length > 0) {
           return (
             <ListButton
@@ -174,7 +175,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                             }),
                             checked: selectedLidLabware != null,
                             onCheckboxChange:
-                              !isTiprack && isOnHopper
+                              (!isTiprack && isOnHopper) || !isLidValid
                                 ? undefined
                                 : () => {
                                     dispatch(

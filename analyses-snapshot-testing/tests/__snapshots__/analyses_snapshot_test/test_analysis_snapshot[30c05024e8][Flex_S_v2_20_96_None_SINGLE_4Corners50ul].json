@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1194,6 +1196,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1213,6 +1216,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1231,6 +1235,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1257,13 +1262,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1278,6 +1284,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1292,6 +1299,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1306,6 +1314,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1320,6 +1329,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1334,6 +1344,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1348,6 +1359,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1362,6 +1374,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1376,6 +1389,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1390,6 +1404,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1404,6 +1419,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1433,6 +1449,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1447,6 +1464,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1473,13 +1491,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1494,6 +1513,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1508,6 +1528,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1522,6 +1543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1536,6 +1558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1550,6 +1573,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1564,6 +1588,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1578,6 +1603,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1592,6 +1618,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1606,6 +1633,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1620,6 +1648,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1649,6 +1678,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1663,6 +1693,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1681,6 +1712,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1707,13 +1739,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1728,6 +1761,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1742,6 +1776,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1756,6 +1791,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1770,6 +1806,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1784,6 +1821,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1798,6 +1836,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1812,6 +1851,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1826,6 +1866,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1840,6 +1881,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1854,6 +1896,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1883,6 +1926,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1897,6 +1941,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1923,13 +1968,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1944,6 +1990,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1958,6 +2005,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1972,6 +2020,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1986,6 +2035,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2000,6 +2050,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2014,6 +2065,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2028,6 +2080,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2042,6 +2095,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2056,6 +2110,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2070,6 +2125,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2099,6 +2155,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2113,6 +2170,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2131,6 +2189,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2157,13 +2216,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2178,6 +2238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2192,6 +2253,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2206,6 +2268,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2220,6 +2283,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2234,6 +2298,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2248,6 +2313,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2262,6 +2328,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2276,6 +2343,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2290,6 +2358,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2304,6 +2373,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2333,6 +2403,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2347,6 +2418,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2373,13 +2445,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2394,6 +2467,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2408,6 +2482,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2422,6 +2497,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2436,6 +2512,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2450,6 +2527,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2464,6 +2542,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2478,6 +2557,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2492,6 +2572,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2506,6 +2587,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2520,6 +2602,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2549,6 +2632,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2563,6 +2647,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2581,6 +2666,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2607,13 +2693,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2628,6 +2715,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2642,6 +2730,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2656,6 +2745,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2670,6 +2760,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2684,6 +2775,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2698,6 +2790,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2712,6 +2805,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2726,6 +2820,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2740,6 +2835,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2754,6 +2850,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2783,6 +2880,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2797,6 +2895,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2823,13 +2922,14 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.4,
+        "tipLength": 47.565,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2844,6 +2944,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2858,6 +2959,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2872,6 +2974,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2886,6 +2989,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2900,6 +3004,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2914,6 +3019,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2928,6 +3034,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2942,6 +3049,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2956,6 +3064,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2970,6 +3079,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2999,6 +3109,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

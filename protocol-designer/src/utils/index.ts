@@ -195,11 +195,10 @@ export function getMatchingTipLiquidSpecs(
 ): SupportedTip {
   const tipLength = tiprackDef?.parameters?.tipLength ?? 0
 
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength for tiprack ${getLabwareDefURI(tiprackDef)} but could not`
-    )
-  }
+  console.assert(
+    tipLength,
+    `expected to find a tiplength for tiprack ${tiprackDef && getLabwareDefURI(tiprackDef)} but could not`
+  )
 
   const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
     key => key === 'lowVolumeDefault'
@@ -306,9 +305,10 @@ export const getDefaultBlowoutFlowRate = (
   const liquidsObject = isInLowVolumeMode
     ? liquids.lowVolumeDefault
     : liquids.default
+  // if the tiprack is not in the pipette's supportedTips, we'll just return null:
   return liquidsObject.supportedTips[
     `t${tiprackDef.wells.A1.totalLiquidVolume}`
-  ].defaultBlowOutFlowRate.default
+  ]?.defaultBlowOutFlowRate.default
 }
 
 export const getDefaultPushOutVolume = (
@@ -436,13 +436,15 @@ export const getFullStackFromLabwaresOnDeck = (
   const slotInStack = onHopper
     ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
     : slot
-  return labwareOnDeck
-    .filter(
-      ({ stack }) =>
-        stack.includes(slotInStack as string) &&
-        onHopper === stack.includes(HOPPER_STACKER_LOCATION)
-    )
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+  return (
+    labwareOnDeck
+      .filter(
+        ({ stack }) =>
+          stack.includes(slotInStack as string) &&
+          onHopper === stack.includes(HOPPER_STACKER_LOCATION)
+      )
+      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+  )
 }
 
 export const getModuleIdFromStack = (

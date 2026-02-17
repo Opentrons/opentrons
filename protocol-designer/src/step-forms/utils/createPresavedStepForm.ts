@@ -323,10 +323,7 @@ const _patchHeaterShakerModuleId =
 const _patchFlexStackerModuleId =
   (args: {
     initialDeckSetup: InitialDeckSetup
-    orderedStepIds: OrderedStepIdsState
-    savedStepForms: SavedStepFormState
     stepType: StepType
-    robotStateTimeline: Timeline
   }): FormUpdater =>
   () => {
     const { initialDeckSetup, stepType } = args
@@ -340,7 +337,6 @@ const _patchFlexStackerModuleId =
       const moduleId =
         getModuleOnDeckByType(initialDeckSetup, FLEX_STACKER_MODULE_TYPE)?.id ??
         null
-
       if (moduleId == null) {
         return null
       }
@@ -540,10 +536,7 @@ export const createPresavedStepForm = ({
 
   const updateFlexStackerModuleId = _patchFlexStackerModuleId({
     initialDeckSetup,
-    orderedStepIds,
-    savedStepForms,
     stepType,
-    robotStateTimeline,
   })
 
   const updateThermocyclerFields = _patchThermocyclerFields({

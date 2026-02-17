@@ -51,6 +51,7 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
+        primaryNozzle: null,
         pushOut_checkbox: null,
         pushOut_volume: null,
         times: null,
@@ -147,6 +148,7 @@ export function getDefaultsForStepType(
         pickUpTip_wellNames: undefined,
         pipette: null,
         preWetTip: false,
+        primaryNozzle: null,
         pushOut_checkbox: null,
         pushOut_volume: null,
         tipRack: null,
@@ -191,6 +193,7 @@ export function getDefaultsForStepType(
         labwareLocationUpdate: {},
         moduleLocationUpdate: {},
         pipetteLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -224,15 +227,10 @@ export function getDefaultsForStepType(
     case 'thermocycler':
       return {
         blockIsActive: false,
-        blockIsActiveHold: false,
         blockTargetTemp: null,
-        blockTargetTempHold: null,
         lidIsActive: false,
-        lidIsActiveHold: false,
         lidOpen: false,
-        lidOpenHold: null,
         lidTargetTemp: null,
-        lidTargetTempHold: null,
         moduleId: null,
         orderedProfileItems: [],
         profileItemsById: {},
@@ -254,7 +252,7 @@ export function getDefaultsForStepType(
     case 'flexStacker':
       return {
         fillLabwareUri: null,
-        fillQuantity: null,
+        fillLabwareIds: null,
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,

@@ -62,6 +62,10 @@ setup-py:
 	@$(uv_sync_dev)
 	@$(UV) pip list
 
+.PHONY: lock-py
+lock-py:
+	@$(UV) lock
+
 .PHONY: teardown
 teardown: teardown-py
 
@@ -101,6 +105,7 @@ lint: $(py_sources)
 .PHONY: format
 format:
 	$(ruff) format python/opentrons_shared_data python_tests tools
+	$(ruff) check --select I --fix python/opentrons_shared_data python_tests tools
 
 .PHONY: push-no-restart
 push-no-restart: wheel

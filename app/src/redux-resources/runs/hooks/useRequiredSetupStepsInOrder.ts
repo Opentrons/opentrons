@@ -18,7 +18,6 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   StepKey,
-  StepMap,
   UpdateRunSetupStepsRequiredAction,
 } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
@@ -133,7 +132,12 @@ export function useRequiredSetupStepsInOrder({
     : {
         orderedSteps: ALL_STEPS_IN_ORDER,
         orderedApplicableSteps: ALL_STEPS_IN_ORDER.filter(
-          step => (requiredSteps as Required<StepMap<boolean>> | null)?.[step]
+          step =>
+            (
+              requiredSteps as Required<
+                Partial<Record<StepKey, boolean>>
+              > | null
+            )?.[step]
         ),
       }
 }

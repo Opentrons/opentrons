@@ -1,21 +1,25 @@
 """An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
 
 import contextlib
-import random
 import logging
+import random
+from enum import Enum
+from typing import Annotated, Any, Dict, Generator, Optional
+
 import paho.mqtt.client as mqtt
 from fastapi import Depends
-from typing import Annotated, Any, Dict, Generator, Optional
-from enum import Enum
 
-
-from .topics import TopicName
-from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
+from server_utils.fastapi_utils.models.json_api import (
+    NotifyRefetchBody,
+    NotifyUnsubscribeBody,
+)
+
+from .topics import TopicName
 
 log: logging.Logger = logging.getLogger(__name__)
 

@@ -1,22 +1,22 @@
 """Router for /system/register endpoint."""
 
-import re
 import os
+import re
+from pathlib import Path
+
 import filetype  # type: ignore[import-untyped]
 from fastapi import (
     APIRouter,
     Depends,
-    status,
-    Response,
-    UploadFile,
     File,
     HTTPException,
+    Response,
+    UploadFile,
+    status,
 )
-from pathlib import Path
 
-from .models import EnableOEMMode
 from ...settings import SystemServerSettings, get_settings, save_settings
-
+from .models import EnableOEMMode
 
 # regex to sanitize the filename
 FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-.]")
@@ -27,7 +27,8 @@ oem_mode_router = APIRouter()
 
 @oem_mode_router.put(
     "/system/oem_mode/enable",
-    summary="Enable or Disable OEM Mode for this robot.",
+    summary="Enable or disable OEM Mode",
+    description="Enable or disable OEM Mode",
     responses={
         status.HTTP_200_OK: {"message": "OEM Mode changed successfully."},
         status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not changed."},
@@ -56,7 +57,8 @@ async def enable_oem_mode_endpoint(
 
 @oem_mode_router.post(
     "/system/oem_mode/upload_splash",
-    summary="Upload an image to be used as the boot up splash screen.",
+    summary="Upload an image for the boot up splash screen",
+    description="Upload an image for the boot up splash screen",
     responses={
         status.HTTP_201_CREATED: {"message": "OEM Mode splash screen uploaded"},
         status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode splash screen not set"},

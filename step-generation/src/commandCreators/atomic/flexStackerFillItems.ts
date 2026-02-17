@@ -1,11 +1,11 @@
-import { HOPPER_STACKER_LOCATION } from '../../constants'
+import { getIsLid } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   formatPyStr,
   getChunkForIndentingLists,
   getIsSpaceInHopper,
-  getSlotInLocationStack,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
@@ -19,44 +19,44 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   invariantContext,
   robotState
 ) => {
-  // NOTE: fillLabwareUri, fillQuantity will be wired up when we emit setStoredLabware
-  // midway through the protocol
-  const { moduleId, interventionMessage } = args
+  const { moduleId, interventionMessage, fillLabwareIds } = args
   const { labwareEntities, moduleEntities } = invariantContext
-  const moduleSlot = robotState.modules[moduleId].slot
+  if (moduleId == null || moduleEntities[moduleId] == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
-  const labwareOnHopper = Object.entries(robotState.labware)
-    .filter(
-      ([id, { stack }]) =>
-        stack.includes(HOPPER_STACKER_LOCATION) &&
-        getSlotInLocationStack(stack) === moduleSlot
-    )
-    .map(labwareState => labwareState[0])
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = labwareOnHopper.map(
-    lwId => labwareEntities[lwId].pythonName
-  )
+  const labwarePythonNames = fillLabwareIds
+    .filter(id => !getIsLid(labwareEntities[id].def))
+    .map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
-
   const indentedLabwarePythonNames = labwareChunks
     .map(chunk => INDENT + chunk.join(', '))
     .join(',\n')
-
   const formattedPythonLabwareNames =
     labwarePythonNames.length < 4
       ? labwarePythonNames.join(', ')
       : `\n${indentedLabwarePythonNames}\n`
 
+  if (
+    flexStackerState != null &&
+    flexStackerState.storedLabwareDetails === null &&
+    flexStackerState.labwareInHopper == null
+  ) {
+    return {
+      errors: [errorCreators.flexStackerLabwareTypeMissing()],
+    }
+  }
   if (!isSpace) {
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (labwareOnHopper.length > 0) {
-    const allMatch = labwareOnHopper.every(labware =>
+  } else if (fillLabwareIds.length > 0) {
+    const allMatch = fillLabwareIds.every(labware =>
       labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
@@ -66,8 +66,11 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     }
   }
 
+  const filteredFillLabwareIds = fillLabwareIds.filter(
+    id => !getIsLid(labwareEntities[id].def)
+  )
   const pythonArgs = [
-    ...(labwareOnHopper.length > 0
+    ...(filteredFillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null
@@ -82,7 +85,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          labware: labwareOnHopper,
+          labware: fillLabwareIds,
           message: interventionMessage ?? undefined,
         },
       },

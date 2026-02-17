@@ -7,14 +7,12 @@ from __future__ import annotations
 
 import abc
 import contextlib
+import logging
 from typing import Callable, Generator, NamedTuple, Optional, cast
+
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
-
-
-import logging
-
 
 FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
 

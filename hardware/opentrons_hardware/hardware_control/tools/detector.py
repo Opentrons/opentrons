@@ -1,24 +1,24 @@
 """Head tool detector."""
 
-import logging
 import asyncio
-from typing import AsyncIterator, Set, Dict, Tuple, Union
+import logging
+from typing import AsyncIterator, Dict, Set, Tuple, Union
 
 from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
 
-from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
-from opentrons_hardware.firmware_bindings.messages import message_definitions
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
-from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
-from opentrons_hardware.drivers.can_bus import CanMessenger
 from .types import (
-    PipetteInformation,
-    ToolSummary,
     GripperInformation,
     HepaUVInformation,
+    PipetteInformation,
+    ToolSummary,
 )
+from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
+from opentrons_hardware.firmware_bindings.constants import PipetteName, ToolType
+from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.hardware_control.tools.types import ToolDetectionResult
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
 
 log = logging.getLogger(__name__)
 

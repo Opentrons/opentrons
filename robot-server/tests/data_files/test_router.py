@@ -1,47 +1,51 @@
 """Tests for data_files router."""
 
 import io
+from datetime import datetime
+from pathlib import Path
 from typing import List
 
 import pytest
-from datetime import datetime
-from pathlib import Path
-
 from decoy import Decoy
 from fastapi import UploadFile
-from opentrons.protocol_reader import FileHasher, FileReaderWriter, BufferedFile
 
-from robot_server.service.json_api import MultiBodyMeta, SimpleEmptyBody
+from opentrons.protocol_reader import BufferedFile, FileHasher, FileReaderWriter
+from opentrons_shared_data.data_files import (
+    CmdDataFileInfo,
+    DataFileInfo,
+    DataFileInfoWithCommands,
+    DataFileSource,
+    MimeType,
+)
+from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleEmptyBody
 
 from robot_server.data_files.data_files_store import (
-    DataFilesStore,
     DataFilesByRunInfo,
+    DataFilesStore,
+    DataFileWithCommandsInfoSlice,
 )
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.data_files.models import (
     DataFile,
     FileIdNotFoundError,
     FileInUseError,
 )
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.data_files.router import (
-    upload_data_file,
-    get_data_file_info_by_id,
-    get_data_file,
-    get_all_data_files,
     delete_file_by_id,
-    get_run_image_metadata,
     delete_run_images,
+    download_run_images,
+    get_all_data_files,
+    get_data_file,
+    get_data_file_info_by_id,
     get_data_files_by_run_id,
+    get_run_image_metadata,
+    upload_data_file,
 )
-from robot_server.data_files.data_files_store import DataFileWithCommandsInfoSlice
-from opentrons_shared_data.data_files import DataFileInfoWithCommands, CmdDataFileInfo
-from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
+from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
-from robot_server.data_files.router import download_run_images
 from robot_server.runs.run_store import RunStore
-from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.service.notifications.publishers import DataFilePublisher
 
 
@@ -519,7 +523,7 @@ async def test_delete_non_existent_file(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file ID doesn't exist."""
-    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(  # type: ignore[func-returns-value]
         FileIdNotFoundError(data_file_id="file-id")
     )
 
@@ -534,7 +538,7 @@ async def test_delete_file_in_use(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file to be deleted is in use."""
-    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(  # type: ignore[func-returns-value]
         FileInUseError(
             data_file_id="file-id", ids_used_in_runs=set(), ids_used_in_analyses=set()
         )

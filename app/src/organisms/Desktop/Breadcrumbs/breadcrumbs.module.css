@@ -6,6 +6,9 @@
   font-weight: var(--font-weight-regular);
   -webkit-line-clamp: 1;
   line-height: var(--line-height-16);
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  word-break: normal;
 }
 
 .crumb_link {

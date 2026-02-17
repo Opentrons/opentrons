@@ -343,7 +343,6 @@
           "toggleOn": "On",
           "valid_range": "Valid range between 4 and 96°C"
         },
-        "ending_hold": "Ending hold",
         "lid": {
           "engage": "Lid",
           "label": "Lid",
@@ -414,7 +413,7 @@
     },
     "flex_stacker": {
       "fields": {
-        "fillQuantity": {
+        "fillLabwareIds": {
           "caption": "Valid range between 1 and {{max}}",
           "title": "Number of labware to refill"
         },
@@ -451,8 +450,12 @@
       },
       "no_labware_on_shuttle": "No labware on shuttle",
       "no_labware_on_stacker": "No labware on stacker",
+      "no_labware_selected": "No labware selected",
+      "stacker_labware_not_defined": "Stacker labware not defined",
+      "no_labware_selected_body": "Add labware to the stacker in the starting deck so that you can refill it later",
+
       "quantity": "Quantity: {{count}}",
-      "selected_labware": "Selected labware",
+      "selected_labware": "Select labware to refill into stacker",
       "shuttle": "Shuttle",
       "stacker": "Stacker",
       "with_lid": { "standard": "With lid", "tiprack": "With tiprack lid" }

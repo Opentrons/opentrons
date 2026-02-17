@@ -1,85 +1,82 @@
 """Tests for the InstrumentContext public interface."""
 
 import inspect
-import pytest
 from collections import OrderedDict
 from datetime import datetime
-from typing import ContextManager, Optional, Any
+from typing import Any, ContextManager, Optional
 from unittest.mock import sentinel
 
+import pytest
 from decoy import Decoy, matchers
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.errors.error_occurrence import (
-    ProtocolCommandFailedError,
-)
-
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.advanced_control.transfers.common import (
-    TransferTipPolicyV2,
-    TransferTipPolicyV2Type,
-)
-from opentrons.protocols.advanced_control.transfers import (
-    transfer_liquid_utils as mock_tx_liquid_utils,
-)
-
-from tests.opentrons.protocol_api.partial_tip_configurations import (
-    PipetteReliantNozzleConfigSpec,
-    PIPETTE_RELIANT_TEST_SPECS,
-    NozzleLayoutArgs,
-    PipetteIndependentNozzleConfigSpec,
-    PIPETTE_INDEPENDENT_TEST_SPECS,
-    InstrumentCoreNozzleConfigSpec,
-    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
-    ExpectedCoreArgs,
-)
-from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import (
-    APIVersionError,
-    UnsupportedAPIError,
-    FlowRates,
-    PlungerSpeeds,
-)
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    InstrumentContext,
-    Labware,
-    Well,
-    labware,
-    LiquidClass,
-)
-from opentrons.protocol_api.core.common import (
-    InstrumentCore,
-    ProtocolCore,
-    WellCore,
-    LabwareCore,
-)
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import (
-    Location,
-    Mount,
-    Point,
-    NozzleMapInterface,
-    MeniscusTrackingTarget,
-)
-
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.robot.types import RobotType
-from . import versions_at_or_above, versions_between
+from tests.opentrons.protocol_api.partial_tip_configurations import (
+    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
+    PIPETTE_INDEPENDENT_TEST_SPECS,
+    PIPETTE_RELIANT_TEST_SPECS,
+    ExpectedCoreArgs,
+    InstrumentCoreNozzleConfigSpec,
+    NozzleLayoutArgs,
+    PipetteIndependentNozzleConfigSpec,
+    PipetteReliantNozzleConfigSpec,
+)
+
+from . import versions_at_or_above, versions_below, versions_between
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    InstrumentContext,
+    Labware,
+    LiquidClass,
+    Well,
+    labware,
+)
+from opentrons.protocol_api.core.common import (
+    InstrumentCore,
+    LabwareCore,
+    ProtocolCore,
+    WellCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
+)
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as mock_tx_liquid_utils,
+)
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    TransferTipPolicyV2Type,
+)
+from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    FlowRates,
+    PlungerSpeeds,
+    UnsupportedAPIError,
+)
+from opentrons.types import (
+    Location,
+    MeniscusTrackingTarget,
+    Mount,
+    NozzleMapInterface,
+    Point,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -1149,7 +1146,9 @@ def test_drop_tip_to_trash(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+@pytest.mark.parametrize(
+    "api_version", [APIVersion(2, 15), APIVersion(2, 18), APIVersion(2, 28)]
+)
 def test_drop_tip_to_randomized_trash_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1176,7 +1175,7 @@ def test_drop_tip_to_randomized_trash_location(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 28), False)],
 )
 def test_drop_tip_in_trash_bin(
     decoy: Decoy,
@@ -1201,7 +1200,7 @@ def test_drop_tip_in_trash_bin(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 28), False)],
 )
 def test_drop_tip_in_waste_chute(
     decoy: Decoy,
@@ -1219,6 +1218,36 @@ def test_drop_tip_in_waste_chute(
             waste_chute,
             home_after=None,
             alternate_tip_drop=alternate_drop,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 28)])
+def test_drop_tip_alternate_position_explicitly(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should alternate the drop position when alternate_drop_location is specified."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=True)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=True,
+        ),
+        times=1,
+    )
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=False)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=False,
         ),
         times=1,
     )
@@ -1710,6 +1739,49 @@ def test_touch_tip_raises_if_trash_last_location(
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
     with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
+
+
+@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 28), False))
+def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should no-op for labware with `touchTipDisabled` quirk for older API versions."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+    decoy.when(mock_well.top(z=4.56)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+    subject.touch_tip(mock_well, v_offset=4.56, speed=42.0)
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=1,
+            z_offset=4.56,
+            speed=42.0,
+        ),
+        times=0,
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+def test_touch_tip_raises_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.28 & above."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+
+    with pytest.raises(RuntimeError, match="Touch tip not allowed on labware"):
+        subject.touch_tip(mock_well)
 
 
 def test_return_height(
@@ -3162,7 +3234,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -3575,7 +3647,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -4009,7 +4081,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))

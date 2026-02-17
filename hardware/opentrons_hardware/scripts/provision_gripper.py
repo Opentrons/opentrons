@@ -7,23 +7,23 @@ A log of what has been flashed to pipettes can be found at
 provision_gripper.log.
 """
 
+import argparse
 import asyncio
+import datetime
 import logging
 import logging.config
-import argparse
-import datetime
 from typing import Tuple
 
-from opentrons_hardware.drivers.can_bus import build, CanMessenger, WaitableCallback
-from opentrons_hardware.firmware_bindings.utils import UInt16Field
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback, build
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
+    fields,
     message_definitions,
     payloads,
-    fields,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
+from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.instruments.gripper import serials
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 
 async def run(

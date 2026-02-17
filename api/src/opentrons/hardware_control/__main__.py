@@ -11,7 +11,7 @@ _should_ only be run on an OT-2.
 import argparse
 import asyncio
 import logging
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 from . import API
 from .types import HardwareFeatureFlags

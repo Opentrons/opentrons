@@ -1,26 +1,28 @@
 """Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
 
-from typing import Annotated
 import logging
+from typing import Annotated
 
 from fastapi import Depends, status
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from server_utils.fastapi_utils.light_router import LightRouter
-
 from opentrons.protocol_engine import (
+    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
-    LabwareOffset,
+)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
 )
 
-from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
-
-from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
-from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from ..dependencies import get_maintenance_run_orchestrator_store
+from ..maintenance_run_models import LabwareDefinitionSummary, MaintenanceRun
+from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .base_router import RunNotFound, RunNotIdle, get_run_data_from_url
+from robot_server.errors.error_responses import ErrorBody
 
 log = logging.getLogger(__name__)
 labware_router = LightRouter()

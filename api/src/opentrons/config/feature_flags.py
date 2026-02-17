@@ -1,5 +1,6 @@
-from opentrons.config import advanced_settings as advs
 from opentrons_shared_data.robot.types import RobotTypeEnum
+
+from opentrons.config import advanced_settings as advs
 
 
 def short_fixed_trash() -> bool:
@@ -83,4 +84,23 @@ def oem_mode_enabled() -> bool:
 def flex_stacker_tof_sensors_disabled() -> bool:
     return advs.get_setting_with_env_overload(
         "disableFlexStackerLabwareDetection", RobotTypeEnum.FLEX
+    )
+
+
+def protocol_subprocess_enabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableProtocolSubprocess", RobotTypeEnum.FLEX
+    )
+
+
+def hardware_subprocess_enabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableHardwareSubprocess", RobotTypeEnum.FLEX
+    )
+
+
+def allow_step_grouping() -> bool:
+    return advs.get_setting_with_env_overload(
+        "allowStepGrouping",
+        RobotTypeEnum.FLEX,
     )

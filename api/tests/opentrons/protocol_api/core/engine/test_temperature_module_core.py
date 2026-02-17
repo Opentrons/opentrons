@@ -5,15 +5,13 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import TempDeck
-from opentrons.hardware_control.modules.types import TemperatureStatus, ModuleType
-
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
-
+from opentrons.hardware_control.modules.types import ModuleType, TemperatureStatus
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 TempDeckHardware = SynchronousAdapter[TempDeck]
 
@@ -33,7 +31,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> TempDeckHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture
@@ -83,7 +83,8 @@ def test_set_target_temperature(
         mock_engine_client.execute_command_without_recovery(
             cmd.temperature_module.SetTargetTemperatureParams(
                 moduleId="1234", celsius=38.9
-            )
+            ),
+            command_annotations=[],
         ),
     ).then_return(
         cmd.temperature_module.SetTargetTemperatureResult(
@@ -108,7 +109,8 @@ def test_wait_for_target_temperature(
         mock_engine_client.execute_command(
             cmd.temperature_module.WaitForTemperatureParams(
                 moduleId="1234", celsius=None
-            )
+            ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -124,7 +126,8 @@ def test_deactivate(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.temperature_module.DeactivateTemperatureParams(moduleId="1234")
+            cmd.temperature_module.DeactivateTemperatureParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )

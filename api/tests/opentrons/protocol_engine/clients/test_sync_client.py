@@ -12,12 +12,11 @@ the subject's methods in a synchronous context in a child thread to ensure:
 import pytest
 from decoy import Decoy
 
-
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.protocol_engine import commands
-from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
+from opentrons.protocol_engine.clients import ChildThreadTransport, SyncClient
 from opentrons.protocol_engine.types import DeckPoint, DeckSlotLocation, Liquid
 from opentrons.types import DeckSlotName
 
@@ -40,7 +39,7 @@ def test_execute_command(
     """It should map the command params and execute it."""
     params = commands.CommentParams(message="hewwo")
     expected_request = commands.CommentCreate(params=params)
-    subject.execute_command(params)
+    subject.execute_command(params, command_annotations=[])
     decoy.verify(transport.execute_command_wait_for_recovery(request=expected_request))
 
 
@@ -61,7 +60,9 @@ def test_execute_command_without_recovery(
     decoy.when(transport.execute_command(expected_request)).then_return(
         result_from_transport
     )
-    result_from_subject = subject.execute_command_without_recovery(params)
+    result_from_subject = subject.execute_command_without_recovery(
+        params, command_annotations=[]
+    )
     assert result_from_subject == result_from_transport  # type: ignore[comparison-overlap]
 
 

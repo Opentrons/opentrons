@@ -1,10 +1,11 @@
 from __future__ import annotations
-from pathlib import Path
+
 import random
-import subprocess
 import signal
+import subprocess
 import sys
 import tempfile
+from pathlib import Path
 from types import TracebackType
 from typing import Optional
 
@@ -69,6 +70,10 @@ class DevServer:
         )
 
     def stop(self) -> None:
-        """Stop the robot server."""
+        """Stop the server and wait for it to clean up."""
         self.proc.send_signal(signal.SIGTERM)
         self.proc.wait()
+
+    @property
+    def base_url(self) -> str:
+        return f"http://localhost:{self.port}"

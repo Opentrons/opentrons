@@ -7,7 +7,7 @@ import reduce from 'lodash/reduce'
 import { LiquidIcon, StyledText } from '@opentrons/components'
 import { swatchColors } from '@opentrons/step-generation'
 
-import { getModalPortalEl } from '/app/App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import { formatPercentage } from '../utils/formatPercentage'
 import { formatVolume } from '../utils/formatVolume'
@@ -31,6 +31,7 @@ interface WellTooltipParams {
 interface WellTooltipProps {
   children: (wellTooltipParams: WellTooltipParams) => ReactNode
   ingredNames: Record<string, string | null>
+  liquidDisplayColors: Record<string, string>
 }
 
 interface TooltipState {
@@ -51,6 +52,7 @@ const initialTooltipState: TooltipState = {
 export function WellTooltip({
   children,
   ingredNames,
+  liquidDisplayColors,
 }: WellTooltipProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const [tooltipState, setTooltipState] =
@@ -59,12 +61,12 @@ export function WellTooltip({
   const makeHandleMouseEnterWell =
     (wellName: string, wellIngreds: LocationLiquidState) =>
     (e: MouseEvent): void => {
-      const target = e.target as HTMLElement
+      const target = e.currentTarget as HTMLElement
       const { left, top, height, width } = target.getBoundingClientRect()
-      if (Object.keys(wellIngreds).length > 0 && left && top) {
+      if (wellIngreds != null && Object.keys(wellIngreds).length > 0) {
         setTooltipState({
           tooltipX: left + width / 2,
-          tooltipY: top + height / 2,
+          tooltipY: top + height / 3,
           tooltipWellName: wellName,
           tooltipWellIngreds: wellIngreds,
           tooltipOffset: height / 2,
@@ -90,7 +92,6 @@ export function WellTooltip({
     0
   )
   const hasMultipleIngreds = Object.keys(tooltipWellIngreds ?? {}).length > 1
-  const liquidDisplayColors: Record<string, string> = {}
 
   return (
     <>
@@ -118,6 +119,7 @@ export function WellTooltip({
                     <tr key={groupId} className={styles.tooltip_row}>
                       <td>
                         <LiquidIcon
+                          size="xSmall"
                           color={
                             liquidDisplayColors[groupId] ??
                             swatchColors(groupId)
@@ -125,14 +127,14 @@ export function WellTooltip({
                         />
                       </td>
                       <td>
-                        <StyledText desktopStyle="captionRegular">
+                        <StyledText desktopStyle="captionSemiBold">
                           {ingredNames[groupId]}
                         </StyledText>
                       </td>
                       {hasMultipleIngreds ? (
                         <td>
                           <StyledText desktopStyle="captionRegular">
-                            {formatPercentage(ingred.volume, totalLiquidVolume)}
+                            {`(${formatPercentage(ingred.volume, totalLiquidVolume)})`}
                           </StyledText>
                         </td>
                       ) : null}
@@ -162,7 +164,7 @@ export function WellTooltip({
                 </>
               ) : null}
             </div>,
-            getModalPortalEl()
+            getTopPortalEl()
           )
         : null}
     </>

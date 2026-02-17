@@ -5,7 +5,7 @@ from typing import Optional
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class ThermocyclerStepPage(BasePage):
@@ -88,9 +88,9 @@ class ThermocyclerStepPage(BasePage):
             position: "open" or "closed".
         """
         if position == "open":
-            self.page.get_by_text("Lid positionClosed").click()
+            self.page.get_by_test_id("ToggleButton_Closed").click()
         else:
-            self.page.get_by_text("Lid positionOpen").click()
+            self.page.get_by_test_id("ToggleButton_Open").click()
 
     # ========== Profile Mode: Well Volume & Temperatures ==========
 
@@ -117,30 +117,6 @@ class ThermocyclerStepPage(BasePage):
         self.wait_for_visible(lid_input)
         lid_input.click()
         lid_input.fill(temp)
-
-    def set_block_temperature_hold(self, temp: str) -> None:
-        """
-        Set the block temperature hold value in profile mode.
-
-        Args:
-            temp: Temperature value (e.g., "90").
-        """
-        hold_input = self.page.locator('input[name="blockTargetTempHold"]')
-        self.wait_for_visible(hold_input)
-        hold_input.click()
-        hold_input.fill(temp)
-
-    def set_lid_temperature_hold(self, temp: str) -> None:
-        """
-        Set the lid temperature hold value in profile mode.
-
-        Args:
-            temp: Temperature value (e.g., "40").
-        """
-        hold_input = self.page.locator('input[name="lidTargetTempHold"]')
-        self.wait_for_visible(hold_input)
-        hold_input.click()
-        hold_input.fill(temp)
 
     # ========== Profile Programming Modal ==========
 
@@ -215,16 +191,8 @@ class ThermocyclerProfileModal(BasePage):
         # Click on the "Number of cycles" area
         num_cycles_div = cycle_container.locator("div").filter(has_text="Number of cycles").nth(3)
         num_cycles_div.click()
-
-        # Find the input within the cycles section using a shorter variable name
-        cycles_input = (
-            self.page.locator("label:has-text('Number of cycles')")
-            .locator("..")  # label row wrapper
-            .locator("..")  # field wrapper
-            .locator("input")  # the actual textbox
-            .first
-        )
-        cycles_input.fill(count)
+        target = self.page.get_by_text("Number of cycles").locator("..").locator("..").locator("input")
+        target.fill(count)
 
     # ========== Cycle Steps ==========
 

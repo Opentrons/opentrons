@@ -111,7 +111,7 @@ export function SummaryAndSettings(
       files: [protocolFile],
       protocolKind: 'quick-transfer',
     }).then(() => {
-      navigate('/quick-transfer')
+      navigate('/protocols')
     })
     trackEventWithRobotSerial({
       name: ANALYTICS_QUICK_TRANSFER_SAVE_FOR_LATER,

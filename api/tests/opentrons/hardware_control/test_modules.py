@@ -1,39 +1,43 @@
 import asyncio
-from typing import AsyncIterator, Union, Type, TypeVar, Optional
 from pathlib import Path
+from typing import AsyncIterator, Optional, Type, TypeVar, Union
 from unittest import mock
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
-from opentrons.hardware_control.modules import ModuleAtPort
-from opentrons.hardware_control.modules.flex_stacker import FlexStacker
-from opentrons.hardware_control.modules.types import (
-    BundledFirmware,
-    ModuleModel,
-    MagneticModuleModel,
-    TemperatureModuleModel,
-    HeaterShakerModuleModel,
-    ThermocyclerModuleModel,
-    AbsorbanceReaderModel,
-    FlexStackerModuleModel,
-    ModuleType,
-    ModuleDisconnectedCallback,
-    ModuleErrorCallback,
-)
 from opentrons.hardware_control.modules import (
-    TempDeck,
-    MagDeck,
-    Thermocycler,
-    HeaterShaker,
     AbsorbanceReader,
     AbstractModule,
+    FlexStacker,
+    HeaterShaker,
+    MagDeck,
+    ModuleAtPort,
     SimulatingModule,
+    TempDeck,
+    Thermocycler,
+    VacuumModule,
+)
+from opentrons.hardware_control.modules import (
     build as build_module,
 )
 from opentrons.hardware_control.modules.mod_abc import parse_fw_version
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control.modules.types import (
+    AbsorbanceReaderModel,
+    BundledFirmware,
+    FlexStackerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticModuleModel,
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    ModuleModel,
+    ModuleType,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    VacuumModuleModel,
+)
 
 
 async def test_get_modules_simulating() -> None:
@@ -118,6 +122,7 @@ async def test_module_caching() -> None:
         (HeaterShakerModuleModel.HEATER_SHAKER_V1, HeaterShaker),
         (AbsorbanceReaderModel.ABSORBANCE_READER_V1, AbsorbanceReader),
         (FlexStackerModuleModel.FLEX_STACKER_V1, FlexStacker),
+        (VacuumModuleModel.VACUUM_MODULE_V1, VacuumModule),
     ],
 )
 async def test_create_simulating_module(
@@ -329,6 +334,33 @@ async def mod_flexstacker(
     await flexstacker.cleanup()
 
 
+@pytest.fixture
+async def mod_vacuummodule(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
+    usb_port = USBPort(
+        name="",
+        hub=False,
+        port_number=0,
+        device_path="/dev/ot_module_sim_vacuummodule0",
+    )
+
+    vacuummodule = await build_module(
+        port="/dev/ot_module_sim_vacuummodule0",
+        usb_port=usb_port,
+        type=ModuleType.VACUUM_MODULE,
+        simulating=True,
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
+    )
+    yield vacuummodule
+    await vacuummodule.cleanup()
+
+
 async def test_module_update_integration(  # noqa: C901
     monkeypatch: pytest.MonkeyPatch,
     mod_tempdeck: AbstractModule,
@@ -338,6 +370,7 @@ async def test_module_update_integration(  # noqa: C901
     mod_thermocycler_gen2: AbstractModule,
     mod_absorbancereader: AbstractModule,
     mod_flexstacker: AbstractModule,
+    mod_vacuummodule: AbstractModule,
 ) -> None:
     from opentrons.hardware_control import modules
 
@@ -461,6 +494,17 @@ async def test_module_update_integration(  # noqa: C901
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )
+    upload_via_dfu_mock.reset_mock()
+
+    # test vacuum module update with dfu bootloader
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_fs2)
+
+    bootloader_kwargs["module"] = mod_vacuummodule
+    await modules.update_firmware(mod_vacuummodule, "fake_fw_file_path")
+    upload_via_dfu_mock.assert_called_once_with(
+        "df11", "fake_fw_file_path", bootloader_kwargs
+    )
+    upload_via_dfu_mock.reset_mock()
 
 
 async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> None:
@@ -483,6 +527,9 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
 
     dummy_fs_file = Path(tmpdir) / "flex-stacker@v7.0.0.bin"
     dummy_fs_file.write_text("hello")
+
+    dummy_vm_file = Path(tmpdir) / "vacuum-module@v1.0.0.bin"
+    dummy_vm_file.write_text("hello")
 
     dummy_bogus_file = Path(tmpdir) / "thermoshaker@v6.6.6.bin"
     dummy_bogus_file.write_text("hello")
@@ -509,6 +556,7 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
         "flexstacker": [
             SimulatingModule(serial_number="656", model="flexStackerModuleV1")
         ],
+        "vacuummodule": [SimulatingModule(serial_number="657", model="vacuumModuleV1")],
     }
 
     api = await API.build_hardware_simulator(attached_modules=mods)
@@ -531,6 +579,9 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
     )
     assert api.attached_modules[5].bundled_fw == BundledFirmware(
         version="7.0.0", path=dummy_fs_file
+    )
+    assert api.attached_modules[6].bundled_fw == BundledFirmware(
+        version="1.0.0", path=dummy_vm_file
     )
     for m in api.attached_modules:
         await m.cleanup()

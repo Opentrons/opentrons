@@ -15,27 +15,28 @@ from automation.pd_pages import (
     ModuleConfigPage,
     PipetteModal,
     ProtocolEditorPage,
+    TransferPage,
 )
 
 
 @pytest.mark.pdE2E
-def test_protocol_designer_loads(page: Page, base_url: str) -> None:
+def test_protocol_designer_loads(page: Page, pd_base_url: str) -> None:
     """Test that Protocol Designer loads successfully."""
     landing_page = LandingPage(page)
     landing_page.wait_for_page_load()
 
-    print(f"✓ Protocol Designer loaded successfully at {base_url}")
+    print(f"✓ Protocol Designer loaded successfully at {pd_base_url}")
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_full_onboarding_flow(page: Page, base_url: str) -> None:
+def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     """Full onboarding flow test using page objects."""
-    print(f"Running full onboarding test against: {base_url}")
+    print(f"Running full onboarding test against: {pd_base_url}")
 
     # Landing Page
     landing_page = LandingPage(page)
-    landing_page.goto(base_url)
+    landing_page.goto(pd_base_url)
     landing_page.wait_for_page_load()
     print("✓ Main page loaded")
 
@@ -88,7 +89,8 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     editor = ProtocolEditorPage(page)
     editor.add_labware_to_slot("D2")
     editor.select_labware_category(2)
-    editor.select_labware_by_name("Axygen 96 Well Plate 500 µL")
+    labware_on_deck = "Axygen 96 Well Plate 500 µL"
+    editor.select_labware_by_name(labware_on_deck)
 
     editor.edit_liquid()
     editor.select_first_well()
@@ -100,9 +102,11 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     # Add Transfer Step
     editor.confirm_liquid_setup()  # Close labware setup
     editor.add_step("Transfer")
-    editor.configure_transfer_source()
-    editor.configure_transfer_destination("Axygen 96 Well Plate 500 µL", 17)
-    editor.set_transfer_volume("100")
+    transfer_page = TransferPage(page)
+    # Source labware is selected by default so we proceed to selecting the well
+    transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
+    transfer_page.destination_labware_select(labware_on_deck)
+    transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
+    transfer_page.input_volume("100")
     print("✓ Transfer step configured")
-
     print("\n✅ Full onboarding flow completed successfully!")

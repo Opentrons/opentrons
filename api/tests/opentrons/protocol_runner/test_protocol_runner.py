@@ -1,13 +1,13 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
 
-from unittest.mock import sentinel
 from datetime import datetime
+from pathlib import Path
+from typing import List, Type, Union, cast
+from unittest.mock import sentinel
 
 import pytest
-from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy, matchers
-from pathlib import Path
-from typing import List, cast, Union, Type
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 from opentrons_shared_data.labware.types import (
@@ -17,45 +17,49 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSche
 from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
+
+from opentrons import protocol_reader
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_engine.types import PostRunHardwareState
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
-from opentrons.protocols.types import PythonProtocol, JsonProtocol
-from opentrons.util.broker import Broker
-
-from opentrons import protocol_reader
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     CommandStatus,
     Liquid,
+    ProtocolEngine,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocol_reader import (
-    ProtocolSource,
     JsonProtocolConfig,
+    ProtocolSource,
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner import (
-    create_protocol_runner,
-    JsonRunner,
-    PythonAndLegacyRunner,
-    LiveRunner,
     AnyRunner,
+    JsonRunner,
+    LiveRunner,
+    PythonAndLegacyRunner,
+    create_protocol_runner,
 )
-from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.python_protocol_wrappers import (
-    PythonAndLegacyFileReader,
     ProtocolContextCreator,
+    PythonAndLegacyFileReader,
     PythonProtocolExecutor,
 )
+from opentrons.protocol_runner.task_queue import TaskQueue
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.util.broker import Broker
 
 
 @pytest.fixture

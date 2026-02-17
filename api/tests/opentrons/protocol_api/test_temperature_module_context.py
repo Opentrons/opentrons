@@ -3,14 +3,14 @@
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import TemperatureStatus
-from opentrons.protocol_api.tasks import Task
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, TemperatureModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, TemperatureModuleCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.tasks import Task
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 
 
 @pytest.fixture

@@ -8,76 +8,75 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-
 from opentrons.protocol_engine import (
     ProtocolEngine,
     commands,
-    slot_standardization,
     labware_offset_standardization,
+    slot_standardization,
 )
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    AddAddressableAreaAction,
+    AddCameraSettingsAction,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    AddLiquidAction,
+    AddModuleAction,
+    CreateUserCommandAnnotation,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    ResumeFromRecoveryAction,
+    StopAction,
+)
+from opentrons.protocol_engine.actions.actions import SetErrorRecoveryPolicyAction
+from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolCommandFailedError
 from opentrons.protocol_engine.errors.exceptions import (
     CommandNotAllowedError,
 )
-from opentrons.protocol_engine.types import (
-    DeckType,
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LegacyLabwareOffsetCreate,
-    LabwareOffsetVector,
-    LegacyLabwareOffsetLocation,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    LabwareOffsetCreateInternal,
-    LabwareUri,
-    ModuleDefinition,
-    ModuleModel,
-    Liquid,
-    PostRunHardwareState,
-)
 from opentrons.protocol_engine.execution import (
-    QueueWorker,
-    HardwareStopper,
     DoorWatcher,
+    HardwareStopper,
+    QueueWorker,
 )
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 from opentrons.protocol_engine.resources import (
-    FileProvider,
     CameraProvider,
+    FileProvider,
     ModelUtils,
     ModuleDataProvider,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
-from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
-
-from opentrons.protocol_engine.actions import (
-    ActionDispatcher,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    AddAddressableAreaAction,
-    AddLiquidAction,
-    AddModuleAction,
-    AddCameraSettingsAction,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    ResumeFromRecoveryAction,
-    StopAction,
-    FinishAction,
-    FinishErrorDetails,
-    QueueCommandAction,
-    HardwareStoppedAction,
+from opentrons.protocol_engine.state.update_types import StateUpdate
+from opentrons.protocol_engine.types import (
+    DeckType,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
+    LabwareOffsetVector,
+    LabwareUri,
+    LegacyLabwareOffsetCreate,
+    LegacyLabwareOffsetLocation,
+    Liquid,
+    ModuleDefinition,
+    ModuleModel,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    PostRunHardwareState,
 )
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture
@@ -281,7 +280,7 @@ def test_add_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -353,7 +352,7 @@ def test_add_fixit_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -461,7 +460,7 @@ async def test_add_and_execute_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -549,7 +548,7 @@ async def test_add_and_execute_command_wait_for_recovery(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -888,7 +887,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     """It should be able to stop the engine."""
     exception = RuntimeError("oh no")
     decoy.when(
-        await queue_worker.join(),
+        await queue_worker.join(),  # type: ignore[func-returns-value]
     ).then_raise(exception)
 
     decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
@@ -1311,7 +1310,7 @@ def test_add_labware_definition(
         ).then_return(LabwareUri("some/definition/uri"))
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             AddLabwareDefinitionAction(definition=well_plate_def)
         )
     ).then_do(_stub_get_definition_uri)
@@ -1426,6 +1425,33 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_create_user_command_annotation(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should create a user command annotation and return an annotation ID."""
+    result = subject.create_user_command_annotation(
+        annotation_name="My annotation",
+        annotation_id="abc123",
+        description="Hello world",
+    )
+
+    assert result == "abc123"
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id="abc123",
+                user_defined_name="My annotation",
+                user_description="Hello world",
+                params={},
+            ),
+        ),
+        times=1,
     )
 
 

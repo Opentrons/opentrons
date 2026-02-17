@@ -1,15 +1,44 @@
 """Protocol Engine types dealing with command annotations."""
 
-from typing import List, Literal, Dict, Any, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
+
 from pydantic import (
-    ConfigDict,
     BaseModel,
+    ConfigDict,
     Field,
 )
 
 
 class BaseCommandAnnotation(BaseModel):
     """Optional annotations for protocol engine commands."""
+
+    annotationType: str = Field(
+        ..., description="The type of annotation (for machine parsing)"
+    )
+    annotationId: str = Field(
+        ..., description="A unique identifier for the command annotation."
+    )
+
+
+class UserCommandAnnotation(BaseCommandAnnotation):
+    """Annotations generated explicitly by the Python Protocol."""
+
+    annotationType: Literal["userCommand"] = "userCommand"
+    userSpecifiedName: str = Field(
+        ..., description="The user-specified name of the annotation"
+    )
+    userSpecifiedDescription: Optional[str] = Field(
+        None,
+        description="The optional user-specified description for the annotation.",
+    )
+    params: Dict[str, Any] = Field(
+        ...,
+        description="Key value pairs of the parameters passed to the annotation.",
+    )
+
+
+class BaseCommandAnnotationLegacy(BaseModel):
+    """Legacy implementation for optional annotations for protocol engine commands."""
 
     commandKeys: List[str] = Field(
         ..., description="Command keys to which this annotation applies"
@@ -19,7 +48,7 @@ class BaseCommandAnnotation(BaseModel):
     )
 
 
-class SecondOrderCommandAnnotation(BaseCommandAnnotation):
+class SecondOrderCommandAnnotationLegacy(BaseCommandAnnotationLegacy):
     """Annotates a group of atomic commands which were the direct result of a second order command.
 
     Examples of second order commands would be transfer, consolidate, mix, etc.
@@ -43,11 +72,13 @@ class SecondOrderCommandAnnotation(BaseCommandAnnotation):
     )
 
 
-class CustomCommandAnnotation(BaseCommandAnnotation):
+class CustomCommandAnnotationLegacy(BaseCommandAnnotationLegacy):
     """Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate."""
 
     annotationType: Literal["custom"] = "custom"
     model_config = ConfigDict(extra="allow")
 
 
-CommandAnnotation = Union[SecondOrderCommandAnnotation, CustomCommandAnnotation]
+CommandAnnotation = Union[
+    SecondOrderCommandAnnotationLegacy, CustomCommandAnnotationLegacy
+]

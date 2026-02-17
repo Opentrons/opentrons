@@ -1,28 +1,27 @@
 """Modules routes."""
 
-from typing import Annotated, List, Dict
+from typing import Annotated, Dict, List
 
 from fastapi import Depends, status
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration
 from opentrons.protocol_engine.types import Vec3f
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleMultiBody,
+)
 
+from .module_data_mapper import ModuleDataMapper
+from .module_identifier import ModuleIdentifier
+from .module_models import AttachedModule, ModuleCalibrationData
 from robot_server.hardware import get_hardware
-from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.routers.modules import (
     get_modules as legacy_get_attached_modules,
 )
-from robot_server.service.json_api import (
-    SimpleMultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-)
-
-from .module_models import AttachedModule, ModuleCalibrationData
-from .module_identifier import ModuleIdentifier
-from .module_data_mapper import ModuleDataMapper
+from robot_server.versioning import get_requested_version
 
 modules_router = LightRouter()
 

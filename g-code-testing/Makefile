@@ -29,6 +29,10 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: clean
 clean:
 	$(clean_cmd)
@@ -69,6 +73,7 @@ lint: lint-other
 .PHONY: format
 format: format-other
 	$(ruff) format g_code_parsing tests cli.py
+	$(ruff) check --select I --fix g_code_parsing tests cli.py
 
 .PHONY: get-g-code-configurations
 get-g-code-configurations:

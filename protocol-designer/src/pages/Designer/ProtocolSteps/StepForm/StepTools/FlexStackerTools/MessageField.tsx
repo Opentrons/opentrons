@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { TextAreaField } from '/protocol-designer/components/molecules/TextAreaField'
+import { TextAreaField } from '@opentrons/components'
 
 import type { ChangeEvent } from 'react'
 import type { FieldProps } from '../../types'

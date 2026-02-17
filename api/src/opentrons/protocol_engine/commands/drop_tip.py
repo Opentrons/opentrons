@@ -1,27 +1,16 @@
 """Drop tip command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
-
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors.exceptions import TipAttachedError
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-
+from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 from ..types import DropTipWellLocation, TipRackWellState
-from .pipetting_common import (
-    PipetteIdMixin,
-    TipPhysicallyAttachedError,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    move_to_well,
-    StallOrCollisionError,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -29,11 +18,21 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
+    TipPhysicallyAttachedError,
+)
+from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
+    from ..state.state import StateView
 
 from opentrons.hardware_control.types import TipScrapeType
 
@@ -130,14 +129,10 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
         else:
             well_location = params.wellLocation
 
-        is_partially_configured = self._state_view.pipettes.get_is_partially_configured(
-            pipette_id=pipette_id
-        )
         tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
-            partially_configured=is_partially_configured,
         )
 
         is_tip_rack = self._state_view.labware.get_definition(

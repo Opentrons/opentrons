@@ -37,6 +37,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2B1',
     'heaterShakerV1B1',
     'movableTrashB1',
+    'thermocyclerModuleV2',
   ],
   VSC1: [
     'C1',
@@ -63,6 +64,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'heaterShakerV1A3',
     'movableTrashA3',
     'absorbanceReaderV1A3',
+    'vacuumModuleMilliporeV1A3',
   ],
   VSB3: [
     'B3',
@@ -92,30 +94,10 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'gripperWasteChute',
     'absorbanceReaderV1D3',
   ],
-  VSA4: [
-    'fakeA4',
-    'A4',
-    'flexStackerModuleV1A4',
-    'absorbanceReaderV1LidDockA4',
-  ],
-  VSB4: [
-    'fakeB4',
-    'B4',
-    'flexStackerModuleV1B4',
-    'absorbanceReaderV1LidDockB4',
-  ],
-  VSC4: [
-    'fakeC4',
-    'C4',
-    'flexStackerModuleV1C4',
-    'absorbanceReaderV1LidDockC4',
-  ],
-  VSD4: [
-    'fakeD4',
-    'D4',
-    'flexStackerModuleV1D4',
-    'absorbanceReaderV1LidDockD4',
-  ],
+  VSA4: ['fakeA4', 'A4', 'flexStackerModuleV1A4'],
+  VSB4: ['fakeB4', 'B4', 'flexStackerModuleV1B4'],
+  VSC4: ['fakeC4', 'C4', 'flexStackerModuleV1C4'],
+  VSD4: ['fakeD4', 'D4', 'flexStackerModuleV1D4'],
 }
 
 export const getVisualSlotIdFromAAId = (

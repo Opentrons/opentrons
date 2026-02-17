@@ -1,32 +1,35 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
 
 from __future__ import annotations
+
 import logging
 from typing import (
+    List,
     Tuple,
     Union,
-    List,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
-from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
+from . import point_calculations
 from opentrons.motion_planning import adjacent_slots_getters
-
 from opentrons.protocol_engine import (
-    StateView,
     DeckSlotLocation,
-    OnLabwareLocation,
     DropTipWellLocation,
+    OnLabwareLocation,
+    StateView,
 )
+from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons.protocol_engine.types import (
+    LoadedModule,
     StagingSlotLocation,
     WellLocationType,
-    LoadedModule,
 )
-from opentrons.types import DeckSlotName, StagingSlotName, Point
-from . import point_calculations
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, Point, StagingSlotName
+
+_PARTIAL_TIP_RETURN_VERSION_GATE = APIVersion(2, 28)
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
@@ -68,6 +71,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
     labware_id: str,
     well_name: str,
     well_location: WellLocationType,
+    version: APIVersion,
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
 
@@ -77,6 +81,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
         labware_id: ID of the labware we are moving to
         well_name: Name of the well to move to
         well_location: exact location within the well to move to
+        version: the API version of the protocol
     """
     # TODO (spp, 2023-02-06): remove this check after thorough testing.
     #  This function is capable of checking for movement conflict regardless of
@@ -90,7 +95,9 @@ def check_safe_for_pipette_movement(  # noqa: C901
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
-            partially_configured=True,
+            # TODO (jbl, 2026-01-14) check if partially configured if the above TODO is addressed
+            api_version_allows_partial_return_tip=version
+            >= _PARTIAL_TIP_RETURN_VERSION_GATE,
         )
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id,

@@ -1,11 +1,12 @@
 """HTTP API registration token logic."""
 
-from fastapi import Header, Request, HTTPException, status, Depends
-from uuid import UUID
 import logging
+from uuid import UUID
 
+from fastapi import Depends, Header, HTTPException, Request, status
+
+from system_server.constants import AUTHORIZATION_AUDIENCE, REGISTRATION_AUDIENCE
 from system_server.jwt import jwt_is_valid
-from system_server.constants import REGISTRATION_AUDIENCE, AUTHORIZATION_AUDIENCE
 from system_server.persistence import get_persistent_uuid
 
 _log = logging.getLogger(__name__)
@@ -15,7 +16,7 @@ async def check_registration_token_header(
     request: Request,
     authenticationBearer: str = Header(
         ...,
-        description="An authentication header bearing a token provided by the /system/register endpoint.",
+        description="An authentication header bearing a token provided by the `/system/register` endpoint.",
     ),
     signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:
@@ -46,7 +47,7 @@ async def check_authorization_token_header(
     request: Request,
     authenticationBearer: str = Header(
         ...,
-        description="An authentication header bearing a token provided by the /system/authorize endpoint.",
+        description="An authentication header bearing a token provided by the `/system/authorize` endpoint.",
     ),
     signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:

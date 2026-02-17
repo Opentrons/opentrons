@@ -8,6 +8,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { ConfirmDeleteEntityInUseModal } from '/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal'
 import { EditNickNameModal } from '/protocol-designer/components/organisms/EditNickNameModal'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -15,14 +16,26 @@ import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labw
 import { LabwareCardOverflowMenu } from '../index'
 
 import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ZoomedIntoSlotInfoState } from '/protocol-designer/labware-ingred/types'
+
+const mockNavigate = vi.fn()
 
 vi.mock('/protocol-designer/components/organisms/EditNickNameModal')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('/protocol-designer/pages/Designer/DeckSetup/utils')
 vi.mock('/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 const render = (props: ComponentProps<typeof LabwareCardOverflowMenu>) => {
   return renderWithProviders(<LabwareCardOverflowMenu {...props} />, {
     i18nInstance: i18n,
@@ -59,6 +72,9 @@ describe('LabwareCardOverflowMenu', () => {
     vi.mocked(ConfirmDeleteEntityInUseModal).mockReturnValue(
       <div>mock ConfirmDeleteEntityInUseModal</div>
     )
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedSlot: { slot: null, cutout: null },
+    } as ZoomedIntoSlotInfoState)
   })
   it('renders the overflow menu with 2 buttons', () => {
     render(props)

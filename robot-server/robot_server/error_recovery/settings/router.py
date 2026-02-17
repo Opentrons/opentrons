@@ -3,12 +3,16 @@
 from typing import Annotated
 
 import fastapi
-from server_utils.fastapi_utils.light_router import LightRouter
 
-from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
+
 from .models import RequestData, ResponseData
 from .store import ErrorRecoverySettingStore, get_error_recovery_setting_store
-
 
 router = LightRouter()
 _PATH = "/errorRecovery/settings"

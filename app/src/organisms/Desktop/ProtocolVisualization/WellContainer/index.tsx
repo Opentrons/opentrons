@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 
@@ -12,7 +12,7 @@ import {
 import { TipSvg } from '../TipSvg'
 import { getTipSvgInfo } from '../utils/getTipSvgInfo'
 import { getWellVolume } from '../utils/getWellVolume'
-import { WellSvg } from '../WellSvg'
+import { WELL_GEOMETRY, WELL_VIEWBOX, WellSvg } from '../WellSvg'
 import styles from './wellcontainer.module.css'
 
 import type {
@@ -22,9 +22,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LocationLiquidState } from '@opentrons/step-generation'
 
-const WELL_HEIGHT_PIXELS = 54
-const WELL_WIDTH_PIXELS = 20
-const PIXEL_DECIMALS = 2
+const SVG_DECIMALS = 2
 
 interface WellContainerProps {
   params: RunTimeCommand['params']
@@ -50,44 +48,56 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const [isWellHovered, setIsWellHovered] = useState<boolean>(false)
   const [isTipHovered, setIsTipHovered] = useState<boolean>(false)
+  const lastTipBottomYRef = useRef<number>(WELL_GEOMETRY.bottomY)
+  const lastXPositionSvgRef = useRef<number>(0)
 
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
   const labwareWellMaxVolume = wells.A1.totalLiquidVolume
-  const zValue = 'wellLocation' in params ? (params.wellLocation.z ?? 1) : 1
+  const hasWellLocation = 'wellLocation' in params
 
   //  TODO: add support for rest of references
-  const reference =
-    'wellLocation' in params
-      ? params.wellLocation.origin === 'top'
-        ? POSITION_REFERENCE_TOP
-        : POSITION_REFERENCE_BOTTOM
+  const reference = hasWellLocation
+    ? params.wellLocation.origin === 'top'
+      ? POSITION_REFERENCE_TOP
       : POSITION_REFERENCE_BOTTOM
-  const mmFromBottom =
-    getMmFromBottom(Number(zValue), reference, labwareDepth) ?? 1
+    : POSITION_REFERENCE_BOTTOM
+  const mmFromBottom = hasWellLocation
+    ? getMmFromBottom(
+        Number(params.wellLocation.z ?? 1),
+        reference,
+        labwareDepth
+      )
+    : null
 
-  const fractionOfWellHeight = mmFromBottom / labwareDepth
-  const pixelsFromBottom =
-    fractionOfWellHeight * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
-  const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-  const bottomPx = labwareDepth
-    ? roundedPixelsFromBottom * 2
-    : mmFromBottom - WELL_HEIGHT_PIXELS
+  const wellHeightSvg = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
+  const wellWidthSvg = WELL_GEOMETRY.rightX - WELL_GEOMETRY.leftX
 
-  const xPositionPixels =
-    (WELL_WIDTH_PIXELS / xLabwareWellWidth) *
-    ('wellLocation' in params ? params.wellLocation.x : 1)
-  const roundedXPositionPixels = round(xPositionPixels, PIXEL_DECIMALS)
+  if (labwareDepth != null && labwareDepth > 0 && mmFromBottom != null) {
+    const fractionOfWellHeight = mmFromBottom / labwareDepth
+    const tipBottomY =
+      WELL_GEOMETRY.bottomY - fractionOfWellHeight * wellHeightSvg
+    lastTipBottomYRef.current = round(tipBottomY, SVG_DECIMALS)
+  }
+  const roundedTipBottomY = lastTipBottomYRef.current
 
-  const { tipColor, tipCurrentVolume } =
+  if (hasWellLocation && xLabwareWellWidth != null && xLabwareWellWidth > 0) {
+    const xPositionSvg =
+      (wellWidthSvg / xLabwareWellWidth) * (params.wellLocation.x ?? 0)
+    lastXPositionSvgRef.current = round(xPositionSvg, SVG_DECIMALS)
+  }
+  const roundedXPositionSvg = lastXPositionSvgRef.current
+
+  const { tipColor, tipCurrentVolume, airGapVolume } =
     pipetteLocationLiquidState != null
       ? getTipSvgInfo(pipetteLocationLiquidState, liquids)
-      : { tipColor: COLORS.grey40, tipCurrentVolume: 0 }
+      : { tipColor: COLORS.grey40, tipCurrentVolume: 0, airGapVolume: 0 }
 
   const totalVolumeInWell =
     labwareLocationLiquidState != null
       ? getWellVolume(labwareLocationLiquidState)
       : 0
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -101,20 +111,11 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
           <div className={styles.well_detail_svg_positioning}>
             <div className={styles.well_detail_svg_container}>
               <div className={styles.well_detail_svg_inner}>
-                <TipSvg
-                  volume={tipCurrentVolume}
-                  maxVolume={tipMaxVolume}
-                  roundedXPositionPixels={roundedXPositionPixels}
-                  bottomPx={bottomPx}
-                  color={tipColor}
-                  setIsHovered={setIsTipHovered}
-                  isHovered={isTipHovered}
-                />
                 {isTipHovered ? (
                   <div className={styles.tip_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: tipCurrentVolume.toString(),
+                        volume: tipCurrentVolume.toFixed(1),
                       })}
                       type="flex"
                     />
@@ -124,20 +125,36 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   <div className={styles.well_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: totalVolumeInWell.toString(),
+                        volume: totalVolumeInWell.toFixed(1),
                       })}
                       type="flex"
                     />
                   </div>
                 ) : null}
                 <div className={styles.svg_container}>
-                  <WellSvg
-                    volume={totalVolumeInWell}
-                    maxVolume={labwareWellMaxVolume}
-                    color={wellColor}
-                    setIsHovered={setIsWellHovered}
-                    isHovered={isWellHovered}
-                  />
+                  <svg
+                    viewBox={`0 0 ${WELL_VIEWBOX.width} ${WELL_VIEWBOX.height}`}
+                    className={styles.well_and_tip_svg}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <WellSvg
+                      volume={totalVolumeInWell}
+                      maxVolume={labwareWellMaxVolume}
+                      color={wellColor}
+                      setIsHovered={setIsWellHovered}
+                      isHovered={isWellHovered}
+                    />
+                    <TipSvg
+                      volume={tipCurrentVolume}
+                      maxVolume={tipMaxVolume}
+                      xOffset={roundedXPositionSvg}
+                      tipBottomY={roundedTipBottomY}
+                      color={tipColor}
+                      setIsHovered={setIsTipHovered}
+                      isHovered={isTipHovered}
+                      airGapVolume={airGapVolume}
+                    />
+                  </svg>
                 </div>
               </div>
               {labwareDepth !== null && (

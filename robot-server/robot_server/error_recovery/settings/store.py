@@ -7,8 +7,7 @@ import fastapi
 import sqlalchemy
 
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
-from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey
-
+from robot_server.persistence.tables import BooleanSettingKey, boolean_setting_table
 
 _ERROR_RECOVERY_ENABLED_DEFAULT = True
 

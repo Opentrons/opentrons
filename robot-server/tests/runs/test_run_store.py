@@ -1,45 +1,50 @@
 """Tests for robot_server.runs.run_store."""
 
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Type
-import warnings
+from unittest import mock
 
 import pytest
 from decoy import Decoy
+from sqlalchemy.engine import Engine
+
+from opentrons.protocol_engine import (
+    CommandSlice,
+    EngineStatus,
+    ErrorOccurrence,
+    Liquid,
+    StateSummary,
+)
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.types import DeckSlotName, MountType
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
+from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons_shared_data.pipette.types import PipetteNameType
+
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-from sqlalchemy.engine import Engine
-from unittest import mock
-
-from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.errors.codes import ErrorCodes
-
-from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import (
-    CSVParameterRunResource,
-    RunStore,
-    RunResource,
-    CommandNotFoundError,
-    BadStateSummary,
-)
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.service.notifications import RunsPublisher
-
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-    errors as pe_errors,
-    types as pe_types,
-    StateSummary,
-    CommandSlice,
-    Liquid,
-    EngineStatus,
-    ErrorOccurrence,
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import (
+    BadStateSummary,
+    CommandNotFoundError,
+    CSVParameterRunResource,
+    RunResource,
+    RunStore,
 )
-from opentrons.types import MountType, DeckSlotName
+from robot_server.service.notifications import RunsPublisher
 
 
 @pytest.fixture()
@@ -1017,11 +1022,17 @@ def test_get_all_commands_as_preserialized_list(
     )
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"protocol"}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
+        '"intent":"protocol","commandAnnotations":[]}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},"intent":"protocol"}',
-        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{}}',
-        '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"fixit"}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
+        '"intent":"protocol","commandAnnotations":[]}',
+        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
+        '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
+        '"commandAnnotations":[]}',
+        '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
+        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
+        '"intent":"fixit","commandAnnotations":[]}',
     ]
 
 
@@ -1047,8 +1058,12 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
     )
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"protocol"}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
+        '"intent":"protocol","commandAnnotations":[]}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},"intent":"protocol"}',
-        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{}}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
+        '"intent":"protocol","commandAnnotations":[]}',
+        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
+        '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
+        '"commandAnnotations":[]}',
     ]

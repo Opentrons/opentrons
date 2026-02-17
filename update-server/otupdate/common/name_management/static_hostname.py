@@ -11,7 +11,6 @@ import urllib.parse
 
 from .avahi import restart_daemon as restart_avahi_daemon
 
-
 _log = logging.getLogger(__name__)
 
 

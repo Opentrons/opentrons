@@ -16,6 +16,11 @@ import {
   DELETE_STEP_FORM,
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import {
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '/protocol-designer/step-forms/selectors'
 import { actions as steplistActions } from '/protocol-designer/steplist'
 import {
   deselectAllSteps,
@@ -24,7 +29,10 @@ import {
 import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
 
 import { StepOverflowMenu } from './StepOverflowMenu'
-import { capitalizeFirstLetterAfterNumber } from './utils'
+import {
+  capitalizeFirstLetterAfterNumber,
+  getFillLabwareToDeleteData,
+} from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
@@ -88,7 +96,8 @@ export function ConnectedStepContainer(
     text === STARTING_DECK_STATE || text === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-
+  const savedStepForms = useSelector(getSavedStepForms)
+  const { modules: deckSetupModules } = useSelector(getInitialDeckSetup)
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
 
   const handleClick = (event: MouseEvent): void => {
@@ -130,8 +139,22 @@ export function ConnectedStepContainer(
     setOpenedOverflowMenuId?.(null)
   }
 
+  const handleDeleteFillLabware = (stepIds: string[]): void => {
+    const fillLabwareToDeleteData = getFillLabwareToDeleteData(
+      stepIds,
+      savedStepForms,
+      deckSetupModules
+    )
+    for (const { labwareIds, module } of fillLabwareToDeleteData) {
+      labwareIds.forEach(id => {
+        dispatch(deleteContainer({ labwareId: id, stacker: module }))
+      })
+    }
+  }
+
   const onDeleteClickAction = (): void => {
     if (multiSelectItemIds) {
+      handleDeleteFillLabware(multiSelectItemIds)
       dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
       // todo(mm, 2025-10-31): Why are we doing deselectAllSteps here?
       // deleteMultipleSteps already adjusts the selection when any of them are deleted.
@@ -151,6 +174,7 @@ export function ConnectedStepContainer(
 
   const handleDelete = (): void => {
     if (stepId != null) {
+      handleDeleteFillLabware([stepId])
       dispatch(steplistActions.deleteMultipleSteps([stepId]))
     } else {
       console.warn(
@@ -171,6 +195,7 @@ export function ConnectedStepContainer(
       onDoubleClick?.(e)
     }
   }
+
   return (
     <>
       {showDeleteConfirmation === true && (

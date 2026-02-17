@@ -1,14 +1,15 @@
 """Definition of CAN messages."""
 
-from dataclasses import dataclass, field
-from typing import Type, Any
 import threading
+from dataclasses import dataclass, field
+from logging import Logger
+from typing import Any, Type
+
 from typing_extensions import Literal
 
-from ..constants import MessageId, ErrorCode, ErrorSeverity
-from . import payloads
 from .. import utils
-from logging import Logger
+from ..constants import ErrorCode, ErrorSeverity, MessageId
+from . import payloads
 
 
 class SingletonMessageIndexGenerator(object):

@@ -9,20 +9,20 @@ import pytest
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
-from opentrons.protocol_engine.commands import Command, Comment
 from opentrons.protocol_engine.actions import (
-    SucceedCommandAction,
     AddAddressableAreaAction,
+    SucceedCommandAction,
 )
+from opentrons.protocol_engine.commands import Command, Comment
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaStore,
     AddressableAreaState,
+    AddressableAreaStore,
 )
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import (
-    DeckType,
     DeckConfigurationType,
+    DeckType,
 )
 
 

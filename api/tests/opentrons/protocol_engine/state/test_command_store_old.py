@@ -5,42 +5,38 @@ Try to add new tests to test_command_state.py, where they can be tested together
 treating CommandState as a private implementation detail.
 """
 
-from decoy import matchers
-import pytest
 from datetime import datetime
 from typing import Any
 
+import pytest
+from decoy import matchers
+
 from opentrons_shared_data.errors import ErrorCodes
 
+from .command_fixtures import create_succeeded_command
 from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.actions.actions import RunCommandAction
-
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckType
-from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.actions import (
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.actions.actions import RunCommandAction
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
-    RunResult,
     QueueStatus,
+    RunResult,
 )
-from opentrons.protocol_engine.state.command_history import CommandEntry
-
-from opentrons.protocol_engine.actions import (
-    QueueCommandAction,
-    SucceedCommandAction,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    FinishAction,
-    FinishErrorDetails,
-    StopAction,
-    HardwareStoppedAction,
-)
-
-from opentrons.protocol_engine.state.command_history import CommandHistory
-
-from .command_fixtures import create_succeeded_command
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.types import DeckType
 
 
 def _make_config(block_on_door_open: bool = False) -> Config:
@@ -185,6 +181,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.QUEUED,
         intent=commands.CommandIntent.SETUP,
+        commandAnnotations=[],
     )
 
     subject = CommandStore(
@@ -336,6 +333,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
 
 
@@ -366,6 +364,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -401,6 +400,7 @@ def test_command_store_handles_finish_action() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -456,6 +456,7 @@ def test_command_store_handles_stop_action(
         is_stopping_because_of_async_error=from_asynchronous_error,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -494,6 +495,7 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -528,6 +530,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -675,6 +678,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -745,6 +749,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -781,6 +786,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -817,6 +823,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []
@@ -853,6 +860,7 @@ def test_handles_hardware_stopped() -> None:
         is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
+        command_annotations={},
     )
     assert subject.state.command_history.get_running_command() is None
     assert subject.state.command_history.get_all_ids() == []

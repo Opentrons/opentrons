@@ -6,6 +6,7 @@ import reduce from 'lodash/reduce'
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getIsTiprack,
@@ -871,12 +872,20 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack: string[] | null,
+  isStacker: boolean = false
+): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return `STACKER ${slot.slice(-2, -1)}`
+    } else {
+      return slot
+    }
   }
 }
 
@@ -919,6 +928,15 @@ export const getIsLabwareCompatibleWithStack = (
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
+  // Determine if labware is on hopper
+  let isOnHopper = false
+  const moduleId = stack.find(id => id in moduleEntities)
+  if (moduleId != null) {
+    const isStackerInStack =
+      moduleEntities[moduleId].type === FLEX_STACKER_MODULE_TYPE
+    isOnHopper = isStackerInStack && stack.includes(HOPPER_STACKER_LOCATION)
+  }
+
   const topIdInStack = getTopLocationInStack(stack)
   let isCompatible: boolean = true
   let isAboveStackLimit: boolean = false
@@ -927,15 +945,41 @@ export const getIsLabwareCompatibleWithStack = (
   if (topIdInStack in labwareEntities) {
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
+    const labwareIdsInStack = stack.filter(id => labwareEntities[id] != null)
+    const lidInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
+    const adapterInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('adapter')
+    )[0]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
-    const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
-    const isSameLoadName =
-      loadNameToCheck === movingLabwareEntity.def.parameters.loadName
-    const currentStackAmount = stack.filter(
-      item => labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
-    )?.length
-    isAboveStackLimit =
-      isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    const primaryLabwareInStack = labwareIdsInStack.filter(
+      id =>
+        !labwareEntities[id]?.def?.allowedRoles?.includes('adapter') &&
+        !labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
+    if (isOnHopper) {
+      // allow labware without a stack limit to be stacked on the stacker
+      const maxPoolCount = getMaxPoolCount({
+        labwareDefinitions: {
+          primary: labwareEntities[primaryLabwareInStack]?.def ?? null,
+          adapter: labwareEntities[adapterInStack]?.def ?? null,
+          lid: labwareEntities[lidInStack]?.def ?? null,
+        },
+        model: FLEX_STACKER_MODULE_V1,
+      })
+      isAboveStackLimit = stack.length > maxPoolCount
+    } else {
+      const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
+      const isSameLoadName =
+        loadNameToCheck === movingLabwareEntity.def.parameters.loadName
+      const currentStackAmount = stack.filter(
+        item =>
+          labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
+      )?.length
+      isAboveStackLimit =
+        isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    }
 
     // This is an exception to allow universal lids to be placed on any labware except
     // tube racks, aluminum blocks, tip racks, or other lids.
@@ -1393,10 +1437,17 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
-  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
-  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
-  return loadedLabware == null || loadedLabware === labwareURIToBeStored
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
+  const storedLabwareURIs = Object.values(
+    stackerState?.storedLabwareDetails ?? {}
+  ).reduce<string[]>((acc, val) => {
+    return val != null ? [...acc, val] : acc
+  }, [])
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
+  return storedLabwareURIs.some(uri => labwareEntity?.labwareDefURI === uri)
 }
 
 export const getIsSpaceInHopper = (

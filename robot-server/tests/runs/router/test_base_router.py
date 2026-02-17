@@ -1,92 +1,91 @@
 """Tests for base /runs routes."""
 
+from datetime import datetime
+from pathlib import Path
+
+import pytest
+from decoy import Decoy
+
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons_shared_data.robot.types import RobotTypeEnum
-from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import (
+    CommandErrorSlice,
+    CommandPointer,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.file_provider import (
+    FileProvider,
+)
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
+from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource
+from opentrons.types import DeckSlotName, NozzleConfigurationType, Point
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     labware_definition_type_adapter,
 )
-import pytest
-from datetime import datetime
-from decoy import Decoy
-from pathlib import Path
-
-from opentrons.types import DeckSlotName, Point, NozzleConfigurationType
-from opentrons.protocol_engine import (
-    types as pe_types,
-    errors as pe_errors,
-    CommandErrorSlice,
-    CommandPointer,
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
 )
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-
-from opentrons_shared_data.data_files import DataFileInfo, MimeType
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import (
-    RequestModel,
-    SimpleBody,
-    SimpleEmptyBody,
-    MultiBodyMeta,
-    ResourceLink,
-)
-
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
     ProtocolStore,
 )
-
-from robot_server.runs.run_auto_deleter import RunAutoDeleter
-
-from robot_server.runs.run_models import (
-    Run,
-    RunCreate,
-    RunUpdate,
-    RunCurrentState,
-    ActiveNozzleLayout,
-    CommandLinkNoMeta,
-    NozzleLayoutConfig,
-    TipState,
-    FlexStackerState,
+from robot_server.runs.router.base_router import (
+    AllRunsLinks,
+    CurrentStateLinks,
+    create_run,
+    get_current_state,
+    get_run,
+    get_run_commands_error,
+    get_run_data_from_url,
+    get_runs,
+    remove_run,
+    update_run,
 )
-from robot_server.runs.run_orchestrator_store import RunConflictError
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
 )
-from robot_server.runs.run_models import RunNotFoundError
-from robot_server.runs.router.base_router import (
-    AllRunsLinks,
-    create_run,
-    get_run_data_from_url,
-    get_run,
-    get_runs,
-    remove_run,
-    update_run,
-    get_run_commands_error,
-    get_current_state,
-    CurrentStateLinks,
+from robot_server.runs.run_models import (
+    ActiveNozzleLayout,
+    CommandLinkNoMeta,
+    FlexStackerState,
+    NozzleLayoutConfig,
+    Run,
+    RunCreate,
+    RunCurrentState,
+    RunNotFoundError,
+    RunUpdate,
+    TipState,
 )
-
-from robot_server.deck_configuration.store import DeckConfigurationStore
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from opentrons.protocol_engine.resources.file_provider import (
-    FileProvider,
-)
-from robot_server.file_provider.provider import FileProviderExecutor
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
+from robot_server.runs.run_orchestrator_store import RunConflictError
 
 
 def mock_notify_publishers() -> None:
@@ -568,7 +567,7 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
@@ -582,7 +581,7 @@ async def test_delete_active_run(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
         RunConflictError("oh no")
     )
 
@@ -796,7 +795,7 @@ async def test_get_run_commands_errors_raises_no_run(
 
 @pytest.mark.parametrize(
     "error_list, expected_cursor_result",
-    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],
+    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],  # type: ignore[call-arg]
 )
 async def test_get_run_commands_errors_defualt_cursor(
     decoy: Decoy,

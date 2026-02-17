@@ -2,33 +2,32 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING, Sequence
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Dict, Generic, List, Optional, Sequence, Tuple, Union
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
-from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import (
-    DeckSlotName,
-    StagingSlotName,
-    Location,
-    Mount,
-    Point,
-)
-from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
-
+from .._liquid import Liquid, LiquidClass
+from .._types import OffDeckType
+from ..disposal_locations import TrashBin, WasteChute
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
-from .tasks import TaskCoreType
-from .._liquid import Liquid, LiquidClass
 from .robot import AbstractRobot
-from .._types import OffDeckType
-from ..disposal_locations import TrashBin, WasteChute
+from .tasks import TaskCoreType
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.types import (
+    DeckSlotName,
+    Location,
+    Mount,
+    Point,
+    StagingSlotName,
+)
 
 if TYPE_CHECKING:
     from ..labware import Labware
@@ -302,6 +301,18 @@ class AbstractProtocol(
         saturation: Optional[float] = None,
     ) -> None:
         "Capture an image using a camera."
+
+    @abstractmethod
+    def start_step_grouping(
+        self,
+        annotation_name: str,
+        annotation_description: Optional[str],
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+
+    @abstractmethod
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
 
     @abstractmethod
     def load_robot(self) -> AbstractRobot:

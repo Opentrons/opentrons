@@ -6,38 +6,35 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount, Point
+from opentrons_shared_data.labware.labware_definition import (
+    CuboidalFrustum,
+    InnerWellGeometry,
+    RectangularWellDefinition3,
+    SphericalSegment,
+)
+
+from ..note_utils import CommandNoteMatcher
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import CriticalPoint
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.pipettes import HardwarePipette
-from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.wells import WellView
-from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.errors.exceptions import (
+    InvalidAspirateVolumeError,
+    InvalidDispenseVolumeError,
+    InvalidPushOutVolumeError,
+    TipNotAttachedError,
+)
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
-
-from opentrons.protocol_engine.errors.exceptions import (
-    TipNotAttachedError,
-    InvalidAspirateVolumeError,
-    InvalidPushOutVolumeError,
-    InvalidDispenseVolumeError,
-)
-from opentrons.protocol_engine.notes import CommandNoteAdder, CommandNote
-from ..note_utils import CommandNoteMatcher
-
-
-from opentrons_shared_data.labware.labware_definition import (
-    CuboidalFrustum,
-    InnerWellGeometry,
-    SphericalSegment,
-    RectangularWellDefinition3,
-)
+from opentrons.protocol_engine.notes import CommandNote, CommandNoteAdder
+from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.pipettes import HardwarePipette
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.wells import WellView
+from opentrons.protocol_engine.types import TipGeometry
+from opentrons.types import Mount, Point
 
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
     sections=[

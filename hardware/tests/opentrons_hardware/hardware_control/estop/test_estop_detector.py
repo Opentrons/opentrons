@@ -1,31 +1,31 @@
 """Test the estop.detector module."""
 
+from typing import List, Type
+
 import pytest
 from mock import AsyncMock
-from typing import Type, List
-
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopSummary,
-    EstopDetector,
-)
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
-)
 from opentrons_shared_data.errors.exceptions import (
     InternalUSBCommunicationError,
 )
 
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    BinaryMessageDefinition,
-    EstopButtonDetectionChange,
-    EstopStateChange,
-    EstopButtonPresentRequest,
-    EstopStateRequest,
     Ack,
     AckFailed,
+    BinaryMessageDefinition,
+    EstopButtonDetectionChange,
+    EstopButtonPresentRequest,
+    EstopStateChange,
+    EstopStateRequest,
 )
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+)
+from opentrons_hardware.hardware_control.estop.detector import (
+    EstopDetector,
+    EstopSummary,
+)
 
 
 @pytest.fixture

@@ -1,16 +1,27 @@
-import { getIsTiprack } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import { FLEX_STACKER_MODULE_TYPE, getIsTiprack } from '@opentrons/shared-data'
+import {
+  getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
+} from '@opentrons/step-generation'
+
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { getRobotType } from '../../file-data/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { updateStackerModuleState } from '../../step-forms/actions/modules'
 import { getLabwareEntities } from '../../step-forms/selectors'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
-import type { LabwareEntities } from '@opentrons/step-generation'
-import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
+import type { FlexStackerStoredLabwareGroup } from '@opentrons/shared-data'
+import type { FlexStackerModuleState } from '@opentrons/step-generation'
+import type {
+  ModuleOnDeck,
+  NormalizedLabware,
+  NormalizedLabwareById,
+} from '../../step-forms'
 import type { UpdateStackerModuleStateAction } from '../../step-forms/actions/modules'
 import type { ThunkAction } from '../../types'
 import type {
@@ -201,54 +212,109 @@ export interface EditMultipleLabwareAction {
 
 interface DeleteContainerArgs {
   labwareId: string
+  // needed to override the hopper/module checks below, since when we enter `deleteContainer`
+  // from deleting multiple steps, the active deck setup contains an empty object for modules and labware
+  stacker?: ModuleOnDeck
 }
 export const deleteContainer: (
   args: DeleteContainerArgs
-) => ThunkAction<DeleteContainerAction | EditMultipleLabwareAction> =
-  args => (dispatch, getState) => {
-    const { labwareId } = args
-    const state = getState()
-    const labwareEntities = getLabwareEntities(state)
-    const displayCategory =
-      labwareEntities[labwareId].def.metadata.displayCategory
-    const labwareOfSameCategory: LabwareEntities = Object.fromEntries(
-      Object.entries(labwareEntities).filter(
-        ([_, labware]) =>
-          labware.def.metadata.displayCategory === displayCategory
-      )
+) => ThunkAction<
+  | DeleteContainerAction
+  | EditMultipleLabwareAction
+  | UpdateStackerModuleStateAction
+> = args => (dispatch, getState) => {
+  const { labwareId, stacker } = args
+  const state = getState()
+  const labwareEntities = getLabwareEntities(state)
+  const deckSetup = getDeckSetupForActiveItem(state)
+  const { modules, labware } = deckSetup
+  const isLabwareOnHopper =
+    stacker != null ||
+    labware[labwareId].stack.includes(HOPPER_STACKER_LOCATION)
+  const labwareSlot =
+    stacker?.slot ?? getSlotInLocationStack(labware[labwareId].stack)
+  const moduleOnSlot =
+    stacker ??
+    Object.values(modules).find(
+      ({ slot: moduleSlot }) => moduleSlot === labwareSlot
     )
-    const typeCount = Object.keys(labwareOfSameCategory).length
+
+  const displayCategory =
+    labwareEntities[labwareId].def.metadata.displayCategory
+  const labwareOfSameCategory = Object.fromEntries(
+    Object.entries(labwareEntities).filter(
+      ([_, labware]) => labware.def.metadata.displayCategory === displayCategory
+    )
+  )
+  const typeCount = Object.keys(labwareOfSameCategory).length
+
+  dispatch({
+    type: 'DELETE_CONTAINER',
+    payload: {
+      labwareId,
+    },
+  })
+
+  if (typeCount > 1) {
+    const { [labwareId]: _, ...remainingLabwareEntities } =
+      labwareOfSameCategory
+
+    const updatedLabwarePythonName: NormalizedLabwareById = Object.keys(
+      remainingLabwareEntities
+    )
+      .sort()
+      .reduce<Record<string, NormalizedLabware>>(
+        (acc: NormalizedLabwareById, oldId, index) => {
+          acc[oldId] = {
+            ...remainingLabwareEntities[oldId],
+            pythonName: getLabwarePythonName(displayCategory, index + 1),
+            displayCategory,
+          }
+          return acc
+        },
+        {}
+      )
 
     dispatch({
-      type: 'DELETE_CONTAINER',
-      payload: {
-        labwareId,
-      },
+      type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME',
+      payload: updatedLabwarePythonName,
     })
+  }
 
-    if (typeCount > 1) {
-      const { [labwareId]: _, ...remainingLabwareEntities } =
-        labwareOfSameCategory
+  if (isLabwareOnHopper && moduleOnSlot?.type === FLEX_STACKER_MODULE_TYPE) {
+    const stackerModuleState: FlexStackerModuleState =
+      moduleOnSlot.moduleState as FlexStackerModuleState
 
-      const updatedLabwarePythonName: NormalizedLabwareById = Object.keys(
-        remainingLabwareEntities
-      )
-        .sort()
-        .reduce<Record<string, NormalizedLabware>>(
-          (acc: NormalizedLabwareById, oldId, index) => {
-            acc[oldId] = {
-              ...remainingLabwareEntities[oldId],
-              pythonName: getLabwarePythonName(displayCategory, index + 1),
-              displayCategory,
-            }
-            return acc
+    if (stackerModuleState.labwareInHopper != null) {
+      const labwareInHopper = stackerModuleState.labwareInHopper.reduce<
+        FlexStackerStoredLabwareGroup[]
+      >((acc, group) => {
+        if (group.primaryLabwareId === labwareId) {
+          return acc
+        }
+
+        acc.push({
+          ...group,
+          adapterLabwareId:
+            group.adapterLabwareId === labwareId
+              ? null
+              : group.adapterLabwareId,
+          lidLabwareId:
+            group.lidLabwareId === labwareId ? null : group.lidLabwareId,
+        })
+
+        return acc
+      }, [])
+
+      dispatch(
+        updateStackerModuleState({
+          moduleId: moduleOnSlot.id,
+          moduleState: {
+            ...stackerModuleState,
+            labwareInHopper,
           },
-          {}
-        )
-
-      dispatch({
-        type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME',
-        payload: updatedLabwarePythonName,
-      })
+        })
+      )
     }
   }
+}

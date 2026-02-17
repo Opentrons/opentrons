@@ -2,70 +2,69 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union, AsyncGenerator, Callable, Tuple
+from typing import AsyncGenerator, Callable, Dict, Optional, Tuple, Union
 
 from opentrons_shared_data.errors import (
-    ErrorCodes,
     EnumeratedError,
+    ErrorCodes,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
-from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.system import camera
-
+from . import commands, labware_offset_standardization, slot_standardization
+from .actions import (
+    ActionDispatcher,
+    AddAddressableAreaAction,
+    AddCameraCaptureImageSettingsAction,
+    AddCameraSettingsAction,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    AddLiquidAction,
+    AddModuleAction,
+    CreateUserCommandAnnotation,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    SetDeckConfigurationAction,
+    SetPipetteMovementSpeedAction,
+    StopAction,
+)
 from .actions.actions import (
     ResumeFromRecoveryAction,
     SetErrorRecoveryPolicyAction,
 )
-from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
-from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
-from . import commands, slot_standardization, labware_offset_standardization
-from .resources import ModelUtils, ModuleDataProvider, FileProvider, CameraProvider
-from .resources.camera_provider import CameraSettings
-from .types import (
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LegacyLabwareOffsetCreate,
-    LabwareUri,
-    ModuleModel,
-    Liquid,
-    HexColor,
-    PostRunHardwareState,
-    DeckConfigurationType,
-)
+from .errors import CommandNotAllowedError, ErrorOccurrence, ProtocolCommandFailedError
+from .errors.exceptions import EStopActivatedError
 from .execution import (
-    QueueWorker,
-    create_queue_worker,
     DoorWatcher,
     HardwareStopper,
+    QueueWorker,
+    create_queue_worker,
 )
+from .plugins import AbstractPlugin, PluginStarter
+from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
+from .resources.camera_provider import CameraSettings
 from .state.state import StateStore, StateView
 from .state.update_types import StateUpdate
-from .plugins import AbstractPlugin, PluginStarter
-from .actions import (
-    ActionDispatcher,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    StopAction,
-    FinishAction,
-    FinishErrorDetails,
-    QueueCommandAction,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    AddLiquidAction,
-    AddCameraSettingsAction,
-    AddCameraCaptureImageSettingsAction,
-    SetDeckConfigurationAction,
-    AddAddressableAreaAction,
-    AddModuleAction,
-    HardwareStoppedAction,
-    SetPipetteMovementSpeedAction,
+from .types import (
+    DeckConfigurationType,
+    HexColor,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareUri,
+    LegacyLabwareOffsetCreate,
+    Liquid,
+    ModuleModel,
+    PostRunHardwareState,
 )
-
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
+from opentrons.system import camera
 
 _log = getLogger(__name__)
 
@@ -764,6 +763,25 @@ class ProtocolEngine:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Replace the run's error recovery policy with a new one."""
         self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str],
+    ) -> str:
+        """Creates a new user generated command annotation."""
+        if annotation_id is None:
+            annotation_id = self._model_utils.generate_id()
+        self._action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id=annotation_id,
+                user_defined_name=annotation_name,
+                user_description=description,
+                params={},
+            )
+        )
+        return annotation_id
 
     def clear_command_history(self) -> None:
         """Clear command history."""

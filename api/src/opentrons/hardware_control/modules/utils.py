@@ -2,24 +2,22 @@ import asyncio
 import logging
 from typing import Dict, Optional, Type
 
-from opentrons.drivers.rpi_drivers.types import USBPort
-
 from ..execution_manager import ExecutionManager
-
-from .types import (
-    ModuleDisconnectedCallback,
-    ModuleType,
-    SpeedStatus,
-    ModuleErrorCallback,
-)
-from .mod_abc import AbstractModule
-from .tempdeck import TempDeck
-from .magdeck import MagDeck
-from .thermocycler import Thermocycler
-from .heater_shaker import HeaterShaker
 from .absorbance_reader import AbsorbanceReader
 from .flex_stacker import FlexStacker
-
+from .heater_shaker import HeaterShaker
+from .magdeck import MagDeck
+from .mod_abc import AbstractModule
+from .tempdeck import TempDeck
+from .thermocycler import Thermocycler
+from .types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    ModuleType,
+    SpeedStatus,
+)
+from .vacuum_module import VacuumModule
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +31,7 @@ MODULE_TYPE_BY_NAME = {
     HeaterShaker.name(): HeaterShaker.MODULE_TYPE,
     AbsorbanceReader.name(): AbsorbanceReader.MODULE_TYPE,
     FlexStacker.name(): FlexStacker.MODULE_TYPE,
+    VacuumModule.name(): VacuumModule.MODULE_TYPE,
 }
 
 _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
@@ -42,6 +41,7 @@ _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
     HeaterShaker.MODULE_TYPE: HeaterShaker,
     AbsorbanceReader.MODULE_TYPE: AbsorbanceReader,
     FlexStacker.MODULE_TYPE: FlexStacker,
+    VacuumModule.MODULE_TYPE: VacuumModule,
 }
 
 
