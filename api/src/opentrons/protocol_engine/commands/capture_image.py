@@ -285,7 +285,7 @@ class CaptureImageImpl(
 class CaptureImage(
     BaseCommand[CaptureImageParams, CaptureImageResult, ErrorOccurrence]
 ):
-    """A command to execute an Absorbance Reader measurement."""
+    """A command to capture an image from the onboard camera."""
 
     commandType: CaptureImageCommandType = "captureImage"
     params: CaptureImageParams
@@ -295,7 +295,7 @@ class CaptureImage(
 
 
 class CaptureImageCreate(BaseCommandCreate[CaptureImageParams]):
-    """A request to execute an Absorbance Reader measurement."""
+    """A request to capture an image from the onboard camera."""
 
     commandType: CaptureImageCommandType = "captureImage"
     params: CaptureImageParams
