@@ -11,8 +11,7 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.users.models import User
-from auth_server.users.store import get, password_hash
+from auth_server.users.store import User, get, password_hash
 
 _log = logging.getLogger(__name__)
 
