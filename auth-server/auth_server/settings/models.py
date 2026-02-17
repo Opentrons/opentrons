@@ -34,6 +34,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings."""
 
     accessControlEnabled: Annotated[
+        # Note: `Literal[True]` instead of `bool` to enforce one-way latching.
         Literal[True] | None,
         pydantic.Field(
             description=dedent(

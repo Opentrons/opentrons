@@ -26,8 +26,12 @@ class SettingsStore:
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
         new_settings = self._settings.model_copy()
+
+        # Pydantic will already have validated that `patch.accessControlEnabled` is
+        # `True | None`, not `False`, so this is a one-way latch.
         if patch.accessControlEnabled is not None:
             new_settings.accessControlEnabled = patch.accessControlEnabled
+
         self._settings = new_settings
         return self.get()
 
