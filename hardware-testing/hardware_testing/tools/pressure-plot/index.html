@@ -18,12 +18,11 @@
 			height: 100%;
 			font-family: "Open Sans", verdana, arial, sans-serif;
 		}
-		#plotly {
-			border: solid 2px black;
-			position: absolute;
+		#plot-container {
+			position: relative;
 			left: 5px;
-			top: 105px;
-			display: inline-block;
+			top: 10px;
+			display: block;
 		}
 		/* #testnamecontainer {
 			position: absolute;
@@ -53,7 +52,8 @@
 		<p id="buttoncontainer">
 		</p>
 	</div>
-	<div id="plotly"></div>
+	<!-- Replace single plotly div with a container for multiple plots -->
+	<div id="plot-container"></div>
 </body>
-<script src="./index.js" type="text/javascript"></script>
+<script src="./index_plot.js" type="text/javascript"></script>
 </html>

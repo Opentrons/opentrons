@@ -94,8 +94,6 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             "files": [],
             "name": "",
             "csv": "",
-            "Time": [],
-            "Pressure": []
         }
 
         if path_list:
@@ -105,16 +103,18 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             with open(file_name, "r") as f:
                 csv_data = f.readlines()
                 print(f'csv_data: {csv_data}')
-            # Parse the CSV file
+            # Parse the CSV file - dynamically handle all columns
             header = csv_data[0].strip().split(",")
-            time_idx = header.index("Time")
-            pressure_idx = header.index("Pressure")
+            # Initialize empty lists for every column in the header
+            for col in header:
+                response_data[col] = []
 
             for line in csv_data[1:]:
                 if line.strip():
                     values = line.strip().split(",")
-                    response_data["Time"].append(float(values[time_idx]))
-                    response_data["Pressure"].append(float(values[pressure_idx]))
+                    for i, col in enumerate(header):
+                        if i < len(values):
+                            response_data[col].append(float(values[i]))
 
         response_str = json.dumps({req_cmd: response_data})
         print(f'response_str: {response_str}')
