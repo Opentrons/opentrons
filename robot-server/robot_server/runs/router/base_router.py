@@ -85,7 +85,6 @@ from robot_server.protocols.protocol_store import (
 )
 from robot_server.protocols.router import ProtocolNotFound
 from robot_server.robot.control.dependencies import require_estop_in_good_state
-from robot_server.runs import dependencies
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.notifications import get_pe_notify_publishers
 
