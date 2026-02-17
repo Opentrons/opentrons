@@ -2,10 +2,10 @@ import pytest
 
 from server_utils.auth.scopes import Scope
 
+from auth_server.users.models import User
 from auth_server.users.store import (
     TEST_USERS,
     AccountType,
-    User,
     add,
     build_user,
     get,

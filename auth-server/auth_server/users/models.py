@@ -1,6 +1,22 @@
+from dataclasses import dataclass
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
+
+from server_utils.auth.scopes import Scope
+
+from auth_server.users.store import AccountType
+
+
+@dataclass(frozen=True)
+class User:
+    """Information about a given user account."""
+
+    username: str
+    hashed_password: str
+    full_name: str
+    account_type: AccountType
+    scopes: list[Scope]
 
 
 class UserCreate(BaseModel):
@@ -10,7 +26,7 @@ class UserCreate(BaseModel):
     password: Annotated[SecretStr, Field(..., description="The password for the user.")]
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
-        str, Field(..., description="The type of account for the user.")
+        AccountType, Field(..., description="The type of account for the user.")
     ]
 
 
@@ -27,7 +43,8 @@ class UpdateUser(BaseModel):
         Optional[str], Field(..., description="The full name of the user.")
     ] = None
     accountType: Annotated[
-        Optional[str], Field(..., description="The type of account for the user.")
+        Optional[AccountType],
+        Field(..., description="The type of account for the user."),
     ] = None
 
 
@@ -36,5 +53,5 @@ class UserResponse(BaseModel):
 
     userName: str
     fullName: str
-    accountType: str
+    accountType: AccountType
     scopes: list[str]

@@ -3,7 +3,9 @@ from enum import StrEnum
 
 from pwdlib import PasswordHash
 
-from .scopes import Scope
+from server_utils.auth.scopes import Scope
+
+from auth_server.users.models import User
 
 password_hash = PasswordHash.recommended()
 
@@ -15,18 +17,6 @@ class AccountType(StrEnum):
     USER = "user"
     AUDITOR = "auditor"
     SERVICE = "service"
-
-
-@dataclass(frozen=True)
-class User:
-    """Information about a given user account."""
-
-
-    username: str
-    hashed_password: str
-    full_name: str
-    account_type: AccountType
-    scopes: list[Scope]
 
 
 # todo(mm, 2026-01-29): Delete these placeholder users when we have a real DB to store real users.
