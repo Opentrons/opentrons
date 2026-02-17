@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  InlineNotification,
   ModalShell,
   PrimaryButton,
   SecondaryButton,
@@ -49,6 +50,7 @@ export function NozzleAndWellSelectionModal(
   const robotType = useSelector(getRobotType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const isMixStep = stepType === 'mix'
+
   const handleContinue = (): void => {
     setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
   }
@@ -106,8 +108,23 @@ export function NozzleAndWellSelectionModal(
   const isLastStepOfMix = isMixStep
     ? currentStepIndex + 1 === totalSteps - 1
     : false
+  const stepFieldMap: Record<number, keyof FieldPropsByName | null> = {
+    0: null,
+    1: isMixStep ? 'wells' : 'aspirate_wells',
+    2: 'dispense_wells',
+  }
+
+  const activeFieldKey = stepFieldMap[currentStepIndex]
+
+  const currentStepError =
+    activeFieldKey != null
+      ? (propsForFields[activeFieldKey]?.errorToShow ?? null)
+      : null
   const footerElement = (
     <div className={styles.modal_footer}>
+      {currentStepError != null && (
+        <InlineNotification type="error" message={currentStepError} hug />
+      )}
       {currentStepIndex !== 0 ? (
         <SecondaryButton onClick={handleBack}>
           {t('shared:go_back')}
