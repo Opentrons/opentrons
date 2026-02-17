@@ -45,7 +45,7 @@ describe('RecoveryDoorOpen', () => {
   it(`calls resumeRecovery when the primary button is clicked and the run status is ${RUN_STATUS_AWAITING_RECOVERY_PAUSED}`, () => {
     render(props)
 
-    clickButtonLabeled('Resume')
+    clickButtonLabeled('Confirm')
 
     expect(mockResumeRecovery).toHaveBeenCalledTimes(1)
   })
@@ -56,7 +56,7 @@ describe('RecoveryDoorOpen', () => {
 
     render(props)
 
-    clickButtonLabeled('Resume')
+    clickButtonLabeled('Confirm')
 
     await vi.waitFor(() => {
       expect(mockResumeRecovery).toHaveBeenCalledTimes(1)
@@ -114,7 +114,7 @@ describe('RecoveryDoorOpen', () => {
       render(props)
 
       screen.getByTestId('recovery_door_alert_icon')
-      screen.getByText('Close the robot and stacker door')
+      screen.getByText('Confirm the robot and stacker door are closed')
       screen.getByText(
         'The robot needs to safely move to its home location before you manually move the labware.'
       )
@@ -128,9 +128,9 @@ describe('RecoveryDoorOpen', () => {
       render(props)
 
       screen.getByTestId('recovery_door_alert_icon')
-      screen.getByText('Robot door is open')
+      screen.getByText('Confirm the robot door is closed')
       screen.getByText(
-        'Close the robot door, and then resume the recovery action.'
+        'Ensure the robot door is closed before continuing the recovery action.'
       )
     }
   )

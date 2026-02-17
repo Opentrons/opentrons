@@ -122,7 +122,7 @@ describe('RecoveryDoorOpenSpecial', () => {
     render(props)
     screen.getByText('Close the robot door')
     screen.getByText(
-      'Close the robot door, and then resume the recovery action.'
+      'Ensure the robot door is closed before continuing the recovery action.'
     )
   })
 
