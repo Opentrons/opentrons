@@ -8,17 +8,6 @@ from server_utils.auth.scopes import Scope
 from auth_server.users.store import AccountType
 
 
-@dataclass(frozen=True)
-class User:
-    """Information about a given user account."""
-
-    username: str
-    hashed_password: str
-    full_name: str
-    account_type: AccountType
-    scopes: list[Scope]
-
-
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
