@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "eyes-playwright>=6.4.20",
+    "httpx>=0.26.0",
     "mypy>=1.13.0",
     "playwright>=1.55.0",
     "pytest>=8.0.0",

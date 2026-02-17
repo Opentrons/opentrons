@@ -1,6 +1,6 @@
 # E2E Testing
 
-End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Library (LL)** using Playwright and pytest. Soon we will add app tests and API testing.
+End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, and **Auth Server** using Playwright (PD/LL) and httpx (Auth Server) with pytest.
 
 ## Prerequisites
 
@@ -63,6 +63,18 @@ make test-ll-staging                             # Against staging
 make test-ll-prod                                # Against production
 ```
 
+### Auth Server
+
+```bash
+make test-auth                                   # Auto-starts auth-server if needed
+make test-auth PYTEST_ARGS="-k test_name"        # Run one test
+AUTH_SERVER_URL=http://host:33950 make test-auth  # Point at a remote server
+```
+
+The auth tests use **httpx** (not Playwright) to exercise the auth-server's OAuth 2 password-grant flow, token refresh, introspection, and settings endpoints.
+
+**Auto-start behavior:** When no `AUTH_SERVER_URL` is set and nothing is already listening on `:33950`, the test fixture automatically runs `make -C ../auth-server dev`, waits for it to become ready, and tears it down after the session. If the auth-server is already running, the fixture reuses it.
+
 ### Other Targets
 
 ```bash
@@ -97,13 +109,15 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
 
 ## Directory Layout
 
-- `automation/` — Page objects and shared helpers
+- `automation/` — Page objects, clients, and shared helpers
   - `base_page.py` — Shared `BasePage` class inherited by all page objects
+  - `auth_client.py` — httpx-based OAuth 2 client for auth-server E2E tests
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
+  - `auth/` — Auth Server tests (marked `@pytest.mark.authE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
 - `eyes.py` — Applitools Eyes wrapper and pytest fixture
@@ -125,12 +139,15 @@ Tests use the **Page Object Model** pattern for maintainability:
 
 ### Key Fixtures (conftest.py)
 
-| Fixture       | Scope    | Purpose                                                                                        |
-| ------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `pd_base_url` | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
-| `ll_base_url` | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
-| `page`        | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
-| `eyes`        | function | Applitools Eyes session (or `None` when disabled)                                              |
+| Fixture         | Scope    | Purpose                                                                                        |
+| --------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `pd_base_url`   | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
+| `ll_base_url`   | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
+| `page`          | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
+| `eyes`          | function | Applitools Eyes session (or `None` when disabled)                                              |
+| `auth_base_url` | session  | Resolves auth-server URL; auto-starts `make -C ../auth-server dev` if nothing is running       |
+| `auth_client`   | session  | Shared `AuthClient` (httpx) instance pointed at `auth_base_url`                                |
+| `admin_token`   | function | Fresh admin access token for tests that need one                                               |
 
 ### Environment Variables
 
@@ -142,6 +159,7 @@ Tests use the **Page Object Model** pattern for maintainability:
 | `PD_SERVER_URL`      | auto    | Override PD URL                       |
 | `LL_SERVER_URL`      | auto    | Override LL URL                       |
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
+| `AUTH_SERVER_URL`    | auto    | Override auth-server URL              |
 | `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
 
 ## Development Workflow
@@ -191,6 +209,7 @@ make troubleshoot
 
 - **PD tests** (`tests/pd/`) — Onboarding, imports, protocol steps, settings, drag-and-drop, URL navigation, etc.
 - **LL tests** (`tests/ll/`) — Navigation, labware creator forms for well plates, reservoirs, tube racks, etc.
+- **Auth tests** (`tests/auth/`) — OAuth 2 password grant, token refresh, introspection, settings endpoints, error cases
 - **Unit tests** — `test_testfiles.py` validates fixture JSON files
 
 ### Test Reports and Artifacts
@@ -220,7 +239,7 @@ All tests automatically generate comprehensive reports and recordings:
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document test steps with comments and print statements so agents can maintain them
-8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E` — never both
+8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E`, Auth tests `@pytest.mark.authE2E`
 
 ## Visual Snapshots (Applitools Eyes)
 
@@ -279,4 +298,5 @@ Notes:
 
 - **`.github/workflows/pd-e2e-test.yaml`** — PD E2E tests
 - **`.github/workflows/ll-e2e-test.yaml`** — LL E2E tests
+- **`.github/workflows/auth-server-e2e-test.yaml`** — Auth Server E2E tests
 - **`.github/workflows/e2e-test-checks.yaml`** — Lint + typecheck

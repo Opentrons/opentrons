@@ -116,6 +116,15 @@ test-ll-staging-headed:
 test-ll-prod:
 	TEST_ENV=prod uv run pytest -m llE2E $(PYTEST_ARGS)
 
+# ── Auth-server E2E tests ────────────────────────────────────────────
+# Auto-starts a local auth-server if one isn't already running.
+# Point AUTH_SERVER_URL at a remote server to skip local startup:
+#   AUTH_SERVER_URL=http://host:33950 make test-auth
+
+.PHONY: test-auth
+test-auth:
+	uv run pytest -m authE2E $(PYTEST_ARGS)
+
 .PHONY: test-compare
 test-compare:
 	@if [ "$(HEADLESS)" = "false" ]; then \

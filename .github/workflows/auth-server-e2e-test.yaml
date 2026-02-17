@@ -1,0 +1,83 @@
+# Auth Server E2E Tests
+# The e2e-testing conftest auto-starts the auth-server when no
+# AUTH_SERVER_URL is set, so we just need both Python environments
+# installed and let pytest handle the rest.
+
+name: 'Auth Server E2E Tests'
+
+on:
+  pull_request:
+    paths:
+      - 'auth-server/**'
+      - 'server-utils/**'
+      - 'e2e-testing/tests/auth/**'
+      - 'e2e-testing/automation/auth_client.py'
+      - 'e2e-testing/uv.lock'
+      - 'e2e-testing/pyproject.toml'
+      - 'e2e-testing/pytest.ini'
+      - '.github/workflows/auth-server-e2e-test.yaml'
+      - '.github/actions/python/**'
+      - 'Makefile'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: 'true'
+
+jobs:
+  e2e-test:
+    name: 'auth-server E2E tests'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 15
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # -- Auth-server setup (so `make -C ../auth-server dev` works) ---
+      - uses: 'actions/setup-node@v6'
+        with:
+          node-version: '22.22.0'
+
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'auth-server'
+
+      # -- E2E test runner setup ---------------------------------------
+      - name: 'Setup UV for E2E tests'
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+          cache-dependency-glob: |
+            e2e-testing/uv.lock
+            e2e-testing/pyproject.toml
+
+      - name: 'Install E2E test dependencies'
+        working-directory: e2e-testing
+        run: make setup
+
+      # -- Run tests (conftest auto-starts auth-server) ----------------
+      - name: 'Run auth E2E tests'
+        working-directory: e2e-testing
+        run: make test-auth
+
+      # -- Artifacts ---------------------------------------------------
+      - name: 'Upload test results'
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: auth-e2e-results
+          path: |
+            e2e-testing/test-results/
+          retention-days: 7
+          if-no-files-found: warn
