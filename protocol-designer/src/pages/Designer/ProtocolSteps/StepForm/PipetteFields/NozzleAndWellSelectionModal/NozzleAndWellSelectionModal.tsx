@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -57,11 +57,7 @@ export function NozzleAndWellSelectionModal(
   }
   const activeFieldKey = stepFieldMap[currentStepIndex]
   const wellValues = propsForFields[activeFieldKey]?.value as []
-  useEffect(() => {
-    if (wellValues?.length > 0) {
-      setShowError(false)
-    }
-  })
+
   const handleContinue = (): void => {
     setShowError(false)
     if (currentStepIndex !== 0 && activeFieldKey !== null) {
