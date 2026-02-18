@@ -16,11 +16,12 @@ def create_pyro_daemon(pyroname: str, resource: Type, registry: Callable):
     # Create a gauranteed synchronous adapted alias to the resource
     pyro_object = PyroSynchronousObject(resource)
 
-    # Handle Pyro registration and publication of our synchronized oobject
+    # Handle Pyro registration and publication of our synchronized object
     with pyro.Daemon() as daemon:
         pyro_uri = daemon.register(pyro_object)
 
-        # Find the currently running nameserver (requires running pyro5-ns)
+        # Find the currently running nameserver
+        # todo(chb, 2026-02-18): Need error handling if the namerserver is not present
         with pyro.locate_ns() as ns:
             # Register our objects URI with the system nameserver
             ns.register(pyroname, pyro_uri)

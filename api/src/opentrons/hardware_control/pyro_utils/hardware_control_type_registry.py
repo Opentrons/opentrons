@@ -37,3 +37,6 @@ def register_hardware_types():
     serpent.unregister_class(enum.Enum)
     register_class_to_dict(opentrons.hardware_control.types.OT3Mount, _ot3_mount_class_to_dict)
     serpent.register_class(enum.Enum, _serpent_enum_serializer)
+
+    # todo(chb, 2026-02-18): Implement the remaining HWC type registries
+    
