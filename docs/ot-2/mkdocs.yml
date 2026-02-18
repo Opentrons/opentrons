@@ -31,7 +31,7 @@ nav:
   - Calibration:
       - Calibration: calibration/index.md
       - Robot Calibration: calibration/robot-calibration.md
-      - Labware Calibration: calibration/labware-calibration.md
+      - Labware Offsets: calibration/labware-offsets.md
       - Jog Controls: calibration/jog-controls.md
   - Opentrons App:
       - Opentrons App: opentrons-app/index.md

@@ -1,5 +1,5 @@
 ---
-title: "Opentrons OT-2: Robot Calibration Overview"
+title: "Opentrons OT-2: Robot Calibration"
 ---
 
 Start here for an overview of the robot calibration process and instructions on how to perform these procedures.
