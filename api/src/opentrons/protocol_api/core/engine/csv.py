@@ -1,9 +1,13 @@
-from typing import List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
 
 from ..csv import AbstractCSV
-from .protocol import ProtocolCore
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+
+if TYPE_CHECKING:
+    from .protocol import ProtocolCore
 
 
 class CSVCore(AbstractCSV):
