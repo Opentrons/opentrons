@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -58,9 +59,14 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     name: t('form:step_edit_form.field.dropTip.option.return'),
     value: tiprackDefUri,
   }
-
+  const enableAdditionalPartialTip = useSelector(
+    getEnableAdditionalPartialTipSelection
+  )
   const isReturnTipValid =
-    nozzles === ALL || nozzles == null || (channels === 1 && nozzles === SINGLE)
+    nozzles === ALL ||
+    nozzles == null ||
+    (channels === 1 && nozzles === SINGLE) ||
+    (enableAdditionalPartialTip ? nozzles === COLUMN && channels === 96 : false)
 
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
