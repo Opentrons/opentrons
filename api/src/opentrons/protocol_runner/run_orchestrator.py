@@ -6,6 +6,8 @@ import enum
 from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.types import UserCommandAnnotation
 
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -275,13 +277,21 @@ class RunOrchestrator:
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_command_annotations(self) -> List[LegacyCommandAnnotation]:
-        """Get the list of command annotations defined in the protocol, if any."""
+    def get_all_legacy_command_annotations(self) -> List[LegacyCommandAnnotation]:
+        """Get the list of legacy command annotations defined in the protocol, if any."""
         return (
             []
             if self._protocol_runner is None
             else self._protocol_runner.command_annotations
         )
+
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations defined in the protocol, if any."""
+        return len(self._protocol_engine.state_view.commands.get_all_command_annotations())
+
+    def get_command_annotation(self, annotation_id: str) -> UserCommandAnnotation:
+        """Get the command annotation by ID."""
+        return self._protocol_engine.state_view.commands.get_command_annotation(annotation_id)
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
@@ -313,6 +323,12 @@ class RunOrchestrator:
         """
         return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
+
+    def get_command_annotations_slice(self, cursor: int, length: int) -> CommandAnnotationsSlice:
+        """Get a slice of run annotations commands."""
+        return self._protocol_engine.state_view.commands.get_command_annotations_slice(
+            cursor=cursor, length=length
         )
 
     def get_command_error_slice(

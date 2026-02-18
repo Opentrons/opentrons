@@ -333,6 +333,7 @@ async def get_run_commands(
             error=c.error,
             notes=c.notes,
             failedCommandId=c.failedCommandId,
+            commandAnnotationIds=c.commandAnnotations if c.commandAnnotations else None,
         )
         for c in command_slice.commands
     ]
