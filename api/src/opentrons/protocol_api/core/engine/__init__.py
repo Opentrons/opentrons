@@ -2,12 +2,12 @@
 
 from typing_extensions import Final
 
+from .csv import CSVCore
 from .instrument import InstrumentCore
 from .labware import LabwareCore
 from .module_core import ModuleCore
 from .protocol import ProtocolCore
 from .well import WellCore
-from .csv import CSVCore
 from opentrons.protocols.api_support.types import APIVersion
 
 ENGINE_CORE_API_VERSION: Final = APIVersion(2, 14)
@@ -20,5 +20,5 @@ __all__ = [
     "LabwareCore",
     "WellCore",
     "ModuleCore",
-    "CSVCore"
+    "CSVCore",
 ]
