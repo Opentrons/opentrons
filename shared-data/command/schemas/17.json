@@ -674,6 +674,62 @@
       "title": "BlowoutProperties",
       "type": "object"
     },
+    "CSVWriteRowCreate": {
+      "description": "A request to create a generic csv file.",
+      "properties": {
+        "commandAnnotations": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotations",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "csvWriteRow",
+          "default": "csvWriteRow",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CSVWriteRowParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CSVWriteRowCreate",
+      "type": "object"
+    },
+    "CSVWriteRowParams": {
+      "description": "Input parameters for appending data to a csv.",
+      "properties": {
+        "fileId": {
+          "description": "File ID of the csv to write to.",
+          "title": "Fileid",
+          "type": "string"
+        },
+        "rowData": {
+          "description": "Information to write to the row.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Rowdata",
+          "type": "array"
+        }
+      },
+      "required": ["fileId", "rowData"],
+      "title": "CSVWriteRowParams",
+      "type": "object"
+    },
     "CalibrateGripperCreate": {
       "description": "A request to create a `calibrateGripper` command.",
       "properties": {
@@ -836,7 +892,7 @@
       "type": "object"
     },
     "CaptureImageCreate": {
-      "description": "A request to execute an Absorbance Reader measurement.",
+      "description": "A request to capture an image from the onboard camera.",
       "properties": {
         "commandAnnotations": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
@@ -1316,6 +1372,59 @@
       },
       "required": ["x", "y", "z"],
       "title": "Coordinate",
+      "type": "object"
+    },
+    "CreateCSVCreate": {
+      "description": "A request to create a generic csv file.",
+      "properties": {
+        "commandAnnotations": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotations",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "createCSV",
+          "default": "createCSV",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CreateCSVParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CreateCSVCreate",
+      "type": "object"
+    },
+    "CreateCSVParams": {
+      "description": "Input parameters for an image capture.",
+      "properties": {
+        "columns": {
+          "description": "How many columns are going to be used in this csv.",
+          "title": "Columns",
+          "type": "integer"
+        },
+        "fileName": {
+          "description": "File name to use when creating a csv.",
+          "title": "Filename",
+          "type": "string"
+        }
+      },
+      "required": ["fileName", "columns"],
+      "title": "CreateCSVParams",
       "type": "object"
     },
     "CreateTimerCreate": {
@@ -8115,7 +8224,9 @@
       "comment": "#/$defs/CommentCreate",
       "configureForVolume": "#/$defs/ConfigureForVolumeCreate",
       "configureNozzleLayout": "#/$defs/ConfigureNozzleLayoutCreate",
+      "createCSV": "#/$defs/CreateCSVCreate",
       "createTimer": "#/$defs/CreateTimerCreate",
+      "csvWriteRow": "#/$defs/CSVWriteRowCreate",
       "custom": "#/$defs/CustomCreate",
       "dispense": "#/$defs/DispenseCreate",
       "dispenseInPlace": "#/$defs/DispenseInPlaceCreate",
@@ -8361,6 +8472,12 @@
     },
     {
       "$ref": "#/$defs/CaptureImageCreate"
+    },
+    {
+      "$ref": "#/$defs/CreateCSVCreate"
+    },
+    {
+      "$ref": "#/$defs/CSVWriteRowCreate"
     },
     {
       "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
