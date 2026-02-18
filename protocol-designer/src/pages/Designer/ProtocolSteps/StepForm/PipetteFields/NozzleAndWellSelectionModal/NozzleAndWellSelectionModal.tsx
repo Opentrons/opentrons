@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -49,16 +49,40 @@ export function NozzleAndWellSelectionModal(
   const { t } = useTranslation('protocol_steps')
   const robotType = useSelector(getRobotType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
+  const [showError, setShowError] = useState<boolean>(false)
   const isMixStep = stepType === 'mix'
-
+  const stepFieldMap: Record<number, keyof FieldPropsByName> = {
+    1: isMixStep ? 'wells' : 'aspirate_wells',
+    2: 'dispense_wells',
+  }
+  const activeFieldKey = stepFieldMap[currentStepIndex]
+  const wellValues = propsForFields[activeFieldKey]?.value as []
+  useEffect(() => {
+    if (wellValues?.length > 0) {
+      setShowError(false)
+    }
+  })
   const handleContinue = (): void => {
-    setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+    setShowError(false)
+    if (currentStepIndex !== 0 && activeFieldKey !== null) {
+      if (wellValues.length === 0) {
+        setShowError(true)
+      } else {
+        setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+      }
+    } else {
+      setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+    }
   }
   const handleBack = (): void => {
     setCurrentStepIndex(currentStepIndex => currentStepIndex - 1)
   }
   const handleClose = (): void => {
-    showModal(false)
+    if (wellValues.length === 0) {
+      setShowError(true)
+    } else {
+      showModal(false)
+    }
   }
   const nozzleAndWellSelectionBaseModalProps = {
     robotType,
@@ -108,21 +132,14 @@ export function NozzleAndWellSelectionModal(
   const isLastStepOfMix = isMixStep
     ? currentStepIndex + 1 === totalSteps - 1
     : false
-  const stepFieldMap: Record<number, keyof FieldPropsByName | null> = {
-    0: null,
-    1: isMixStep ? 'wells' : 'aspirate_wells',
-    2: 'dispense_wells',
-  }
-
-  const activeFieldKey = stepFieldMap[currentStepIndex]
-  const currentStepError =
-    activeFieldKey != null
-      ? (propsForFields[activeFieldKey]?.errorToShow ?? null)
-      : null
   const footerElement = (
     <div className={styles.modal_footer}>
-      {currentStepError != null ? (
-        <InlineNotification type="error" message={currentStepError} hug />
+      {showError ? (
+        <InlineNotification
+          type="error"
+          message={t('well_selection_error')}
+          hug
+        />
       ) : null}
       {currentStepIndex !== 0 ? (
         <SecondaryButton onClick={handleBack}>

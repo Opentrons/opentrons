@@ -128,8 +128,8 @@ const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
 
 const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
-  dependentFields: ['aspirate_wells', 'dispense_wells', 'wells'],
-  location: ['field'],
+  dependentFields: ['aspirate_wells', 'dispense_wells'],
+  location: ['form'],
   showOnReopen: true,
 }
 const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {

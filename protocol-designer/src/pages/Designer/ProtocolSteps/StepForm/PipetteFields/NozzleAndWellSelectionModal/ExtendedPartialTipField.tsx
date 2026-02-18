@@ -67,9 +67,10 @@ export function ExtendedPartialTipField(
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
-  const dspLabwareDef = deckSetup.labware[
-    propsForFields.dispense_labware.value as string
-  ].def as LabwareDefinition
+  const dspLabwareDef = propsForFields.dispense_wells
+    ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
+        .def as LabwareDefinition)
+    : null
 
   const aspWellsLength = aspLabwareDef
     ? getWellGroupLength(
