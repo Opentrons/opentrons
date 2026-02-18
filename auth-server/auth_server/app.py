@@ -11,6 +11,7 @@ from server_utils import systemd_utils
 
 from auth_server.oauth2.fastapi_dependencies import init_oauth2_backend
 from auth_server.oauth2.router import router as oauth2_router
+from auth_server.settings.router import router as settings_router
 from auth_server.users.router import router as users_router
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
@@ -33,6 +34,7 @@ app = FastAPI(
 )
 
 app.include_router(oauth2_router)
+app.include_router(settings_router)
 app.include_router(users_router)
 
 

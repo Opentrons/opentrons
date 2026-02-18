@@ -44,12 +44,14 @@
   position: absolute;
   top: 4.6rem;
   left: 0.2rem;
+  pointer-events: none;
 }
 
 .tip_details_volume {
   position: absolute;
   top: 0.3rem;
   right: 2rem;
+  pointer-events: none;
 }
 
 .well_detail_svg_container {
