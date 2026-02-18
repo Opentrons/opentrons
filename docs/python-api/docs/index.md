@@ -140,7 +140,7 @@ The [Opentrons App](https://opentrons.com/ot-app/) is the easiest way to run you
 
 ### Support
 
-Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](/) or [contact Opentrons Support directly](mailto:support@opentrons.com).
+Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](../) or [contact Opentrons Support directly](mailto:support@opentrons.com).
 
 ### Custom protocol service
 
