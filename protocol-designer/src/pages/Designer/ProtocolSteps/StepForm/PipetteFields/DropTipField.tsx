@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
@@ -65,7 +65,6 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
   const isReturnTipValid =
     nozzles === ALL ||
     nozzles == null ||
-    (channels === 1 && nozzles === SINGLE) ||
     (enableAdditionalPartialTip ? nozzles === COLUMN && channels === 96 : false)
 
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
