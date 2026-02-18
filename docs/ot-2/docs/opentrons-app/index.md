@@ -8,7 +8,7 @@ You operate an OT-2 through the [Opentrons App](https://opentrons.com/ot-app). T
 
 - When you're ready to put the OT-2 to work, see [Importing Protocols](./protocol-import.md) and [Running Protocols](./protocol-run.md). Those sections provide step-by-step instructions on how to upload a protocol and run it on the robot.
 
-- The Opentrons App can do more than import and run protocols. See the [Features Summary](./features-summary.md) for a reference guide to other functions that help you interact with the robot, along with descriptions of other selected basic or advanced settings.
+- The Opentrons App can do more than import and run protocols. See the [App Features Summary](./features-summary.md) for a reference guide to other functions that help you interact with the robot, along with descriptions of other selected basic or advanced settings.
 
 !!! note
     While the Opentrons App lets you control the robot and run automated protocols, this software does not create protocols. To create a protocol, you'll use the [Opentrons Protocol Designer](../../../protocol-designer/). You can also create protocols with the [Opentrons Python API](../../python-api/) or the [OpentronsAI](https://opentrons.com/ai).
