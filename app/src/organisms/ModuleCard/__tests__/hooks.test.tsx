@@ -715,7 +715,7 @@ describe('useModuleOverflowMenu', () => {
     expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
   })
 
-  it.only('should return vacuum module menu items and call handleSlideoutClick when module is idle', () => {
+  it('should return vacuum module menu items and call handleSlideoutClick when module is idle', () => {
     const mockHandleSlideoutClick = vi.fn()
     const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
