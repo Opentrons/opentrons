@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.8.1
+
+**Welcome to Protocol Designer 8.8.1!**
+
+This hotfix release addresses a bug to allow manual tip selection in any column of a well plate.
+
 ## Opentrons Protocol Designer Changes in 8.8.0
 
 **Welcome to Protocol Designer 8.8.0.!**
