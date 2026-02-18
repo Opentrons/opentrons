@@ -163,7 +163,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          role-to-assume: ${{ needs.determine-deploy-config.outputs.environment == 'production' && secrets.OT2_PD_DEPLOYMENT_ROLE_ARN_PRODUCTION || needs.determine-deploy-config.outputs.environment == 'staging' && secrets.OT2_PD_DEPLOYMENT_ROLE_ARN_STAGING || secrets.OT2_PD_DEPLOYMENT_ROLE_ARN_SANDBOX }}
           aws-region: us-east-2
       - name: Checkout Repository
         uses: actions/checkout@v5
