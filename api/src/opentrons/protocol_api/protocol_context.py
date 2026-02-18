@@ -1948,14 +1948,18 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 27)
     def create_csv(
-        self, filename: str, columns: Optional[int]=None, title_row: List[str] = None
+        self,
+        filename: str,
+        columns: Optional[int] = None,
+        title_row: Optional[List[str]] = None,
     ) -> CSVContext:
         if not columns and not title_row:
             raise ValueError("You must supply either columns or title_row.")
         if columns and title_row:
             raise ValueError("Use title row OR columns but not both")
         csv_core = self._core.create_csv(
-            filename=filename, columns=columns if columns else len(title_row)
+            filename=filename,
+            columns=columns if columns else len(title_row),  # type: ignore [arg-type]
         )
         if title_row:
             csv_core.write_row(title_row)

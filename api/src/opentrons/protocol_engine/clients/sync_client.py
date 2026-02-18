@@ -196,7 +196,9 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.CreateCSVParams
+        self,
+        params: commands.CreateCSVParams,
+        command_annotations: list[str],
     ) -> commands.CreateCSVResult:
         pass
 

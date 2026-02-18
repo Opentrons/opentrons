@@ -1,14 +1,22 @@
 from typing import List
 
 from ..csv import AbstractCSV
+from .protocol import ProtocolCore
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 
 class CSVCore(AbstractCSV):
-    def __init__(self, file_id: str, columns: int, engine_client: EngineClient):
+    def __init__(
+        self,
+        file_id: str,
+        columns: int,
+        engine_client: EngineClient,
+        protocol_core: ProtocolCore,
+    ):
         self._file_id = file_id
         self._columns = columns
+        self._protocol_core = protocol_core
         self._engine_client = engine_client
 
     def write_row(self, row: List[str]) -> None:
@@ -22,5 +30,6 @@ class CSVCore(AbstractCSV):
             cmd.CSVWriteRowParams(
                 fileId=self._file_id,
                 rowData=row,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )

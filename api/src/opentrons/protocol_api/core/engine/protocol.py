@@ -1294,12 +1294,14 @@ class ProtocolCore(
     def create_csv(self, filename: str, columns: int) -> CSVCore:
         """Create a new csv file"""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.CreateCSVParams(fileName=filename, columns=columns)
+            cmd.CreateCSVParams(fileName=filename, columns=columns),
+            command_annotations=self._annotation_ids,
         )
         return CSVCore(
             file_id=result.fileId,
             columns=result.columns,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
     def _convert_labware_location(
