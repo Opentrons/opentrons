@@ -1,12 +1,12 @@
 """Flow rate sensor."""
-import time
-import numpy
-import serial  # type: ignore[import]
-import dataclasses
-import csv
-from datetime import datetime
+from typing import Optional, Protocol
+from abc import abstractmethod
+import serial # type: ignore[import]
 import logging
-
+import datetime
+import asyncio
+import time
+import csv
 
 BAUDRATE = 115200
 TIMEOUT = 1
@@ -19,76 +19,97 @@ logging.basicConfig(
     filemode='a'
 )
 
-class MassFlowSensor:
+class AbstractMassFlowSensor(Protocol):
+    """Protocol for mass flow sensor driver."""
+    async def connect(self) -> None:
+        """Connect to sensor."""
+        ...
+
+    async def disconnect(self) -> None:
+        """Disconnect from sensor"""
+        ...
+
+    @abstractmethod
+    async def is_simulator(self) -> bool:
+        """Is this a simulation"""
+        ...
+    
+    async def get_flow_rate(self, timeout: float = 1.0) -> float:
+        """Read flow rate in sLm"""
+        ...
+        
+    def set_csv_filename(self, new_path: str) -> None:
+        """Name the csv file"""
+        ...
+
+    async def read_continuous_data(self):
+        """Record flow rate in sLm"""
+        ...
+    
+    async def stop(self):
+        """Stop Recording Process"""
+        ...
+
+class MassFlowSensor(AbstractMassFlowSensor):
     """Driver class to use Flow rate driver."""
 
-    def __init__(self, port: str = "/dev/ttyACM1", csv_path: str = "flow_rate.csv") -> None:
+    def __init__(self, sensor: serial.Serial, csv_path: str = "flow_rate.csv") -> None:
         """Initialize class."""
-        self.PORT = port
         self._stop_requested = False
         self._csv_initialized = False
         self.csv_path = csv_path
         self.st = time.perf_counter()
-        self.gauge = None
+        self._sensor = sensor  # Expect a Serial object here
 
-        # Validate port and baudrate
-        if not isinstance(self.PORT, str) or not self.PORT:
-            raise ValueError("Invalid port specified.")
-        if not isinstance(BAUDRATE, int) or BAUDRATE <= 0:
-            raise ValueError("Invalid baudrate specified.")
+    @classmethod
+    async def create(cls, port: str, csv_path: str, loop: Optional[asyncio.AbstractEventLoop]) -> "MassFlowSensor":
+        conn = serial.Serial(port=port, baudrate=BAUDRATE, timeout=TIMEOUT)
+        return cls(sensor=conn, csv_path=csv_path)
+    
+    async def is_simulator(self) -> bool:
+        """Is simulator."""
+        return False
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         """Connect communication ports."""
         try:
-            self.gauge = serial.Serial(
-                port=self.PORT,
-                baudrate=BAUDRATE,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.EIGHTBITS,
-                timeout=TIMEOUT,
-            )
-            logging.info("Connected to serial port %s at baudrate %d", self.PORT, BAUDRATE)
+            self._sensor.open()  # Now _sensor is a Serial object, so this works
+            logging.info("Connected to serial port %s at baudrate %d", self._sensor.port, BAUDRATE)
         except serial.SerialException as e:
             logging.error("Unable to access Serial port: %s", e)
-            raise RuntimeError(f"Failed to connect to serial port {self.PORT}: {e}")
+            raise RuntimeError(f"Failed to connect to serial port {self._sensor.port}: {e}")
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         """Disconnect communication ports."""
-        if self.gauge is not None:
-            self.gauge.close()
-            logging.info("Disconnected from serial port %s", self.PORT)
+        if self._sensor is not None:
+            self._sensor.close()
+            logging.info("Disconnected from serial port %s", self._sensor)
 
-    def __enter__(self):
-        """Enter the runtime context related to this object."""
-        self.connect()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Exit the runtime context and close the connection."""
-        self.disconnect()
-
-    def _send_packet(self, packet: str) -> None:
-        if self.gauge is not None:
-            self.gauge.flush()
-            self.gauge.reset_input_buffer()
-            self.gauge.write(packet.encode())
-
-    def _get_packet(self) -> str:
+    async def _readline(self) -> str:
+        """Non-blocking read operation."""
+        try:
+            # Offload readline to another thread to avoid blocking the event loop
+            return (await asyncio.to_thread(self._sensor.readline)).decode("utf-8")
+        except Exception as e:
+            # logger.error(f"Error reading from force gauge: {e} ")
+            raise RuntimeError("Unable to read from sensor")
+        
+    async def _get_packet(self) -> str:
         packet = ""
-        if self.gauge is not None:
-            self.gauge.reset_output_buffer()
+        if self._sensor is not None:
+            self._sensor.reset_output_buffer()
             try:
-                packet = self.gauge.readline().decode("utf-8")
+                packet = await self._readline()
             except UnicodeDecodeError as e:
                 logging.warning("Failed to decode packet: %s", e)
         return packet
 
-    def get_flow_rate(self, timeout: float = 5.0) -> float:
+    async def get_flow_rate(self, timeout: float = 5.0) -> float:
         """Reads dial indicator with a timeout."""
         start_time = time.monotonic()
         while time.monotonic() - start_time < timeout:
-            data = self._get_packet().strip().split(',')
+            data = await self._get_packet()
+            data = data.strip().split(',')
             if len(data) >= 2:
                 try:
                     return float(data[0])
@@ -127,13 +148,14 @@ class MassFlowSensor:
         self._csv_initialized = False
         logging.info("CSV file path updated to %s", self.csv_path)
 
-    def read_continuous_data(self):
+    async def read_continuous_data(self):
         """Read and print continuous data from the vacuum pump."""
         try:
             while not self._stop_requested:
-                flow_rate = self.get_flow_rate()
+                flow_rate = await self.get_flow_rate()
                 ts = time.perf_counter() - self.st
                 self._write_to_csv(ts, flow_rate)
+                print(f'time(s): {ts}.2f, flow_rate: {flow_rate}')
                 logging.info("time(s): %.2f, flow_rate: %.2f", ts, flow_rate)
         except ValueError as e:
             logging.error("Error reading continuous data: %s", e)
@@ -141,18 +163,26 @@ class MassFlowSensor:
             logging.exception("Unexpected error: %s", e)
             raise
 
-    def stop(self):
+    async def stop(self):
         """Signal to stop continuous data reading."""
         self._stop_requested = True
+
+async def main(file_name, loop):
+    sensor = await MassFlowSensor.create(port="/dev/ttyACM1", csv_path=file_name, loop=loop)
+    try:
+        sensor.set_csv_filename(file_name)
+        await sensor.read_continuous_data()
+        await loop.sleep(10)
+        await sensor.stop()
+    except Exception as e:
+        logging.critical("Critical failure: %s", e)
 
 
 if __name__ == "__main__":
     logging.info("Flow rate sensor initialized.")
-    date_str = datetime.utcnow().strftime("%y-%m-%d")
-    file_name = str(f'/data/testing_data/example-test/FlowrateData_{date_str}.csv')
-    try:
-        with MassFlowSensor(port="/dev/ttyACM1", csv_path=file_name) as meter:
-            meter.set_csv_filename(file_name)
-            meter.read_continuous_data()
-    except Exception as e:
-        logging.critical("Critical failure: %s", e)
+    current_datetime = datetime.datetime.now(datetime.UTC)
+    file_name = str(f'/data/testing_data/example-test/FlowrateData_{current_datetime}.csv')
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    asyncio.run(main(file_name, loop))
+    
