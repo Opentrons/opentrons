@@ -27,7 +27,7 @@ Throughout this section, we'll use the labware listed in the following table.
 
 | Labware type | Labware name | API load name {width="40%"} |
 |--------------|--------------|-----------------------------|
-| Well plate    | [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt](https://labware.opentrons.com/#/?loadName=opentrons_96_wellplate_200ul_pcr_full_skirt) | `corning_96_wellplate_360ul_flat` |
+| Well plate    | [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt](https://labware.opentrons.com/#/?loadName=opentrons_96_wellplate_200ul_pcr_full_skirt) | `opentrons_96_wellplate_200ul_pcr_full_skirt` |
 | Flex tip rack | [Opentrons Flex 96 Tips 200 µL](https://labware.opentrons.com/#/?loadName=opentrons_flex_96_tiprack_200ul) | `opentrons_flex_96_tiprack_200ul` |
 | OT-2 tip rack | [Opentrons 96 Tip Rack 300 µL](https://labware.opentrons.com/#/?loadName=opentrons_96_tiprack_300ul) | `opentrons_96_tiprack_300ul`      |
 

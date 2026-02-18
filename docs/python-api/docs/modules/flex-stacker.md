@@ -36,7 +36,7 @@ Next, you'll need to define the type and amount of labware the Stacker will stor
 
 Each Stacker can hold a labware stack of up to:
 
-- 7 Flex tip racks with lids (6 in the Stacker and 1 on the shuttle)
+- 7 Flex tip racks (6 in the Stacker and 1 on the shuttle)
 - 48 PCR plates, like `opentrons_96_wellplate_200ul_pcr_full_skirt`
 - 16 deep well plates, like `nest_96_wellplate_2ml_deep`
 
@@ -54,7 +54,9 @@ stacker_2.set_stored_labware(
 )
 ```
 
-In this example, `stacker_1` is configured to hold 5 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. `stacker_2` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using [`store()`][opentrons.protocol_api.FlexStackerContext.store] or [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve].
+In this example, `stacker_1` is configured to hold 5 Flex tip racks, each with a compatible lid. To be properly stored in the Stacker, all Flex tip racks must match: either all tip racks have lids, or none have lids.
+
+`stacker_2` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using [`store()`][opentrons.protocol_api.FlexStackerContext.store] or [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve].
 
 [`set_stored_labware()`][opentrons.protocol_api.FlexStackerContext.set_stored_labware] assigns a labware stack to the Stacker in this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with [`load_labware()`][opentrons.protocol_api.FlexStackerContext.load_labware]. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.
 

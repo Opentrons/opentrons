@@ -33,7 +33,6 @@ dev = [
     "pytest-asyncio<2,>=1",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
-    "pytest-aiohttp==1.0.5",
     "pytest-xdist~=2.5.0",
     "coverage==7.4.1",
     "mypy==1.19.1",

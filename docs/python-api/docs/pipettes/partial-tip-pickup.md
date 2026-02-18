@@ -82,7 +82,7 @@ pipette.pick_up_tip()  # picks up A2-H2 from tip rack
 ```
 
 !!! warning
-    [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more unused tips than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
+    [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more tips in the rack than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
 
 ### Row layout
 
