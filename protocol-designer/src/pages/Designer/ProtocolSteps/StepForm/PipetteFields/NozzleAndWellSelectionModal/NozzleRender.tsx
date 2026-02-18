@@ -61,6 +61,36 @@ interface NozzleRenderProps {
   setSelectedNozzle: Dispatch<SetStateAction<string[]>>
 }
 
+const getAvailableNozzles = (
+  nozzleConfiguration: NozzleConfigurationStyle,
+  params: {
+    allNozzles: string[]
+    nozzles: string[]
+    wellOrdering: string[][]
+    primaryNozzle: PrimaryNozzleConfigurationStyle
+    channels: number
+  }
+): string[] => {
+  const { allNozzles, nozzles, wellOrdering, primaryNozzle, channels } = params
+
+  if (nozzleConfiguration === ALL) {
+    return allNozzles
+  }
+
+  if (nozzleConfiguration === COLUMN || nozzleConfiguration === ROW) {
+    return nozzles.flatMap(nozzle =>
+      getEntireWellSelection(
+        nozzle,
+        wellOrdering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+    )
+  }
+
+  return nozzles
+}
 export function NozzleRender(props: NozzleRenderProps): JSX.Element {
   const {
     robotType,
@@ -102,34 +132,30 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
   const wellOrdering = Object.values(orderedColumns).map(
     column => column.orderedNozzles
   )
-  let availableNozzles: string[]
-  if (nozzleConfiguration === ALL) {
-    availableNozzles = allNozzles
-  } else if (nozzleConfiguration === COLUMN || nozzleConfiguration === ROW) {
-    availableNozzles = nozzles.flatMap(nozzle => {
-      return getEntireWellSelection(
-        nozzle,
-        wellOrdering,
-        nozzleConfiguration,
-        primaryNozzle,
-        channels
-      )
-    })
-  } else {
-    availableNozzles = nozzles
+  const params = {
+    allNozzles,
+    nozzles,
+    wellOrdering,
+    primaryNozzle,
+    channels,
   }
+  const availableNozzles = getAvailableNozzles(nozzleConfiguration, params)
 
   const nozzleStatus: Record<string, WellType> = Object.fromEntries(
-    Object.entries(nozzleMap).map(([wellName]) => [
-      wellName,
-      selectedNozzle?.includes(wellName)
-        ? SELECTED
-        : availableNozzles.includes(wellName) && !isPartial
-          ? UNSELECTED
-          : INACCESSIBLE,
-    ])
-  )
+    Object.entries(nozzleMap).map(([wellName]) => {
+      let status: WellType
 
+      if (selectedNozzle?.includes(wellName)) {
+        status = SELECTED
+      } else if (availableNozzles.includes(wellName) && !isPartial) {
+        status = UNSELECTED
+      } else {
+        status = INACCESSIBLE
+      }
+
+      return [wellName, status]
+    })
+  )
   const handleClickNozzle = (nozzleName: string): void => {
     const isAccessible = nozzleStatus[nozzleName] !== INACCESSIBLE
     if (isAccessible) {

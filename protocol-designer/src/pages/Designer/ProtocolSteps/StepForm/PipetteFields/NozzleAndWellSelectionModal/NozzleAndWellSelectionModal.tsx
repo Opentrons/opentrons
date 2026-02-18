@@ -115,16 +115,15 @@ export function NozzleAndWellSelectionModal(
   }
 
   const activeFieldKey = stepFieldMap[currentStepIndex]
-
   const currentStepError =
     activeFieldKey != null
       ? (propsForFields[activeFieldKey]?.errorToShow ?? null)
       : null
   const footerElement = (
     <div className={styles.modal_footer}>
-      {currentStepError != null && (
+      {currentStepError != null ? (
         <InlineNotification type="error" message={currentStepError} hug />
-      )}
+      ) : null}
       {currentStepIndex !== 0 ? (
         <SecondaryButton onClick={handleBack}>
           {t('shared:go_back')}

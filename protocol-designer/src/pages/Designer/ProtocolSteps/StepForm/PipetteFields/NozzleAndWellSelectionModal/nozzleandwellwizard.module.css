@@ -25,7 +25,7 @@
 
 .column_wrapper_fixed_width{
   display: flex;
-  width: 185px;
+  width: 11.5625rem;
   flex-direction: column;
   justify-content: center;
   gap: var(--spacing-8)
@@ -48,8 +48,8 @@
 
 .nozzle_background_square {
   display: flex;
-  width: 558px;
-  height: 497px;
+  width: 34.875rem;
+  height: 31.063rem;
   flex-direction: column; 
   align-items: center;  
   justify-content: center;           
@@ -59,7 +59,7 @@
 }
 
 .nozzle_render {
-  height: 297px;
+  height: 18.5625rem;
   padding: var(--spacing-24);
   gap: var(--spacing-8);
 }
@@ -73,5 +73,5 @@
 
 .well_legend_box {
   display: flex;
-  width: 160px;
+  width: 10rem;
 }

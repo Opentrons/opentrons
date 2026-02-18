@@ -81,10 +81,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     getSelectedWells(stepType)
   )
 
-  const [hoveredWells, setHoveredWells] = useState<Set<string>>()
+  const [hoveredWells, setHoveredWells] = useState<Set<string> | null>(null)
   useEffect(() => {
-    setSelectedWells(getSelectedWells(stepType))
     setHoveredWells(new Set())
+    setSelectedWells(getSelectedWells(stepType))
   }, [stepType])
   const pipetteId = propsForFields.pipette.value as string
   const nozzleConfiguration = propsForFields.nozzles

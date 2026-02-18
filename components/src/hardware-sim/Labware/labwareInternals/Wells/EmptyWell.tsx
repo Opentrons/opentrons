@@ -2,10 +2,12 @@ import { getWidthAndHeightOfWellSVG } from './utils'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
 
-export function EmptyWell(props: {
-  size?: string
+interface EmptyWellProps {
   wellMap: LabwareWellMap
-}): JSX.Element {
+  size?: string
+}
+
+export function EmptyWell(props: EmptyWellProps): JSX.Element {
   const { size, wellMap } = props
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'

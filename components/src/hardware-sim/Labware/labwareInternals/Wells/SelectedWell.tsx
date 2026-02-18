@@ -4,7 +4,7 @@ import styles from './wells.module.css'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
 
-export function SelectedWell(props: {
+interface SelectedWellProps {
   wellMap: LabwareWellMap
   size?: string
   textInsideTip?: string
@@ -12,7 +12,8 @@ export function SelectedWell(props: {
   isError?: boolean
   isSelected?: boolean
   showStroke?: boolean
-}): JSX.Element {
+}
+export function SelectedWell(props: SelectedWellProps): JSX.Element {
   const {
     wellMap,
     size,

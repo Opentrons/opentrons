@@ -106,14 +106,15 @@ export function ExtendedPartialTipField(
       return t('no_nozzles_and_wells_selected')
     }
     const positionType = isRowOrColumn
-      ? nozzleConfiguration.toLowerCase() + 's'
+      ? `${nozzleConfiguration.toLowerCase()}s`
       : 'wells'
 
-    const nozzleSelection = isRowOrColumn
-      ? `${nozzleText}${positionType} nozzles`
-      : isTransfer
-        ? nozzleText
-        : `${nozzleText} nozzles`
+    let nozzleSelection = `${nozzleText} nozzles`
+    if (isRowOrColumn) {
+      nozzleSelection = `${nozzleText}${positionType} nozzles`
+    } else if (isTransfer) {
+      nozzleSelection = nozzleText
+    }
 
     if (isTransfer) {
       return t('transfer_nozzles_selected', {

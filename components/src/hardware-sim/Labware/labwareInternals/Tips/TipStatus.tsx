@@ -15,12 +15,14 @@ import { UsedTip } from './UsedTip'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
-export function TipStatus(props: {
+interface TipStatusProps {
   type: TipType
   wellMap: LabwareWellMap
   size?: string
   text?: string
-}): JSX.Element {
+}
+
+export function TipStatus(props: TipStatusProps): JSX.Element {
   const { type, size, text, wellMap } = props
   switch (type) {
     case NEW:
