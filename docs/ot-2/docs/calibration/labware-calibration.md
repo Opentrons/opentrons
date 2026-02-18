@@ -14,7 +14,7 @@ Depending on how they are created and used, offsets fall into three categories:
 | :--- | :--- |
 | **Default** | Created manually via Labware Position Check and automatically applied to every instance of that labware. This "measure once, set everywhere" approach reduces setup time for duplicate labware across any deck slot or protocol. |
 | **Applied** | Overrides a default offset for a specific piece of labware in a specific deck slot. You can reuse this offset in other protocols, but only for that exact labware-and-slot combination. |
-| **Hardcoded** | Defined directly in Python API protocols using `set_offset`. Because these offsets are written into the code, they cannot be adjusted via the Opentrons App or touchscreen; you must edit the Python script. See [Setting Labware Offsets](../../python-api/advanced-control/jupyter.md#setting-labware-offsets).. |
+| **Hardcoded** | Defined directly in Python API protocols using `set_offset`. Because these offsets are written into the code, they cannot be adjusted via the Opentrons App or touchscreen; you must edit the Python script. See [Setting Labware Offsets](../../python-api/advanced-control/jupyter.md#setting-labware-offsets). |
 
 This illustration shows offsets applied to a tip rack, reservoir, and well plate used in a protocol. Clicking **Run Labware Position Check** will let you recalibrate labware if needed.
 
@@ -52,7 +52,7 @@ The Labware Position Check is a guided workflow that's similar to the [robot cal
 
 3. Follow the instructions shown on the screen. As you go through each step in the process you'll verify the type and location of labware used in your protocol and use the [jog controls](./jog-controls.md) to align the pipette with that labware.
 
-4. Click **Complete** to finish Labare Position Check.
+4. Click **Complete** to finish Labware Position Check.
 
     <figure class="screenshot" markdown>
     ![Confirmation screen for completing Labware Position Check](../images/lpc-confirm-3.png)

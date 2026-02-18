@@ -6,7 +6,7 @@ Start here for an overview of the robot calibration process and instructions on 
 
 ## Calibration overview
 
-Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left-right, front-back, up-down). To move accurately, the robot needs a precise map of its own hardware relative to a good reference point: the deck. The robot calibration process creates this map.
+Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left–right, front–back, up–down). To move accurately, the robot needs a precise map of its own hardware relative to a good reference point: the deck. The robot calibration process creates this map.
 
 <figure class="screenshot" markdown>
 ![Calibration diagram](../images/robot-calibration.png)
