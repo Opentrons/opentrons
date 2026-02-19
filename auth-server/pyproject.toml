@@ -15,7 +15,7 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==2.0.46",
+    "sqlalchemy==1.4.51",
     "oauthlib>=3.3.1,<4",
     "pwdlib[argon2,bcrypt]==0.3.0",
 ]
@@ -31,7 +31,7 @@ robot = [
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==2.0.46",
+    "sqlalchemy==1.4.51",
     "oauthlib==3.3.1",
 ]
 dev = [
@@ -50,6 +50,7 @@ dev = [
     "types-requests==2.27.1",
     "tavern>=3.0.2",
     "types-oauthlib==3.3.0.20250822",
+    "sqlalchemy2-stubs==0.0.2a21",
 ]
 
 [tool.ruff.lint]
@@ -130,10 +131,11 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
+    "error::sqlalchemy.exc.RemovedIn20Warning",
 ]
 
 [tool.mypy]
-plugins = ["pydantic.mypy", "decoy.mypy"]
+plugins = ["pydantic.mypy", "decoy.mypy", "sqlalchemy.ext.mypy.plugin"]
 show_error_codes = true
 strict = true
 

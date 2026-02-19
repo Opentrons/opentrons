@@ -7,8 +7,7 @@ from typing import Any
 
 import sqlalchemy
 import sqlalchemy.types as types
-from sqlalchemy import Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column, Enum, Integer, String
 
 from server_utils.auth.scopes import Scope
 
@@ -45,17 +44,17 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
-class User(Base):
+class User(Base):  # type: ignore[valid-type]
     """ORM model for user accounts."""
 
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String, unique=True)
-    hashed_password: Mapped[str] = mapped_column(String)
-    full_name: Mapped[str] = mapped_column(String)
-    account_type: Mapped[AccountType] = mapped_column(Enum(AccountType))
-    scopes: Mapped[list[Scope]] = mapped_column(ScopeListType)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String, unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    account_type = Column(Enum(AccountType), nullable=False)
+    scopes = Column(ScopeListType, nullable=False)
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
