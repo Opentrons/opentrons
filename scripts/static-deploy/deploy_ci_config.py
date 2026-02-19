@@ -108,10 +108,10 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
             sandbox_prefix = "unknown"
         return environment, sandbox_prefix
 
-    if event_name == "push" and ref_type == "branch":
+    if event_name in ["push", 'workflow_dispatch'] and ref_type == "branch":
         return "sandbox", ref_name
 
-    if event_name == "push" and ref_type == "tag":
+    if event_name in ["push", 'workflow_dispatch'] and ref_type == "tag":
         # Tag-based environment detection - normalize to lowercase for comparison
         ref_name_lower = ref_name.lower()
         if ref_name_lower.startswith("staging-"):
