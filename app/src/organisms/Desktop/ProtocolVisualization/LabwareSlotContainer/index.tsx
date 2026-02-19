@@ -40,6 +40,16 @@ interface LabwareSlotContainerProps {
   pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
+
+const HIDE_WELL_CONTAINER_COMMAND_TYPES = [
+  'comment',
+  'waitForDuration',
+  'waitForResume',
+  'waitForTasks',
+  'dropTip',
+  'pickUpTip',
+]
+
 export function LabwareSlotContainer(
   props: LabwareSlotContainerProps
 ): JSX.Element {
@@ -107,9 +117,7 @@ export function LabwareSlotContainer(
       : activeWellName
   const shouldShowWellContainer =
     selectedWellName != null &&
-    !['comment', 'waitForDuration', 'waitForResume', 'waitForTasks'].includes(
-      commandType
-    )
+    !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
   const wellGroup: WellGroup | null =
     selectedWellName != null
       ? {
