@@ -66,6 +66,7 @@ export function StepDetailContainer({
       : false
   const shouldHideLabwareCardForTiprackCommand =
     isTopMostLabwareTiprack &&
+    HIDE_LABWARE_CARD_FOR_TIPRACK_COMMAND_TYPES.includes(
       currentCommand.commandType
     )
 
