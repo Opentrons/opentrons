@@ -4,14 +4,16 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Generator
+from typing import Generator
 
 import sqlalchemy
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
 from server_utils import sql_utils
 
-Base: Any = declarative_base()
+
+class Base(DeclarativeBase):
+    """Base class for all ORM models."""
 
 
 def create_sql_engine(
@@ -26,7 +28,6 @@ def create_sql_engine(
     """
     engine = sqlalchemy.create_engine(
         sql_utils.get_connection_url(db_path),
-        future=True,
     )
     try:
         sql_utils.enable_foreign_key_constraints(engine)
