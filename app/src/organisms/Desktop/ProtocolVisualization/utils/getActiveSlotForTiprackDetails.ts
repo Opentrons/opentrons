@@ -38,16 +38,23 @@ export const getActiveSlotForTiprackDetails = (
   const { labware } = robotState
   const { trashBinEntities, wasteChuteEntities, labwareEntities } =
     invariantContext
-  const tiprackUnderPipette = pipettes.find(
-    pipette => pipette.tiprackId != null
-  )?.tiprackId
-  const tiprackFromCurrentCommand =
+  const tiprackUnderPipette =
+    pipettes.find(
+      (pipette): pipette is PipetteTemporalProperties & { tiprackId: string } =>
+        typeof pipette.tiprackId === 'string'
+    )?.tiprackId ?? null
+  const currentCommandLabwareId =
     'labwareId' in currentCommand.params &&
-    labwareEntities[currentCommand.params.labwareId]?.def.parameters
-      .isTiprack === true
+    typeof currentCommand.params.labwareId === 'string'
       ? currentCommand.params.labwareId
       : null
-  const tiprackToShow = tiprackUnderPipette ?? tiprackFromCurrentCommand
+  const tiprackFromCurrentCommand =
+    currentCommandLabwareId != null &&
+    labwareEntities[currentCommandLabwareId]?.def.parameters.isTiprack === true
+      ? currentCommandLabwareId
+      : null
+  const tiprackToShow: string | null =
+    tiprackUnderPipette ?? tiprackFromCurrentCommand
   let slot = null
 
   if (tiprackToShow != null) {
