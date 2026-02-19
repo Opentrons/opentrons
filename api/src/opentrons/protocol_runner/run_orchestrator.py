@@ -35,13 +35,13 @@ from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.state.module_substates import FlexStackerSubState
 from ..protocol_engine.types import (
-    LegacyCommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyCommandAnnotation,
     LegacyLabwareOffsetCreate,
     ModuleModel,
     PostRunHardwareState,

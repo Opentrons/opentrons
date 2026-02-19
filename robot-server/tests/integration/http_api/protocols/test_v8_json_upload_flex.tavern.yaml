@@ -91,8 +91,8 @@ stages:
             robotType: OT-3 Standard
             runTimeParameters: []
             commandAnnotations:
-              - annotationType: userCommand
-                annotationId: !anystr
+              - source: userCommand
+                id: !anystr
                 userSpecifiedName: Legacy custom command annotation
                 userSpecifiedDescription: Legacy command annotation
                 params: {}

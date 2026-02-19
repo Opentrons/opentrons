@@ -42,9 +42,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
-    LegacyCommandAnnotation,
     CommandPreconditions,
     CustomCommandAnnotationLegacy,
+    LegacyCommandAnnotation,
 )
 from opentrons.protocol_reader import (
     JsonProtocolConfig,

@@ -18,7 +18,6 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import (
     CommandPreconditions,
     CSVRunTimeParamFilesType,
-    LegacyCommandAnnotation,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
     UserCommandAnnotation,

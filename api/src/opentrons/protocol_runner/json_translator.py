@@ -28,7 +28,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
-from opentrons.protocol_engine.types import LegacyCommandAnnotation, HexColor
+from opentrons.protocol_engine.types import HexColor, LegacyCommandAnnotation
 from opentrons.types import MountType
 
 

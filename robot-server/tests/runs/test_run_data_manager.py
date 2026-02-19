@@ -131,9 +131,7 @@ def engine_state_summary() -> StateSummary:
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(
-                annotationId="some-command-annotation-id"
-            )  # type: ignore[call-arg]
+            UserCommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
         ],
     )
 
@@ -603,7 +601,7 @@ async def test_get_all_runs(
         wells=[],
         commandAnnotations=[
             UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
-                annotationId="current-command-annotation-id"
+                id="current-command-annotation-id"
             )
         ],
     )
@@ -629,7 +627,7 @@ async def test_get_all_runs(
         wells=[],
         commandAnnotations=[
             UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
-                annotationId="old-command-annotation-id"
+                id="old-command-annotation-id"
             )
         ],
     )

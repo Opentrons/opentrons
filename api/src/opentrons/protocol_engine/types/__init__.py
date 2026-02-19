@@ -6,8 +6,8 @@ from opentrons_shared_data.pipette.types import LabwareUri
 
 from .automatic_tip_selection import NextTipInfo, NoTipAvailable, NoTipReason
 from .command_annotations import (
-    LegacyCommandAnnotation,
     CustomCommandAnnotationLegacy,
+    LegacyCommandAnnotation,
     SecondOrderCommandAnnotationLegacy,
     UserCommandAnnotation,
 )

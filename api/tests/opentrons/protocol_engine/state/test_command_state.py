@@ -1396,7 +1396,8 @@ def test_handle_create_command_annotation_action() -> None:
 
     annotation = subject_view.get_command_annotation("abc123")
     assert annotation == UserCommandAnnotation(
-        annotationId="abc123",
+        id="abc123",
+        source="userCommand",
         userSpecifiedName="bar",
         userSpecifiedDescription="foo",
         params={"a": 1},
@@ -1423,13 +1424,15 @@ def test_get_all_command_annotations() -> None:
         )
     assert subject_view.get_all_command_annotations() == [
         UserCommandAnnotation(
-            annotationId="ann_id_1",
+            id="ann_id_1",
+            source="userCommand",
             userSpecifiedName="bar",
             userSpecifiedDescription="foo",
             params={"a": 1},
         ),
         UserCommandAnnotation(
-            annotationId="ann_id_2",
+            id="ann_id_2",
+            source="userCommand",
             userSpecifiedName="bar",
             userSpecifiedDescription="foo",
             params={"a": 1},

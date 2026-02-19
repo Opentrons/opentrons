@@ -256,7 +256,8 @@ async def test_update_adds_details_and_completes_analysis(
         default=3.0,
     )
     command_annotation = pe_types.UserCommandAnnotation(
-        annotationId="annotation-id",
+        id="annotation-id",
+        source="userCommand",
         userSpecifiedName="My command annotation",
         params={},
     )
@@ -332,8 +333,8 @@ async def test_update_adds_details_and_completes_analysis(
         "modules": [],
         "commandAnnotations": [
             {
-                "annotationType": "userCommand",
-                "annotationId": "annotation-id",
+                "source": "userCommand",
+                "id": "annotation-id",
                 "userSpecifiedName": "My command annotation",
                 "params": {},
             }

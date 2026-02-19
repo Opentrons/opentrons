@@ -603,7 +603,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self, action: CreateUserCommandAnnotation
     ) -> None:
         annotation = UserCommandAnnotation(
-            annotationId=action.annotation_id,
+            id=action.annotation_id,
+            source="userCommand",
             userSpecifiedName=action.user_defined_name,
             userSpecifiedDescription=action.user_description,
             params=action.params,

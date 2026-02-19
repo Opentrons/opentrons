@@ -174,7 +174,8 @@ async def test_analyze(
         commandKeys=["abc", "xyz"]
     )
     new_command_annotation = pe_types.UserCommandAnnotation(
-        annotationId="annotation-id",
+        id="annotation-id",
+        source="userCommand",
         userSpecifiedName="My command annotation",
         params={},
     )
