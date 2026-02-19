@@ -107,8 +107,9 @@ export function LabwareSlotContainer(
       : activeWellName
   const shouldShowWellContainer =
     selectedWellName != null &&
-    commandType !== 'comment' &&
-    commandType !== 'waitForResume'
+    !['comment', 'waitForDuration', 'waitForResume', 'waitForTasks'].includes(
+      commandType
+    )
   const wellGroup: WellGroup | null =
     selectedWellName != null
       ? {
