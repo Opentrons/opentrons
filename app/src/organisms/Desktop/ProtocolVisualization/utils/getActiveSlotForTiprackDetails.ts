@@ -1,5 +1,6 @@
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   DeckSlot,
   InvariantContext,
@@ -31,18 +32,27 @@ const getSlotFromPipetteLocation = (
 export const getActiveSlotForTiprackDetails = (
   pipettes: PipetteTemporalProperties[],
   robotState: RobotState,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  currentCommand: RunTimeCommand
 ): DeckSlot | null => {
   const { labware } = robotState
-  const { trashBinEntities, wasteChuteEntities } = invariantContext
+  const { trashBinEntities, wasteChuteEntities, labwareEntities } =
+    invariantContext
   const tiprackUnderPipette = pipettes.find(
     pipette => pipette.tiprackId != null
   )?.tiprackId
+  const tiprackFromCurrentCommand =
+    'labwareId' in currentCommand.params &&
+    labwareEntities[currentCommand.params.labwareId]?.def.parameters
+      .isTiprack === true
+      ? currentCommand.params.labwareId
+      : null
+  const tiprackToShow = tiprackUnderPipette ?? tiprackFromCurrentCommand
   let slot = null
 
-  if (tiprackUnderPipette != null) {
+  if (tiprackToShow != null) {
     slot = getSlotFromPipetteLocation(
-      tiprackUnderPipette,
+      tiprackToShow,
       labware,
       trashBinEntities,
       wasteChuteEntities

@@ -35,7 +35,8 @@ export function StepDetailContainer({
   const tiprackActiveSlot = getActiveSlotForTiprackDetails(
     Object.values(pipettes),
     robotState,
-    invariantContext
+    invariantContext,
+    currentCommand
   )
   const tiprackStack =
     tiprackActiveSlot != null
@@ -53,6 +54,10 @@ export function StepDetailContainer({
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
   const tiprackOnSlot = tiprackStack.length > 1 ? tiprackStack[0] : null
+  const isTopMostLabwareTiprack =
+    topMostLabwareOnSlot != null
+      ? labwareEntities[topMostLabwareOnSlot]?.def.parameters.isTiprack === true
+      : false
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -93,7 +98,7 @@ export function StepDetailContainer({
     if (tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null) {
       components.push('tiprack')
     }
-    if (topMostLabwareOnSlot != null) {
+    if (topMostLabwareOnSlot != null && !isTopMostLabwareTiprack) {
       components.push('labware')
     }
     // temporary filtering out the disposal card for RS 9.0.0
