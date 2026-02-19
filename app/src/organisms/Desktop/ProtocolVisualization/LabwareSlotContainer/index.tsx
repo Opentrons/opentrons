@@ -41,6 +41,9 @@ interface LabwareSlotContainerProps {
   moduleEntities: ModuleEntities
 }
 
+// TODO: this is a temp fix in an interest of time
+// but we should investigate why the dropTip and pickUpTip
+// commands are showing the well container
 const HIDE_WELL_CONTAINER_COMMAND_TYPES = [
   'comment',
   'waitForDuration',
