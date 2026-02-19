@@ -1,99 +1,107 @@
-from dataclasses import dataclass
-from enum import StrEnum
+"""User store – pure data access layer for user persistence."""
 
-from pwdlib import PasswordHash
+from sqlalchemy.engine import Engine as SQLEngine
+from sqlalchemy.orm import Session, sessionmaker
 
 from server_utils.auth.scopes import Scope
 
-password_hash = PasswordHash.recommended()
+from auth_server.persistence.tables import AccountType, User
 
 
-class AccountType(StrEnum):
-    """The type of account."""
+class UserStore:
+    """Manages user CRUD operations against the database."""
 
-    ADMIN = "admin"
-    USER = "user"
-    AUDITOR = "auditor"
-    SERVICE = "service"
+    def __init__(self, sql_engine: SQLEngine) -> None:
+        """Initialize with a SQLAlchemy engine."""
+        self._sql_engine = sql_engine
+        self._session_factory = sessionmaker(
+            bind=sql_engine,
+            expire_on_commit=False,
+        )  # type: ignore[call-overload]
 
+    def _session(self) -> Session:
+        return self._session_factory()
 
-@dataclass(frozen=True)
-class User:
-    """Information about a given user account."""
+    def seed(self, users: list[User]) -> None:
+        """Insert users that don't already exist (matched by username)."""
+        with self._session() as session:
+            for user in users:
+                if (
+                    session.query(User).filter(User.username == user.username).first()
+                    is None
+                ):
+                    session.add(user)
+            session.commit()
 
-    username: str
-    hashed_password: str
-    full_name: str
-    account_type: AccountType
-    scopes: list[Scope]
+    def get(self, username: str) -> User | None:
+        """Look up a user by username. Returns the User or None."""
+        with self._session() as session:
+            user = session.query(User).filter(User.username == username).first()
+            if user is not None:
+                session.expunge(user)
+            return user
 
+    def add(
+        self,
+        username: str,
+        hashed_password: str,
+        full_name: str,
+        account_type: str,
+        scopes: list[Scope],
+    ) -> User:
+        """Create a user, persist it, and return it."""
+        new_user = User(
+            username=username,
+            hashed_password=hashed_password,
+            full_name=full_name,
+            account_type=AccountType(account_type),
+            scopes=scopes,
+        )
+        with self._session() as session:
+            session.add(new_user)
+            session.commit()
+            session.expunge(new_user)
+        return new_user
 
-# todo(mm, 2026-01-29): Delete these placeholder users when we have a real DB to store real users.
-TEST_USERS = [
-    User(
-        username="test_admin",
-        hashed_password=password_hash.hash("test_admin_password"),
-        scopes=list(Scope),
-        full_name="Test Admin",
-        account_type=AccountType.ADMIN,
-    ),
-    User(
-        username="test_user",
-        hashed_password=password_hash.hash("test_user_password"),
-        scopes=[Scope.RUNS_WRITE, Scope.RUNS_READ],
-        full_name="Test User",
-        account_type=AccountType.USER,
-    ),
-]
+    def remove(self, username: str) -> None:
+        """Delete a user by username.
 
+        Raises ``ValueError`` if the user does not exist.
+        """
+        with self._session() as session:
+            user = session.query(User).filter(User.username == username).first()
+            if user is None:
+                raise ValueError(f"User {username!r} not found")
+            session.delete(user)
+            session.commit()
 
-def get(username: str) -> User | None:
-    """Look up a user by username. Returns the User or None."""
-    return next(
-        (user for user in TEST_USERS if user.username == username),
-        None,
-    )
+    def update(
+        self,
+        username: str,
+        new_username: str | None = None,
+        hashed_password: str | None = None,
+        full_name: str | None = None,
+        account_type: str | None = None,
+    ) -> User:
+        """Update a user's fields and return the updated User.
 
-
-def add(
-    username: str, password: str, full_name: str, account_type: str, scopes: list[Scope]
-) -> User:
-    """Add a user to the TEST_USERS list."""
-    new_user = User(
-        username=username,
-        hashed_password=password_hash.hash(password),
-        full_name=full_name,
-        account_type=AccountType(account_type),
-        scopes=scopes,
-    )
-    TEST_USERS.append(new_user)
-    return new_user
-
-
-def remove(user: User) -> None:
-    """Remove a user from the TEST_USERS list."""
-    TEST_USERS.remove(user)
-
-
-def update(
-    user: User,
-    username: str | None = None,
-    password: str | None = None,
-    full_name: str | None = None,
-    account_type: str | None = None,
-) -> User:
-    """Update a user in the TEST_USERS list and return the updated User."""
-    updated_user = User(
-        username=username or user.username,
-        hashed_password=(
-            password_hash.hash(password)
-            if password is not None
-            else user.hashed_password
-        ),
-        full_name=full_name or user.full_name,
-        account_type=AccountType(account_type) if account_type else user.account_type,
-        scopes=user.scopes,
-    )
-    idx = TEST_USERS.index(user)
-    TEST_USERS[idx] = updated_user
-    return updated_user
+        Raises ``ValueError`` if the user does not exist.
+        """
+        with self._session() as session:
+            user = session.query(User).filter(User.username == username).first()
+            if user is None:
+                raise ValueError(f"User {username!r} not found")
+            updates: dict[str, object] = {
+                "username": new_username,
+                "hashed_password": hashed_password,
+                "full_name": full_name,
+                "account_type": AccountType(account_type)
+                if account_type is not None
+                else None,
+            }
+            for attr, value in updates.items():
+                if value is not None:
+                    setattr(user, attr, value)
+            session.commit()
+            session.expunge(user)
+            return user
