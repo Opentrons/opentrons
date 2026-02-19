@@ -64,7 +64,7 @@ camera_router = LightRouter()
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_camera_settings(
     request_body: RequestModel[CameraEnable],
@@ -149,7 +149,7 @@ async def add_camera_settings(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_camera_capture_image_settings(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -202,7 +202,6 @@ async def add_camera_capture_image_settings(
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_camera_capture_image_settings(
     cameraId: str,
@@ -247,7 +246,7 @@ async def get_camera_capture_image_settings(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],

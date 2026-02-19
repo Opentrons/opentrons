@@ -30,7 +30,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: runs.read # Omit users.write.
+        scope: runs.write # Omit users.write.
     response:
       status_code: 200
       json:
@@ -38,7 +38,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read
+        scope: runs.write
       save:
         json:
           access_token: access_token

@@ -158,7 +158,7 @@ async def get_current_run_from_url(
         },
         status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
@@ -271,7 +271,6 @@ async def create_run_command(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run_commands(
     runId: str,
@@ -381,7 +380,6 @@ async def get_run_commands(
             "model": ErrorBody[PreSerializedCommandsNotAvailable]
         },
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run_commands_as_pre_serialized_list(
     runId: str,
@@ -431,7 +429,6 @@ async def get_run_commands_as_pre_serialized_list(
             "model": Union[ErrorBody[RunNotFound], ErrorBody[CommandNotFound]]
         },
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run_command(
     runId: str,

@@ -53,7 +53,7 @@ labware_router = LightRouter()
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_labware_offset(
     request_body: RequestModel[
@@ -117,7 +117,7 @@ async def add_labware_offset(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
@@ -165,7 +165,6 @@ async def add_labware_definition(
         status.HTTP_200_OK: {"model": SimpleBody[list[LabwareDefinition]]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run_loaded_labware_definitions(
     runId: str,

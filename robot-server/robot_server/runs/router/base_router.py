@@ -185,7 +185,7 @@ async def get_run_data_from_url(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def create_run(  # noqa: C901
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -296,7 +296,6 @@ async def create_run(  # noqa: C901
     responses={
         status.HTTP_200_OK: {"model": MultiBody[Union[Run, BadRun], AllRunsLinks]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_runs(
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -342,7 +341,6 @@ async def get_runs(
         status.HTTP_200_OK: {"model": SimpleBody[Union[Run, BadRun]]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run(
     run_data: Annotated[Run, Depends(get_run_data_from_url)],
@@ -367,7 +365,7 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def remove_run(
     runId: str,
@@ -404,7 +402,7 @@ async def remove_run(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def update_run(
     runId: str,
@@ -452,7 +450,6 @@ async def update_run(
         status.HTTP_200_OK: {"model": SimpleMultiBody[pe_errors.ErrorOccurrence]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_run_commands_error(
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -528,7 +525,6 @@ async def get_run_commands_error(
         status.HTTP_200_OK: {"model": Body[RunCurrentState, CurrentStateLinks]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ))],
 )
 async def get_current_state(  # noqa: C901
     runId: str,

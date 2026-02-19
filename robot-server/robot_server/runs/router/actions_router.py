@@ -106,7 +106,7 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_READ, Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def create_run_action(
     runId: str,
