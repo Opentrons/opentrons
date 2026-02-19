@@ -173,7 +173,7 @@ async def test_analyze(
     legacy_command_annotation = pe_types.CustomCommandAnnotationLegacy(
         commandKeys=["abc", "xyz"]
     )
-    new_command_annotation = pe_types.UserCommandAnnotation(
+    new_command_annotation = pe_types.CommandAnnotation(
         id="annotation-id",
         source="userCommand",
         userSpecifiedName="My command annotation",

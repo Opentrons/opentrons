@@ -20,7 +20,7 @@ class BaseCommandAnnotation(BaseModel):
     )
 
 
-class UserCommandAnnotation(BaseModel):
+class CommandAnnotation(BaseModel):
     """Optional annotations for protocol engine commands."""
 
     id: str = Field(..., description="A unique identifier for the command annotation.")
@@ -32,9 +32,11 @@ class UserCommandAnnotation(BaseModel):
         None,
         description="The optional user-specified description for the annotation.",
     )
-    params: Dict[str, Any] = Field(
-        ...,
-        description="Key value pairs of the parameters passed to the annotation.",
+    params: Dict[str, Any] = (
+        Field(  # maybe make this field optional if it's not going to be used in the near future?
+            ...,
+            description="Key value pairs of the parameters passed to the annotation.",
+        )
     )
     parent: Optional[str] = Field(
         None, description="The ID of the parent annotation if this is a sub-annotation."

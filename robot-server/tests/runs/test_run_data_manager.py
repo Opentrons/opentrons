@@ -29,9 +29,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import (
     BooleanParameter,
+    CommandAnnotation,
     CommandPreconditions,
     CSVParameter,
-    UserCommandAnnotation,
 )
 from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
@@ -131,7 +131,7 @@ def engine_state_summary() -> StateSummary:
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
+            CommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
         ],
     )
 
@@ -600,7 +600,7 @@ async def test_get_all_runs(
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
+            CommandAnnotation.model_construct(  # type: ignore[call-arg]
                 id="current-command-annotation-id"
             )
         ],
@@ -626,7 +626,7 @@ async def test_get_all_runs(
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
+            CommandAnnotation.model_construct(  # type: ignore[call-arg]
                 id="old-command-annotation-id"
             )
         ],

@@ -35,7 +35,7 @@ from opentrons.protocol_engine.state.commands import (
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
-from opentrons.protocol_engine.types.command_annotations import UserCommandAnnotation
+from opentrons.protocol_engine.types.command_annotations import CommandAnnotation
 
 
 def _make_config() -> Config:
@@ -1395,7 +1395,7 @@ def test_handle_create_command_annotation_action() -> None:
     )
 
     annotation = subject_view.get_command_annotation("abc123")
-    assert annotation == UserCommandAnnotation(
+    assert annotation == CommandAnnotation(
         id="abc123",
         source="userCommand",
         userSpecifiedName="bar",
@@ -1423,14 +1423,14 @@ def test_get_all_command_annotations() -> None:
             )
         )
     assert subject_view.get_all_command_annotations() == [
-        UserCommandAnnotation(
+        CommandAnnotation(
             id="ann_id_1",
             source="userCommand",
             userSpecifiedName="bar",
             userSpecifiedDescription="foo",
             params={"a": 1},
         ),
-        UserCommandAnnotation(
+        CommandAnnotation(
             id="ann_id_2",
             source="userCommand",
             userSpecifiedName="bar",
