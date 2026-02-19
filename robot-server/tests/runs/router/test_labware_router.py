@@ -16,6 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2 as SD_LabwareDefinition2,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from server_utils.fastapi_utils.models.json_api import RequestModel, SimpleBody
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs.router.labware_router import (
@@ -26,7 +27,6 @@ from robot_server.runs.router.labware_router import (
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import LabwareDefinitionSummary, Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.service.json_api import RequestModel, SimpleBody
 
 
 @pytest.fixture()

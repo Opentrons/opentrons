@@ -27,7 +27,9 @@ class VerifyToken:
         self.jwks_client = jwt.PyJWKClient(jwks_url)
 
     async def verify(
-        self, security_scopes: SecurityScopes, credentials: HTTPAuthorizationCredentials = Security(HTTPBearer())  # noqa: B008
+        self,
+        security_scopes: SecurityScopes,
+        credentials: HTTPAuthorizationCredentials = Security(HTTPBearer()),  # noqa: B008
     ) -> User:
         if credentials is None:
             raise UnauthenticatedException()

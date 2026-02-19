@@ -34,6 +34,7 @@ import { MagneticModuleData } from '../MagneticModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
+import { VacuumModuleData } from '../VacuumModule/VacuumModuleData'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
@@ -44,6 +45,7 @@ import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
+  VacuumModule,
 } from '/app/redux/modules/types'
 
 vi.mock('../ErrorInfo')
@@ -52,6 +54,7 @@ vi.mock('../TemperatureModuleData')
 vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
 vi.mock('../FlexStackerModuleData')
+vi.mock('../VacuumModule/VacuumModuleData')
 vi.mock('/app/redux/config')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../ModuleOverflowMenu')
@@ -207,6 +210,32 @@ const mockFlexStacker = {
   },
 } as FlexStackerModule
 
+const mockVacuumModule = {
+  id: 'vacuum_module_id',
+  serialNumber: 'vm123',
+  hardwareRevision: 'vacuum_module_v1.0',
+  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleType: 'vacuumModuleType',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: false,
+  usbPort: {
+    path: '/dev/ot_module_vacuum',
+    hub: false,
+    port: 1,
+    hubPort: 1,
+    portGroup: 'unknown',
+  },
+  data: {
+    currentPressure: null,
+    targetPressure: null,
+    currentPower: null,
+    targetPower: null,
+    modeType: 'pressure',
+    ventStatus: 'closed',
+    status: 'idle',
+  },
+} as VacuumModule
+
 const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
@@ -249,6 +278,9 @@ describe('ModuleCard', () => {
     )
     vi.mocked(FlexStackerModuleData).mockReturnValue(
       <div>Mock Flex Stacker Module Data</div>
+    )
+    vi.mocked(VacuumModuleData).mockReturnValue(
+      <div>Mock Vacuum Module Data</div>
     )
     vi.mocked(ModuleOverflowMenu).mockReturnValue(
       <div>mock module overflow menu</div>
@@ -408,36 +440,41 @@ describe('ModuleCard', () => {
     screen.getByText('Module setup required.')
   })
   it('does not render calibration update banner for OT-2-specific modules', () => {
+    vi.mocked(useIsFlex).mockReturnValue(false)
     render({
       ...props,
       module: mockMagneticModule,
     })
     expect(screen.queryByText('Module setup required.')).not.toBeInTheDocument()
   })
-  it('renders module setup link for no-calibration required modules', () => {
-    render({
-      ...props,
-      module: mockFlexStacker,
+  ;[mockFlexStacker, mockVacuumModule].forEach(module =>
+    it('renders module setup link for no-calibration required modules', () => {
+      render({
+        ...props,
+        module,
+      })
+      screen.getByText('Set up module for use.')
+      const button = screen.getByText('Set up module')
+      fireEvent.click(button)
+      expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
+      expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
-    screen.getByText('Set up module for use.')
-    const button = screen.getByText('Set up module')
-    fireEvent.click(button)
-    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
-    expect(vi.mocked(getRequestById)).toHaveBeenCalled()
-  })
-  it('renders module setup link for no-calibration required modules if firmware update available', () => {
-    mockFlexStacker.hasAvailableUpdate = true
+  )
+  ;[mockFlexStacker, mockVacuumModule].forEach(module =>
+    it('renders module setup link for no-calibration required modules if firmware update available', () => {
+      mockFlexStacker.hasAvailableUpdate = true
 
-    render({
-      ...props,
-      module: mockFlexStacker,
+      render({
+        ...props,
+        module,
+      })
+      screen.getByText('Set up module for use.')
+      const button = screen.getByText('Set up module')
+      fireEvent.click(button)
+      expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
+      expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
-    screen.getByText('Set up module for use.')
-    const button = screen.getByText('Set up module')
-    fireEvent.click(button)
-    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
-    expect(vi.mocked(getRequestById)).toHaveBeenCalled()
-  })
+  )
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
@@ -550,5 +587,16 @@ describe('ModuleCard', () => {
     screen.getByText('Heater-Shaker Module GEN1')
     screen.getByText('Mock Heater Shaker Module Data')
     screen.getByText('mock heater shaker error')
+  })
+
+  it('renders information for a vacuum module with mocked status', () => {
+    render({
+      ...props,
+      module: mockVacuumModule,
+    })
+
+    screen.getByText('Millipore MultiScreen® Vacuum Manifold')
+    screen.getByText('Mock Vacuum Module Data')
+    screen.getByAltText('vacuumModuleMilliporeV1')
   })
 })

@@ -10,6 +10,7 @@ classifiers = [
 description = "Common utilities for various Opentrons Python servers."
 
 dependencies = [
+    "aiohttp>=3.12.14,<4",
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
@@ -55,8 +56,7 @@ max-complexity = 9
 "server_utils/util.py" = ["ANN", "D"]
 "server_utils/fastapi_utils/service/*" = ["ANN", "D"]
 "server_utils/_version.py" = ["I"]
-"tests/fastapi_utils/service/*" = ["ANN", "D"]
-"tests/test_util.py" = ["ANN", "D"]
+"tests/*" = ["D"]
 [tool.ruff.lint.isort]
 known-local-folder = ["server_utils"]
 

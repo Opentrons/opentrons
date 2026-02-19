@@ -14,6 +14,13 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..dependencies import (
     get_maintenance_run_data_manager,
@@ -31,13 +38,6 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
-from robot_server.service.json_api import (
-    MultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-)
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 

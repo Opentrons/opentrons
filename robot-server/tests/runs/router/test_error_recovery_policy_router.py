@@ -3,6 +3,8 @@
 import pytest
 from decoy import Decoy
 
+from server_utils.fastapi_utils.models.json_api.request import RequestModel
+
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs import error_recovery_models as er_models
 from robot_server.runs.router.error_recovery_policy_router import (
@@ -10,7 +12,6 @@ from robot_server.runs.router.error_recovery_policy_router import (
     put_error_recovery_policy,
 )
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.service.json_api.request import RequestModel
 
 
 async def test_put(decoy: Decoy, mock_run_data_manager: RunDataManager) -> None:

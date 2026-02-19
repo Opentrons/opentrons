@@ -77,7 +77,25 @@
 .individual_command_text {
   overflow-wrap: anywhere;
   white-space: normal;
-  word-break: break-all;
+  word-break: normal;
+}
+
+.individual_command_text :global(ul),
+.individual_command_text :global(ol) {
+  padding-left: 0;
+  margin: 0;
+}
+
+.individual_command_text :global(li) {
+  position: relative;
+  padding-left: var(--spacing-10);
+  list-style: none;
+}
+
+.individual_command_text :global(li)::before {
+  position: absolute;
+  left: 0;
+  content: '•';
 }
 
 .annotated_steps_container {

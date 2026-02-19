@@ -5,7 +5,7 @@ from typing import Literal
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class PlateReaderPage(BasePage):
@@ -24,7 +24,6 @@ class PlateReaderPage(BasePage):
         self.page.get_by_test_id(slot).click()
         self.page.get_by_test_id("Modules").click()
         self.page.get_by_test_id(module).click()
-        self.button_selection("Confirm")
 
     def dimiss_deck_hardware_modal(self) -> None:
         """Dismiss the deck hardware modal if it appears."""

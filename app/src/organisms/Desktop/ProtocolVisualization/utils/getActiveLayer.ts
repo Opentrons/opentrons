@@ -1,14 +1,30 @@
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { PipetteTemporalProperties } from '@opentrons/step-generation'
 
 interface ActiveLayer {
   isActiveLayerVisible: boolean
 }
 
+// omitting dropTipInPlace because
+// we know that happens over a trashBin or wasteChute
+const IN_PLACE_COMMANDS = [
+  'aspirateInPlace',
+  'blowoutInPlace',
+  'dispenseInPlace',
+  'airGapInPlace',
+]
+
 export const getActiveLayer = (
   id: string,
+  pipetteState: {
+    [pipetteId: string]: PipetteTemporalProperties
+  },
   selectedRunTimeCommand?: RunTimeCommand,
   moduleId?: string
 ): ActiveLayer => {
+  const pipetteEntityId = Object.values(pipetteState).find(
+    pipette => pipette.entityId === id
+  )
   const isStepAssosciatedWithLabwareId =
     selectedRunTimeCommand != null &&
     'labwareId' in selectedRunTimeCommand.params &&
@@ -21,7 +37,11 @@ export const getActiveLayer = (
     selectedRunTimeCommand.params.labwareId === id
 
   const isStepAssosciatedWithLabware =
-    isStepAssosciatedWithLabwareId || isMoveStepAssosciatedWithLabwareId
+    isStepAssosciatedWithLabwareId ||
+    isMoveStepAssosciatedWithLabwareId ||
+    (pipetteEntityId != null &&
+      selectedRunTimeCommand != null &&
+      IN_PLACE_COMMANDS.includes(selectedRunTimeCommand?.commandType))
 
   const isStepAssociatedWithModuleId =
     moduleId != null &&
