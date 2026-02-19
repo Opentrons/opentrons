@@ -17,7 +17,7 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferProtocolContentsLog'
-  | 'flexOnlyApp'
+  | 'ignoreOT2App'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
