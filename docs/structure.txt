@@ -1,0 +1,549 @@
+.
+├── README.md
+├── absorbance-plate-reader
+│   └── docs
+│       ├── additional-info.md
+│       ├── data.md
+│       ├── images
+│       ├── index.md
+│       ├── installation.md
+│       ├── maintenance.md
+│       ├── placement.md
+│       ├── product-specs.md
+│       └── safety.md
+├── flex
+│   └── docs
+│       ├── additional-docs.md
+│       ├── advanced-operation
+│       │   ├── command-line.md
+│       │   ├── index.md
+│       │   ├── jupyter-notebook.md
+│       │   └── log-files.md
+│       ├── glossary.md
+│       ├── images
+│       │   ├── parts-list
+│       │   ├── regulatory-marks
+│       │   └── unboxing
+│       ├── index.md
+│       ├── installation
+│       │   ├── first-run.md
+│       │   ├── index.md
+│       │   ├── instruments.md
+│       │   ├── relocation.md
+│       │   ├── requirements.md
+│       │   └── unboxing.md
+│       ├── introduction.md
+│       ├── labware
+│       │   ├── concepts.md
+│       │   ├── definitions.md
+│       │   ├── gripper.md
+│       │   ├── index.md
+│       │   └── types.md
+│       ├── maintenance
+│       │   ├── cleaning.md
+│       │   ├── index.md
+│       │   └── service.md
+│       ├── modules
+│       │   ├── absorbance-plate-reader.md
+│       │   ├── caddy.md
+│       │   ├── calibration.md
+│       │   ├── heater-shaker.md
+│       │   ├── hepa-uv.md
+│       │   ├── index.md
+│       │   ├── magnetic-block.md
+│       │   ├── stacker.md
+│       │   ├── temperature.md
+│       │   └── thermocycler.md
+│       ├── open-source.md
+│       ├── opentrons-app
+│       │   ├── camera.md
+│       │   ├── flex-downgrade.md
+│       │   ├── index.md
+│       │   ├── install.md
+│       │   ├── module-control.md
+│       │   └── protocol-transfer.md
+│       ├── preface.md
+│       ├── protocols
+│       │   ├── designer.md
+│       │   ├── development-service.md
+│       │   ├── index.md
+│       │   ├── library.md
+│       │   ├── opentrons-ai.md
+│       │   ├── ot-2.md
+│       │   └── python-api.md
+│       ├── safety-regulatory.md
+│       ├── support.md
+│       ├── system-description
+│       │   ├── connections.md
+│       │   ├── e-stop.md
+│       │   ├── gripper.md
+│       │   ├── index.md
+│       │   ├── pipettes.md
+│       │   ├── robot.md
+│       │   └── specs.md
+│       └── touchscreen
+│           ├── dashboard.md
+│           ├── deck-config.md
+│           ├── index.md
+│           ├── instruments.md
+│           ├── protocol-details.md
+│           ├── protocol-management.md
+│           ├── protocol-run.md
+│           ├── protocol-setup.md
+│           ├── quick-transfer.md
+│           └── settings.md
+├── flex-manual
+│   └── site
+│       ├── additional-documentation
+│       ├── assets
+│       │   ├── images
+│       │   ├── javascripts
+│       │   │   ├── lunr
+│       │   │   │   └── min
+│       │   │   └── workers
+│       │   └── stylesheets
+│       ├── glossary
+│       ├── images
+│       │   ├── parts-list
+│       │   ├── regulatory-marks
+│       │   └── unboxing
+│       ├── installation-relocation
+│       ├── introduction
+│       ├── labware
+│       ├── maintenance-service
+│       ├── modules
+│       ├── open-source-software
+│       ├── preface
+│       ├── protocol-development
+│       ├── search
+│       ├── software-operation
+│       ├── support-contact-information
+│       └── system-description
+├── heater-shaker
+│   └── docs
+│       ├── adapters.md
+│       ├── additional-info.md
+│       ├── compliance.md
+│       ├── images
+│       ├── index.md
+│       ├── installation-flex.md
+│       ├── installation-ot2.md
+│       ├── maintenance.md
+│       ├── pre-installation.md
+│       ├── product-specs.md
+│       └── software.md
+├── hepa-uv
+│   └── docs
+│       ├── additional-info.md
+│       ├── cleaning.md
+│       ├── compliance.md
+│       ├── hardware-controls.md
+│       ├── hepa-specs.md
+│       ├── images
+│       │   ├── instructions
+│       │   ├── parts-list
+│       │   └── regulatory-marks
+│       ├── index.md
+│       ├── installation.md
+│       ├── maintenance.md
+│       ├── product-specs.md
+│       └── uv-specs.md
+├── mkdocs-parent-css-plugin
+│   └── parent_css_plugin
+├── ot-2
+│   └── docs
+│       ├── additional-docs.md
+│       ├── calibration
+│       │   ├── index.md
+│       │   ├── jog-controls.md
+│       │   ├── labware-offsets.md
+│       │   └── robot-calibration.md
+│       ├── images
+│       ├── index.md
+│       ├── installation
+│       │   ├── first-run.md
+│       │   ├── index.md
+│       │   ├── instruments.md
+│       │   ├── relocation.md
+│       │   ├── requirements.md
+│       │   └── unboxing.md
+│       ├── introduction.md
+│       ├── labware
+│       │   ├── concepts.md
+│       │   ├── definitions.md
+│       │   ├── index.md
+│       │   └── types.md
+│       ├── maintenance
+│       │   ├── cleaning.md
+│       │   ├── index.md
+│       │   └── services.md
+│       ├── modules
+│       │   ├── heater-shaker.md
+│       │   ├── hepa.md
+│       │   ├── index.md
+│       │   ├── magnetic.md
+│       │   ├── temperature.md
+│       │   └── thermocycler.md
+│       ├── open-source.md
+│       ├── opentrons-app
+│       │   ├── features-summary.md
+│       │   ├── index.md
+│       │   ├── installation.md
+│       │   ├── protocol-import.md
+│       │   └── protocol-run.md
+│       ├── pipettes.md
+│       ├── safety-regulatory.md
+│       ├── support.md
+│       └── system-description
+│           ├── index.md
+│           ├── robot.md
+│           └── specs.md
+├── protocol-designer
+│   └── docs
+│       ├── about.md
+│       ├── create-protocol
+│       │   ├── metadata-overview.md
+│       │   ├── modules-fixtures.md
+│       │   └── robot-instruments.md
+│       ├── edit-steps.md
+│       ├── export-protocol.md
+│       ├── images
+│       ├── index.md
+│       ├── modify-protocol.md
+│       ├── starting-deck.md
+│       ├── steps
+│       │   ├── camera.md
+│       │   ├── magnet.md
+│       │   ├── mix.md
+│       │   ├── module.md
+│       │   ├── move.md
+│       │   ├── pause.md
+│       │   └── transfer.md
+│       ├── stylesheets
+│       └── warnings-errors.md
+├── python-api
+│   ├── __pycache__
+│   └── docs
+│       ├── adapting-ot2-flex.md
+│       ├── advanced-control
+│       │   ├── command-line.md
+│       │   ├── index.md
+│       │   ├── jupyter.md
+│       │   └── robot-motors.md
+│       ├── building-block-commands
+│       │   ├── index.md
+│       │   ├── liquids.md
+│       │   ├── pipette-tips.md
+│       │   └── utilities.md
+│       ├── complex-commands
+│       │   ├── index.md
+│       │   ├── order-operations.md
+│       │   ├── parameters.md
+│       │   └── sources-destinations.md
+│       ├── deck-slots.md
+│       ├── examples.md
+│       ├── img
+│       │   ├── complex_commands
+│       │   ├── lc_icons
+│       │   ├── modules
+│       │   ├── tutorial
+│       │   └── well_iteration
+│       ├── index.md
+│       ├── labware.md
+│       ├── liquid-class-definitions.md
+│       ├── liquid-classes.md
+│       ├── modules
+│       │   ├── absorbance-plate-reader.md
+│       │   ├── concurrent.md
+│       │   ├── flex-stacker.md
+│       │   ├── heater-shaker.md
+│       │   ├── index.md
+│       │   ├── magnetic-block.md
+│       │   ├── magnetic-module.md
+│       │   ├── multiple-same-type.md
+│       │   ├── setup.md
+│       │   ├── temperature-module.md
+│       │   └── thermocycler.md
+│       ├── moving-labware.md
+│       ├── pipettes
+│       │   ├── characteristics.md
+│       │   ├── index.md
+│       │   ├── loading.md
+│       │   ├── partial-tip-pickup.md
+│       │   └── volume-modes.md
+│       ├── reference
+│       │   ├── absorbance-plate-reader.md
+│       │   ├── execute-simulate.md
+│       │   ├── flex-stacker.md
+│       │   ├── heater-shaker.md
+│       │   ├── instruments.md
+│       │   ├── labware.md
+│       │   ├── magnetic-block.md
+│       │   ├── magnetic-module.md
+│       │   ├── protocols.md
+│       │   ├── robot-motors.md
+│       │   ├── temperature-module.md
+│       │   ├── thermocycler.md
+│       │   ├── types.md
+│       │   └── wells-liquids.md
+│       ├── robot-position.md
+│       ├── runtime-parameters
+│       │   ├── choosing.md
+│       │   ├── defining.md
+│       │   ├── index.md
+│       │   ├── style.md
+│       │   ├── use-case-cherrypicking.md
+│       │   ├── use-case-dry-run.md
+│       │   ├── use-case-sample-count.md
+│       │   └── using-values.md
+│       ├── tutorial.md
+│       └── versioning.md
+├── shared
+│   ├── icons
+│   │   └── opentrons
+│   ├── images
+│   ├── index.md
+│   ├── modules
+│   │   └── index.md
+│   └── partials
+├── site
+│   ├── absorbance-plate-reader
+│   │   ├── additional-info
+│   │   ├── data
+│   │   ├── images
+│   │   ├── installation
+│   │   ├── maintenance
+│   │   ├── placement
+│   │   ├── product-specs
+│   │   └── safety
+│   ├── assets
+│   │   ├── images
+│   │   ├── javascripts
+│   │   │   ├── lunr
+│   │   │   │   └── min
+│   │   │   └── workers
+│   │   └── stylesheets
+│   ├── flex
+│   │   ├── additional-docs
+│   │   ├── advanced-operation
+│   │   ├── glossary
+│   │   ├── images
+│   │   │   ├── parts-list
+│   │   │   ├── regulatory-marks
+│   │   │   └── unboxing
+│   │   ├── installation
+│   │   │   ├── first-run
+│   │   │   ├── instruments
+│   │   │   ├── relocation
+│   │   │   ├── requirements
+│   │   │   └── unboxing
+│   │   ├── introduction
+│   │   ├── labware
+│   │   │   ├── concepts
+│   │   │   ├── definitions
+│   │   │   ├── gripper
+│   │   │   └── types
+│   │   ├── maintenance
+│   │   │   ├── cleaning
+│   │   │   └── service
+│   │   ├── modules
+│   │   │   ├── absorbance-plate-reader
+│   │   │   ├── caddy
+│   │   │   ├── calibration
+│   │   │   ├── heater-shaker
+│   │   │   ├── hepa-uv
+│   │   │   ├── magnetic-block
+│   │   │   ├── stacker
+│   │   │   ├── temperature
+│   │   │   └── thermocycler
+│   │   ├── open-source
+│   │   ├── opentrons-app
+│   │   ├── preface
+│   │   ├── protocols
+│   │   │   ├── designer
+│   │   │   ├── development-service
+│   │   │   ├── library
+│   │   │   ├── ot-2
+│   │   │   └── python-api
+│   │   ├── safety-regulatory
+│   │   ├── support
+│   │   ├── system-description
+│   │   │   ├── connections
+│   │   │   ├── e-stop
+│   │   │   ├── gripper
+│   │   │   ├── pipettes
+│   │   │   ├── robot
+│   │   │   └── specs
+│   │   └── touchscreen
+│   │       ├── dashboard
+│   │       ├── deck-config
+│   │       ├── instruments
+│   │       ├── protocol-details
+│   │       ├── protocol-management
+│   │       ├── protocol-run
+│   │       ├── protocol-setup
+│   │       ├── quick-transfer
+│   │       └── settings
+│   ├── heater-shaker
+│   │   ├── adapters
+│   │   ├── additional-info
+│   │   ├── compliance
+│   │   ├── images
+│   │   ├── installation-flex
+│   │   ├── installation-ot2
+│   │   ├── maintenance
+│   │   ├── pre-installation
+│   │   ├── product-specs
+│   │   └── software
+│   ├── hepa-uv
+│   │   ├── additional-info
+│   │   ├── cleaning
+│   │   ├── compliance
+│   │   ├── hardware-controls
+│   │   ├── hepa-specs
+│   │   ├── images
+│   │   │   ├── instructions
+│   │   │   ├── parts-list
+│   │   │   └── regulatory-marks
+│   │   ├── installation
+│   │   ├── maintenance
+│   │   ├── product-specs
+│   │   └── uv-specs
+│   ├── icons
+│   │   └── opentrons
+│   ├── images
+│   ├── modules
+│   ├── protocol-designer
+│   │   ├── about
+│   │   ├── create-protocol
+│   │   │   ├── metadata-overview
+│   │   │   ├── modules-fixtures
+│   │   │   └── robot-instruments
+│   │   ├── edit-steps
+│   │   ├── export-protocol
+│   │   ├── images
+│   │   ├── modify-protocol
+│   │   ├── starting-deck
+│   │   ├── steps
+│   │   │   ├── magnet
+│   │   │   ├── mix
+│   │   │   ├── module
+│   │   │   ├── move
+│   │   │   ├── pause
+│   │   │   └── transfer
+│   │   ├── stylesheets
+│   │   └── warnings-errors
+│   ├── search
+│   ├── stacker
+│   │   ├── additional-info
+│   │   ├── assets
+│   │   ├── compliance
+│   │   ├── images
+│   │   │   └── iso-warnings
+│   │   ├── installation
+│   │   ├── loading-labware
+│   │   ├── maintenance
+│   │   ├── post-installation
+│   │   ├── pre-installation
+│   │   └── product-specs
+│   ├── temperature-module
+│   │   ├── additional-info
+│   │   ├── compliance
+│   │   ├── images
+│   │   ├── installation-flex
+│   │   ├── installation-ot2
+│   │   ├── maintenance
+│   │   ├── pre-installation
+│   │   └── product-specs
+│   └── thermocycler
+│       ├── additional-info
+│       ├── compliance
+│       ├── images
+│       ├── installation-flex
+│       ├── installation-ot2
+│       ├── lid-seals
+│       ├── maintenance
+│       ├── pre-installation
+│       └── product-specs
+├── stacker
+│   └── docs
+│       ├── additional-info.md
+│       ├── assets
+│       ├── compliance.md
+│       ├── images
+│       │   └── iso-warnings
+│       ├── index.md
+│       ├── installation.md
+│       ├── loading-labware.md
+│       ├── maintenance.md
+│       ├── post-installation.md
+│       ├── pre-installation.md
+│       └── product-specs.md
+├── stacker-manual
+│   └── site
+│       ├── assets
+│       │   ├── images
+│       │   ├── javascripts
+│       │   │   ├── lunr
+│       │   │   │   └── min
+│       │   │   └── workers
+│       │   └── stylesheets
+│       ├── compliance
+│       ├── images
+│       │   └── iso-warnings
+│       ├── installation
+│       ├── loading-labware
+│       ├── maintenance
+│       ├── postinstall
+│       ├── preinstall
+│       ├── search
+│       ├── specifications
+│       ├── stylesheets
+│       └── warranty
+├── temperature-module
+│   ├── docs
+│   │   ├── additional-info.md
+│   │   ├── compliance.md
+│   │   ├── images
+│   │   ├── index.md
+│   │   ├── installation-flex.md
+│   │   ├── installation-ot2.md
+│   │   ├── maintenance.md
+│   │   ├── pre-installation.md
+│   │   └── product-specs.md
+│   └── site
+│       ├── assets
+│       │   ├── images
+│       │   ├── javascripts
+│       │   │   ├── lunr
+│       │   │   │   └── min
+│       │   │   └── workers
+│       │   └── stylesheets
+│       └── search
+├── thermocycler
+│   └── docs
+│       ├── additional-info.md
+│       ├── compliance.md
+│       ├── images
+│       ├── index.md
+│       ├── installation-flex.md
+│       ├── installation-ot2.md
+│       ├── lid-seals.md
+│       ├── maintenance.md
+│       ├── pre-installation.md
+│       └── product-specs.md
+└── thermocycler-manual
+    └── site
+        ├── assets
+        │   ├── images
+        │   ├── javascripts
+        │   │   ├── lunr
+        │   │   │   └── min
+        │   │   └── workers
+        │   └── stylesheets
+        ├── compliance
+        ├── images
+        ├── search
+        └── specifications
+
+308 directories, 239 files

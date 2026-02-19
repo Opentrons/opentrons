@@ -9,7 +9,7 @@ title: "Opentrons OT-2: Temperature Module"
 The [Opentrons Temperature Module](https://opentrons.com/products/temperature-module-gen2?sku=991-00350-0) is a hot and cold plate module. It can reach and maintain temperatures ranging from 4 °C to 95 °C. The Temperature Module is often used in protocols that require heating, cooling, rapid temperature changes, or for long duration storage of samples and reagents at a specific, constant temperature. The module is compatible with various thermal block adapters and the Opentrons Flex and OT-2 liquid handling robots.
 
 !!! note "Additional Documentation"
-    For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../../temperature-module/).
+    For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
 
 ### Heating and cooling
 
@@ -23,7 +23,7 @@ The Temperature Module uses aluminum thermal blocks to hold labware at temperatu
 
 ### Software control
 
-The Temperature Module is fully programmable in [Protocol Designer](../../../protocol-designer/) and the [Python Protocol API](../../../python-api/).
+The Temperature Module is fully programmable in [Protocol Designer](../../protocol-designer/index.md) and the [Python Protocol API](../../python-api/index.md).
 
 Outside of protocols, the Opentrons App can display the current status of the Temperature Module and can directly control the temperature of the surface plate.
 

@@ -15,7 +15,7 @@ The [Opentrons Knowledge Hub](https://opentrons.com/resources/knowledge-hub/) ho
 
 ## Python Protocol API documentation
 
-The [Opentrons Python Protocol API documentation](../../python-api/) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](../../python-api/tutorial/) for users writing their first Python protocol.
+The [Opentrons Python Protocol API documentation](../python-api/index.md) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](../python-api/tutorial.md) for users writing their first Python protocol.
 
 The Python API documentation covers writing Python code to:
 
