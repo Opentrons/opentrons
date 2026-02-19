@@ -13,11 +13,12 @@ Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left–right
 <figcaption>Robot calibration</figcaption>
 </figure>
 
-There are three positional calibrations that work together and are performed in sequence:
+During robot calibration, the Opentrons App automatically takes you through all these procedures in the sequence listed here:
 
-- **Deck calibration:** The foundation. This process maps the deck to the gantry.
-- **Tip length calibration:** Measures the distance from the nozzle of the pipette to the tip.
-- **Pipette offset calibration:** Aligns the pipette nozzle to the calibrated deck.
+1. **Deck calibration:** The foundation. This process maps the deck to the gantry.
+2. **Tip length calibration:** Measures the distance from the nozzle of the pipette to the tip.
+3. **Pipette offset calibration:** Aligns the pipette nozzle to the calibrated deck.
+
 
 ## Deck calibration
 
@@ -52,7 +53,7 @@ Deck calibration helps the OT-2 understand deck location and size. This calibrat
 
 ## Tip length calibration
 
-Tip length calibration measures the Z-axis distance between the pipette’s nozzle and the bottom of the tip. This helps ensure the robot knows exactly how close the tip is to the deck or labware.
+Tip length calibration measures the z-axis distance between the pipette’s nozzle and the bottom of the tip. This helps ensure the robot knows exactly how close the tip is to the deck or labware.
 
 Because pipette nozzles vary slightly in manufacturing, this calibration is unique to specific pipette and tip combinations. For example, if you have two identical P300 pipettes, they each need their own tip length calibration for the same box of tips.
 
@@ -107,7 +108,7 @@ The calibration controls are located in the Robot Settings section of the Opentr
 
     <figure class="screenshot" markdown>
     ![Robot settings showing calibration status and action button](../images/calibration-launch.png)
-    <figcaption>Robot Settings showing that an OT-2 needs calibration.</figcaption>
+    <figcaption>Robot Settings showing an uncalibrated OT-2.</figcaption>
     </figure>
 
 4. Click **Launch Calibration**. This opens the calibration status dashboard.
@@ -131,6 +132,6 @@ Upon completion, the Robot Settings screen updates the calibration status of you
 <figure class="screenshot" markdown>
 ![Robot Settings showing updated date/time stamps for a calibrated robot](../images/calibration-complete.png)
 <figcaption>Robot Settings screen after calibration.</figcaption>
-
+</figure>
 
 Your OT-2 is now calibrated. For even greater precision, you can also run Labware Position Check. This check aligns the robot to labware used in protocols. See the [Labware Calibration section](./labware-offsets.md) for more information.

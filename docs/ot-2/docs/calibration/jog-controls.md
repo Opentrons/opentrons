@@ -22,13 +22,13 @@ Jog controls vary slightly depending on the procedure. To help you navigate thes
 
 You may not always need to jog the pipette. Sometimes the robot knows how to align with its deck, labware, or modules. In these cases, simply confirm the position to proceed.
 
-## Using Jog Controls
+## Using jog controls
 
 To use the jog controls:
 
 <div class="instruction-list" markdown>
 
-1. Select a control option to set the pipette's axis of movement.
+1. Select **X- and Y-axis** to move the pipette horizontally, or **Z-axis** to move the pipette vertically.
 2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm. Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette.
 3. Click an arrow to move the pipette for your selected direction and distance.
 4. Click the confirmation button when, in your best judgment, the pipette is optimally aligned with its target.
