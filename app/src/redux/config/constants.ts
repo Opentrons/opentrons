@@ -9,6 +9,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'reactQueryDevtools',
   'reactScan',
   'quickTransferProtocolContentsLog',
+  'flexOnlyApp',
 ]
 
 // action type constants
