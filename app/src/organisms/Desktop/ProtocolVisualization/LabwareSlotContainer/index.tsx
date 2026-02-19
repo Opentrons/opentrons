@@ -108,7 +108,7 @@ export function LabwareSlotContainer(
   const shouldShowWellContainer =
     selectedWellName != null &&
     commandType !== 'comment' &&
-    commandType !== 'pause'
+    commandType !== 'waitForResume'
   const wellGroup: WellGroup | null =
     selectedWellName != null
       ? {
