@@ -9,7 +9,7 @@ import { NewTip } from '../NewTip'
 import { TipStatus } from '../TipStatus'
 import { UsedTip } from '../UsedTip'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
 vi.mock('../NewTip')
 vi.mock('../UsedTip')
@@ -32,7 +32,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="new"
-        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+        wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
       />
     )
     screen.getByText('New tip')
@@ -42,7 +42,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="used"
-        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+        wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
       />
     )
     screen.getByText('Used tip')
@@ -52,7 +52,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="selected"
-        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+        wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
       />
     )
     screen.getByText('Selected well')
@@ -62,7 +62,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="no"
-        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+        wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
       />
     )
     screen.getByText('Empty well')
@@ -72,7 +72,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="inaccessible"
-        labwareDefinition={fixtureTiprack1000ul as LabwareDefinition}
+        wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
       />
     )
     screen.getByText('Inaccessible tip')

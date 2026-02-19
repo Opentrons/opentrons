@@ -15,6 +15,7 @@ import {
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
+  getWellGroupLength,
 } from '../utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -34,7 +35,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -60,7 +61,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -74,7 +75,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8
@@ -89,7 +90,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8
@@ -185,5 +186,50 @@ describe('getAvailableNozzleConfigurations', () => {
     expect(
       getAvailableNozzleConfigurations(channels, mockDeckSetup, mockT)
     ).toStrictEqual(nozzleConfigurationOptions)
+  })
+  it('returns length of well group when the nozzle configuration is ROW', () => {
+    const totalSelected = 24
+    const nozzleConfiguration = ROW
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+    ).toStrictEqual(2)
+  })
+  it('returns length of well group when the nozzle configuration is ROW', () => {
+    const totalSelected = 16
+    const nozzleConfiguration = COLUMN
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+    ).toStrictEqual(2)
+  })
+  it('returns length of well group when the nozzle configuration is ROW', () => {
+    const totalSelected = 13
+    const nozzleConfiguration = ALL
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+    ).toStrictEqual(13)
   })
 })
