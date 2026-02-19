@@ -92,7 +92,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
         ],
     ) -> None:
         authorization_result = await authorization_checker.check(
-            token=bearer_token, scopes=required_scopes_set
+            token=bearer_token, required_scopes=required_scopes_set
         )
         if isinstance(authorization_result, AuthorizedResult):
             # The request is authorized, yay.

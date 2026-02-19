@@ -14,15 +14,15 @@ class AuthorizationChecker(ABC):
     """An interface to check whether an HTTP client is authorized to do something."""
 
     @abstractmethod
-    async def check(self, token: str | None, scopes: set[Scope]) -> Result:
+    async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         """Check whether an HTTP request is authorized.
 
         Params:
             token: The OAuth 2 access token carried by the request,
                 or `None` if it didn't carry such a token.
 
-            scopes: The authorization scopes to check against. The request passes if
-                the token is authorized for all of these.
+            required_scopes: The authorization scopes to check against. The request
+                passes if the token is authorized for all of these.
         """
         pass
 
@@ -31,7 +31,7 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always allows access."""
 
     @override
-    async def check(self, token: str | None, scopes: set[Scope]) -> Result:
+    async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         return AuthorizedResult()
 
 
@@ -42,7 +42,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
         self._client = client
 
     @override
-    async def check(self, token: str | None, scopes: set[Scope]) -> Result:
+    async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         if token is None:
             # The client is trying to access a protected resource without providing a token.
             # We allow this if and only if access control is disabled.
@@ -58,7 +58,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
             token_info = await self._client.introspect_token(token)
             provided_scopes = parse_scopes(token_info.scope)
 
-            missing_scopes = scopes - provided_scopes
+            missing_scopes = required_scopes - provided_scopes
 
             if not token_info.active:
                 return NotAnActiveTokenResult()

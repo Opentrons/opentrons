@@ -28,11 +28,11 @@ async def test_always_allowed_checker() -> None:
     subject = AlwaysAllowedAuthorizationChecker()
 
     assert (
-        await subject.check(token=None, scopes={Scope.USERS_WRITE})
+        await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
         == AuthorizedResult()
     )
     assert (
-        await subject.check(token="token-abc123", scopes={Scope.USERS_WRITE})
+        await subject.check(token="token-abc123", required_scopes={Scope.USERS_WRITE})
         == AuthorizedResult()
     )
 
@@ -47,7 +47,7 @@ async def test_auth_server_checker_given_no_token(
         AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=True))
     )
     assert (
-        await subject.check(token=None, scopes={Scope.USERS_WRITE})
+        await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
         == MissingTokenResult()
     )
 
@@ -55,7 +55,7 @@ async def test_auth_server_checker_given_no_token(
         AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=False))
     )
     assert (
-        await subject.check(token=None, scopes={Scope.USERS_WRITE})
+        await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
         == AuthorizedResult()
     )
 
