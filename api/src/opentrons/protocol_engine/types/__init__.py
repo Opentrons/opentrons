@@ -9,6 +9,7 @@ from .command_annotations import (
     LegacyCommandAnnotation,
     CustomCommandAnnotationLegacy,
     SecondOrderCommandAnnotationLegacy,
+    UserCommandAnnotation,
 )
 from .command_preconditions import (
     CommandPreconditions,
@@ -170,6 +171,7 @@ __all__ = [
     "SecondOrderCommandAnnotationLegacy",
     "CustomCommandAnnotationLegacy",
     "LegacyCommandAnnotation",
+    "UserCommandAnnotation",
     # Command preconditions
     "PreconditionTypes",
     "CommandPreconditions",

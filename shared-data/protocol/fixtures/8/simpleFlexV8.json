@@ -1304,7 +1304,8 @@
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
         "wellName": "B1"
-      }
+      },
+      "key": "1abc123"
     },
     {
       "commandType": "aspirate",
@@ -1318,13 +1319,15 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 2 }
         }
-      }
+      },
+      "key": "2abc123"
     },
     {
       "commandType": "waitForDuration",
       "params": {
         "seconds": 42
-      }
+      },
+      "key": "3abc123"
     },
     {
       "commandType": "dispense",
@@ -1338,7 +1341,8 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         }
-      }
+      },
+      "key": "4abc123"
     },
     {
       "commandType": "touchTip",
@@ -1351,7 +1355,8 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 11 }
         }
-      }
+      },
+      "key": "5abc123"
     },
     {
       "commandType": "blowout",
@@ -1364,7 +1369,8 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 12 }
         }
-      }
+      },
+      "key": "6abc123"
     },
     {
       "commandType": "moveToCoordinates",
@@ -1460,15 +1466,7 @@
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
   "commandAnnotations": [
     {
-      "commandKeys": [
-        "1abc123",
-        "2abc123",
-        "3abc123",
-        "4abc123",
-        "5abc123",
-        "6abc123",
-        "7abc123"
-      ],
+      "commandKeys": ["1abc123", "2abc123", "3abc123", "4abc123"],
       "annotationType": "custom"
     }
   ]

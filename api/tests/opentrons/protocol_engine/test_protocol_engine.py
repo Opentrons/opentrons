@@ -1438,6 +1438,7 @@ def test_create_user_command_annotation(
         annotation_name="My annotation",
         annotation_id="abc123",
         description="Hello world",
+        params={},
     )
 
     assert result == "abc123"
