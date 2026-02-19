@@ -1,10 +1,6 @@
 ---
-description: Locize i18n synchronization workflow for the Opentrons monorepo
-globs:
-  - scripts/locize_sync.py
-  - app/src/assets/localization/**
-  - components/src/assets/localization/**
-alwaysApply: false
+name: locize-sync
+description: Locize i18n synchronization workflow for pushing and downloading translations in the Opentrons monorepo. Use when working with locize_sync.py, localization files in app/src/assets/localization/ or components/src/assets/localization/, or syncing translations.
 ---
 
 # Locize Synchronization Instructions
