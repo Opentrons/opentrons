@@ -4,12 +4,7 @@
   "title": "Command Annotation Schema V2",
   "description": "Schema for defining annotations that group an arbitrary number of commands together.",
   "type": "object",
-  "required": [
-    "id",
-    "source",
-    "params",
-    "userSpecifiedName"
-  ],
+  "required": ["id", "source", "params", "userSpecifiedName"],
   "properties": {
     "id": {
       "description": "A unique identifier for a command annotation.",

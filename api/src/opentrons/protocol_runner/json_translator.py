@@ -206,7 +206,7 @@ def _translate_simple_command(
             dict_command["commandType"] = "waitForResume"
         else:
             dict_command["commandType"] = "waitForDuration"
-    dict_command["commandAnnotations"] = command_annotations or []
+    dict_command["commandAnnotationIds"] = command_annotations or []
     return pe_commands.CommandCreateAdapter.validate_python(dict_command)
 
 
