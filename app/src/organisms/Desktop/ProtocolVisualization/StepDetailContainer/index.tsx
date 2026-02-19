@@ -22,6 +22,12 @@ interface StepDetailContainerProps {
   currentCommand: RunTimeCommand
 }
 
+const HIDE_LABWARE_CARD_FOR_TIPRACK_COMMAND_TYPES = [
+  'pickUpTip',
+  'dropTip',
+  'dropTipInPlace',
+]
+
 export function StepDetailContainer({
   protocolKey,
   commands,
@@ -58,6 +64,10 @@ export function StepDetailContainer({
     topMostLabwareOnSlot != null
       ? labwareEntities[topMostLabwareOnSlot]?.def.parameters.isTiprack === true
       : false
+  const shouldHideLabwareCardForTiprackCommand =
+    isTopMostLabwareTiprack &&
+      currentCommand.commandType
+    )
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -98,7 +108,10 @@ export function StepDetailContainer({
     if (tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null) {
       components.push('tiprack')
     }
-    if (topMostLabwareOnSlot != null && !isTopMostLabwareTiprack) {
+    if (
+      topMostLabwareOnSlot != null &&
+      !shouldHideLabwareCardForTiprackCommand
+    ) {
       components.push('labware')
     }
     // temporary filtering out the disposal card for RS 9.0.0
