@@ -16,15 +16,14 @@ TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 
 
+# The hard-coded client_id that auth-server expects in certain OAuth 2 requests.
+#
+# todo(mm, 2026-02-19): It may be a bug in oauthlib, or auth-server's usage of oa uthlib,
+# that the token introspection endpoint absolutely requires a client_id. If it is a bug,
+# we should find a fix or workaround contained to auth-server, and not provide a client_id
+# in our requests here. If it isn't, we should use a client_id separate from the
+# Opentrons App, like "opentrons_resource_server" or something.
 _CLIENT_ID: ClientIDType = "opentrons_app"
-"""The hard-coded client_id that auth-server expects in certain OAuth 2 requests.
-
-todo(mm, 2026-02-19): It may be a bug in oauthlib, or auth-server's usage of oauthlib,
-that the token introspection endpoint absolutely requires a client_id. If it is a bug,
-we should find a fix or workaround contained to auth-server, and not provide a client_id
-in our requests here. If it isn't, we should use a client_id separate from the
-Opentrons App, like "opentrons_resource_server" or something.
-"""
 ClientIDType: typing.TypeAlias = typing.Literal["opentrons_app"]
 
 
