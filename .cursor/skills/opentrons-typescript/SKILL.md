@@ -1,6 +1,8 @@
 ---
-alwaysApply: false
+name: opentrons-typescript
+description: TypeScript conventions, React patterns, testing, styling, and import rules for the Opentrons monorepo JS/TS packages. Use when working with TypeScript or React files in app/, components/, shared-data/, step-generation/, protocol-designer/, opentrons-ai-client/, or other JS/TS packages.
 ---
+
 # Opentrons Monorepo — TypeScript Conventions
 
 Node.js, Yarn, Python setup, teardown, and troubleshooting are in the always-apply `monorepo-setup` rule.
@@ -11,35 +13,35 @@ Yarn workspaces monorepo with 14 TypeScript packages. No Lerna/Nx/Turbo — uses
 
 ### Packages
 
-| Package | Directory | Type |
-| ------- | --------- | ---- |
-| `@opentrons/app` | `app/` | React app |
-| `@opentrons/app-shell` | `app-shell/` | Electron shell |
-| `@opentrons/app-shell-odd` | `app-shell-odd/` | Electron shell (ODD) |
-| `@opentrons/components` | `components/` | React UI components library |
-| `@opentrons/api-client` | `api-client/` | Pure TS library |
-| `@opentrons/react-api-client` | `react-api-client/` | React hooks library |
-| `@opentrons/discovery-client` | `discovery-client/` | Pure TS (Node) |
-| `@opentrons/shared-data` | `shared-data/` | Pure TS/JS data library |
-| `@opentrons/step-generation` | `step-generation/` | Pure TS library |
-| `@opentrons/labware-library` | `labware-library/` | React app |
-| `@opentrons/labware-designer` | `labware-designer/` | React app |
-| `opentrons-ai-client` | `opentrons-ai-client/` | React app |
-| `protocol-designer` | `protocol-designer/` | React app |
-| `@opentrons/usb-bridge-client` | `usb-bridge/node-client/` | Pure TS (Node) |
+| Package                        | Directory                 | Type                        |
+| ------------------------------ | ------------------------- | --------------------------- |
+| `@opentrons/app`               | `app/`                    | React app                   |
+| `@opentrons/app-shell`         | `app-shell/`              | Electron shell              |
+| `@opentrons/app-shell-odd`     | `app-shell-odd/`          | Electron shell (ODD)        |
+| `@opentrons/components`        | `components/`             | React UI components library |
+| `@opentrons/api-client`        | `api-client/`             | Pure TS library             |
+| `@opentrons/react-api-client`  | `react-api-client/`       | React hooks library         |
+| `@opentrons/discovery-client`  | `discovery-client/`       | Pure TS (Node)              |
+| `@opentrons/shared-data`       | `shared-data/`            | Pure TS/JS data library     |
+| `@opentrons/step-generation`   | `step-generation/`        | Pure TS library             |
+| `@opentrons/labware-library`   | `labware-library/`        | React app                   |
+| `@opentrons/labware-designer`  | `labware-designer/`       | React app                   |
+| `opentrons-ai-client`          | `opentrons-ai-client/`    | React app                   |
+| `protocol-designer`            | `protocol-designer/`      | React app                   |
+| `@opentrons/usb-bridge-client` | `usb-bridge/node-client/` | Pure TS (Node)              |
 
 ### Dependency Graph
 
 `shared-data` is the foundation. Nothing should import "up" the tree:
 
-```md
+```markdown
 shared-data
-  ├── step-generation
-  ├── components
-  ├── api-client → react-api-client
-  └── discovery-client
-       ↓
-  app, protocol-designer, labware-library, opentrons-ai-client (leaf apps)
+├── step-generation
+├── components
+├── api-client → react-api-client
+└── discovery-client
+↓
+app, protocol-designer, labware-library, opentrons-ai-client (leaf apps)
 ```
 
 ## TypeScript Configuration
@@ -83,6 +85,7 @@ Use the `@opentrons/` scope. These resolve to source via Vite aliases in dev/tes
 ```typescript
 import { Flex, SPACING } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+
 import type { PipetteName } from '@opentrons/shared-data'
 ```
 
@@ -98,11 +101,10 @@ Each app has a path alias (configured in tsconfig + Vite):
 // Good — absolute import within app
 import { useRobot } from '/app/resources/robots'
 
-// Acceptable — relative for nearby files in the same feature
-import { utils } from './utils'
-
 // Bad — deep relative paths across features
 import { useRobot } from '../../../resources/robots'
+// Acceptable — relative for nearby files in the same feature
+import { utils } from './utils'
 ```
 
 ### No Default Exports
@@ -115,10 +117,10 @@ Import individual functions only:
 
 ```typescript
 // Good
-import mapValues from 'lodash/mapValues'
 
 // Bad — imports entire library
 import { mapValues } from 'lodash'
+import mapValues from 'lodash/mapValues'
 ```
 
 ### Type Imports
@@ -165,7 +167,14 @@ The `app` package separates Desktop and ODD (On-Device Display) UIs. ESLint rule
 Use primitives from the shared component library for layout and common UI:
 
 ```typescript
-import { Flex, StyledText, Icon, SPACING, COLORS, DIRECTION_COLUMN } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 ```
 
 ### Hooks
@@ -224,11 +233,11 @@ width: 15rem;
 
 ### Test File Structure
 
-```text
+```markdown
 FeatureOrComponent/
 ├── index.tsx (or module.ts)
-└── __tests__/
-    └── FeatureName.test.tsx
+└── **tests**/
+└── FeatureName.test.tsx
 ```
 
 ### renderWithProviders
@@ -274,30 +283,30 @@ describe('MyComponent', () => {
 
 Each package has a `Makefile` with some or all of:
 
-| Target | Description |
-| ------ | ----------- |
-| `make dev` | Start Vite dev server |
-| `make build` | Production build |
-| `make clean` | Remove build output |
-| `make test` | Run tests (delegates to root) |
-| `make test-cov` | Run tests with coverage |
+| Target          | Description                   |
+| --------------- | ----------------------------- |
+| `make dev`      | Start Vite dev server         |
+| `make build`    | Production build              |
+| `make clean`    | Remove build output           |
+| `make test`     | Run tests (delegates to root) |
+| `make test-cov` | Run tests with coverage       |
 
 ### Root Makefile (run from monorepo root)
 
-| Target | Description |
-| ------ | ----------- |
-| `make setup-js` | Install all JS deps (`yarn`) |
-| `make test-js` | Run ALL JS tests |
-| `make test-js-<project>` | Run tests for one project (e.g., `make test-js-protocol-designer`) |
-| `make lint-js` | ESLint + Prettier check |
-| `make lint-js-eslint` | ESLint only |
-| `make lint-js-prettier` | Prettier only |
-| `make lint-css` | Stylelint all CSS |
-| `make format-js` | Auto-format with Prettier |
-| `make format-css` | Auto-fix CSS with Stylelint |
-| `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
-| `make clean-ts` | Clean TS build output |
-| `make circular-dependencies-js` | Check circular imports (madge) |
+| Target                            | Description                                                        |
+| --------------------------------- | ------------------------------------------------------------------ |
+| `make setup-js`                   | Install all JS deps (`yarn`)                                       |
+| `make test-js`                    | Run ALL JS tests                                                   |
+| `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
+| `make lint-js`                    | ESLint + Prettier check                                            |
+| `make lint-js-eslint`             | ESLint only                                                        |
+| `make lint-js-prettier`           | Prettier only                                                      |
+| `make lint-css`                   | Stylelint all CSS                                                  |
+| `make format-js`                  | Auto-format with Prettier                                          |
+| `make format-css`                 | Auto-fix CSS with Stylelint                                        |
+| `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`)                              |
+| `make clean-ts`                   | Clean TS build output                                              |
+| `make circular-dependencies-js`   | Check circular imports (madge)                                     |
 
 ### Running Tests Directly
 

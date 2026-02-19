@@ -1,46 +1,24 @@
 ---
-description: Guidelines for working with the robot Python projects
-globs:
-  - api/**/*.py
-  - robot-server/**/*.py
-  - hardware/**/*.py
-  - auth-server/**/*.py
-  - shared-data/python/**/*.py
-  - shared-data/python_tests/**/*.py
-  - server-utils/**/*.py
-  - system-server/**/*.py
-  - update-server/**/*.py
-  - usb-bridge/**/*.py
-  - g-code-testing/**/*.py
-  - api/pyproject.toml
-  - robot-server/pyproject.toml
-  - hardware/pyproject.toml
-  - auth-server/pyproject.toml
-  - shared-data/pyproject.toml
-  - server-utils/pyproject.toml
-  - system-server/pyproject.toml
-  - update-server/pyproject.toml
-  - usb-bridge/pyproject.toml
-  - g-code-testing/pyproject.toml
-alwaysApply: false
+name: robot-python-projects
+description: Guidelines for robot Python projects — api/, robot-server/, hardware/, auth-server/, shared-data/, server-utils/, system-server/, update-server/, usb-bridge/, g-code-testing/. Use when working with Python files in these directories or their pyproject.toml files.
 ---
 
 # Robot Python Projects
 
 The following directories contain the robot Python projects — packages that run on or support Opentrons robots:
 
-| Project | Directory | Description |
-| --- | --- | --- |
-| `opentrons` | `api/` | Core Opentrons Python API for protocol execution |
-| `robot-server` | `robot-server/` | HTTP API server that runs on the robot |
-| `opentrons-hardware` | `hardware/` | Low-level hardware control and CAN bus communication |
-| `auth-server` | `auth-server/` | Authentication server for Flex |
-| `opentrons-shared-data` | `shared-data/` | Shared data definitions (labware, pipettes, modules) |
-| `server-utils` | `server-utils/` | Common utilities for Python servers |
-| `system-server` | `system-server/` | System-level server for robot management |
-| `otupdate` | `update-server/` | Server for software and firmware updates |
-| `ot3usb` | `usb-bridge/` | USB bridge daemon for Flex |
-| `g-code-testing` | `g-code-testing/` | G-code testing and emulation tools |
+| Project                 | Directory         | Description                                          |
+| ----------------------- | ----------------- | ---------------------------------------------------- |
+| `opentrons`             | `api/`            | Core Opentrons Python API for protocol execution     |
+| `robot-server`          | `robot-server/`   | HTTP API server that runs on the robot               |
+| `opentrons-hardware`    | `hardware/`       | Low-level hardware control and CAN bus communication |
+| `auth-server`           | `auth-server/`    | Authentication server for Flex                       |
+| `opentrons-shared-data` | `shared-data/`    | Shared data definitions (labware, pipettes, modules) |
+| `server-utils`          | `server-utils/`   | Common utilities for Python servers                  |
+| `system-server`         | `system-server/`  | System-level server for robot management             |
+| `otupdate`              | `update-server/`  | Server for software and firmware updates             |
+| `ot3usb`                | `usb-bridge/`     | USB bridge daemon for Flex                           |
+| `g-code-testing`        | `g-code-testing/` | G-code testing and emulation tools                   |
 
 ## Common Patterns
 

@@ -1,7 +1,6 @@
 ---
-description: Conventions for static deploy automation Python CLIs
-globs: scripts/static-deploy/**
-alwaysApply: false
+name: static-deploy
+description: Conventions for static deploy automation Python CLIs in scripts/static-deploy/. Use when working with deployment scripts, AWS S3/CloudFront automation, or Python CLIs in the static-deploy directory.
 ---
 
 # Static Deploy — Python CLI Conventions
@@ -37,6 +36,7 @@ alwaysApply: false
 ### Environment Parity
 
 Same code path runs locally and in CI. Only entry points differ:
+
 - **Local**: dev sets flags manually (`--aws-profile`, etc.)
 - **CI**: wrapper or Make target builds the same args from CI env
 
@@ -45,6 +45,7 @@ Configuration should be static and deterministic — avoid runtime environment d
 ### Rich Console UX
 
 Use `rich.console.Console` for all human output:
+
 - `style="red"` for errors
 - `style="yellow"` for warnings
 - `style="green"` for success

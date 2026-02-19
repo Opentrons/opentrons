@@ -1,14 +1,11 @@
 ---
-description: Component creation checklist and ai-client-specific patterns for React .tsx files
-globs:
-  - opentrons-ai-client/src/**/*.tsx
-  - protocol-designer/src/**/*.tsx
-alwaysApply: false
+name: react-component-creation
+description: Component creation checklist and ai-client-specific patterns for React .tsx files in opentrons-ai-client/ and protocol-designer/. Use when creating new React components in these packages.
 ---
 
 # React Component Creation Checklist
 
-General TypeScript, React, styling, testing, and import conventions are in the `opentrons-typescript` and `css-modules` rules. PD-specific architecture is in the `protocol-designer` rule. This file covers the **component creation workflow** and **opentrons-ai-client specifics**.
+General TypeScript, React, styling, testing, and import conventions are in the `opentrons-typescript` skill. PD-specific architecture is in the `protocol-designer` skill. CSS Modules details are in the `css-modules` skill. This file covers the **component creation workflow** and **opentrons-ai-client specifics**.
 
 ## Before Creating a New Component
 
@@ -35,8 +32,9 @@ ComponentName/
 The ai-client uses `/ai-client/` as its path alias (mapped to `opentrons-ai-client/src/`):
 
 ```typescript
-import type { ChatData } from '/ai-client/resources/types'
 import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
+
+import type { ChatData } from '/ai-client/resources/types'
 ```
 
 ### Testing

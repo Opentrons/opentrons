@@ -11,10 +11,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -24,6 +21,7 @@ import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
 import { useModuleOverflowMenu } from './hooks'
+import { getCanCalibrateModule, getIsModuleCalibrated } from './utils'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 
@@ -121,12 +119,7 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {isFlex &&
-        module.moduleType !== ABSORBANCE_READER_TYPE &&
-        module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
-        !MODULE_MODELS_OT2_ONLY.some(
-          modModel => modModel === module.moduleModel
-        ) ? (
+        {getCanCalibrateModule(module, isFlex) ? (
           <>
             <MenuItem
               onClick={handleCalibrateClick}
@@ -134,7 +127,7 @@ export const ModuleOverflowMenu = (
               {...targetProps}
             >
               {i18n.format(
-                module.moduleOffset?.last_modified != null
+                getIsModuleCalibrated(module)
                   ? t('recalibrate')
                   : t('calibrate'),
                 'capitalize'
