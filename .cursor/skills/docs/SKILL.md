@@ -14,14 +14,14 @@ The `/docs` directory is organized to support multiple documentation publication
 ### Publication Directories (Multiple MkDocs Projects)
 
 - Each major documentation set ("publication") exists in its own subdirectory, with its own `mkdocs.yml` and content:
-    | Publication Directory              | Description                              |
+    | Publication Directory             | Description                              |
     |-----------------------------------|------------------------------------------|
     | `docs/absorbance-plate-reader/`   | Absorbance Plate Reader Module manual    |
     | `docs/flex/`                      | Opentrons Flex robot manual              |
     | `docs/heater-shaker/`             | Heater-Shaker Module manual              |
     | `docs/hepa-uv/`                   | HEPA/UV Module manual                    |
     | `docs/protocol-designer/`         | Protocol Designer application manual     |
-    | `docs/python-api/`                | Python API (PAPI) reference and guides   |
+    | `docs/python-api/`                | Python API reference and guides          |
     | `docs/stacker/`                   | Flex Stacker Module manual               |
     | `docs/temperature-module/`        | Temperature Module manual                |
     | `docs/thermocycler/`              | Thermocycler Module manual               |
