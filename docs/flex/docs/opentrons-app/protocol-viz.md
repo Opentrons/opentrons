@@ -8,7 +8,7 @@ It's important to test a new protocol before running it on your Flex. In the Ope
 - Detect and fix protocol errors before the first run.
 - Assess new protocols created with Protocol Designer, OpentronsAI, or the Python Protocol API.
 
-Click **Visualize** on any Flex protocol's [details page](../touchscreen/protocol-details.md) to get started.
+Click **Visualize** on any Flex protocol's [details page](../touchscreen/protocol-details.md) to get started. You'll be able to see details for any protocol using API version 2.16 and newer.
 
 <figure markdown>
 ![Image showing protocol visualization in the Opentrons App](../images/protocol-viz.png)
@@ -60,7 +60,13 @@ For each step, additional protocol details appear on the right side of the scree
 
 ## Editing errors
 
-upload a protocol with an error and fill out this section + screenshot
+When you import any protocol, the Opentrons App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error. 
+
+<figure markdown>
+![Image showing protocol visualization details for tips, labware, wells, and more.](../images/viz-error.png)
+</figure>
+
+In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. The visualization screen includes the number of errors at the top of the screen. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details. 
 
 
 
