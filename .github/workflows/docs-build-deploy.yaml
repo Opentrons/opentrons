@@ -1,4 +1,4 @@
-name: 'Docs build and deploy'
+name: 'Docs build'
 
 on:
   pull_request:
@@ -6,7 +6,6 @@ on:
       - 'api/**'
       - 'docs/**'
       - '.github/workflows/docs-build-deploy.yaml'
-      - 'scripts/static-deploy/**'
   push:
     branches:
       - 'edge'
@@ -26,10 +25,6 @@ defaults:
     shell: bash
 env:
   CI: 'true'
-  # This is the artifact directory as a relative path
-  # to the working-directory of our tools: scripts/static-deploy
-  # our script deploy_ci_config.py expects this ENV variable is set
-  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
   build-docs:
@@ -65,85 +60,3 @@ jobs:
           path: |
             docs/site/
           retention-days: 1
-
-  determine-deploy-config:
-    name: Determine Deployment Configuration
-    runs-on: ubuntu-24.04
-    outputs:
-      application: ${{ steps.deploy-config.outputs.APPLICATION }}
-      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
-      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
-      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
-      branch: ${{ steps.config.outputs.branch }}
-      bucket: ${{ steps.config.outputs.bucket }}
-      url: ${{ steps.config.outputs.url }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-      - uses: ./.github/actions/git/resolve-tag
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: '3.12'
-          enable-cache: true
-      - name: Setup Deploy Dependencies
-        working-directory: scripts/static-deploy
-        run: make setup
-      - name: Determine Deployment Configuration
-        id: deploy-config
-        working-directory: scripts/static-deploy
-        run: make resolve-ci
-
-  deploy-docs:
-    needs:
-      - build-docs
-      - determine-deploy-config
-    timeout-minutes: 5
-    runs-on: ubuntu-24.04
-    if: always() && needs.build-docs.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      ENVIRONMENT: ${{ needs.determine-deploy-config.outputs.ENVIRONMENT }}
-      BRANCH: ${{ needs.determine-deploy-config.outputs.branch }}
-      BUCKET: ${{ needs.determine-deploy-config.outputs.bucket }}
-      URL: ${{ needs.determine-deploy-config.outputs.url }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-      - id: resolve-tag
-        uses: ./.github/actions/git/resolve-tag
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: '3.12'
-          enable-cache: true
-      - name: Setup Deploy Dependencies
-        working-directory: scripts/static-deploy
-        run: make setup
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
-          aws-region: us-east-2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-artifacts
-          path: ./dist # in the default workspace
-          # RELATIVE_ARTIFACT_DIR is set to ../../dist
-          # because that is the relative path from scripts/static-deploy
-          # to the this location
-      - name: Deploy to S3
-        working-directory: scripts/static-deploy
-        run: make deploy \
-          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
-          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
-          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
-          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
-
-      - name: Output Deployment URL
-        run: |
-          echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "<${{ env.URL }}>" >> $GITHUB_STEP_SUMMARY

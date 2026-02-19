@@ -271,7 +271,7 @@ def parse_github_event_context(  # noqa: C901
     """
 
     # Determine application based on tag patterns
-    application = "labware_library"  # default
+    application = "protocol_designer"  # default
 
     if ref_type == "tag":
         # Tag-based application detection
