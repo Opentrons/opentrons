@@ -1,5 +1,6 @@
 ---
-applyTo: 'e2e-testing/**'
+name: e2e-testing
+description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
 ---
 
 # E2E Testing Instructions
@@ -16,8 +17,6 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 
 ## Directory Layout
 
-Key directories:
-
 - `automation/base_page.py` — Shared `BasePage` class inherited by all page objects
 - `automation/pd_pages/` — PD page objects (import from `automation.pd_pages`)
 - `automation/ll_pages/` — LL page objects (import from `automation.ll_pages`)
@@ -25,47 +24,31 @@ Key directories:
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 
-## Architecture
+## Architecture — Page Object Model
 
-### Page Object Model (POM) Pattern
+**ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests.
 
-**ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests:
+### Shared Base (`automation/base_page.py`)
 
-1. **Shared base** (`automation/base_page.py`):
-   - `BasePage` provides: `click_button`, `click_test_id`, `fill_input`, `wait_for_visible`, `dismiss_release_notes_toast`, `highlight_element`, `goto`
-   - Exposes `self.is_sandbox` (True when `TEST_ENV=sandbox`)
-   - All page objects in both `pd_pages/` and `ll_pages/` inherit from it via `from automation.base_page import BasePage`
+`BasePage` provides: `click_button`, `click_test_id`, `fill_input`, `wait_for_visible`, `dismiss_release_notes_toast`, `highlight_element`, `goto`. Exposes `self.is_sandbox` (True when `TEST_ENV=sandbox`). All page objects inherit from it.
 
-2. **PD Page Objects** (`automation/pd_pages/`):
-   - `LandingPage` — welcome modal, create/import protocol
-   - `CreateProtocolWizard` — robot type, pipette, gripper, etc.
-   - `PipetteModal` — pipette selection
-   - `ModuleConfigPage` — module hardware configuration
-   - `DeckConfigPage` — slot selection, fixtures, modules, naming
-   - `ProtocolEditorPage` — labware placement, liquid editing, well selection, toolbox
-   - `TransferPage` — transfer step form
-   - `MixStepForm` — mix step form
-   - `ThermocyclerStepPage`, `ThermocyclerProfileModal` — TC steps
-   - `TemperatureStepPage` — temp deck steps
-   - `HeaterShakerStepPage` — H/S steps
-   - `PlateReaderPage` — absorbance reader
-   - `FlexStackerPage` — Flex Stacker configuration
-   - `SettingsPage` — app settings
-   - `Timeline` — protocol timeline
+### PD Page Objects (`automation/pd_pages/`)
 
-3. **LL Page Objects** (`automation/ll_pages/`):
-   - `DesktopNavigation` — header nav, subdomain links, About dropdown
-   - `LabwareCreator` — full Labware Creator wizard (type selection, dimensions, grid, well shape, export)
+`LandingPage`, `CreateProtocolWizard`, `PipetteModal`, `ModuleConfigPage`, `DeckConfigPage`, `ProtocolEditorPage`, `TransferPage`, `MixStepForm`, `ThermocyclerStepPage`, `ThermocyclerProfileModal`, `TemperatureStepPage`, `HeaterShakerStepPage`, `PlateReaderPage`, `FlexStackerPage`, `SettingsPage`, `Timeline`.
 
-4. **Tests** (`tests/pd/` and `tests/ll/`):
-   - Import and use page objects — never write raw Playwright selectors in test files
-   - Focus on test logic and assertions
-   - Naming: `test_<feature>_<scenario>`
-   - Mark PD tests with `@pytest.mark.pdE2E`, LL tests with `@pytest.mark.llE2E`
-   - Add `@pytest.mark.slow` for tests taking >10 seconds
-   - Add type annotations: `def test_name(page: Page, pd_base_url: str) -> None:`
+### LL Page Objects (`automation/ll_pages/`)
 
-**Example — PD page object:**
+`DesktopNavigation`, `LabwareCreator`.
+
+### Tests (`tests/pd/` and `tests/ll/`)
+
+- Import and use page objects — never write raw Playwright selectors in test files
+- Naming: `test_<feature>_<scenario>`
+- Mark PD tests with `@pytest.mark.pdE2E`, LL tests with `@pytest.mark.llE2E`
+- Add `@pytest.mark.slow` for tests taking >10 seconds
+- Add type annotations: `def test_name(page: Page, pd_base_url: str) -> None:`
+
+### Example — PD Page Object
 
 ```python
 """Module for <page name> interactions."""
@@ -89,7 +72,7 @@ class MyPage(BasePage):
         self.fill_input("protocolName", name)
 ```
 
-**Example — PD test:**
+### Example — PD Test
 
 ```python
 import pytest
@@ -108,7 +91,7 @@ def test_my_feature(page: Page, pd_base_url: str) -> None:
     my_page.click_submit_button()
 ```
 
-**Example — LL test:**
+### Example — LL Test
 
 ```python
 import pytest
@@ -129,8 +112,8 @@ def test_nav_loads(page: Page, ll_base_url: str) -> None:
 Tests run against different environments via `TEST_ENV`:
 
 - **local** (default): Auto-builds and serves the app (PD on ports 4173-4175, LL on ports 4176-4178)
-- **staging**: PD → `https://staging.designer.opentrons.com` · LL → `https://staging.labware.opentrons.com`
-- **prod**: PD → `https://designer.opentrons.com` · LL → `https://labware.opentrons.com`
+- **staging**: PD → `https://staging.designer.opentrons.com` / LL → `https://staging.labware.opentrons.com`
+- **prod**: PD → `https://designer.opentrons.com` / LL → `https://labware.opentrons.com`
 - **sandbox**: TODO — Not implemented (requires branch-specific URLs)
 
 ### conftest.py Fixtures
@@ -140,7 +123,7 @@ Tests run against different environments via `TEST_ENV`:
 | `pd_base_url`              | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
 | `ll_base_url`              | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
 | `page`                     | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
-| `browser_context_args`     | session  | Viewport 1280×720, video recording                                                             |
+| `browser_context_args`     | session  | Viewport 1280x720, video recording                                                             |
 | `browser_type_launch_args` | session  | Headless/headed, slow_mo                                                                       |
 | `eyes`                     | function | Applitools Eyes session (or None)                                                              |
 | `eyes_singleton`           | session  | Shared Applitools Eyes instance                                                                |
@@ -157,24 +140,15 @@ Tests run against different environments via `TEST_ENV`:
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
 | `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
 
-## Key Files
-
-- **`conftest.py`** — Fixtures, server lifecycle, video recording, Applitools batch setup
-- **`pytest.ini`** — Markers (`pdE2E`, `llE2E`, `slow`, `unit`, `integration`), addopts, timeout (300 s)
-- **`pyproject.toml`** — Dependencies (`playwright>=1.55`, `eyes-playwright>=6.4`), ruff (line-length 120, py312), mypy (strict for `automation/`, relaxed for `tests/`)
-- **`eyes.py`** — `Eyes` wrapper class, `eyes` + `eyes_singleton` fixtures
-- **`utility.py`** — `troubleshoot_and_pause` decorator, `_import_protocol_and_open_editor`, `create_new_protocol_from_landing_page`
-- **`run_many_tests.py`** — Local "CI" runner: format → lint → typecheck with auto-fix
-
 ## Development Commands
 
-**ALWAYS run these before committing:**
+**ALWAYS run before committing:**
 
 ```bash
-make format                  # Auto-format (ruff format + ruff check --fix)
-make typecheck               # Run mypy
-make check                   # lint + typecheck combined
-make prep                    # format + typecheck
+make format       # Auto-format (ruff format + ruff check --fix)
+make typecheck    # Run mypy
+make check        # lint + typecheck combined
+make prep         # format + typecheck
 ```
 
 **Running PD tests:**
@@ -200,10 +174,10 @@ make test-ll-prod                                # Against prod
 **Other targets:**
 
 ```bash
-make test-unit               # Unit tests only
-make troubleshoot            # Re-run last failures in headed mode
-make codegen                 # Playwright Inspector/recorder (default localhost:4173)
-make codegen URL=<url>       # Record against custom URL
+make test-unit      # Unit tests only
+make troubleshoot   # Re-run last failures in headed mode
+make codegen        # Playwright Inspector/recorder (default localhost:4173)
+make codegen URL=<url>  # Record against custom URL
 ```
 
 ## Code Quality Standards
@@ -213,12 +187,12 @@ make codegen URL=<url>       # Record against custom URL
 All functions must have type annotations:
 
 ```python
-# ✅ CORRECT
+# Good
 def my_function(page: Page, name: str) -> None:
     """Docstring here."""
     pass
 
-# ❌ WRONG - Missing type annotations
+# Bad — Missing type annotations
 def my_function(page, name):
     pass
 ```
@@ -227,16 +201,16 @@ Note: `mypy` is strict for `automation/` but relaxed (`disallow_untyped_defs = f
 
 ### Imports
 
-Organized automatically by ruff. Import page objects from the package, not from internal modules:
+Import page objects from the package, not from internal modules:
 
 ```python
-# ✅ CORRECT
+# Good
 from automation.pd_pages import LandingPage
 from automation.ll_pages import LabwareCreator
 from automation.base_page import BasePage
 
-# ❌ WRONG
-from automation.pd_pages.landing_page import LandingPage  # Too specific
+# Bad
+from automation.pd_pages.landing_page import LandingPage
 ```
 
 ### Docstrings
@@ -245,61 +219,47 @@ from automation.pd_pages.landing_page import LandingPage  # Too specific
 
 ## Testing Best Practices
 
-### 1. Use Descriptive Selectors
-
-**Prefer (in order):**
+### Selectors (prefer in order)
 
 1. `get_by_role()` — Semantic HTML roles
-2. `get_by_test_id()` — Test IDs added by developers
+2. `get_by_test_id()` — Test IDs
 3. `get_by_text()` — Visible text
 4. `get_by_label()` — Form labels
 
-**Avoid:** CSS selectors (brittle), XPath (hard to maintain).
+Avoid CSS selectors (brittle) and XPath (hard to maintain).
 
-### 2. Wait for Elements
+### Wait for Elements
 
-**ALWAYS wait** for elements before interacting:
+**ALWAYS wait** before interacting:
 
 ```python
-# ✅ CORRECT — Using BasePage helper
+# Good — Using BasePage helper
 self.wait_for_visible(element, timeout=5000)
 
-# ✅ CORRECT — Using Playwright expect
+# Good — Using Playwright expect
 from playwright.sync_api import expect
 expect(element).to_be_visible()
 element.click()
 
-# ❌ WRONG — No wait
+# Bad — No wait
 self.page.get_by_role("button", name="Submit").click()
 ```
 
-### 3. Test Independence
+### Test Independence
 
 - Don't rely on test execution order
 - Don't share state between tests
-- Clean up is handled by fixtures and fresh browser contexts
+- Clean up handled by fixtures and fresh browser contexts
 
-### 4. Assertions
-
-```python
-# Playwright assertions (preferred)
-from playwright.sync_api import expect
-expect(page.get_by_text("Success")).to_be_visible()
-
-# pytest assertions (also fine)
-assert "Protocol Designer" in page.title()
-```
-
-### 5. Test Markers
+### Test Markers
 
 Every PD test **must** have `@pytest.mark.pdE2E`. Every LL test **must** have `@pytest.mark.llE2E`. A test cannot have both markers.
 
 ## Visual Snapshots (Applitools Eyes)
 
-- Use the `eyes` pytest fixture (exposed via `pytest_plugins = ["eyes"]` in `conftest.py`).
-- `python-dotenv` loads `.env`. Set `APPLITOOLS_API_KEY` to enable.
-- In headed mode, `eyes` yields `None` (no visual snapshots).
-- Multiple `eyes.check(...)` calls group under one Applitools test per pytest function.
+- Use the `eyes` pytest fixture (exposed via `pytest_plugins = ["eyes"]` in `conftest.py`)
+- `python-dotenv` loads `.env`. Set `APPLITOOLS_API_KEY` to enable
+- In headed mode, `eyes` yields `None` (no visual snapshots)
 
 ```python
 from eyes import Eyes
@@ -311,8 +271,6 @@ def test_my_feature(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     eyes.check("After navigation")
     eyes.check_element("Timeline", page.get_by_test_id("TimelineToolbox_scrollContainer"))
 ```
-
-Batch naming: Local → `dev run | <TEST_ENV>` · CI → `CI | <PR branch>`.
 
 ## Common Patterns
 
@@ -332,10 +290,6 @@ Batch naming: Local → `dev run | <TEST_ENV>` · CI → `CI | <PR branch>`.
 4. Run locally: `make test-ll-local PYTEST_ARGS="-k test_name"`
 5. Check code quality: `make check`
 
-### Adding Labware Fixtures for LL Tests
-
-Place custom labware JSON files in `fixtures/labware/`. The `LabwareCreator` page object has methods like `import_labware_file()` that accept file paths relative to the e2e-testing directory.
-
 ### Chaining Page Objects
 
 ```python
@@ -348,8 +302,6 @@ def navigate_and_configure(self) -> "NextPage":
 
 ## CI/CD Integration
 
-### GitHub Actions Workflows
-
 - **`.github/workflows/pd-e2e-test.yaml`** — PD E2E tests
 - **`.github/workflows/ll-e2e-test.yaml`** — LL E2E tests
 - **`.github/workflows/e2e-test-checks.yaml`** — Lint + typecheck
@@ -358,55 +310,27 @@ def navigate_and_configure(self) -> "NextPage":
 
 ### Local Server Issues
 
-If Protocol Designer or Labware Library fails to build/serve:
-
-1. Check Node.js version: `node --version` (should be 22.21.1)
+1. Check Node.js version: `node --version` (should be >= 22.22.0)
 2. Build manually: `cd ../protocol-designer && make build` or `cd ../labware-library && make build`
 3. Check memory: PD Makefile sets `NODE_OPTIONS=--max-old-space-size=8192`
 4. Kill conflicting processes: `pkill -9 node`
-5. Check that `node` and `npx` are on PATH (the e2e `conftest.py` spawns `make -C ../protocol-designer serve`)
 
 ### Import Errors
 
 1. Run: `make setup`
 2. Verify: `uv run python -c "from automation.base_page import BasePage; print('OK')"`
-3. Check `pyproject.toml` `[tool.hatch.build.targets.wheel]` includes `automation` and `tests`
-
-### Type Check Failures
-
-1. Add missing type annotations
-2. Tests are allowed to omit type annotations (see `[[tool.mypy.overrides]]` in `pyproject.toml`)
-3. Fix incrementally: `make typecheck`
 
 ### Test Timeouts
 
-Default timeout: 300 seconds per test (set in `pytest.ini`).
-
-- Per-test override: `@pytest.mark.timeout(600)`
-- Use `make test-pd-debug` / `make troubleshoot` for step-by-step debugging
+Default: 300 seconds per test (set in `pytest.ini`). Per-test override: `@pytest.mark.timeout(600)`. Use `make test-pd-debug` or `make troubleshoot` for step-by-step debugging.
 
 ## DO NOT
 
-1. ❌ Write Playwright selectors directly in test files — USE page objects
-2. ❌ Use CSS selectors without justification — USE semantic selectors
-3. ❌ Commit without running `make check`
-4. ❌ Skip type annotations — REQUIRED by mypy
-5. ❌ Rely on test execution order — Tests must be independent
-6. ❌ Use `time.sleep()` — Use Playwright's waiting mechanisms
-7. ❌ Mark a test with both `@pytest.mark.pdE2E` and `@pytest.mark.llE2E`
-8. ❌ Import `BasePage` from `automation.pd_pages.base_page` — it no longer exists there; use `automation.base_page`
-
-## DO
-
-1. ✅ Use Page Object Model or Screenplay pattern for all tests
-2. ✅ Add type annotations to all functions
-3. ✅ Run `make check` before committing
-4. ✅ Test PD locally: `make test-pd-local` · Test LL locally: `make test-ll-local`
-5. ✅ Add docstrings to modules, classes, and public methods
-6. ✅ Use environment-aware selectors when needed (`self.is_sandbox`)
-7. ✅ Write descriptive test names
-8. ✅ Mark slow tests with `@pytest.mark.slow`
-9. ✅ Review video recordings when debugging failures (`test-results/videos/`)
-10. ✅ Keep page objects focused and single-purpose
-11. ✅ Document test steps with comments and print statements so agents can maintain them
-12. ✅ Use `make troubleshoot` to re-run last failures in headed mode
+1. Write Playwright selectors directly in test files — USE page objects
+2. Use CSS selectors without justification — USE semantic selectors
+3. Commit without running `make check`
+4. Skip type annotations — REQUIRED by mypy
+5. Rely on test execution order — tests must be independent
+6. Use `time.sleep()` — use Playwright's waiting mechanisms
+7. Mark a test with both `@pytest.mark.pdE2E` and `@pytest.mark.llE2E`
+8. Import `BasePage` from `automation.pd_pages.base_page` — use `automation.base_page`

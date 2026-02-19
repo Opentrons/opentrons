@@ -147,19 +147,20 @@ describe('useModuleApiRequests', () => {
 describe('getPumpStatusProps', () => {
   const mockT = (key: string): string => {
     const translations: Record<string, string> = {
-      pump_idle: 'Pump idle',
-      pump_engaged: 'Pump engaged',
+      pump_idle: 'Idle',
+      pump_engaged: 'Engaged',
+      pump_error: 'Error',
     }
     return translations[key] ?? key
   }
 
   it.each<[string, { text: string; type: string }]>([
-    ['idle', { text: 'Pump idle', type: 'neutral' }],
-    ['ramping', { text: 'Pump engaged', type: 'info' }],
-    ['holding', { text: 'Pump engaged', type: 'info' }],
-    ['venting', { text: 'Pump engaged', type: 'info' }],
-    ['complete', { text: 'Pump engaged', type: 'info' }],
-    ['error', { text: 'Pump engaged', type: 'info' }],
+    ['idle', { text: 'Idle', type: 'neutral' }],
+    ['ramping', { text: 'Engaged', type: 'info' }],
+    ['holding', { text: 'Engaged', type: 'info' }],
+    ['venting', { text: 'Engaged', type: 'info' }],
+    ['complete', { text: 'Engaged', type: 'info' }],
+    ['error', { text: 'Error', type: 'error' }],
   ])(
     'should return the correct props for the pump status',
     (status, expected) => {

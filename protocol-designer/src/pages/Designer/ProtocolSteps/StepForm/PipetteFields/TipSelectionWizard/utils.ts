@@ -97,15 +97,14 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
+  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null) {
+  if (wellName == null || labware.def.wells[wellName] == null) {
     return {
       x: 0,
       y: 0,
     }
   }
-  const labware = labwareState[selectedLabwareId ?? '']
-
   const well = labware.def.wells[wellName]
   return {
     x: well.x + xOffset,
