@@ -1,7 +1,6 @@
 ---
-description: CSS Modules file conventions, stylelint rules, and patterns
-globs: '**/*.module.css'
-alwaysApply: false
+name: css-modules
+description: CSS Modules conventions, Stylelint rules, design tokens (spacing, colors, typography, border-radius), and patterns for the Opentrons monorepo. Use when working with .module.css files or styling React components.
 ---
 
 # CSS Modules — Opentrons Conventions
@@ -10,12 +9,12 @@ alwaysApply: false
 
 File names are **lowercase**, no separators, suffixed with `.module.css`, and match the component name:
 
-```text
+```markdown
 ComponentName/
 ├── index.tsx
 ├── componentname.module.css
-└── __tests__/
-    └── ComponentName.test.tsx
+└── **tests**/
+└── ComponentName.test.tsx
 ```
 
 Examples: `navbar.module.css`, `labwarebutton.module.css`, `textareafield.module.css`
@@ -28,15 +27,22 @@ Use a `component_element` or `element_modifier` structure:
 
 ```css
 /* Base classes */
-.button { }
-.slider_container { }
-.crumb_link { }
+.button {
+}
+.slider_container {
+}
+.crumb_link {
+}
 
 /* State/modifier variants */
-.button_active { }
-.textarea_error { }
-.title_text_center { }
-.crumb_link_inactive { }
+.button_active {
+}
+.textarea_error {
+}
+.title_text_center {
+}
+.crumb_link_inactive {
+}
 ```
 
 ## Importing in Components
@@ -55,6 +61,7 @@ Use [clsx](https://github.com/lukeed/clsx) for combining or conditionally applyi
 
 ```tsx
 import clsx from 'clsx'
+
 import styles from './componentname.module.css'
 
 export function MyButton({ isActive, isError }: Props): JSX.Element {
@@ -72,25 +79,25 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 ### Spacing
 
-| Variable | Value |
-| -------- | ----- |
-| `--spacing-2` | 0.125rem (2px) |
-| `--spacing-4` | 0.25rem (4px) |
-| `--spacing-6` | 0.375rem (6px) |
-| `--spacing-8` | 0.5rem (8px) |
-| `--spacing-10` | 0.625rem (10px) |
-| `--spacing-12` | 0.75rem (12px) |
-| `--spacing-16` | 1rem (16px) |
-| `--spacing-20` | 1.25rem (20px) |
-| `--spacing-24` | 1.5rem (24px) |
-| `--spacing-32` | 2rem (32px) |
-| `--spacing-40` | 2.5rem (40px) |
-| `--spacing-44` | 2.75rem (44px) |
-| `--spacing-48` | 3rem (48px) |
-| `--spacing-60` | 3.75rem (60px) |
-| `--spacing-68` | 4.25rem (68px) |
-| `--spacing-80` | 5rem (80px) |
-| `--spacing-120` | 7.5rem (120px) |
+| Variable        | Value           |
+| --------------- | --------------- |
+| `--spacing-2`   | 0.125rem (2px)  |
+| `--spacing-4`   | 0.25rem (4px)   |
+| `--spacing-6`   | 0.375rem (6px)  |
+| `--spacing-8`   | 0.5rem (8px)    |
+| `--spacing-10`  | 0.625rem (10px) |
+| `--spacing-12`  | 0.75rem (12px)  |
+| `--spacing-16`  | 1rem (16px)     |
+| `--spacing-20`  | 1.25rem (20px)  |
+| `--spacing-24`  | 1.5rem (24px)   |
+| `--spacing-32`  | 2rem (32px)     |
+| `--spacing-40`  | 2.5rem (40px)   |
+| `--spacing-44`  | 2.75rem (44px)  |
+| `--spacing-48`  | 3rem (48px)     |
+| `--spacing-60`  | 3.75rem (60px)  |
+| `--spacing-68`  | 4.25rem (68px)  |
+| `--spacing-80`  | 5rem (80px)     |
+| `--spacing-120` | 7.5rem (120px)  |
 
 ### Colors
 
@@ -128,16 +135,16 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 ## Where to Use Tokens vs Explicit Values
 
-| Property | Use token? | Example |
-| -------- | ---------- | ------- |
-| `color`, `background-color`, `border-color` | **Yes** | `var(--blue-50)` |
-| `padding`, `margin`, `gap` | **Yes** | `var(--spacing-16)` |
-| `border-radius` | **Yes** | `var(--border-radius-8)` |
-| `font-size` | **Yes** | `var(--font-size-p)` |
-| `font-weight` | **Yes** | `var(--font-weight-semi-bold)` |
-| `line-height` | **Yes** | `var(--line-height-20)` |
-| `width`, `height`, `max-width`, `min-height` | **No** — use explicit `rem` | `15rem`, `100vh` |
-| `box-shadow` | **No** — use `px` | `0 0 0 2px var(--blue-50)` |
+| Property                                     | Use token?                  | Example                        |
+| -------------------------------------------- | --------------------------- | ------------------------------ |
+| `color`, `background-color`, `border-color`  | **Yes**                     | `var(--blue-50)`               |
+| `padding`, `margin`, `gap`                   | **Yes**                     | `var(--spacing-16)`            |
+| `border-radius`                              | **Yes**                     | `var(--border-radius-8)`       |
+| `font-size`                                  | **Yes**                     | `var(--font-size-p)`           |
+| `font-weight`                                | **Yes**                     | `var(--font-weight-semi-bold)` |
+| `line-height`                                | **Yes**                     | `var(--line-height-20)`        |
+| `width`, `height`, `max-width`, `min-height` | **No** — use explicit `rem` | `15rem`, `100vh`               |
+| `box-shadow`                                 | **No** — use `px`           | `0 0 0 2px var(--blue-50)`     |
 
 ## Unit Rules
 

@@ -1,7 +1,6 @@
 ---
-description: ProtocolDeck component testing environment using built packages with Playwright snapshots
-globs: components-testing/**
-alwaysApply: false
+name: components-testing
+description: ProtocolDeck component testing environment using built packages with Playwright visual snapshots in components-testing/. Use when working with component integration tests, package linking, or visual snapshot testing.
 ---
 
 # Components Testing — ProtocolDeck Component Testing Environment
@@ -28,49 +27,49 @@ Workflow: `pnpm install` → build packages as `.tgz` → extract to `pack/` →
 
 ## Project Structure
 
-```
+```markdown
 components-testing/
-├── Makefile                    # Build and setup automation
-├── package.json               # Dependencies (local packages NOT listed)
-├── pnpm-lock.yaml             # Lock file (unaffected by local links)
-├── playwright.config.ts       # Playwright test configuration
-├── vite.config.mts            # Vite configuration
-├── index.html                 # HTML entry point
-├── pack/                      # Gitignored .tgz packages
+├── Makefile # Build and setup automation
+├── package.json # Dependencies (local packages NOT listed)
+├── pnpm-lock.yaml # Lock file (unaffected by local links)
+├── playwright.config.ts # Playwright test configuration
+├── vite.config.mts # Vite configuration
+├── index.html # HTML entry point
+├── pack/ # Gitignored .tgz packages
 ├── src/
-│   ├── main.tsx               # Main application with ProtocolDeck test
-│   ├── styles.css             # Base styles
-│   └── StackerAnalysis.json   # Protocol analysis test data
+│ ├── main.tsx # Main application with ProtocolDeck test
+│ ├── styles.css # Base styles
+│ └── StackerAnalysis.json # Protocol analysis test data
 └── tests/
-    ├── protocolDeck.spec.ts   # Playwright visual tests
-    └── __screenshots__/       # Baseline screenshots (committed)
+├── protocolDeck.spec.ts # Playwright visual tests
+└── **screenshots**/ # Baseline screenshots (committed)
 ```
 
 ## Makefile Targets
 
 ### Setup
 
-| Target | Description |
-| --- | --- |
-| `make setup` | Complete setup: pnpm install, build packages, link them |
-| `make install-local-packages` | Rebuild and relink local packages only |
-| `make teardown` | Remove `pack/` and `node_modules` |
-| `make clean-local-packages` | Remove local packages only (keeps node_modules) |
+| Target                        | Description                                             |
+| ----------------------------- | ------------------------------------------------------- |
+| `make setup`                  | Complete setup: pnpm install, build packages, link them |
+| `make install-local-packages` | Rebuild and relink local packages only                  |
+| `make teardown`               | Remove `pack/` and `node_modules`                       |
+| `make clean-local-packages`   | Remove local packages only (keeps node_modules)         |
 
 ### Development
 
-| Target | Description |
-| --- | --- |
-| `make dev` | Start Vite dev server (localhost:5173) |
-| `make build` | Build for production |
-| `make preview` | Preview production build |
+| Target         | Description                            |
+| -------------- | -------------------------------------- |
+| `make dev`     | Start Vite dev server (localhost:5173) |
+| `make build`   | Build for production                   |
+| `make preview` | Preview production build               |
 
 ### Testing
 
-| Target | Description |
-| --- | --- |
-| `make test-setup` | Install Playwright browsers (one-time) |
-| `make test` | Run Playwright tests with current snapshots |
+| Target                       | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| `make test-setup`            | Install Playwright browsers (one-time)            |
+| `make test`                  | Run Playwright tests with current snapshots       |
 | `make test-update-snapshots` | Update visual snapshots after intentional changes |
 
 ## Quick Start

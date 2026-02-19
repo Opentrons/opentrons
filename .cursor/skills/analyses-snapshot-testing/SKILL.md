@@ -1,7 +1,6 @@
 ---
-description: Conventions for the analyses snapshot testing framework
-globs: analyses-snapshot-testing/**
-alwaysApply: false
+name: analyses-snapshot-testing
+description: Conventions for the analyses snapshot testing framework in analyses-snapshot-testing/. Use when working with protocol analysis snapshots, adding protocols, updating snapshots, or running snapshot tests.
 ---
 
 # Analyses Snapshot Testing Instructions
@@ -28,8 +27,8 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 
 ## Protocol Naming Convention
 
-```
-{Robot}_{Status}_{Version}_{Source}_{Pipettes}_{Modules}_{Overrides}_{Description}
+```markdown
+{Robot}_{Status}_{Version}_{Source}_{Pipettes}_{Modules}_{Overrides}\_{Description}
 ```
 
 - **Robot**: `OT2` or `Flex`
@@ -133,6 +132,7 @@ make analyze-chunk CHUNK=chunk_0.json  # Analyze specific chunk
 ## CI/CD Integration
 
 Workflow (`analyses-snapshot-test.yaml`) triggers on:
+
 - PRs affecting `api/`, `shared-data/`, or this directory
 - Scheduled daily at 7:26 AM UTC
 - Manual dispatch

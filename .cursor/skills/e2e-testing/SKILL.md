@@ -1,7 +1,6 @@
 ---
-description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest
-globs: e2e-testing/**
-alwaysApply: false
+name: e2e-testing
+description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
 ---
 
 # E2E Testing Instructions
@@ -119,36 +118,27 @@ Tests run against different environments via `TEST_ENV`:
 
 ### conftest.py Fixtures
 
-| Fixture | Scope | Purpose |
-| --- | --- | --- |
-| `pd_base_url` | session | Resolves PD URL; starts local preview server when `TEST_ENV=local` |
-| `ll_base_url` | session | Resolves LL URL; starts local preview server when `TEST_ENV=local` |
-| `page` | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
-| `browser_context_args` | session | Viewport 1280x720, video recording |
-| `browser_type_launch_args` | session | Headless/headed, slow_mo |
-| `eyes` | function | Applitools Eyes session (or None) |
-| `eyes_singleton` | session | Shared Applitools Eyes instance |
+| Fixture                    | Scope    | Purpose                                                                                        |
+| -------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `pd_base_url`              | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
+| `ll_base_url`              | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
+| `page`                     | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
+| `browser_context_args`     | session  | Viewport 1280x720, video recording                                                             |
+| `browser_type_launch_args` | session  | Headless/headed, slow_mo                                                                       |
+| `eyes`                     | function | Applitools Eyes session (or None)                                                              |
+| `eyes_singleton`           | session  | Shared Applitools Eyes instance                                                                |
 
 ### Key Environment Variables
 
-| Variable | Default | Notes |
-| --- | --- | --- |
-| `TEST_ENV` | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS` | (unset) | `true` / `false`; overrides default |
-| `SKIP_SERVER_START` | `false` | Skip automatic server build+serve |
-| `PD_SERVER_URL` | auto | Override PD URL |
-| `LL_SERVER_URL` | auto | Override LL URL |
-| `LL_SERVER_PORT` | `4176` | Preferred port for LL local server |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks |
-
-## Key Files
-
-- **`conftest.py`** — Fixtures, server lifecycle, video recording, Applitools batch setup
-- **`pytest.ini`** — Markers (`pdE2E`, `llE2E`, `slow`, `unit`, `integration`), addopts, timeout (300 s)
-- **`pyproject.toml`** — Dependencies (`playwright>=1.55`, `eyes-playwright>=6.4`), ruff (line-length 120, py312), mypy (strict for `automation/`, relaxed for `tests/`)
-- **`eyes.py`** — `Eyes` wrapper class, `eyes` + `eyes_singleton` fixtures
-- **`utility.py`** — `troubleshoot_and_pause` decorator, `_import_protocol_and_open_editor`, `create_new_protocol_from_landing_page`
-- **`run_many_tests.py`** — Local "CI" runner: format, lint, typecheck with auto-fix
+| Variable             | Default | Notes                                 |
+| -------------------- | ------- | ------------------------------------- |
+| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
+| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
+| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
+| `PD_SERVER_URL`      | auto    | Override PD URL                       |
+| `LL_SERVER_URL`      | auto    | Override LL URL                       |
+| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
+| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
 
 ## Development Commands
 
