@@ -85,7 +85,7 @@ export function LabwareSlotContainer(
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const { params } = currentCommand
+  const { params, commandType } = currentCommand
   const commandWellName =
     'wellName' in params && typeof params.wellName === 'string'
       ? params.wellName
@@ -118,6 +118,9 @@ export function LabwareSlotContainer(
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
       : activeWellName
+  const shouldShowWellContainer =
+    selectedWellName != null &&
+    !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
   const wellGroup: WellGroup | null =
     selectedWellName != null
       ? {
@@ -162,7 +165,7 @@ export function LabwareSlotContainer(
 
   return (
     <>
-      {selectedWellName != null ? (
+      {shouldShowWellContainer ? (
         <WellContainer
           wells={wells}
           params={params}
