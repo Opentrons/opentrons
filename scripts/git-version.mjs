@@ -72,6 +72,7 @@ export async function latestLabwareVersions(appVersion) {
   const lstreeCmd = ['ls-tree', '-r', '--name-only', '-z']
   // We will first look for a release tag named `v${version}`.
   // If that doesn't exist, look for a branch named `chore_release-${version}`.
+  // If _that_ doesn't exist, (i.e. because this is a fresh fork that has no releases yet) use edge
   const releaseTag = `v${appVersion}`
   const choreBranch = `origin/chore_release-${appVersion}`
   const labwareFiles = (
@@ -79,6 +80,9 @@ export async function latestLabwareVersions(appVersion) {
       .raw([...lstreeCmd, releaseTag, labwareDir])
       .catch(error =>
         monorepoGit().raw([...lstreeCmd, choreBranch, labwareDir])
+      )
+      .catch(error =>
+        monorepoGit().raw([...lstreeCmd, 'origin/edge', labwareDir])
       )
   )
     .split('\0')
