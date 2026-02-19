@@ -112,31 +112,31 @@ def get_deploy_config() -> DeployConfig:
     sandbox_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             name="labware_library",
-            s3_bucket="opentrons.sandbox.labware",
+            s3_bucket='',  # unset for ot2 fork
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.sandbox.designer",
+            s3_bucket="opentrons.sandbox.designer.ot2",
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
-            url="http://sandbox.designer.opentrons.com/",
+            url="http://ot2.sandbox.designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
-            s3_bucket="sandbox.docs",
+            s3_bucket='', # unset for ot2 fork
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
-            s3_bucket="sandbox.docs",
+            s3_bucket='', # unset for ot2 fork
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.docs.opentrons.com/",
         ),
         components=ApplicationConfig(
             name="components",
-            s3_bucket="opentrons.sandbox.components",
+            s3_bucket='', # unset for ot2 fork
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.components.opentrons.com/",
         ),
@@ -146,31 +146,31 @@ def get_deploy_config() -> DeployConfig:
     staging_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             name="labware_library",
-            s3_bucket="opentrons.staging.labware",
-            cloudfront_id="E8IWASMDOWHYP",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://staging.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.staging.designer",
-            cloudfront_id="EO925AKFD33ZG",  # Add CloudFront ID when available
-            url="https://staging.protocol-designer.opentrons.com/",
+            s3_bucket="opentrons.staging.designer.ot2",
+            cloudfront_id="E39HUURVTOO2K0",  # Add CloudFront ID when available
+            url="https://ot2.staging.designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
-            s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E2DBE0K9VT8YB9",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://staging.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
-            s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E2DBE0K9VT8YB9",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://staging.docs.opentrons.com/",
         ),
         components=ApplicationConfig(
             name="components",
-            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            s3_bucket='',
             cloudfront_id=None,
             url="http://sandbox.components.opentrons.com/",
         ),
@@ -180,31 +180,31 @@ def get_deploy_config() -> DeployConfig:
     production_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             name="labware_library",
-            s3_bucket="opentrons.production.labware",
-            cloudfront_id="E16BZZXDTINN0S",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.production.designer",
-            cloudfront_id="E2D3NFAZUK9GIG",  # Add CloudFront ID when available
-            url="https://protocol-designer.opentrons.com/",
+            s3_bucket="opentrons.production.designer.ot2",
+            cloudfront_id="E1Q0C0L5XV0TAQ",  # Add CloudFront ID when available
+            url="https://ot2.designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
-            s3_bucket="opentrons.production.docs",
-            cloudfront_id="E2PSPUXND1RQWG",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
-            s3_bucket="opentrons.production.docs",
-            cloudfront_id="E2PSPUXND1RQWG",
+            s3_bucket='',
+            cloudfront_id=None,
             url="https://docs.opentrons.com/",
         ),
         components=ApplicationConfig(
             name="components",
-            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            s3_bucket='',
             cloudfront_id=None,
             url="http://sandbox.components.opentrons.com/",
         ),
@@ -232,7 +232,7 @@ def get_config(environment: str, application: str) -> ApplicationConfig:
     application = application.lower()
 
     valid_environments = ["sandbox", "staging", "production"]
-    valid_applications = ["labware_library", "protocol_designer", "docs", "mkdocs", "components"]
+    valid_applications = ["protocol_designer"]
 
     if environment not in valid_environments:
         raise InvalidEnvironmentError(f"Invalid environment '{environment}'. Valid environments are: {', '.join(valid_environments)}")
