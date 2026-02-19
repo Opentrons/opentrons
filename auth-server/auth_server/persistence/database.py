@@ -7,13 +7,11 @@ from pathlib import Path
 from typing import Generator
 
 import sqlalchemy
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import declarative_base
 
 from server_utils import sql_utils
 
-
-class Base(DeclarativeBase):
-    """Base class for all ORM models."""
+Base = declarative_base()
 
 
 def create_sql_engine(
@@ -28,6 +26,7 @@ def create_sql_engine(
     """
     engine = sqlalchemy.create_engine(
         sql_utils.get_connection_url(db_path),
+        future=True,
     )
     try:
         sql_utils.enable_foreign_key_constraints(engine)
@@ -40,7 +39,7 @@ def create_sql_engine(
 
 @contextmanager
 def sql_engine_ctx(
-    db_path: Path | None = None,
+    db_path: Path,
 ) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Context-managed engine that disposes itself on exit."""
     engine = create_sql_engine(db_path)
