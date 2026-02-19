@@ -140,141 +140,128 @@ class TestParseGithubEventContext:
 
     def test_pull_request_with_valid_head_ref(self):
         """Test pull request event with valid head_ref."""
+        evt = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref="feature-branch"
+        )
 
-    evt = parse_github_event_context(
-        event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref="feature-branch"
-    )
-
-    assert evt.application == "labware_library"  # default application
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "feature-branch"
+        assert evt.application == "labware_library"  # default application
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "feature-branch"
 
     def test_pull_request_with_empty_head_ref(self):
         """Test pull request event with empty head_ref."""
+        evt = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=""
+        )
 
-    evt = parse_github_event_context(
-        event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=""
-    )
-
-    assert evt.application == "labware_library"
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "unknown"
+        assert evt.application == "labware_library"
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "unknown"
 
     def test_pull_request_with_none_head_ref(self):
         """Test pull request event with None head_ref."""
+        evt = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=None
+        )
 
-    evt = parse_github_event_context(
-        event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=None
-    )
-
-    assert evt.application == "labware_library"
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "unknown"
+        assert evt.application == "labware_library"
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "unknown"
 
     def test_push_branch_event(self):
         """Test push event to a branch."""
+        evt = parse_github_event_context(event_name="push", ref="refs/heads/edge", ref_name="edge", ref_type="branch")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/heads/edge", ref_name="edge", ref_type="branch")
-
-    assert evt.application == "labware_library"
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "edge"
+        assert evt.application == "labware_library"
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "edge"
 
     def test_push_tag_staging_labware_library(self):
         """Test push event for staging labware library tag."""
+        evt = parse_github_event_context(
+            event_name="push",
+            ref="refs/tags/tmp-staging-labware-library-202509041016",
+            ref_name="tmp-staging-labware-library-202509041016",
+            ref_type="tag",
+        )
 
-    evt = parse_github_event_context(
-        event_name="push",
-        ref="refs/tags/tmp-staging-labware-library-202509041016",
-        ref_name="tmp-staging-labware-library-202509041016",
-        ref_type="tag",
-    )
-
-    assert evt.application == "labware_library"
-    assert evt.environment == "staging"
-    assert evt.sandbox_prefix == "tmp-staging-labware-library-202509041016"
+        assert evt.application == "labware_library"
+        assert evt.environment == "staging"
+        assert evt.sandbox_prefix == "tmp-staging-labware-library-202509041016"
 
     def test_push_tag_production_labware_library(self):
         """Test push event for production labware library tag."""
+        evt = parse_github_event_context(
+            event_name="push", ref="refs/tags/tmp-labware-library-202509041016", ref_name="tmp-labware-library-202509041016", ref_type="tag"
+        )
 
-    evt = parse_github_event_context(
-        event_name="push", ref="refs/tags/tmp-labware-library-202509041016", ref_name="tmp-labware-library-202509041016", ref_type="tag"
-    )
-
-    assert evt.application == "labware_library"
-    assert evt.environment == "production"
-    assert evt.sandbox_prefix == "tmp-labware-library-202509041016"
+        assert evt.application == "labware_library"
+        assert evt.environment == "production"
+        assert evt.sandbox_prefix == "tmp-labware-library-202509041016"
 
     def test_push_tag_staging_mkdocs(self):
         """Test push event for staging mkdocs tag."""
+        evt = parse_github_event_context(
+            event_name="push", ref="refs/tags/staging-mkdocs-v1.0.0", ref_name="staging-mkdocs-v1.0.0", ref_type="tag"
+        )
 
-    evt = parse_github_event_context(
-        event_name="push", ref="refs/tags/staging-mkdocs-v1.0.0", ref_name="staging-mkdocs-v1.0.0", ref_type="tag"
-    )
-
-    assert evt.application == "mkdocs"
-    assert evt.environment == "staging"
-    assert evt.sandbox_prefix == "staging-mkdocs-v1.0.0"
+        assert evt.application == "mkdocs"
+        assert evt.environment == "staging"
+        assert evt.sandbox_prefix == "staging-mkdocs-v1.0.0"
 
     def test_push_tag_production_mkdocs(self):
         """Test push event for production mkdocs tag."""
+        evt = parse_github_event_context(event_name="push", ref="refs/tags/mkdocs-v1.0.0", ref_name="mkdocs-v1.0.0", ref_type="tag")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/tags/mkdocs-v1.0.0", ref_name="mkdocs-v1.0.0", ref_type="tag")
-
-    assert evt.application == "mkdocs"
-    assert evt.environment == "production"
-    assert evt.sandbox_prefix == "mkdocs-v1.0.0"
+        assert evt.application == "mkdocs"
+        assert evt.environment == "production"
+        assert evt.sandbox_prefix == "mkdocs-v1.0.0"
 
     def test_push_tag_staging_docs(self):
         """Test push event for staging docs tag."""
+        evt = parse_github_event_context(event_name="push", ref="refs/tags/staging-docs-v1.0.0", ref_name="staging-docs-v1.0.0", ref_type="tag")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/tags/staging-docs-v1.0.0", ref_name="staging-docs-v1.0.0", ref_type="tag")
-
-    assert evt.application == "docs"
-    assert evt.environment == "staging"
-    assert evt.sandbox_prefix == "staging-docs-v1.0.0"
+        assert evt.application == "docs"
+        assert evt.environment == "staging"
+        assert evt.sandbox_prefix == "staging-docs-v1.0.0"
 
     def test_push_tag_production_docs(self):
         """Test push event for production docs tag."""
+        evt = parse_github_event_context(event_name="push", ref="refs/tags/docs-v1.0.0", ref_name="docs-v1.0.0", ref_type="tag")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/tags/docs-v1.0.0", ref_name="docs-v1.0.0", ref_type="tag")
-
-    assert evt.application == "docs"
-    assert evt.environment == "production"
-    assert evt.sandbox_prefix == "docs-v1.0.0"
+        assert evt.application == "docs"
+        assert evt.environment == "production"
+        assert evt.sandbox_prefix == "docs-v1.0.0"
 
     def test_push_tag_unrecognized_defaults_to_sandbox(self):
         """Test push event for unrecognized tag defaults to sandbox."""
+        evt = parse_github_event_context(event_name="push", ref="refs/tags/random-tag-name", ref_name="random-tag-name", ref_type="tag")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/tags/random-tag-name", ref_name="random-tag-name", ref_type="tag")
-
-    assert evt.application == "labware_library"  # default application
-    assert evt.environment == "sandbox"  # default for unrecognized tags
-    assert evt.sandbox_prefix == "random-tag-name"
+        assert evt.application == "labware_library"  # default application
+        assert evt.environment == "sandbox"  # default for unrecognized tags
+        assert evt.sandbox_prefix == "random-tag-name"
 
     def test_branch_based_application_detection_mkdocs(self):
         """Test branch-based application detection defaults to labware_library (not implemented yet)."""
         # Note: Branch-based application detection is not yet implemented
         # Currently defaults to labware_library for all branch events
+        evt = parse_github_event_context(
+            event_name="push", ref="refs/heads/mkdocs-new-workflow", ref_name="mkdocs-new-workflow", ref_type="branch"
+        )
 
-    evt = parse_github_event_context(
-        event_name="push", ref="refs/heads/mkdocs-new-workflow", ref_name="mkdocs-new-workflow", ref_type="branch"
-    )
-
-    assert evt.application == "labware_library"  # Default application (branch detection not implemented)
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "mkdocs-new-workflow"
+        assert evt.application == "labware_library"  # Default application (branch detection not implemented)
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "mkdocs-new-workflow"
 
     def test_branch_based_application_detection_docs(self):
         """Test branch-based application detection defaults to labware_library (not implemented yet)."""
         # Note: Branch-based application detection is not yet implemented
         # Currently defaults to labware_library for all branch events
+        evt = parse_github_event_context(event_name="push", ref="refs/heads/docs-deploy", ref_name="docs-deploy", ref_type="branch")
 
-    evt = parse_github_event_context(event_name="push", ref="refs/heads/docs-deploy", ref_name="docs-deploy", ref_type="branch")
-
-    assert evt.application == "labware_library"  # Default application (branch detection not implemented)
-    assert evt.environment == "sandbox"
-    assert evt.sandbox_prefix == "docs-deploy"
+        assert evt.application == "labware_library"  # Default application (branch detection not implemented)
+        assert evt.environment == "sandbox"
+        assert evt.sandbox_prefix == "docs-deploy"
 
     def test_invalid_event_raises_error(self):
         """Test that invalid event combinations raise ValueError."""
