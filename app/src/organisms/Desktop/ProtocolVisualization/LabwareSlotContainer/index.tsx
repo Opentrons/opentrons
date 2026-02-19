@@ -40,6 +40,19 @@ interface LabwareSlotContainerProps {
   pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
+
+// TODO: this is a temp fix in an interest of time
+// but we should investigate why the dropTip and pickUpTip
+// commands are showing the well container
+const HIDE_WELL_CONTAINER_COMMAND_TYPES = [
+  'comment',
+  'waitForDuration',
+  'waitForResume',
+  'waitForTasks',
+  'dropTip',
+  'pickUpTip',
+]
+
 export function LabwareSlotContainer(
   props: LabwareSlotContainerProps
 ): JSX.Element {
@@ -72,7 +85,7 @@ export function LabwareSlotContainer(
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const { params } = currentCommand
+  const { params, commandType } = currentCommand
   const commandWellName =
     'wellName' in params && typeof params.wellName === 'string'
       ? params.wellName
@@ -105,6 +118,9 @@ export function LabwareSlotContainer(
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
       : activeWellName
+  const shouldShowWellContainer =
+    selectedWellName != null &&
+    !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
   const wellGroup: WellGroup | null =
     selectedWellName != null
       ? {
@@ -149,7 +165,7 @@ export function LabwareSlotContainer(
 
   return (
     <>
-      {selectedWellName != null ? (
+      {shouldShowWellContainer ? (
         <WellContainer
           wells={wells}
           params={params}
