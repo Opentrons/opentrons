@@ -769,7 +769,7 @@ class ProtocolEngine:
         annotation_name: str,
         description: Optional[str],
         annotation_id: Optional[str],
-        params: Optional[Dict[str, Any]],
+        params: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Creates a new user generated command annotation."""
         if annotation_id is None:
