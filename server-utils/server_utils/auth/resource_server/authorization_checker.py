@@ -44,7 +44,8 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
     @override
     async def check(self, token: str | None, scopes: set[Scope]) -> Result:
         if token is None:
-            # Unauthenticated access is allowed if (and only if) access control is disabled.
+            # The client is trying to access a protected resource without providing a token.
+            # We allow this if and only if access control is disabled.
             access_control_enabled = (
                 await self._client.get_auth_settings()
             ).data.accessControlEnabled
