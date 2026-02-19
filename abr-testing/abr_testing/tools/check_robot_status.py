@@ -4,6 +4,7 @@ from collections import deque
 
 import requests
 from abr_testing.automation import slack
+from abr_testing.protocols.helpers import run_helpers
 import configparser
 import os
 from typing import List, Dict, Any, Tuple
@@ -65,7 +66,11 @@ def get_current_run_details_from_robot(
                         if (len(past_run_status_list) == 0) or not (
                             past_run_status_list[-1] == run_status
                         ):
-                            slack_bot.send_slack_message(message)
+
+                            slack_bot.send_slack_message(
+                                message,
+                                [run_helpers.get_livestream_video(30)]
+                            )
                     else:
                         slack_bot.send_slack_message(message)
                         completed_robots.append(robot_name)

@@ -42,6 +42,23 @@ def detect_robot_status(ip: str) -> None:
             past_run_status=past_run_statuses,
         )
 
+def change_robot_video_length(time: str, ip: str) -> None:
+    """Changes the length of the robot video to the given time."""
+    key = "hls_playlist_length"
+    ssh_command = f"""
+    mount -o remount,rw / &&
+    sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s;/g" /etc/nginx/nginx.conf &&
+    systemctl daemon-reload &&
+    systemctl restart nginx 
+    """
+
+    try:
+        subprocess.run(ssh_command, shell=True, check=True)
+        print(f"Successfully updated livestream length on {ip}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to update {ip}: {e}")
+
+
 
 def launch_background_tasks() -> None:
     """Launches background processes."""

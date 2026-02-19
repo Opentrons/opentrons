@@ -17,7 +17,9 @@ fi
 # check what already exists and kill it
 pkill -f "background_helpers"
 
-
+# update the video capture length to 30 seconds
+VIDEO_LENGTH=30
+(python3 -c "from background_helpers import change_robot_video_length('$VIDEO_LENGTH', '$IP_ADDRESS')")
 
 (python3 -c "from background_helpers import detect_robot_status; detect_robot_status('$IP_ADDRESS')" &)
 sleep 0.5
