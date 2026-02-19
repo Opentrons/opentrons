@@ -7,7 +7,7 @@ from typing import Any
 
 import sqlalchemy
 import sqlalchemy.types as types
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Enum, Integer, String
 
 from server_utils.auth.scopes import Scope
 
@@ -44,38 +44,17 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
-class AccountTypeType(types.TypeDecorator[Any]):
-    """Store an ``AccountType`` enum as its string value."""
-
-    impl = types.String
-    cache_ok = True
-
-    def process_bind_param(
-        self, value: Any, dialect: sqlalchemy.engine.Dialect
-    ) -> str | None:
-        if value is None:
-            return None
-        return str(value)
-
-    def process_result_value(
-        self, value: Any, dialect: sqlalchemy.engine.Dialect
-    ) -> AccountType | None:
-        if value is None:
-            return None
-        return AccountType(value)
-
-
 class User(Base):  # type: ignore[misc]
     """ORM model for user accounts."""
 
     __tablename__ = "users"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    username: str = Column(String, unique=True, nullable=False)
-    hashed_password: str = Column(String, nullable=False)
-    full_name: str = Column(String, nullable=False)
-    account_type: AccountType = Column(AccountTypeType, nullable=False)
-    scopes: list[Scope] = Column(ScopeListType, nullable=False)
+    id: int = Column(Integer, primary_key=True, autoincrement=True)  # type: ignore[assignment]
+    username: str = Column(String, unique=True, nullable=False)  # type: ignore[assignment]
+    hashed_password: str = Column(String, nullable=False)  # type: ignore[assignment]
+    full_name: str = Column(String, nullable=False)  # type: ignore[assignment]
+    account_type: AccountType = Column(Enum(AccountType), nullable=False)  # type: ignore[assignment]
+    scopes: list[Scope] = Column(ScopeListType, nullable=False)  # type: ignore[assignment]
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
