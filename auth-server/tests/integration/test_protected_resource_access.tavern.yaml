@@ -9,12 +9,24 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
     response:
       status_code: 403
 
   - name: Accessing the resource with a bogus token should fail
     request:
       method: POST
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       url: '{run_server.base_url}/auth/users'
       headers:
         Authorization: Bearer bogus_token_1234
@@ -47,6 +59,12 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       headers:
         Authorization: 'Bearer {access_token}'
     response:
@@ -78,7 +96,13 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user_new
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       headers:
         Authorization: 'Bearer {access_token}'
     response:
-      status_code: 200
+      status_code: 201

@@ -19,7 +19,6 @@ import {
 import type { TFunction } from 'i18next'
 import type { DropdownOption } from '@opentrons/components'
 import type {
-  LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
@@ -167,53 +166,60 @@ export const getNozzleText = (
 
 export const getEntireWellSelection = (
   wellName: string,
-  labwareDef: LabwareDefinition,
+  wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
   channels: number
 ): string[] => {
   if (nozzleConfiguration === SINGLE) return [wellName]
-  const { ordering } = labwareDef
-  const columnIndex = ordering.findIndex(column => column.includes(wellName))
+  const columnIndex = wellOrdering.findIndex(column =>
+    column.includes(wellName)
+  )
   if (columnIndex === -1) return []
-  const rowIndex = ordering[columnIndex].indexOf(wellName)
+  const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
   switch (nozzleConfiguration) {
     case ALL:
       if (channels === 8) {
-        return ordering[columnIndex]
+        return wellOrdering[columnIndex]
       }
       if (channels === 96) {
-        return ordering.flat()
+        return wellOrdering.flat()
       }
       return [wellName]
     case COLUMN:
-      return ordering[columnIndex]
+      return wellOrdering[columnIndex]
     case ROW:
-      return ordering.map(column => column[rowIndex])
+      return wellOrdering.map(column => column[rowIndex])
     case PARTIAL: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) return []
-      const column = ordering[columnIndex]
+      const column = wellOrdering[columnIndex]
       const count = partialNozzleMap[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {
-        console.warn(
-          `Partial nozzle selection blocked. ` +
-            `Requested ${count} wells but only ${remainingWells} ` +
-            `available starting at row ${rowIndex}.`
-        )
         return []
       }
       const end = rowIndex + count
-      if (isSingleRowLabware && end > column.length) {
-        console.warn(
-          `Partial nozzle selection truncated for single-row labware. ` +
-            `Requested ${count} wells but column only has ${column.length}.`
-        )
-      }
       return column.slice(rowIndex, Math.min(end, column.length))
     }
     default:
       return [wellName]
+  }
+}
+
+export function getWellGroupLength(
+  totalSelected: number,
+  ordering: string[][],
+  nozzleConfiguration: NozzleConfigurationStyle
+): number {
+  const rows = ordering.length
+  const columns = ordering[0]?.length ?? 0
+  switch (nozzleConfiguration) {
+    case ROW:
+      return totalSelected / rows
+    case COLUMN:
+      return totalSelected / columns
+    default:
+      return totalSelected / 1
   }
 }
