@@ -227,40 +227,6 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
-    def validate_bearer_token(
-        self,
-        # Despite the docs, token can apparently be None if this is called
-        # through verify_request().
-        token: str | None,
-        scopes: list[str],
-        request: oauthlib.common.Request,
-    ) -> bool:
-        """Check if a bearer (access) token is allowed to access the given scopes."""
-        if token is None:
-            _log.info("The request provided no bearer token.")
-            return False
-
-        issuance = self.__token_store.find_active_access_token(token, now=_now())
-        if issuance is not None:
-            # find_active_access_token() already checked the expiration for us,
-            # so we just need to check scope membership.
-            requested_scopes = set(scopes)
-            issued_scopes = {scope.api_name for scope in issuance.scopes}
-            if requested_scopes.issubset(issued_scopes):
-                return True
-            else:
-                _log.info(
-                    f"The request provided a bearer token with insufficient scopes."
-                    f" Required: {requested_scopes}."
-                    f" Provided: {issued_scopes}."
-                )
-                return False
-        else:
-            _log.info("The request provided an expired or nonexistent bearer token.")
-            return False
-
-    @override
-    @pydantic.validate_call(config=_validate_call_config)
     def validate_refresh_token(  # type: ignore[override]
         self,
         refresh_token: str,
