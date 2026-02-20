@@ -71,7 +71,6 @@ describe('ConfirmCancelRunModal', () => {
       isActiveRun: true,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
-      isQuickTransfer: false,
     }
 
     vi.mocked(useStopRunMutation).mockReturnValue({
@@ -169,7 +168,6 @@ describe('ConfirmCancelRunModal', () => {
     props = {
       ...props,
       isActiveRun: false,
-      isQuickTransfer: true,
     }
 
     vi.mocked(useNotifyRunQuery).mockReturnValue({
@@ -184,14 +182,13 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 
   it('when quick transfer run with protocolId is stopped, it navigates to protocol-specific quick transfer', () => {
     props = {
       ...props,
       isActiveRun: false,
-      isQuickTransfer: true,
       protocolId: 'test-protocol-id',
     }
 
@@ -207,9 +204,7 @@ describe('ConfirmCancelRunModal', () => {
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/quick-transfer/test-protocol-id'
-    )
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
   })
 
   it('when run with protocolId is stopped, it navigates to protocol page', () => {

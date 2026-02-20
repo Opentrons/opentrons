@@ -37,7 +37,6 @@ import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
-import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
@@ -85,7 +84,6 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/network-setup/wifi',
   '/protocols',
   '/protocols/:protocolId',
-  '/quick-transfer',
   '/quick-transfer/new',
   '/quick-transfer/:quickTransferId',
   '/robot-settings',
@@ -126,8 +124,6 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
-    case '/quick-transfer':
-      return <QuickTransferDashboard />
     case '/quick-transfer/new':
       return <QuickTransferFlow />
     case '/quick-transfer/:quickTransferId':

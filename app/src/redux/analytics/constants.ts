@@ -101,7 +101,6 @@ export const ANALYTICS_RECOVERY_RUN_RESULT = 'recoveryRunResultAfterError'
  * Quick Transfer Analytics
  */
 
-export const ANALYTICS_QUICK_TRANSFER_TAB_SELECTED = 'quickTransferTab'
 export const ANALYTICS_QUICK_TRANSFER_FLOW_STARTED = 'quickTransferFlowStarted'
 export const ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION =
   'quickTransferWellSelectionDuration'
