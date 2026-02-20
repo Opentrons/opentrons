@@ -16,7 +16,7 @@ RUN git clone --branch $ANALYSIS_REF --depth 1 https://github.com/Opentrons/open
 RUN python -m pip install -U ./shared-data
 RUN python -m pip install -U ./hardware[flex]
 RUN python -m pip install -U ./api
-RUN python -m pip install -U pandas==1.4.3
+RUN python -m pip install -U pandas==2.3.3
 
 # The default command to run when starting the container
 CMD ["tail", "-f", "/dev/null"]

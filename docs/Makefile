@@ -29,3 +29,22 @@ serve:
 pdf-flex:
 	uv run --python 3.10 mkdocs build -f ./flex/mkdocs.yml && \
 	uv run --python 3.10 python flex/export_to_pdf.py flex/site/print_page/index.html site/Opentrons-Flex-Instruction-Manual.pdf 'Opentrons Flex Instruction Manual'
+
+.PHONY: lock
+lock:
+	uv lock
+
+.PHONY: test
+test:
+# No tests in this project.
+#This target exists to support `make test-py` in the top-level Makefile.
+
+.PHONY: lint
+lint:
+# No linting to do in this project.
+# This target exists to support `make lint-py` in the top-level Makefile.
+
+.PHONY: format
+format:
+# No formatting to do in this project.
+# This target exists to support `make format-py` in the top-level Makefile.

@@ -230,6 +230,9 @@ export const SINGLE_MOUNT_PIPETTES: 'Single-Channel_and_8-Channel' =
 export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
+// Vacuum module info
+export const VACUUM_MODULE_LOCATION: 'A3+A4' = 'A3+A4'
+
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
 export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
@@ -911,3 +914,6 @@ export const COMBO_FIXTURE_TO_FIXTURE_MAP: Partial<
 // a labware location when something has been used already on the deck
 // and moves to a new location that isn't accessible on or off the deck
 export const SYSTEM_LOCATION = 'systemLocation'
+
+export const PROTOCOL_ENGINE_LID_STACK_LOADNAME =
+  'protocol_engine_lid_stack_object'

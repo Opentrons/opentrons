@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
+  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -52,6 +53,7 @@ import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AccessibilityStatus,
@@ -69,7 +71,7 @@ export function SelectTips(
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowErrorBanner: Dispatch<SetStateAction<boolean>>
-    primaryNozzle: string
+    primaryNozzle: PrimaryNozzleConfigurationStyle
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
 ): JSX.Element {
@@ -313,7 +315,7 @@ export function SelectTips(
           selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
-                tipStatusByWellName,
+                statusByWellName: tipStatusByWellName,
               }
             : {})}
           fill={COLORS.white}
@@ -326,7 +328,7 @@ export function SelectTips(
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
-            selectedTiprackId={selectedTiprackId}
+            selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()
@@ -368,7 +370,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} />
+        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
       </div>
     </div>
   )

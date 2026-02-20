@@ -12,6 +12,11 @@ from opentrons.protocol_engine import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..dependencies import get_run_data_manager, get_run_orchestrator_store
 from ..run_data_manager import RunDataManager, RunNotCurrentError
@@ -19,11 +24,6 @@ from ..run_models import LabwareDefinitionSummary, Run
 from ..run_orchestrator_store import RunOrchestratorStore
 from .base_router import RunNotFound, RunNotIdle, RunStopped, get_run_data_from_url
 from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.json_api import (
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-)
 
 log = logging.getLogger(__name__)
 labware_router = LightRouter()

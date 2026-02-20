@@ -5,7 +5,7 @@ from typing import List, Literal, Optional, Union
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class TransferPage(BasePage):
@@ -73,13 +73,11 @@ class TransferPage(BasePage):
         self.page.get_by_text("Save", exact=True).click()
 
     def destination_labware_select(self, labware: str) -> None:
-        """Select destination labware in transfer step.
-        args:
-            labware: The labware to select like "Greiner 384 Well Plate 240 µL".
-        """
+        """Select destination labware in transfer step."""
         self.page.get_by_test_id("dispense_labware_dropdownMenu").click()
-        destination_labware = self.page.get_by_text(labware)
-        destination_labware.click()
+        option = self.page.get_by_role("listbox").get_by_text(labware)
+        option.scroll_into_view_if_needed()
+        option.click()
 
     def pipette_path_select(self, pathtype: str) -> None:
         """Select pipette path type in transfer step.
@@ -101,6 +99,7 @@ class TransferPage(BasePage):
 
     def transfer_continue_to_next_step(self) -> None:
         """Click continue to next step button in transfer step."""
+        self.dismiss_release_notes_toast()
         self.page.get_by_text("Continue").click()
 
     def go_back_to_previous_step(self) -> None:

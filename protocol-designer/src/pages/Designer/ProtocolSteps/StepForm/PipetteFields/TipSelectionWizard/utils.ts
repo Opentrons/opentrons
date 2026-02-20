@@ -27,6 +27,7 @@ import type {
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -75,14 +76,14 @@ export const getViewboxFromSelectedLabware = (
 }
 
 export const getHoveredOffsetFromWell = (args: {
-  selectedTiprackId: string
+  selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   wellName: string | null
   pipetteSpec: PipetteV2Specs
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     wellName,
     pipetteSpec,
@@ -96,14 +97,14 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
+  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null) {
+  if (wellName == null || labware.def.wells[wellName] == null) {
     return {
       x: 0,
       y: 0,
     }
   }
-  const labware = labwareState[selectedTiprackId ?? '']
   const well = labware.def.wells[wellName]
   return {
     x: well.x + xOffset,
@@ -111,8 +112,14 @@ export const getHoveredOffsetFromWell = (args: {
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(-2, -1)
+export const getColumnFromWellName = (wellName: string): string => {
+  const match = wellName.match(/^[A-Za-z]+(\d+)/)
+  if (match && match.length > 1) {
+    return match[1]
+  }
+  console.error('No column found for well name', wellName)
+  return ''
+}
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
@@ -201,7 +208,7 @@ export const getValidTiprackIds = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
   numPickups: number
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   invariantContext: InvariantContext
   robotState: TimelineFrame | null
   tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>

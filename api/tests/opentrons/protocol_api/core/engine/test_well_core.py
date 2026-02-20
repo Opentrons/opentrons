@@ -17,7 +17,12 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
+from opentrons.protocol_api.core.engine import (
+    ProtocolCore,
+    WellCore,
+    point_calculations,
+    stringify,
+)
 from opentrons.protocol_engine import (
     LoadedPipette,
     WellLocation,
@@ -70,8 +75,19 @@ def well_definition() -> WellDefinition2:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
+
+
+@pytest.fixture
 def subject(
-    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition2
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    well_definition: WellDefinition2,
 ) -> WellCore:
     """Get a WellCore test subject with mocked dependencies."""
     decoy.when(
@@ -84,6 +100,7 @@ def subject(
         name="well-name",
         labware_id="labware-id",
         engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -226,7 +243,8 @@ def test_load_liquid(
                 labwareId="labware-id",
                 liquidId="liquid-id",
                 volumeByWell={"well-name": 20},
-            )
+            ),
+            command_annotations=[],
         ),
         times=1,
     )

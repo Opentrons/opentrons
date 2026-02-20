@@ -21,7 +21,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
       save:
         json:
           initial_access_token: access_token
@@ -39,7 +39,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
 
   - name: Introspect the refresh token to confirm that it's active
     request:
@@ -53,7 +53,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -70,7 +70,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
       save:
         json:
           refreshed_access_token: access_token
@@ -88,7 +88,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
 
   - name: Introspect the new refresh token to confirm that it's active
     request:
@@ -102,7 +102,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: runs.read runs.write users.read users.write
 
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
@@ -215,7 +215,7 @@ stages:
         scope: runs.read
 
 ---
-test_name: Invalid username and password credentials should be rejected
+test_name: Wrong username and password credentials should be rejected
 
 marks:
   - usefixtures:
@@ -276,19 +276,19 @@ stages:
         - json:off
 
 ---
-test_name: Invalid clients should be rejected
+test_name: Unrecognized clients should be rejected
 
 marks:
   - usefixtures:
       - run_server
 
 stages:
-  - name: Send an invalid client_id to the token endpoint
+  - name: Send an unrecognized client_id to the token endpoint
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: invalid_client
+        client_id: unrecognized_client
         grant_type: password
         username: test_admin
         password: test_admin_password
@@ -299,17 +299,78 @@ stages:
       strict:
         - json:off
 
-  - name: Send an invalid client_id to the token introspection endpoint
+  - name: Send an unrecognized client_id to the token introspection endpoint
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: invalid_client
+        client_id: unrecognized_client
         token: dummy_token
     response:
       status_code: 401
       json:
         error: invalid_client
+      strict:
+        - json:off
+
+---
+test_name: Unrecognized scopes should be rejected
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Pass an unrecognized scope to the initial token request
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+        scope: unrecognized_scope
+    response:
+      status_code: 400
+      json:
+        error: invalid_scope
+      strict:
+        - json:off
+
+  - name: Do a successful token request to get a refresh token
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+      save:
+        json:
+          refresh_token: refresh_token
+      strict:
+        - json:off
+
+  - name: Pass an unrecognized scope to the refresh token request
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{refresh_token}'
+        scope: unrecognized_scope
+    response:
+      status_code: 400
+      json:
+        error: invalid_scope
       strict:
         - json:off
 

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -23,7 +24,11 @@ import { WellTooltip } from '../../WellTooltip'
 import styles from './labwareslot.module.css'
 
 import type { WellGroup } from '@opentrons/components'
-import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  Liquid,
+  LoadLidStackRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   LabwareEntities,
@@ -50,10 +55,11 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   } = props
   const { labware, pipettes, liquidState, modules } = robotState
   const { t } = useTranslation('protocol_visualization')
-  const labwareLoadCommand = Object.values(commands).find(
-    command =>
-      'labwareId' in command.result &&
-      command.result.labwareId === topLabwareOnSlotId
+  const [hoveredWellName, setHoveredWellName] = useState<string | null>(null)
+  const lidStackCommand = commands.find(
+    (command): command is LoadLidStackRunTimeCommand =>
+      command.commandType === 'loadLidStack' &&
+      command.result?.labwareIds?.includes(topLabwareOnSlotId) === true
   )
   const pipetteTemporalProperties = Object.entries(pipettes).find(
     ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
@@ -71,18 +77,36 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       : null
   const hopperGroups =
     stackerModuleState != null ? stackerModuleState.labwareInHopper : null
-
+  const isTopLabwareLid =
+    labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('lid')
+  const topLabwareStack = labware[topLabwareOnSlotId].stack
+  const labwareIdUnderLid = topLabwareStack.find(
+    id =>
+      id !== topLabwareOnSlotId &&
+      labware[id] != null &&
+      labwareEntities[id]?.def.allowedRoles?.includes('lid') !== true
+  )
+  const hasRenderableWellsUnderLid =
+    labwareIdUnderLid != null
+      ? Object.keys(labwareEntities[labwareIdUnderLid].def.wells).length > 0
+      : false
+  const adjustedTopLabwareId =
+    isTopLabwareLid && hasRenderableWellsUnderLid
+      ? (labwareIdUnderLid ?? topLabwareOnSlotId)
+      : topLabwareOnSlotId
+  const labwareLoadCommand = Object.values(commands).find(
+    command =>
+      command.result != null &&
+      'labwareId' in command.result &&
+      (command.result.labwareId === topLabwareOnSlotId ||
+        command.result.labwareId === adjustedTopLabwareId)
+  )
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname: string | null =
     labwareLoadCommandParams != null &&
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const isTopLabwareLid =
-    labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('lid')
-  const adjustedTopLabwareId = isTopLabwareLid
-    ? labware[topLabwareOnSlotId].stack[1]
-    : topLabwareOnSlotId
   const labwareDef = labwareEntities[adjustedTopLabwareId].def
   const labwareDisplayName = labwareDef.metadata.displayName
 
@@ -104,9 +128,15 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       ? pipetteTemporalProperties[1].wellName
       : null
   const wellGroup: WellGroup | null =
-    activeWellName != null
+    activeWellName != null && labwareDef.wells[activeWellName] != null
       ? {
           [activeWellName]: null,
+        }
+      : null
+  const hoveredWellGroup: WellGroup | null =
+    hoveredWellName != null && labwareDef.wells[hoveredWellName] != null
+      ? {
+          [hoveredWellName]: null,
         }
       : null
 
@@ -119,58 +149,50 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     {}
   )
   const topLabwareURI = labwareEntities[topLabwareOnSlotId].labwareDefURI
+  const stackQuantity = labware[topLabwareOnSlotId].stack.filter(
+    id =>
+      labware[id] != null && labwareEntities[id].labwareDefURI === topLabwareURI
+  ).length
   const quantity =
     hopperGroups != null
       ? hopperGroups.length
-      : labware[topLabwareOnSlotId].stack.filter(
-          id =>
-            labware[id] != null &&
-            labwareEntities[id].labwareDefURI === topLabwareURI
-        )?.length
+      : stackQuantity > 0
+        ? stackQuantity
+        : (lidStackCommand?.params?.quantity ?? 1)
   const adapterId = labware[topLabwareOnSlotId].stack.find(
     id =>
       labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&
       !labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('adapter')
   )
+  const stackItems =
+    labware[topLabwareOnSlotId]?.stack.filter(
+      item => item !== topLabwareOnSlotId
+    ) ?? []
+  const moduleStackItems = stackItems.filter(
+    item => moduleEntities[item] != null
+  )
+  const hasStackedLabware = stackItems.some(item => labware[item] != null)
+  const hasHopper = stackItems.includes(HOPPER_STACKER_LOCATION)
+  const showStackedIcon =
+    hasStackedLabware || (hopperGroups != null && hopperGroups.length > 1)
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         {/* header icon part */}
         <div className={styles.header_icons}>
-          {labware[topLabwareOnSlotId]?.stack
-            .filter(item => item !== topLabwareOnSlotId)
-            .reverse()
-            .map((item, index) => {
-              if (moduleEntities[item] != null) {
-                return (
-                  <RobotInfoLabel
-                    key={`${item}-${index}`}
-                    iconName={
-                      MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
-                    }
-                  />
-                )
-              } else if (labware[item] != null) {
-                return (
-                  <RobotInfoLabel key={`${item}-${index}`} iconName="stacked" />
-                )
-              } else {
-                if (item !== HOPPER_STACKER_LOCATION) {
-                  const stack = labware[topLabwareOnSlotId]?.stack
-                  const hasHopper = stack.includes(HOPPER_STACKER_LOCATION)
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      deckLabel={
-                        hasHopper ? t('stacker_slot', { slot: slot }) : slot
-                      }
-                    />
-                  )
-                }
-              }
-            })}
-          {hopperGroups != null && hopperGroups.length > 1 ? (
-            <RobotInfoLabel key="hopperGroupStackedIcon" iconName="stacked" />
+          <RobotInfoLabel
+            key="slotLabel"
+            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
+          />
+          {moduleStackItems.map((item, index) => (
+            <RobotInfoLabel
+              key={`${item}-${index}`}
+              iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
+            />
+          ))}
+          {showStackedIcon ? (
+            <RobotInfoLabel key="stackedIcon" iconName="stacked" />
           ) : null}
         </div>
         {/* header icon part */}
@@ -191,19 +213,21 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
                 {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
               </StyledText>
             ) : null}
-            {adapterId != null ? (
-              <div>
-                <Divider />
-                <StyledText desktopStyle="captionSemiBold">
-                  {labwareEntities[adapterId].def.metadata.displayName}
-                </StyledText>
-              </div>
-            ) : null}
           </div>
           {quantity > 1 ? (
-            <Tag text={t('quantity', { quantity })} type="default" />
+            <div className={styles.tag_container}>
+              <Tag text={t('quantity', { quantity })} type="default" />
+            </div>
           ) : null}
         </div>
+        {adapterId != null ? (
+          <>
+            <Divider className={styles.full_width_divider} />
+            <StyledText desktopStyle="captionSemiBold">
+              {labwareEntities[adapterId].def.metadata.displayName}
+            </StyledText>
+          </>
+        ) : null}
         {/* header text part */}
       </div>
       <div className={styles.body_container}>
@@ -224,12 +248,15 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
                         definition={labwareDef}
                         positioningMode="passThrough"
                         wellFill={wellFill}
-                        highlightedWells={wellGroup}
+                        highlightedWells={hoveredWellGroup}
+                        selectedWells={wellGroup}
                         onMouseLeaveWell={mouseEventArgs => {
+                          setHoveredWellName(null)
                           handleMouseLeaveWell(mouseEventArgs)
                           handleMouseLeaveWell(mouseEventArgs.event)
                         }}
                         onMouseEnterWell={({ wellName, event }) => {
+                          setHoveredWellName(wellName)
                           if (wellContents != null) {
                             makeHandleMouseEnterWell(
                               wellName,

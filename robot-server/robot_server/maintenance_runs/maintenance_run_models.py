@@ -19,8 +19,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LoadedPipette,
 )
-
-from robot_server.service.json_api import ResourceModel
+from server_utils.fastapi_utils.models.json_api import ResourceModel
 
 
 class MaintenanceRun(ResourceModel):

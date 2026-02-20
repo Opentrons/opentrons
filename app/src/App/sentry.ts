@@ -84,7 +84,9 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
         if (
           errorMessage.includes('Failed to fetch') ||
           errorMessage.includes('Failed to load resource') ||
-          errorMessage.includes('ERR_INTERNET_DISCONNECTED')
+          errorMessage.includes(
+            'video-only background media was paused to save power'
+          )
         ) {
           return null
         }

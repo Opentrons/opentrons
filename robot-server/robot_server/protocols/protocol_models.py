@@ -13,9 +13,9 @@ from opentrons.protocol_reader import (
 )
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.util import StrEnum
+from server_utils.fastapi_utils.models.json_api import ResourceModel
 
 from .analysis_models import AnalysisSummary
-from robot_server.service.json_api import ResourceModel
 
 
 class ProtocolKind(StrEnum):

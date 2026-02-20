@@ -3,6 +3,8 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_LOCATION,
+  VACUUM_MODULE_TYPE,
 } from '..'
 
 import type { ModuleType } from '../types'
@@ -35,6 +37,8 @@ export function getModuleDeckLabel(
       }
     case FLEX_STACKER_MODULE_TYPE:
       return getFlexStackerDisplayLocationFromSlotName(slotName)
+    case VACUUM_MODULE_TYPE:
+      return VACUUM_MODULE_LOCATION
     default:
       return slotName
   }
