@@ -1388,8 +1388,8 @@ def test_handle_create_command_annotation_action() -> None:
     subject.handle_action(
         actions.CreateUserCommandAnnotation(
             annotation_id="abc123",
-            user_defined_name="bar",
-            user_description="foo",
+            name="bar",
+            description="foo",
             params={"a": 1},
         )
     )
@@ -1398,8 +1398,8 @@ def test_handle_create_command_annotation_action() -> None:
     assert annotation == CommandAnnotation(
         id="abc123",
         source="userCommand",
-        userSpecifiedName="bar",
-        userSpecifiedDescription="foo",
+        name="bar",
+        description="foo",
         params={"a": 1},
     )
 
@@ -1417,8 +1417,8 @@ def test_get_all_command_annotations() -> None:
         subject.handle_action(
             actions.CreateUserCommandAnnotation(
                 annotation_id=ann_id,
-                user_defined_name="bar",
-                user_description="foo",
+                name="bar",
+                description="foo",
                 params={"a": 1},
             )
         )
@@ -1426,15 +1426,15 @@ def test_get_all_command_annotations() -> None:
         CommandAnnotation(
             id="ann_id_1",
             source="userCommand",
-            userSpecifiedName="bar",
-            userSpecifiedDescription="foo",
+            name="bar",
+            description="foo",
             params={"a": 1},
         ),
         CommandAnnotation(
             id="ann_id_2",
             source="userCommand",
-            userSpecifiedName="bar",
-            userSpecifiedDescription="foo",
+            name="bar",
+            description="foo",
             params={"a": 1},
         ),
     ]

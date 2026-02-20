@@ -258,7 +258,7 @@ async def test_update_adds_details_and_completes_analysis(
     command_annotation = pe_types.CommandAnnotation(
         id="annotation-id",
         source="userCommand",
-        userSpecifiedName="My command annotation",
+        name="My command annotation",
         params={},
     )
     subject.add_pending(
@@ -335,7 +335,7 @@ async def test_update_adds_details_and_completes_analysis(
             {
                 "source": "userCommand",
                 "id": "annotation-id",
-                "userSpecifiedName": "My command annotation",
+                "name": "My command annotation",
                 "params": {},
             }
         ],

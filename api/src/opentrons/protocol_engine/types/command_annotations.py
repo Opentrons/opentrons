@@ -25,10 +25,8 @@ class CommandAnnotation(BaseModel):
 
     id: str = Field(..., description="A unique identifier for the command annotation.")
     source: str = Field(..., description="The type of annotation (for machine parsing)")
-    userSpecifiedName: str = Field(
-        ..., description="The user-specified name of the annotation"
-    )
-    userSpecifiedDescription: Optional[str] = Field(
+    name: str = Field(..., description="The user-specified name of the annotation")
+    description: Optional[str] = Field(
         None,
         description="The optional user-specified description for the annotation.",
     )

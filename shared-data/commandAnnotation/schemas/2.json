@@ -22,12 +22,12 @@
       "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
       "type": "object"
     },
-    "userSpecifiedName": {
-      "description": "The optional user-specified name of the second order command",
+    "name": {
+      "description": "Required user-specified name of the command annotation.",
       "type": "string"
     },
-    "userSpecifiedDescription": {
-      "description": "The optional user-specified description of the second order command",
+    "description": {
+      "description": "The optional user-specified description of the command annotation.",
       "type": "string"
     }
   }

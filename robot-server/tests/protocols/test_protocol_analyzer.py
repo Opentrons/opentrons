@@ -176,7 +176,7 @@ async def test_analyze(
     new_command_annotation = pe_types.CommandAnnotation(
         id="annotation-id",
         source="userCommand",
-        userSpecifiedName="My command annotation",
+        name="My command annotation",
         params={},
     )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)

@@ -77,13 +77,13 @@ stages:
             commandAnnotations:
               - source: userCommand
                 id: !anystr
-                userSpecifiedName: My step group
-                userSpecifiedDescription: It's a comment, that's it.
+                name: My step group
+                description: It's a comment, that's it.
                 params: {}
               - source: userCommand
                 id: !anystr
-                userSpecifiedName: My step group 2
-                userSpecifiedDescription: Another comment!
+                name: My step group 2
+                description: Another comment!
                 params: {}
             commandPreconditions: { isCameraUsed: false }
             pipettes: []

@@ -777,8 +777,8 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             CreateUserCommandAnnotation(
                 annotation_id=annotation_id,
-                user_defined_name=annotation_name,
-                user_description=description,
+                name=annotation_name,
+                description=description,
                 params=params or {},
             )
         )

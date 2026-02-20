@@ -605,8 +605,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
         annotation = CommandAnnotation(
             id=action.annotation_id,
             source="userCommand",
-            userSpecifiedName=action.user_defined_name,
-            userSpecifiedDescription=action.user_description,
+            name=action.name,
+            description=action.description,
             params=action.params,
         )
         self._state.command_annotations[action.annotation_id] = annotation

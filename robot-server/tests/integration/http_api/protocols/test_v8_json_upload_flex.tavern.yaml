@@ -93,8 +93,8 @@ stages:
             commandAnnotations:
               - source: userCommand
                 id: !anystr
-                userSpecifiedName: Legacy custom command annotation
-                userSpecifiedDescription: Legacy command annotation
+                name: Legacy custom command annotation
+                description: Legacy command annotation
                 params: {}
             commandPreconditions: { isCameraUsed: false }
             pipettes:
