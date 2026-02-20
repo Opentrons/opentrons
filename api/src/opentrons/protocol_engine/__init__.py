@@ -22,6 +22,7 @@ from .protocol_engine import ProtocolEngine
 from .state.commands import CommandErrorSlice, CommandPointer, CommandSlice
 from .state.config import Config
 from .state.state import State, StateView
+from .command_text import annotate_commands_with_command_text
 from .state.state_summary import StateSummary
 from .types import (
     OFF_DECK_LOCATION,
@@ -83,6 +84,7 @@ __all__ = [
     "ProtocolEngine",
     "StateSummary",
     "Config",
+    "annotate_commands_with_command_text",
     # error types
     "ProtocolEngineError",
     "ErrorOccurrence",

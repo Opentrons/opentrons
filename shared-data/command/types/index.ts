@@ -54,6 +54,15 @@ export interface CommandNote {
 }
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export type CommandIntent = 'protocol' | 'setup' | 'fixit'
+/**
+ * Optional command text for display. When present, consumers can look up
+ * commandTextKey in protocol_command_text and interpolate with commandTextParams.
+ */
+export interface CommandTextAnnotation {
+  commandTextKey?: string
+  commandTextParams?: Record<string, string | number>
+}
+
 export interface CommonCommandRunTimeInfo<
   DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError,
 > {
@@ -67,6 +76,10 @@ export interface CommonCommandRunTimeInfo<
   intent?: CommandIntent
   notes?: CommandNote[] | null
   failedCommandId?: string // only present if intent === 'fixit'
+  /** Optional localization key for human-readable command text (analysis output). */
+  commandTextKey?: string
+  /** Optional interpolation params for command text (analysis output). */
+  commandTextParams?: Record<string, string | number>
 }
 export interface CommonCommandCreateInfo {
   intent?: CommandIntent

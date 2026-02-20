@@ -298,6 +298,21 @@ class BaseCommand(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     )
+    commandTextKey: Optional[str] = Field(
+        None,
+        description=(
+            "Optional localization key for human-readable command text. "
+            "When present with commandTextParams, consumers (e.g. App, opentrons_simulate) "
+            "can look up the key in protocol_command_text and interpolate with commandTextParams."
+        ),
+    )
+    commandTextParams: Optional[Dict[str, Union[str, float]]] = Field(
+        None,
+        description=(
+            "Optional interpolation params for command text. Keys match placeholders "
+            "in the string identified by commandTextKey (e.g. well_name, volume, labware)."
+        ),
+    )
 
     _ImplementationCls: Type[
         AbstractCommandImpl[

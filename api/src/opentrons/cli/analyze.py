@@ -45,6 +45,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
 )
+from opentrons.protocol_engine.command_text import annotate_commands_with_command_text
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import (
     CommandPreconditions,
@@ -393,6 +394,11 @@ async def _analyze(  # noqa: C901
         raise click.ClickException(str(error))
 
     analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
+    annotate_commands_with_command_text(
+        analysis.commands,
+        analysis.state_summary,
+        protocol_source.robot_type,
+    )
     return_code = _get_return_code(analysis)
 
     # This ugly code checks to see if an engine remains past garbage collection
