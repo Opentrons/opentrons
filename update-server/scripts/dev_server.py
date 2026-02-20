@@ -23,14 +23,17 @@ Usage (from update-server/):
     uv run python scripts/dev_server.py                   # OT-2 / buildroot
     uv run python scripts/dev_server.py --flex            # OT-3 / openembedded
 
-Then in another terminal:
+Then in another terminal (from repo root), validate the update script against localhost:
     # OT-2
     python .cursor/skills/robot-ip-health/scripts/update_robot.py \\
-        localhost --version 8.3.0 --port 34000
+        localhost --version 8.3.0 --port 34000 -y
 
-    # OT-3 / Flex
+    # OT-3 / Flex (with local zip; no download)
     python .cursor/skills/robot-ip-health/scripts/update_robot.py \\
-        localhost --version 8.8.1 --port 34000
+        localhost --file .cursor/skills/robot-ip-health/scripts/ot3-system-8.8.1.zip --port 34000 -y
+
+The script will show "Connection: network (http://localhost:34000)" and run the full flow;
+the dev server does not reboot. This validates the update API before running on a robot (or --usb).
 """
 
 import argparse
