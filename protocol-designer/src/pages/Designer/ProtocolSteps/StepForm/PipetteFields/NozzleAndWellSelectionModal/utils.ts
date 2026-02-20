@@ -235,38 +235,26 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
 ): string[] => {
   const inaccessible: string[] = []
 
-  for (const wellGroup of selectedWells) {
-    const firstWell = wellGroup[0]
+  for (const column of wellDefMap) {
+    const selectedInColumn = selectedWells
+      .flat()
+      .filter(well => column.includes(well))
+    const unselectedWells = column.filter(
+      well => !selectedInColumn.includes(well)
+    )
 
-    for (const column of wellDefMap) {
-      const startingWellIndex = column.indexOf(firstWell)
-
-      if (startingWellIndex !== -1) {
-        const endingWellIndex = startingWellIndex + channels
-
-        const unselectedPortionOfColumn = remainingWellsInAColumn(
-          column,
-          startingWellIndex,
-          endingWellIndex
-        )
-        unselectedPortionOfColumn.forEach(wellChunk => {
-          if (
-            wellChunk.some(well =>
-              allWellsWithState[well] === INACCESSIBLE
-                ? inaccessible.push(well)
-                : null
-            )
-          )
-            console.log(
-              '🚀 ~ getInaccessibleWellsForPartialNozzleRowMap ~ wellChunk:',
-              wellChunk
-            )
-          if (wellChunk.length < channels) {
-            inaccessible.push(...wellChunk)
-          }
-        })
-        break
+    unselectedWells.forEach(well => {
+      if (allWellsWithState[well] === INACCESSIBLE) {
+        inaccessible.push(well)
       }
+    })
+
+    if (unselectedWells.length > 0 && unselectedWells.length < channels) {
+      unselectedWells.forEach(well => {
+        if (!inaccessible.includes(well)) {
+          inaccessible.push(well)
+        }
+      })
     }
   }
 

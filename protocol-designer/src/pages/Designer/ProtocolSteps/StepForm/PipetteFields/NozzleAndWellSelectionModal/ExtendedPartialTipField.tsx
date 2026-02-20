@@ -96,7 +96,8 @@ export function ExtendedPartialTipField(
   function getNozzleWellText(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
-    stepType: string
+    stepType: string,
+    channels: number
   ): string {
     const nozzleText = getNozzleText(
       primaryNozzle,
@@ -104,19 +105,25 @@ export function ExtendedPartialTipField(
       partialNozzleCount
     )
     const isTransfer = stepType === 'transfer'
-    const isRowOrColumn =
-      nozzleConfiguration === ROW || nozzleConfiguration === COLUMN
+    const isColumn =
+      (channels === 8 && nozzleConfiguration === ALL) ||
+      nozzleConfiguration === COLUMN
+    const isRow = nozzleConfiguration === ROW
     const hasRequiredWells =
       aspWells.length > 0 && (!isTransfer || dspWells.length > 0)
     if (!nozzleText || !hasRequiredWells) {
       return t('no_nozzles_and_wells_selected')
     }
-    const positionType = isRowOrColumn
-      ? `${nozzleConfiguration.toLowerCase()}s`
-      : 'wells'
+    let positionType: string = 'wells'
+    if (isColumn) {
+      positionType = 'columns'
+    }
+    if (isRow) {
+      positionType = 'rows'
+    }
 
     let nozzleSelection = `${nozzleText} nozzles`
-    if (isRowOrColumn) {
+    if ((isRow || isColumn) && channels === 96) {
       nozzleSelection = `${nozzleText}${positionType} nozzles`
     } else if (isTransfer) {
       nozzleSelection = nozzleText
@@ -142,7 +149,12 @@ export function ExtendedPartialTipField(
       <div className={styles.nozzle_selection_text}>
         <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
-            {getNozzleWellText(primaryNozzle, nozzleConfiguration, stepType)}
+            {getNozzleWellText(
+              primaryNozzle,
+              nozzleConfiguration,
+              stepType,
+              channels
+            )}
           </StyledText>
         </ListButton>
       </div>
