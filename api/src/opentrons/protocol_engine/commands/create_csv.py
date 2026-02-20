@@ -1,4 +1,4 @@
-"""Command models to capture an image with a camera."""
+"""Command models to create a csv file for writing."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def _remove_default(s: dict[str, Any]) -> None:
 
 
 class CreateCSVParams(BaseModel):
-    """Input parameters for an image capture."""
+    """Input parameters to create csv."""
 
     fileName: str = Field(..., description="File name to use when creating a csv.")
     columns: int = Field(
@@ -42,14 +42,14 @@ class CreateCSVParams(BaseModel):
 
 
 class CreateCSVResult(BaseModel):
-    """Result data from running an image capture."""
+    """Result data creating a csv."""
 
     fileId: str = Field(..., description="File ID for the created csv file.")
     columns: int = Field(..., description="Number of columns in the csv.")
 
 
 class CreateCSVImpl(AbstractCommandImpl[CreateCSVParams, SuccessData[CreateCSVResult]]):
-    """Execution implementation of an image capture."""
+    """Execution implementation of create csv."""
 
     def __init__(
         self,
@@ -61,7 +61,7 @@ class CreateCSVImpl(AbstractCommandImpl[CreateCSVParams, SuccessData[CreateCSVRe
         self._file_provider = file_provider
 
     async def execute(self, params: CreateCSVParams) -> SuccessData[CreateCSVResult]:
-        """Initiate an image capture with a camera."""
+        """Initiate an csv creation."""
         if set(SPECIAL_CHARACTERS).intersection(set(params.fileName)):
             raise FileNameInvalidError(
                 message=f"Create CSV filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"

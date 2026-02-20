@@ -26,7 +26,7 @@ class CSVCore(AbstractCSV):
     def write_row(self, row: List[str]) -> None:
         """Add a new row to the csv file."""
         if len(row) > self._columns:
-            raise RuntimeError("To many data columns.")
+            raise RuntimeError("Too many data columns.")
         if len(row) < self._columns:
             # extend row to match columns
             row.extend([""] * (self._columns - len(row)))

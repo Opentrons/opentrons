@@ -1,4 +1,4 @@
-"""Command models to capture an image with a camera."""
+"""Command models to add a row to an extant csv."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ class CSVWriteRowResult(BaseModel):
 class CSVWriteRowImpl(
     AbstractCommandImpl[CSVWriteRowParams, SuccessData[CSVWriteRowResult]]
 ):
-    """Execution implementation of an image capture."""
+    """Execution implementation adding a row to a csv."""
 
     def __init__(
         self,
@@ -56,10 +56,9 @@ class CSVWriteRowImpl(
     async def execute(
         self, params: CSVWriteRowParams
     ) -> SuccessData[CSVWriteRowResult]:
-        """Initiate an image capture with a camera."""
+        """Initiate a data append."""
         state_update = update_types.StateUpdate()
         csv_data = self._state_view.files.get_csv_file_info(params.fileId)
-        # old_rows = await self._file_provider.read_file(csv_data)
         output = StringIO()
         writer = csv.writer(output, delimiter=",")
         writer.writerow(params.rowData)
@@ -88,7 +87,7 @@ class CSVWriteRowImpl(
 
 
 class CSVWriteRow(BaseCommand[CSVWriteRowParams, CSVWriteRowResult, ErrorOccurrence]):
-    """A command to create a generic csv file."""
+    """A command to write to a generic csv file."""
 
     commandType: CSVWriteRowCommandType = "csvWriteRow"
     params: CSVWriteRowParams
@@ -98,7 +97,7 @@ class CSVWriteRow(BaseCommand[CSVWriteRowParams, CSVWriteRowResult, ErrorOccurre
 
 
 class CSVWriteRowCreate(BaseCommandCreate[CSVWriteRowParams]):
-    """A request to create a generic csv file."""
+    """A request to write to a generic csv file."""
 
     commandType: CSVWriteRowCommandType = "csvWriteRow"
     params: CSVWriteRowParams

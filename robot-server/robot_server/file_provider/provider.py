@@ -79,6 +79,8 @@ class FileProviderExecutor:
     async def write_file_cb(self, file_data: FileData) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file.
 
+        If file_data contains a file_id then the file is already created and we append instead of create.
+
         Raises:
             A StorageLimitReachedError on disk space limit violations.
         """
