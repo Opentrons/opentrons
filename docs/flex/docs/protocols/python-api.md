@@ -95,9 +95,9 @@ Sensors in Flex pipettes can detect the level of liquid in a well. You can use t
 
 Starting in API version 2.27, use start and end location parameters to control pipette movements during liquid transfers: 
 
-- Continuously target the [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html#meniscus) as it changes while pipetting liquid.
+- Continuously target the [liquid meniscus](../../python-api/robot-position.md#meniscus) as it changes while pipetting liquid.
 - Change the pipette's position within a well while aspirating, dispensing, or mixing.
-- Mix in different locations in labware using the [dynamic mix](https://docs.opentrons.com/v2/basic_commands/liquids.html#dynamic-mix) method.
+- Mix in different locations in labware using the [dynamic mix](../../python-api/building-block-commands/liquids.md#dynamic-mix) method.
 
 ### Concurrent commands
 
