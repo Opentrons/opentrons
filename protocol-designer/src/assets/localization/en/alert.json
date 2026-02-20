@@ -157,7 +157,7 @@
       "title": "Pause until Thermocycler Lid reaches {{temperature}}\u00a0°C"
     },
     "wait_for_thermocycler_profile": {
-      "body": "<p>This Thermocycler profile can run in parallel with other steps. Click and drag to move steps between "Start profile" and "Wait for profile for complete".</p><p>If you don't move any steps, the robot will not perform any other actions during the Thermocycler profile.</p>",
+      "body": "<p>This Thermocycler profile can run in parallel with other steps. Click and drag to move steps between \"Start profile\" and \"Wait for profile for complete\".</p><p>If you don't move any steps, the robot will not perform any other actions during the Thermocycler profile.</p>",
       "title": "Run a Thermocycler profile in parallel with other steps"
     },
     "waste_chute_warning": {
