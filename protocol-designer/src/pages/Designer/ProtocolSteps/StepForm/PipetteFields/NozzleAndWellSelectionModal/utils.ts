@@ -197,7 +197,8 @@ export const getEntireWellSelection = (
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {
-        return []
+        const beginning = column.length - count
+        return column.slice(beginning, column.length)
       }
       const end = rowIndex + count
       return column.slice(rowIndex, Math.min(end, column.length))
@@ -205,6 +206,60 @@ export const getEntireWellSelection = (
     default:
       return [wellName]
   }
+}
+
+export const remainingWellsInAColumn = (
+  column: string[],
+  startingWellIndex: number,
+  endingWellIndex: number
+): string[][] => {
+  const lengthOfColumn = column.length
+  const remainingWells: string[][] = []
+  if (startingWellIndex !== 0) {
+    const startingChunk = column.slice(0, startingWellIndex)
+    remainingWells.push(startingChunk)
+  }
+  if (startingWellIndex !== lengthOfColumn) {
+    const endingChunk = column.slice(endingWellIndex, lengthOfColumn)
+    remainingWells.push(endingChunk)
+  }
+  return remainingWells
+}
+
+export const getInaccessibleWellsForPartialNozzleRowMap = (
+  selectedWells: string[][],
+  wellDefMap: string[][],
+  channels: number
+): string[] => {
+  const inaccessible: string[] = []
+
+  for (const wellGroup of selectedWells) {
+    const firstWell = wellGroup[0]
+
+    for (const column of wellDefMap) {
+      const startingWellIndex = column.indexOf(firstWell)
+
+      if (startingWellIndex !== -1) {
+        const endingWellIndex = startingWellIndex + channels
+
+        const unselectedPortionOfColumn = remainingWellsInAColumn(
+          column,
+          startingWellIndex,
+          endingWellIndex
+        )
+
+        unselectedPortionOfColumn.forEach(wellChunk => {
+          if (wellChunk.length < channels) {
+            inaccessible.push(...wellChunk)
+          }
+        })
+
+        break
+      }
+    }
+  }
+
+  return [...new Set(inaccessible)]
 }
 
 export function getWellGroupLength(
