@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { UNSELECTED } from '@opentrons/components'
 import {
   A1_NOZZLE,
   ALL,
@@ -15,10 +16,11 @@ import {
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
+  getInaccessibleWellsForPartialNozzleRowMap,
   getWellGroupLength,
 } from '../utils'
 
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
   LabwareDefinition,
   LabwareDefinition2,
@@ -231,5 +233,41 @@ describe('getAvailableNozzleConfigurations', () => {
     expect(
       getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 3)
     ).toStrictEqual(9)
+  })
+})
+
+describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
+  const channels = 3
+  const mockTiprack = {
+    stack: ['tiprack2', '3'],
+    id: 'tiprack2',
+    labwareDefURI: 'tiprackURI2',
+    def: fixtureTiprack1000ul as LabwareDefinition2,
+    pythonName: 'tiprack2',
+  }
+  const wellDefMap = mockTiprack.def.ordering
+  const allWellsWithState: Record<string, WellType> = {}
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+  const cols = Array.from({ length: 12 }, (_, i) => (i + 1).toString())
+
+  for (const row of rows) {
+    for (const col of cols) {
+      const well = `${row}${col}`
+      allWellsWithState[well] = UNSELECTED
+    }
+  }
+  const selectedWells = [
+    ['A1', 'B1', 'C1'],
+    ['F1', 'G1', 'H1'],
+  ]
+  it('marks wells D1 and E1 as inaccessible when two 3 well chunks are selected', () => {
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells,
+        wellDefMap,
+        allWellsWithState,
+        channels
+      )
+    ).toStrictEqual(['D1', 'E1'])
   })
 })

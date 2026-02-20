@@ -216,34 +216,36 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
   channels: number
 ): string[] => {
   const inaccessible: string[] = []
+  const selectedFlat = selectedWells.flat()
+
   for (const column of wellDefMap) {
-    const selectedInColumn = selectedWells
-      .flat()
-      .filter(well => column.includes(well))
-    if (selectedInColumn.length === 0) {
-      continue
-    }
+    // Find indices of selected wells in this column
+    const selectedIndices = column
+      .map((well, i) => (selectedFlat.includes(well) ? i : -1))
+      .filter(i => i !== -1)
 
-    const accessibleUnselected = column.filter(
-      well =>
-        !selectedInColumn.includes(well) &&
-        allWellsWithState[well] !== INACCESSIBLE
-    )
+    if (selectedIndices.length === 0) continue
 
-    const slotsLeft = channels - selectedInColumn.length
-    if (accessibleUnselected.length > slotsLeft) {
-      const newlyInaccessible = accessibleUnselected.slice(slotsLeft)
-      newlyInaccessible.forEach(well => {
-        if (!inaccessible.includes(well)) {
-          inaccessible.push(well)
-        }
-      })
+    // Split column into chunks of unselected wells around selected wells
+    const boundaries = [-1, ...selectedIndices, column.length] // include start/end
+    for (let i = 0; i < boundaries.length - 1; i++) {
+      const start = boundaries[i] + 1
+      const end = boundaries[i + 1]
+      const chunk = column
+        .slice(start, end)
+        .filter(well => allWellsWithState[well] !== INACCESSIBLE)
+
+      // Only mark inaccessible if chunk is smaller than channels
+      if (chunk.length > 0 && chunk.length < channels) {
+        chunk.forEach(well => {
+          if (!inaccessible.includes(well)) inaccessible.push(well)
+        })
+      }
     }
   }
 
-  return [...new Set(inaccessible)]
+  return inaccessible
 }
-
 export function getWellGroupLength(
   totalSelected: number,
   ordering: string[][],
