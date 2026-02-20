@@ -36,7 +36,7 @@ def main() -> int:
 
     APPROVED_DIR.mkdir(parents=True, exist_ok=True)
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
 
     promoted: list[tuple[str, str | None, str]] = []  # (name, archived_path, approved_path)
     for temp_path in sorted(TEMP_DIR.glob("*.snapshot.md")):

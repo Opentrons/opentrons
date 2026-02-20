@@ -43,7 +43,7 @@ dev = [
 [tool.ruff]
 line-length = 140
 indent-width = 4
-exclude = ["files", "snapshots"]
+exclude = ["files", "snapshots", "snapshot-report"]
 src = ["*.py", "api", "tests"]
 
 [tool.ruff.lint]

@@ -7,7 +7,8 @@ for comparison, with code blocks syntax-highlighted) plus copies of input files 
 snapshots. PM unzips and opens index.html in a browser.
 
 Usage:
-  uv run python scripts/generate_snapshot_report.py [--source snapshots/temp] [--compare-with snapshots/approved] [--output snapshot-report.zip]
+  uv run python scripts/generate_snapshot_report.py [--source snapshots/temp]
+  [--compare-with snapshots/approved] [--output snapshot-report.zip]
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ import shutil
 import sys
 import tempfile
 import zipfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -51,7 +52,7 @@ def escape_html(s: str) -> str:
     return html.escape(s, quote=True)
 
 
-def parse_snapshot_md(content: str) -> dict:
+def parse_snapshot_md(content: str) -> dict:  # noqa: C901
     """
     Parse .snapshot.md into structured sections.
     Returns dict: status, reply_blocks (list of {lang, code}), protocol_content_raw, received_files, fake.
@@ -107,7 +108,7 @@ def render_snapshot_html(parsed: dict) -> str:
     if parsed.get("status") is not None:
         out.append(f'<p class="snapshot-meta"><strong>Status:</strong> {escape_html(parsed["status"])}')
         if parsed.get("fake") is not None:
-            out.append(f' <strong>fake:</strong> {escape_html(parsed["fake"])}')
+            out.append(f" <strong>fake:</strong> {escape_html(parsed['fake'])}")
         out.append("</p>")
     for block in parsed.get("reply_blocks", []):
         lang = (block["lang"] or "text").strip()
@@ -136,7 +137,7 @@ def build_index_html(
     input_links: dict[str, list[tuple[str, str]]],
 ) -> str:
     """Build index.html with one section per prompt: prompt, inputs, old output, new output (compare)."""
-    date_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     sections = []
     for entry in prompts:
         pid = entry["id"]
@@ -154,32 +155,33 @@ def build_index_html(
 
         inputs_html = ""
         if inputs:
-            links = " ".join(
-                f'<a href="{escape_html(rel_path)}">{escape_html(label)}</a>' for label, rel_path in inputs
-            )
-            inputs_html = f'<p><strong>Inputs:</strong> {links}</p>'
+            links = " ".join(f'<a href="{escape_html(rel_path)}">{escape_html(label)}</a>' for label, rel_path in inputs)
+            inputs_html = f"<p><strong>Inputs:</strong> {links}</p>"
 
-        old_html = render_snapshot_html(old_parsed) if old_parsed else "<p class=\"no-snapshot\">No previous snapshot</p>"
-        new_html = render_snapshot_html(new_parsed) if new_parsed else "<p class=\"no-snapshot\">No new snapshot</p>"
+        old_html = render_snapshot_html(old_parsed) if old_parsed else '<p class="no-snapshot">No previous snapshot</p>'
+        new_html = render_snapshot_html(new_parsed) if new_parsed else '<p class="no-snapshot">No new snapshot</p>'
 
         sections.append(
             f"""
 <section class="prompt-block" id="prompt-{escape_html(pid)}">
   <h2>{escape_html(pid)} {escape_html(slug)}</h2>
-  {f'<p class="description">{escape_html(description)}</p>' if description else ''}
+  {f'<p class="description">{escape_html(description)}</p>' if description else ""}
   <p><strong>Prompt</strong></p>
   <pre class="prompt">{escape_html(message)}</pre>
   {inputs_html}
-  <div class="compare-row">
-    <div class="output-col">
-      <p><strong>Old output</strong> <a href="{escape_html(old_path)}">{escape_html(snapshot_name)}</a></p>
-      <div class="output-body">{old_html}</div>
+  <details class="output-collapse">
+    <summary>Output (expand to compare old vs new)</summary>
+    <div class="compare-row">
+      <div class="output-col">
+        <p><strong>Old output</strong> <a href="{escape_html(old_path)}">{escape_html(snapshot_name)}</a></p>
+        <div class="output-body">{old_html}</div>
+      </div>
+      <div class="output-col">
+        <p><strong>New output</strong> <a href="{escape_html(new_path)}">{escape_html(snapshot_name)}</a></p>
+        <div class="output-body">{new_html}</div>
+      </div>
     </div>
-    <div class="output-col">
-      <p><strong>New output</strong> <a href="{escape_html(new_path)}">{escape_html(snapshot_name)}</a></p>
-      <div class="output-body">{new_html}</div>
-    </div>
-  </div>
+  </details>
 </section>
 """
         )
@@ -189,11 +191,13 @@ def build_index_html(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>API Snapshot Report</title>
+  <title>OpentronsAI Snapshot Report</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" crossorigin="anonymous">
   <style>
     body {{ font-family: system-ui, sans-serif; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; }}
     h1 {{ margin-top: 0; }}
+    .output-collapse {{ margin-top: 0.5rem; }}
+    .output-collapse summary {{ cursor: pointer; font-weight: 600; }}
     .meta {{ color: #666; margin-bottom: 2rem; }}
     .prompt-block {{ border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }}
     .prompt-block h2 {{ margin-top: 0; font-size: 1.2rem; }}
@@ -214,7 +218,7 @@ def build_index_html(
   </style>
 </head>
 <body>
-  <h1>API Snapshot Report</h1>
+  <h1>OpentronsAI Snapshot Report</h1>
   <p class="meta">Generated {date_str}. Unzip and open this file in a browser. Old = approved, New = temp.</p>
   {"".join(sections)}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" crossorigin="anonymous"></script>
@@ -224,7 +228,7 @@ def build_index_html(
 """
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901
     parser = argparse.ArgumentParser(
         description="Generate a zip with index.html report (prompt, inputs, old vs new output, syntax-highlighted) for PM."
     )
@@ -314,9 +318,7 @@ def main() -> int:
             if links:
                 input_links[pid] = links
 
-        index_html = build_index_html(
-            prompts, old_dir, new_dir, input_dir, old_contents, new_contents, input_links
-        )
+        index_html = build_index_html(prompts, old_dir, new_dir, input_dir, old_contents, new_contents, input_links)
         (report_path / "index.html").write_text(index_html, encoding="utf-8")
 
         out_path = Path(args.output)

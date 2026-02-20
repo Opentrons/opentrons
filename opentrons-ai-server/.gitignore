@@ -19,3 +19,4 @@ ai-server/
 # Snapshot testing: temp outputs are local only; approved/ and archive/ are committed
 snapshots/temp/
 snapshot-report.zip
+snapshot-report/

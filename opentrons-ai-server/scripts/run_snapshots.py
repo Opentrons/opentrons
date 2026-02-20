@@ -130,20 +130,14 @@ def _run_one_prompt(
             if not proto_path.exists():
                 return (pid, slug, str(out_path), False)
             protocol_text = proto_path.read_text(encoding="utf-8")
-            response = client.post_update_protocol(
-                protocol_text=protocol_text, prompt=message, fake=use_fake
-            )
+            response = client.post_update_protocol(protocol_text=protocol_text, prompt=message, fake=use_fake)
         elif "attachments" in entry:
             paths = [resolve_path(p) for p in entry["attachments"]]
             if any(not p.exists() for p in paths):
                 return (pid, slug, str(out_path), False)
-            response = client.post_chat_completion_multipart(
-                message=message, file_paths=paths, fake=use_fake
-            )
+            response = client.post_chat_completion_multipart(message=message, file_paths=paths, fake=use_fake)
         else:
-            response = client.get_chat_completion(
-                message, fake=use_fake, fake_key=fake_key
-            )
+            response = client.get_chat_completion(message, fake=use_fake, fake_key=fake_key)
 
         try:
             body = response.json()
@@ -164,7 +158,7 @@ def _run_one_prompt(
         client.close()
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901
     parser = argparse.ArgumentParser(
         description="Run snapshot prompts against the API and write to snapshots/temp/. Default: dry-run (fake responses)."
     )
@@ -215,10 +209,7 @@ def main() -> int:
         task = progress.add_task("[cyan]Running prompts (parallel)...", total=len(prompts))
         results: list[tuple[str, str, str, bool]] = []
         with ThreadPoolExecutor(max_workers=len(prompts)) as executor:
-            futures = {
-                executor.submit(_run_one_prompt, entry, dry_run, default_fake_key, settings): entry
-                for entry in prompts
-            }
+            futures = {executor.submit(_run_one_prompt, entry, dry_run, default_fake_key, settings): entry for entry in prompts}
             for future in as_completed(futures):
                 try:
                     results.append(future.result())
@@ -232,7 +223,7 @@ def main() -> int:
     results.sort(key=lambda r: r[0])
 
     # Log any skips (missing files)
-    for pid, slug, path, ok in results:
+    for pid, slug, _path, ok in results:
         if not ok:
             entry = next((p for p in prompts if p["id"] == pid), None)
             if entry and "protocol_file" in entry:
