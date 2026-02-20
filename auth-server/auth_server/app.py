@@ -37,6 +37,7 @@ app.include_router(oauth2_router)
 app.include_router(settings_router)
 app.include_router(users_router)
 
+
 # This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.
 # The page loads Redoc from a CDN, and the problem is that the default CDN URL
 # uses a fragile version tag.
