@@ -157,7 +157,7 @@ async def test_flex_pick_up_tip_state(
         decoy.verify(mock_hardware_api.cache_tip(Mount.LEFT, 42), times=1)
     else:
         decoy.when(
-            await subject.verify_tip_presence(
+            await subject.verify_tip_presence(  # type: ignore[func-returns-value]
                 pipette_id="pipette-id", expected=TipPresenceStatus.PRESENT
             )
         ).then_raise(TipNotAttachedError())

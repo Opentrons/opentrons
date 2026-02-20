@@ -436,8 +436,11 @@ class LabwareView:
             f"There is not labware loaded onto labware {self.get_display_name(labware_id)}"
         )
 
-    def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> None:
-        """Raise if labware has another labware that is not its lid on top."""
+    def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> bool:
+        """Raise if labware has another labware that is not its lid on top.
+
+        Returns True if it does not raise.
+        """
         lid_id = self.get_lid_id_by_labware_id(labware_id)
         for candidate_id, candidate_labware in self._state.labware_by_id.items():
             if (
@@ -449,9 +452,13 @@ class LabwareView:
                     f"Cannot access labware {self.get_display_name(labware_id)} because it has"
                     " a non-lid labware stacked on top."
                 )
+        return True
 
-    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
-        """Raise if labware has another labware on top."""
+    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> bool:
+        """Raise if labware has another labware on top.
+
+        Returns True if it does not raise.
+        """
         for labware in self._state.labware_by_id.values():
             if (
                 isinstance(labware.location, OnLabwareLocation)
@@ -461,18 +468,26 @@ class LabwareView:
                     f"Cannot access labware {self.get_display_name(labware_id)} because it has"
                     " another labware stacked on top."
                 )
+        return True
 
-    def raise_if_not_tip_rack(self, labware_id: str) -> None:
-        """Raise if a labware is not a tip rack."""
+    def raise_if_not_tip_rack(self, labware_id: str) -> bool:
+        """Raise if a labware is not a tip rack.
+
+        Returns True if it does not raise.
+        """
         if not self.is_tiprack(labware_id):
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {self.get_display_name(labware_id)} is not a tip rack and cannot have its well states set."
             )
+        return True
 
     def raise_if_wells_are_invalid(
         self, labware_id: str, well_names: List[str]
-    ) -> None:
-        """Raise if given wells do not exist with the given labware ID."""
+    ) -> bool:
+        """Raise if given wells do not exist with the given labware ID.
+
+        Return True if it does not raise.
+        """
         non_existent_wells = set(well_names) - set(
             self.get_definition(labware_id).wells
         )
@@ -480,6 +495,7 @@ class LabwareView:
             raise errors.WellDoesNotExistError(
                 f"Tip rack {self.get_display_name(labware_id)} does not have wells: {', '.join(non_existent_wells)}"
             )
+        return True
 
     def get_by_slot(
         self,
@@ -1070,32 +1086,43 @@ class LabwareView:
     def raise_if_labware_in_location(
         self,
         location: OnDeckLabwareLocation,
-    ) -> None:
-        """Raise an error if the specified location has labware in it."""
+    ) -> bool:
+        """Raise an error if the specified location has labware in it.
+
+        Returns True if it does not raise.
+        """
         for labware in self.get_all():
             if labware.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Labware {labware.loadName} is already present at {location}."
                 )
+        return True
 
     def raise_if_labware_cannot_be_ondeck(
         self,
         location: LabwareLocation,
         labware_definition: LabwareDefinition,
-    ) -> None:
-        """Raise an error if the labware cannot be in the specified location."""
+    ) -> bool:
+        """Raise an error if the labware cannot be in the specified location.
+
+        Returns True if it does not raise.
+        """
         if isinstance(
             location, (DeckSlotLocation, AddressableAreaLocation)
         ) and not labware_validation.validate_labware_can_be_ondeck(labware_definition):
             raise errors.LabwareCannotSitOnDeckError(
                 f"{labware_definition.parameters.loadName} cannot sit in a slot by itself."
             )
+        return True
 
     def raise_if_labware_incompatible_with_plate_reader(
         self,
         labware_definition: LabwareDefinition,
-    ) -> None:
-        """Raise an error if the labware is not compatible with the plate reader."""
+    ) -> bool:
+        """Raise an error if the labware is not compatible with the plate reader.
+
+        Returns True if it does not raise.
+        """
         load_name = labware_definition.parameters.loadName
         number_of_wells = len(labware_definition.wells)
         if number_of_wells != 96:
@@ -1111,14 +1138,18 @@ class LabwareView:
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" maximum allowed labware height is {_PLATE_READER_MAX_LABWARE_Z_MM}mm."
             )
+        return True
 
     def raise_if_stacker_labware_pool_is_not_valid(
         self,
         primary_labware_definition: LabwareDefinition,
         lid_labware_definition: LabwareDefinition | None,
         adapter_labware_definition: LabwareDefinition | None,
-    ) -> None:
-        """Raise if the primary, lid, and adapter do not go together."""
+    ) -> bool:
+        """Raise if the primary, lid, and adapter do not go together.
+
+        Returns True if it does not raise.
+        """
         if lid_labware_definition:
             if not labware_validation.validate_definition_is_lid(
                 lid_labware_definition
@@ -1150,6 +1181,7 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
+        return True
 
     def stacker_labware_pool_to_ordered_list(
         self,
@@ -1187,8 +1219,11 @@ class LabwareView:
 
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
-    ) -> None:
-        """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+    ) -> bool:
+        """Raise if the specified labware definition cannot be placed on top of the bottom labware.
+
+        Returns True if it does not raise.
+        """
         if labware_validation.validate_definition_is_adapter(top_labware_definition):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
@@ -1235,8 +1270,24 @@ class LabwareView:
                     self.get_definition(lw.id)
                 ) and not labware_validation.is_lid_stack(self.get_load_name(lw.id)):
                     stack_without_adapters.append(lw)
+
+            # todo(chb, 2025-01-29): We should refactor how labware stacking and the stackLimit parameter are used so that we do not have to do this special case check.
+            # This is occuring because the stackLimit no longer only means "the limit this labware can stack on itself" and now also means "the limit of a labwares position in a stack".
+            # If this eventually is fixed, we can get rid of this special case for the tiprack lid validation.
+            if labware_validation.is_tiprack_lid(
+                top_labware_definition.parameters.loadName
+            ) and labware_validation.is_tiprack_lid(below_labware.loadName):
+                # Validate that when attempting to stack a tiprack lid on another tiprack lid we still adhere to the maximum limit
+                if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
+                    top_labware_definition
+                ):
+                    raise errors.LabwareCannotBeStackedError(
+                        f"Tip rack lid {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
+                    )
             if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
                 top_labware_definition
+            ) and not labware_validation.is_tiprack_lid(
+                top_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
@@ -1254,6 +1305,7 @@ class LabwareView:
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
                 )
+        return True
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

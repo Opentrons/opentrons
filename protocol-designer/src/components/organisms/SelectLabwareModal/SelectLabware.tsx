@@ -62,8 +62,6 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedTopLabware, selectedAdapterDefURI, selectedLidLabware } =
     zoomedInSlotInfo
-  const isStackerShuttleOrHopper =
-    zoomedInSlotInfo.selectedModuleModel === FLEX_STACKER_MODULE_V1
   const lidLoadNames = Object.values(defs)
     .filter(
       def =>
@@ -111,7 +109,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   return (
     <>
       {ORDERED_CATEGORIES.map(category => {
-        const isLidValid = category === 'tipRack' || !isStackerShuttleOrHopper
+        const isLidValid = category === 'tipRack' || !isOnHopper
         if (filteredLabwareByCategory[category].length > 0) {
           return (
             <ListButton
@@ -151,10 +149,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                     })
 
                     const stackingProps: StackingProps | null =
-                      isLidValid &&
-                      (isOnHopper ||
-                        (stackingLabwareDefUris.length === 1 &&
-                          slot !== 'offDeck'))
+                      isOnHopper ||
+                      (stackingLabwareDefUris.length === 1 &&
+                        slot !== 'offDeck')
                         ? {
                             inputTitle: t('labware_quantity'),
                             errorMessage: t('unsupported_range'),
@@ -178,7 +175,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                             }),
                             checked: selectedLidLabware != null,
                             onCheckboxChange:
-                              !isTiprack && isOnHopper
+                              (!isTiprack && isOnHopper) || !isLidValid
                                 ? undefined
                                 : () => {
                                     dispatch(

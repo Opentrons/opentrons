@@ -36,6 +36,13 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
@@ -79,13 +86,6 @@ from robot_server.runs.run_models import (
     TipState,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 
 
 def mock_notify_publishers() -> None:
@@ -567,7 +567,7 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
@@ -581,7 +581,7 @@ async def test_delete_active_run(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
         RunConflictError("oh no")
     )
 
@@ -795,9 +795,9 @@ async def test_get_run_commands_errors_raises_no_run(
 
 @pytest.mark.parametrize(
     "error_list, expected_cursor_result",
-    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],
+    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],  # type: ignore[call-arg]
 )
-async def test_get_run_commands_errors_defualt_cursor(
+async def test_get_run_commands_errors_default_cursor(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     error_list: list[pe_errors.ErrorOccurrence],

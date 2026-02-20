@@ -1,3 +1,4 @@
+import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
   NEW,
@@ -9,32 +10,48 @@ import {
 } from './constants'
 import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
-import { NoTip } from './NoTip'
-import { SelectedTip } from './SelectedTip'
 import { UsedTip } from './UsedTip'
 
+import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
-export function TipStatus(props: {
+interface TipStatusProps {
   type: TipType
+  wellMap: LabwareWellMap
   size?: string
   text?: string
-}): JSX.Element {
-  const { type, size, text } = props
+}
+
+export function TipStatus(props: TipStatusProps): JSX.Element {
+  const { type, size, text, wellMap } = props
   switch (type) {
     case NEW:
       return <NewTip size={size} />
     case USED:
       return <UsedTip size={size} />
     case SELECTED:
-      return <SelectedTip size={size} textInsideTip={text} />
+      return <SelectedWell size={size} textInsideTip={text} wellMap={wellMap} />
     case NO:
-      return <NoTip size={size} />
+      return <EmptyWell size={size} wellMap={wellMap} />
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
-      return <SelectedTip size={size} textInsideTip={text} isUsed />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          isUsed
+          wellMap={wellMap}
+        />
+      )
     case SELECTED_ERROR:
-      return <SelectedTip size={size} textInsideTip={text} isError />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          isError
+          wellMap={wellMap}
+        />
+      )
   }
 }

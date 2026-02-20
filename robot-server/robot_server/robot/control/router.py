@@ -8,16 +8,16 @@ from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    SimpleBody,
+)
 
 from .estop_handler import EstopHandler
 from .models import DoorState, DoorStatusModel, EstopStatusModel
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.hardware import get_estop_handler, get_hardware, get_robot_type
-from robot_server.service.json_api import (
-    PydanticResponse,
-    SimpleBody,
-)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401

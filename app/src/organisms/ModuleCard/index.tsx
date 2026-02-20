@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  ALIGN_CENTER,
   ALIGN_START,
   Banner,
   BORDERS,
@@ -33,9 +34,9 @@ import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
-  MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -77,7 +78,13 @@ import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
-import { getModuleCardImage } from './utils'
+import {
+  getModuleCalibrationRequired,
+  getModuleCardImage,
+  getModuleSetupRequired,
+} from './utils'
+import { VacuumModuleData } from './VacuumModule/VacuumModuleData'
+import { VacuumModuleSlideout } from './VacuumModule/VacuumModuleSlideout'
 
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -91,10 +98,6 @@ import type { Dispatch, State } from '/app/redux/types'
 const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-]
-const NO_CALIBRATION_TYPE: ModuleType[] = [
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 ]
 
 const POLL_INTERVAL_MS = 5000
@@ -198,30 +201,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
 
-  const getSetupWizardFlow = (): {
-    requireModuleCalibration: boolean
-    requireModuleSetup: boolean
-  } => {
-    if (!isFlex)
-      return { requireModuleCalibration: false, requireModuleSetup: false }
-    if (NO_CALIBRATION_TYPE.includes(module.moduleType)) {
-      return {
-        requireModuleCalibration: false,
-        requireModuleSetup: !deckConfig?.some(
-          c => c.opentronsModuleSerialNumber === module.serialNumber
-        ),
-      }
-    }
-    return {
-      requireModuleCalibration:
-        !MODULE_MODELS_OT2_ONLY.some(
-          modModel => modModel === module.moduleModel
-        ) && module.moduleOffset?.last_modified == null,
-      requireModuleSetup: false,
-    }
-  }
-  const { requireModuleCalibration, requireModuleSetup } = getSetupWizardFlow()
-
+  const requireModuleCalibration = getModuleCalibrationRequired(module, isFlex)
+  const requireModuleSetup = getModuleSetupRequired(module, isFlex, deckConfig)
   const isTooHot = getModuleTooHot(module)
 
   let moduleData: JSX.Element = <div></div>
@@ -270,6 +251,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
     case FLEX_STACKER_MODULE_TYPE: {
       moduleData = <FlexStackerModuleData moduleData={module.data} />
+      break
+    }
+
+    case VACUUM_MODULE_TYPE: {
+      moduleData = <VacuumModuleData moduleData={module.data} />
       break
     }
   }
@@ -453,14 +439,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
+                  gridGap={SPACING.spacing4}
                 >
-                  <ModuleIcon
-                    moduleType={module.moduleType}
-                    size="1rem"
-                    marginTop={SPACING.spacing2}
-                    marginRight={SPACING.spacing4}
-                    color={COLORS.grey60}
-                  />
+                  <Flex alignItems={ALIGN_CENTER}>
+                    <ModuleIcon
+                      moduleType={module.moduleType}
+                      size="1rem"
+                      color={COLORS.grey60}
+                    />
+                  </Flex>
                   <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
                     {getModuleDisplayName(module.moduleModel)}
                   </StyledText>
@@ -563,6 +550,14 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
     return (
       <HeaterShakerSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  } else if (module.moduleType === VACUUM_MODULE_TYPE) {
+    return (
+      <VacuumModuleSlideout
         module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}

@@ -5,7 +5,6 @@ import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
-  ALIGN_NORMAL,
   BORDERS,
   Box,
   COLORS,
@@ -24,6 +23,7 @@ import {
 } from '@opentrons/components'
 import {
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
@@ -57,7 +57,7 @@ import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalData {
-  selectedLabwareIds: string[]
+  selectedLabwareIds: string[] | null
   nickNames: Record<string, string>
   labwareId: string | null
   selectedWells: WellGroup
@@ -113,6 +113,7 @@ export function AssignLiquidsModal(
   const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
+
   const selectableLabwareProps: {
     wellLabelOption: typeof WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
     definition: typeof labwareDef
@@ -130,6 +131,8 @@ export function AssignLiquidsModal(
     ),
   }
 
+  const labwareIsOnHopper = labwareStack.includes(HOPPER_STACKER_LOCATION)
+
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
@@ -138,10 +141,10 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 ? (
+        {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
-            selectedLabwareIds={selectedLabwareIds}
+            selectedLabwareIds={selectedLabwareIds ?? null}
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
             setDefineLiquidModal={setDefineLiquidModal}
@@ -164,14 +167,15 @@ export function AssignLiquidsModal(
           >
             <Flex
               height="100%"
-              alignItems={ALIGN_NORMAL}
+              alignItems={ALIGN_CENTER}
               gap={SPACING.spacing10}
             >
               <RobotInfoLabel
-                size="large"
+                size="extraLarge"
                 deckLabel={
                   getSlotInLocationStack(
-                    labware[labwareId].stack as string[]
+                    labware[labwareId].stack as string[],
+                    labwareIsOnHopper
                   ) ?? ''
                 }
               />
@@ -278,12 +282,12 @@ export function AssignLiquidsModalContainer(
 
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
+  const selectedLabwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const selectedLabwareIds =
-    useSelector(selectors.getSelectedLabwareIds) ?? ([labwareId] as string[])
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
+  // TODO(tz, 2026-01-12): change this to use liquid locations instead of this method and remove getWellContentsForLabwareStack method
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
@@ -292,14 +296,14 @@ export function AssignLiquidsModalContainer(
 
   const data: AssignLiquidsModalData = {
     nickNames,
-    labwareId: labwareId ?? null,
+    labwareId: selectedLabwareId ?? null,
     selectedWells,
     labware,
     labwareEntities,
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
-    selectedLabwareIds: selectedLabwareIds ?? [],
+    selectedLabwareIds: selectedLabwareIds ?? null,
   }
 
   return (

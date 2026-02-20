@@ -1,3 +1,8 @@
+import range from 'lodash/range'
+
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
+import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
 import type {
@@ -21,15 +26,46 @@ export function forDispense(
     'wellName' in params
       ? params.wellName
       : (robotState.pipettes[pipetteId].wellName ?? '')
+  const pipetteState = robotState.liquidState.pipettes[pipetteId]
+  const firstTipState = Object.values(pipetteState)[0] // airGap volume is the same for each tip
+  const airGapVolume = firstTipState?.[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
 
-  dispenseUpdateLiquidState({
-    invariantContext,
-    entityId,
-    pipetteId,
-    prevLiquidState: robotState.liquidState,
-    useFullVolume: false,
-    volume,
-    wellName,
-    robotStateAndWarnings,
-  })
+  // NOTE: (ja, 1/10/26): if airGapVolume is not null, assume that the dispense command
+  // is for dispensing the air gap - NOTE: this is only used for PV right now
+  if (airGapVolume > 0) {
+    const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
+    const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+    let channels = pipetteSpec.channels
+    if (nozzles === COLUMN) {
+      channels = 8
+    } else if (nozzles === SINGLE) {
+      channels = 1
+    }
+    range(channels).forEach((tipIndex): void => {
+      const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}
+
+      robotState.liquidState.pipettes[pipetteId][tipIndex] = {
+        ...prev,
+        [AIR_GAP_LIQUID_STATE_CONST]: { volume: 0 },
+      }
+    })
+  } else {
+    dispenseUpdateLiquidState({
+      invariantContext,
+      entityId,
+      pipetteId,
+      prevLiquidState: robotState.liquidState,
+      useFullVolume: false,
+      volume,
+      wellName,
+      robotStateAndWarnings,
+    })
+  }
+  // set the entityId for dispense if it was not previously set in the previous moveToWell
+  if ('labwareId' in params) {
+    robotState.pipettes[pipetteId] = {
+      ...robotState.pipettes[pipetteId],
+      entityId: params.labwareId,
+    }
+  }
 }

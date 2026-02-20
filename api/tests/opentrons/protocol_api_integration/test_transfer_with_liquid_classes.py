@@ -1409,7 +1409,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
     water_props = water.get_for(pipette_1k, tiprack)
 
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
 
@@ -1627,7 +1627,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
     water_props = water.get_for(pipette_1k, tiprack)
 
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
     disposal_volume = 5.5
@@ -2007,7 +2007,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
     water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
     expected_conditioning_volume = (
@@ -2995,6 +2995,193 @@ def test_water_transfer_with_selected_tips(
                 tip_contents=[LiquidAndAirGapPair(liquid=40, air_gap=0.1)],
                 add_final_air_gap=True,
                 trash_location=mock.ANY,
+            ),
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+# Fix this test
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_order_of_water_transfer_steps_with_blowout_in_source_custom_position(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should run the transfer steps with blowout at specified position in source labware.
+
+    This test only checks that various supported configurations for a transfer
+    analyze successfully. It doesn't check whether the steps are as expected.
+    That will be covered in analysis snapshot tests.
+    """
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    water_blowout_props = water.get_for(pipette_50, tiprack).dispense.retract.blowout
+    water_blowout_props.enabled = True
+    water_blowout_props.location = "source"
+    water_blowout_props.blowout_position = {
+        "position_reference": "well-top",
+        "offset": {"x": 1, "y": 2, "z": 3},
+    }
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "load_liquid_class",
+            side_effect=InstrumentCore.load_liquid_class,
+            autospec=True,
+        ) as patched_load_liquid_class,
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+        mock.patch.object(
+            InstrumentCore,
+            "blow_out",
+            side_effect=InstrumentCore.blow_out,
+            autospec=True,
+        ) as patched_blowout,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip_in_disposal_location",
+            side_effect=InstrumentCore.drop_tip_in_disposal_location,
+            autospec=True,
+        ) as patched_drop_tip,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_load_liquid_class, "load_liquid_class")
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        mock_manager.attach_mock(patched_blowout, "blow_out")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip_in_disposal_location")
+        pipette_50.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=40,
+            source=nest_plate.rows()[0][:2],
+            dest=arma_plate.rows()[0][:2],
+            new_tip="always",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.load_liquid_class(
+                mock.ANY,
+                name="water",
+                transfer_properties=mock.ANY,
+                tiprack_uri="opentrons/opentrons_flex_96_tiprack_50ul/1",
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=40,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                volume_for_pipette_mode_configuration=40,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=40,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=40, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+            mock.call.blow_out(
+                mock.ANY,
+                location=Location(
+                    nest_plate.rows()[0][0].top(0).point + Point(1, 2, 3),
+                    labware=nest_plate.rows()[0][0],
+                ),
+                well_core=mock.ANY,
+                in_place=False,
+                flow_rate=50,
+            ),
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=40,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                volume_for_pipette_mode_configuration=40,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=40,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=40, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+            mock.call.blow_out(
+                mock.ANY,
+                location=Location(
+                    nest_plate.rows()[0][1].top(0).point + Point(1, 2, 3),
+                    labware=nest_plate.rows()[0][1],
+                ),
+                well_core=mock.ANY,
+                in_place=False,
+                flow_rate=50,
             ),
             mock.call.drop_tip_in_disposal_location(
                 mock.ANY,

@@ -1610,9 +1610,9 @@ async def test_gripper_action_works_with_gripper(
         return_value=GripperJawWidthData(
             source=SourceType.default,
             status=CalibrationStatus(),
-            encoder_position_at_jaw_closed=None
-            if needs_calibration
-            else fake_jaw_encoder_val,
+            encoder_position_at_jaw_closed=(
+                None if needs_calibration else fake_jaw_encoder_val
+            ),
             last_modified=None,
         ),
         autospec=True,
@@ -1746,7 +1746,7 @@ async def test_gripper_move_to(
             Axis.Y,
             Axis.Z_G,
         ],
-        key=lambda elem: cast(int, elem.value),
+        key=lambda elem: elem.value,
     )
 
 

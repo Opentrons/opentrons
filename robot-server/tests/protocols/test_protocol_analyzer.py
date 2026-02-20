@@ -170,7 +170,14 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    legacy_command_annotation = pe_types.CustomCommandAnnotationLegacy(
+        commandKeys=["abc", "xyz"]
+    )
+    new_command_annotation = pe_types.UserCommandAnnotation(
+        annotationId="annotation-id",
+        userSpecifiedName="My command annotation",
+        params={},
+    )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
@@ -205,9 +212,10 @@ async def test_analyze(
                 wells=[],
                 files=[],
                 hasEverEnteredErrorRecovery=False,
+                commandAnnotations=[new_command_annotation],
             ),
             parameters=[bool_parameter],
-            command_annotations=[command_annotation],
+            command_annotations=[legacy_command_annotation],
             command_preconditions=command_preconditions,
         )
     )
@@ -227,7 +235,7 @@ async def test_analyze(
             errors=[],
             liquids=[],
             liquidClasses=[],
-            command_annotations=[command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )

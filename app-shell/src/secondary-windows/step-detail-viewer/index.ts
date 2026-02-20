@@ -9,6 +9,7 @@ import {
 
 import type { Logger } from 'winston'
 import type {
+  CompletedProtocolAnalysis,
   Liquid,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -30,7 +31,7 @@ interface OpenStepDetailViewerParams {
   command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   liquids: Liquid[]
   log: Logger
 }
@@ -102,9 +103,9 @@ export function createStepDetailViewerUi({
   const stepDetailViewerWindow = new BrowserWindow({
     ...SECONDARY_WINDOW_OPTS,
     width: 500,
-    height: 450,
+    height: 464,
     minWidth: 500,
-    minHeight: 450,
+    minHeight: 464,
   })
 
   stepDetailViewerWindow.once('ready-to-show', () => {

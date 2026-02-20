@@ -28,7 +28,6 @@ def run(primary_files_fd: List[int], primary_files_obj: List[io.FileIO]) -> None
 
     When data is received from one port, sends to all the other ports.
     """
-    print(type(primary_files_obj[0]))
     primary_files = {}
 
     for i in range(2):

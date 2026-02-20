@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     BooleanParameter,
     CommandPreconditions,
     CSVParameter,
+    UserCommandAnnotation,
 )
 from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
@@ -129,6 +130,11 @@ def engine_state_summary() -> StateSummary:
         ],
         liquidClasses=[],
         wells=[],
+        commandAnnotations=[
+            UserCommandAnnotation.model_construct(
+                annotationId="some-command-annotation-id"
+            )  # type: ignore[call-arg]
+        ],
     )
 
 
@@ -163,7 +169,7 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 def command_annotations() -> List[pe_types.CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotation(
+        pe_types.SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
             params={"abc": "123"},
             machineReadableName="hello world",
@@ -595,6 +601,11 @@ async def test_get_all_runs(
         ],
         liquidClasses=[],
         wells=[],
+        commandAnnotations=[
+            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
+                annotationId="current-command-annotation-id"
+            )
+        ],
     )
     current_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -616,6 +627,11 @@ async def test_get_all_runs(
         liquids=[],
         liquidClasses=[],
         wells=[],
+        commandAnnotations=[
+            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
+                annotationId="old-command-annotation-id"
+            )
+        ],
     )
     historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(

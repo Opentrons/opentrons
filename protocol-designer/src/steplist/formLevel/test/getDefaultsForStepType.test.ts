@@ -21,6 +21,7 @@ describe('getDefaultsForStepType', () => {
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
+        primaryNozzle: null,
         dropTip_wellNames: undefined,
         dropTip_location: null,
         pickUpTip_location: undefined,
@@ -134,6 +135,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_checkbox: false,
         pipette: null,
         nozzles: null,
+        primaryNozzle: null,
         volume: undefined,
         times: null,
         wells: [],
@@ -225,11 +227,6 @@ describe('getDefaultsForStepType', () => {
         profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
-        blockIsActiveHold: false,
-        blockTargetTempHold: null,
-        lidIsActiveHold: false,
-        lidTargetTempHold: null,
-        lidOpenHold: null,
       })
     })
     it('should default to an empty object', () => {

@@ -30,7 +30,6 @@ export function FlexStackerSummary(
   const { fillLabwareIds, flexStackerFormType, moduleId } = currentStep
   const { moduleState: stackerModuleState } = moduleRobotState[moduleId] ?? {}
   const nicknamesById = useSelector(getLabwareNicknamesById)
-  console.log(nicknamesById)
   if (
     stackerModuleState == null ||
     stackerModuleState.type !== FLEX_STACKER_MODULE_TYPE

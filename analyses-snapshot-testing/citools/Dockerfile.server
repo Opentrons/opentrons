@@ -24,4 +24,4 @@ ENV PORT=31950
 EXPOSE ${PORT}
 
 # Default command
-CMD ["sh", "-c", "python -m pipenv run uvicorn robot_server.app:app --host 0.0.0.0 --port ${PORT} --ws wsproto --lifespan on"]
+CMD ["sh", "-c", "python -m pipenv run uvicorn robot_server.app:app --host 0.0.0.0 --port ${PORT} --ws wsproto"]

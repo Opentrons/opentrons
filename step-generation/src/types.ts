@@ -17,11 +17,13 @@ import type {
   PipetteName,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   ShakeSpeedParams,
   StackerStoredLabwareDefinitionURIs,
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -48,6 +50,10 @@ export interface LabwareTemporalProperties {
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
+  // this is needed for PV to determine which labware is being moved
+  // into the hopper based on the setStoredLabware count
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export interface PipetteTemporalProperties {
@@ -62,6 +68,8 @@ export interface PipetteTemporalProperties {
   tiprackId?: string
   //  last primary tip well accessed (used for return tip)
   tipWell?: string
+  // primary nozzle to use
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -155,6 +163,15 @@ export interface FlexStackerModuleState {
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
+  // this is needed in order to differentiate between the different
+  // off-deck labwares and when they get loaded onto the hopper for setStoredLabware
+  setStoredLabwareCount?: number
+  fillCount?: number
+}
+
+// TODO (nd: 02/04/2026): configure this type for vacuum module
+export interface VacuumModuleState {
+  type: typeof VACUUM_MODULE_TYPE
 }
 
 export type ModuleState =
@@ -165,6 +182,7 @@ export type ModuleState =
   | MagneticBlockState
   | AbsorbanceReaderState
   | FlexStackerModuleState
+  | VacuumModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -223,6 +241,7 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
+
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
@@ -336,6 +355,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
+
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -493,15 +514,16 @@ export type MixArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
-  /**  z offset from bottom of well in mm */
-  offsetFromBottomMm: number
+  /** mix position offset relative to this PositionReference */
+  positionReference: PositionReference
   /** x offset */
   xOffset: number
   /** y offset */
   yOffset: number
-  /** flow rates in uL/sec */
+  /** z offset */
   zOffset: number
-  positionReference: PositionReference
+
+  /** flow rates in uL/sec */
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
@@ -511,6 +533,7 @@ export type MixArgs = CommonArgs & {
   tipTracking: TipTrackingOption
   tipsSelected: string[][]
   tiprackSelected: string | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export type PauseArgs = CommonArgs & {
@@ -611,6 +634,11 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
+/**
+ * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
+ * step immediately after the profile starts, and the profile will continue in the
+ * background.
+ */
 export type ThermocyclerProfileStepArgs = CommonArgs & {
   commandCreatorFnName: THERMOCYCLER_PROFILE
 
@@ -625,36 +653,6 @@ export type ThermocyclerProfileStepArgs = CommonArgs & {
   }
 
   message?: string
-} & (
-    | BlockingThermocyclerProfileStepArgs
-    | ConcurrentThermocyclerProfileStepArgs
-  )
-
-/**
- * Emits a blocking Thermocycler profile step. The entire profile will complete
- * before the protocol moves on to the next step.
- *
- * In this mode, we can do some extra things immediately after the profile ends,
- * like open the lid or set final temperatures. ("Hold" steps.)
- */
-interface BlockingThermocyclerProfileStepArgs {
-  concurrent: false
-  blockTargetTempHold: number | null
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-}
-
-/**
- * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
- * step immediately after the profile starts, and the profile will continue in the
- * background.
- *
- * Because of limitations in Protocol Engine and the Python Protocol API, this mode lacks
- * support for running "hold" steps immediately after the profile ends, so those
- * properties are omitted here.
- */
-interface ConcurrentThermocyclerProfileStepArgs {
-  concurrent: true
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
@@ -880,6 +878,7 @@ export type ErrorType =
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
   | 'MISSING_PROFILE_STEP'
+  | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
@@ -902,6 +901,7 @@ export type ErrorType =
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
+  | 'THERMOCYCLER_BUSY_WITH_PROFILE'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'

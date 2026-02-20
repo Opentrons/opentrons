@@ -1,5 +1,6 @@
 """Router for /system/register endpoint."""
 
+from textwrap import dedent
 from uuid import UUID
 
 import sqlalchemy
@@ -16,7 +17,18 @@ register_router = APIRouter()
 
 @register_router.post(
     "/system/register",
-    summary="Register an agent with this robot.",
+    deprecated=True,
+    summary="Register a client with this robot",
+    description=dedent(
+        """\
+        This was part of an experimental set of endpoints for authorization.
+        It's kept for compatibility reasons. Do not use it in new code.
+        Use the `/auth` endpoints instead.
+
+        This registers a client (basically just storing the information you pass in)
+        and returns a registration token that you can pass to `/system/authorize`.
+        Identical information is deduplicated, so this is safe to call multiple times.
+        """),
     responses={
         status.HTTP_200_OK: {"model": PostRegisterResponse},
         status.HTTP_201_CREATED: {"model": PostRegisterResponse},

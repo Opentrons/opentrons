@@ -9,14 +9,15 @@ from decoy import Decoy
 from fastapi.responses import FileResponse
 
 from opentrons.protocol_engine import EngineStatus
+from server_utils.fastapi_utils.models.json_api.request import RequestModel
 
 from robot_server.runs.router.camera_router import (
     add_camera_capture_image_settings,
+    get_camera_capture_image_settings,
     post_camera_preview_image,
 )
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
 
@@ -59,7 +60,7 @@ async def test_camera_settings(
 ) -> None:
     """It should be able to modify the capture image settings for a run."""
     image_settings = CameraCaptureImageSettings(
-        cameraId="cool_cam",
+        cameraId="ot_system_camera",
         resolution=(1, 2),
         zoom=1.5,
         pan=(3, 4),
@@ -80,6 +81,19 @@ async def test_camera_settings(
 
     assert result.content.data == image_settings
     assert result.status_code == 201
+
+    decoy.when(
+        mock_run_orchestrator_store.get_camera_capture_image_settings(
+            "ot_system_camera"
+        )
+    ).then_return(image_settings)
+
+    get_settings_result = await get_camera_capture_image_settings(
+        cameraId="ot_system_camera",
+        run_orchestrator_store=mock_run_orchestrator_store,
+    )
+
+    assert get_settings_result == image_settings
 
 
 async def test_camera_preview_image(

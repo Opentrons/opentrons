@@ -2635,6 +2635,50 @@ def test_get_tip_drop_explicit_location(
     )
 
 
+def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should raise if version gate is False and the labware is tip rack, and not raise otherwise."""
+    decoy.when(mock_labware_view.get_definition("tip-rack-id")).then_return(
+        tip_rack_def
+    )
+
+    with pytest.raises(errors.UnexpectedProtocolError):
+        subject.get_checked_tip_drop_location(
+            pipette_id="pipette-id",
+            labware_id="tip-rack-id",
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=1, y=2, z=3),
+            ),
+            api_version_allows_partial_return_tip=False,
+        )
+
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        reservoir_def
+    )
+
+    location = subject.get_checked_tip_drop_location(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
+        api_version_allows_partial_return_tip=False,
+    )
+
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
+
+
 def test_get_ancestor_slot_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,
@@ -2808,7 +2852,7 @@ def test_ensure_location_not_occupied_raises(
     module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(
         mock_labware_view.raise_if_labware_in_location(module_location)
-    ).then_return(None)
+    ).then_return(True)
     decoy.when(
         mock_module_view.raise_if_module_in_location(module_location)
     ).then_raise(errors.LocationIsOccupiedError("Woops again!"))

@@ -213,6 +213,9 @@
               "enum": ["source", "destination", "trash"],
               "description": "Location for blow out."
             },
+            "blowoutPosition": {
+              "$ref": "#/definitions/tipPosition"
+            },
             "flowRate": {
               "$ref": "#/definitions/positiveNumber",
               "description": "Flow rate for blow out, in microliters per second."

@@ -166,7 +166,12 @@ class ThermocyclerModuleSubState:
         if ramp_rate is None:
             return ramp_rate
 
-        heating = target_temp > self.get_target_block_temperature()
+        if self.target_block_temperature:
+            heating = target_temp > self.get_target_block_temperature()
+        else:
+            # When we're simulating we don't load the TC from live data so there is no default
+            # target temperature.
+            heating = target_temp > 20
         if (heating and ramp_rate > MAX_HEATING_RATE) or (
             not heating and ramp_rate > MAX_COOLING_RATE
         ):

@@ -3,6 +3,7 @@ import type {
   DeckDefinition,
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
 import type {
@@ -24,6 +25,7 @@ export interface TipSelectionBaseProps {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   pipetteId: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export interface PipetteShadowProps {
@@ -33,6 +35,7 @@ export interface PipetteShadowProps {
   height: number
   fill: string
   stroke: string
+  rotate?: boolean
 }
 
 export type LabelPlacement =

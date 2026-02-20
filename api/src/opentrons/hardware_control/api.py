@@ -17,7 +17,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import (
@@ -28,7 +27,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.types import PipetteName
-from opentrons_shared_data.robot.types import RobotType
 
 from . import modules
 from .backends import Controller, Simulator
@@ -83,7 +81,11 @@ mod_log = logging.getLogger(__name__)
 AttachedModuleSpec = Dict[str, List[Union[str, Tuple[str, str]]]]
 
 
-class API(
+# TODO(sfoster,1/9/2026): it looks like we did not fully migrate everything away
+# from the typevariable mount definition, and this now means that we can get grippers
+# out of this API and things are bad. we should fix this but it's going to take some
+# surgery.
+class API(  # type: ignore[misc]
     ExecutionManagerProvider,
     RobotCalibrationProvider,
     PipetteHandlerProvider[top_types.Mount],
@@ -190,7 +192,7 @@ class API(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=top_types.Point(0, 0, 0),
-            robot_type=cast(RobotType, "OT-2 Standard"),
+            robot_type="OT-2 Standard",
         )
 
     @classmethod
@@ -902,7 +904,7 @@ class API(
                 deck_pos=target_position,
                 attitude=self._robot_calibration.deck_calibration.attitude,
                 offset=top_types.Point(0, 0, 0),
-                robot_type=cast(RobotType, "OT-2 Standard"),
+                robot_type="OT-2 Standard",
             )
         )
 

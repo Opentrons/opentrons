@@ -1,6 +1,7 @@
 """Page object exports."""
 
-from .base_page import BasePage
+from automation.base_page import BasePage
+
 from .create_protocol_wizard import CreateProtocolWizard
 from .deck_config_page import DeckConfigPage
 from .heater_shaker_step_form_page import HeaterShakerStepPage
@@ -12,6 +13,7 @@ from .protocol_editor_page import ProtocolEditorPage
 from .settings_page import SettingsPage
 from .tc_step_form_page import ThermocyclerStepPage
 from .tempdeck_step_form_page import TemperatureStepPage
+from .timeline import Timeline
 from .transfer_form import TransferPage
 
 __all__ = [
@@ -28,4 +30,5 @@ __all__ = [
     "TemperatureStepPage",
     "HeaterShakerStepPage",
     "TransferPage",
+    "Timeline",
 ]

@@ -2,9 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
-import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
-import { UpdatedProtocolDetails } from '/app/organisms/Desktop/ProtocolDetails/UpdatedProtocolDetails'
-import { useFeatureFlag } from '/app/redux/config'
+import { ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 import {
   fetchProtocols,
   getStoredProtocol,
@@ -26,25 +24,15 @@ export function ProtocolDetails(): JSX.Element {
   const groupedCommands = useSelector((state: State) =>
     getStoredProtocolGroupedCommands(state, protocolKey)
   )
-  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
 
   return storedProtocol != null ? (
-    <>
-      {enableProtocolTimeline ? (
-        <UpdatedProtocolDetails
-          {...storedProtocol}
-          groupedCommands={groupedCommands}
-        />
-      ) : (
-        <ProtocolDetailsContents
-          {...storedProtocol}
-          groupedCommands={groupedCommands}
-        />
-      )}
-    </>
+    <ProtocolDetailsContents
+      {...storedProtocol}
+      groupedCommands={groupedCommands}
+    />
   ) : (
     <Navigate to="/protocols" />
   )

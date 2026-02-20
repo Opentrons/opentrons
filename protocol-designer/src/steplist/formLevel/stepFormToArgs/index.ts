@@ -34,8 +34,7 @@ export function _castForm<HydratedFormDataT extends HydratedFormData>(
 
 export const stepFormToArgs = (
   hydratedForm: HydratedFormData,
-  contextualState: InvariantContext,
-  enableConcurrentModuleActions: boolean
+  contextualState: InvariantContext
 ): StepArgs => {
   const castForm = _castForm(hydratedForm)
   let stepArgs: StepArgs = null
@@ -61,10 +60,7 @@ export const stepFormToArgs = (
       break
     }
     case 'thermocycler': {
-      stepArgs = thermocyclerFormToArgs(
-        _castForm(hydratedForm),
-        enableConcurrentModuleActions
-      )
+      stepArgs = thermocyclerFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'heaterShaker': {

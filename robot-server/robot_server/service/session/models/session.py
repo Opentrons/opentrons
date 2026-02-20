@@ -5,6 +5,12 @@ from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.util import StrEnum
+from server_utils.fastapi_utils.models.json_api import (
+    DeprecatedMultiResponseModel,
+    DeprecatedResponseDataModel,
+    DeprecatedResponseModel,
+    RequestModel,
+)
 
 from robot_server.robot.calibration.check.models import (
     CalibrationCheckSessionStatus,
@@ -18,12 +24,6 @@ from robot_server.robot.calibration.pipette_offset.models import (
     PipetteOffsetCalibrationSessionStatus,
 )
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
-from robot_server.service.json_api import (
-    DeprecatedMultiResponseModel,
-    DeprecatedResponseDataModel,
-    DeprecatedResponseModel,
-    RequestModel,
-)
 
 
 class SessionType(StrEnum):

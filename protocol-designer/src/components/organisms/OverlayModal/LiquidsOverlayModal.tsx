@@ -18,11 +18,21 @@ export function LiquidLayoutOverlayModalContainer({
 
   const dispatch = useDispatch()
   const allWellContents = useSelector(
-    wellContentsSelectors.getWellContentsForLabwareStack
+    wellContentsSelectors.getWellContentsAllLabware
   )
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
-  const wellContents = allWellContents[labwareId ?? ''] ?? {}
-  const wellContentsId = Object.keys(wellContents)
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
+
+  const handleClearLiquids = (): void => {
+    for (const labwareId of selectedLabwareIds ?? []) {
+      const wellContents = allWellContents[labwareId] ?? {}
+      dispatch(
+        removeWellsContents({
+          labwareId,
+          wells: Object.keys(wellContents),
+        })
+      )
+    }
+  }
 
   return (
     <OverlayModal
@@ -31,12 +41,7 @@ export function LiquidLayoutOverlayModalContainer({
       primaryButtonProps={{
         text: t('clear_liquids'),
         onClick: () => {
-          dispatch(
-            removeWellsContents({
-              labwareId: labwareId ?? '',
-              wells: wellContentsId,
-            })
-          )
+          handleClearLiquids()
           showLiquidOverflowMenu(false)
         },
       }}

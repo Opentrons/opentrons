@@ -13,9 +13,7 @@ import {
 } from '@opentrons/components'
 
 import {
-  DESKTOP_ONLY,
   ERROR_KINDS,
-  ODD_ONLY,
   ODD_SECTION_TITLE_STYLE,
   RECOVERY_MAP,
 } from '../constants'
@@ -56,6 +54,7 @@ export function IgnoreErrorStepHome({
   recoveryCommands,
   routeUpdateActions,
   errorKind,
+  isOnDevice,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { ignoreErrorKindThisRun } = recoveryCommands
@@ -123,42 +122,37 @@ export function IgnoreErrorStepHome({
       >
         {t('ignore_similar_errors_later_in_run')}
       </StyledText>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        css={ODD_ONLY}
-      >
-        <IgnoreOptions
-          ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
-          setSelectedOption={setSelectedOption}
-          selectedOption={selectedOption}
-        />
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        css={DESKTOP_ONLY}
-      >
-        <RecoveryRadioGroup
-          value={selectedOption}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setSelectedOption(e.currentTarget.value as IgnoreOption)
-          }}
-          options={IGNORE_OPTIONS_IN_ORDER.map(option => {
-            return {
-              value: option,
-              children: (
-                <StyledText
-                  css={RADIO_GROUP_MARGIN}
-                  desktopStyle="bodyDefaultRegular"
-                >
-                  {t(option)}
-                </StyledText>
-              ),
-            }
-          })}
-        />
-      </Flex>
+      {isOnDevice ? (
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <IgnoreOptions
+            ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
+            setSelectedOption={setSelectedOption}
+            selectedOption={selectedOption}
+          />
+        </Flex>
+      ) : (
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <RecoveryRadioGroup
+            value={selectedOption}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setSelectedOption(e.currentTarget.value as IgnoreOption)
+            }}
+            options={IGNORE_OPTIONS_IN_ORDER.map(option => {
+              return {
+                value: option,
+                children: (
+                  <StyledText
+                    css={RADIO_GROUP_MARGIN}
+                    desktopStyle="bodyDefaultRegular"
+                  >
+                    {t(option)}
+                  </StyledText>
+                ),
+              }
+            })}
+          />
+        </Flex>
+      )}
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
         secondaryBtnOnClick={goBackPrevStep}

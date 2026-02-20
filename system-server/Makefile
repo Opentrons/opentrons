@@ -41,6 +41,10 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: clean
 clean:
 	$(SHX) rm -rf \
@@ -95,8 +99,3 @@ dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(python) -m system_server --reload --log-level=debug
 
-.PHONY: docs
-docs: settings_schema.json
-
-settings_schema.json: system_server/settings/settings.py
-	$(python) -m scripts.settings_schema $@

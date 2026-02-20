@@ -5,6 +5,8 @@ import {
   FIXED_TRASH_ID,
   fixtureTiprack300ul,
   getLabwareDefURI,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
 } from '@opentrons/shared-data'
 
 import { MANUAL } from '../../../constants'
@@ -67,12 +69,13 @@ beforeEach(() => {
 
     blowoutLocation: null,
     touchTip: false,
-    offsetFromBottomMm: 3.2,
     aspirateDelaySeconds: null,
     dispenseDelaySeconds: null,
     dropTipLocation: FIXED_TRASH_ID,
+    positionReference: POSITION_REFERENCE_BOTTOM,
     xOffset: 0,
     yOffset: 0,
+    zOffset: 3.2,
   }
 
   invariantContext = makeContext()
@@ -733,6 +736,7 @@ mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
       times,
       changeTip: 'always',
       wells: ['A1', 'B1', 'C1'],
+      positionReference: POSITION_REFERENCE_CENTER,
       xOffset: 1,
       yOffset: 1,
     } as MixArgs
@@ -747,7 +751,7 @@ mock_pipette.pick_up_tip(location=mock_tip_rack_1)
 mock_pipette.mix(
     repetitions=2,
     volume=8,
-    location=mock_source_plate["A1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    location=mock_source_plate["A1"].center().move(types.Point(x=1, y=1, z=3.2)),
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
@@ -760,7 +764,7 @@ mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,
-    location=mock_source_plate["B1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    location=mock_source_plate["B1"].center().move(types.Point(x=1, y=1, z=3.2)),
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
@@ -773,7 +777,7 @@ mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,
-    location=mock_source_plate["C1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    location=mock_source_plate["C1"].center().move(types.Point(x=1, y=1, z=3.2)),
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )

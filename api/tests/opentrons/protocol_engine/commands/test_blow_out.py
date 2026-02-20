@@ -142,7 +142,7 @@ async def test_overpressure_error(
     )
 
     decoy.when(
-        await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234)
+        await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234)  # type: ignore[func-returns-value]
     ).then_raise(PipetteOverpressureError())
 
     decoy.when(model_utils.generate_id()).then_return(error_id)

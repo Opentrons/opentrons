@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 
+import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getPipetteEntities,
@@ -17,6 +18,7 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
+import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
@@ -35,7 +37,14 @@ export function FirstStepMoveLiquidTools({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-
+  const completedSteps =
+    formData.aspirate_labware != null &&
+    formData.dispense_labware != null &&
+    formData.tipRack != null &&
+    formData.pipette != null
+  const enableAdditionalPartialTip = useSelector(
+    getEnableAdditionalPartialTipSelection
+  )
   const { pipette, tipRack } = propsForFields
   const channels =
     pipette.value != null
@@ -54,40 +63,33 @@ export function FirstStepMoveLiquidTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {channels != null && channels !== 1 ? (
-        <>
-          <Divider marginY="0" />
-          <PartialTipField
-            {...propsForFields.nozzles}
-            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
-          />
-        </>
-      ) : null}
       <Divider marginY="0" />
       <TiprackField {...tipRack} pipetteId={pipette.value} />
       <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         <LabwareField {...propsForFields.aspirate_labware} />
-        <WellSelectionField
-          {...propsForFields.aspirate_wells}
-          labwareId={
-            typeof propsForFields.aspirate_labware.value === 'string'
-              ? propsForFields.aspirate_labware.value
-              : null
-          }
-          pipetteId={formData.pipette}
-          nozzles={
-            typeof propsForFields.nozzles.value === 'string'
-              ? propsForFields.nozzles.value
-              : null
-          }
-          hasFormError={propsForFields.aspirate_wells.errorToShow != null}
-        />
+        {!enableAdditionalPartialTip ? (
+          <WellSelectionField
+            {...propsForFields.aspirate_wells}
+            labwareId={
+              typeof propsForFields.aspirate_labware.value === 'string'
+                ? propsForFields.aspirate_labware.value
+                : null
+            }
+            pipetteId={formData.pipette}
+            nozzles={
+              typeof propsForFields.nozzles.value === 'string'
+                ? propsForFields.nozzles.value
+                : null
+            }
+            hasFormError={propsForFields.aspirate_wells.errorToShow != null}
+          />
+        ) : null}
       </Flex>
       <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         <LabwareField {...propsForFields.dispense_labware} />
-        {isDisposalLocation ? null : (
+        {!enableAdditionalPartialTip && !isDisposalLocation ? (
           <WellSelectionField
             {...propsForFields.dispense_wells}
             labwareId={
@@ -103,24 +105,57 @@ export function FirstStepMoveLiquidTools({
             }
             hasFormError={propsForFields.dispense_wells.errorToShow != null}
           />
-        )}
+        ) : null}
+        {enableAdditionalPartialTip && completedSteps ? (
+          <>
+            <Divider marginY="0" />
+            <ExtendedPartialTipField
+              {...propsForFields.nozzles}
+              pipetteSpecs={
+                pipettes[String(propsForFields.pipette.value)]?.spec
+              }
+              propsForFields={propsForFields}
+              stepType="transfer"
+            />
+            <Divider marginY="0" />
+          </>
+        ) : null}
+        {channels != null && channels !== 1 && completedSteps ? (
+          <>
+            {!enableAdditionalPartialTip ? (
+              <PartialTipField
+                {...propsForFields.nozzles}
+                pipetteSpecs={
+                  pipettes[String(propsForFields.pipette.value)]?.spec
+                }
+              />
+            ) : null}
+          </>
+        ) : null}
       </Flex>
-      <Divider marginY="0" />
-      <PathField
-        {...propsForFields.path}
-        aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
-        aspirate_airGap_volume={formData.aspirate_airGap_volume}
-        aspirate_wells={formData.aspirate_wells}
-        changeTip={formData.changeTip}
-        dispense_wells={formData.dispense_wells}
-        pipette={formData.pipette}
-        volume={formData.volume}
-        tipRack={formData.tipRack}
-        isDisposalLocation={isDisposalLocation}
-        title={t('pipette_path')}
-      />
-      <Divider marginY="0" />
-      <VolumeField fieldProps={propsForFields.volume} path={formData.path} />
+
+      {completedSteps ? (
+        <>
+          <PathField
+            {...propsForFields.path}
+            aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+            aspirate_airGap_volume={formData.aspirate_airGap_volume}
+            aspirate_wells={formData.aspirate_wells}
+            changeTip={formData.changeTip}
+            dispense_wells={formData.dispense_wells}
+            pipette={formData.pipette}
+            volume={formData.volume}
+            tipRack={formData.tipRack}
+            isDisposalLocation={isDisposalLocation}
+            title={t('pipette_path')}
+          />
+          <Divider marginY="0" />
+          <VolumeField
+            fieldProps={propsForFields.volume}
+            path={formData.path}
+          />
+        </>
+      ) : null}
     </Flex>
   )
 }

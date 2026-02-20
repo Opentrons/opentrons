@@ -1146,7 +1146,9 @@ def test_drop_tip_to_trash(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+@pytest.mark.parametrize(
+    "api_version", [APIVersion(2, 15), APIVersion(2, 18), APIVersion(2, 28)]
+)
 def test_drop_tip_to_randomized_trash_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1173,7 +1175,7 @@ def test_drop_tip_to_randomized_trash_location(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 28), False)],
 )
 def test_drop_tip_in_trash_bin(
     decoy: Decoy,
@@ -1198,7 +1200,7 @@ def test_drop_tip_in_trash_bin(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 28), False)],
 )
 def test_drop_tip_in_waste_chute(
     decoy: Decoy,
@@ -1216,6 +1218,36 @@ def test_drop_tip_in_waste_chute(
             waste_chute,
             home_after=None,
             alternate_tip_drop=alternate_drop,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 28)])
+def test_drop_tip_alternate_position_explicitly(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should alternate the drop position when alternate_drop_location is specified."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=True)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=True,
+        ),
+        times=1,
+    )
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=False)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=False,
         ),
         times=1,
     )
@@ -3202,7 +3234,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -3615,7 +3647,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -4049,7 +4081,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))

@@ -29,6 +29,7 @@ from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     AddLiquidAction,
     AddModuleAction,
+    CreateUserCommandAnnotation,
     FinishAction,
     FinishErrorDetails,
     HardwareStoppedAction,
@@ -279,7 +280,7 @@ def test_add_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -351,7 +352,7 @@ def test_add_fixit_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -459,7 +460,7 @@ async def test_add_and_execute_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -547,7 +548,7 @@ async def test_add_and_execute_command_wait_for_recovery(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -886,7 +887,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     """It should be able to stop the engine."""
     exception = RuntimeError("oh no")
     decoy.when(
-        await queue_worker.join(),
+        await queue_worker.join(),  # type: ignore[func-returns-value]
     ).then_raise(exception)
 
     decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
@@ -1309,7 +1310,7 @@ def test_add_labware_definition(
         ).then_return(LabwareUri("some/definition/uri"))
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             AddLabwareDefinitionAction(definition=well_plate_def)
         )
     ).then_do(_stub_get_definition_uri)
@@ -1424,6 +1425,34 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_create_user_command_annotation(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should create a user command annotation and return an annotation ID."""
+    result = subject.create_user_command_annotation(
+        annotation_name="My annotation",
+        annotation_id="abc123",
+        description="Hello world",
+        params={},
+    )
+
+    assert result == "abc123"
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id="abc123",
+                user_defined_name="My annotation",
+                user_description="Hello world",
+                params={},
+            ),
+        ),
+        times=1,
     )
 
 

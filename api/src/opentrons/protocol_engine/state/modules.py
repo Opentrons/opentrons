@@ -1320,8 +1320,11 @@ class ModuleView:
     def raise_if_module_in_location(
         self,
         location: DeckSlotLocation,
-    ) -> None:
-        """Raise if the given location has a module in it."""
+    ) -> bool:
+        """Raise if the given location has a module in it.
+
+        Return True if it does not raise.
+        """
         for module in self.get_all():
             if module.model in _COLUMN_4_MODULES and module.location == location:
                 raise errors.LocationIsOccupiedError(
@@ -1331,6 +1334,7 @@ class ModuleView:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
+        return True
 
     def is_column_4_module(self, model: ModuleModel) -> bool:
         """Determine whether or not a module is a Column 4 Module."""
@@ -1436,6 +1440,11 @@ class ModuleView:
             # loaded to column 3 but the addressable area is in column 4
             assert deck_slot.value[-1] == "3"
             return f"flexStackerModuleV1{deck_slot.value[0]}4"
+
+        elif model == ModuleModel.VACUUM_MODULE_V1:
+            # only allowed in column 3
+            assert deck_slot.value[-1] == "3"
+            return f"vacuumModuleMilliporeV1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."

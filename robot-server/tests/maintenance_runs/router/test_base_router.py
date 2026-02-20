@@ -12,6 +12,11 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.types import DeckSlotName
+from server_utils.fastapi_utils.models.json_api import (
+    RequestModel,
+    ResourceLink,
+    SimpleEmptyBody,
+)
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -36,11 +41,6 @@ from robot_server.maintenance_runs.router.base_router import (
     remove_run,
 )
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.service.json_api import (
-    RequestModel,
-    ResourceLink,
-    SimpleEmptyBody,
-)
 
 
 def mock_notify_publishers() -> None:
@@ -375,7 +375,7 @@ async def test_delete_run_with_bad_id(
 ) -> None:
     """It should 404 if the run ID does not exist."""
     decoy.when(
-        await mock_maintenance_run_data_manager.delete(
+        await mock_maintenance_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id", None, camera_provider=mock_camera_provider
         )
     ).then_raise(MaintenanceRunNotFoundError("uh oh"))
@@ -400,7 +400,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(
-        await mock_maintenance_run_data_manager.delete(
+        await mock_maintenance_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id", None, camera_provider=mock_camera_provider
         )
     ).then_raise(RunConflictError("oh no"))

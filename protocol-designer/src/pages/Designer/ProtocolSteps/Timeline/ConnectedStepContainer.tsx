@@ -17,7 +17,10 @@ import {
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
-import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '/protocol-designer/step-forms/selectors'
 import { actions as steplistActions } from '/protocol-designer/steplist'
 import {
   deselectAllSteps,
@@ -28,7 +31,7 @@ import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import {
   capitalizeFirstLetterAfterNumber,
-  getFillLabwareIdsToDelete,
+  getFillLabwareToDeleteData,
 } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -94,6 +97,7 @@ export function ConnectedStepContainer(
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
   const savedStepForms = useSelector(getSavedStepForms)
+  const { modules: deckSetupModules } = useSelector(getInitialDeckSetup)
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
 
   const handleClick = (event: MouseEvent): void => {
@@ -136,10 +140,16 @@ export function ConnectedStepContainer(
   }
 
   const handleDeleteFillLabware = (stepIds: string[]): void => {
-    const fillLabwareIds = getFillLabwareIdsToDelete(stepIds, savedStepForms)
-    fillLabwareIds.forEach(id => {
-      dispatch(deleteContainer({ labwareId: id }))
-    })
+    const fillLabwareToDeleteData = getFillLabwareToDeleteData(
+      stepIds,
+      savedStepForms,
+      deckSetupModules
+    )
+    for (const { labwareIds, module } of fillLabwareToDeleteData) {
+      labwareIds.forEach(id => {
+        dispatch(deleteContainer({ labwareId: id, stacker: module }))
+      })
+    }
   }
 
   const onDeleteClickAction = (): void => {
@@ -185,6 +195,7 @@ export function ConnectedStepContainer(
       onDoubleClick?.(e)
     }
   }
+
   return (
     <>
       {showDeleteConfirmation === true && (

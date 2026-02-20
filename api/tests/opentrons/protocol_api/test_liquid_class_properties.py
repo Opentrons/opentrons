@@ -1,15 +1,21 @@
 """Tests for LiquidClass properties and related functions."""
 
+from typing import Union
+
 import pytest
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     LiquidClassSchemaV1,
+    PositionReference,
 )
+from opentrons_shared_data.liquid_classes.types import TipPositionDict
 
 from opentrons.protocol_api._liquid_properties import (
     LiquidHandlingPropertyByVolume,
+    TipPosition,
+    _ensure_validated_tip_position,
     build_aspirate_properties,
     build_multi_dispense_properties,
     build_single_dispense_properties,
@@ -77,12 +83,12 @@ def test_aspirate_settings_overrides() -> None:
 
     aspirate_properties = build_aspirate_properties(aspirate_data)
 
-    aspirate_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    aspirate_properties.submerge.start_position.position_reference = "well-bottom"
     assert (
         aspirate_properties.submerge.start_position.position_reference.value
         == "well-bottom"
     )
-    aspirate_properties.submerge.start_position.offset = 5, 0, 0  # type: ignore[assignment]
+    aspirate_properties.submerge.start_position.offset = 5, 0, 0
     assert aspirate_properties.submerge.start_position.offset == Coordinate(
         x=5, y=0, z=0
     )
@@ -93,12 +99,12 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.submerge.delay.duration = 5.1
     assert aspirate_properties.submerge.delay.duration == 5.1
 
-    aspirate_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    aspirate_properties.retract.end_position.position_reference = "well-center"
     assert (
         aspirate_properties.retract.end_position.position_reference.value
         == "well-center"
     )
-    aspirate_properties.retract.end_position.offset = 0, 50, 0  # type: ignore[assignment]
+    aspirate_properties.retract.end_position.offset = 0, 50, 0
     assert aspirate_properties.retract.end_position.offset == Coordinate(x=0, y=50, z=0)
     aspirate_properties.retract.speed = 987
     assert aspirate_properties.retract.speed == 987
@@ -115,12 +121,12 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.retract.delay.duration = 0.5
     assert aspirate_properties.retract.delay.duration == 0.5
 
-    aspirate_properties.aspirate_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    aspirate_properties.aspirate_position.position_reference = "liquid-meniscus"
     assert (
         aspirate_properties.aspirate_position.position_reference.value
         == "liquid-meniscus"
     )
-    aspirate_properties.aspirate_position.offset = -1, -2, -3  # type: ignore[assignment]
+    aspirate_properties.aspirate_position.offset = -1, -2, -3
     assert aspirate_properties.aspirate_position.offset == Coordinate(x=-1, y=-2, z=-3)
     aspirate_properties.pre_wet = False
     assert aspirate_properties.pre_wet is False
@@ -214,13 +220,13 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties = build_single_dispense_properties(single_dispense_data)
 
     single_dispense_properties.submerge.start_position.position_reference = (
-        "well-bottom"  # type: ignore[assignment]
+        "well-bottom"
     )
     assert (
         single_dispense_properties.submerge.start_position.position_reference.value
         == "well-bottom"
     )
-    single_dispense_properties.submerge.start_position.offset = 3, -2, 1  # type: ignore[assignment]
+    single_dispense_properties.submerge.start_position.offset = 3, -2, 1
     assert single_dispense_properties.submerge.start_position.offset == Coordinate(
         x=3, y=-2, z=1
     )
@@ -231,12 +237,12 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.submerge.delay.duration = 5.1
     assert single_dispense_properties.submerge.delay.duration == 5.1
 
-    single_dispense_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    single_dispense_properties.retract.end_position.position_reference = "well-center"
     assert (
         single_dispense_properties.retract.end_position.position_reference.value
         == "well-center"
     )
-    single_dispense_properties.retract.end_position.offset = -9, -8, -7  # type: ignore[assignment]
+    single_dispense_properties.retract.end_position.offset = -9, -8, -7
     assert single_dispense_properties.retract.end_position.offset == Coordinate(
         x=-9, y=-8, z=-7
     )
@@ -252,7 +258,7 @@ def test_single_dispense_settings_override() -> None:
     assert single_dispense_properties.retract.touch_tip.speed == 543
     single_dispense_properties.retract.blowout.enabled = False
     assert single_dispense_properties.retract.blowout.enabled is False
-    single_dispense_properties.retract.blowout.location = "destination"  # type: ignore[assignment]
+    single_dispense_properties.retract.blowout.location = "destination"
     assert single_dispense_properties.retract.blowout.location
     assert single_dispense_properties.retract.blowout.location.value == "destination"
     single_dispense_properties.retract.blowout.flow_rate = 3.21
@@ -262,14 +268,30 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.retract.delay.duration = 0.1
     assert single_dispense_properties.retract.delay.duration == 0.1
 
-    single_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    single_dispense_properties.retract.blowout.blowout_position = TipPosition(
+        _position_reference=PositionReference.WELL_BOTTOM,
+        _offset=Coordinate(x=10, y=20, z=30),
+    )
+    assert (
+        single_dispense_properties.retract.blowout.blowout_position.position_reference
+        == PositionReference.WELL_BOTTOM
+    )
+    assert (
+        single_dispense_properties.retract.blowout.blowout_position.offset
+        == Coordinate(x=10, y=20, z=30)
+    )
+
+    single_dispense_properties.retract.blowout.blowout_position = None
+    assert single_dispense_properties.retract.blowout.blowout_position is None
+    single_dispense_properties.dispense_position = (
+        single_dispense_properties.submerge.start_position
+    )
     assert (
         single_dispense_properties.dispense_position.position_reference.value
-        == "liquid-meniscus"
+        == "well-bottom"
     )
-    single_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
     assert single_dispense_properties.dispense_position.offset == Coordinate(
-        x=11, y=22, z=-33
+        x=3, y=-2, z=1
     )
     single_dispense_properties.mix.enabled = False
     assert single_dispense_properties.mix.enabled is False
@@ -361,12 +383,12 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties = build_multi_dispense_properties(multi_dispense_data)
     assert multi_dispense_properties is not None
 
-    multi_dispense_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    multi_dispense_properties.submerge.start_position.position_reference = "well-bottom"
     assert (
         multi_dispense_properties.submerge.start_position.position_reference.value
         == "well-bottom"
     )
-    multi_dispense_properties.submerge.start_position.offset = 3, -2, 1  # type: ignore[assignment]
+    multi_dispense_properties.submerge.start_position.offset = 3, -2, 1
     assert multi_dispense_properties.submerge.start_position.offset == Coordinate(
         x=3, y=-2, z=1
     )
@@ -377,12 +399,12 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties.submerge.delay.duration = 5.1
     assert multi_dispense_properties.submerge.delay.duration == 5.1
 
-    multi_dispense_properties.retract.end_position.position_reference = "well-center"  # type: ignore[assignment]
+    multi_dispense_properties.retract.end_position.position_reference = "well-center"
     assert (
         multi_dispense_properties.retract.end_position.position_reference.value
         == "well-center"
     )
-    multi_dispense_properties.retract.end_position.offset = -9, -8, -7  # type: ignore[assignment]
+    multi_dispense_properties.retract.end_position.offset = -9, -8, -7
     assert multi_dispense_properties.retract.end_position.offset == Coordinate(
         x=-9, y=-8, z=-7
     )
@@ -398,7 +420,7 @@ def test_multi_dispense_settings_override() -> None:
     assert multi_dispense_properties.retract.touch_tip.speed == 543
     multi_dispense_properties.retract.blowout.enabled = False
     assert multi_dispense_properties.retract.blowout.enabled is False
-    multi_dispense_properties.retract.blowout.location = "destination"  # type: ignore[assignment]
+    multi_dispense_properties.retract.blowout.location = "destination"
     assert multi_dispense_properties.retract.blowout.location
     assert multi_dispense_properties.retract.blowout.location.value == "destination"
     multi_dispense_properties.retract.blowout.flow_rate = 3.21
@@ -408,12 +430,12 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties.retract.delay.duration = 0.1
     assert multi_dispense_properties.retract.delay.duration == 0.1
 
-    multi_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    multi_dispense_properties.dispense_position.position_reference = "liquid-meniscus"
     assert (
         multi_dispense_properties.dispense_position.position_reference.value
         == "liquid-meniscus"
     )
-    multi_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
+    multi_dispense_properties.dispense_position.offset = 11, 22, -33
     assert multi_dispense_properties.dispense_position.offset == Coordinate(
         x=11, y=22, z=-33
     )
@@ -484,3 +506,55 @@ def test_non_existent_property_raises_error() -> None:
 
     with pytest.raises(AttributeError):
         aspirate_properties.mix.enable = True  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize(
+    "tip_position, expected_position",
+    [
+        (
+            TipPosition(
+                _position_reference=PositionReference.WELL_BOTTOM,
+                _offset=Coordinate(x=1, y=2, z=3),
+            ),
+            TipPosition(
+                _position_reference=PositionReference.WELL_BOTTOM,
+                _offset=Coordinate(x=1, y=2, z=3),
+            ),
+        ),
+        (
+            {"position_reference": "well-top", "offset": {"x": 10, "y": 20, "z": 30}},
+            TipPosition(
+                _position_reference=PositionReference.WELL_TOP,
+                _offset=Coordinate(x=10, y=20, z=30),
+            ),
+        ),
+    ],
+)
+def test_ensure_validated_tip_position(
+    tip_position: Union[TipPosition, TipPositionDict], expected_position: TipPosition
+) -> None:
+    """It should set tip position properties correctly."""
+    validated_position = _ensure_validated_tip_position(tip_position)
+    assert validated_position == expected_position
+
+
+def test_ensure_validated_tip_position_raises_error() -> None:
+    """It should raise an error if the tip position is invalid."""
+    with pytest.raises(TypeError):
+        _ensure_validated_tip_position("invalid_tip_position")  # type: ignore[arg-type]
+
+    with pytest.raises(
+        ValueError,
+        match="Input should be 'well-bottom', 'well-top', 'well-center' or 'liquid-meniscus'",
+    ):
+        _ensure_validated_tip_position(
+            {"position_reference": "invalid", "offset": {"x": 10, "y": 20, "z": 30}}  # type: ignore[arg-type]
+        )
+
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        _ensure_validated_tip_position(
+            {  # type: ignore[arg-type]
+                "position_reference": "well-bottom",
+                "offset": {"x": 10, "y": 20, "z": 30, "w": 3},
+            }
+        )

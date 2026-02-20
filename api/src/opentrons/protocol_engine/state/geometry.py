@@ -773,20 +773,26 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
-        partially_configured: bool = False,
+        api_version_allows_partial_return_tip: bool = True,
         override_default_offset: float | None = None,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
+
+        In API levels before 2.28, we did not support dropping tips in a tip rack
+        while in a partial configuration. The boolean variable `api_version_allows_partial_return_tip`
+        will be set to False if called by a protocol API layer and the API level is both below
+        v2.28 and the pipette is partially configured.
         """
         if (
-            self._labware.get_definition(labware_id).parameters.isTiprack
-            and partially_configured
+            not api_version_allows_partial_return_tip
+            and self._labware.get_definition(labware_id).parameters.isTiprack
         ):
             raise errors.UnexpectedProtocolError(
-                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+                "Cannot return tip to a tip rack while the pipette is"
+                " configured for partial tip before API version 2.28."
             )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
@@ -1889,6 +1895,7 @@ class GeometryView:
         #   position of the liquid or doing dynamic tracking, return the initial height
         if (
             well_location.origin == WellOrigin.MENISCUS
+            and hasattr(well_location, "volumeOffset")
             and not well_location.volumeOffset
         ):
             return initial_handling_height

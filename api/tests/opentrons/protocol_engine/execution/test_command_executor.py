@@ -341,7 +341,7 @@ async def test_execute(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             RunCommandAction(
                 command_id="command-id", started_at=datetime(year=2022, month=2, day=2)
             )
@@ -510,7 +510,7 @@ async def test_execute_undefined_error(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             RunCommandAction(
                 command_id="command-id", started_at=datetime(year=2022, month=2, day=2)
             )
@@ -688,7 +688,7 @@ async def test_execute_defined_error(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             RunCommandAction(command_id=command_id, started_at=started_at)
         )
     ).then_do(

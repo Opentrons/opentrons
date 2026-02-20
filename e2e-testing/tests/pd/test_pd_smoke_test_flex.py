@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page, expect
 
+from automation.pd_pages import ProtocolEditorPage
 from automation.pd_pages.heater_shaker_step_form_page import _add_heater_shaker_step
 from automation.pd_pages.tc_step_form_page import _add_thermocycler_profile_step, _add_thermocycler_state_step
 from automation.pd_pages.tempdeck_step_form_page import _add_temperature_module_step
@@ -28,7 +29,7 @@ PROTOCOL_PATH = "fixtures/protocol/9/smoke_flex_setup.py"
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
+def test_pd_combined_smoke_flow(page: Page, pd_base_url: str) -> None:
     """Run a compact smoke flow that covers the requested module interactions.
 
     Steps:
@@ -40,8 +41,9 @@ def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
 
     If any Playwright action or assertion fails, the test will pause for debugging.
     """
+    _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
-    editor = _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
+    editor = ProtocolEditorPage(page)
     print("✓ File uploaded, ready for module steps")
     editor.add_step("Temperature")
     _add_temperature_module_step(page, "50")

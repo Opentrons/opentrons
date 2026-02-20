@@ -1,6 +1,6 @@
 """Module identification and response data mapping."""
 
-from typing import Annotated, List, Optional, Type, cast
+from typing import Annotated, Optional, Type, cast
 
 from fastapi import Depends
 from opentrons_hardware.hardware_control.types import PCBARevision
@@ -105,7 +105,7 @@ class ModuleDataMapper:
 
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
-                engaged=cast(bool, live_data["data"].get("engaged")),
+                engaged=live_data["data"].get("engaged"),
                 height=height_from_base,
             )
 
@@ -114,8 +114,8 @@ class ModuleDataMapper:
             assert ModuleDataValidator.is_temperature_module_data(live_data["data"])
             module_data = TemperatureModuleData(
                 status=TemperatureStatus(live_data["status"]),
-                targetTemperature=cast(float, live_data["data"].get("targetTemp")),
-                currentTemperature=cast(float, live_data["data"].get("currentTemp")),
+                targetTemperature=live_data["data"].get("targetTemp"),
+                currentTemperature=live_data["data"].get("currentTemp"),
             )
 
         elif module_type == ModuleType.THERMOCYCLER:
@@ -129,7 +129,7 @@ class ModuleDataMapper:
                 lidTemperatureStatus=cast(
                     TemperatureStatus, live_data["data"].get("lidTempStatus")
                 ),
-                lidTemperature=cast(float, live_data["data"].get("lidTemp")),
+                lidTemperature=live_data["data"].get("lidTemp"),
                 lidTargetTemperature=cast(float, live_data["data"].get("lidTarget")),
                 holdTime=cast(float, live_data["data"].get("holdTime")),
                 rampRate=cast(float, live_data["data"].get("rampRate")),
@@ -149,14 +149,14 @@ class ModuleDataMapper:
                     live_data["data"].get("labwareLatchStatus"),
                 ),
                 speedStatus=cast(SpeedStatus, live_data["data"].get("speedStatus")),
-                currentSpeed=cast(int, live_data["data"].get("currentSpeed")),
+                currentSpeed=live_data["data"].get("currentSpeed"),
                 targetSpeed=cast(int, live_data["data"].get("targetSpeed")),
                 temperatureStatus=cast(
                     TemperatureStatus, live_data["data"].get("temperatureStatus")
                 ),
-                currentTemperature=cast(float, live_data["data"].get("currentTemp")),
-                targetTemperature=cast(float, live_data["data"].get("targetTemp")),
-                errorDetails=cast(str, live_data["data"].get("errorDetails")),
+                currentTemperature=live_data["data"].get("currentTemp"),
+                targetTemperature=live_data["data"].get("targetTemp"),
+                errorDetails=live_data["data"].get("errorDetails"),
             )
         elif module_type == ModuleType.ABSORBANCE_READER:
             assert ModuleDataValidator.is_absorbance_reader_data(live_data["data"])
@@ -170,13 +170,9 @@ class ModuleDataMapper:
                     AbsorbanceReaderPlatePresence,
                     live_data["data"].get("platePresence"),
                 ),
-                measureMode=cast(str, live_data["data"].get("measureMode")),
-                sampleWavelengths=cast(
-                    List[int], live_data["data"].get("sampleWavelengths")
-                ),
-                referenceWavelength=cast(
-                    int, live_data["data"].get("referenceWavelength")
-                ),
+                measureMode=live_data["data"].get("measureMode"),
+                sampleWavelengths=live_data["data"].get("sampleWavelengths"),
+                referenceWavelength=live_data["data"].get("referenceWavelength"),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         elif module_type == ModuleType.FLEX_STACKER:
@@ -191,7 +187,7 @@ class ModuleDataMapper:
                 hopperDoorState=cast(
                     HopperDoorState, live_data["data"].get("hopperDoorState")
                 ),
-                installDetected=cast(bool, live_data["data"].get("installDetected")),
+                installDetected=live_data["data"].get("installDetected"),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
 

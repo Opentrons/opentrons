@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   Icon,
@@ -7,61 +8,69 @@ import {
   PrimaryButton,
   SecondaryButton,
   Slider,
+  StyledText,
 } from '@opentrons/components'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
+import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
 import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
-import type {
-  CameraImageSettings,
-  CameraImageSettingsResponse,
-} from '@opentrons/api-client'
+import type { CameraImageSettings } from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
   runId: string | null
-  postCameraImageSettings: UseMutateFunction<
-    CameraImageSettingsResponse,
-    AxiosError,
-    CameraImageSettings
-  >
 }
 
 export function CameraControls({
   onClose,
-  postCameraImageSettings,
   runId,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const settings = useCameraSettingsValues()
+  const settings = useCameraSettingsValues(runId)
+  const dispatch = useDispatch()
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
+
   const [isLoading, setIsLoading] = useState(false)
+
   const handleSave = (): void => {
     setIsLoading(true)
-    postCameraImageSettings(
-      {
-        zoom: settings.zoom,
-        brightness: settings.brightness,
-        contrast: settings.contrast,
-        saturation: settings.saturation,
-      },
-      {
+
+    const cameraImageSettings: CameraImageSettings = {
+      zoom: settings.zoom,
+      brightness: settings.brightness,
+      contrast: settings.contrast,
+      saturation: settings.saturation,
+    }
+
+    if (runId != null) {
+      dispatch(
+        updateCameraSpecificSettings(
+          runId,
+          'ot_system_camera',
+          cameraImageSettings
+        )
+      )
+      onClose()
+    } else {
+      createCameraImageSettings(cameraImageSettings, {
         onSuccess: () => {
           onClose()
         },
         onSettled: () => {
           setIsLoading(false)
         },
-      }
-    )
+      })
+    }
   }
+
   return (
     <Modal onClose={onClose} title={t('camera_controls')} width="46rem">
       <div className={styles.container}>
@@ -110,26 +119,47 @@ function CameraControlSettings({
     <div className={styles.settings_container}>
       <ZoomSettings zoom={settings.zoom} adjustZoom={settings.adjustZoom} />
       <Divider />
-      <Slider
-        title={t('brightness')}
-        subtext={t('adjust_brightness')}
-        adjustValue={settings.adjustBrightness}
-        value={settings.brightness}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('brightness')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_brightness')}
+          </StyledText>
+        </div>
+        <Slider
+          adjustValue={settings.adjustBrightness}
+          value={settings.brightness}
+        />
+      </div>
       <Divider />
-      <Slider
-        title={t('contrast')}
-        subtext={t('adjust_contrast')}
-        adjustValue={settings.adjustContrast}
-        value={settings.contrast}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('contrast')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_contrast')}
+          </StyledText>
+        </div>
+      </div>
+      <Slider adjustValue={settings.adjustContrast} value={settings.contrast} />
       <Divider />
-      <Slider
-        title={t('saturation')}
-        subtext={t('adjust_saturation')}
-        adjustValue={settings.adjustSaturation}
-        value={settings.saturation}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('saturation')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_saturation')}
+          </StyledText>
+        </div>
+        <Slider
+          adjustValue={settings.adjustSaturation}
+          value={settings.saturation}
+        />
+      </div>
     </div>
   )
 }

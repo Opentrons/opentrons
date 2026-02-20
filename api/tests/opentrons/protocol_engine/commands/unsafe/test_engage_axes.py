@@ -46,7 +46,7 @@ async def test_engage_axes_implementation(
     ).then_return([Axis.Z_L, Axis.P_L, Axis.X, Axis.Y])
 
     decoy.when(
-        await ot3_hardware_api.update_axis_position_estimations(
+        await ot3_hardware_api.update_axis_position_estimations(  # type: ignore[func-returns-value]
             [Axis.Z_L, Axis.P_L, Axis.X, Axis.Y]
         )
     ).then_return(None)

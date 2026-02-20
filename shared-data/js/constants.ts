@@ -52,6 +52,8 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
 export const ABSORBANCE_READER_V1: 'absorbanceReaderV1' = 'absorbanceReaderV1'
 export const FLEX_STACKER_MODULE_V1: 'flexStackerModuleV1' =
   'flexStackerModuleV1'
+export const VACUUM_MODULE_MILLIPORE_V1: 'vacuumModuleMilliporeV1' =
+  'vacuumModuleMilliporeV1'
 
 export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
@@ -99,6 +101,7 @@ export const ABSORBANCE_READER_TYPE: 'absorbanceReaderType' =
   'absorbanceReaderType'
 export const FLEX_STACKER_MODULE_TYPE: 'flexStackerModuleType' =
   'flexStackerModuleType'
+export const VACUUM_MODULE_TYPE: 'vacuumModuleType' = 'vacuumModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -120,6 +123,8 @@ export const ABSORBANCE_READER_MODELS = [ABSORBANCE_READER_V1]
 
 export const FLEX_STACKER_MODULE_MODELS = [FLEX_STACKER_MODULE_V1]
 
+export const VACUUM_MODULE_MODELS = [VACUUM_MODULE_MILLIPORE_V1]
+
 export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
 
 export const MODULE_MODELS = [
@@ -130,6 +135,7 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
   ...ABSORBANCE_READER_MODELS,
   ...FLEX_STACKER_MODULE_MODELS,
+  ...VACUUM_MODULE_MODELS,
 ]
 
 export const MODULE_MODELS_OT2_ONLY = [
@@ -146,6 +152,7 @@ export const MODULE_TYPES = [
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
@@ -278,12 +285,6 @@ export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [
   ...SINGLE_LEFT_CUTOUTS,
 ]
 export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
-export const ABSORBANCE_READER_CUTOUTS: CutoutId[] = [
-  'cutoutA3',
-  'cutoutB3',
-  'cutoutC3',
-  'cutoutD3',
-]
 
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
@@ -447,6 +448,8 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
   'flexStackerModuleV1C4'
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
+export const VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA: 'vacuumModuleMilliporeV1A3' =
+  'vacuumModuleMilliporeV1A3'
 
 export const exactMatchOnlyLoadNames = new Set([
   'milliplex_microtiter_plate',
@@ -462,6 +465,7 @@ export const exactMatchOnlyLoadNames = new Set([
   'opentrons_universal_flat_adapter_type_b',
 ])
 
+// TODO: (tz, 1/27/26): removed all these groupted aa
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,
@@ -517,11 +521,16 @@ export const FLEX_STACKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   FLEX_STACKER_D4_ADDRESSABLE_AREA,
 ]
 
+export const VACUUM_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA,
+]
+
 export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   THERMOCYCLER_ADDRESSABLE_AREA,
   ...ABSORBANCE_READER_ADDRESSABLE_AREAS,
   ...HEATERSHAKER_ADDRESSABLE_AREAS,
   ...TEMPERATURE_MODULE_ADDRESSABLE_AREAS,
+  ...VACUUM_MODULE_ADDRESSABLE_AREAS,
 ]
 
 export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
@@ -678,6 +687,8 @@ export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStacke
   'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
 export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
   'flexStackerModuleV1WithMagneticBlockV1'
+export const VACUUM_MODULE_MILLIPORE_V1_FIXTURE: 'vacuumModuleMilliporeV1' =
+  'vacuumModuleMilliporeV1'
 
 export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [moduleModel in ModuleModel]?: AreaType
@@ -688,6 +699,7 @@ export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [THERMOCYCLER_MODULE_V2]: 'thermocycler',
   [ABSORBANCE_READER_V1]: 'absorbanceReader',
   [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+  [VACUUM_MODULE_MILLIPORE_V1]: 'vacuumModule',
 }
 
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
@@ -697,6 +709,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   THERMOCYCLER_V2_FRONT_FIXTURE,
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_STACKER_V1_FIXTURE,
+  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
 ]
 
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
@@ -756,6 +769,10 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
 
+export const VACUUM_MODULE_FIXTURES: CutoutFixtureId[] = [
+  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
+]
+
 export const MODULE_FIXTURES_BY_MODEL: {
   [moduleModel in ModuleModel]?: CutoutFixtureId[]
 } = {
@@ -768,6 +785,7 @@ export const MODULE_FIXTURES_BY_MODEL: {
   ],
   [ABSORBANCE_READER_V1]: [ABSORBANCE_READER_V1_FIXTURE],
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
+  [VACUUM_MODULE_MILLIPORE_V1]: [VACUUM_MODULE_MILLIPORE_V1_FIXTURE],
 }
 
 export const DEFAULT_AA_FOR_WASTE_CHUTE =
@@ -845,6 +863,14 @@ export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
 ]
 
+// TODO: (tz, 2026-01-28) - find better name for this
+export const FIXTURES_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  ...([TRASH_BIN_ADAPTER_FIXTURE] as CutoutFixtureId[]),
+  ...WASTE_CHUTE_FIXTURES,
+  ...FAKE_FIXTURE_IDS,
+  ...STAGING_AREA_FIXTURES,
+]
+
 export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FLEX_STACKER_FIXTURES,
   ...MAGNETIC_BLOCK_FIXTURES,
@@ -853,6 +879,38 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...STAGING_AREA_FIXTURES,
 ]
 
+export const COMBO_FIXTURE_TO_FIXTURE_MAP: Partial<
+  Record<CutoutFixtureId, CutoutFixtureIdsWithFakes[]>
+> = {
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  ],
+}
+
 // a labware location when something has been used already on the deck
 // and moves to a new location that isn't accessible on or off the deck
 export const SYSTEM_LOCATION = 'systemLocation'
+
+export const PROTOCOL_ENGINE_LID_STACK_LOADNAME =
+  'protocol_engine_lid_stack_object'

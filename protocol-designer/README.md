@@ -41,7 +41,7 @@ We have an evolving set of feature flags for development, to avoid introducing r
 
 The environment variables start with `OT_PD_`. See the code for the current list. Use them like:
 
-```
+```bash
 OT_PD_COOL_FLAG=1 OT_PD_SWAG_FLAG=1 make dev
 ```
 
@@ -96,17 +96,22 @@ make -C protocol-designer build
 
 Notes:
 
-- The plugin is **disabled in CI**; it only runs locally when the `SENTRY_*` env vars are present.
+- The plugin is always enabled (to annotate React component names for better Sentry breadcrumbs), but it only uploads sourcemaps when the `SENTRY_*` env vars are present.
 - Local sourcemaps are uploaded under the Sentry release name `local-dev` so they don’t collide with real releases.
 - The runtime SDK is configured to report `release=local-dev` when local upload is enabled, so local events can resolve the uploaded sourcemaps.
 
 #### CI sourcemap upload (releases)
 
-CI uploads sourcemaps via `getsentry/action-release` (not the Vite plugin). See the workflow at `.github/workflows/pd-test-build-deploy.yaml`.
+CI uploads sourcemaps via the Vite plugin on tagged staging/production releases. See the workflow at `.github/workflows/pd-test-build-deploy.yaml`.
 
 - Sourcemaps are uploaded from `protocol-designer/dist`.
 - Upload only runs for tagged **staging** or **production** releases.
 - The release name comes from the tag version (e.g. `protocol-designer@8.8.0` → `8.8.0`).
+
+Implementation notes:
+
+- CI enables the upload by setting `OT_PD_SENTRY_PLUGIN_UPLOAD=true` for eligible tagged builds.
+- CI sets `SENTRY_RELEASE` to the tag version so runtime events match the uploaded sourcemaps.
 
 [chrome]: https://www.google.com/chrome/
 [json-schema]: https://json-schema.org/

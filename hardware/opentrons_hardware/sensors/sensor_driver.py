@@ -289,7 +289,7 @@ class LogListener:
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             if (
                 message.payload.sensor_id.value is not self.id
-                or message.payload.sensor is not self.type
+                or message.payload.sensor.value != self.type
             ):
                 # ignore sensor responses from other sensors
                 return

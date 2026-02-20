@@ -2,7 +2,7 @@
 
 from playwright.sync_api import Page, TimeoutError
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class DeckConfigPage(BasePage):
@@ -27,14 +27,18 @@ class DeckConfigPage(BasePage):
 
         Args:
             slot: Slot identifier like "C1", "D1", "D2", etc.
-                  For sandbox, use "cutoutC1", "cutoutD1", etc.
+                    For sandbox, use "cutoutC1", "cutoutD1", etc.
         """
         if self.is_sandbox and not slot.startswith("cutout"):
             # Convert regular slot to cutout format for sandbox
             selector = f"cutout{slot}"
             self.page.get_by_test_id(selector).nth(1).click()
         else:
-            self.click_test_id(slot)
+            if slot == "A4" or slot == "B4" or slot == "C4" or slot == "D4":
+                slot_name = f"fake{slot}"
+                self.page.get_by_test_id(slot_name).click()
+            else:
+                self.page.get_by_test_id(slot).click()
 
     def select_module(self, module_name: str) -> None:
         """Select a module from the module list.
@@ -61,13 +65,9 @@ class DeckConfigPage(BasePage):
         Args:
             fixture_name: Name of the fixture
         """
-        self.click_test_id("Fixtures")
 
-        # Handle different fixture names between environments
-        if self.is_sandbox and fixture_name == "Staging Area Slot":
-            self.click_test_id("Staging area slot")
-        else:
-            self.click_test_id(fixture_name)
+        self.page.get_by_test_id("Fixtures").click()
+        self.page.get_by_test_id(fixture_name).click()
 
     def confirm_deck_configuration(self) -> None:
         """Confirm the deck configuration."""
@@ -85,3 +85,11 @@ class DeckConfigPage(BasePage):
 
         self.click_button("Edit protocol")
         expect(self.page.get_by_role("button", name="Back to overview")).to_be_visible(timeout=5000)
+
+    def remove_fixture(self, fixture_name: str) -> None:
+        """Remove a fixture from the deck.
+
+        Args:
+            fixture_name: Name of the fixture to remove
+        """
+        self.page.get_by_role("button", name=fixture_name).click()

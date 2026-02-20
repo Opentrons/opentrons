@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
-import {
-  useAddCameraImageSettingsToRunMutation,
-  useCreateCameraImageSettings,
-} from '@opentrons/react-api-client'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
+import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
 import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
@@ -32,31 +31,41 @@ export function CameraControls({
   runId,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
-
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
-  const settings = useCameraSettingsValues()
-  const createGlobalCameraSettings = useCreateCameraImageSettings()
-  const createRunCameraSettings = useAddCameraImageSettingsToRunMutation(
-    runId || ''
-  )
+  const settings = useCameraSettingsValues(runId)
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
 
-  const returnToHomeView = (settings: CameraImageSettings): void => {
+  const returnToHomeView = (partialSettings: CameraImageSettings): void => {
     setIsLoading(true)
 
-    const createCameraSettings =
-      runId != null
-        ? createRunCameraSettings.addCameraImageSettingsToRun
-        : createGlobalCameraSettings.createCameraImageSettings
+    const cameraImageSettings: CameraImageSettings = {
+      zoom: partialSettings.zoom ?? settings.zoom,
+      brightness: partialSettings.brightness ?? settings.brightness,
+      contrast: partialSettings.contrast ?? settings.contrast,
+      saturation: partialSettings.saturation ?? settings.saturation,
+    }
 
-    createCameraSettings(settings, {
-      onSuccess: () => {
-        setActiveSubView(null)
-      },
-      onSettled: () => {
-        setIsLoading(false)
-      },
-    })
+    if (runId != null) {
+      dispatch(
+        updateCameraSpecificSettings(
+          runId,
+          'ot_system_camera',
+          cameraImageSettings
+        )
+      )
+      setActiveSubView(null)
+    } else {
+      createCameraImageSettings(cameraImageSettings, {
+        onSuccess: () => {
+          setActiveSubView(null)
+        },
+        onSettled: () => {
+          setIsLoading(false)
+        },
+      })
+    }
   }
 
   switch (activeSubView) {

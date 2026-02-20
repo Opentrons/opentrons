@@ -1,1 +1,5 @@
-"""Automation package for Protocol Designer e2e tests."""
+"""Automation package for e2e tests."""
+
+from .base_page import BasePage
+
+__all__ = ["BasePage"]

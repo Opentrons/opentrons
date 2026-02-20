@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
     RunTimeParameter,
-    SecondOrderCommandAnnotation,
+    SecondOrderCommandAnnotationLegacy,
 )
 from opentrons.protocol_runner import RunResult
 
@@ -105,7 +105,7 @@ def run_time_parameters() -> List[RunTimeParameter]:
 def command_annotations() -> List[CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        SecondOrderCommandAnnotation(
+        SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
             params={"abc": "123"},
             machineReadableName="hello world",
@@ -362,8 +362,8 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
-    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)
-    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

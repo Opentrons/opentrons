@@ -47,7 +47,7 @@ async def test_prepare_to_aspirate_implementation(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="some id")).then_return(
         False
     )
-    decoy.when(await pipetting.prepare_for_aspirate(pipette_id="some id")).then_return(
+    decoy.when(await pipetting.prepare_for_aspirate(pipette_id="some id")).then_return(  # type: ignore[func-returns-value]
         None
     )
     decoy.when(await gantry_mover.get_position("some id")).then_return(position)
@@ -90,7 +90,7 @@ async def test_overpressure_error(
     )
 
     decoy.when(
-        await pipetting.prepare_for_aspirate(
+        await pipetting.prepare_for_aspirate(  # type: ignore[func-returns-value]
             pipette_id=pipette_id,
         ),
     ).then_raise(PipetteOverpressureError())
