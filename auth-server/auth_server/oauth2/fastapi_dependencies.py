@@ -14,7 +14,7 @@ _app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
 
 
 def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
-    """Initialize the server's singleton OAuth 2 backend and store it for later retrieval.
+    """Store the server's singleton OAuth 2 backend in server state for later retrieval.
 
     This should be called once at server startup.
     """
