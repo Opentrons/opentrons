@@ -3,6 +3,8 @@ import { app, shell } from 'electron'
 import fs from 'fs-extra'
 import { v4 as uuidv4 } from 'uuid'
 
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { analyzeProtocolSource } from '../protocol-analysis'
 
 import type { Dirent } from 'fs'
@@ -36,8 +38,39 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
 export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
 
+export const OLD_OPENTRONS_APP_PATH = path.join(
+  path.dirname(app.getPath('userData')),
+  'Opentrons'
+)
+export const OLD_PROTOCOLS_DIRECTORY_PATH = path.join(
+  OLD_OPENTRONS_APP_PATH,
+  PROTOCOLS_DIRECTORY_NAME
+)
+
 function makeAnalysisFilePath(analysisDirPath: string): string {
   return path.join(analysisDirPath, `${new Date().getTime()}.json`)
+}
+
+export function isOT2Protocol(protocolDirPath: string): Promise<boolean> {
+  const analysisDir = path.join(
+    protocolDirPath,
+    PROTOCOL_ANALYSIS_DIRECTORY_NAME
+  )
+  return fs
+    .readdir(analysisDir)
+    .then(files => {
+      const jsonFiles = files.filter(f => f.endsWith('.json'))
+      if (jsonFiles.length === 0) {
+        return false
+      }
+
+      const mostRecent = jsonFiles.sort().pop() ?? ''
+      const analysisPath = path.join(analysisDir, mostRecent)
+      const analysis = fs.readJsonSync(analysisPath)
+
+      return analysis.robotType === OT2_ROBOT_TYPE
+    })
+    .catch(() => false)
 }
 
 export function readDirectoriesWithinDirectory(dir: string): Promise<string[]> {

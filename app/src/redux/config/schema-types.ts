@@ -300,4 +300,11 @@ export type ConfigV28 = Omit<ConfigV27, 'version'> & {
   }
 }
 
-export type Config = ConfigV28
+export type ConfigV29 = Omit<ConfigV28, 'version' | 'protocols'> & {
+  version: 29
+  protocols: ConfigV28['protocols'] & {
+    migratedOT2ProtocolsFromOldApp: boolean
+  }
+}
+
+export type Config = ConfigV29

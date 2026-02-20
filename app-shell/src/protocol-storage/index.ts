@@ -2,16 +2,19 @@ import path from 'path'
 import { shell } from 'electron'
 import fse from 'fs-extra'
 
+import { getConfig } from '../config'
 import {
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
+  updateConfigValue,
   updateProtocolList,
   updateProtocolListFailure,
 } from '../config/actions'
 import {
   ADD_PROTOCOL,
   ANALYZE_PROTOCOL,
+  CONFIG_INITIALIZED,
   FETCH_PROTOCOLS,
   INITIAL,
   OPEN_PROTOCOL_DIRECTORY,
@@ -110,6 +113,76 @@ export function preParityMigrateProtocolsFrom(
   }
 }
 
+export function migrateOT2ProtocolsFrom(
+  src: string,
+  dest: string,
+  dispatch: Dispatch
+): () => Promise<void> {
+  return function (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const config = getConfig()
+      if (config.protocols.migratedOT2ProtocolsFromOldApp) {
+        resolve()
+        return
+      }
+
+      fse
+        .stat(src)
+        .then(doesSrcExist => {
+          if (!doesSrcExist.isDirectory()) {
+            console.log(
+              'Old Opentrons app directory does not exist, skipping migration...'
+            )
+            dispatch(
+              updateConfigValue(
+                'protocols.migratedOT2ProtocolsFromOldApp',
+                true
+              )
+            )
+            resolve()
+            return
+          }
+
+          console.log('Migrating OT-2 protocols from old Opentrons app...')
+
+          return fse
+            .readdir(src)
+            .then(items => {
+              const migrationTasks = items.map(item => {
+                const srcItem = path.join(src, item)
+                const destItem = path.join(dest, item)
+
+                return FileSystem.isOT2Protocol(srcItem).then(isOT2 => {
+                  if (isOT2) {
+                    return fse.copy(srcItem, destItem, { overwrite: false })
+                  }
+                })
+              })
+
+              return Promise.all(migrationTasks)
+            })
+            .then(() => {
+              dispatch(
+                updateConfigValue(
+                  'protocols.migratedOT2ProtocolsFromOldApp',
+                  true
+                )
+              )
+              console.log('OT-2 protocol migration complete.')
+              resolve()
+            })
+        })
+        .catch(e => {
+          console.log(`Error migrating OT-2 protocols: ${e}`)
+          dispatch(
+            updateConfigValue('protocols.migratedOT2ProtocolsFromOldApp', true)
+          )
+          resolve()
+        })
+    })
+  }
+}
+
 export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
@@ -166,8 +239,24 @@ export const fetchProtocols = (
 }
 
 export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
+  const migrateProtocolsFromOldAppDirectory = migrateOT2ProtocolsFrom(
+    FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH,
+    FileSystem.PROTOCOLS_DIRECTORY_PATH,
+    dispatch
+  )
+
   return function handleActionForProtocolStorage(action: Action) {
     switch (action.type) {
+      case CONFIG_INITIALIZED: {
+        const config = action.payload.config
+        if (!config.protocols.migratedOT2ProtocolsFromOldApp) {
+          void migrateProtocolsFromOldAppDirectory().then(() =>
+            fetchProtocols(dispatch, INITIAL)
+          )
+        }
+        break
+      }
+
       case FETCH_PROTOCOLS:
       case UI_INITIALIZED: {
         const source = action.type === FETCH_PROTOCOLS ? POLL : INITIAL
