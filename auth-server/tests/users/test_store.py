@@ -4,10 +4,8 @@ from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import Base, sql_engine_ctx
 from auth_server.persistence.tables import AccountType
-from auth_server.users.service import UserService, hash_password
-from auth_server.users.store import UserStore
-
-HASHED_PW = hash_password("securepassword123")
+from auth_server.users.user_data_manager import UserDataManager, password_hash, UserStore
+HASHED_PW = password_hash.hash("securepassword123")
 
 
 @pytest.fixture()
@@ -16,7 +14,7 @@ def user_store() -> UserStore:
     with sql_engine_ctx() as engine:
         Base.metadata.create_all(engine)
         store = UserStore(sql_engine=engine)
-        service = UserService(user_store=store)
+        service = UserDataManager(user_store=store)
         service.seed_initial_users()
         yield store  # type: ignore[misc]
 
