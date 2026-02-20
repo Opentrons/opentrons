@@ -43,7 +43,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         else:
             _file_name = self.path_elements[-1]
         file_path = Path(__file__).parent / _file_name
-        print(f'file_path: {file_path}')
+        # print(f'file_path: {file_path}')
         with open(file_path, "rb") as f:
             file = f.read(-1)
         if ".html" in _file_name:
@@ -74,50 +74,52 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         _ret.sort(key=lambda f: abs(time() - f.stat().st_mtime))
         return _ret
 
+    def _parse_csv_file(self, file_path: Path) -> dict:
+        """Parse a CSV file and return a dict with column arrays."""
+        result: dict = {"name": str(file_path.stem)}
+        with open(file_path, "r") as f:
+            csv_data = f.readlines()
+            # print(f'csv_data ({file_path.name}): {csv_data}')
+        if not csv_data:
+            return result
+        header = csv_data[0].strip().split(",")
+        for col in header:
+            result[col] = []
+        for line in csv_data[1:]:
+            if line.strip():
+                values = line.strip().split(",")
+                for i, col in enumerate(header):
+                    if i < len(values):
+                        try:
+                            result[col].append(float(values[i]))
+                        except ValueError:
+                            result[col].append(values[i])
+        return result
+
     def _respond_to_data_request(self) -> None:
         req_cmd = self.path_elements[1]
         if req_cmd != "latest":
             raise NotImplementedError(f"unable to process command: {req_cmd}")
 
-        # Debug: Log the plot directory
-        print(f"Plot directory: {self.plot_directory}")
+        # File patterns to search for - each becomes a key in the response
+        #---------------------Add file names that needs to be search----------------------------------
+        file_patterns = ["PressureData", "FlowrateData"]
 
-        # Find the latest CSV file in the plot directory
-        path_list = self._list_file_paths_in_directory(self.plot_directory, "PressureData")
-
-        # Debug: Log the files found in the directory
-        print(f"Files in directory: {[f.name for f in self.plot_directory.iterdir()]}")
-        print(f"Filtered files: {path_list}")
-
-        response_data = {
+        response_data: dict = {
             "directory": str(self.plot_directory.resolve()),
-            "files": [],
-            "name": "",
-            "csv": "",
         }
 
-        if path_list:
-            file_name = path_list[0]
-            response_data["name"] = str(file_name.stem)
-            print(f'file_name: {file_name.stem}')
-            with open(file_name, "r") as f:
-                csv_data = f.readlines()
-                print(f'csv_data: {csv_data}')
-            # Parse the CSV file - dynamically handle all columns
-            header = csv_data[0].strip().split(",")
-            # Initialize empty lists for every column in the header
-            for col in header:
-                response_data[col] = []
-
-            for line in csv_data[1:]:
-                if line.strip():
-                    values = line.strip().split(",")
-                    for i, col in enumerate(header):
-                        if i < len(values):
-                            response_data[col].append(float(values[i]))
+        for pattern in file_patterns:
+            path_list = self._list_file_paths_in_directory(
+                self.plot_directory, pattern
+            )
+            # print(f"Pattern '{pattern}': found {len(path_list)} files")
+            if path_list:
+                response_data[pattern] = self._parse_csv_file(path_list[0])
+            else:
+                response_data[pattern] = {"name": "", "error": f"No {pattern} file found"}
 
         response_str = json.dumps({req_cmd: response_data})
-        print(f'response_str: {response_str}')
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def _respond_to_new_name_request(self) -> None:
@@ -126,15 +128,14 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         else:
             new_name = self.path_elements[1]
             dir_path = create_folder_for_test_data(new_name)
-            print(f'{dir_path}')
+            # print(f'{dir_path}')
             response_str = json.dumps({"name": new_name})
-            print(f'resp: {response_str}')
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def do_GET(self) -> None:
         """Do GET."""
         try:
-            print(f'path_elements: {self.path_elements}')
+            # print(f'path_elements: {self.path_elements}')
             if len(self.path_elements) > 1 and self.path_elements[0] == "data":
                 self._respond_to_data_request()
             elif len(self.path_elements) > 0 and self.path_elements[0] == "name":
@@ -163,4 +164,4 @@ def run(test_name: str, http_port: int) -> None:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    server.server_close()
+    # server.server_close()

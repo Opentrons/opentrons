@@ -37,12 +37,12 @@ class AbstractMassFlowSensor(Protocol):
     async def get_flow_rate(self, timeout: float = 1.0) -> float:
         """Read flow rate in sLm"""
         ...
-        
+
     def set_csv_filename(self, new_path: str) -> None:
         """Name the csv file"""
         ...
 
-    async def read_continuous_data(self):
+    async def read_continuous_data(self, run_time):
         """Record flow rate in sLm"""
         ...
     
@@ -62,7 +62,7 @@ class MassFlowSensor(AbstractMassFlowSensor):
         self._sensor = sensor  # Expect a Serial object here
 
     @classmethod
-    async def create(cls, port: str, csv_path: str, loop: Optional[asyncio.AbstractEventLoop]) -> "MassFlowSensor":
+    async def create(cls, port: str, csv_path: str, loop: Optional[asyncio.AbstractEventLoop] = None) -> "MassFlowSensor":
         conn = serial.Serial(port=port, baudrate=BAUDRATE, timeout=TIMEOUT)
         return cls(sensor=conn, csv_path=csv_path)
     
@@ -146,16 +146,18 @@ class MassFlowSensor(AbstractMassFlowSensor):
             return
         self.csv_path = new_path
         self._csv_initialized = False
+        print(f'file_name: {self.csv_path}')
         logging.info("CSV file path updated to %s", self.csv_path)
 
-    async def read_continuous_data(self):
+    async def read_continuous_data(self, run_time):
         """Read and print continuous data from the vacuum pump."""
+        start_time = time.perf_counter()
         try:
-            while not self._stop_requested:
+            while time.perf_counter() - start_time < run_time:
                 flow_rate = await self.get_flow_rate()
-                ts = time.perf_counter() - self.st
+                ts = round(time.perf_counter() - start_time, 2)  # Round to 2 decimal places
                 self._write_to_csv(ts, flow_rate)
-                print(f'time(s): {ts}.2f, flow_rate: {flow_rate}')
+                print(f'time(s): {ts:.2f}, flow_rate: {flow_rate}')
                 logging.info("time(s): %.2f, flow_rate: %.2f", ts, flow_rate)
         except ValueError as e:
             logging.error("Error reading continuous data: %s", e)
@@ -167,22 +169,22 @@ class MassFlowSensor(AbstractMassFlowSensor):
         """Signal to stop continuous data reading."""
         self._stop_requested = True
 
-async def main(file_name, loop):
-    sensor = await MassFlowSensor.create(port="/dev/ttyACM1", csv_path=file_name, loop=loop)
-    try:
-        sensor.set_csv_filename(file_name)
-        await sensor.read_continuous_data()
-        await loop.sleep(10)
-        await sensor.stop()
-    except Exception as e:
-        logging.critical("Critical failure: %s", e)
+# async def main(file_name, loop):
+#     print(f'file_name: {file_name}')
+#     sensor = await MassFlowSensor.create(port="/dev/ttyACM1", csv_path=file_name, loop=loop)
+#     try:
+#         sensor.set_csv_filename(file_name)
+#         asyncio.create_task(sensor.read_continuous_data())
+#         await asyncio.sleep(5)
+#         await sensor.stop()
+#     except Exception as e:
+#         logging.critical("Critical failure: %s", e)
 
 
-if __name__ == "__main__":
-    logging.info("Flow rate sensor initialized.")
-    current_datetime = datetime.datetime.now(datetime.UTC)
-    file_name = str(f'/data/testing_data/example-test/FlowrateData_{current_datetime}.csv')
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    asyncio.run(main(file_name, loop))
-    
+# if __name__ == "__main__":
+#     logging.info("Flow rate sensor initialized.")
+#     current_datetime = datetime.datetime.utcnow().strftime("%y-%m-%d %H:%M")
+#     file_name = '/data/testing_data/example-test/FlowrateData_{current_datetime}.csv'
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     asyncio.run(main(file_name, loop))

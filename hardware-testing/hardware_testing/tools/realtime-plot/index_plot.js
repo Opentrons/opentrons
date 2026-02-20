@@ -1,21 +1,24 @@
 // Plot configurations - add/remove entries here to control which plots are displayed
+// Each plot can specify a filePattern to load data from a different CSV file
 const plotConfigs = [
   {
     divId: 'plotly1',
-    xColumn: 'Time',
-    yColumns: ['Pressure'],
+    xColumn: 'Time(s)',
+    yColumns: ['current_guage_pressure'],
     title: 'Pressure vs Time',
     yAxisLabel: 'Pressure (mbar)',
     colors: ['#006fff'],
+    filePattern: 'PressureData',  // matches CSV files containing "PressureData" in the name
   },
-  // {
-  //   divId: 'plotly2',
-  //   xColumn: 'Time',
-  //   yColumns: ['Temperature'],
-  //   title: 'Temperature vs Time',
-  //   yAxisLabel: 'Temperature',
-  //   colors: ['#ff5733'],
-  // },
+  {
+    divId: 'plotly2',
+    xColumn: 'Time(s)',
+    yColumns: ['Flow_rate(sLM)'],
+    title: 'Flow Rate(sLM) vs Time',
+    yAxisLabel: 'Flow Rate(sLm)',
+    colors: ['#ff3a33'],
+    filePattern: 'FlowrateData',  // matches CSV files containing "FlowRate" in the name
+  },
 ]
 
 const testNames = [
@@ -55,8 +58,13 @@ function initializePlots() {
   });
 }
 
-function updatePlot(config, responseData) {
-  const timeData = responseData.latest[config.xColumn];
+function updatePlot(config, fileData) {
+  if (!fileData) {
+    console.error('No data returned for plot:', config.title, '(filePattern:', config.filePattern, ')');
+    return;
+  }
+
+  const timeData = fileData[config.xColumn];
 
   if (!Array.isArray(timeData)) {
     console.error('Invalid time data for plot:', config.title);
@@ -64,7 +72,7 @@ function updatePlot(config, responseData) {
   }
 
   const newData = config.yColumns.map((yColumn, i) => {
-    const yData = responseData.latest[yColumn];
+    const yData = fileData[yColumn];
 
     if (!Array.isArray(yData)) {
       console.error('Invalid data for column:', yColumn);
@@ -82,7 +90,7 @@ function updatePlot(config, responseData) {
   }).filter(Boolean);
 
   const layout = {
-    title: responseData.latest.name || config.title,
+    title: fileData.name || config.title,
     xaxis: { title: config.xColumn + ' (s)', autorange: true },
     yaxis: { title: config.yAxisLabel, autorange: true },
     uirevision: true,
@@ -93,7 +101,9 @@ function updatePlot(config, responseData) {
 
 function updateAllPlots(responseData) {
   plotConfigs.forEach((config) => {
-    updatePlot(config, responseData);
+    // Each plot's data is keyed by its filePattern in the response
+    const fileData = responseData.latest[config.filePattern];
+    updatePlot(config, fileData);
   });
 }
 
@@ -173,7 +183,6 @@ window.addEventListener('load', function (evt) {
     oReq.addEventListener('load', function () {
       _clearTimeout();
       const responseData = JSON.parse(this.responseText);
-      console.log('Response Data:', responseData);
 
       // Update ALL plots with the latest data
       updateAllPlots(responseData);
