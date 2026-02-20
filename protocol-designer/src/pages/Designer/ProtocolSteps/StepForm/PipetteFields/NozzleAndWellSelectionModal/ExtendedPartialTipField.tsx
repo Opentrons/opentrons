@@ -71,12 +71,16 @@ export function ExtendedPartialTipField(
     ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
         .def as LabwareDefinition)
     : null
-
+  const partialChannels =
+    primaryNozzle in partialNozzleMap
+      ? partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
+      : 0
   const aspWellsLength = aspLabwareDef
     ? getWellGroupLength(
         aspWells.length,
         aspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 
@@ -84,7 +88,8 @@ export function ExtendedPartialTipField(
     ? getWellGroupLength(
         dspWells.length,
         dspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 

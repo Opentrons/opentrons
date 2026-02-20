@@ -94,6 +94,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
+  const allWells = labwareDef.ordering.flat()
   const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
@@ -135,13 +136,53 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }, [stepType])
 
   const flatSelectedWells = useMemo(() => selectedWells.flat(), [selectedWells])
+  const allWellsWithStatus = allWells.reduce<Record<string, number>>(
+    (acc, wellName) => {
+      const safe = robotState
+        ? getIsSafePipetteMovement({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: wellName,
+            primaryNozzle,
+            nozzleConfiguration,
+          })
+        : true
 
+      acc[wellName] = safe ? 0 : 1
+      return acc
+    },
+    {}
+  )
+
+  const allWellsWithState = allWells.reduce<Record<string, WellType>>(
+    (acc, wellName) => {
+      const accessible = allWellsWithStatus[wellName] === 0
+
+      if (hoveredWells?.includes(wellName) && !accessible) {
+        acc[wellName] = SELECTED_ERROR
+      } else if (!accessible) {
+        acc[wellName] = INACCESSIBLE
+      } else if (
+        flatSelectedWells.includes(wellName) ||
+        hoveredWells?.includes(wellName)
+      ) {
+        acc[wellName] = SELECTED
+      } else {
+        acc[wellName] = UNSELECTED
+      }
+      return acc
+    },
+    {}
+  )
   const inaccessiblePartialWells = useMemo(() => {
     if (!isPartialNozzle || selectedWells.length === 0) return []
 
     return getInaccessibleWellsForPartialNozzleRowMap(
       selectedWells,
       labwareDef.ordering,
+      allWellsWithState,
       partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
     )
   }, [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering])
@@ -149,7 +190,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const deckDef = getDeckDefFromRobotType(robotType)
   const slot = getSlotInLocationStack(labware.stack)
   const slotPosition = getPositionFromSlotId(slot, deckDef)
-  const allWells = labwareDef.ordering.flat()
+
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
   const handleClickWell = (wellName: string): void => {
@@ -161,19 +202,36 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       channels
     )
 
-    const wellsField = getWellsField()
-    setSelectedWells(prev => {
-      const next = [...prev]
+    const hasInaccessibleWell = wellsToToggle.some(well => {
+      const isSafe = robotState
+        ? getIsSafePipetteMovement({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: well,
+            primaryNozzle,
+            nozzleConfiguration,
+          })
+        : true
 
-      const groupIndex = next.findIndex(
-        group =>
-          group.length === wellsToToggle.length &&
-          group.every(w => wellsToToggle.includes(w))
+      const isPartialBlocked = inaccessiblePartialWells.includes(well)
+
+      return !isSafe || isPartialBlocked
+    })
+
+    if (hasInaccessibleWell) return
+
+    const wellsField = getWellsField()
+
+    setSelectedWells(prev => {
+      const next = prev.filter(
+        group => !group.some(well => wellsToToggle.includes(well))
       )
 
-      if (groupIndex !== -1) {
-        next.splice(groupIndex, 1)
-      } else {
+      const hadOverlap = next.length !== prev.length
+
+      if (!hadOverlap) {
         next.push(wellsToToggle)
       }
 
@@ -240,55 +298,23 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   let controls: JSX.Element = <></>
 
   if (slotPosition && labware && robotState) {
-    const allWellsWithStatus = allWells.reduce<Record<string, number>>(
-      (acc, wellName) => {
-        acc[wellName] = getIsSafePipetteMovement({
-          robotState,
-          invariantContext,
-          pipetteId,
-          labwareId,
-          wellTargetName: wellName,
-          primaryNozzle,
-          nozzleConfiguration,
-        })
-          ? 0
-          : 1
-        return acc
-      },
-      {}
-    )
-
-    const allWellsWithState = allWells.reduce<Record<string, WellType>>(
-      (acc, wellName) => {
-        const accessible = allWellsWithStatus[wellName] === 0
-
-        if (hoveredWells?.includes(wellName) && !accessible) {
-          acc[wellName] = SELECTED_ERROR
-        } else if (!accessible) {
-          acc[wellName] = INACCESSIBLE
-        } else if (
-          flatSelectedWells.includes(wellName) ||
-          hoveredWells?.includes(wellName)
-        ) {
-          acc[wellName] = SELECTED
-        } else {
-          acc[wellName] = UNSELECTED
-        }
-
-        return acc
-      },
-      {}
-    )
-
     inaccessiblePartialWells.forEach(well => {
       if (!flatSelectedWells.includes(well)) {
-        allWellsWithState[well] = INACCESSIBLE
+        if (hoveredWells?.includes(well)) {
+          allWellsWithState[well] = SELECTED_ERROR
+        } else {
+          allWellsWithState[well] = INACCESSIBLE
+        }
       }
     })
-
     const hoveredIsSelected = hoveredWells
       ? hoveredWells.every(w => flatSelectedWells.includes(w))
       : false
+    const isAccessible = hoveredWells
+      ? hoveredWells.every(w => {
+          return allWellsWithState[w] !== SELECTED_ERROR
+        })
+      : true
 
     controls = (
       <>
@@ -316,10 +342,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
             isHoveredWellSelected={hoveredIsSelected}
-            isAccessible={
-              allWellsWithState[hoveredWells[0]] !== INACCESSIBLE &&
-              allWellsWithState[hoveredWells[0]] !== SELECTED_ERROR
-            }
+            isAccessible={isAccessible}
             inaccessibleReason={
               inaccessiblePartialWells.includes(hoveredWells[0])
                 ? INACCESSIBLE_PARTIAL_TIP

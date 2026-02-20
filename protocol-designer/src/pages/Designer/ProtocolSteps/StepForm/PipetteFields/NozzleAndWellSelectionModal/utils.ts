@@ -1,3 +1,4 @@
+import { INACCESSIBLE } from '@opentrons/components'
 import {
   A1_NOZZLE,
   A12_NOZZLE,
@@ -17,7 +18,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -229,6 +230,7 @@ export const remainingWellsInAColumn = (
 export const getInaccessibleWellsForPartialNozzleRowMap = (
   selectedWells: string[][],
   wellDefMap: string[][],
+  allWellsWithState: Record<string, WellType>,
   channels: number
 ): string[] => {
   const inaccessible: string[] = []
@@ -247,13 +249,18 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
           startingWellIndex,
           endingWellIndex
         )
-
         unselectedPortionOfColumn.forEach(wellChunk => {
-          if (wellChunk.length < channels) {
-            inaccessible.push(...wellChunk)
-          }
+          if (
+            wellChunk.some(well =>
+              allWellsWithState[well] === INACCESSIBLE
+                ? inaccessible.push(well)
+                : null
+            )
+          )
+            if (wellChunk.length < channels) {
+              inaccessible.push(...wellChunk)
+            }
         })
-
         break
       }
     }
@@ -265,7 +272,8 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
 export function getWellGroupLength(
   totalSelected: number,
   ordering: string[][],
-  nozzleConfiguration: NozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle,
+  partialChannels: number
 ): number {
   const rows = ordering.length
   const columns = ordering[0]?.length ?? 0
@@ -274,6 +282,11 @@ export function getWellGroupLength(
       return totalSelected / rows
     case COLUMN:
       return totalSelected / columns
+    case PARTIAL:
+      if (ordering.length === 1) {
+        return totalSelected
+      }
+      return totalSelected * partialChannels
     default:
       return totalSelected / 1
   }

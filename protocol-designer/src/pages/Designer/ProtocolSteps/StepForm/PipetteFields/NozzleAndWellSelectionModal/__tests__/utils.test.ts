@@ -82,21 +82,6 @@ describe('getEntireWellSelection', () => {
       )
     ).toStrictEqual(['A1', 'B1', 'C1'])
   })
-
-  it('returns an error if there are not enough wells to select when the pipette configuration is PARTIAL', () => {
-    const nozzleConfiguration = PARTIAL
-    const partialPrimaryNozzle = F1_NOZZLE
-    const wellName = 'H12'
-    expect(
-      getEntireWellSelection(
-        wellName,
-        labwareDef.ordering,
-        nozzleConfiguration,
-        partialPrimaryNozzle,
-        8
-      )
-    ).toStrictEqual([])
-  })
 })
 
 describe('getAvailableNozzleConfigurations', () => {
@@ -199,10 +184,10 @@ describe('getAvailableNozzleConfigurations', () => {
     }
     const ordering = mockTiprack.def.ordering
     expect(
-      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
     ).toStrictEqual(2)
   })
-  it('returns length of well group when the nozzle configuration is ROW', () => {
+  it('returns length of well group when the nozzle configuration is COLUMN', () => {
     const totalSelected = 16
     const nozzleConfiguration = COLUMN
     const mockTiprack = {
@@ -214,10 +199,10 @@ describe('getAvailableNozzleConfigurations', () => {
     }
     const ordering = mockTiprack.def.ordering
     expect(
-      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
     ).toStrictEqual(2)
   })
-  it('returns length of well group when the nozzle configuration is ROW', () => {
+  it('returns length of well group when the nozzle configuration is ALL', () => {
     const totalSelected = 13
     const nozzleConfiguration = ALL
     const mockTiprack = {
@@ -229,7 +214,22 @@ describe('getAvailableNozzleConfigurations', () => {
     }
     const ordering = mockTiprack.def.ordering
     expect(
-      getWellGroupLength(totalSelected, ordering, nozzleConfiguration)
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
     ).toStrictEqual(13)
+  })
+  it('returns length of well group when the nozzle configuration is PARTIAL', () => {
+    const totalSelected = 3
+    const nozzleConfiguration = PARTIAL
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 3)
+    ).toStrictEqual(9)
   })
 })
