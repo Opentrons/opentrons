@@ -315,12 +315,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           return allWellsWithState[w] !== SELECTED_ERROR
         })
       : true
-    const inaccessibleReason = inaccessiblePartialWells.filter(well =>
-      hoveredWells?.includes(well)
-    )
-      ? INACCESSIBLE_PARTIAL_TIP
-      : INACCESSIBLE_COLLISION
 
+    const inaccessibleReason =
+      inaccessiblePartialWells.filter(well => hoveredWells?.includes(well))
+        .length > 0
+        ? INACCESSIBLE_PARTIAL_TIP
+        : INACCESSIBLE_COLLISION
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />

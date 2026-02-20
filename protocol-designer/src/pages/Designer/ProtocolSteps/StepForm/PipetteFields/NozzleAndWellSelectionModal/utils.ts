@@ -209,24 +209,6 @@ export const getEntireWellSelection = (
   }
 }
 
-export const remainingWellsInAColumn = (
-  column: string[],
-  startingWellIndex: number,
-  endingWellIndex: number
-): string[][] => {
-  const lengthOfColumn = column.length
-  const remainingWells: string[][] = []
-  if (startingWellIndex !== 0) {
-    const startingChunk = column.slice(0, startingWellIndex)
-    remainingWells.push(startingChunk)
-  }
-  if (startingWellIndex !== lengthOfColumn) {
-    const endingChunk = column.slice(endingWellIndex, lengthOfColumn)
-    remainingWells.push(endingChunk)
-  }
-  return remainingWells
-}
-
 export const getInaccessibleWellsForPartialNozzleRowMap = (
   selectedWells: string[][],
   wellDefMap: string[][],
@@ -234,23 +216,24 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
   channels: number
 ): string[] => {
   const inaccessible: string[] = []
-
   for (const column of wellDefMap) {
     const selectedInColumn = selectedWells
       .flat()
       .filter(well => column.includes(well))
-    const unselectedWells = column.filter(
-      well => !selectedInColumn.includes(well)
+    if (selectedInColumn.length === 0) {
+      continue
+    }
+
+    const accessibleUnselected = column.filter(
+      well =>
+        !selectedInColumn.includes(well) &&
+        allWellsWithState[well] !== INACCESSIBLE
     )
 
-    unselectedWells.forEach(well => {
-      if (allWellsWithState[well] === INACCESSIBLE) {
-        inaccessible.push(well)
-      }
-    })
-
-    if (unselectedWells.length > 0 && unselectedWells.length < channels) {
-      unselectedWells.forEach(well => {
+    const slotsLeft = channels - selectedInColumn.length
+    if (accessibleUnselected.length > slotsLeft) {
+      const newlyInaccessible = accessibleUnselected.slice(slotsLeft)
+      newlyInaccessible.forEach(well => {
         if (!inaccessible.includes(well)) {
           inaccessible.push(well)
         }
