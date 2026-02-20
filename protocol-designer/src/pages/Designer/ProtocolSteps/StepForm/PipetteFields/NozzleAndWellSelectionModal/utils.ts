@@ -257,9 +257,13 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
                 : null
             )
           )
-            if (wellChunk.length < channels) {
-              inaccessible.push(...wellChunk)
-            }
+            console.log(
+              '🚀 ~ getInaccessibleWellsForPartialNozzleRowMap ~ wellChunk:',
+              wellChunk
+            )
+          if (wellChunk.length < channels) {
+            inaccessible.push(...wellChunk)
+          }
         })
         break
       }

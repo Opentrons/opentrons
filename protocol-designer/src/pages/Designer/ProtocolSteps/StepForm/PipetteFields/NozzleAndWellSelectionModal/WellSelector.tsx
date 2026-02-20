@@ -308,13 +308,18 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
     })
     const hoveredIsSelected = hoveredWells
-      ? hoveredWells.every(w => flatSelectedWells.includes(w))
+      ? hoveredWells.some(w => flatSelectedWells.includes(w))
       : false
     const isAccessible = hoveredWells
       ? hoveredWells.every(w => {
           return allWellsWithState[w] !== SELECTED_ERROR
         })
       : true
+    const inaccessibleReason = inaccessiblePartialWells.filter(well =>
+      hoveredWells?.includes(well)
+    )
+      ? INACCESSIBLE_PARTIAL_TIP
+      : INACCESSIBLE_COLLISION
 
     controls = (
       <>
@@ -343,11 +348,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             hasPickupsRemaining={null}
             isHoveredWellSelected={hoveredIsSelected}
             isAccessible={isAccessible}
-            inaccessibleReason={
-              inaccessiblePartialWells.includes(hoveredWells[0])
-                ? INACCESSIBLE_PARTIAL_TIP
-                : INACCESSIBLE_COLLISION
-            }
+            inaccessibleReason={inaccessibleReason}
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
             nozzles={nozzleConfiguration}
