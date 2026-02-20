@@ -1,8 +1,11 @@
+from pathlib import Path
+from typing import Generator
+
 import pytest
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.database import Base, sql_engine_ctx
+from auth_server.persistence.database import Base, create_schema, sql_engine_ctx
 from auth_server.persistence.tables import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
@@ -14,10 +17,11 @@ HASHED_PW = password_hash.hash("securepassword123")
 
 
 @pytest.fixture()
-def user_store() -> UserStore:
-    """Provide a UserStore backed by a fresh in-memory DB with seed users."""
-    with sql_engine_ctx() as engine:
-        Base.metadata.create_all(engine)
+def user_store(tmp_path: Path) -> Generator[UserStore, None, None]:
+    """Provide a UserStore backed by a fresh SQLite DB with seed users."""
+    db_path = tmp_path / "test_auth.db"
+    with sql_engine_ctx(db_path) as engine:
+        create_schema(engine)
         store = UserStore(sql_engine=engine)
         service = UserDataManager(user_store=store)
         service.seed_initial_users()

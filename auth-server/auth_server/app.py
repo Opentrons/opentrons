@@ -1,7 +1,8 @@
 """The server's ASGI app object."""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from pathlib import Path
+from typing import AsyncGenerator, Optional
 
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html
@@ -16,26 +17,54 @@ from auth_server.authorization_checker import build_authorization_checker
 from auth_server.oauth2.backend import build as build_oauth2_backend
 from auth_server.oauth2.fastapi_dependencies import install_oauth2_backend
 from auth_server.oauth2.router import router as oauth2_router
+from auth_server.persistence.database import create_schema, sql_engine_ctx
+from auth_server.persistence.fastapi_dependencies import (
+    set_persistence_directory,
+    set_sql_engine,
+)
+from auth_server.persistence.file_and_directory_names import DB_FILE
+from auth_server.persistence.persistence_directory import (
+    prepare_active_subdirectory,
+    prepare_root,
+)
+from auth_server.server_settings import AuthServerSettings, get_settings
 from auth_server.settings.router import router as settings_router
 from auth_server.settings.store import SettingsStore, install_settings_store
 from auth_server.users.router import router as users_router
+from auth_server.users.store import UserStore
+from auth_server.users.user_data_manager import UserDataManager
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
+def _get_persistence_directory(settings: AuthServerSettings) -> Optional[Path]:
+    """Extract the persistence directory from settings."""
+    if settings.persistence_directory == "automatically_make_temporary":
+        return None
+    return settings.persistence_directory
+
+
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    settings_store = SettingsStore()
-    install_settings_store(app.state, settings_store)
+    settings = get_settings()
+    persistence_directory_root = _get_persistence_directory(settings)
+    prepared_root = await prepare_root(persistence_directory_root)
+    set_persistence_directory(app.state, prepared_root)
 
-    oauth2_backend = build_oauth2_backend()
-    install_oauth2_backend(app.state, oauth2_backend)
+    active_subdirectory = await prepare_active_subdirectory(prepared_root)
+    db_path = active_subdirectory / DB_FILE
 
-    authorization_checker = build_authorization_checker(settings_store, oauth2_backend)
-    install_authorization_checker(app.state, authorization_checker)
+    with sql_engine_ctx(db_path) as engine:
+        create_schema(engine)
+        set_sql_engine(app.state, engine)
 
-    systemd_utils.notify_up()
-    yield
+        user_store = UserStore(sql_engine=engine)
+        user_service = UserDataManager(user_store=user_store)
+        user_service.seed_initial_users()
+
+        init_oauth2_backend(app.state, engine)
+        systemd_utils.notify_up()
+        yield
 
 
 app = FastAPI(
