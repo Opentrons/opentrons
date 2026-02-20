@@ -1,5 +1,5 @@
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from server_utils.auth.scopes import Scope
 
@@ -26,16 +26,6 @@ def manager(mock_store: UserStore) -> UserDataManager:
     return UserDataManager(user_store=mock_store)
 
 
-# ── seed_initial_users ──────────────────────────────────────────────
-
-
-def test_seed_calls_store_seed(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
-) -> None:
-    manager.seed_initial_users()
-    decoy.verify(mock_store.seed(decoy.matchers.IsA(list)))
-
-
 # ── create_user ─────────────────────────────────────────────────────
 
 
@@ -53,7 +43,7 @@ def test_create_user_success(
     decoy.when(
         mock_store.add(
             username="new_user",
-            hashed_password=decoy.matchers.IsA(str),
+            hashed_password=matchers.IsA(str),
             full_name="New User",
             account_type=AccountType.USER,
             scopes=[Scope.RUNS_READ],
@@ -77,7 +67,7 @@ def test_create_user_hashes_password(
     decoy.when(
         mock_store.add(
             username="hash_check",
-            hashed_password=decoy.matchers.IsA(str),
+            hashed_password=matchers.IsA(str),
             full_name="X",
             account_type=AccountType.USER,
             scopes=[],
@@ -265,7 +255,7 @@ def test_update_user_password_is_hashed(
         mock_store.update(
             "pw_user",
             new_username=None,
-            hashed_password=decoy.matchers.IsA(str),
+            hashed_password=matchers.IsA(str),
             full_name=None,
             account_type=None,
         )

@@ -44,7 +44,7 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
-class User(Base):  # type: ignore[valid-type]
+class User(Base):
     """ORM model for user accounts."""
 
     __tablename__ = "users"

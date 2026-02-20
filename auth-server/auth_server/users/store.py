@@ -17,7 +17,7 @@ class UserStore:
         self._session_factory = sessionmaker(
             bind=sql_engine,
             expire_on_commit=False,
-        )  # type: ignore[call-overload]
+        )
 
     def _session(self) -> Session:
         return self._session_factory()

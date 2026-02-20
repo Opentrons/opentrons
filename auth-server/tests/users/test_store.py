@@ -4,7 +4,12 @@ from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import Base, sql_engine_ctx
 from auth_server.persistence.tables import AccountType
-from auth_server.users.user_data_manager import UserDataManager, password_hash, UserStore
+from auth_server.users.store import UserStore
+from auth_server.users.user_data_manager import (
+    UserDataManager,
+    password_hash,
+)
+
 HASHED_PW = password_hash.hash("securepassword123")
 
 
@@ -16,7 +21,7 @@ def user_store() -> UserStore:
         store = UserStore(sql_engine=engine)
         service = UserDataManager(user_store=store)
         service.seed_initial_users()
-        yield store  # type: ignore[misc]
+        yield store
 
 
 def test_get_returns_existing_user(user_store: UserStore) -> None:
