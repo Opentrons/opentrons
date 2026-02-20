@@ -115,7 +115,7 @@ def _run_one_prompt(
 
     pid = entry["id"]
     slug = entry["slug"]
-    message = entry["message"].strip()
+    message = entry["prompt"].strip()
     filename = f"{pid}_{slug}.snapshot.md"
     out_path = TEMP_DIR / filename
     # All prompts get fake responses until --live is passed
@@ -125,13 +125,24 @@ def _run_one_prompt(
 
     client = Client(settings)
     try:
-        if "protocol_file" in entry:
+        has_protocol = "protocol_file" in entry
+        has_attachments = "attachments" in entry
+
+        if has_protocol and has_attachments:
+            # Both: send protocol file + attachments via multipart (one request with all files)
+            proto_path = resolve_path(entry["protocol_file"])
+            attach_paths = [resolve_path(p) for p in entry["attachments"]]
+            all_paths = [proto_path] + attach_paths
+            if any(not p.exists() for p in all_paths):
+                return (pid, slug, str(out_path), False)
+            response = client.post_chat_completion_multipart(message=message, file_paths=all_paths, fake=use_fake)
+        elif has_protocol:
             proto_path = resolve_path(entry["protocol_file"])
             if not proto_path.exists():
                 return (pid, slug, str(out_path), False)
             protocol_text = proto_path.read_text(encoding="utf-8")
             response = client.post_update_protocol(protocol_text=protocol_text, prompt=message, fake=use_fake)
-        elif "attachments" in entry:
+        elif has_attachments:
             paths = [resolve_path(p) for p in entry["attachments"]]
             if any(not p.exists() for p in paths):
                 return (pid, slug, str(out_path), False)

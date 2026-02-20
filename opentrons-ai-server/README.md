@@ -96,10 +96,11 @@ A scripted process captures API responses for a fixed set of prompts and stores 
 
 **Layout:**
 
-- `snapshots/prompts.yaml` – prompt suite (at least 5 prompts; one should target protocol file output).
-- `snapshots/approved/` – committed, approved snapshots (e.g. `001_simple_protocol.snapshot.md`).
+- `snapshots/prompts.yaml` – prompt suite; each entry has `id`, `slug`, `description`, and `prompt`. Use `protocol_file` and `attachments` for file-based prompts (paths relative to `snapshots/`).
+- `snapshots/approved/` – committed, approved snapshots (e.g. `001_reagent_transfer.snapshot.md`).
 - `snapshots/temp/` – latest run output (not committed; written by the run script).
-- `snapshots/archive/` – previous approved snapshots when you promote (e.g. `001_simple_protocol.snapshot.20250220_143022.md`).
+- `snapshots/archive/` – previous approved snapshots when you promote (e.g. `001_reagent_transfer.snapshot.20250220_143022.md`).
+- `snapshots/fixtures/` – protocol files, PDFs, and CSVs referenced by `prompts.yaml` (see `snapshots/fixtures/README.md`).
 
 **How to run the snapshot process:**
 

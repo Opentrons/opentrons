@@ -143,7 +143,7 @@ def build_index_html(
         pid = entry["id"]
         slug = entry["slug"]
         description = entry.get("description") or ""
-        message = (entry.get("message") or "").strip()
+        message = (entry.get("prompt") or "").strip()
         snapshot_name = f"{pid}_{slug}.snapshot.md"
         old_path = f"{old_dir}/{snapshot_name}"
         new_path = f"{new_dir}/{snapshot_name}"
