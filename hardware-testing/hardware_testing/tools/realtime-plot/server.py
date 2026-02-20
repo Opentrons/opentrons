@@ -3,11 +3,71 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
 from time import time
-from typing import List, Any
+from typing import List, Any, Union
 import os
+import sys
+# from hardware_testing.data import create_folder_for_test_data
 
-from hardware_testing.data import create_folder_for_test_data
+IS_WIN = sys.platform.startswith("win")
+IS_OSX = sys.platform == "darwin"
+IS_LINUX = sys.platform.startswith("linux")
 
+_CONFIG_FILENAME = "config.json"
+IS_ROBOT = bool(
+    IS_LINUX
+    and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN"))
+)
+def infer_config_base_dir() -> Path:
+    """Return the directory to store data in.
+
+    Defaults are ~/.opentrons if not on a pi; OT_API_CONFIG_DIR is
+    respected here.
+
+    When this module is imported, this function is called automatically
+    and the result stored in :py:attr:`APP_DATA_DIR`.
+
+    This directory may not exist when the module is imported. Even if it
+    does exist, it may not contain data, or may require data to be moved
+    to it.
+
+    :return pathlib.Path: The path to the desired root settings dir.
+    """
+    if "OT_API_CONFIG_DIR" in os.environ:
+        return Path(os.environ["OT_API_CONFIG_DIR"])
+    elif IS_ROBOT:
+        return Path("/data")
+    else:
+        search = (Path.cwd(), Path.home() / ".opentrons")
+        print(search)
+        for path in search:
+            if (path / _CONFIG_FILENAME).exists():
+                return path
+        else:
+            return search[-1]
+
+def get_testing_data_directory() -> Path:
+    """Get testing_data directory."""
+    if "TESTING_DATA_DIR" in os.environ:
+        return Path(os.environ["TESTING_DATA_DIR"])
+    print(infer_config_base_dir() / "testing_data")
+    return infer_config_base_dir() / "testing_data"
+
+def _initialize_testing_data_base_dir() -> Path:
+    base = get_testing_data_directory()
+    base.mkdir(parents=True, exist_ok=True)
+    return base
+
+def create_test_name_from_file(f: str) -> str:
+    """Create test name from file name."""
+    return os.path.basename(f).replace("_", "-").replace(".py", "")
+
+
+def create_folder_for_test_data(test_name: Union[str, Path]) -> Path:
+    """Create a folder for test data."""
+    base = _initialize_testing_data_base_dir()
+    test_path = base / test_name
+    test_path.mkdir(parents=False, exist_ok=True)
+    return test_path
 
 class PlotRequestHandler(BaseHTTPRequestHandler):
     """Plot Request Handler."""

@@ -304,7 +304,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
                 writer = csv.writer(f)
                 if write_header:
                     writer.writerow([
-                        "timestamp",
+                        "Time(s)",
                         "target_guage_pressure",
                         "current_guage_pressure",
                         "pressure_abs_a",
@@ -344,7 +344,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         try:
             while time.perf_counter() - start_time < run_time:
                 line = await self.get_vacuum_state()
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.1)
                 pressure_dict = dataclasses.asdict(line)
                 # Timestamp
                 ts = time.perf_counter() - start_time
