@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ListButton, StyledText } from '@opentrons/components'
+import { COLORS, ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
@@ -147,6 +147,9 @@ export function ExtendedPartialTipField(
   return (
     <>
       <div className={styles.nozzle_selection_text}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {t('pipette_nozzles_and_wells')}
+        </StyledText>
         <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
             {getNozzleWellText(
