@@ -6,7 +6,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { LabwareSlotContainer } from '../../LabwareSlotContainer'
 import { PipetteContainer } from '../../PipetteContainer'
 import { StepDetailContainer } from '../../StepDetailContainer'
-import { TipDisposalContainer } from '../../TipDisposalContainer'
+// import { TipDisposalContainer } from '../../TipDisposalContainer'
 import { TipPickupContainer } from '../../TipPickupContainer'
 
 import type { ComponentProps } from 'react'
@@ -14,7 +14,7 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../../PipetteContainer')
-vi.mock('../../TipDisposalContainer')
+// vi.mock('../../TipDisposalContainer')
 vi.mock('../../TipPickupContainer')
 vi.mock('../../LabwareSlotContainer')
 
@@ -98,9 +98,9 @@ describe('StepDetailContainer', () => {
     vi.mocked(LabwareSlotContainer).mockReturnValue(
       <div>mock LabwareSlotContainer </div>
     )
-    vi.mocked(TipDisposalContainer).mockReturnValue(
-      <div>mock Tip Disposal Container</div>
-    )
+    // vi.mocked(TipDisposalContainer).mockReturnValue(
+    //   <div>mock Tip Disposal Container</div>
+    // )
 
     vi.mocked(TipPickupContainer).mockReturnValue(
       <div>mock Tip Pickup Container</div>
@@ -114,6 +114,6 @@ describe('StepDetailContainer', () => {
   it('renders the pipette containers and tip container', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
-    screen.getByText('mock Tip Disposal Container')
+    // screen.getByText('mock Tip Disposal Container')
   })
 })

@@ -96,7 +96,8 @@ export function StepDetailContainer({
     if (topMostLabwareOnSlot != null) {
       components.push('labware')
     }
-    components.push('disposal')
+    // temporary filtering out the disposal card for RS 9.0.0
+    // components.push('disposal')
 
     return components
   }

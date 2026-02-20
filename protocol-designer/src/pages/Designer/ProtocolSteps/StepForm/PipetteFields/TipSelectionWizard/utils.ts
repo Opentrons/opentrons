@@ -112,8 +112,14 @@ export const getHoveredOffsetFromWell = (args: {
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(-2, -1)
+export const getColumnFromWellName = (wellName: string): string => {
+  const match = wellName.match(/^[A-Za-z]+(\d+)/)
+  if (match && match.length > 1) {
+    return match[1]
+  }
+  console.error('No column found for well name', wellName)
+  return ''
+}
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],

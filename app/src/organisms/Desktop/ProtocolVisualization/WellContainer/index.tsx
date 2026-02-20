@@ -26,7 +26,7 @@ const SVG_DECIMALS = 2
 
 interface WellContainerProps {
   params: RunTimeCommand['params']
-  activeWellName: string
+  selectedWellName: string
   wellColor: string
   wells: LabwareWellMap
   pipetteLocationLiquidState: LocationLiquidState | null
@@ -37,7 +37,7 @@ interface WellContainerProps {
 export function WellContainer(props: WellContainerProps): JSX.Element {
   const {
     params,
-    activeWellName,
+    selectedWellName,
     wellColor,
     wells,
     liquids,
@@ -54,20 +54,21 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
   const labwareWellMaxVolume = wells.A1.totalLiquidVolume
-  const hasWellLocation = 'wellLocation' in params
+  const wellLocation = 'wellLocation' in params ? params.wellLocation : null
+  const hasWellLocation = wellLocation != null
 
   //  TODO: add support for rest of references
-  const reference = hasWellLocation
-    ? params.wellLocation.origin === 'top'
+  const reference =
+    wellLocation?.origin === 'top'
       ? POSITION_REFERENCE_TOP
       : POSITION_REFERENCE_BOTTOM
-    : POSITION_REFERENCE_BOTTOM
+  const zOffset: number =
+    typeof wellLocation?.offset?.z === 'number' ? wellLocation.offset.z : 1
+  const xOffset: number =
+    typeof wellLocation?.offset?.x === 'number' ? wellLocation.offset.x : 0
+
   const mmFromBottom = hasWellLocation
-    ? getMmFromBottom(
-        Number(params.wellLocation.z ?? 1),
-        reference,
-        labwareDepth
-      )
+    ? getMmFromBottom(zOffset, reference, labwareDepth)
     : null
 
   const wellHeightSvg = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
@@ -82,8 +83,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const roundedTipBottomY = lastTipBottomYRef.current
 
   if (hasWellLocation && xLabwareWellWidth != null && xLabwareWellWidth > 0) {
-    const xPositionSvg =
-      (wellWidthSvg / xLabwareWellWidth) * (params.wellLocation.x ?? 0)
+    const xPositionSvg = (wellWidthSvg / xLabwareWellWidth) * xOffset
     lastXPositionSvgRef.current = round(xPositionSvg, SVG_DECIMALS)
   }
   const roundedXPositionSvg = lastXPositionSvgRef.current
@@ -103,7 +103,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
       <div className={styles.header}>
         <Tag text={t('well_view')} type="default" shrinkToContent />
         <RobotInfoLabel
-          deckLabel={t('well_name', { wellName: activeWellName })}
+          deckLabel={t('well_name', { wellName: selectedWellName })}
         />
       </div>
       <div>
