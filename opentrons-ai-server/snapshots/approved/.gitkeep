@@ -1,0 +1,2 @@
+# Approved snapshots live here (e.g. 001_simple_protocol.snapshot.md).
+# Run scripts/run_snapshots.py then scripts/promote_snapshots.py to populate.

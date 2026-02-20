@@ -15,3 +15,7 @@ evaluation/
 api/storage/api_docs/scripts/
 ai-server/
 .venv/
+
+# Snapshot testing: temp outputs are local only; approved/ and archive/ are committed
+snapshots/temp/
+snapshot-report.zip

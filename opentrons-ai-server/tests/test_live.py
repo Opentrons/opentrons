@@ -1,9 +1,15 @@
+from pathlib import Path
+
 import pytest
 from api.models.chat_response import ChatResponse
 from api.models.error_response import ErrorResponse
 from api.models.feedback_response import FeedbackResponse
 
 from tests.helpers.client import Client
+
+# Snapshot fixtures (used for file-upload live test)
+SNAPSHOTS_FIXTURES_DIR = Path(__file__).resolve().parent.parent / "snapshots" / "fixtures"
+SAMPLE_OT2_FILE = SNAPSHOTS_FIXTURES_DIR / "sample_ot2.py"
 
 
 @pytest.mark.live
@@ -74,6 +80,22 @@ def test_get_bad_endpoint_with_bad_auth(client: Client) -> None:
     """Test a nonexistent endpoint with bad authentication."""
     response = client.get_bad_endpoint(bad_auth=True)
     assert response.status_code == 404, "nonexistent endpoint with bad auth should return HTTP 404"
+
+
+@pytest.mark.live
+def test_post_chat_completion_multipart_with_file_upload(client: Client) -> None:
+    """Test the completion-multipart (file upload) endpoint with good auth and one attached file."""
+    assert SAMPLE_OT2_FILE.exists(), f"Fixture file missing: {SAMPLE_OT2_FILE}"
+    response = client.post_chat_completion_multipart(
+        message="What does the attached file do?",
+        file_paths=[SAMPLE_OT2_FILE],
+        fake=True,
+    )
+    assert response.status_code == 200, "Completion-multipart with file upload and good auth should return HTTP 200"
+    body = response.json()
+    chat = ChatResponse.model_validate(body)
+    assert chat.fake is True
+    assert chat.received_files == [SAMPLE_OT2_FILE.name], "Response should list the uploaded file"
 
 
 @pytest.mark.live

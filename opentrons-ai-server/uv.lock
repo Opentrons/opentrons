@@ -1622,10 +1622,12 @@ dev = [
     { name = "docker" },
     { name = "mypy" },
     { name = "pytest" },
+    { name = "pyyaml" },
     { name = "rich" },
     { name = "ruff" },
     { name = "types-beautifulsoup4" },
     { name = "types-docker" },
+    { name = "types-pyyaml" },
     { name = "types-requests" },
 ]
 
@@ -1652,11 +1654,13 @@ requires-dist = [
     { name = "pyjwt", extras = ["crypto"] },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.2.1" },
     { name = "python-dotenv", specifier = "==1.0.1" },
+    { name = "pyyaml", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "rich", marker = "extra == 'dev'", specifier = "==13.7.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.0" },
     { name = "structlog", specifier = "==24.4.0" },
     { name = "types-beautifulsoup4", marker = "extra == 'dev'" },
     { name = "types-docker", marker = "extra == 'dev'", specifier = "==7.0.0.20240528" },
+    { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "weave", specifier = "==0.51.54" },
 ]
@@ -2811,6 +2815,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c8/f3/d9a1bbba7b42b5558a3f9fe017d967f5338cf8108d35991d9b15fdea3e0d/types_html5lib-1.1.11.20251117.tar.gz", hash = "sha256:1a6a3ac5394aa12bf547fae5d5eff91dceec46b6d07c4367d9b39a37f42f201a", size = 18100, upload-time = "2025-11-17T03:08:00.78Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f0/ab/f5606db367c1f57f7400d3cb3bead6665ee2509621439af1b29c35ef6f9e/types_html5lib-1.1.11.20251117-py3-none-any.whl", hash = "sha256:2a3fc935de788a4d2659f4535002a421e05bea5e172b649d33232e99d4272d08", size = 24302, upload-time = "2025-11-17T03:07:59.996Z" },
+]
+
+[[package]]
+name = "types-pyyaml"
+version = "6.0.12.20250915"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7e/69/3c51b36d04da19b92f9e815be12753125bd8bc247ba0470a982e6979e71c/types_pyyaml-6.0.12.20250915.tar.gz", hash = "sha256:0f8b54a528c303f0e6f7165687dd33fafa81c807fcac23f632b63aa624ced1d3", size = 17522, upload-time = "2025-09-15T03:01:00.728Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bd/e0/1eed384f02555dde685fff1a1ac805c1c7dcb6dd019c916fe659b1c1f9ec/types_pyyaml-6.0.12.20250915-py3-none-any.whl", hash = "sha256:e7d4d9e064e89a3b3cae120b4990cd370874d2bf12fa5f46c97018dd5d3c9ab6", size = 20338, upload-time = "2025-09-15T03:00:59.218Z" },
 ]
 
 [[package]]

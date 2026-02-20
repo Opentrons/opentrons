@@ -26,6 +26,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "docker==7.1.0",
+    "pyyaml>=6.0",
     "pytest==8.2.1",
     "ruff==0.15.0",
     "mypy==1.10.0",
@@ -36,12 +37,13 @@ dev = [
     "cryptography==42.0.7",
     "types-docker==7.0.0.20240528",
     "types-beautifulsoup4",
+    "types-PyYAML>=6.0",
 ]
 
 [tool.ruff]
 line-length = 140
 indent-width = 4
-exclude = ["files"]
+exclude = ["files", "snapshots"]
 src = ["*.py", "api", "tests"]
 
 [tool.ruff.lint]

@@ -458,6 +458,20 @@ async def create_chat_completion_multipart(
         current_msg_idx = len(history_with_attachments)
         current_msg_files = files_by_message.get(current_msg_idx, [])
 
+        # When fake=True, return immediately without calling the LLM but acknowledge received files
+        if fake:
+            received_files = [f.get("name", "unknown") for f in current_msg_files]
+            if received_files:
+                reply = f"Fake response. Received {len(received_files)} file(s): {', '.join(received_files)}"
+            else:
+                reply = "Fake response. No files attached to this message."
+            return ChatResponse(
+                reply=reply,
+                fake=True,
+                file_token_warning=token_warning,
+                received_files=received_files if received_files else None,
+            )
+
         protocol_format_enum = ProtocolFormat.PYTHON
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER

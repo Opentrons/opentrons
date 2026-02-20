@@ -1,9 +1,12 @@
+import io
 import time
 from functools import wraps
-from typing import Any, Callable, Optional, TypeVar
+from pathlib import Path
+from typing import Any, Callable, List, Optional, TypeVar
 
 from api.models.chat_request import ChatRequest, FakeKeys
 from api.models.feedback_request import FeedbackRequest
+from api.models.update_protocol import UpdateProtocol
 from httpx import Client as HttpxClient
 from httpx import Response, Timeout
 from rich.console import Console, Group
@@ -17,6 +20,18 @@ from tests.helpers.settings import Settings, get_settings
 from tests.helpers.token import Token
 
 F = TypeVar("F", bound=Callable[..., Any])
+
+
+def _content_type_for(path: Path) -> str:
+    """Return media type for multipart file upload."""
+    suffix = path.suffix.lower()
+    if suffix == ".pdf":
+        return "application/pdf"
+    if suffix == ".py":
+        return "text/x-python"
+    if suffix == ".csv":
+        return "text/csv"
+    return "application/octet-stream"
 
 
 def timeit(func: F) -> F:
@@ -90,6 +105,61 @@ class Client:
     def get_options(self) -> Response:
         """Call the OPTIONS endpoint and return the response."""
         return self.httpx.options("/chat/completions", headers=self.type_headers)
+
+    def post_update_protocol(
+        self,
+        protocol_text: str,
+        prompt: str,
+        update_type: str = "add_runtime_parameters",
+        update_details: str = "Add runtime parameters so the user can change values at run time.",
+        regenerate: bool = False,
+        fake: bool = False,
+    ) -> Response:
+        """Call the /chat/updateProtocol endpoint with an existing protocol and update instruction."""
+        body = UpdateProtocol(
+            protocol_text=protocol_text,
+            prompt=prompt,
+            regenerate=regenerate,
+            update_type=update_type,
+            update_details=update_details,
+            fake=fake,
+        )
+        return self.httpx.post("/chat/updateProtocol", headers=self.standard_headers, json=body.model_dump())
+
+    def post_chat_completion_multipart(
+        self,
+        message: str,
+        file_paths: List[Path],
+        fake: bool = False,
+        protocol_format: str = "python",
+    ) -> Response:
+        """Call the /chat/completion-multipart endpoint with a message and file attachments.
+        Files are attached to the current message (index 0). Paths must exist.
+        """
+        # API expects form fields: message, history (JSON), fake, protocol_format, and files named msg0_<filename>
+        history_json = "[]"
+        files = []
+        for path in file_paths:
+            if not path.exists():
+                raise FileNotFoundError(f"Attachment not found: {path}")
+            # Current message is index 0; filename must be msg0_<original> so backend assigns to this message
+            upload_name = f"msg0_{path.name}"
+            content = path.read_bytes()
+            content_type = _content_type_for(path)
+            files.append(("files", (upload_name, io.BytesIO(content), content_type)))
+        data = {
+            "message": message,
+            "history": history_json,
+            "fake": str(fake).lower(),
+            "protocol_format": protocol_format,
+        }
+        # httpx sends multipart when you pass files=; data as form fields
+        return self.httpx.post(
+            "/chat/completion-multipart",
+            headers=self.auth_headers,
+            data=data,
+            files=files,
+        )
 
 
 def print_response(response: Response) -> None:

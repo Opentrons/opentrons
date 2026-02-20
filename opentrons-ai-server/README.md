@@ -88,6 +88,42 @@ The live-test target will run tests against any environment. The default is loca
 1. run `make live-test`
 1. You should see the tests run and pass against the local environment
 
+#### Snapshot testing
+
+A scripted process captures API responses for a fixed set of prompts and stores them as versioned snapshots. Use it to evaluate API, model, or prompt changes systematically (review diffs, then promote when appropriate). This is a minimum viable, human-reviewable workflow; automated scoring and CI are out of scope.
+
+**When to run:** Before merging changes that affect the API, models, or prompts. Run after modifying domain logic or prompts to ensure responses stay consistent or to capture intentional changes.
+
+**Layout:**
+
+- `snapshots/prompts.yaml` – prompt suite (at least 5 prompts; one should target protocol file output).
+- `snapshots/approved/` – committed, approved snapshots (e.g. `001_simple_protocol.snapshot.md`).
+- `snapshots/temp/` – latest run output (not committed; written by the run script).
+- `snapshots/archive/` – previous approved snapshots when you promote (e.g. `001_simple_protocol.snapshot.20250220_143022.md`).
+
+**How to run the snapshot process:**
+
+1. Have the server running locally (or use staging).
+2. Run prompts and write to temp:
+   - **Dry-run (default):** `make snapshot-run` uses fake responses (fake_key), no LLM call. Use this to lock in baseline snapshots or test the flow.
+   - **Live API:** `make snapshot-run-live` (or `make snapshot-run ENV=local` with `uv run python scripts/run_snapshots.py --live`) calls the real API.
+   - Staging: `make snapshot-run ENV=staging` (dry-run) or `make snapshot-run-live ENV=staging` (ensure `tests/helpers/test.env` has staging credentials).
+3. Review the diff between temp and approved:
+   - `make snapshot-diff` (or `diff -r snapshots/temp snapshots/approved` and open files in your editor).
+4. If the changes are acceptable, promote temp to approved (and archive current approved):
+   - `make snapshot-promote`
+5. Commit approved and archive snapshot files.
+
+**Makefile targets:**
+
+- `make snapshot-run` – run all prompts in **dry-run** (fake_key), write responses to `snapshots/temp/`. No LLM call.
+- `make snapshot-run-live` – run all prompts against the real API, write to `snapshots/temp/`.
+- `make snapshot-diff` – show diffs between `snapshots/temp` and `snapshots/approved`.
+- `make snapshot-promote` – move current approved to `snapshots/archive/` (timestamped), then move temp to approved.
+- `make snapshot-report` – generate `snapshot-report.zip` from `snapshots/temp/` (new) and `snapshots/approved/` (old). Unzip and open `index.html` in a browser for a PM-friendly report: each prompt, links to inputs, **old output vs new output** for comparison, with Python/JSON syntax-highlighted (not raw markdown).
+
+**Future: AI judge in the loop.** Automated pass/fail or LLM-as-judge evaluation is out of scope for this workflow. If you add it later, consider Python-friendly options that work with existing snapshots or HTTP calls: e.g. [Braintrust](https://braintrust.dev) (evals and scorers in Python), [promptfoo](https://www.promptfoo.dev) (CLI and config-driven evals), or provider-specific eval APIs. The current snapshot format (markdown with reply and optional protocol_content) is easy to feed into custom scorers or judge prompts.
+
 #### API Access from the UI
 
 1. Follow the directions in the [opentrons-ai-client README](../opentrons-ai-client/README.md) to run the UI locally

@@ -135,3 +135,35 @@ shell:
 test-googlesheet:
 	@echo "Loading environment variables from .env and running test-googlesheet"
 	uv run python -m api.integration.google_sheets
+
+# Snapshot testing: capture and promote API response snapshots (see README Snapshot testing)
+# Default is dry-run (fake_key, no LLM). Use snapshot-run-live for real API.
+.PHONY: snapshot-run
+snapshot-run:
+	@echo "Running snapshot prompts (dry-run with fake_key, writes to snapshots/temp/)"
+	uv run python scripts/run_snapshots.py --env $(ENV)
+
+.PHONY: snapshot-run-live
+snapshot-run-live:
+	@echo "Running snapshot prompts against real API (writes to snapshots/temp/)"
+	uv run python scripts/run_snapshots.py --live --env $(ENV)
+
+.PHONY: snapshot-promote
+snapshot-promote:
+	@echo "Promoting temp snapshots to approved (archives previous approved)"
+	uv run python scripts/promote_snapshots.py
+
+.PHONY: snapshot-diff
+snapshot-diff:
+	@echo "Diff temp vs approved (review before promoting)"
+	@diff -rq snapshots/temp snapshots/approved 2>/dev/null || true
+	@for f in snapshots/temp/*.snapshot.md 2>/dev/null; do \
+		b=$$(basename "$$f"); \
+		if [ -f "snapshots/approved/$$b" ]; then diff -u "snapshots/approved/$$b" "$$f" || true; \
+		else echo "--- new file: $$b"; fi; \
+	done
+
+.PHONY: snapshot-report
+snapshot-report:
+	@echo "Generating PM report zip (old=approved, new=temp, syntax-highlighted)"
+	uv run python scripts/generate_snapshot_report.py --source snapshots/temp --compare-with snapshots/approved --output snapshot-report.zip

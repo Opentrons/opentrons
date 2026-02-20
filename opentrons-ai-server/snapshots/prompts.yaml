@@ -1,0 +1,60 @@
+# Prompt suite for API response snapshot testing.
+# Used by scripts/run_snapshots.py. Add or edit prompts here; use kebab-case slugs.
+# At least one prompt should target protocol file output (protocol_content in response).
+#
+# Optional per-prompt (dry-run only):
+#   fake_key: "pd serial diliution"  # use this fake response so snapshot includes protocol_content
+#   fake_key: "reagent transfer"     # Python protocol in reply; default for chat prompts
+#
+# File paths (protocol_file, attachments) are relative to the snapshots/ directory.
+# Place your PDF and protocol fixtures under snapshots/fixtures/ and reference them here.
+
+prompts:
+  - id: "001"
+    slug: "simple_protocol"
+    description: "Simple protocol generation (Python API v2, OT-2); response may include protocol_content."
+    message: |
+      Write a protocol using the Opentrons Python Protocol API v2 for OT-2: transfer 30 µL from well A1 to well B1 of a 96-well plate using a P20 single-channel pipette. Use standard labware and tip racks.
+
+  # fake_key in dry-run: use "pd serial diliution" so snapshot includes protocol_content (PD JSON)
+  - id: "002"
+    slug: "liquid_transfer"
+    description: "Multi-well liquid transfer scenario."
+    fake_key: "pd serial diliution"
+    message: |
+      I need an OT-2 protocol to transfer 50 µL from the first column of a 96-well source plate to the first column of a 96-well destination plate, using a P300 multi-channel pipette. Include tip handling and use API v2.
+
+  - id: "003"
+    slug: "thermocycler_protocol"
+    description: "Protocol involving a thermocycler module."
+    message: |
+      Write an OT-2 Python API v2 protocol that loads a thermocycler module, places a 96-well PCR plate on it, and runs a simple PCR cycle: 95 °C for 30 s, then 60 °C for 30 s, then 72 °C for 60 s. Use a P20 single-channel for any liquid handling if needed.
+
+  - id: "004"
+    slug: "edge_case_empty_input"
+    description: "Edge case: minimal or ambiguous input to see how the API handles it."
+    message: |
+      make a protocol
+
+  - id: "005"
+    slug: "multi_step_instruction"
+    description: "Multi-step instruction combining several operations."
+    message: |
+      For an OT-2 with API v2: (1) Load a 24-tube rack with 1.5 mL tubes and a 96-well plate. (2) Transfer 20 µL from tube A1 to wells A1–A4 of the plate using a P20 single-channel. (3) Mix twice in each destination well. Include metadata and tip handling.
+
+  # Attached protocol: update to add runtime parameters (RTP). Path relative to snapshots/.
+  - id: "006"
+    slug: "update_to_rtp"
+    description: "Update an attached Python protocol to add runtime parameters (RTP)."
+    protocol_file: "fixtures/sample_ot2.py"
+    message: |
+      Update this protocol to add runtime parameters (RTP). Add a parameter for the transfer volume so the user can change it at run time.
+
+  # Attached PDF: path relative to snapshots/. Add your PDF to snapshots/fixtures/ and set attachments to that file.
+  - id: "007"
+    slug: "pdf_attachment"
+    description: "Chat completion with an attached PDF; API summarizes or answers using the document."
+    attachments:
+      - "fixtures/sample.pdf"
+    message: |
+      Summarize the key points in the attached document. If it describes a protocol or procedure, list the main steps.
