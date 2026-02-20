@@ -239,6 +239,7 @@
   "usb_port": "USB-{{port}}",
   "usb_port_not_connected": "usb not connected",
   "usb_port_stacker": "S-{{port}}",
+  "vacuum_module": "Vacuum Module",
   "vacuum_pump": "Vacuum Pump",
   "valid_range": "Valid range between {{min}}-{{max}}",
   "vent": "Vent",
