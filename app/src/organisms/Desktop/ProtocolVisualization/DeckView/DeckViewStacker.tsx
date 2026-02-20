@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 import {
   CenterLabwareInModuleChildSlot,
   COLORS,
@@ -9,6 +11,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { DeckViewOverlay } from './DeckViewOverlay'
+import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -72,28 +75,44 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
   return (
     <>
       {renderLabware ? (
-        <CenterLabwareInModuleChildSlot
-          deckId={deckDef.otId}
-          slotId={slot}
-          moduleDefinition={moduleDef}
-          labwareDefinition={
-            labwareEntitiesExtended[labwareLoadedOnModuleId].def
-          }
-        >
-          <LabwareOnDeck
-            robotState={robotState}
-            labwareDef={labwareEntitiesExtended[labwareLoadedOnModuleId].def}
-            liquids={liquids}
-            labwareId={labwareLoadedOnModuleId}
-            x={
-              0 +
-              (moduleType === FLEX_STACKER_MODULE_TYPE ? STACKER_X_OFFSET : 0)
+        <>
+          <CenterLabwareInModuleChildSlot
+            deckId={deckDef.otId}
+            slotId={slot}
+            moduleDefinition={moduleDef}
+            labwareDefinition={
+              labwareEntitiesExtended[labwareLoadedOnModuleId].def
             }
-            y={0}
-            setSelectedSlot={setSelectedSlot}
-            setHoveredSlot={setHoveredSlot}
-          />
-        </CenterLabwareInModuleChildSlot>
+          >
+            <LabwareOnDeck
+              robotState={robotState}
+              labwareDef={labwareEntitiesExtended[labwareLoadedOnModuleId].def}
+              liquids={liquids}
+              labwareId={labwareLoadedOnModuleId}
+              x={
+                0 +
+                (moduleType === FLEX_STACKER_MODULE_TYPE ? STACKER_X_OFFSET : 0)
+              }
+              y={0}
+              setSelectedSlot={setSelectedSlot}
+              setHoveredSlot={setHoveredSlot}
+            />
+            <Fragment key={labwareLoadedOnModuleId}>
+              {showModuleCommandSummary &&
+              moduleType === THERMOCYCLER_MODULE_TYPE &&
+              selectedRunTimeCommand != null ? (
+                <LabwareCommandSummary
+                  commandType={selectedRunTimeCommand.commandType}
+                  position={[0, 0, 0]}
+                  labwareDef={
+                    labwareEntitiesExtended[labwareLoadedOnModuleId].def
+                  }
+                  showModuleIcon={false}
+                />
+              ) : null}
+            </Fragment>
+          </CenterLabwareInModuleChildSlot>
+        </>
       ) : null}
       {moduleType === THERMOCYCLER_MODULE_TYPE ? (
         <DeckViewOverlay
