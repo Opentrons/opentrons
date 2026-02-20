@@ -1,4 +1,4 @@
-"""User service – business logic between the router and the store."""
+"""User data manager – business logic between the router and the store."""
 
 from pwdlib import PasswordHash
 

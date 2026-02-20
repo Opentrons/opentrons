@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
-from auth_server.users.store import AccountType
+from auth_server.persistence.tables import AccountType
 
 if TYPE_CHECKING:
-    from auth_server.users.store import User
+    from auth_server.persistence.tables import User
 
 
 class UserCreate(BaseModel):
@@ -48,11 +48,11 @@ class UserResponse(BaseModel):
     scopes: list[str]
 
     @classmethod
-    def from_user(cls, user: User) -> UserResponse:
-        """Build a UserResponse from a store User."""
+    def from_orm_user(cls, user: User) -> UserResponse:
+        """Build a UserResponse from an ORM User."""
         return cls(
-            userName=user.username,
-            fullName=user.full_name,
-            accountType=user.account_type,
-            scopes=[scope.api_name for scope in user.scopes],
+            userName=user.username, # type: ignore[arg-type]
+            fullName=user.full_name,    # type: ignore[arg-type]
+            accountType=user.account_type,  # type: ignore[arg-type]
+            scopes=[scope.api_name for scope in user.scopes or []],
         )

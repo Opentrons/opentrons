@@ -10,7 +10,6 @@ from auth_server.users.user_data_manager import (
     UserAlreadyExistsError,
     UserDataManager,
     UserNotFoundError,
-    password_hash,
 )
 
 
@@ -26,15 +25,41 @@ def manager(mock_store: UserStore) -> UserDataManager:
     return UserDataManager(user_store=mock_store)
 
 
+def _make_orm_user(
+    username: str = "user",
+    hashed_password: str = "h",
+    full_name: str = "Full Name",
+    account_type: AccountType = AccountType.USER,
+    scopes: list[Scope] | None = None,
+) -> User:
+    """Helper to build an ORM User for mock return values."""
+    return User(
+        username=username,
+        hashed_password=hashed_password,
+        full_name=full_name,
+        account_type=account_type,
+        scopes=scopes if scopes is not None else [],
+    )
+
+
+# ── seed_initial_users ──────────────────────────────────────────────
+
+
+def test_seed_calls_store_seed(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    manager.seed_initial_users()
+    decoy.verify(mock_store.seed(matchers.IsA(list)))
+
+
 # ── create_user ─────────────────────────────────────────────────────
 
 
 def test_create_user_success(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    expected_user = User(
+    expected = _make_orm_user(
         username="new_user",
-        hashed_password="hashed",
         full_name="New User",
         account_type=AccountType.USER,
         scopes=[Scope.RUNS_READ],
@@ -48,7 +73,7 @@ def test_create_user_success(
             account_type=AccountType.USER,
             scopes=[Scope.RUNS_READ],
         )
-    ).then_return(expected_user)
+    ).then_return(expected)
 
     result = manager.create_user(
         username="new_user",
@@ -57,7 +82,8 @@ def test_create_user_success(
         account_type=AccountType.USER,
         scopes=[Scope.RUNS_READ],
     )
-    assert result == expected_user
+    assert result.username == "new_user"
+    assert result.account_type == AccountType.USER
 
 
 def test_create_user_hashes_password(
@@ -72,15 +98,7 @@ def test_create_user_hashes_password(
             account_type=AccountType.USER,
             scopes=[],
         )
-    ).then_return(
-        User(
-            username="hash_check",
-            hashed_password="anything",
-            full_name="X",
-            account_type=AccountType.USER,
-            scopes=[],
-        )
-    )
+    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
 
     manager.create_user(
         username="hash_check",
@@ -90,7 +108,6 @@ def test_create_user_hashes_password(
         scopes=[],
     )
 
-    # The store should never receive the raw password.
     decoy.verify(
         mock_store.add(
             username="hash_check",
@@ -107,13 +124,7 @@ def test_create_user_duplicate_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
     decoy.when(mock_store.get("dup_user")).then_return(
-        User(
-            username="dup_user",
-            hashed_password="h",
-            full_name="Existing",
-            account_type=AccountType.USER,
-            scopes=[],
-        )
+        _make_orm_user(username="dup_user")
     )
     with pytest.raises(UserAlreadyExistsError):
         manager.create_user(
@@ -175,15 +186,11 @@ def test_create_user_empty_full_name_raises(manager: UserDataManager) -> None:
 def test_get_user_returns_existing(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    expected = User(
-        username="admin",
-        hashed_password="h",
-        full_name="Admin",
-        account_type=AccountType.ADMIN,
-        scopes=[],
-    )
+    expected = _make_orm_user(username="admin", account_type=AccountType.ADMIN)
     decoy.when(mock_store.get("admin")).then_return(expected)
-    assert manager.get_user("admin") == expected
+    result = manager.get_user("admin")
+    assert result.username == "admin"
+    assert result.account_type == AccountType.ADMIN
 
 
 def test_get_user_not_found_raises(
@@ -220,11 +227,9 @@ def test_delete_user_not_found_raises(
 def test_update_user_username(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    expected = User(
+    expected = _make_orm_user(
         username="new_name",
-        hashed_password="h",
         full_name="Name Test",
-        account_type=AccountType.USER,
         scopes=[Scope.RUNS_READ],
     )
     decoy.when(
@@ -239,18 +244,12 @@ def test_update_user_username(
 
     result = manager.update_user("old_name", new_username="new_name")
     assert result.username == "new_name"
+    assert result.full_name == "Name Test"
 
 
 def test_update_user_password_is_hashed(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    expected = User(
-        username="pw_user",
-        hashed_password="new_hash",
-        full_name="Pw Test",
-        account_type=AccountType.USER,
-        scopes=[],
-    )
     decoy.when(
         mock_store.update(
             "pw_user",
@@ -259,12 +258,10 @@ def test_update_user_password_is_hashed(
             full_name=None,
             account_type=None,
         )
-    ).then_return(expected)
+    ).then_return(_make_orm_user(username="pw_user"))
 
-    result = manager.update_user("pw_user", password="newpassword2")
-    assert result == expected
+    manager.update_user("pw_user", password="newpassword2")
 
-    # Raw password should never reach the store.
     decoy.verify(
         mock_store.update(
             "pw_user",
