@@ -303,7 +303,8 @@ class BaseCommand(
         description=(
             "Optional localization key for human-readable command text. "
             "When present with commandTextParams, consumers (e.g. App, opentrons_simulate) "
-            "can look up the key in protocol_command_text and interpolate with commandTextParams."
+            "look up the key in the namespace given by commandTextNamespace (default "
+            "protocol_command_text) and interpolate with commandTextParams."
         ),
     )
     commandTextParams: Optional[Dict[str, Union[str, float]]] = Field(
@@ -311,6 +312,13 @@ class BaseCommand(
         description=(
             "Optional interpolation params for command text. Keys match placeholders "
             "in the string identified by commandTextKey (e.g. well_name, volume, labware)."
+        ),
+    )
+    commandTextNamespace: Optional[str] = Field(
+        None,
+        description=(
+            "Optional i18n namespace for commandTextKey (e.g. 'branded'). "
+            "When None or omitted, consumers use protocol_command_text."
         ),
     )
 

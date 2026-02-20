@@ -63,8 +63,6 @@ _DIRECT_TRANSLATION_KEY_BY_COMMAND_TYPE: Dict[str, str] = {
     "absorbanceReader/openLid": "absorbance_reader_open_lid",
     "absorbanceReader/closeLid": "absorbance_reader_close_lid",
     "absorbanceReader/read": "absorbance_reader_read",
-    "flexStacker/empty": "empty_stacker",
-    "flexStacker/fill": "fill_stacker",
 }
 
 
@@ -149,6 +147,63 @@ def _get_pipette_display_name(
         if p.id == pipette_id:
             return str(getattr(p, "pipetteName", "") or "")
     return ""
+
+
+def _get_display_name_for_labware_uri(
+    uri: str,
+    labware_list: List[LoadedLabware],
+) -> str:
+    """Resolve labware display name from definition URI (displayName or loadName from loaded labware)."""
+    for lw in labware_list:
+        if getattr(lw, "definitionUri", "") == uri:
+            return lw.displayName or lw.loadName
+    # Fallback: use last segment of URI (e.g. "generic_96_wellplate_380_ul/1" -> "generic_96_wellplate_380_ul")
+    if "/" in uri:
+        return uri.split("/")[-2] if uri.endswith("/") else uri.rsplit("/", 1)[-1]
+    return uri or "Labware"
+
+
+def _get_module_slot_display(
+    module_id: str,
+    modules: List[LoadedModule],
+    include_module_name: bool = False,
+) -> str:
+    """Resolve module slot to display string (e.g. 'Slot D1' or 'Stacker in Slot D1')."""
+    for mod in modules:
+        if mod.id == module_id:
+            slot = _module_slot_or_unknown(mod)
+            if include_module_name:
+                model = str(getattr(mod, "model", "") or "")
+                if "stacker" in model.lower() or "flex" in model.lower():
+                    return f"Stacker in Slot {slot}"
+                return f"Module in Slot {slot}"
+            return f"Slot {slot}"
+    return "?"
+
+
+def _get_location_sequence_display_string(
+    seq: Any,
+    modules: List[LoadedModule],
+    labware_list: List[LoadedLabware],
+) -> str:
+    """Produce a short display string from a location sequence (for flex stacker result)."""
+    if not seq:
+        return "?"
+    # If it's a list (LabwareLocationSequence), take first component
+    if isinstance(seq, list) and len(seq) > 0:
+        first = seq[0]
+        if hasattr(first, "moduleId"):
+            return _get_module_slot_display(getattr(first, "moduleId", ""), modules, include_module_name=True)
+        if hasattr(first, "slotName"):
+            return f"Slot {getattr(first, 'slotName')}"
+        if hasattr(first, "addressableAreaName"):
+            return str(getattr(first, "addressableAreaName", "?"))
+    # Single location-like object
+    if hasattr(seq, "moduleId"):
+        return _get_module_slot_display(getattr(seq, "moduleId", ""), modules, include_module_name=True)
+    if hasattr(seq, "slotName"):
+        return f"Slot {getattr(seq, 'slotName')}"
+    return str(seq)
 
 
 def _annotate_pipetting_command(
@@ -717,6 +772,94 @@ def _annotate_load_command(
         pass
 
 
+BRANDED_NAMESPACE = "branded"
+
+
+def _annotate_flex_stacker_command(
+    command: Command,
+    state_summary: StateSummary,
+) -> None:
+    """Set commandTextKey, commandTextParams, and commandTextNamespace for flex stacker commands (branded)."""
+    command_type = getattr(command, "commandType", "")
+    params = getattr(command, "params", None)
+    result = getattr(command, "result", None)
+
+    def set_branded(key: str, text_params: Optional[Dict[str, Union[str, float]]] = None) -> None:
+        command.commandTextKey = key
+        command.commandTextParams = text_params
+        command.commandTextNamespace = BRANDED_NAMESPACE
+
+    if command_type == "flexStacker/retrieve":
+        if result is not None and hasattr(result, "primaryLabwareURI") and hasattr(result, "primaryLocationSequence"):
+            primary_uri = getattr(result, "primaryLabwareURI", "") or ""
+            primary_seq = getattr(result, "primaryLocationSequence", None)
+            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            slot_name = _get_location_sequence_display_string(
+                primary_seq, state_summary.modules, state_summary.labware
+            )
+            if display_name and slot_name != "?":
+                set_branded("retrieve_labware_from_stacker_to", {"primaryDefinitionDisplayName": display_name, "slotName": slot_name})
+                return
+        set_branded("flex_stacker_retrieve", None)
+
+    elif command_type == "flexStacker/store":
+        if result is not None and hasattr(result, "primaryLabwareURI") and hasattr(result, "primaryOriginLocationSequence"):
+            primary_uri = getattr(result, "primaryLabwareURI", "") or ""
+            origin_seq = getattr(result, "primaryOriginLocationSequence", None)
+            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            slot_name = _get_location_sequence_display_string(
+                origin_seq, state_summary.modules, state_summary.labware
+            )
+            if display_name and slot_name != "?":
+                set_branded("store_labware_from_slot_to_stacker", {"primaryDefinitionDisplayName": display_name, "slotName": slot_name})
+                return
+        set_branded("flex_stacker_store", None)
+
+    elif command_type == "flexStacker/setStoredLabware":
+        if result is not None and hasattr(result, "primaryLabwareDefinition") and params is not None:
+            defn = getattr(result, "primaryLabwareDefinition", None)
+            module_id = getattr(params, "moduleId", "") or ""
+            initial_count = getattr(params, "initialCount", 0) or 0
+            stacker_column = _get_module_slot_display(module_id, state_summary.modules, include_module_name=True)
+            labware_name = ""
+            if defn is not None and hasattr(defn, "metadata"):
+                labware_name = str(getattr(defn.metadata, "displayName", "") or "")
+            if stacker_column != "?" and labware_name:
+                set_branded(
+                    "flex_stacker_set_stored_labware_with_quantity_and_location",
+                    {"quantity": str(initial_count), "stackerColumn": stacker_column, "labwareAndLidDisplayNames": labware_name},
+                )
+                return
+        set_branded("flex_stacker_set_stored_labware", None)
+
+    elif command_type == "flexStacker/fill":
+        if result is not None and hasattr(result, "primaryLabwareURI") and params is not None:
+            primary_uri = getattr(result, "primaryLabwareURI", "") or ""
+            module_id = getattr(params, "moduleId", "") or ""
+            count = getattr(params, "count", 0) or 0
+            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            stacker_column = _get_module_slot_display(module_id, state_summary.modules, include_module_name=True)
+            if display_name and stacker_column != "?":
+                set_branded(
+                    "flex_stacker_fill_with_quantity_and_labware",
+                    {"quantity": str(count), "stackerColumn": stacker_column, "labwareAndLidDisplayNames": display_name},
+                )
+                return
+        set_branded("flex_stacker_fill", None)
+
+    elif command_type == "flexStacker/empty":
+        if params is not None:
+            module_id = getattr(params, "moduleId", "") or ""
+            stacker_column = _get_module_slot_display(module_id, state_summary.modules, include_module_name=True)
+            if stacker_column != "?":
+                set_branded("flex_stacker_empty_from_location", {"stackerColumn": stacker_column})
+                return
+        set_branded("flex_stacker_empty", None)
+
+    else:
+        pass
+
+
 def _annotate_tc_run_profile_command(command: Command) -> None:
     """Set commandTextKey and commandTextParams for thermocycler/runProfile."""
     params = getattr(command, "params", None)
@@ -914,6 +1057,16 @@ def annotate_commands_with_command_text(
             continue
         if command_type in ("thermocycler/runExtendedProfile", "thermocycler/startRunExtendedProfile"):
             _annotate_tc_extended_profile_command(command)
+            continue
+
+        if command_type in (
+            "flexStacker/retrieve",
+            "flexStacker/store",
+            "flexStacker/setStoredLabware",
+            "flexStacker/fill",
+            "flexStacker/empty",
+        ):
+            _annotate_flex_stacker_command(command, state_summary)
             continue
 
         # Unknown or not yet implemented: leave commandTextKey/Params unset

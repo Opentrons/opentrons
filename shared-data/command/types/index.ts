@@ -80,6 +80,8 @@ export interface CommonCommandRunTimeInfo<
   commandTextKey?: string
   /** Optional interpolation params for command text (analysis output). */
   commandTextParams?: Record<string, string | number>
+  /** Optional i18n namespace for commandTextKey (e.g. 'branded'). Omit/undefined = protocol_command_text. */
+  commandTextNamespace?: string
 }
 export interface CommonCommandCreateInfo {
   intent?: CommandIntent
