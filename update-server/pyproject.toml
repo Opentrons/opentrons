@@ -55,6 +55,8 @@ known-local-folder = ["otupdate"]
 "otupdate/_version.py" = ["I"]
 "buildroot_upload.py" = ["T201"]
 "oe_upload.py" = ["T201"]
+"scripts/dev_server.py" = ["E402", "T201"]
+"../.cursor/skills/robot-ip-health/scripts/*.py" = ["T201", "C901"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"

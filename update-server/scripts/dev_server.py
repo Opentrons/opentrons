@@ -41,7 +41,7 @@ import logging
 import os
 import shutil
 import tempfile
-from typing import Callable, Generator, Optional, Tuple
+from typing import Any, Callable, Generator, Optional, Tuple
 from unittest.mock import AsyncMock, MagicMock
 
 from aiohttp import web
@@ -78,7 +78,9 @@ class DevOT2UpdateActions(OT2UpdateActions):
         file_size: Optional[int] = None,
     ) -> Partition:
         LOG.info(f"[dev-ot2] write_update → {self._partfile}")
-        write_file(rootfs_filepath, self._partfile, progress_callback, chunk_size, file_size)
+        write_file(
+            rootfs_filepath, self._partfile, progress_callback, chunk_size, file_size
+        )
         return Partition(2, self._partfile)
 
     @contextlib.contextmanager
@@ -201,7 +203,7 @@ def _make_name_sync() -> NameSynchronizer:
     mock_sync: MagicMock = MagicMock(spec=NameSynchronizer)
     mock_sync.get_name = AsyncMock(return_value="dev-robot")
     mock_sync.set_name = AsyncMock(side_effect=lambda name: name)
-    return mock_sync  # type: ignore[return-value]
+    return mock_sync
 
 
 def _make_temp_tree(flex: bool) -> tuple[str, str, str, str]:
@@ -240,7 +242,7 @@ def _make_temp_tree(flex: bool) -> tuple[str, str, str, str]:
     return tmpdir, partfile, config_path, version_path
 
 
-def _health_handler(robot_model: str) -> web.RequestHandler:
+def _health_handler(robot_model: str) -> Any:
     """Build a /health stub that reports the given robot_model."""
 
     async def handler(request: web.Request) -> web.Response:
@@ -268,8 +270,8 @@ def _health_handler(robot_model: str) -> web.RequestHandler:
 async def run_server(port: int, flex: bool) -> None:
     tmpdir, partfile, config_path, version_path = _make_temp_tree(flex)
 
-    original_do_restart = control_mod._do_restart  # type: ignore[attr-defined]
-    control_mod._do_restart = lambda: LOG.info(  # type: ignore[attr-defined]
+    original_do_restart = control_mod._do_restart
+    control_mod._do_restart = lambda: LOG.info(
         "[dev] /server/restart → no-op"
     )
 
@@ -306,14 +308,14 @@ async def run_server(port: int, flex: bool) -> None:
         site = web.TCPSite(runner, "0.0.0.0", port)
         await site.start()
 
-        print(f"\n{'─'*62}")
+        print(f"\n{'─' * 62}")
         print(f"  Update server (dev mode) — {label}")
         print(f"  Listening:          http://localhost:{port}")
         print(f"  Robot model:        {robot_model}")
-        print(f"  Signature check:    DISABLED")
+        print("  Signature check:    DISABLED")
         print(f"  Fake partition:     {partfile}")
-        print(f"{'─'*62}")
-        print(f"\n  Run update_robot.py against this server:")
+        print(f"{'─' * 62}")
+        print("\n  Run update_robot.py against this server:")
         print(
             f"  python .cursor/skills/robot-ip-health/scripts/update_robot.py \\\n"
             f"    localhost --version {example_version} --port {port}\n"
@@ -327,7 +329,7 @@ async def run_server(port: int, flex: bool) -> None:
             pass
 
     finally:
-        control_mod._do_restart = original_do_restart  # type: ignore[attr-defined]
+        control_mod._do_restart = original_do_restart
         await runner.cleanup()
         shutil.rmtree(tmpdir, ignore_errors=True)
         LOG.info(f"[dev] Cleaned up {tmpdir}")
