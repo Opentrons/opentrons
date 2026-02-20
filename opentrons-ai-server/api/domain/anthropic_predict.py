@@ -55,7 +55,7 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
-        self.max_tokens: int = 20000
+        self.max_tokens: int = settings.anthropic_max_tokens
         self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
@@ -283,15 +283,17 @@ class AnthropicPredict:
 
         # With the Files API, uploaded files should be automatically accessible
         # when file IDs are mentioned in the message content (which we do in _create_file_attachment_blocks)
-        response: Message = self.client.messages.create(  # type: ignore[call-overload]
+        # Use streaming to avoid the SDK's 10-minute limit for long-running requests (e.g. large max_tokens).
+        with self.client.messages.stream(
             max_tokens=self.max_tokens,
             messages=messages,
             model=self.model_name,
             system=self.system_prompt,
-            tools=self.tools,
+            tools=self.tools,  # type: ignore[arg-type]
             metadata={"user_id": user_id},
             temperature=0.0,
-        )
+        ) as stream:
+            response: Message = stream.get_final_message()
 
         logger.info(
             f"Token usage: {message_type.capitalize()}",
@@ -614,14 +616,16 @@ class AnthropicPredict:
 
             messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
 
-            response: Message = self.client.messages.create(
+            # Use streaming to avoid the SDK's 10-minute limit for long-running requests.
+            with self.client.messages.stream(
                 max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
                 system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
                 temperature=0.0,
-            )
+            ) as stream:
+                response: Message = stream.get_final_message()
             if response.content and response.content[0].type == "text":
                 response_text = response.content[0].text
                 return response_text
