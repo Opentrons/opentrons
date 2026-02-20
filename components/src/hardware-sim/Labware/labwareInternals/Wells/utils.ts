@@ -1,11 +1,11 @@
 import { DEFAULT_TIP_SIZE } from '../Tips/constants'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
 export const getWidthAndHeightOfWellSVG = (
-  labwareDefinition: LabwareDefinition
+  wellMap: LabwareWellMap
 ): [number, number] => {
-  const firstWell = labwareDefinition.wells.A1
+  const firstWell = wellMap.A1
   const wellShape = firstWell.shape
 
   const width =

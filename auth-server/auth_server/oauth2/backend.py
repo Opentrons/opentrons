@@ -11,7 +11,7 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.users.store import TEST_USERS, User
+from auth_server.users.store import User, get, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def build() -> Backend:
     """Return a backend that our server can use to process OAuth 2 requests."""
     return oauthlib.oauth2.LegacyApplicationServer(
         _RequestValidator(_TokenStore()),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds())
+        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
     )
 
 
@@ -162,11 +162,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
-        for user in TEST_USERS:
-            if user.username == username and user.password == password:
-                # Set `.user` per the oauthlib docs.
-                request.user = user  # type: ignore[attr-defined]
-                return True
+        user = get(username)
+        if user is not None and password_hash.verify(password, user.hashed_password):
+            request.user = user  # type: ignore[attr-defined]
+            return True
         return False
 
     @override
@@ -275,9 +274,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=_now()
         )
         if issuance is not None:
-            user = next(
-                user for user in TEST_USERS if user.username == issuance.username
-            )
+            user = get(issuance.username)
             # Set `.user` per the oauthlib docs.
             request.user = user  # type: ignore[attr-defined]
             return True

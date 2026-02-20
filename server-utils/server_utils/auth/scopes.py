@@ -21,6 +21,11 @@ class Scope(enum.Enum):
 
     # todo(mm, 2026-01-28): Replace these placeholder scopes with real ones.
 
+    USERS_READ = (
+        "users.read",
+        "Read users.",
+    )
+
     USERS_WRITE = (
         "users.write",
         "Read, write, and edit users.",

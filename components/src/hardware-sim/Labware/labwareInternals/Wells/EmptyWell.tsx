@@ -1,20 +1,22 @@
 import { getWidthAndHeightOfWellSVG } from './utils'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
-export function EmptyWell(props: {
+interface EmptyWellProps {
+  wellMap: LabwareWellMap
   size?: string
-  labwareDefinition: LabwareDefinition
-}): JSX.Element {
-  const { size, labwareDefinition } = props
+}
 
-  const firstWell = labwareDefinition.wells.A1
+export function EmptyWell(props: EmptyWellProps): JSX.Element {
+  const { size, wellMap } = props
+  const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
-  const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
+  const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
   const circularDimension = 20
-  const viewBox = isCircular
-    ? size || `0 0 ${circularDimension} ${circularDimension}`
-    : size || `0 0 ${width} ${height}`
+  const viewBox =
+    size || isCircular
+      ? `0 0 ${circularDimension} ${circularDimension}`
+      : `0 0 ${width} ${height}`
 
   return (
     <svg

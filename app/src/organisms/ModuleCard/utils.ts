@@ -10,10 +10,15 @@ import thermoModuleGen1Closed from '/app/assets/images/thermocycler_closed.png'
 import thermoModuleGen2Closed from '/app/assets/images/thermocycler_gen_2_closed.png'
 import thermoModuleGen2Opened from '/app/assets/images/thermocycler_gen_2_opened.png'
 import thermoModuleGen1Opened from '/app/assets/images/thermocycler_open_transparent.png'
+import vacuumModule from '/app/assets/images/vacuum_module_v1.png'
 import { updateModule } from '/app/redux/modules'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
+import { NO_CALIBRATION_TYPE } from './constants'
+
+import type { TFunction } from 'i18next'
 import type { ChipType } from '@opentrons/components'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   VacuumModuleStatus,
@@ -46,6 +51,8 @@ export function getModuleCardImage(attachedModule: AttachedModule): string {
     case 'flexStackerModuleV1':
       return flexStacker
     //  this should never be reached
+    case 'vacuumModuleMilliporeV1':
+      return vacuumModule
     default:
       return 'unknown module model, this is an error'
   }
@@ -105,11 +112,48 @@ export function useModuleApiRequests(): [
 }
 
 export const getPumpStatusProps = (
-  t: any,
+  t: TFunction,
   status: VacuumModuleStatus
 ): { text: string; type: ChipType } => {
   if (status === 'idle') {
     return { text: t('pump_idle'), type: 'neutral' }
   }
+  if (status === 'error') {
+    return { text: t('pump_error'), type: 'error' }
+  }
   return { text: t('pump_engaged'), type: 'info' }
+}
+
+export const getCanCalibrateModule = (
+  module: AttachedModule,
+  isFlex: boolean
+): boolean => isFlex && !NO_CALIBRATION_TYPE.includes(module.moduleType)
+
+export const getIsModuleCalibrated = (module: AttachedModule): boolean =>
+  module.moduleOffset?.last_modified != null
+
+export const getModuleCalibrationRequired = (
+  module: AttachedModule,
+  isFlex: boolean
+): boolean => {
+  if (!getCanCalibrateModule(module, isFlex)) {
+    return false
+  }
+  return !getIsModuleCalibrated(module)
+}
+
+export const getModuleSetupRequired = (
+  module: AttachedModule,
+  isFlex: boolean,
+  deckConfig?: DeckConfiguration
+): boolean => {
+  if (!isFlex) {
+    return false
+  }
+  return !(
+    deckConfig?.some(
+      ({ opentronsModuleSerialNumber }) =>
+        opentronsModuleSerialNumber === module.serialNumber
+    ) ?? false
+  )
 }

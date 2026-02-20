@@ -1826,7 +1826,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "aiohttp", marker = "python_full_version >= '3.11'" },
     { name = "build", marker = "python_full_version >= '3.11'" },
     { name = "click", marker = "python_full_version >= '3.11'" },
     { name = "decoy", marker = "python_full_version >= '3.11'" },
@@ -1876,7 +1875,7 @@ robot = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", specifier = "==3.12.14" },
+    { name = "aiohttp", specifier = ">=3.12.14,<4" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "opentrons", editable = "../api" },
@@ -1898,7 +1897,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "aiohttp", marker = "python_full_version >= '3.11'", specifier = "==3.12.14" },
     { name = "build", marker = "python_full_version >= '3.11'", specifier = "~=1.2.0" },
     { name = "click", marker = "python_full_version >= '3.11'", specifier = "==8.1.2" },
     { name = "decoy", marker = "python_full_version >= '3.11'", specifier = ">=2.2.0,<3" },
@@ -2109,6 +2107,7 @@ wheels = [
 name = "server-utils"
 source = { editable = "../server-utils" }
 dependencies = [
+    { name = "aiohttp" },
     { name = "anyio" },
     { name = "fastapi" },
     { name = "idna" },
@@ -2124,6 +2123,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.12.14,<4" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "idna", specifier = "==3.3" },

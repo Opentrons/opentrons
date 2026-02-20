@@ -64,6 +64,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'heaterShakerV1A3',
     'movableTrashA3',
     'absorbanceReaderV1A3',
+    'vacuumModuleMilliporeV1A3',
   ],
   VSB3: [
     'B3',

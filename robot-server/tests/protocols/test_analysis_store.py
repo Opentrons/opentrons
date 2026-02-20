@@ -255,8 +255,10 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
-    command_annotation = pe_types.CustomCommandAnnotationLegacy(
-        commandKeys=["abc", "xyz"]
+    command_annotation = pe_types.UserCommandAnnotation(
+        annotationId="annotation-id",
+        userSpecifiedName="My command annotation",
+        params={},
     )
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
@@ -329,7 +331,12 @@ async def test_update_adds_details_and_completes_analysis(
         "liquidClasses": [],
         "modules": [],
         "commandAnnotations": [
-            {"annotationType": "custom", "commandKeys": ["abc", "xyz"]}
+            {
+                "annotationType": "userCommand",
+                "annotationId": "annotation-id",
+                "userSpecifiedName": "My command annotation",
+                "params": {},
+            }
         ],
     }
 
