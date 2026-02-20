@@ -15,8 +15,7 @@ from typing import (
 import fastapi
 import fastapi.security
 
-from .auth_server import TOKEN_ENDPOINT_PATH
-from .auth_server import Client as AuthServerClient
+from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
@@ -121,16 +120,28 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
     return dependency
 
 
+def install_authorization_checker(
+    app_state: AppState,
+    authorization_checker: AuthorizationChecker,
+) -> None:
+    """Store a singleton `AuthorizationChecker` in global server state for later retrieval.
+
+    This should be called once during server initialization.
+    """
+    _authorization_checker_accessor.set_on(app_state, authorization_checker)
+
+
 @asynccontextmanager
-async def set_up_authorization_checker(
-    app_state: AppState, *, auth_server_uds: str | None = None, auth_server_url: str | None = None
-) -> AsyncGenerator[None, None]:
-    """Set up the server's singleton `AuthorizationChecker`.
+async def build_authorization_checker(
+    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
+) -> AsyncGenerator[AuthorizationChecker, None]:
+    """Build an `AuthorizationChecker` appropriately configured for most servers.
 
-    When this context manager is entered, the `AuthorizationChecker` is initialized
-    and placed on `app_state` for later retrieval via `_get_notification_client()`.
-
-    When this context manager is exited, the `AuthorizationChecker` is cleaned up.
+    `auth_server_uds` (a path to a Unix domain socket) or `auth_server_url` (a URL like
+    http://localhost:1234) describes how to connect to the auth-server. These should
+    typically be taken from CLI options or environment variables. If neither are
+    specified, a dummy `AuthorizationChecker` is returned that allows unauthenticated
+    access to everything.
     """
     if auth_server_uds is None and auth_server_url is None:
         _log.info(
@@ -138,20 +149,13 @@ async def set_up_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        authorization_checker: AuthorizationChecker = (
-            AlwaysAllowedAuthorizationChecker()
-        )
-        _authorization_checker_accessor.set_on(app_state, authorization_checker)
-        yield
+        yield AlwaysAllowedAuthorizationChecker()
 
     else:
-        async with AuthServerClient(
-            auth_server_uds=auth_server_uds,
-            auth_server_url=auth_server_url
+        async with LocalHTTPClient(
+            auth_server_uds=auth_server_uds, auth_server_url=auth_server_url
         ) as client:
-            authorization_checker = AuthServerAuthorizationChecker(client)
-            _authorization_checker_accessor.set_on(app_state, authorization_checker)
-            yield
+            yield AuthServerAuthorizationChecker(client)
 
 
 def _get_authorization_checker(

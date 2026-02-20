@@ -8,17 +8,16 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .backend import Backend, build
+from .backend import Backend
 
 _app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
 
 
-def init_oauth2_backend(app_state: AppState) -> None:
+def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
     """Initialize the server's singleton OAuth 2 backend and store it for later retrieval.
 
     This should be called once at server startup.
     """
-    backend = build()
     _app_state_accessor.set_on(app_state, backend)
 
 
