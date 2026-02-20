@@ -2,6 +2,7 @@
 import enum
 from Pyro5.api import register_class_to_dict, register_dict_to_class
 import serpent
+import inspect
 from typing import Any, Dict
 import opentrons.hardware_control.types
 import opentrons.config.types
@@ -30,6 +31,14 @@ def _generic_enum_dict_to_class(classname:str, d: Any):
     else:
         raise RuntimeError(f"Unsupported module processed in Pyro request: {classname}")
     return opentrons_type(d["value"])
+
+def find_enums_in_packages(modules: list):
+    enums = [] 
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, enum.Enum) and obj is not enum.Enum:
+                enums.append(obj)
+    return enums
 
 # Estop Overall Status registry
 def _estop_overall_status_dict_to_class(classname, d):
@@ -67,21 +76,18 @@ def register_hardware_types():
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
-    opentrons_enum_types = [
-        opentrons.types.Mount,
-        opentrons.config.types.GantryLoad,
-        opentrons.hardware_control.types.OT3Mount,
-        opentrons.hardware_control.types.DoorState,
-        opentrons.hardware_control.types.Axis,
-        opentrons.hardware_control.types.SubSystem,
-        opentrons.hardware_control.types.UpdateState
-    ]
-
+    opentrons_types = find_enums_in_packages(
+        [
+            opentrons.types,
+            opentrons.config.types,
+            opentrons.hardware_control.types
+        ]
+    )
     # Serpent matches by first isinstance() in registry order, so unregister enums first so that
     # types like "Mount" don't automatically become strings/ints, then register the enums after.
     serpent.unregister_class(enum.Enum)
 
-    for enum_type in opentrons_enum_types:
+    for enum_type in opentrons_types:
         classpath = '.'.join((enum_type.__module__, enum_type.__qualname__))
         register_dict_to_class(classpath, _generic_enum_dict_to_class)
         register_class_to_dict(enum_type, _generic_enum_class_to_dict)
