@@ -70,6 +70,7 @@ export const BeforeBeginning = ({
           </StyledText>
           <MediumButton
             css={ODD_MEDIUM_BUTTON_STYLE}
+            justifyContent={JUSTIFY_FLEX_START}
             buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
             onClick={() => {
               setFlowType('blowout')
@@ -78,6 +79,7 @@ export const BeforeBeginning = ({
           />
           <MediumButton
             css={ODD_MEDIUM_BUTTON_STYLE}
+            justifyContent={JUSTIFY_FLEX_START}
             buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
             onClick={() => {
               setFlowType('drop_tips')
@@ -240,7 +242,6 @@ const CONTAINER_STYLE = css`
 
 const ODD_MEDIUM_BUTTON_STYLE = css`
   flex: 1;
-  justify-content: ${JUSTIFY_FLEX_START};
   padding-left: ${SPACING.spacing24};
   height: 5.25rem;
 `

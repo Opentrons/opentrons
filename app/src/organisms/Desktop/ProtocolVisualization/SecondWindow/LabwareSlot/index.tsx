@@ -128,13 +128,13 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       ? pipetteTemporalProperties[1].wellName
       : null
   const wellGroup: WellGroup | null =
-    activeWellName != null
+    activeWellName != null && labwareDef.wells[activeWellName] != null
       ? {
           [activeWellName]: null,
         }
       : null
   const hoveredWellGroup: WellGroup | null =
-    hoveredWellName != null
+    hoveredWellName != null && labwareDef.wells[hoveredWellName] != null
       ? {
           [hoveredWellName]: null,
         }

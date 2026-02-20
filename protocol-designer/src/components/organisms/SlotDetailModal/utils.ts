@@ -1,6 +1,6 @@
-import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
-
 import type { TFunction } from 'i18next'
+
+const getRowFromSlotName = (slotName: string): string => slotName.slice(0, 1)
 
 export function getDeckLabel(
   slotName: string,
@@ -13,7 +13,7 @@ export function getDeckLabel(
 
   if (isHopper) {
     return t('shared:stacker', {
-      slot: getColumnFromWellName(slotName),
+      slot: getRowFromSlotName(slotName),
     })
   }
 

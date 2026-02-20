@@ -105,15 +105,9 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
         ]}
       >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-          <Flex flexDirection={DIRECTION_ROW}>
+          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <StyledIcon name="jump-size" width="1.2rem" />
-            <StyledText
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              css={TYPOGRAPHY.pSemiBold}
-              marginLeft={SPACING.spacing8}
-            >
-              {t('jump_size')}
-            </StyledText>
+            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('jump_size')}</StyledText>
           </Flex>
           <StyledText
             color={COLORS.grey60}
@@ -137,7 +131,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
 }
 
 export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
-  const { i18n, t } = useTranslation('robot_calibration')
+  const { t } = useTranslation('robot_calibration')
   return (
     <Flex
       flex="3"
@@ -147,9 +141,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      <TouchControlLabel>
-        {i18n.format(t('jump_size'), 'capitalize')}
-      </TouchControlLabel>
+      <TouchControlLabel>{t('jump_size')}</TouchControlLabel>
 
       <StepSizeButtons {...props} />
     </Flex>
