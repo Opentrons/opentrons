@@ -9,7 +9,7 @@ import requests
 import structlog
 import weave
 from anthropic import Anthropic
-from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam
+from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam, ToolParam
 from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
@@ -88,7 +88,7 @@ class AnthropicPredict:
                 "content": [TextBlockParam(type="text", text=self.get_api_docs(), cache_control={"type": "ephemeral"})],
             }
         ]
-        self.tools: List[Dict[str, Any]] = [
+        self.tools: List[ToolParam] = [
             {
                 "name": "simulate_protocol",
                 "description": "Simulates the python protocol on user input. Returned value is text indicating if protocol is successful.",
@@ -289,7 +289,7 @@ class AnthropicPredict:
             messages=messages,
             model=self.model_name,
             system=self.system_prompt,
-            tools=self.tools,  # type: ignore[arg-type]
+            tools=self.tools,
             metadata={"user_id": user_id},
             temperature=0.0,
         ) as stream:
