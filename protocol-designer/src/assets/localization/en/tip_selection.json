@@ -29,13 +29,13 @@
   "select_tiprack": "Select a tip rack to pick up tips from",
   "select_tips": "Select tips",
   "select_tips_for_tracking": "Select tips for manual tip tracking",
-  "tip_accessible": {
+  "accessible": {
     "deselect_multiple": "Deselect tips",
     "deselect_one": "Deselect tip",
     "select_multiple": "Select tips",
     "select_one": "Select tip"
   },
-  "tip_inaccessible": {
+  "inaccessible": {
     "collision": "Selection will cause a collision",
     "incomplete": "Selection will be incomplete",
     "tooManyPickups": "Selection will pickup too many tips"

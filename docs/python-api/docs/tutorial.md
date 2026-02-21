@@ -16,7 +16,7 @@ You're going to write some Python code, but you don't need to be a Python expert
 
 You should write your code in your favorite plaintext editor or development environment and save it in a file with a `.py` extension, like `dilution-tutorial.py`.
 
-To simulate your code, you'll need [Python 3.10](https://www.python.org/downloads/) and the [pip package installer](https://pip.pypa.io/en/stable/getting-started/). Newer versions of Python aren't yet supported by the Python Protocol API. If you don't use Python 3.10 as your system Python, we recommend using [pyenv](https://github.com/pyenv/pyenv) to manage multiple Python versions.
+To simulate your code, you'll need [Python 3.12](https://www.python.org/downloads/) and the [pip package installer](https://pip.pypa.io/en/stable/getting-started/). Newer versions of Python aren't yet supported by the Python Protocol API. If you don't use Python 3.12 as your system Python, we recommend using [pyenv](https://github.com/pyenv/pyenv) to manage multiple Python versions.
 
 ## Hardware and labware
 

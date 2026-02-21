@@ -36,6 +36,7 @@ class BaseDeploymentConfig:
     SERVICE_NAME: str
     CONTAINER_NAME: str
     ENV_VARIABLES_SECRET_NAME: str  # key/value secret as the source of truth for environment variables in the deployed environment
+    LOG_GROUP_NAME: str = ""  # CloudWatch log group name for awslogs driver
     TAG: str = "not set"
     DEPLOYMENT_TIMEOUT_S: int = 600
     DEPLOYMENT_POLL_INTERVAL_S: int = 20
@@ -51,6 +52,7 @@ class StagingDeploymentConfig(BaseDeploymentConfig):
     SERVICE_NAME: str = "staging-ai-service"
     CONTAINER_NAME: str = "staging-ai-api"
     ENV_VARIABLES_SECRET_NAME: str = "staging-environment-variables"
+    LOG_GROUP_NAME: str = "/ecs/staging-ai-api"
 
 
 @dataclass(frozen=True)
@@ -63,6 +65,7 @@ class ProdDeploymentConfig(BaseDeploymentConfig):
     SERVICE_NAME: str = "prod-ai-service"
     CONTAINER_NAME: str = "prod-ai-api"
     ENV_VARIABLES_SECRET_NAME: str = "prod-environment-variables"
+    LOG_GROUP_NAME: str = "/ecs/prod-ai-api"
 
 
 class Deploy:
@@ -148,7 +151,10 @@ class Deploy:
 
         unexpected_secrets = [secret.upper() for secret in task_secrets if secret not in expected_secrets]
         if unexpected_secrets:
-            raise ValueError(f"Secrets found in the api container definition that are NOT in Settings: {', '.join(unexpected_secrets)}")
+            print(f"Removing unexpected secrets not in Settings: {unexpected_secrets}")
+            container_definition["secrets"] = [s for s in container_definition["secrets"] if s["name"].upper() not in unexpected_secrets]
+            # Refresh task_secrets after removal
+            task_secrets = {secret["name"].upper() for secret in container_definition.get("secrets", [])}
 
         missing_secrets = [secret.upper() for secret in expected_secrets if secret.upper() not in task_secrets]
 
@@ -177,30 +183,50 @@ class Deploy:
         task_definition_arn = response["services"][0]["taskDefinition"]
 
         task_definition = self.ecs_client.describe_task_definition(taskDefinition=task_definition_arn)["taskDefinition"]
-        container_definitions = task_definition["containerDefinitions"]
-        for container_definition in container_definitions:
-            # ENV--datadog-agent container has one secret and 2 environment variables
-            # ENV--log-router container has no secrets or environment variables
-            # These are managed in the infra repo, NOT here
-            if container_definition["name"] == self.config.CONTAINER_NAME:
-                container_definition["image"] = self.full_image_name
-                environment_variables = container_definition.get("environment", [])
-                # set the environment variables for the environment
-                for key, value in self.env_variables.model_dump().items():
-                    if not isinstance(value, SecretStr):
-                        # Secrets are not set here
-                        # They are set in the secrets key of the containerDefinition
-                        environment_variables = self.update_environment_variables(environment_variables, key, value)
-                # Overwrite the DD_VERSION environment variable
-                # with the current deployment tag
-                # this is what we are using for version currently
-                environment_variables = self.update_environment_variables(environment_variables, "DD_VERSION", self.config.TAG)
-                container_definition["environment"] = environment_variables
-                # Update the secrets in the container definition
-                self.update_secrets_in_container_definition(container_definition)
-                print("Updated container definition:")
-                print(container_definition)
-                break
+        all_container_definitions = task_definition["containerDefinitions"]
+
+        # Filter out sidecar containers (datadog agent, log router, etc.)
+        # Only keep the API container — sidecars are no longer needed
+        removed = [c["name"] for c in all_container_definitions if c["name"] != self.config.CONTAINER_NAME]
+        if removed:
+            print(f"Removing sidecar containers from task definition: {removed}")
+        container_definitions = [c for c in all_container_definitions if c["name"] == self.config.CONTAINER_NAME]
+
+        if not container_definitions:
+            raise ValueError(f"API container '{self.config.CONTAINER_NAME}' not found in task definition")
+
+        container_definition = container_definitions[0]
+        container_definition["image"] = self.full_image_name
+
+        # Set CloudWatch Logs as the log driver (replaces awsfirelens/datadog)
+        container_definition["logConfiguration"] = {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": self.config.LOG_GROUP_NAME,
+                "awslogs-region": get_aws_region(),
+                "awslogs-stream-prefix": "ecs",
+                "awslogs-create-group": "true",
+            },
+        }
+
+        # Build environment variables fresh from Settings (not merging with old task def)
+        # This ensures removed env vars (e.g. DD_*) don't persist across deploys
+        environment_variables: List[Dict[str, str]] = []
+        for key, value in self.env_variables.model_dump().items():
+            if not isinstance(value, SecretStr):
+                # Secrets are not set here
+                # They are set in the secrets key of the containerDefinition
+                environment_variables = self.update_environment_variables(environment_variables, key, value)
+        # Overwrite the SERVICE_VERSION environment variable
+        # with the current deployment tag
+        # this is what we are using for version currently
+        environment_variables = self.update_environment_variables(environment_variables, "SERVICE_VERSION", self.config.TAG)
+        container_definition["environment"] = environment_variables
+        # Update the secrets in the container definition
+        self.update_secrets_in_container_definition(container_definition)
+        print("Updated container definition:")
+        print(container_definition)
+
         # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html#fargate-tasks-size
         new_task_definition = {
             "family": task_definition["family"],
@@ -242,6 +268,7 @@ def main() -> None:
     parser.add_argument("--tag", type=str, help="The tag and therefore version of the container to use")
     # action="store_true" sets args.dry to True only if --dry is provided on the command line
     parser.add_argument("--dry", action="store_true", help="Dry run, do not make any changes")
+    parser.add_argument("--no-build", action="store_true", help="Skip the Docker image build")
     parser.add_argument("--build-only", action="store_true", help="Only build the Docker image, do not deploy")
     args = parser.parse_args()
 
@@ -273,7 +300,10 @@ def main() -> None:
         print(f"[red]Invalid environment specified: {env}[/red]")
         exit(1)
     aws = Deploy(config, build_only=args.build_only)
-    aws.build_docker_image()
+    if not args.no_build:
+        aws.build_docker_image()
+    else:
+        print("Skipping Docker image build (--no-build)")
 
     if args.build_only:
         print(f"[green]Build complete! Image built: {config.IMAGE_NAME}:{tag}[/green]")

@@ -15,6 +15,14 @@ from typing_extensions import Literal
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import EngineStatus
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    Body,
+    PydanticResponse,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from ..dependencies import get_maintenance_run_data_manager
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
@@ -39,14 +47,6 @@ from robot_server.runs.dependencies import (
 )
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    Body,
-    PydanticResponse,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)

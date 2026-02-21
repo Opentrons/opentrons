@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Literal, Optional, TypedDict
 
 import anthropic
 from api.constants.file_constants import CONTENT_TYPE_MAPPING, format_file_size_error, get_file_size_limit
-from ddtrace import tracer
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +51,6 @@ class FileProcessor:
         return len(content) // 4
 
     @staticmethod
-    @tracer.wrap()
     def count_file_tokens(
         filename: str, content: str, media_type: str, anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> int:
@@ -76,7 +74,8 @@ class FileProcessor:
             ]
 
             token_count_response = anthropic_client.messages.count_tokens(
-                model=model or "claude-3-5-sonnet-20241022", messages=[{"role": "user", "content": message_content}]  # type: ignore
+                model=model or "claude-3-5-sonnet-20241022",
+                messages=[{"role": "user", "content": message_content}],  # type: ignore
             )
 
             logger.info(f"File {filename} token count: {token_count_response.input_tokens}")
@@ -148,7 +147,6 @@ class FileProcessor:
                     raise ValueError(f"Unsupported file type for {filename}. Only PDF, CSV, and Python files are supported.")
 
     @staticmethod
-    @tracer.wrap()
     def check_files_token_warning(
         file_references: Optional[List[Dict[str, Any]]], anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> Optional[str]:

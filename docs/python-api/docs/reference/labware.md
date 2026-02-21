@@ -10,7 +10,6 @@ title: "Python API Reference: Labware and Trash"
         - "!use_tips"
         - "!previous_tip"
         - "!return_tips"
-        - "!set_empty"
 
 ::: opentrons.protocol_api.TrashBin
     options:

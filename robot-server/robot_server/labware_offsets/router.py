@@ -8,6 +8,14 @@ import fastapi
 from pydantic.json_schema import SkipJsonSchema
 
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
 
 from .fastapi_dependencies import get_labware_offset_store
 from .models import (
@@ -24,14 +32,6 @@ from robot_server.labware_offsets.models import LabwareOffsetNotFound
 from robot_server.service.dependencies import (
     UniqueIDFactory,
     get_current_time,
-)
-from robot_server.service.json_api.request import RequestModel
-from robot_server.service.json_api.response import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleBody,
-    SimpleEmptyBody,
-    SimpleMultiBody,
 )
 
 router = LightRouter()

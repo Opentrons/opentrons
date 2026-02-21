@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     If the variable is not set in the OS the default value is used (this is just for creating the .env file with default values)
     """
 
-    model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow")  # Allows extra fields
+    model_config = SettingsConfigDict(
+        env_file=ENV_PATH, env_file_encoding="utf-8", extra="allow", protected_namespaces=("settings_",)
+    )  # Allows extra fields
     # Delete the extra=allow above
     # once we figure out why aws secret manager has a variable called protocol_designer_app_version
     # see https://github.com/Opentrons/opentrons/actions/runs/15007084098/job/42168255050
@@ -29,15 +31,15 @@ class Settings(BaseSettings):
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
     anthropic_model_name: str = "claude-sonnet-4-5-20250929"
+    anthropic_max_tokens: int = 64000
     model_helper: str = "claude-sonnet-4-5-20250929"
     model: str = "claude"
     auth0_domain: str = "opentrons-dev.us.auth0.com"
     auth0_api_audience: str = "sandbox-ai-api"
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
-    dd_version: str = "hardcoded_default_from_settings"
+    service_version: str = "hardcoded_default_from_settings"
     allowed_origins: str = "*"
-    dd_trace_enabled: str = "false"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
@@ -48,7 +50,6 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr = SecretStr("default_openai_api_key")
     huggingface_api_key: SecretStr = SecretStr("default_huggingface_api_key")
     google_credentials_json: SecretStr = SecretStr("default_google_credentials_json")
-    datadog_api_key: SecretStr = SecretStr("default_datadog_api_key")
     anthropic_api_key: SecretStr = SecretStr("default_anthropic_api_key")
     wandb_api_key: SecretStr = SecretStr("default_wandb_api_key")
 

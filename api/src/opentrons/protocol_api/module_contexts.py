@@ -709,8 +709,8 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
-                the block heats or cools. 
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+                the block heats or cools.
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -763,8 +763,8 @@ class ThermocyclerContext(ModuleContext):
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
 
-        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
-        the block heats or cools. 
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        the block heats or cools.
         """
 
         if block_max_volume is None:

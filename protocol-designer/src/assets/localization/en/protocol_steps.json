@@ -150,6 +150,7 @@
   "multi_dispense_options": "Disposal volume",
   "new_location": "New location",
   "no_tiprack": "No tiprack available",
+  "no_nozzles_and_wells_selected": "No nozzles and wells selected",
   "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "num_nozzles": "{{num}} nozzles",
   "number_of_nozzles_used": "Number of nozzles used",
@@ -289,6 +290,7 @@
   "well_position_with_reference_nested": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm from {{reference}}",
   "well_position_xyz": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm",
   "well_position_z_only": "Well position: Z {{z}} (mm)",
+  "well_selection_error": "Well selection ratio must be 1 to many, many to 1, or N to N",
   "wells_in_labware": "{{well}} of {{labware}}",
   "wells_of": "{{wells}} of"
 }

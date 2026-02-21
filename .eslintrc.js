@@ -181,13 +181,6 @@ module.exports = {
         '@typescript-eslint/consistent-type-assertions': 'off',
       },
     },
-    {
-      files: ['**/cypress/**'],
-      extends: ['plugin:cypress/recommended'],
-      rules: {
-        'cypress/unsafe-to-chain-command': 'warn',
-      },
-    },
     // Allow HTTP hooks in notification wrappers and tests
     {
       files: ['app/src/resources/**', '**/__tests__/**test**'],

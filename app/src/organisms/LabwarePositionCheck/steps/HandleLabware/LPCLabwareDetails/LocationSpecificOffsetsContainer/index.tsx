@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
+  DISPLAY_GRID,
   Flex,
   ListTable,
   RESPONSIVENESS,
@@ -44,7 +45,7 @@ export function LocationSpecificOffsetsContainer(
       >
         {t('applied_location_offsets')}
       </StyledText>
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} display={DISPLAY_GRID}>
         <OffsetTableHeaders />
         <ListTable>
           {sortedDetailsBySlot.map(offset => {

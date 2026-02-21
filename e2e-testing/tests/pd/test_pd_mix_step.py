@@ -12,7 +12,7 @@ TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 
 
 @pytest.mark.pdE2E
-def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
+def test_import_protocol_and_enter_edit_mode(page: Page, pd_base_url: str) -> None:
     """Verify we can import a protocol and reach the editor."""
 
     _import_protocol_and_open_editor(page)
@@ -20,7 +20,7 @@ def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
 
 
 @pytest.mark.pdE2E
-def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
+def test_mix_step_configuration_workflow(page: Page, pd_base_url: str) -> None:
     """Replicate the complete mixSettings Cypress test using Playwright."""
 
     editor = _import_protocol_and_open_editor(page)

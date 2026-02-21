@@ -35,11 +35,11 @@ export function FirstStepMixTools({
   const enableAdditionalPartialTip = useSelector(
     getEnableAdditionalPartialTipSelection
   )
-
   const completedSteps =
     formData.labware != null &&
     formData.tipRack != null &&
     formData.pipette != null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -54,7 +54,6 @@ export function FirstStepMixTools({
       />
       <Divider marginY="0" />
       <LabwareField {...propsForFields.labware} tooltipContent={null} />
-      <Divider marginY="0" />
       {completedSteps ? (
         enableAdditionalPartialTip ? (
           <>
@@ -69,26 +68,31 @@ export function FirstStepMixTools({
             />
           </>
         ) : (
-          <PartialTipField
-            {...propsForFields.nozzles}
-            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
-          />
+          <>
+            <PartialTipField
+              {...propsForFields.nozzles}
+              pipetteSpecs={
+                pipettes[String(propsForFields.pipette.value)]?.spec
+              }
+            />
+            <Divider marginY="0" />
+            <WellSelectionField
+              {...propsForFields.wells}
+              labwareId={formData.labware}
+              pipetteId={formData.pipette}
+              nozzles={
+                typeof propsForFields.nozzles.value === 'string'
+                  ? propsForFields.nozzles.value
+                  : null
+              }
+              hasFormError={propsForFields.wells.errorToShow != null}
+            />
+          </>
         )
       ) : null}
 
       {completedSteps ? (
         <>
-          <WellSelectionField
-            {...propsForFields.wells}
-            labwareId={formData.labware}
-            pipetteId={formData.pipette}
-            nozzles={
-              typeof propsForFields.nozzles.value === 'string'
-                ? propsForFields.nozzles.value
-                : null
-            }
-            hasFormError={propsForFields.wells.errorToShow != null}
-          />
           <Divider marginY="0" />
           <VolumeField fieldProps={propsForFields.volume} />
           <Divider marginY="0" />

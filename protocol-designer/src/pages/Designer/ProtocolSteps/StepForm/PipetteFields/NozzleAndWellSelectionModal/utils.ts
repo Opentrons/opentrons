@@ -2,7 +2,13 @@ import {
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
+  B1_NOZZLE,
+  C1_NOZZLE,
   COLUMN,
+  D1_NOZZLE,
+  E1_NOZZLE,
+  F1_NOZZLE,
+  G1_NOZZLE,
   H1_NOZZLE,
   H12_NOZZLE,
   PARTIAL,
@@ -26,6 +32,11 @@ export const partialNozzleMap: Record<PartialPrimaryNozzles, number> = {
   D1: 5,
   C1: 6,
   B1: 7,
+}
+function isPartialPrimaryNozzle(
+  nozzle: string
+): nozzle is PartialPrimaryNozzles {
+  return nozzle in partialNozzleMap
 }
 
 export const getAvailableNozzleConfigurations = (
@@ -66,21 +77,18 @@ export const getAvailableNozzleConfigurations = (
             ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
             : null,
         },
+        {
+          name: t('single_row_of_nozzles'),
+          value: ROW,
+          disabled: areAllTipracksOnAdapter,
+          tooltipText: areAllTipracksOnAdapter
+            ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
+            : null,
+        },
       ]
     )
   }
-  if (channels !== 8) {
-    nozzleConfigurationOptions.push({
-      name: t('single_row_of_nozzles'),
-      value: ROW,
-      disabled: areAllTipracksOnAdapter,
-      tooltipText: areAllTipracksOnAdapter
-        ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
-        : null,
-    })
-  }
   if (channels === 8) {
-    // 8-channel
     nozzleConfigurationOptions.push({
       name: t('single_nozzle'),
       value: SINGLE,
@@ -107,7 +115,18 @@ export const getAvailablePrimaryNozzles = (
       COLUMN: [A1_NOZZLE, A12_NOZZLE],
       ALL: [A1_NOZZLE],
     },
-    8: { SINGLE: [A1_NOZZLE, H1_NOZZLE], ALL: [A1_NOZZLE] },
+    8: {
+      SINGLE: [A1_NOZZLE, H1_NOZZLE],
+      ALL: [A1_NOZZLE],
+      PARTIAL: [
+        B1_NOZZLE,
+        C1_NOZZLE,
+        D1_NOZZLE,
+        E1_NOZZLE,
+        G1_NOZZLE,
+        F1_NOZZLE,
+      ],
+    },
     1: { ALL: [A1_NOZZLE] },
   }
   const filteredAllowedNozzles =
@@ -143,4 +162,64 @@ export const getNozzleText = (
   }
 
   return nozzleTextMapping[nozzleConfiguration](primaryNozzle) ?? null
+}
+
+export const getEntireWellSelection = (
+  wellName: string,
+  wellOrdering: string[][],
+  nozzleConfiguration: NozzleConfigurationStyle,
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
+  channels: number
+): string[] => {
+  if (nozzleConfiguration === SINGLE) return [wellName]
+  const columnIndex = wellOrdering.findIndex(column =>
+    column.includes(wellName)
+  )
+  if (columnIndex === -1) return []
+  const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
+  switch (nozzleConfiguration) {
+    case ALL:
+      if (channels === 8) {
+        return wellOrdering[columnIndex]
+      }
+      if (channels === 96) {
+        return wellOrdering.flat()
+      }
+      return [wellName]
+    case COLUMN:
+      return wellOrdering[columnIndex]
+    case ROW:
+      return wellOrdering.map(column => column[rowIndex])
+    case PARTIAL: {
+      if (!isPartialPrimaryNozzle(primaryNozzle)) return []
+      const column = wellOrdering[columnIndex]
+      const count = partialNozzleMap[primaryNozzle]
+      const remainingWells = column.length - rowIndex
+      const isSingleRowLabware = column.length === 1
+      if (!isSingleRowLabware && remainingWells < count) {
+        return []
+      }
+      const end = rowIndex + count
+      return column.slice(rowIndex, Math.min(end, column.length))
+    }
+    default:
+      return [wellName]
+  }
+}
+
+export function getWellGroupLength(
+  totalSelected: number,
+  ordering: string[][],
+  nozzleConfiguration: NozzleConfigurationStyle
+): number {
+  const rows = ordering.length
+  const columns = ordering[0]?.length ?? 0
+  switch (nozzleConfiguration) {
+    case ROW:
+      return totalSelected / rows
+    case COLUMN:
+      return totalSelected / columns
+    default:
+      return totalSelected / 1
+  }
 }

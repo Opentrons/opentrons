@@ -8,6 +8,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   Slider,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
@@ -118,26 +119,47 @@ function CameraControlSettings({
     <div className={styles.settings_container}>
       <ZoomSettings zoom={settings.zoom} adjustZoom={settings.adjustZoom} />
       <Divider />
-      <Slider
-        title={t('brightness')}
-        subtext={t('adjust_brightness')}
-        adjustValue={settings.adjustBrightness}
-        value={settings.brightness}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('brightness')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_brightness')}
+          </StyledText>
+        </div>
+        <Slider
+          adjustValue={settings.adjustBrightness}
+          value={settings.brightness}
+        />
+      </div>
       <Divider />
-      <Slider
-        title={t('contrast')}
-        subtext={t('adjust_contrast')}
-        adjustValue={settings.adjustContrast}
-        value={settings.contrast}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('contrast')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_contrast')}
+          </StyledText>
+        </div>
+      </div>
+      <Slider adjustValue={settings.adjustContrast} value={settings.contrast} />
       <Divider />
-      <Slider
-        title={t('saturation')}
-        subtext={t('adjust_saturation')}
-        adjustValue={settings.adjustSaturation}
-        value={settings.saturation}
-      />
+      <div className={styles.controls_section_container}>
+        <div className={styles.controls_section_text_container}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('saturation')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('adjust_saturation')}
+          </StyledText>
+        </div>
+        <Slider
+          adjustValue={settings.adjustSaturation}
+          value={settings.saturation}
+        />
+      </div>
     </div>
   )
 }

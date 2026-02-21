@@ -15,7 +15,7 @@ export function Sidebar(props: SidebarProps): JSX.Element {
   const { filters } = props
 
   return (
-    <nav className={styles.sidebar}>
+    <nav className={styles.sidebar} aria-label="Labware filters">
       <LabwareGuide />
       <FilterManufacturer filters={filters} />
       <FilterCategory filters={filters} />

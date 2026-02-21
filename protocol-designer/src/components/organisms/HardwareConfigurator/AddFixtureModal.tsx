@@ -20,6 +20,7 @@ import {
   FIXTURES_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   getAADisplayName,
+  getComboFixtureFromFixtureIds,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -266,11 +267,43 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     )
     if (moduleModel == null) return
 
+    // Get the first existing module in this cutout (if any) before filtering
+    const matchedModuleEntry = Object.entries(modules).find(
+      ([, module]) => module.cutoutId === newModule.cutoutId
+    )
+    const module =
+      matchedModuleEntry != null ? matchedModuleEntry[1] : undefined
+    const moduleFixtureId =
+      module != null
+        ? getCutoutFixturesForModuleModel(
+            module.model as ModuleModel,
+            deckDef
+          )[0].id
+        : undefined
+
+    const matchedModule =
+      matchedModuleEntry != null
+        ? getCutoutFixturesForModuleModel(
+            matchedModuleEntry[1].model as ModuleModel,
+            deckDef
+          )[0]
+        : undefined
+
+    // Remove all existing modules in this cutout (handles duplicates)
     const filteredModules = Object.fromEntries(
       Object.entries(modules).filter(
         ([, module]) => module.cutoutId !== newModule.cutoutId
       )
     )
+
+    const matchedComboFixtureId =
+      matchedModule != null
+        ? getComboFixtureFromFixtureIds([
+            moduleFixtureId!,
+            newModule.cutoutFixtureId as CutoutFixtureId,
+          ])
+        : undefined
+
     const isThermocyclerModule = getCutoutFixturesForModuleModel(
       THERMOCYCLER_MODULE_V2,
       deckDef
@@ -280,6 +313,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedModules: FormModules = {
       ...filteredModules,
+      ...(matchedModule != null &&
+      matchedComboFixtureId != null &&
+      matchedModuleEntry != null
+        ? { [matchedModuleEntry[0]]: matchedModuleEntry[1] }
+        : {}),
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel as ModuleModel),
@@ -296,6 +334,16 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   }
 
   const handleAddNewFixture = (newFixture: CutoutConfigMap): void => {
+    // Get the first existing fixture in this cutout (if any)
+    const matchedEntry = Object.entries(fixtures).find(
+      ([, fixture]) => fixture.cutoutId === newFixture.cutoutId
+    )
+    const matchedFixture = matchedEntry != null ? matchedEntry[1] : undefined
+
+    const matchedComboFixtureId = getComboFixtureFromFixtureIds([
+      matchedFixture?.cutoutFixtureId! ?? '',
+      newFixture.cutoutFixtureId as CutoutFixtureId,
+    ])
     const filteredFixtures = Object.fromEntries(
       Object.entries(fixtures).filter(
         ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
@@ -309,6 +357,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     const updatedFixtures: Fixtures = {
       ...filteredFixtures,
+      ...(matchedFixture != null && matchedComboFixtureId != null
+        ? { [matchedComboFixtureId]: matchedFixture }
+        : {}),
       [uuid()]: {
         name:
           (mapFixtureIdToFixtureName(fixtureName) as FixtureName) ??

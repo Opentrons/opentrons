@@ -17,6 +17,7 @@ from opentrons_shared_data.data_files import (
     DataFileSource,
     MimeType,
 )
+from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleEmptyBody
 
 from robot_server.data_files.data_files_store import (
     DataFilesByRunInfo,
@@ -45,7 +46,6 @@ from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
-from robot_server.service.json_api import MultiBodyMeta, SimpleEmptyBody
 from robot_server.service.notifications.publishers import DataFilePublisher
 
 
