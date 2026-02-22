@@ -1,0 +1,78 @@
+[project]
+name = "opentrons-pyodide"
+version = "0.1.0"
+description = "Scripts and tooling for running Opentrons in Pyodide (browser)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff==0.14.10",
+    "mypy==1.19.1",
+    "pytest>=8.2",
+    "pytest-asyncio>=0.25.0,<1",
+    "pytest-cov>=4.1.0",
+    "pydantic>=2.0.0,<3",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff — linting + formatting
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+# Match the api/ ruleset: pyflakes (F), pycodestyle (E/W), isort (I), bugbear (B), pep8-naming (N)
+select = ["E", "F", "W", "I", "B", "N"]
+ignore = [
+    "E501",   # line too long — handled by formatter
+    "B008",   # do not perform function calls in default arguments
+    "N806",   # class objects assigned to local variables (common in stub builders/tests)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons_pyodide_shims"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------------------
+# Mypy — type checking
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_unused_configs = true
+warn_unused_ignores = false
+show_error_codes = true
+# Ignore missing stubs for opentrons (not installed in the pyodide dev venv)
+[[tool.mypy.overrides]]
+module = ["opentrons.*", "anyio.*"]
+ignore_missing_imports = true
+
+# The shims file deliberately accesses CPython private attributes (_scheduled,
+# _ready, _selector, etc.) on SelectorEventLoop and asyncio.tasks internals.
+# Suppressing attr-defined here is intentional.
+[[tool.mypy.overrides]]
+module = "opentrons_pyodide_shims"
+disable_error_code = ["attr-defined", "has-type"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+# ---------------------------------------------------------------------------
+# ty (Cursor built-in type checker)
+# ---------------------------------------------------------------------------
+# ty resolves attributes on types.ModuleType stubs itself, so it flags the
+# mypy-correct `# type: ignore[attr-defined]` comments as unused.
+# Mypy is the authoritative type checker for this project; disable the
+# conflicting ty rule rather than removing valid mypy suppressions.
+[tool.ty.rules]
+unused-ignore-comment = "ignore"

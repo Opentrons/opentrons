@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opentrons Protocol Validator</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22252f;
+      --border: #2a2d3a;
+      --text: #e4e4e7;
+      --muted: #71717a;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- header ---- */
+    header {
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 1rem; font-weight: 600; }
+    .tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+
+    /* ---- footer ---- */
+    footer {
+      padding: 0.4rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    .dot-loading { background: var(--warning); animation: pulse 1s infinite; }
+    .dot-ready   { background: var(--success); }
+    .dot-error   { background: var(--error); }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+    /* ---- buttons ---- */
+    .btn {
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary  { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { color: var(--text); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover:not(:disabled) { filter: brightness(1.1); }
+
+    /* ---- screens ---- */
+    .screen { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* ==== UPLOAD SCREEN ==== */
+    #screen-upload {
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+    }
+
+    .upload-card {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 6px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.06);
+      color: var(--text);
+    }
+    .drop-zone input[type=file] { display: none; }
+    .drop-zone .drop-icon { font-size: 1.4rem; display: block; margin-bottom: 0.35rem; }
+
+    /* File list */
+    .file-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.78rem;
+    }
+    .file-item .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-item .file-size { color: var(--muted); font-size: 0.7rem; flex-shrink: 0; }
+    .file-item .remove-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0 0.2rem;
+      flex-shrink: 0;
+    }
+    .file-item .remove-btn:hover { color: var(--error); }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 32px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--muted);
+      top: 2px; left: 2px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(14px); background: #fff; }
+
+    .csv-section { display: none; }
+    .csv-section.visible { display: flex; }
+
+    /* Validate row */
+    .validate-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    /* ==== LOADING SCREEN ==== */
+    #screen-loading {
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-label { font-size: 0.85rem; color: var(--muted); }
+
+    /* ==== RESULTS SCREEN ==== */
+    #screen-results { flex-direction: column; }
+
+    .results-toolbar {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .results-toolbar .spacer { flex: 1; }
+    .result-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+    .badge-ok { background: rgba(34,197,94,0.15); color: var(--success); }
+    .badge-err { background: rgba(239,68,68,0.15); color: var(--error); }
+
+    .results-panels {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 0;
+    }
+
+    .result-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-right: 1px solid var(--border);
+    }
+    .result-panel:last-child { border-right: none; }
+
+    .panel-header {
+      padding: 0.45rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+    }
+
+    pre.output-plain {
+      font-family: inherit;
+      font-size: 0.75rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--text);
+    }
+
+    @media (max-width: 720px) {
+      .results-panels { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .result-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Opentrons Protocol Validator</h1>
+    <span class="tag">PYODIDE</span>
+  </header>
+
+  <!-- ===================== UPLOAD ===================== -->
+  <div class="screen active" id="screen-upload">
+    <div class="upload-card">
+
+      <!-- Protocol file -->
+      <div class="card-section">
+        <div class="section-title">Protocol file <span style="color:var(--error)">*</span></div>
+        <div class="drop-zone" id="protocol-drop" onclick="document.getElementById('protocol-input').click()"
+             ondragover="handleDragOver(event,'protocol-drop')" ondragleave="handleDragLeave(event,'protocol-drop')"
+             ondrop="handleDrop(event,'protocol')">
+          <input type="file" id="protocol-input" accept=".py,.json" onchange="handleFileSelect(event,'protocol')">
+          <span class="drop-icon">📄</span>
+          Drop a <strong>.py</strong> or <strong>.json</strong> protocol here, or click to browse
+        </div>
+        <ul class="file-list" id="protocol-file-list"></ul>
+      </div>
+
+      <!-- Custom labware -->
+      <div class="card-section">
+        <div class="section-title">Custom labware <span style="color:var(--muted)">(optional)</span></div>
+        <div class="drop-zone" id="labware-drop" onclick="document.getElementById('labware-input').click()"
+             ondragover="handleDragOver(event,'labware-drop')" ondragleave="handleDragLeave(event,'labware-drop')"
+             ondrop="handleDrop(event,'labware')">
+          <input type="file" id="labware-input" accept=".json" multiple onchange="handleFileSelect(event,'labware')">
+          <span class="drop-icon">🧪</span>
+          Drop <strong>.json</strong> labware definition files here, or click to browse
+        </div>
+        <ul class="file-list" id="labware-file-list"></ul>
+      </div>
+
+      <!-- CSV RTP toggle + upload -->
+      <div class="card-section">
+        <label class="toggle-row">
+          <span class="toggle-switch">
+            <input type="checkbox" id="csv-toggle" onchange="toggleCsvSection()">
+            <span class="toggle-slider"></span>
+          </span>
+          This protocol uses a CSV runtime parameter (RTP)
+        </label>
+        <div class="csv-section card-section" id="csv-section" style="margin:-0.25rem -0.25rem 0; border:none; padding:0; gap:0.5rem;">
+          <div class="section-title">CSV file</div>
+          <div class="drop-zone" id="csv-drop" onclick="document.getElementById('csv-input').click()"
+               ondragover="handleDragOver(event,'csv-drop')" ondragleave="handleDragLeave(event,'csv-drop')"
+               ondrop="handleDrop(event,'csv')">
+            <input type="file" id="csv-input" accept=".csv" onchange="handleFileSelect(event,'csv')">
+            <span class="drop-icon">📊</span>
+            Drop a <strong>.csv</strong> runtime parameter file here, or click to browse
+          </div>
+          <ul class="file-list" id="csv-file-list"></ul>
+        </div>
+      </div>
+
+      <!-- Validate -->
+      <div class="validate-row">
+        <button class="btn btn-ghost" onclick="resetAll()" type="button">Reset</button>
+        <button class="btn btn-primary" id="validate-btn" onclick="runValidation()" type="button">Validate</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== LOADING ===================== -->
+  <div class="screen" id="screen-loading">
+    <div class="spinner"></div>
+    <div class="loading-label" id="loading-label">Running Protocol Engine...</div>
+  </div>
+
+  <!-- ===================== RESULTS ===================== -->
+  <div class="screen" id="screen-results">
+    <div class="results-toolbar">
+      <button class="btn btn-ghost" onclick="showScreen('upload')" type="button">← Back</button>
+      <span id="result-protocol-name" style="font-size:0.8rem;"></span>
+      <span class="result-badge" id="result-badge"></span>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="copy-btn" onclick="copyAnalysis()" type="button">Copy analysis</button>
+      <button class="btn btn-ghost" id="save-btn" onclick="saveAnalysis()" type="button">Save analysis</button>
+    </div>
+    <div class="results-panels">
+      <div class="result-panel">
+        <div class="panel-header">Analysis <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:0.68rem;" id="analysis-elapsed"></span></div>
+        <div class="panel-body" id="panel-analysis"></div>
+      </div>
+      <div class="result-panel">
+        <div class="panel-header">Simulation <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:0.68rem;" id="sim-elapsed"></span></div>
+        <div class="panel-body" id="panel-simulation"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><span id="status-dot" class="dot-loading"></span><span id="status-text">Loading Pyodide...</span></span>
+    <span id="version-info"></span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.6/full/pyodide.js"></script>
+  <script>
+    // ------------------------------------------------------------------ state
+    let pyodide = null;
+    let pyodideReady = false;
+    let lastAnalysisJson = '';
+
+    const state = {
+      protocol: null,   // { name, text }
+      labware: [],      // [{ name, text }, ...]
+      csv: null,        // { name, text } | null
+    };
+
+    // ------------------------------------------------------------------ utils
+    function setStatus(text, dot) {
+      document.getElementById('status-text').textContent = text;
+      document.getElementById('status-dot').className = dot;
+    }
+
+    function formatBytes(n) {
+      return n < 1024 ? n + ' B' : (n / 1024).toFixed(1) + ' KB';
+    }
+
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(`screen-${name}`).classList.add('active');
+    }
+
+    // ------------------------------------------------------------------ drag/drop
+    function handleDragOver(e, id) {
+      e.preventDefault();
+      document.getElementById(id).classList.add('drag-over');
+    }
+    function handleDragLeave(e, id) {
+      document.getElementById(id).classList.remove('drag-over');
+    }
+    function handleDrop(e, type) {
+      e.preventDefault();
+      const id = `${type}-drop`;
+      document.getElementById(id).classList.remove('drag-over');
+      const files = [...e.dataTransfer.files];
+      processFiles(type, files);
+    }
+    function handleFileSelect(e, type) {
+      const files = [...e.target.files];
+      processFiles(type, files);
+      e.target.value = '';
+    }
+
+    function processFiles(type, files) {
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const text = ev.target.result;
+          const entry = { name: file.name, text, size: file.size };
+          if (type === 'protocol') {
+            state.protocol = entry;
+            renderFileList('protocol-file-list', [state.protocol], 'protocol');
+          } else if (type === 'labware') {
+            state.labware.push(entry);
+            renderFileList('labware-file-list', state.labware, 'labware');
+          } else if (type === 'csv') {
+            state.csv = entry;
+            renderFileList('csv-file-list', [state.csv], 'csv');
+          }
+          updateValidateBtn();
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function renderFileList(listId, items, type) {
+      const ul = document.getElementById(listId);
+      ul.innerHTML = '';
+      items.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+        li.innerHTML = `
+          <span class="file-name" title="${item.name}">${item.name}</span>
+          <span class="file-size">${formatBytes(item.size || item.text.length)}</span>
+          <button class="remove-btn" title="Remove" onclick="removeFile('${type}', ${idx})">×</button>`;
+        ul.appendChild(li);
+      });
+    }
+
+    function removeFile(type, idx) {
+      if (type === 'protocol') { state.protocol = null; renderFileList('protocol-file-list', [], 'protocol'); }
+      else if (type === 'labware') { state.labware.splice(idx, 1); renderFileList('labware-file-list', state.labware, 'labware'); }
+      else if (type === 'csv') { state.csv = null; renderFileList('csv-file-list', [], 'csv'); }
+      updateValidateBtn();
+    }
+
+    function toggleCsvSection() {
+      const show = document.getElementById('csv-toggle').checked;
+      document.getElementById('csv-section').classList.toggle('visible', show);
+      if (!show) { state.csv = null; renderFileList('csv-file-list', [], 'csv'); }
+    }
+
+    function updateValidateBtn() {
+      document.getElementById('validate-btn').disabled = !state.protocol;
+    }
+
+    function resetAll() {
+      state.protocol = null;
+      state.labware = [];
+      state.csv = null;
+      ['protocol-file-list', 'labware-file-list', 'csv-file-list'].forEach(id => {
+        document.getElementById(id).innerHTML = '';
+      });
+      document.getElementById('csv-toggle').checked = false;
+      document.getElementById('csv-section').classList.remove('visible');
+      updateValidateBtn();
+      showScreen('upload');
+    }
+
+    // ------------------------------------------------------------------ copy / save
+    async function copyAnalysis() {
+      if (!lastAnalysisJson) return;
+      const btn = document.getElementById('copy-btn');
+      try {
+        await navigator.clipboard.writeText(lastAnalysisJson);
+        btn.textContent = 'Copied!';
+      } catch {
+        btn.textContent = 'Failed';
+      }
+      setTimeout(() => { btn.textContent = 'Copy analysis'; }, 2000);
+    }
+
+    function saveAnalysis() {
+      if (!lastAnalysisJson) return;
+      const name = (state.protocol?.name || 'analysis').replace(/\.[^.]+$/, '') + '_analysis.json';
+      const blob = new Blob([lastAnalysisJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ------------------------------------------------------------------ run
+    async function runValidation() {
+      if (!pyodideReady) {
+        alert('Pyodide is still loading — wait for "Ready" in the footer.');
+        return;
+      }
+      if (!state.protocol) return;
+
+      showScreen('loading');
+      lastAnalysisJson = '';
+
+      const t0 = performance.now();
+
+      try {
+        // Pass files to Python via pyodide globals
+        pyodide.globals.set('_protocol_text', state.protocol.text);
+        pyodide.globals.set('_protocol_name', state.protocol.name);
+        pyodide.globals.set('_labware_files',
+          pyodide.toPy(state.labware.map(f => [f.name, f.text])));
+        pyodide.globals.set('_csv_file',
+          state.csv ? pyodide.toPy([state.csv.name, state.csv.text]) : null);
+
+        document.getElementById('loading-label').textContent = 'Running Analysis...';
+        const analysisResult = await pyodide.runPythonAsync(`
+import traceback, logging, json
+logging.getLogger("opentrons").setLevel(logging.ERROR)
+
+def _to_jsonable(obj):
+    if obj is None: return None
+    if hasattr(obj, "model_dump"): return obj.model_dump()
+    if hasattr(obj, "_asdict"): return {k: _to_jsonable(v) for k, v in obj._asdict().items()}
+    if isinstance(obj, (list, tuple)): return [_to_jsonable(x) for x in obj]
+    if isinstance(obj, dict): return {k: _to_jsonable(v) for k, v in obj.items()}
+    return obj
+
+_analysis_json = ""
+try:
+    result = await opentrons_pyodide_shims.analyze_pyodide(
+        _protocol_text, _protocol_name,
+        labware_files=list(_labware_files) if _labware_files is not None else [],
+        csv_file=tuple(_csv_file) if _csv_file is not None else None,
+    )
+    data = _to_jsonable(result)
+    _analysis_json = json.dumps(data, indent=2, default=str)
+except Exception as e:
+    traceback.print_exc()
+    _analysis_json = json.dumps({"error": str(e)}, indent=2)
+_analysis_json
+        `);
+
+        const analysisElapsed = ((performance.now() - t0) / 1000).toFixed(2);
+
+        document.getElementById('loading-label').textContent = 'Running Simulation...';
+        const t1 = performance.now();
+        const simResult = await pyodide.runPythonAsync(`
+_sim_out = ""
+try:
+    _sim_out = await opentrons_pyodide_shims.simulate_pyodide(
+        _protocol_text, _protocol_name,
+        labware_files=list(_labware_files) if _labware_files is not None else [],
+        csv_file=tuple(_csv_file) if _csv_file is not None else None,
+    )
+except Exception as e:
+    traceback.print_exc()
+    _sim_out = f"ERROR: {e}"
+_sim_out
+        `);
+        const simElapsed = ((performance.now() - t1) / 1000).toFixed(2);
+
+        // Fill results
+        lastAnalysisJson = analysisResult != null ? String(analysisResult) : '';
+
+        // Badge
+        let status = 'unknown';
+        try { status = JSON.parse(lastAnalysisJson)?.state_summary?.status ?? 'unknown'; } catch {}
+        const isOk = status === 'succeeded';
+        const badge = document.getElementById('result-badge');
+        badge.textContent = isOk ? 'succeeded' : status;
+        badge.className = 'result-badge ' + (isOk ? 'badge-ok' : 'badge-err');
+
+        // Protocol name
+        document.getElementById('result-protocol-name').textContent =
+          state.protocol.name + (state.labware.length ? ` + ${state.labware.length} labware` : '');
+
+        // Elapsed
+        document.getElementById('analysis-elapsed').textContent = `(${analysisElapsed}s)`;
+        document.getElementById('sim-elapsed').textContent = `(${simElapsed}s)`;
+
+        // Content
+        const analysisPanel = document.getElementById('panel-analysis');
+        analysisPanel.innerHTML = '';
+        const apre = document.createElement('pre');
+        apre.className = 'output-plain';
+        apre.textContent = lastAnalysisJson || 'No output.';
+        analysisPanel.appendChild(apre);
+
+        const simPanel = document.getElementById('panel-simulation');
+        simPanel.innerHTML = '';
+        const spre = document.createElement('pre');
+        spre.className = 'output-plain';
+        spre.textContent = simResult != null ? String(simResult) : 'No output.';
+        simPanel.appendChild(spre);
+
+        showScreen('results');
+
+      } catch (err) {
+        console.error(err);
+        showScreen('upload');
+        alert('Validation failed: ' + err.message);
+      }
+    }
+
+    // ------------------------------------------------------------------ init
+    async function initPyodide() {
+      const t0 = performance.now();
+      try {
+        pyodide = await loadPyodide();
+        setStatus('Installing packages...', 'dot-loading');
+        await pyodide.loadPackage('micropip');
+
+        await pyodide.runPythonAsync(`
+import micropip
+await micropip.install("typing-extensions>=4.12.0")
+for pkg in ["numpy", "pydantic", "jsonschema", "packaging", "anyio", "click", "pydantic-settings"]:
+    try: await micropip.install(pkg)
+    except Exception as e: print(f"Warning: {pkg}: {e}")
+        `);
+
+        setStatus('Loading shims...', 'dot-loading');
+        const shimsResp = await fetch('opentrons_pyodide_shims.py');
+        const shimsCode = await shimsResp.text();
+        pyodide.FS.writeFile('/home/pyodide/opentrons_pyodide_shims.py', shimsCode);
+        await pyodide.runPythonAsync(`
+import sys; sys.path.insert(0, '/home/pyodide')
+import opentrons_pyodide_shims; opentrons_pyodide_shims.install()
+        `);
+
+        setStatus('Installing opentrons wheels...', 'dot-loading');
+        let wheelFiles = [];
+        try {
+          const r = await fetch('dist/manifest.json');
+          if (r.ok) wheelFiles = await r.json();
+        } catch {}
+        if (wheelFiles.length === 0) {
+          try {
+            const listing = await fetch('dist/').then(r => r.text());
+            wheelFiles = [...listing.matchAll(/href="([^"]+\.whl)"/gi)].map(m => m[1]);
+            if (!wheelFiles.length) wheelFiles = listing.match(/[\w\-.]+\.whl/g) || [];
+          } catch {}
+        }
+
+        const sdWheel = wheelFiles.find(f => f.startsWith('opentrons_shared_data'));
+        const otWheel = wheelFiles.find(f => f.startsWith('opentrons-') && !f.includes('shared_data'));
+        if (!sdWheel || !otWheel) {
+          const msg = 'Wheels not found. Run: cd pyodide && make build-wheels   then refresh.';
+          setStatus(msg, 'dot-error');
+          throw new Error(msg);
+        }
+        await pyodide.runPythonAsync(`await micropip.install("dist/${sdWheel}", deps=False)`);
+        await pyodide.runPythonAsync(`await micropip.install("dist/${otWheel}", deps=False)`);
+
+        setStatus('Initializing opentrons...', 'dot-loading');
+        const ver = await pyodide.runPythonAsync(`
+import opentrons; opentrons_pyodide_shims.patch_for_pyodide()
+f"opentrons {opentrons.__version__}"
+        `);
+        document.getElementById('version-info').textContent = ver;
+        const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+        setStatus(`Ready (${elapsed}s)`, 'dot-ready');
+        pyodideReady = true;
+        updateValidateBtn();
+
+      } catch (err) {
+        setStatus(err.message || 'Error loading Pyodide', 'dot-error');
+        console.error(err);
+      }
+    }
+
+    // Validate button starts disabled; enabled once Pyodide ready + protocol loaded
+    document.getElementById('validate-btn').disabled = true;
+
+    initPyodide();
+  </script>
+</body>
+</html>

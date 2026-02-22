@@ -1,0 +1,11 @@
+{
+  "name": "opentrons-pyodide-test",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test_pyodide.mjs"
+  },
+  "dependencies": {
+    "pyodide": "0.27.6"
+  }
+}
