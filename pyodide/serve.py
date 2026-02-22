@@ -39,6 +39,11 @@ class CORSHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        # Prevent the browser from caching HTML and Python source files so
+        # that changes to index.html / opentrons_pyodide_shims.py are always
+        # picked up on the next page load without a hard refresh.
+        if self.path.endswith((".html", ".py")):
+            self.send_header("Cache-Control", "no-store")
         super().end_headers()
 
     def translate_path(self, path: str) -> str:

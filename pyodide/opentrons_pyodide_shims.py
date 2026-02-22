@@ -18,6 +18,7 @@ See README.md for full documentation.
 from __future__ import annotations
 
 import asyncio
+import pathlib
 import selectors
 import sys
 import types
@@ -764,6 +765,78 @@ def patch_for_pyodide() -> None:
 # ---------------------------------------------------------------------------
 
 
+async def _build_orchestrator(
+    protocol_text: str,
+    file_name: str,
+    labware_files: Optional[List[tuple]],
+    csv_file: Optional[tuple],
+    tmp_path: "pathlib.Path",
+) -> tuple:
+    """Write protocol files to *tmp_path* and return (orchestrator, protocol_source).
+
+    Handles custom labware and CSV RTP wiring.  Both ``analyze_pyodide`` and
+    ``simulate_pyodide`` share this setup so they always behave identically.
+    """
+    from opentrons.protocol_reader import ProtocolReader
+    from opentrons.protocol_runner.create_simulating_orchestrator import (
+        create_simulating_orchestrator,
+    )
+    from opentrons.protocol_runner.run_orchestrator import ParseMode
+
+    main_file = tmp_path / file_name
+    main_file.write_text(protocol_text, encoding="utf-8")
+    all_files: List[pathlib.Path] = [main_file]
+
+    for lw_name, lw_text in labware_files or []:
+        lw_path = tmp_path / lw_name
+        lw_path.write_text(lw_text, encoding="utf-8")
+        all_files.append(lw_path)
+
+    csv_path: Optional[pathlib.Path] = None
+    if csv_file is not None:
+        csv_name, csv_text = csv_file
+        csv_path = tmp_path / csv_name
+        csv_path.write_text(csv_text, encoding="utf-8")
+
+    protocol_source = await ProtocolReader().read_saved(
+        files=all_files,
+        directory=None,
+        files_are_prevalidated=False,
+    )
+
+    orchestrator = await create_simulating_orchestrator(
+        robot_type=protocol_source.robot_type,
+        protocol_config=protocol_source.config,
+    )
+
+    # Resolve CSV run-time parameter path by matching variable name.
+    rtp_paths = None
+    if csv_path is not None:
+        await orchestrator.load(
+            protocol_source=protocol_source,
+            parse_mode=ParseMode.NORMAL,
+            run_time_param_values=None,
+            run_time_param_paths=None,
+        )
+        rtp_defs = orchestrator.get_run_time_parameters()
+        csv_var_names = [p.variableName for p in rtp_defs if getattr(p, "type", None) == "csv_file"]
+        if csv_var_names:
+            rtp_paths = {csv_var_names[0]: csv_path}
+            orchestrator = await create_simulating_orchestrator(
+                robot_type=protocol_source.robot_type,
+                protocol_config=protocol_source.config,
+            )
+
+    await orchestrator.load(
+        protocol_source=protocol_source,
+        parse_mode=ParseMode.NORMAL,
+        run_time_param_values=None,
+        run_time_param_paths=rtp_paths,
+    )
+
+    return orchestrator, protocol_source
+
+
 async def analyze_pyodide(
     protocol_text: str,
     file_name: str = "protocol.py",
@@ -781,87 +854,105 @@ async def analyze_pyodide(
     Returns the ``RunResult`` NamedTuple (commands, state_summary,
     parameters, command_annotations, command_preconditions).
     """
-    import pathlib
     import tempfile
 
-    from opentrons.protocol_reader import ProtocolReader
-    from opentrons.protocol_runner.create_simulating_orchestrator import (
-        create_simulating_orchestrator,
-    )
-    from opentrons.protocol_runner.run_orchestrator import ParseMode
-
-    async def _run_analysis() -> Any:
+    async def _run() -> Any:
         with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = pathlib.Path(tmp)
-
-            main_file = tmp_path / file_name
-            main_file.write_text(protocol_text, encoding="utf-8")
-            all_files: List[pathlib.Path] = [main_file]
-
-            # Write custom labware files alongside the protocol.
-            for lw_name, lw_text in labware_files or []:
-                lw_path = tmp_path / lw_name
-                lw_path.write_text(lw_text, encoding="utf-8")
-                all_files.append(lw_path)
-
-            # Write CSV RTP file if provided.
-            csv_path: Optional[pathlib.Path] = None
-            if csv_file is not None:
-                csv_name, csv_text = csv_file
-                csv_path = tmp_path / csv_name
-                csv_path.write_text(csv_text, encoding="utf-8")
-
-            protocol_source = await ProtocolReader().read_saved(
-                files=all_files,
-                directory=None,
-                files_are_prevalidated=False,
+            orchestrator, _ = await _build_orchestrator(
+                protocol_text, file_name, labware_files, csv_file, pathlib.Path(tmp)
             )
+            return await orchestrator.run(deck_configuration=[])
 
-            orchestrator = await create_simulating_orchestrator(
-                robot_type=protocol_source.robot_type,
-                protocol_config=protocol_source.config,
+    return asyncio.run(_run())
+
+
+async def analyze_pyodide_as_document(
+    protocol_text: str,
+    file_name: str = "protocol.py",
+    labware_files: Optional[List[tuple]] = None,
+    csv_file: Optional[tuple] = None,
+) -> str:
+    """Analyze a protocol and return a JSON string identical to what
+    ``opentrons analyze --human-json-output`` writes to disk.
+
+    This function constructs the same ``AnalyzeResults`` Pydantic model that
+    the CLI uses (``opentrons.cli.analyze.AnalyzeResults``) and serialises it
+    with ``model_dump_json(exclude_none=True, indent=2)`` — the exact same
+    call the CLI makes — so the output is byte-for-byte compatible.
+
+    The caller receives a JSON *string*, not a dict, so no further
+    serialisation is needed on the JavaScript side.
+    """
+    import tempfile
+    from datetime import datetime, timezone
+
+    # Import the CLI's own models and helpers so we share their logic exactly.
+    # Any future changes to field names or serialisation rules in the CLI will
+    # automatically propagate here without touching this function.
+    from opentrons.cli.analyze import (
+        AnalysisResult,
+        AnalyzeResults,
+        JsonConfig,
+        ProtocolFile,
+        PythonConfig,
+    )
+    from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+    from opentrons.protocol_reader import JsonProtocolConfig
+    from opentrons_shared_data.errors import ErrorCodes  # type: ignore[import-not-found]
+
+    async def _run() -> str:
+        with tempfile.TemporaryDirectory() as tmp:
+            orchestrator, protocol_source = await _build_orchestrator(
+                protocol_text, file_name, labware_files, csv_file, pathlib.Path(tmp)
             )
+            analysis = await orchestrator.run(deck_configuration=[])
 
-            # Build run_time_param_paths from variable_name → Path if CSV provided.
-            rtp_paths = None
-            if csv_path is not None:
-                # Find the CSV parameter variable name from the protocol's RTPs.
-                # We match by variable name so the user doesn't have to supply it.
-                await orchestrator.load(
-                    protocol_source=protocol_source,
-                    parse_mode=ParseMode.NORMAL,
-                    run_time_param_values=None,
-                    run_time_param_paths=None,
-                )
-                rtp_defs = orchestrator.get_run_time_parameters()
-                csv_var_names = [
-                    p.variableName for p in rtp_defs if getattr(p, "type", None) == "csv_file"
-                ]
-                if csv_var_names:
-                    rtp_paths = {csv_var_names[0]: csv_path}
-                    # Re-create orchestrator for fresh load with paths.
-                    orchestrator = await create_simulating_orchestrator(
-                        robot_type=protocol_source.robot_type,
-                        protocol_config=protocol_source.config,
-                    )
-                    await orchestrator.load(
-                        protocol_source=protocol_source,
-                        parse_mode=ParseMode.NORMAL,
-                        run_time_param_values=None,
-                        run_time_param_paths=rtp_paths,
-                    )
-            else:
-                await orchestrator.load(
-                    protocol_source=protocol_source,
-                    parse_mode=ParseMode.NORMAL,
-                    run_time_param_values=None,
-                    run_time_param_paths=None,
-                )
+        ss = analysis.state_summary
+        errors = list(ss.errors or [])
 
-            result = await orchestrator.run(deck_configuration=[])
-            return result
+        # Determine AnalysisResult — mirrors the CLI's _analyze() logic exactly.
+        if errors and any(
+            code_in_error_tree(root_error=e, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED)
+            for e in errors
+        ):
+            result = AnalysisResult.PARAMETER_VALUE_REQUIRED
+        elif errors:
+            result = AnalysisResult.NOT_OK
+        else:
+            result = AnalysisResult.OK
 
-    return asyncio.run(_run_analysis())
+        # Mirror AnalyzeResults.model_construct() call from the CLI's _analyze().
+        results = AnalyzeResults.model_construct(
+            createdAt=datetime.now(tz=timezone.utc),
+            files=[
+                ProtocolFile.model_construct(name=f.path.name, role=f.role)
+                for f in protocol_source.files
+            ],
+            config=(
+                JsonConfig.model_construct(schemaVersion=protocol_source.config.schema_version)
+                if isinstance(protocol_source.config, JsonProtocolConfig)
+                else PythonConfig.model_construct(apiVersion=protocol_source.config.api_version)
+            ),
+            result=result,
+            metadata=protocol_source.metadata,
+            robotType=protocol_source.robot_type,
+            runTimeParameters=analysis.parameters,
+            commands=analysis.commands,
+            errors=errors,
+            labware=ss.labware,
+            pipettes=ss.pipettes,
+            modules=ss.modules,
+            liquids=ss.liquids,
+            commandAnnotations=ss.commandAnnotations,
+            liquidClasses=ss.liquidClasses,
+            commandPreconditions=analysis.command_preconditions,
+        )
+
+        # Same serialisation call the CLI uses — exclude_none=True drops absent
+        # optional fields (commandPreconditions, etc.) rather than emitting null.
+        return results.model_dump_json(exclude_none=True, indent=2)
+
+    return asyncio.run(_run())
 
 
 async def simulate_pyodide(
@@ -872,38 +963,67 @@ async def simulate_pyodide(
 ) -> str:
     """Simulate a protocol and return a human-readable run log.
 
-    This is a convenience wrapper around ``analyze_pyodide`` that formats
-    the ``RunResult`` into a readable string (similar to what
-    ``opentrons.simulate.format_runlog`` produces).
+    Hooks into the legacy broker to capture the same pre-formatted action
+    strings that ``opentrons_simulate`` / ``opentrons.simulate.format_runlog``
+    produces (e.g. "Aspirating 100.0 uL from A1 of … at 716.0 uL/sec").
+
+    This is done by subscribing to ``protocol_runner.broker`` *before* the
+    run and collecting broker events — identical to what
+    ``simulate._CommandScraper`` does in the CLI path.
     """
-    result = await analyze_pyodide(protocol_text, file_name, labware_files, csv_file)
+    import tempfile
 
-    lines: List[str] = []
-    for cmd in result.commands:
-        params = cmd.params
-        text = getattr(cmd, "commandType", str(type(cmd)))
-        detail = ""
-        if hasattr(params, "displayName"):
-            detail = params.displayName or ""
-        elif hasattr(params, "message"):
-            detail = params.message or ""
-        elif hasattr(cmd, "key"):
-            detail = cmd.key or ""
-        lines.append(f"{text}: {detail}" if detail else str(text))
+    from opentrons.legacy_commands import types as command_types
 
-    status = result.state_summary.status if result.state_summary else "unknown"
-    errors = result.state_summary.errors if result.state_summary else []
+    async def _run() -> str:
+        with tempfile.TemporaryDirectory() as tmp:
+            orchestrator, _ = await _build_orchestrator(
+                protocol_text, file_name, labware_files, csv_file, pathlib.Path(tmp)
+            )
 
-    header = f"Protocol simulation: {status}"
-    summary = f"{len(result.commands)} commands executed"
+            # Capture legacy-broker events.  The broker emits a "before" event
+            # at the start of every command with payload["text"] already formatted
+            # as a human-readable string (e.g. "Picking up tip from A1 of …").
+            run_log: List[dict] = []
+            depth = 0
 
-    parts = [header, summary, ""]
-    parts.extend(lines)
+            def _handle(message: dict) -> None:
+                nonlocal depth
+                payload = message["payload"]
+                if message["$"] == "before":
+                    run_log.append({"level": depth, "payload": payload})
+                    depth += 1
+                else:
+                    depth = max(depth - 1, 0)
 
-    if errors:
-        parts.append("")
-        parts.append("Errors:")
-        for err in errors:
-            parts.append(f"  - {err.errorType}: {err.detail}")
+            # orchestrator._protocol_runner is the PythonAndLegacyRunner (or
+            # JsonRunner) created by create_simulating_orchestrator.  It exposes
+            # the same .broker used by simulate._run_file_pe.
+            runner = getattr(orchestrator, "_protocol_runner", None)
+            unsub = None
+            if runner is not None and hasattr(runner, "broker"):
+                unsub = runner.broker.subscribe(command_types.COMMAND, _handle)
 
-    return "\n".join(parts)
+            try:
+                result = await orchestrator.run(deck_configuration=[])
+            finally:
+                if unsub is not None:
+                    unsub()
+
+            # Format exactly like opentrons.simulate.format_runlog().
+            lines = [
+                "\t" * entry["level"] + entry["payload"].get("text", "")
+                for entry in run_log
+                if entry["payload"].get("text")
+            ]
+
+            errors = getattr(getattr(result, "state_summary", None), "errors", []) or []
+            if errors:
+                lines.append("")
+                lines.append("Errors:")
+                for err in errors:
+                    lines.append(f"  - {err.errorType}: {err.detail}")
+
+            return "\n".join(lines)
+
+    return asyncio.run(_run())

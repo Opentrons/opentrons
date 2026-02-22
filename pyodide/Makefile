@@ -1,14 +1,16 @@
 # Opentrons Pyodide — build wheels, run dev server, and test in-browser protocol analysis.
 # Run from this directory (pyodide/). Requires: uv, Python 3.12, Node.js (for tests).
 
+# Resolve paths before including python-uv.mk; after the include, $(lastword $(MAKEFILE_LIST))
+# points to python-uv.mk rather than this file, so PYODIDE_DIR would resolve incorrectly.
+PYODIDE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+REPO_ROOT   := $(PYODIDE_DIR)..
+DIST_DIR    := $(PYODIDE_DIR)dist
+
 include ../scripts/python-uv.mk
 
 NODE := node
 NPM  := npm
-
-PYODIDE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-REPO_ROOT   := $(PYODIDE_DIR)..
-DIST_DIR    := $(PYODIDE_DIR)dist
 PORT        ?= 8080
 
 PYFILES := opentrons_pyodide_shims.py generate_manifest.py serve.py tests/
@@ -26,9 +28,11 @@ help:
 	@echo "  make serve          Rebuild wheels, then run HTTP server (PORT=$(PORT))"
 	@echo "  make test           Run headless Pyodide tests (Node.js)"
 	@echo "  make test-py        Run Python unit tests (pytest)"
+	@echo "  make debug          Run debug_pe.mjs (step-by-step shim diagnostics)"
 	@echo "  make lint           Ruff lint + format check"
 	@echo "  make format         Ruff auto-format (writes files)"
 	@echo "  make typecheck      mypy type check"
+	@echo "  make prep           format → lint → typecheck → test → test-py"
 	@echo "  make setup          Install Node + Python dev dependencies"
 	@echo "  make clean          Remove dist/ and build artifacts"
 	@echo ""
@@ -84,6 +88,15 @@ test-py: setup
 	$(pytest) tests/ -v
 
 # ------------------------------------------------------------------------------
+# Debug: step-by-step Protocol Engine shim diagnostics
+# Runs debug_pe.mjs which tests each compatibility layer individually.
+# Requires wheels to be built first (make build-wheels).
+# ------------------------------------------------------------------------------
+.PHONY: debug
+debug: setup
+	$(NODE) debug_pe.mjs
+
+# ------------------------------------------------------------------------------
 # Lint (ruff check + format check — no auto-fix)
 # ------------------------------------------------------------------------------
 .PHONY: lint
@@ -105,6 +118,29 @@ format:
 .PHONY: typecheck
 typecheck:
 	$(python) -m mypy $(PYFILES)
+
+# ------------------------------------------------------------------------------
+# Prep: format → lint → typecheck → test (Node/Pyodide) → test-py (pytest)
+# Run this before pushing to catch all issues in one shot.
+# ------------------------------------------------------------------------------
+.PHONY: prep
+prep: setup
+	@echo "=== [1/5] format ==="
+	$(MAKE) format
+	@echo ""
+	@echo "=== [2/5] lint ==="
+	$(MAKE) lint
+	@echo ""
+	@echo "=== [3/5] typecheck ==="
+	$(MAKE) typecheck
+	@echo ""
+	@echo "=== [4/5] test (Node + Pyodide) ==="
+	$(MAKE) test
+	@echo ""
+	@echo "=== [5/5] test-py (pytest) ==="
+	$(MAKE) test-py
+	@echo ""
+	@echo "=== prep complete ==="
 
 # ------------------------------------------------------------------------------
 # Setup (Node + Python dev deps)

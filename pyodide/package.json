@@ -6,6 +6,6 @@
     "test": "node test_pyodide.mjs"
   },
   "dependencies": {
-    "pyodide": "0.27.6"
+    "pyodide": "0.29.3"
   }
 }

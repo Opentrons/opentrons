@@ -303,16 +303,93 @@
       color: var(--text);
     }
 
+    /* ---- JSON syntax highlighting ---- */
+    .jkey  { color: #a5b4fc; }                                /* key       — indigo-300 */
+    .jstr  { color: #86efac; }                                /* string    — green-300 */
+    .jnum  { color: #fdba74; }                                /* number    — orange-300 */
+    .jbool { color: #93c5fd; }                                /* boolean   — blue-300 */
+    .jnull { color: var(--muted); }                           /* null */
+    .jcmt  { color: var(--muted); font-style: italic; }       /* collapsed placeholder */
+
+    .json-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+    .json-toggle:hover { color: var(--accent-hover); }
+    .json-toggle:hover .jcmt { color: var(--accent-hover); font-style: normal; }
+
     @media (max-width: 720px) {
       .results-panels { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
       .result-panel { border-right: none; border-bottom: 1px solid var(--border); }
     }
+
+    /* ==== HISTORY SCREEN ==== */
+    #screen-history { flex-direction: column; }
+
+    .history-toolbar {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .history-toolbar .spacer { flex: 1; }
+    .history-toolbar-title { font-size: 0.82rem; font-weight: 600; }
+
+    .history-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    .history-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .history-item-name {
+      flex: 1;
+      font-size: 0.82rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .history-item-ts { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+    .history-item-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+    .btn-danger {
+      background: rgba(239,68,68,0.12);
+      color: var(--error);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .btn-danger:hover:not(:disabled) { background: rgba(239,68,68,0.22); }
   </style>
 </head>
 <body>
   <header>
     <h1>Opentrons Protocol Validator</h1>
     <span class="tag">PYODIDE</span>
+    <div style="flex:1;"></div>
+    <button class="btn btn-ghost" id="history-btn" onclick="openHistory()" type="button">
+      History <span id="history-count"></span>
+    </button>
   </header>
 
   <!-- ===================== UPLOAD ===================== -->
@@ -404,12 +481,25 @@
     </div>
   </div>
 
+  <!-- ===================== HISTORY ===================== -->
+  <div class="screen" id="screen-history">
+    <div class="history-toolbar">
+      <button class="btn btn-ghost" onclick="showScreen('upload')" type="button">← Back</button>
+      <span class="history-toolbar-title">Saved Analyses</span>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost btn-danger" onclick="clearHistory()" type="button">Clear all</button>
+    </div>
+    <div class="history-body" id="history-body">
+      <div class="history-empty">No saved analyses yet. Run a validation to save one.</div>
+    </div>
+  </div>
+
   <footer>
     <span><span id="status-dot" class="dot-loading"></span><span id="status-text">Loading Pyodide...</span></span>
     <span id="version-info"></span>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.6/full/pyodide.js"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
   <script>
     // ------------------------------------------------------------------ state
     let pyodide = null;
@@ -421,6 +511,171 @@
       labware: [],      // [{ name, text }, ...]
       csv: null,        // { name, text } | null
     };
+
+    // ------------------------------------------------------------------ IndexedDB store (via idb)
+    // idb (https://github.com/jakearchibald/idb) wraps the raw IndexedDB
+    // callback API with clean Promises and correctly handles the
+    // transaction auto-commit footgun that breaks naive async/await usage.
+    // Each saved record: { id (auto), protocol_name, timestamp, status,
+    //                      analysis_json, sim_output }
+    let _idb = null;
+    async function _getDB() {
+      if (!_idb) {
+        const { openDB } = await import('https://cdn.jsdelivr.net/npm/idb@8/+esm');
+        _idb = await openDB('opentrons-pyodide', 1, {
+          upgrade(db) {
+            db.createObjectStore('analyses', { keyPath: 'id', autoIncrement: true });
+          },
+        });
+      }
+      return _idb;
+    }
+
+    const AnalysisStore = {
+      async save(record) { return (await _getDB()).add('analyses', record); },
+      async list()       { return [...(await (await _getDB()).getAll('analyses'))].reverse(); },
+      async get(id)      { return (await _getDB()).get('analyses', id); },
+      async delete(id)   { return (await _getDB()).delete('analyses', id); },
+      async clear()      { return (await _getDB()).clear('analyses'); },
+    };
+
+    // ------------------------------------------------------------------ history UI
+    async function updateHistoryCount() {
+      try {
+        const items = await AnalysisStore.list();
+        const el = document.getElementById('history-count');
+        el.textContent = items.length ? `(${items.length})` : '';
+      } catch { /* non-fatal */ }
+    }
+
+    async function openHistory() {
+      await renderHistoryList();
+      showScreen('history');
+    }
+
+    async function renderHistoryList() {
+      const body = document.getElementById('history-body');
+      let items;
+      try { items = await AnalysisStore.list(); }
+      catch (e) {
+        body.innerHTML = `<div class="history-empty">Error loading history: ${e.message}</div>`;
+        return;
+      }
+      if (!items.length) {
+        body.innerHTML = '<div class="history-empty">No saved analyses yet. Run a validation to save one.</div>';
+        return;
+      }
+      const list = document.createElement('div');
+      list.className = 'history-list';
+      for (const item of items) {
+        const ts       = new Date(item.timestamp).toLocaleString();
+        const label    = item.result ?? item.status ?? 'unknown'; // support old records
+        const isOk     = label === 'ok' || label === 'succeeded';
+        const hasFiles = item.protocol_file != null;
+        const hasZip   = hasFiles && ((item.labware_files?.length > 0) || item.csv_file != null);
+        const dlTitle  = !hasFiles ? 'No source files saved'
+                       : hasZip   ? 'Download zip (protocol + extras)'
+                       :            'Download protocol file';
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `
+          <span class="result-badge ${isOk ? 'badge-ok' : 'badge-err'}">${label}</span>
+          <span class="history-item-name" title="${item.protocol_name}">${item.protocol_name}</span>
+          <span class="history-item-ts">${ts}</span>
+          <div class="history-item-actions">
+            <button class="btn btn-ghost" onclick="downloadFromHistory(${item.id})"
+                    type="button" title="${dlTitle}" ${hasFiles ? '' : 'disabled'}>
+              ${hasZip ? '↓ zip' : '↓ .py'}
+            </button>
+            <button class="btn btn-ghost" onclick="loadFromHistory(${item.id})" type="button">Load</button>
+            <button class="btn btn-ghost btn-danger" onclick="deleteFromHistory(${item.id})" type="button">×</button>
+          </div>`;
+        list.appendChild(div);
+      }
+      body.innerHTML = '';
+      body.appendChild(list);
+    }
+
+    async function loadFromHistory(id) {
+      const item = await AnalysisStore.get(id);
+      if (!item) return;
+
+      lastAnalysisJson = item.analysis_json;
+
+      const label = item.result ?? item.status ?? 'unknown';
+      const isOk  = label === 'ok' || label === 'succeeded';
+      const badge = document.getElementById('result-badge');
+      badge.textContent = label;
+      badge.className   = 'result-badge ' + (isOk ? 'badge-ok' : 'badge-err');
+      document.getElementById('result-protocol-name').textContent = item.protocol_name;
+      document.getElementById('analysis-elapsed').textContent = '(saved)';
+      document.getElementById('sim-elapsed').textContent      = '(saved)';
+
+      const analysisPanel = document.getElementById('panel-analysis');
+      renderAnalysisJson(item.analysis_json, analysisPanel);
+
+      const simPanel = document.getElementById('panel-simulation');
+      simPanel.innerHTML = '';
+      const spre = document.createElement('pre');
+      spre.className   = 'output-plain';
+      spre.textContent = item.sim_output || 'No output.';
+      simPanel.appendChild(spre);
+
+      showScreen('results');
+    }
+
+    // ------------------------------------------------------------------ download
+    function _downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function downloadFromHistory(id) {
+      const item = await AnalysisStore.get(id);
+      if (!item?.protocol_file) {
+        alert('Source files were not saved with this entry (created by an older version).');
+        return;
+      }
+      const { name: protoName, text: protoText } = item.protocol_file;
+      const hasExtras = (item.labware_files?.length > 0) || item.csv_file != null;
+
+      if (!hasExtras) {
+        // Single protocol file — download directly as .py, no zip needed.
+        _downloadBlob(new Blob([protoText], { type: 'text/x-python' }), protoName);
+        return;
+      }
+
+      // Multiple files — bundle into a zip using fflate (ESM, ~10 KB).
+      // fflate is loaded lazily so it doesn't affect initial page load time.
+      const { zipSync, strToU8 } = await import('https://cdn.jsdelivr.net/npm/fflate@0.8/esm/browser.js');
+      const files = {};
+      files[protoName] = strToU8(protoText);
+      for (const lw of (item.labware_files ?? [])) {
+        files[lw.name] = strToU8(lw.text);
+      }
+      if (item.csv_file) {
+        files[item.csv_file.name] = strToU8(item.csv_file.text);
+      }
+
+      const zipped   = zipSync(files);
+      const baseName = protoName.replace(/\.[^.]+$/, '');
+      _downloadBlob(new Blob([zipped], { type: 'application/zip' }), baseName + '.zip');
+    }
+
+    async function deleteFromHistory(id) {
+      await AnalysisStore.delete(id);
+      await renderHistoryList();
+      await updateHistoryCount();
+    }
+
+    async function clearHistory() {
+      if (!confirm('Clear all saved analyses?')) return;
+      await AnalysisStore.clear();
+      await renderHistoryList();
+      await updateHistoryCount();
+    }
 
     // ------------------------------------------------------------------ utils
     function setStatus(text, dot) {
@@ -547,6 +802,131 @@
       URL.revokeObjectURL(url);
     }
 
+    // ------------------------------------------------------------------ JSON viewer
+    // Keys whose arrays are collapsed by default.
+    // commandAnnotations can also be large so we treat it the same way.
+    const _COLLAPSE_KEYS = new Set(['commands', 'commandAnnotations']);
+
+    function renderAnalysisJson(jsonStr, container) {
+      container.innerHTML = '';
+      if (!jsonStr) { container.textContent = 'No output.'; return; }
+      let data;
+      try { data = JSON.parse(jsonStr); }
+      catch {
+        const p = document.createElement('pre');
+        p.className = 'output-plain';
+        p.textContent = jsonStr;
+        container.appendChild(p);
+        return;
+      }
+      const pre = document.createElement('pre');
+      pre.className = 'output-plain';
+      pre.appendChild(_jNode(data, 0, _COLLAPSE_KEYS));
+      container.appendChild(pre);
+    }
+
+    function _jNode(v, d, collapse) {
+      if (v === null)             return _jSpan('jnull', 'null');
+      if (typeof v === 'boolean') return _jSpan('jbool', String(v));
+      if (typeof v === 'number')  return _jSpan('jnum',  String(v));
+      if (typeof v === 'string')  return _jSpan('jstr',  JSON.stringify(v));
+      if (Array.isArray(v))       return _jArr(v, d);
+      return _jObj(v, d, collapse);
+    }
+
+    function _jObj(obj, d, collapse) {
+      const keys = Object.keys(obj);
+      if (!keys.length) return document.createTextNode('{}');
+      const pad  = '  '.repeat(d);
+      const pad1 = '  '.repeat(d + 1);
+      const f = document.createDocumentFragment();
+      f.appendChild(document.createTextNode('{\n'));
+      keys.forEach((k, i) => {
+        f.appendChild(document.createTextNode(pad1));
+        f.appendChild(_jSpan('jkey', JSON.stringify(k)));
+        f.appendChild(document.createTextNode(': '));
+        const collapsible = collapse?.has(k) && Array.isArray(obj[k]);
+        f.appendChild(collapsible ? _jCollapsed(obj[k], d + 1, k) : _jNode(obj[k], d + 1, null));
+        if (i < keys.length - 1) f.appendChild(document.createTextNode(','));
+        f.appendChild(document.createTextNode('\n'));
+      });
+      f.appendChild(document.createTextNode(pad + '}'));
+      return f;
+    }
+
+    function _jArr(arr, d) {
+      if (!arr.length) return document.createTextNode('[]');
+      const pad  = '  '.repeat(d);
+      const pad1 = '  '.repeat(d + 1);
+      const f = document.createDocumentFragment();
+      f.appendChild(document.createTextNode('[\n'));
+      arr.forEach((item, i) => {
+        f.appendChild(document.createTextNode(pad1));
+        f.appendChild(_jNode(item, d + 1, null));
+        if (i < arr.length - 1) f.appendChild(document.createTextNode(','));
+        f.appendChild(document.createTextNode('\n'));
+      });
+      f.appendChild(document.createTextNode(pad + ']'));
+      return f;
+    }
+
+    function _jCollapsed(arr, d, key) {
+      const summary = key === 'commands' ? _cmdTypeSummary(arr) : '';
+      const label   = `${arr.length} ${key}${summary ? ': ' + summary : ''}`;
+
+      // Collapsed view (shown by default)
+      const collBtn = document.createElement('span');
+      collBtn.className = 'json-toggle';
+      collBtn.title = 'Click to expand';
+      collBtn.appendChild(document.createTextNode('['));
+      collBtn.appendChild(_jSpan('jcmt', ` ▸ ${label} `));
+      collBtn.appendChild(document.createTextNode(']'));
+
+      // Expanded view (hidden by default)
+      const expWrap = document.createElement('span');
+      expWrap.style.display = 'none';
+      const expBtn = document.createElement('span');
+      expBtn.className = 'json-toggle';
+      expBtn.title = 'Click to collapse';
+      expBtn.appendChild(_jSpan('jcmt', `▾ collapse — `));
+      expWrap.appendChild(expBtn);
+      expWrap.appendChild(_jArr(arr, d));
+
+      const toggle = () => {
+        const wasCollapsed = collBtn.style.display !== 'none';
+        collBtn.style.display = wasCollapsed ? 'none' : '';
+        expWrap.style.display  = wasCollapsed ? '' : 'none';
+      };
+      collBtn.onclick = toggle;
+      expBtn.onclick  = toggle;
+
+      const w = document.createElement('span');
+      w.appendChild(collBtn);
+      w.appendChild(expWrap);
+      return w;
+    }
+
+    function _cmdTypeSummary(commands) {
+      if (!commands.length) return '';
+      const counts = {};
+      for (const cmd of commands) {
+        const t = cmd?.commandType ?? '?';
+        counts[t] = (counts[t] || 0) + 1;
+      }
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([t, n]) => `${t}×${n}`)
+        .join(', ');
+    }
+
+    function _jSpan(cls, text) {
+      const s = document.createElement('span');
+      s.className = cls;
+      s.textContent = text;
+      return s;
+    }
+
     // ------------------------------------------------------------------ run
     async function runValidation() {
       if (!pyodideReady) {
@@ -561,39 +941,42 @@
       const t0 = performance.now();
 
       try {
-        // Pass files to Python via pyodide globals
-        pyodide.globals.set('_protocol_text', state.protocol.text);
-        pyodide.globals.set('_protocol_name', state.protocol.name);
-        pyodide.globals.set('_labware_files',
-          pyodide.toPy(state.labware.map(f => [f.name, f.text])));
-        pyodide.globals.set('_csv_file',
-          state.csv ? pyodide.toPy([state.csv.name, state.csv.text]) : null);
+        // Serialize all inputs to JSON and pass as a single string — this
+        // completely avoids JsProxy / JsNull conversion issues at the
+        // pyodide.globals boundary.
+        const _inputJson = JSON.stringify({
+          protocol_text: state.protocol.text,
+          protocol_name: state.protocol.name,
+          labware_files: state.labware.map(f => [f.name, f.text]),
+          csv_file: state.csv ? [state.csv.name, state.csv.text] : null,
+        });
+        pyodide.globals.set('_input_json', _inputJson);
 
         document.getElementById('loading-label').textContent = 'Running Analysis...';
         const analysisResult = await pyodide.runPythonAsync(`
 import traceback, logging, json
 logging.getLogger("opentrons").setLevel(logging.ERROR)
 
-def _to_jsonable(obj):
-    if obj is None: return None
-    if hasattr(obj, "model_dump"): return obj.model_dump()
-    if hasattr(obj, "_asdict"): return {k: _to_jsonable(v) for k, v in obj._asdict().items()}
-    if isinstance(obj, (list, tuple)): return [_to_jsonable(x) for x in obj]
-    if isinstance(obj, dict): return {k: _to_jsonable(v) for k, v in obj.items()}
-    return obj
+_inp = json.loads(_input_json)
+_protocol_text  = _inp["protocol_text"]
+_protocol_name  = _inp["protocol_name"]
+_labware_files  = [tuple(x) for x in _inp["labware_files"]]
+_csv_file       = tuple(_inp["csv_file"]) if _inp["csv_file"] is not None else None
 
 _analysis_json = ""
 try:
-    result = await opentrons_pyodide_shims.analyze_pyodide(
+    # analyze_pyodide_as_document returns a JSON string produced by
+    # AnalyzeResults.model_dump_json(exclude_none=True, indent=2) —
+    # the exact same call opentrons analyze --human-json-output makes.
+    _analysis_json = await opentrons_pyodide_shims.analyze_pyodide_as_document(
         _protocol_text, _protocol_name,
-        labware_files=list(_labware_files) if _labware_files is not None else [],
-        csv_file=tuple(_csv_file) if _csv_file is not None else None,
+        labware_files=_labware_files,
+        csv_file=_csv_file,
     )
-    data = _to_jsonable(result)
-    _analysis_json = json.dumps(data, indent=2, default=str)
 except Exception as e:
-    traceback.print_exc()
-    _analysis_json = json.dumps({"error": str(e)}, indent=2)
+    _analysis_json = json.dumps(
+        {"error": str(e), "traceback": traceback.format_exc()}, indent=2
+    )
 _analysis_json
         `);
 
@@ -606,12 +989,11 @@ _sim_out = ""
 try:
     _sim_out = await opentrons_pyodide_shims.simulate_pyodide(
         _protocol_text, _protocol_name,
-        labware_files=list(_labware_files) if _labware_files is not None else [],
-        csv_file=tuple(_csv_file) if _csv_file is not None else None,
+        labware_files=_labware_files,
+        csv_file=_csv_file,
     )
 except Exception as e:
-    traceback.print_exc()
-    _sim_out = f"ERROR: {e}"
+    _sim_out = f"ERROR: {e}\\n\\n{traceback.format_exc()}"
 _sim_out
         `);
         const simElapsed = ((performance.now() - t1) / 1000).toFixed(2);
@@ -619,12 +1001,12 @@ _sim_out
         // Fill results
         lastAnalysisJson = analysisResult != null ? String(analysisResult) : '';
 
-        // Badge
-        let status = 'unknown';
-        try { status = JSON.parse(lastAnalysisJson)?.state_summary?.status ?? 'unknown'; } catch {}
-        const isOk = status === 'succeeded';
+        // Badge — new shape uses top-level "result": "ok" | "not-ok" | ...
+        let result = 'unknown';
+        try { result = JSON.parse(lastAnalysisJson)?.result ?? 'unknown'; } catch {}
+        const isOk = result === 'ok';
         const badge = document.getElementById('result-badge');
-        badge.textContent = isOk ? 'succeeded' : status;
+        badge.textContent = result;
         badge.className = 'result-badge ' + (isOk ? 'badge-ok' : 'badge-err');
 
         // Protocol name
@@ -635,13 +1017,9 @@ _sim_out
         document.getElementById('analysis-elapsed').textContent = `(${analysisElapsed}s)`;
         document.getElementById('sim-elapsed').textContent = `(${simElapsed}s)`;
 
-        // Content
+        // Content — syntax-highlighted with commands collapsed
         const analysisPanel = document.getElementById('panel-analysis');
-        analysisPanel.innerHTML = '';
-        const apre = document.createElement('pre');
-        apre.className = 'output-plain';
-        apre.textContent = lastAnalysisJson || 'No output.';
-        analysisPanel.appendChild(apre);
+        renderAnalysisJson(lastAnalysisJson, analysisPanel);
 
         const simPanel = document.getElementById('panel-simulation');
         simPanel.innerHTML = '';
@@ -651,6 +1029,19 @@ _sim_out
         simPanel.appendChild(spre);
 
         showScreen('results');
+
+        // Auto-save to IndexedDB — fire-and-forget, never blocks the UI.
+        // Source files are stored so history entries can be downloaded later.
+        AnalysisStore.save({
+          protocol_name: state.protocol.name,
+          timestamp:     Date.now(),
+          result,                                                          // "ok" | "not-ok" | ...
+          analysis_json: lastAnalysisJson,
+          sim_output:    simResult != null ? String(simResult) : '',
+          protocol_file: { name: state.protocol.name, text: state.protocol.text },
+          labware_files: state.labware.map(f => ({ name: f.name, text: f.text })),
+          csv_file:      state.csv ? { name: state.csv.name, text: state.csv.text } : null,
+        }).then(updateHistoryCount).catch(e => console.warn('IndexedDB save failed:', e));
 
       } catch (err) {
         console.error(err);
@@ -670,7 +1061,7 @@ _sim_out
         await pyodide.runPythonAsync(`
 import micropip
 await micropip.install("typing-extensions>=4.12.0")
-for pkg in ["numpy", "pydantic", "jsonschema", "packaging", "anyio", "click", "pydantic-settings"]:
+for pkg in ["numpy", "pandas", "pydantic", "jsonschema", "packaging", "anyio", "click", "pydantic-settings"]:
     try: await micropip.install(pkg)
     except Exception as e: print(f"Warning: {pkg}: {e}")
         `);
@@ -727,6 +1118,8 @@ f"opentrons {opentrons.__version__}"
 
     // Validate button starts disabled; enabled once Pyodide ready + protocol loaded
     document.getElementById('validate-btn').disabled = true;
+    // Populate history count badge from whatever is already in IndexedDB.
+    updateHistoryCount();
 
     initPyodide();
   </script>
