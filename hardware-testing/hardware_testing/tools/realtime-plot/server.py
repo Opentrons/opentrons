@@ -218,10 +218,11 @@ class PlotServer(HTTPServer):
 def run(test_name: str, http_port: int) -> None:
     """Run a Plot Server Instance."""
     dir_path = create_folder_for_test_data(test_name)
+    print(f'dir: {dir_path}')
     server = PlotServer(dir_path, ("0.0.0.0", http_port), PlotRequestHandler)
     print(f"Plot server running on port: {http_port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    # server.server_close()
+    server.server_close()

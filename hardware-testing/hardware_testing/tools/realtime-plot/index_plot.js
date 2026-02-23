@@ -4,37 +4,46 @@ const plotConfigs = [
   {
     divId: 'plotly1',
     xColumn: 'Time(s)',
-    yColumns: ['current_guage_pressure'],
+    yColumns: ['current_gauge_pressure'],
     title: 'Pressure vs Time',
     yAxisLabel: 'Pressure (mbar)',
     colors: ['#006fff'],
-    filePattern: 'PressureData',  // matches CSV files containing "PressureData" in the name
+    filePattern: 'PressureData', // matches CSV files containing "PressureData" in the name
   },
   {
     divId: 'plotly2',
     xColumn: 'Time(s)',
     yColumns: ['Flow_rate(sLM)'],
-    title: 'Flow Rate(sLM) vs Time',
-    yAxisLabel: 'Flow Rate(sLm)',
+    title: 'Flow Rate (sLM) vs Time',
+    yAxisLabel: 'Flow Rate (sLM)',
     colors: ['#ff3a33'],
-    filePattern: 'FlowrateData',  // matches CSV files containing "FlowRate" in the name
-  },
-]
-
-const testNames = [
-  'Realtime-plot',
-]
+    filePattern: 'FlowrateData', // matches CSV files containing "FlowrateData" in the name
+  }
+];
 
 function createPlotContainers() {
   const container = document.getElementById('plot-container');
-  plotConfigs.forEach((config) => {
+  plotConfigs.forEach((config, index) => {
+    // Create outer wrapper div with border
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'plot-wrapper';
+    wrapperDiv.style.width = '100%';
+    wrapperDiv.style.height = '450px';
+    wrapperDiv.style.marginBottom = '30px';
+    wrapperDiv.style.display = 'block';
+    wrapperDiv.style.position = 'relative';
+    
+    // Create inner div for Plotly
     const plotDiv = document.createElement('div');
     plotDiv.id = config.divId;
     plotDiv.style.width = '100%';
     plotDiv.style.height = '400px';
-    plotDiv.style.marginTop = '20px';
-    plotDiv.style.border = 'solid 2px black';
-    container.appendChild(plotDiv);
+    plotDiv.style.margin = '0';
+    plotDiv.style.padding = '0';
+    
+    // Append inner div to wrapper, then wrapper to container
+    wrapperDiv.appendChild(plotDiv);
+    container.appendChild(wrapperDiv);
   });
 }
 
@@ -90,7 +99,7 @@ function updatePlot(config, fileData) {
   }).filter(Boolean);
 
   const layout = {
-    title: fileData.name || config.title,
+    title: config.title,
     xaxis: { title: config.xColumn + ' (s)', autorange: true },
     yaxis: { title: config.yAxisLabel, autorange: true },
     uirevision: true,
@@ -108,27 +117,10 @@ function updateAllPlots(responseData) {
 }
 
 window.addEventListener('load', function (evt) {
-  const _updateTimeoutMillis = 100
-  const _reloadTimeoutMillis = 1000 * 10
-  let _timeout
-  let _timeoutReload
-
-  const name_input_div = document.getElementById('testname')
-  const button_input_div = document.getElementById('buttoncontainer')
-  const allButtons = []
-  for (let i = 0; i < testNames.length; i++) {
-    const btn = document.createElement('input')
-    btn.type = 'button'
-    btn.value = testNames[i]
-    btn.onclick = function () {
-      name_input_div.value = btn.value
-      _setTestNameOfServer(null)
-    }
-    btn.style.backgroundColor = 'grey'
-    btn.style.marginRight = '5px'
-    button_input_div.appendChild(btn)
-    allButtons.push(btn)
-  }
+  const _updateTimeoutMillis = 100;
+  const _reloadTimeoutMillis = 1000 * 10;
+  let _timeout;
+  let _timeoutReload;
 
   // Create plot containers and initialize empty plots
   createPlotContainers();
@@ -136,31 +128,29 @@ window.addEventListener('load', function (evt) {
 
   function _clearTimeout() {
     if (_timeout) {
-      clearTimeout(_timeout)
-      _timeout = undefined
+      clearTimeout(_timeout);
+      _timeout = undefined;
     }
     if (_timeoutReload) {
-      clearTimeout(_timeoutReload)
-      _timeoutReload = undefined
+      clearTimeout(_timeoutReload);
+      _timeoutReload = undefined;
     }
   }
 
   function _onScreenSizeUpdate(evt) {
-    const plotWidth = window.innerWidth - 50 + 'px'
-    const plotHeight = (window.innerHeight / plotConfigs.length) - 80 + 'px'
-    plotConfigs.forEach((config) => {
-      const div = document.getElementById(config.divId)
-      if (div) {
-        div.style.width = plotWidth
-        div.style.height = plotHeight
+    // Disable dynamic resizing to prevent overlapping - use fixed CSS sizing instead
+    console.log('Screen size update disabled to prevent plot overlapping');
+    // Force proper stacking by ensuring each wrapper maintains its position
+    plotConfigs.forEach((config, index) => {
+      const div = document.getElementById(config.divId);
+      if (div && div.parentElement) {
+        // Force static positioning to prevent overlap
+        div.parentElement.style.position = 'static';
+        div.parentElement.style.display = 'block';
+        div.parentElement.style.marginBottom = '50px';
+        div.style.position = 'relative';
       }
-    })
-    button_input_div.style.width = window.innerWidth - 50 + 'px'
-    if (window.innerWidth - 160 > 400) {
-      name_input_div.style.width = window.innerWidth - 160 + 'px'
-    } else {
-      name_input_div.style.width = 400 + 'px'
-    }
+    });
   }
 
   function _onTestNameResponse() {
@@ -170,10 +160,10 @@ window.addEventListener('load', function (evt) {
   }
 
   function _onServerError(evt) {
-    _clearTimeout()
-    document.body.style.backgroundColor = 'red'
-    document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>'
-    location.reload()
+    _clearTimeout();
+    document.body.style.backgroundColor = 'red';
+    document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>';
+    location.reload();
   }
 
   function _getLatestDataFromServer(evt) {
@@ -195,32 +185,29 @@ window.addEventListener('load', function (evt) {
   }
 
   function _getTestNameFromServer(evt) {
-    const oReq = new XMLHttpRequest()
-    oReq.addEventListener('error', _onServerError)
-    oReq.addEventListener('load', _onTestNameResponse)
-    oReq.open('GET', 'http://' + window.location.host + '/name')
-    oReq.send()
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener('error', _onServerError);
+    oReq.addEventListener('load', _onTestNameResponse);
+    oReq.open('GET', 'http://' + window.location.host + '/name');
+    oReq.send();
   }
 
   function _setTestNameOfServer(evt) {
-    _clearTimeout()
-    initializePlots()
-    const oReq = new XMLHttpRequest()
-    oReq.addEventListener('error', _onServerError)
-    oReq.addEventListener('load', _onTestNameResponse)
+    _clearTimeout();
+    initializePlots();
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener('error', _onServerError);
+    oReq.addEventListener('load', _onTestNameResponse);
     oReq.open(
       'GET',
       'http://' + window.location.host + '/name/' + name_input_div.value
-    )
-    oReq.send()
+    );
+    oReq.send();
   }
 
-  name_input_div.addEventListener('keyup', function (evt) {
-    if (evt.keyCode === 13) {
-      _setTestNameOfServer(evt)
-    }
-  })
-  window.addEventListener('resize', _onScreenSizeUpdate)
-  _onScreenSizeUpdate(evt)
-  _getTestNameFromServer()
-})
+  // window.addEventListener('resize', _onScreenSizeUpdate)
+  // _onScreenSizeUpdate(evt)
+  window.addEventListener('resize', _onScreenSizeUpdate);
+  _onScreenSizeUpdate(evt);
+  _getTestNameFromServer();
+});

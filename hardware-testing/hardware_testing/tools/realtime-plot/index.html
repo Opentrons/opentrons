@@ -17,24 +17,42 @@
 		html, body {
 			height: 100%;
 			font-family: "Open Sans", verdana, arial, sans-serif;
+			margin: 0;
+			padding: 0;
 		}
 		#plot-container {
-			position: relative;
-			left: 5px;
-			top: 10px;
+			padding: 10px;
 			display: block;
+			width: calc(100% - 20px);
+			height: calc(100% - 20px);
+		}
+		/* Force plot wrapper borders to be visible and proper spacing */
+		.plot-wrapper {
+			margin-bottom: 50px !important;
+			border: 4px solid black !important;
+			background-color: #f9f9f9 !important;
+			display: block !important;
+			position: static !important;
+			clear: both !important;
+			height: 450px !important;
+			width: 100% !important;
+		}
+		/* Ensure Plotly doesn't override wrapper styles */
+		.plot-wrapper > div {
+			position: relative !important;
+			z-index: 1 !important;
 		}
 	</style>
 </head>
 <body>
-	<div>
-		<p id="testnamecontainer">
+	<!-- <div> -->
+		<!-- <p id="testnamecontainer">
 			Test Name:
 			<input type="text" id="testname" name="testname">
-		</p>
-		<p id="buttoncontainer">
-		</p>
-	</div>
+		</p> -->
+		<!-- <p id="buttoncontainer">
+		</p> -->
+	<!-- </div> -->
 	<!-- Replace single plotly div with a container for multiple plots -->
 	<div id="plot-container"></div>
 </body>
