@@ -41,6 +41,7 @@ from ..protocol_engine.types import (
     EngineStatus,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyCommandAnnotation,
     LegacyLabwareOffsetCreate,
     ModuleModel,
     PostRunHardwareState,
@@ -276,7 +277,7 @@ class RunOrchestrator:
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_all_command_annotations(self) -> List[CommandAnnotation]:
+    def get_command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
         return self._protocol_engine.state_view.commands.get_all_command_annotations()
 
