@@ -191,7 +191,6 @@ class StateView(HasState[State]):
                 for liquid_class_id, liquid_class_record in self._liquid_classes.get_all().items()
             ],
             tasks=self._tasks.get_summary(),
-            commandAnnotations=self._commands.get_all_command_annotations(),
             cameraSettings=self._camera.get_enablement_settings(),
         )
 

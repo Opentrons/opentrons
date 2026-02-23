@@ -285,6 +285,10 @@ class RunOrchestrator:
             else self._protocol_runner.command_annotations
         )
 
+    def get_all_command_annotations(self) -> List[CommandAnnotation]:
+        """Get the list of command annotations defined in the protocol, if any."""
+        return self._protocol_engine.state_view.commands.get_all_command_annotations()
+
     def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations defined in the protocol, if any."""
         return len(

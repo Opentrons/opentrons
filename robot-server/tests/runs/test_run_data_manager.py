@@ -131,9 +131,6 @@ def engine_state_summary() -> StateSummary:
         ],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
-        ],
     )
 
 
@@ -165,13 +162,14 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def legacy_command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
-    """Get a LegacyCommandAnnotation list."""
+def command_annotations() -> List[pe_types.CommandAnnotation]:
+    """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotationLegacy(
-            commandKeys=["abc"],
-            params={"abc": "123"},
-            machineReadableName="hello world",
+        pe_types.CommandAnnotation(
+            id="annotation-id",
+            name="My command annotation",
+            description="This is a command annotation",
+            params={},
         )
     ]
 
@@ -600,11 +598,6 @@ async def test_get_all_runs(
         ],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(  # type: ignore[call-arg]
-                id="current-command-annotation-id"
-            )
-        ],
     )
     current_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -626,11 +619,6 @@ async def test_get_all_runs(
         liquids=[],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(  # type: ignore[call-arg]
-                id="old-command-annotation-id"
-            )
-        ],
     )
     historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -754,7 +742,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
+    command_annotations: List[pe_types.CommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -772,7 +760,7 @@ async def test_update_current(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=legacy_command_annotations,
+            command_annotations=command_annotations,
             command_preconditions=command_preconditions,
         )
     )
@@ -903,7 +891,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
+    command_annotations: List[pe_types.CommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -924,7 +912,7 @@ async def test_create_archives_existing(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=legacy_command_annotations,
+            command_annotations=command_annotations,
             command_preconditions=command_preconditions,
         )
     )

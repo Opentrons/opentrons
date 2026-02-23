@@ -106,7 +106,7 @@ class ProtocolAnalyzer:
             errors=result.state_summary.errors,
             liquids=result.state_summary.liquids,
             liquidClasses=result.state_summary.liquidClasses,
-            command_annotations=result.state_summary.commandAnnotations,
+            command_annotations=result.command_annotations,
             command_preconditions=result.command_preconditions,
         )
 
