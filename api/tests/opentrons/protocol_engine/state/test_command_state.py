@@ -35,7 +35,7 @@ from opentrons.protocol_engine.state.commands import (
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
-from opentrons.protocol_engine.types.command_annotations import UserCommandAnnotation
+from opentrons.protocol_engine.types.command_annotations import CommandAnnotation
 
 
 def _make_config() -> Config:
@@ -77,7 +77,7 @@ def test_queue_command_action() -> None:
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
         params=params,
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     subject.handle_action(action)
@@ -193,7 +193,7 @@ def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
         result=None,
         error=expected_error_occurrence,
         notes=notes,
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     assert subject_view.get("command-id") == expected_failed_command
@@ -1388,17 +1388,18 @@ def test_handle_create_command_annotation_action() -> None:
     subject.handle_action(
         actions.CreateUserCommandAnnotation(
             annotation_id="abc123",
-            user_defined_name="bar",
-            user_description="foo",
+            name="bar",
+            description="foo",
             params={"a": 1},
         )
     )
 
     annotation = subject_view.get_command_annotation("abc123")
-    assert annotation == UserCommandAnnotation(
-        annotationId="abc123",
-        userSpecifiedName="bar",
-        userSpecifiedDescription="foo",
+    assert annotation == CommandAnnotation(
+        id="abc123",
+        source="userCommand",
+        name="bar",
+        description="foo",
         params={"a": 1},
     )
 
@@ -1416,22 +1417,24 @@ def test_get_all_command_annotations() -> None:
         subject.handle_action(
             actions.CreateUserCommandAnnotation(
                 annotation_id=ann_id,
-                user_defined_name="bar",
-                user_description="foo",
+                name="bar",
+                description="foo",
                 params={"a": 1},
             )
         )
     assert subject_view.get_all_command_annotations() == [
-        UserCommandAnnotation(
-            annotationId="ann_id_1",
-            userSpecifiedName="bar",
-            userSpecifiedDescription="foo",
+        CommandAnnotation(
+            id="ann_id_1",
+            source="userCommand",
+            name="bar",
+            description="foo",
             params={"a": 1},
         ),
-        UserCommandAnnotation(
-            annotationId="ann_id_2",
-            userSpecifiedName="bar",
-            userSpecifiedDescription="foo",
+        CommandAnnotation(
+            id="ann_id_2",
+            source="userCommand",
+            name="bar",
+            description="foo",
             params={"a": 1},
         ),
     ]

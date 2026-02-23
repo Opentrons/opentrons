@@ -29,9 +29,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import (
     BooleanParameter,
+    CommandAnnotation,
     CommandPreconditions,
     CSVParameter,
-    UserCommandAnnotation,
 )
 from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
@@ -131,9 +131,7 @@ def engine_state_summary() -> StateSummary:
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(
-                annotationId="some-command-annotation-id"
-            )  # type: ignore[call-arg]
+            CommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
         ],
     )
 
@@ -166,8 +164,8 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def command_annotations() -> List[pe_types.CommandAnnotation]:
-    """Get a CommandAnnotation list."""
+def command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
+    """Get a LegacyCommandAnnotation list."""
     return [
         pe_types.SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
@@ -602,8 +600,8 @@ async def test_get_all_runs(
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
-                annotationId="current-command-annotation-id"
+            CommandAnnotation.model_construct(  # type: ignore[call-arg]
+                id="current-command-annotation-id"
             )
         ],
     )
@@ -628,8 +626,8 @@ async def test_get_all_runs(
         liquidClasses=[],
         wells=[],
         commandAnnotations=[
-            UserCommandAnnotation.model_construct(  # type: ignore[call-arg]
-                annotationId="old-command-annotation-id"
+            CommandAnnotation.model_construct(  # type: ignore[call-arg]
+                id="old-command-annotation-id"
             )
         ],
     )
@@ -755,7 +753,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.CommandAnnotation],
+    command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -904,7 +902,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.CommandAnnotation],
+    command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
