@@ -1,3 +1,5 @@
+import { COLORS } from '@opentrons/components'
+
 import { INACCESSIBLE, SELECTED, SELECTED_ERROR } from '../Tips/constants'
 import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'
@@ -16,6 +18,7 @@ interface WellStatusProps {
 
 export function WellStatus(props: WellStatusProps): JSX.Element {
   const { type, size, wellMap, flipLine, showStroke = false } = props
+  const outlineColor = size ? COLORS.black90 : COLORS.grey50
   switch (type) {
     case SELECTED:
       return (
@@ -27,7 +30,14 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
         />
       )
     case INACCESSIBLE:
-      return <EmptyWell wellMap={wellMap} flipLine={flipLine} size={size} />
+      return (
+        <EmptyWell
+          wellMap={wellMap}
+          flipLine={flipLine}
+          size={size}
+          outlineColor={outlineColor}
+        />
+      )
     case UNSELECTED:
       return (
         <SelectedWell

@@ -4,12 +4,13 @@ import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface EmptyWellProps {
   wellMap: LabwareWellMap
+  outlineColor: string
   size?: string
   flipLine?: boolean
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap, flipLine } = props
+  const { size, wellMap, flipLine, outlineColor } = props
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
@@ -60,8 +61,8 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             cy="10"
             r="9"
             fill="#CBCCCC"
-            stroke="#737578"
-            strokeWidth="2"
+            stroke={outlineColor}
+            strokeWidth="3"
           />
         ) : (
           <rect
@@ -70,12 +71,12 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             width={width}
             height={height}
             fill="#CBCCCC"
-            stroke="#737578"
+            stroke={outlineColor}
             strokeWidth="1"
           />
         )}
 
-        <line {...lineProps} stroke="#737578" strokeWidth="1" />
+        <line {...lineProps} stroke={outlineColor} strokeWidth="2" />
       </g>
     </svg>
   )
