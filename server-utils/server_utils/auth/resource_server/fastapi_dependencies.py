@@ -15,7 +15,8 @@ from typing import (
 import fastapi
 import fastapi.security
 
-from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
+from .auth_server import TOKEN_ENDPOINT_PATH
+from .auth_server import Client as AuthServerClient
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
@@ -87,7 +88,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
             ),
         ],
         authorization_checker: Annotated[
-            AuthorizationChecker, fastapi.Depends(get_authorization_checker)
+            AuthorizationChecker, fastapi.Depends(_get_authorization_checker)
         ],
     ) -> None:
         authorization_result = await authorization_checker.check(
@@ -120,28 +121,16 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
     return dependency
 
 
-def install_authorization_checker(
-    app_state: AppState,
-    authorization_checker: AuthorizationChecker,
-) -> None:
-    """Store a singleton `AuthorizationChecker` in global server state for later retrieval.
-
-    This should be called once during server initialization.
-    """
-    _authorization_checker_accessor.set_on(app_state, authorization_checker)
-
-
 @asynccontextmanager
-async def build_authorization_checker(
-    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
-) -> AsyncGenerator[AuthorizationChecker, None]:
-    """Build an `AuthorizationChecker` appropriately configured for most servers.
+async def set_up_authorization_checker(
+    app_state: AppState, *, auth_server_uds: str | None = None, auth_server_url: str | None = None
+) -> AsyncGenerator[None, None]:
+    """Set up the server's singleton `AuthorizationChecker`.
 
-    `auth_server_uds` (a path to a Unix domain socket) or `auth_server_url` (a URL like
-    http://localhost:1234) describes how to connect to the auth-server. These should
-    typically be taken from CLI options or environment variables. If neither are
-    specified, a dummy `AuthorizationChecker` is returned that allows unauthenticated
-    access to everything.
+    When this context manager is entered, the `AuthorizationChecker` is initialized
+    and placed on `app_state` for later retrieval via `_get_notification_client()`.
+
+    When this context manager is exited, the `AuthorizationChecker` is cleaned up.
     """
     if auth_server_uds is None and auth_server_url is None:
         _log.info(
@@ -149,25 +138,28 @@ async def build_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        yield AlwaysAllowedAuthorizationChecker()
+        authorization_checker: AuthorizationChecker = (
+            AlwaysAllowedAuthorizationChecker()
+        )
+        _authorization_checker_accessor.set_on(app_state, authorization_checker)
+        yield
 
     else:
-        async with LocalHTTPClient(
-            auth_server_uds=auth_server_uds, auth_server_url=auth_server_url
+        async with AuthServerClient(
+            auth_server_uds=auth_server_uds,
+            auth_server_url=auth_server_url
         ) as client:
-            yield AuthServerAuthorizationChecker(client)
+            authorization_checker = AuthServerAuthorizationChecker(client)
+            _authorization_checker_accessor.set_on(app_state, authorization_checker)
+            yield
 
 
-def get_authorization_checker(
+def _get_authorization_checker(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> AuthorizationChecker:
-    """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`.
-
-    Endpoints should not normally need to use this directly. Use `require_scopes()`,
-    which is higher-level, instead. This is exposed for testing.
-    """
+    """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`."""
     authorization_checker = _authorization_checker_accessor.get_from(app_state)
     assert authorization_checker is not None, (
-        "Forgot to initialize authorization checker as part of server startup?"
+        "Forgot to initialize notification client as part of server startup?"
     )
     return authorization_checker

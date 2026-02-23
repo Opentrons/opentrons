@@ -57,7 +57,12 @@ class Scope(enum.Enum):
 
     USERS_WRITE = (
         "users.write",
-        "Create, update, and delete users.",
+        "Read, write, and edit users.",
+    )
+
+    RUNS_WRITE = (
+        "runs.write",
+        "Create and control protocol runs.",
     )
 
     _description: str

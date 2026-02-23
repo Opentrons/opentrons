@@ -60,8 +60,23 @@ class UserStore:
             session.expunge(new_user)
         return new_user
 
-    def remove(self, username: str) -> None:
-        """Delete a user by username.
+# todo(mm, 2026-01-29): Delete these placeholder users when we have a real DB to store real users.
+TEST_USERS = [
+    User(
+        username="test_admin",
+        hashed_password=password_hash.hash("test_admin_password"),
+        scopes=list(Scope),
+        full_name="Test Admin",
+        account_type=AccountType.ADMIN,
+    ),
+    User(
+        username="test_user",
+        hashed_password=password_hash.hash("test_user_password"),
+        scopes=[Scope.RUNS_WRITE],
+        full_name="Test User",
+        account_type=AccountType.USER,
+    ),
+]
 
         Raises ``ValueError`` if the user does not exist.
         """

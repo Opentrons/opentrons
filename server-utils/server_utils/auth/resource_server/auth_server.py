@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import contextlib
 import typing
-from abc import ABC, abstractmethod
 
 import aiohttp
 import pydantic
@@ -24,34 +23,12 @@ TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 # we should find a fix or workaround contained to auth-server, and not provide a client_id
 # in our requests here. If it isn't, we should use a client_id separate from the
 # Opentrons App, like "opentrons_resource_server" or something.
-CLIENT_ID: ClientIDType = "opentrons_app"
+_CLIENT_ID: ClientIDType = "opentrons_app"
 ClientIDType: typing.TypeAlias = typing.Literal["opentrons_app"]
 
 
-class Client(ABC):
-    """An interface for a resource server to query the Opentrons auth-server."""
-
-    @abstractmethod
-    async def get_auth_settings(self) -> AuthSettingsResponse:
-        """Ask the Opentrons auth-server what the current system-wide auth settings are.
-
-        If there's an internal error (e.g. the auth server is unconnectable),
-        the implementation should raise it as an exception.
-        """
-        pass
-
-    @abstractmethod
-    async def introspect_token(self, token: str) -> TokenIntrospectionResponse:
-        """Ask the Opentrons auth-server for information about an access token.
-
-        If there's an internal error (e.g. the auth server is unconnectable),
-        the implementation should raise it as an exception.
-        """
-        pass
-
-
-class LocalHTTPClient(Client):
-    """A client implementation that talks to auth-server over a local HTTP connection."""
+class Client:
+    """A client to interact with auth-server."""
 
     def __init__(
         self, *, auth_server_uds: str | None = None, auth_server_url: str | None = None
@@ -69,13 +46,7 @@ class LocalHTTPClient(Client):
 
         if auth_server_uds is not None:
             connector = aiohttp.UnixConnector(path=auth_server_uds)
-            session = aiohttp.ClientSession(
-                connector=connector,
-                # We're connecting over a Unix socket, so this URL is nonsensical,
-                # but aiohttp seems to require it as a placeholder.
-                # https://github.com/aio-libs/aiohttp/issues/11324.
-                base_url="http://localhost",
-            )
+            session = aiohttp.ClientSession(connector=connector)
         elif auth_server_url is not None:
             session = aiohttp.ClientSession(base_url=auth_server_url)
         else:
@@ -95,19 +66,19 @@ class LocalHTTPClient(Client):
         """When exited as a context manager, close the underlying connection."""
         await self._exit_stack.aclose()
 
-    @typing.override
     async def get_auth_settings(self) -> AuthSettingsResponse:
+        """Ask the auth server what the current system-wide auth settings are."""
         async with self._session.get(SETTINGS_ENDPOINT_PATH) as response:
             response_bytes = await response.read()
         response.raise_for_status()
         parsed_response = AuthSettingsResponse.model_validate_json(response_bytes)
         return parsed_response
 
-    @typing.override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:
+        """Ask the auth server for information about an access token."""
         request_form_data: TokenIntrospectionRequestFormData = {
             "token": token,
-            "client_id": CLIENT_ID,
+            "client_id": _CLIENT_ID,
         }
 
         async with self._session.post(
@@ -145,12 +116,12 @@ class TokenIntrospectionRequestFormData(typing.TypedDict):
 
 
 class AuthSettingsResponse(_StrictBaseModel):
-    """A response body from auth-server's /settings endpoint."""
+    """A response body from auth-server's settings endpoint."""
 
     data: AuthSettingsResponseData
 
 
 class AuthSettingsResponseData(_StrictBaseModel):
-    """Response body data from auth-server's /settings endpoint."""
+    """Response body data from auth-server's settings endpoint."""
 
     accessControlEnabled: bool

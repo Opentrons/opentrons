@@ -77,13 +77,15 @@ def test_update_username(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Original",
         account_type="user",
+        scopes=[Scope.RUNS_WRITE],
     )
     updated = user_store.update("orig_name", new_username="new_name")
     assert updated.username == "new_name"
     assert updated.full_name == "Original"
     assert updated.account_type == AccountType.USER
-    assert user_store.get("new_name") is not None
-    assert user_store.get("orig_name") is None
+    assert updated.scopes == [Scope.RUNS_WRITE]
+    assert get("new_name") is updated
+    assert get("orig_name") is None
 
 
 def test_update_preserves_password_when_none(user_store: UserStore) -> None:
