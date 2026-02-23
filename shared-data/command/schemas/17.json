@@ -675,14 +675,14 @@
       "type": "object"
     },
     "CSVWriteRowCreate": {
-      "description": "A request to create a generic csv file.",
+      "description": "A request to write to a generic csv file.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1377,12 +1377,12 @@
     "CreateCSVCreate": {
       "description": "A request to create a generic csv file.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1410,7 +1410,7 @@
       "type": "object"
     },
     "CreateCSVParams": {
-      "description": "Input parameters for an image capture.",
+      "description": "Input parameters to create csv.",
       "properties": {
         "columns": {
           "description": "How many columns are going to be used in this csv.",
