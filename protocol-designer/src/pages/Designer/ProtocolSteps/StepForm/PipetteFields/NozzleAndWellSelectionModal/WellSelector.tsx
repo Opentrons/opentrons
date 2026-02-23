@@ -194,13 +194,34 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
   const handleClickWell = (wellName: string): void => {
-    const wellsToToggle = getEntireWellSelection(
-      wellName,
-      labwareDef.ordering,
-      nozzleConfiguration,
-      primaryNozzle,
-      channels
-    )
+    const wellsField = getWellsField()
+
+    const wellIsSelected = selectedWells.flat().includes(wellName)
+    let wellsToToggle: string[] = []
+    if (wellIsSelected) {
+      const primaryWells = wellsField?.value as string[]
+      for (const primaryWell of primaryWells) {
+        const group = getEntireWellSelection(
+          primaryWell,
+          labwareDef.ordering,
+          nozzleConfiguration,
+          primaryNozzle,
+          channels
+        )
+        if (group.includes(wellName)) {
+          wellsToToggle = group
+          break
+        }
+      }
+    } else {
+      wellsToToggle = getEntireWellSelection(
+        wellName,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+    }
 
     const hasInaccessibleWell = wellsToToggle.some(well => {
       const isSafe = robotState
@@ -220,15 +241,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       return !isSafe || isPartialBlocked
     })
 
-    if (hasInaccessibleWell) return
-
-    const wellsField = getWellsField()
+    if (hasInaccessibleWell) {
+      return
+    }
 
     setSelectedWells(prev => {
-      const next = prev.filter(
-        group => !group.some(well => wellsToToggle.includes(well))
-      )
-
+      const next = prev.filter(group => group[0] !== wellsToToggle[0])
       const hadOverlap = next.length !== prev.length
 
       if (!hadOverlap) {

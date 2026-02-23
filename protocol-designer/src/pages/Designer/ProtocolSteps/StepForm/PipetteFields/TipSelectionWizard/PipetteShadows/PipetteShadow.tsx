@@ -165,19 +165,22 @@ export function PipetteShadow(props: {
     shadowHeight: height,
     isOt2EightChannel,
   })
-
   return (
     <g className={styles.shadow_overlay}>
-      <PipetteLabel
-        ref={labelRef}
-        text={labelText}
-        isZoomed
-        x={slotX + xOffset + labelOffsetX}
-        y={slotY + yOffset + labelOffsetY}
-        placement={labelPlacement}
-        isError={isError}
-      />
-      <ShadowComponent {...shadowProps} />
+      {(!isHoveredWellSelected && !isTiprack) || isError ? (
+        <>
+          <PipetteLabel
+            ref={labelRef}
+            text={labelText}
+            isZoomed
+            x={slotX + xOffset + labelOffsetX}
+            y={slotY + yOffset + labelOffsetY}
+            placement={labelPlacement}
+            isError={isError}
+          />
+          <ShadowComponent {...shadowProps} />
+        </>
+      ) : null}
     </g>
   )
 }
