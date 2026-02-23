@@ -41,13 +41,13 @@ from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
     PostRunHardwareState,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons.protocol_runner import (
     RunOrchestrator,
@@ -466,7 +466,7 @@ class RunOrchestratorStore:
             cursor=cursor, length=length
         )
 
-    def get_command_annotation(self, annotation_id: str) -> UserCommandAnnotation:
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the specified command annotation."""
         return self.run_orchestrator.get_command_annotation(annotation_id)
 

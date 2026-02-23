@@ -8,7 +8,7 @@ from starlette import status
 from opentrons.protocol_engine.errors.exceptions import (
     CommandAnnotationNotFoundError as CommandAnnotationNotFoundInEngineError,
 )
-from opentrons.protocol_engine.types import UserCommandAnnotation
+from opentrons.protocol_engine.types import CommandAnnotation
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
@@ -59,7 +59,7 @@ class PreSerializedCommandAnnotationsNotAvailable(ErrorDetails):
         "The command annotations are returned in the order that they were created"
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleMultiBody[UserCommandAnnotation]},
+        status.HTTP_200_OK: {"model": SimpleMultiBody[CommandAnnotation]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
@@ -84,7 +84,7 @@ async def get_command_annotations_list(
             description="The maximum number of command annotations to return from the list."
         ),
     ] = _DEFAULT_COMMAND_ANNOTATIONS_LIST_LENGTH,
-) -> PydanticResponse[SimpleMultiBody[UserCommandAnnotation]]:
+) -> PydanticResponse[SimpleMultiBody[CommandAnnotation]]:
     """Get a list of command annotations in the specified run.
 
     Arguments:
@@ -128,7 +128,7 @@ async def get_command_annotations_list(
     summary="Get full details of a specific command annotation in the specified run.",
     description="Get full details of a specific command annotation in the specified run.",
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[UserCommandAnnotation]},
+        status.HTTP_200_OK: {"model": SimpleBody[CommandAnnotation]},
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
                 ErrorBody[RunNotFound], ErrorBody[CommandAnnotationNotFound]
@@ -140,7 +140,7 @@ async def get_command_annotation(
     runId: str,
     commandAnnotationId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
-) -> PydanticResponse[SimpleBody[UserCommandAnnotation]]:
+) -> PydanticResponse[SimpleBody[CommandAnnotation]]:
     """Get a specific command annotation.
 
     Arguments:

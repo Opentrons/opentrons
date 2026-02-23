@@ -1349,9 +1349,10 @@ def test_get_command_annotations_slice_current_run(
     """It should get the specified slice of command annotations."""
     annotations_slice = CommandAnnotationsSlice(
         command_annotations=[
-            UserCommandAnnotation(
-                annotationId="annotation-id",
-                userSpecifiedName="user-specified-name",
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
                 params={},
             )
         ],
@@ -1374,9 +1375,10 @@ def test_get_command_annotation_from_current_run(
     mock_run_orchestrator_store: RunOrchestratorStore,
 ) -> None:
     """Should get the command annotation by id from run store."""
-    cmd_annotation = UserCommandAnnotation(
-        annotationId="annotation-id",
-        userSpecifiedName="user-specified-name",
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
         params={},
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")

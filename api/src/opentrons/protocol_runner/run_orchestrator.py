@@ -6,8 +6,6 @@ import enum
 from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
-from opentrons.protocol_engine.types import UserCommandAnnotation
 
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -53,6 +51,8 @@ from ..protocol_engine.types import (
 from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
 from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.types import CommandAnnotation
 from opentrons.types import NozzleMapInterface
 
 
@@ -287,11 +287,15 @@ class RunOrchestrator:
 
     def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations defined in the protocol, if any."""
-        return len(self._protocol_engine.state_view.commands.get_all_command_annotations())
+        return len(
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
 
-    def get_command_annotation(self, annotation_id: str) -> UserCommandAnnotation:
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the command annotation by ID."""
-        return self._protocol_engine.state_view.commands.get_command_annotation(annotation_id)
+        return self._protocol_engine.state_view.commands.get_command_annotation(
+            annotation_id
+        )
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
@@ -325,7 +329,9 @@ class RunOrchestrator:
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
-    def get_command_annotations_slice(self, cursor: int, length: int) -> CommandAnnotationsSlice:
+    def get_command_annotations_slice(
+        self, cursor: int, length: int
+    ) -> CommandAnnotationsSlice:
         """Get a slice of run annotations commands."""
         return self._protocol_engine.state_view.commands.get_command_annotations_slice(
             cursor=cursor, length=length

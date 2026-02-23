@@ -7,7 +7,7 @@ from opentrons.protocol_engine.errors import (
     CommandAnnotationNotFoundError as CommandAnnotationNotFoundInEngineError,
 )
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
-from opentrons.protocol_engine.types import UserCommandAnnotation
+from opentrons.protocol_engine.types import CommandAnnotation
 from server_utils.fastapi_utils.models.json_api import MultiBodyMeta
 
 from robot_server.errors.error_responses import ApiError
@@ -30,14 +30,16 @@ async def test_get_command_annotations_slice(
     """It should get a slice of run annotations commands."""
     expected_annotations = CommandAnnotationsSlice(
         command_annotations=[
-            UserCommandAnnotation(
-                annotationId="annotation-id-1",
-                userSpecifiedName="foo",
+            CommandAnnotation(
+                id="annotation-id-1",
+                source="userCommand",
+                name="foo",
                 params={},
             ),
-            UserCommandAnnotation(
-                annotationId="annotation-id-2",
-                userSpecifiedName="bar",
+            CommandAnnotation(
+                id="annotation-id-2",
+                source="engineCommand",
+                name="bar",
                 params={},
             ),
         ],
@@ -197,10 +199,10 @@ async def test_get_specified_command_annotation(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """Should return the correct command annotation."""
-    expected_annotation = UserCommandAnnotation(
-        annotationId="annotation-id",
-        annotationType="userCommand",
-        userSpecifiedName="foo",
+    expected_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="foo",
         params={},
     )
     decoy.when(

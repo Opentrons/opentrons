@@ -19,11 +19,11 @@ from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons.system import camera
 from opentrons.types import NozzleMapInterface
@@ -585,7 +585,7 @@ class RunDataManager:
 
     def get_command_annotation(
         self, run_id: str, annotation_id: str
-    ) -> UserCommandAnnotation:
+    ) -> CommandAnnotation:
         """Get a run's command annotation by ID."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_annotation(annotation_id)

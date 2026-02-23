@@ -188,15 +188,15 @@ stages:
       status_code: 200
       json:
         data:
-          - annotationType: userCommand
-            annotationId: '{annotation_id_1}'
-            userSpecifiedName: 'My step group'
-            userSpecifiedDescription: "It's a comment, that's it."
+          - source: userCommand
+            id: '{annotation_id_1}'
+            name: 'My step group'
+            description: "It's a comment, that's it."
             params: {}
-          - annotationType: userCommand
-            annotationId: '{annotation_id_2}'
-            userSpecifiedName: 'My step group 2'
-            userSpecifiedDescription: "Another comment!"
+          - source: userCommand
+            id: '{annotation_id_2}'
+            name: 'My step group 2'
+            description: "Another comment!"
             params: {}
         meta:
           cursor: 0
@@ -210,10 +210,10 @@ stages:
       status_code: 200
       json:
         data:
-          annotationType: userCommand
-          annotationId: '{annotation_id_1}'
-          userSpecifiedName: 'My step group'
-          userSpecifiedDescription: "It's a comment, that's it."
+          source: userCommand
+          id: '{annotation_id_1}'
+          name: 'My step group'
+          description: "It's a comment, that's it."
           params: {}
 
   - name: Fetch the command annotations by ID 2
@@ -224,8 +224,8 @@ stages:
       status_code: 200
       json:
         data:
-          annotationType: userCommand
-          annotationId: '{annotation_id_2}'
-          userSpecifiedName: 'My step group 2'
-          userSpecifiedDescription: "Another comment!"
+          source: userCommand
+          id: '{annotation_id_2}'
+          name: 'My step group 2'
+          description: "Another comment!"
           params: {}

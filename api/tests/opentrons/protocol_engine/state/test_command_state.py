@@ -1460,57 +1460,99 @@ def test_get_command_annotations_slice_empty() -> None:
 
 
 _sample_command_annotations = [
-    UserCommandAnnotation(
-        annotationId="annotation-1",
-        userSpecifiedName="Step 1",
-        userSpecifiedDescription="Step 1 description",
+    CommandAnnotation(
+        id="annotation-1",
+        source="userCommand",
+        name="Step 1",
+        description="Step 1 description",
         params={},
     ),
-    UserCommandAnnotation(
-        annotationId="annotation-2",
-        userSpecifiedName="Step 2",
-        userSpecifiedDescription="Step 2 description",
+    CommandAnnotation(
+        id="annotation-2",
+        source="userCommand",
+        name="Step 2",
+        description="Step 2 description",
         params={},
     ),
-    UserCommandAnnotation(
-        annotationId="annotation-3",
-        userSpecifiedName="Step 3",
-        userSpecifiedDescription="Step 3 description",
+    CommandAnnotation(
+        id="annotation-3",
+        source="userCommand",
+        name="Step 3",
+        description="Step 3 description",
         params={},
     ),
-    UserCommandAnnotation(
-        annotationId="annotation-4",
-        userSpecifiedName="Step 4",
-        userSpecifiedDescription="Step 4 description",
+    CommandAnnotation(
+        id="annotation-4",
+        source="userCommand",
+        name="Step 4",
+        description="Step 4 description",
         params={},
-    )
+    ),
 ]
+
 
 @pytest.mark.parametrize(
     argnames=["cursor", "length", "expected_slice"],
     argvalues=[
-        (0, 2, CommandAnnotationsSlice(
-            command_annotations=[_sample_command_annotations[0], _sample_command_annotations[1]], cursor=0, total_length=4
-        )),
-        (1, 2, CommandAnnotationsSlice(
-            command_annotations=[_sample_command_annotations[1], _sample_command_annotations[2]], cursor=1, total_length=4
-        )),
-        (2, 4, CommandAnnotationsSlice(
-            command_annotations=[_sample_command_annotations[2], _sample_command_annotations[3]], cursor=2, total_length=4
-        )),
-        (4, 10, CommandAnnotationsSlice
-            (command_annotations=[_sample_command_annotations[3]], cursor=3, total_length=4
-        )),
-        (-4, 10, CommandAnnotationsSlice
-            (command_annotations=[
-                _sample_command_annotations[0],
-                _sample_command_annotations[1],
-                _sample_command_annotations[2],
-                _sample_command_annotations[3]
-            ],
-            cursor=0,
-            total_length=4,
-        )),
+        (
+            0,
+            2,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[0],
+                    _sample_command_annotations[1],
+                ],
+                cursor=0,
+                total_length=4,
+            ),
+        ),
+        (
+            1,
+            2,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[1],
+                    _sample_command_annotations[2],
+                ],
+                cursor=1,
+                total_length=4,
+            ),
+        ),
+        (
+            2,
+            4,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[2],
+                    _sample_command_annotations[3],
+                ],
+                cursor=2,
+                total_length=4,
+            ),
+        ),
+        (
+            4,
+            10,
+            CommandAnnotationsSlice(
+                command_annotations=[_sample_command_annotations[3]],
+                cursor=3,
+                total_length=4,
+            ),
+        ),
+        (
+            -4,
+            10,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[0],
+                    _sample_command_annotations[1],
+                    _sample_command_annotations[2],
+                    _sample_command_annotations[3],
+                ],
+                cursor=0,
+                total_length=4,
+            ),
+        ),
     ],
 )
 def test_get_command_annotations_slice_with_annotations(
@@ -1529,10 +1571,13 @@ def test_get_command_annotations_slice_with_annotations(
         subject.handle_action(
             actions.CreateUserCommandAnnotation(
                 annotation_id=f"annotation-{i}",
-                user_defined_name=f"Step {i}",
-                user_description=f"Step {i} description",
+                name=f"Step {i}",
+                description=f"Step {i} description",
                 params={},
             )
         )
 
-    assert subject_view.get_command_annotations_slice(cursor=cursor, length=length) == expected_slice
+    assert (
+        subject_view.get_command_annotations_slice(cursor=cursor, length=length)
+        == expected_slice
+    )
