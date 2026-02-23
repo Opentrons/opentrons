@@ -447,7 +447,7 @@ describe('ModuleCard', () => {
     })
     expect(screen.queryByText('Module setup required.')).not.toBeInTheDocument()
   })
-  ;[mockFlexStacker, mockVacuumModule].forEach(module =>
+  ;[mockFlexStacker, mockVacuumModule].forEach(module => {
     it('renders module setup link for no-calibration required modules', () => {
       render({
         ...props,
@@ -459,8 +459,8 @@ describe('ModuleCard', () => {
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
       expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
-  )
-  ;[mockFlexStacker, mockVacuumModule].forEach(module =>
+  })
+  ;[mockFlexStacker, mockVacuumModule].forEach(module => {
     it('renders module setup link for no-calibration required modules if firmware update available', () => {
       mockFlexStacker.hasAvailableUpdate = true
 
@@ -474,7 +474,7 @@ describe('ModuleCard', () => {
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
       expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
-  )
+  })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
@@ -595,7 +595,7 @@ describe('ModuleCard', () => {
       module: mockVacuumModule,
     })
 
-    screen.getByText('Millipore MultiScreen® Vacuum Manifold')
+    screen.getByText('Vacuum Module GEN1')
     screen.getByText('Mock Vacuum Module Data')
     screen.getByAltText('vacuumModuleMilliporeV1')
   })
