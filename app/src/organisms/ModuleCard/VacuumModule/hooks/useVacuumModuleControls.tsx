@@ -5,50 +5,16 @@ import { VACUUM_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
-import type { CreateCommand, ModuleOnlyParams } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  ModuleCreateCommand,
+  VacuumModuleCloseVentCreateCommand,
+  VacuumModuleDeactivateCreateCommand,
+  VacuumModuleOpenVentCreateCommand,
+  VacuumModuleSetTargetPowerCreateCommand,
+  VacuumModuleSetTargetPressureCreateCommand,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
-
-// TODO (nd: 02/20/2026): Refine and move these command types to shared-data/command/types/module.ts
-// once vacuum module commands are finalized in protocol engine
-interface VacuumModuleSetTargetPressureParams extends ModuleOnlyParams {
-  pressure: number
-}
-
-interface VacuumModuleSetTargetPowerParams extends ModuleOnlyParams {
-  power: number
-}
-
-interface VacuumModuleSetTargetPressureCreateCommand {
-  commandType: 'vacuumModule/setTargetPressure'
-  params: VacuumModuleSetTargetPressureParams
-}
-
-interface VacuumModuleSetTargetPowerCreateCommand {
-  commandType: 'vacuumModule/setTargetPower'
-  params: VacuumModuleSetTargetPowerParams
-}
-
-interface VacuumModuleDeactivateCreateCommand {
-  commandType: 'vacuumModule/deactivate'
-  params: ModuleOnlyParams
-}
-
-interface VacuumModuleOpenVentCreateCommand {
-  commandType: 'vacuumModule/openVent'
-  params: ModuleOnlyParams
-}
-
-interface VacuumModuleCloseVentCreateCommand {
-  commandType: 'vacuumModule/closeVent'
-  params: ModuleOnlyParams
-}
-
-type VacuumModuleCommand =
-  | VacuumModuleSetTargetPressureCreateCommand
-  | VacuumModuleSetTargetPowerCreateCommand
-  | VacuumModuleDeactivateCreateCommand
-  | VacuumModuleOpenVentCreateCommand
-  | VacuumModuleCloseVentCreateCommand
 
 interface UseVacuumModuleControlsResult {
   setVacuumPressure: (pressure: number) => void
@@ -74,7 +40,7 @@ export function useVacuumModuleControls(
     }
   }
 
-  const executeCommand = (command: VacuumModuleCommand): void => {
+  const executeCommand = (command: ModuleCreateCommand): void => {
     // TODO: Remove type assertion when vacuum commands are added to shared-data
     createLiveCommand({ command: command as unknown as CreateCommand })
       .then(() => {
