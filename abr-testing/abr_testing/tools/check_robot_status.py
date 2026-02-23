@@ -68,8 +68,7 @@ def get_current_run_details_from_robot(
                         ):
 
                             slack_bot.send_slack_message(
-                                message,
-                                [run_helpers.get_livestream_video(30)]
+                                message, [run_helpers.get_livestream_video(30)]
                             )
                     else:
                         slack_bot.send_slack_message(message)

@@ -19,10 +19,14 @@ requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 # Options used by primary developer to describe blowout position options
 BLOWOUT_OPTIONS = {
-	"trash": {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
-	"source": {"position_reference": "well-center", "offset": {"x": 1, "y": 2, "z": 3}},
-	"destination": {"position_reference": "well-bottom", "offset": {"x": 1, "y": 2, "z": 3}},
+    "trash": {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
+    "source": {"position_reference": "well-center", "offset": {"x": 1, "y": 2, "z": 3}},
+    "destination": {
+        "position_reference": "well-bottom",
+        "offset": {"x": 1, "y": 2, "z": 3},
+    },
 }
+
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
@@ -32,22 +36,21 @@ def add_parameters(parameters: ParameterContext) -> None:
     run_helpers.create_error_capture_duration_duration(parameters)
 
     parameters.add_str(
-	    variable_name="blowout_option",
-	    display_name="Blowout Option",
-	    choices=[
-	        {"display_name": "Trash (well-top + offset )", "value": "trash"},
-	        {"display_name": "Source (well-center + offset)", "value": "source"},
-	        {"display_name": "Dest (well-bottom + offset)", "value": "destination"}
-	    ],
-	    default="destination",
-	)
+        variable_name="blowout_option",
+        display_name="Blowout Option",
+        choices=[
+            {"display_name": "Trash (well-top + offset )", "value": "trash"},
+            {"display_name": "Source (well-center + offset)", "value": "source"},
+            {"display_name": "Dest (well-bottom + offset)", "value": "destination"},
+        ],
+        default="destination",
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     if not protocol.is_simulating():
         background_helpers.launch_background_tasks()
-
 
     blowout_selection = protocol.params.blowout_option
 
@@ -62,10 +65,7 @@ def run(protocol: ProtocolContext) -> None:
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
-    protocol.capture_image(
-        filename="start_of_run",
-        resolution=(1280, 720),
-        zoom=1)
+    protocol.capture_image(filename="start_of_run", resolution=(1280, 720), zoom=1)
     protocol.comment("THIS IS A NO MODULE RUN")
     tiprack_x_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
     tiprack_x_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -120,7 +120,9 @@ def run(protocol: ProtocolContext) -> None:
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
     }
     water = protocol.get_liquid_class("water")
-    water_blowout_properties = water.get_for(p1000, tiprack_x_1).dispense.retract.blowout
+    water_blowout_properties = water.get_for(
+        p1000, tiprack_x_1
+    ).dispense.retract.blowout
     water_blowout_properties.enabled = True
     water_blowout_properties.location = blowout_selection
     water_blowout_properties.blowout_position = BLOWOUT_OPTIONS[blowout_selection]
@@ -194,14 +196,15 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_1.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                 p1000.blow_out(location=waste_reservoir["A1"])
-                #p1000.touch_tip()
+                # p1000.touch_tip()
                 current += 1
             p1000.return_tip()
             protocol.capture_image(
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
             protocol.comment("Changing pipette configuration to 8ch.")
 
@@ -242,7 +245,7 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    #p1000_single.touch_tip()()
+                    # p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
@@ -282,7 +285,7 @@ def run(protocol: ProtocolContext) -> None:
                         sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2),
                     )
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    #p1000_single.touch_tip()()
+                    # p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
@@ -326,7 +329,7 @@ def run(protocol: ProtocolContext) -> None:
                     if DilutionVol > 20:
                         wells.append(sample_plate_4.wells_by_name()[CurrentWell])
                     p1000_single.blow_out(location=waste_reservoir["A1"])
-                    #p1000_single.touch_tip()()
+                    # p1000_single.touch_tip()()
                     p1000_single.return_tip()
                 current += 1
 
@@ -342,10 +345,7 @@ def run(protocol: ProtocolContext) -> None:
         run_helpers.find_liquid_height_of_all_wells(
             protocol, p1000_single, [waste_reservoir["A1"]]
         )
-        protocol.capture_image(
-            filename="end_of_run",
-            resolution=(1280, 720),
-            zoom=1)
+        protocol.capture_image(filename="end_of_run", resolution=(1280, 720), zoom=1)
         if not protocol.is_simulating():
             run_helpers.send_slack_message_with_image(
                 slack_bot, metadata["protocolName"]

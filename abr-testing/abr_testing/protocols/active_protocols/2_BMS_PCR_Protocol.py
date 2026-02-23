@@ -270,7 +270,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
             p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
             mmx_pic.append(water)
         # Empty plates into liquid waste
@@ -282,10 +283,7 @@ def run(protocol: ProtocolContext) -> None:
         run_helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
         if deactivate_modules_bool:
             run_helpers.deactivate_modules(protocol)
-        protocol.capture_image(
-            filename="end_of_run",
-            resolution=(1280, 720),
-            zoom=1)
+        protocol.capture_image(filename="end_of_run", resolution=(1280, 720), zoom=1)
         if not protocol.is_simulating():
             run_helpers.send_slack_message_with_image(
                 slack_bot, metadata["protocolName"]

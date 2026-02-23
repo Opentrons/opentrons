@@ -325,7 +325,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
         else:
             length = (
@@ -362,7 +363,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
     def transfer_ep(src: Well, destination: Well, volume: float) -> None:
         """Transfer Extension Product to Sample Plate."""
@@ -418,7 +420,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
     def transfer_ifp(
         src: List[Well],

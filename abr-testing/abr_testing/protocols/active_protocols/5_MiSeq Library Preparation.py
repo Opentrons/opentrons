@@ -206,7 +206,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
         # Step 4: Transfer DNA samples
         all()
@@ -275,7 +276,8 @@ def run(protocol: ProtocolContext) -> None:
                 home_before=True,
                 filename="successful_partial_tip_return",
                 resolution=(1280, 720),
-                zoom=1)
+                zoom=1,
+            )
 
         protocol.comment("Rearranging Deck for Dilutions")
         heater_shaker.open_labware_latch()

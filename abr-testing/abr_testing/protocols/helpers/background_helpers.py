@@ -42,6 +42,7 @@ def detect_robot_status(ip: str) -> None:
             past_run_status=past_run_statuses,
         )
 
+
 def change_robot_video_length(time: str, ip: str) -> None:
     """Changes the length of the robot video to the given time."""
     key = "hls_playlist_length"
@@ -57,7 +58,6 @@ def change_robot_video_length(time: str, ip: str) -> None:
         print(f"Successfully updated livestream length on {ip}")
     except subprocess.CalledProcessError as e:
         print(f"Failed to update {ip}: {e}")
-
 
 
 def launch_background_tasks() -> None:

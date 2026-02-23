@@ -658,8 +658,10 @@ def get_last_image_capture() -> str:
 
 def convert_m3u8_to_mp4(m3u8_pth: str, mp4_pth: str, dur: int = 30) -> None:
     """Convert m3u8 video to mp4 format."""
+    ffmpeg_cmd = f'ffmpeg -live_start_index -28 -i "{m3u8_pth}" -t {dur} -c:v mpeg4 -c:a aac -movflags +faststart "{mp4_pth}" -y'
+
     subprocess.run(
-        f'ffmpeg -i "{m3u8_pth}" -t {dur} -c:v mpeg4 -c:a aac -movflags +faststart "{mp4_pth}" -y',
+        ffmpeg_cmd,
         shell=True,
         check=True,
     )

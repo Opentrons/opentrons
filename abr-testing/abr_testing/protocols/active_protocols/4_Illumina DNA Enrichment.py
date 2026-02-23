@@ -1115,7 +1115,9 @@ def run(protocol: ProtocolContext) -> None:
 
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
             run_helpers.send_slack_error_message_with_attachments(
