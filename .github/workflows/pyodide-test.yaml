@@ -1,0 +1,60 @@
+
+
+name: 'pyodide test'
+
+on:
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+      - '.github/workflows/api-test-lint-deploy.yaml'
+      - '.github/actions/python/**'
+      - '.github/workflows/pyodide-test.yaml'
+      - 'pyodide/**'
+  push:
+    branches:
+      - 'pyodide' # TODO: remove this before merging this branch
+
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: ''
+    timeout-minutes: 10
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: 'actions/checkout@v6'
+        with:
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v6'
+        with:
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'api'
+          python-version: '3.12'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'shared-data'
+          python-version: '3.12'
+      - name: setup pyodide
+        working-directory: 'pyodide'
+        run: make setup
+      - name: test headless pyodide
+        working-directory: 'pyodide'
+        run: make test
+      - name: test python unit tests
+        working-directory: 'pyodide'
+        run: make test-py
