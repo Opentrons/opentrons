@@ -5,7 +5,7 @@
   },
   "commands": [
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +18,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33,7 +33,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -48,7 +48,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -70,7 +70,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -92,7 +92,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -114,7 +114,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -136,7 +136,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -158,7 +158,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -173,7 +173,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -188,7 +188,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -203,7 +203,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -218,7 +218,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -233,7 +233,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -248,7 +248,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -263,7 +263,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -278,7 +278,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -296,7 +296,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/startRunExtendedProfile",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -324,7 +324,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -339,7 +339,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -362,7 +362,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -377,7 +377,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -392,7 +392,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -407,7 +407,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -422,7 +422,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -437,7 +437,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -455,7 +455,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -474,7 +474,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -489,7 +489,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -512,7 +512,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -527,7 +527,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -542,7 +542,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -557,7 +557,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -572,7 +572,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -587,7 +587,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -602,7 +602,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetBlockTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -621,7 +621,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -640,7 +640,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -658,7 +658,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -673,7 +673,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -698,7 +698,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -713,7 +713,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -728,7 +728,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -743,7 +743,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -758,7 +758,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -773,7 +773,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -788,7 +788,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -803,7 +803,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -822,7 +822,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -841,7 +841,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -859,7 +859,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -877,7 +877,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -892,7 +892,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -919,7 +919,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -934,7 +934,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -949,7 +949,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -964,7 +964,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -979,7 +979,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -994,7 +994,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1009,7 +1009,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1024,7 +1024,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1039,7 +1039,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/startRunExtendedProfile",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1067,7 +1067,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1086,7 +1086,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1105,7 +1105,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1123,7 +1123,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1138,7 +1138,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1165,7 +1165,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1180,7 +1180,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1195,7 +1195,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1210,7 +1210,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1225,7 +1225,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1240,7 +1240,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1255,7 +1255,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1270,7 +1270,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1285,7 +1285,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1300,7 +1300,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1315,7 +1315,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1332,7 +1332,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1349,7 +1349,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1364,7 +1364,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
