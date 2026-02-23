@@ -14,7 +14,7 @@ import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectionLegendProps {
   selectionType: 'tip' | 'well'
-  size?: string
+  size: string
 }
 
 export function SelectionLegend({
@@ -45,6 +45,7 @@ export function SelectionLegend({
               type={type as WellType}
               wellMap={labwareWellMap}
               size={size}
+              flipLine={false}
             />
           )}
 

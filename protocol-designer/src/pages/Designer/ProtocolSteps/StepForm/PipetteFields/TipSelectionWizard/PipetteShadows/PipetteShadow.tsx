@@ -47,7 +47,6 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   },
 }
 
-// TODO: adjust once partial tip selection is enabled
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
   slotPosition: CoordinateTuple
@@ -62,6 +61,7 @@ export function PipetteShadow(props: {
   robotType: RobotType
   enclosingViewbox: string | null
   nozzles: NozzleConfigurationStyle
+  rotate?: boolean
 }): JSX.Element {
   const {
     pipetteSpec,
@@ -77,6 +77,7 @@ export function PipetteShadow(props: {
     robotType,
     enclosingViewbox,
     nozzles,
+    rotate,
   } = props
   const [slotX, slotY] = slotPosition
   const isTiprack = labwareState[selectedLabwareId].def.parameters.isTiprack
@@ -143,6 +144,7 @@ export function PipetteShadow(props: {
           fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
           stroke: COLORS.blue50,
         }),
+    rotate,
   }
 
   const labelPlacement = getPlacementByViewboxAndPipetteSpec({

@@ -154,6 +154,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         <WellStatus
                           wellMap={definition.wells}
                           type={statusByWellName[wellName] as WellType}
+                          flipLine={true}
                         />
                       )}
                     </svg>

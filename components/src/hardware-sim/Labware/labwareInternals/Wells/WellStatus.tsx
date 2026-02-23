@@ -9,12 +9,13 @@ import type { WellType } from '../types'
 interface WellStatusProps {
   wellMap: LabwareWellMap
   type: WellType
+  flipLine?: boolean
   showStroke?: boolean
   size?: string
 }
 
 export function WellStatus(props: WellStatusProps): JSX.Element {
-  const { type, size, wellMap, showStroke = false } = props
+  const { type, size, wellMap, flipLine, showStroke = false } = props
   switch (type) {
     case SELECTED:
       return (
@@ -26,7 +27,7 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
         />
       )
     case INACCESSIBLE:
-      return <EmptyWell size={size} wellMap={wellMap} />
+      return <EmptyWell wellMap={wellMap} flipLine={flipLine} size={size} />
     case UNSELECTED:
       return (
         <SelectedWell

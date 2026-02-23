@@ -321,6 +321,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         .length > 0
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
+    const is96Channel = channels === 96
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />
@@ -352,6 +353,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
             nozzles={nozzleConfiguration}
+            rotate={is96Channel}
           />
         )}
       </>
