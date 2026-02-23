@@ -25,10 +25,10 @@ class CommandAnnotation(BaseModel):
 
     id: str = Field(..., description="A unique identifier for the command annotation.")
     source: str = Field(..., description="The type of annotation (for machine parsing)")
-    name: str = Field(..., description="The user-specified name of the annotation")
+    name: str = Field(..., description="The name of the annotation")
     description: Optional[str] = Field(
         None,
-        description="The optional user-specified description for the annotation.",
+        description="An optional description for the annotation.",
     )
     params: Dict[str, Any] = (
         Field(  # maybe make this field optional if it's not going to be used in the near future?

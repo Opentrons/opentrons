@@ -23,11 +23,11 @@
       "type": "object"
     },
     "name": {
-      "description": "Required user-specified name of the command annotation.",
+      "description": "Required name of the command annotation.",
       "type": "string"
     },
     "description": {
-      "description": "The optional user-specified description of the command annotation.",
+      "description": "The optional description of the command annotation.",
       "type": "string"
     }
   }
