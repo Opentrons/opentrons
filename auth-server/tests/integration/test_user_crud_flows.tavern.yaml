@@ -4,7 +4,6 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
-      - admin_scopes_list
 
 stages:
   - name: Create a new user

@@ -11,7 +11,8 @@ from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
 from server_utils.auth.resource_server.fastapi_dependencies import (
-    set_up_authorization_checker,
+    build_authorization_checker,
+    install_authorization_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
@@ -94,13 +95,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
 
-        await exit_stack.enter_async_context(
-            set_up_authorization_checker(
-                app.state,
+        authorization_checker = await exit_stack.enter_async_context(
+            build_authorization_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
+        install_authorization_checker(app.state, authorization_checker)
 
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
