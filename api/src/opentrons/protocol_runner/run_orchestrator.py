@@ -332,7 +332,7 @@ class RunOrchestrator:
     def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
-        """Get a slice of run annotations commands."""
+        """Get a slice of command annotations in the run."""
         return self._protocol_engine.state_view.commands.get_command_annotations_slice(
             cursor=cursor, length=length
         )

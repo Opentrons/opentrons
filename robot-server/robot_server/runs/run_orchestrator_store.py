@@ -453,7 +453,7 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_command(command_id=command_id)
 
     def get_total_command_annotations_count(self) -> int:
-        """Get the total number of annotated commands."""
+        """Get the total number of command annotations in the run."""
         return self.run_orchestrator.get_total_command_annotations_count()
 
     def get_command_annotations_slice(
