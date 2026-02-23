@@ -31,11 +31,6 @@ class Scope(enum.Enum):
         "Read, write, and edit users.",
     )
 
-    RUNS_READ = (
-        "runs.read",
-        "Retrieve information about protocol runs.",
-    )
-
     RUNS_WRITE = (
         "runs.write",
         "Create and control protocol runs.",
