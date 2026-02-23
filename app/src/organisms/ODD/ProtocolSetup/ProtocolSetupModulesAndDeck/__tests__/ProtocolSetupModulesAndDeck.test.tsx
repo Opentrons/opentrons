@@ -47,7 +47,14 @@ vi.mock('/app/resources/modules')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
-vi.mock('../utils')
+// Only mock getUnmatchedModulesForProtocol so ModuleTableItem's getDoesModuleRequireCalibration stays real
+vi.mock('../utils', async importOriginal => {
+  const actual = await importOriginal<typeof import('../utils')>()
+  return {
+    ...actual,
+    getUnmatchedModulesForProtocol: vi.fn(),
+  }
+})
 vi.mock('../SetupInstructionsModal')
 vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
