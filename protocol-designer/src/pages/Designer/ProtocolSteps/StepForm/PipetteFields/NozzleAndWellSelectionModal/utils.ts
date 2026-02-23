@@ -252,13 +252,10 @@ export function getWellGroupLength(
   nozzleConfiguration: NozzleConfigurationStyle,
   partialChannels: number
 ): number {
-  const rows = ordering.length
-  const columns = ordering[0]?.length ?? 0
   switch (nozzleConfiguration) {
     case ROW:
-      return totalSelected / rows
     case COLUMN:
-      return totalSelected / columns
+      return totalSelected
     case PARTIAL:
       if (ordering.length === 1) {
         return totalSelected
