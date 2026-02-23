@@ -52,11 +52,11 @@ export function VacuumModuleSlideout(
     }
     if (modeType === 'power') {
       setVacuumPower(powerPercent)
-    } else {
-      if (pressure == null) {
-        return
-      }
+    } else if (pressure != null) {
+      // non-null pressure value with pressure mode selected
       setVacuumPressure(pressure)
+    } else {
+      return
     }
     onCloseClick()
   }
