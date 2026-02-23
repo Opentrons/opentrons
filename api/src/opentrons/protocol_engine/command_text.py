@@ -248,11 +248,19 @@ def _addressable_area_to_display_string(area_name: str) -> str:
 
 
 def _normalize_pipette_name_for_lookup(name: Any) -> str:
-    """Strip enum prefix so 'PipetteNameType.P1000_96' -> 'P1000_96' for definition lookup."""
-    name_str = str(name) if name is not None else ""
+    """Produce PipetteName string for definition lookup (e.g. 'p1000_single_flex' not 'P1000_SINGLE_FLEX')."""
+    if name is None:
+        return ""
+    # PipetteNameType enum: use .value to get lowercase name (e.g. "p1000_single_flex")
+    if hasattr(name, "value") and isinstance(getattr(name, "value", None), str):
+        return getattr(name, "value", "").strip()
+    name_str = str(name).strip()
     if "PipetteNameType." in name_str:
         name_str = name_str.replace("PipetteNameType.", "")
-    return name_str.strip()
+    # convert_pipette_name expects lowercase (e.g. p1000_single_flex); enum str is uppercase
+    if name_str and name_str.isupper() and "_" in name_str:
+        name_str = name_str.lower()
+    return name_str
 
 
 def _get_pipette_display_name_from_pipette_name(pipette_name: Any) -> str:
@@ -271,22 +279,6 @@ def _get_pipette_display_name_from_pipette_name(pipette_name: Any) -> str:
         return getattr(config, "display_name", "") or ""
     except (KeyError, ValueError, FileNotFoundError, Exception):
         return ""
-
-
-def _get_pipette_display_name(
-    pipette_id: str,
-    pipettes: List[LoadedPipette],
-) -> str:
-    """Resolve pipette display name: human-readable from definition, never internal name or enum repr."""
-    for p in pipettes:
-        if p.id == pipette_id:
-            pipette_name = getattr(p, "pipetteName", None)
-            display = _get_pipette_display_name_from_pipette_name(pipette_name)
-            if display:
-                return display
-            # Fallback: normalized name (e.g. P1000_96), never "PipetteNameType.P1000_96"
-            return _normalize_pipette_name_for_lookup(pipette_name)
-    return ""
 
 
 def _get_pipette_display_name(
