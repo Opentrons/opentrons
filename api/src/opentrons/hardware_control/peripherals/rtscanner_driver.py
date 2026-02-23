@@ -1,28 +1,33 @@
 """Implementation for talking to the RT214C scanner."""
 
+import logging
 from typing import List, Optional
 
 import serial  # type: ignore[import-untyped]
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
-from rtscanner_commands import (
+from .rtscanner_commands import (
+    ack,
     decode_timeout,
-    enable_prefix_suffixs,
+    enable_aim_id,
+    enable_code_id_prefix,
     enable_custom_prefix,
     enable_custom_suffix,
+    enable_prefix_suffixs,
+    enable_terminating_suffix,
     good_read_beep_duration,
     good_read_beep_enable,
     good_read_beep_frequency,
     good_read_beep_volume,
     menu_prefix,
     menu_suffix,
+    permanent_write,
     scan_trigger,
     set_custom_prefix,
-    set_custom_suffix,
-    temporary_write,
-    permanent_write,
-    ack,
+    set_terminating_suffix,
 )
+
+log = logging.getLogger(__name__)
 
 
 class RTScanner:
@@ -39,16 +44,23 @@ class RTScanner:
             raise RuntimeError("No RT scanner found.")
         self.conn = serial.Serial(device)
         self.set_scan_timeout(read_timeout_ms)
+        # disable all weird suffix/prefix to start
+        self.set_menu_option(enable_prefix_suffixs + [ord("0")])
+        self.set_menu_option(enable_custom_prefix + [ord("0")])
+        self.set_menu_option(enable_aim_id + [ord("0")])
+        self.set_menu_option(enable_code_id_prefix + [ord("0")])
+        self.set_menu_option(enable_custom_suffix + [ord("0")])
+        self.set_menu_option(enable_terminating_suffix + [ord("0")])
         self.set_suffix("\r\n")
 
     def set_menu_option(self, cmd: List[int]) -> None:
         """Wrap a given command in the structure needed to pass the setting to the device."""
-        print(f"Sending {' '.join(f'{b:02x}' for b in menu_prefix + permanent_write + cmd + menu_suffix)}")
         self.conn.write(menu_prefix + permanent_write + cmd + menu_suffix)
         recv = self.conn.read_until(bytes(menu_suffix))
-        print(f" recieved {' '.join(f'{b:02x}' for b in recv)} {'success' if recv[-3] == 0x06 else 'fail'}")
-
-
+        if len(recv) < 3 or recv[-3] == 0x06:
+            log.exception(
+                f"Error writing setting recieved {' '.join(f'{b:02x}' for b in recv)}."
+            )
 
     def set_scan_timeout(self, timeout_ms: int) -> None:
         """Tell the scanner how long to keep decoding before failing."""
@@ -61,10 +73,17 @@ class RTScanner:
     def scan(self) -> Optional[str]:
         """Search for a barcode and return if found else None."""
         self.conn.write(scan_trigger)
-        print(f"reading until {bytes(self._scan_terminator)}")
-        print(f"{self.conn.read_until(ack)}") # eat the ack
+        self.conn.read_until(bytes(ack))  # eat the ack
         barcode = self.conn.read_until(bytes(self._scan_terminator))
         return None if len(barcode) == 0 else barcode
+
+    def expand_ascii_args(self, byte_list: List[int]) -> List[int]:
+        """Double encode ascii for some reason."""
+        expanded = []
+        bytes_str = [f"{b:02x}" for b in byte_list]
+        for b in bytes_str:
+            expanded += [ord(c) for c in b]
+        return expanded
 
     def enable_prefix(self, enable: bool) -> None:
         """Enable a custom prefix."""
@@ -73,22 +92,23 @@ class RTScanner:
 
     def _enable_suffix(self) -> None:
         """We always need a suffix so we know when we're done reading."""
-        self.set_menu_option(enable_prefix_suffixs + [ord("1")])
-        self.set_menu_option(enable_custom_suffix + [ord("1")])
+        self.set_menu_option(enable_terminating_suffix + [ord("1")])
 
     def set_prefix(self, prefix: str) -> None:
         """Set the custom prefix."""
         self.enable_prefix(True)
         prefix_bytes = [ord(c) for c in prefix]
         assert len(prefix_bytes) <= 10
-        self.set_menu_option(set_custom_prefix + prefix_bytes)
+        self.set_menu_option(set_custom_prefix + self.expand_ascii_args(prefix_bytes))
 
     def set_suffix(self, suffix: str) -> None:
         """Set a custom suffix."""
         self._enable_suffix()
         suffix_bytes = [ord(c) for c in suffix]
         assert len(suffix_bytes) <= 10
-        self.set_menu_option(set_custom_suffix + suffix_bytes)
+        self.set_menu_option(
+            set_terminating_suffix + self.expand_ascii_args(suffix_bytes)
+        )
         self._scan_terminator = suffix_bytes
 
     def enable_success_beeps(

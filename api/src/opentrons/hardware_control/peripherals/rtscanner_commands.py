@@ -151,6 +151,7 @@ enable_custom_prefix = [ord(c) for c in "CPRENA"]
 enable_aim_id = [ord(c) for c in "AIDENA"]
 enable_code_id_prefix = [ord(c) for c in "CIDENA"]
 enable_custom_suffix = [ord(c) for c in "CSUENA"]
+enable_terminating_suffix = [ord(c) for c in "TSUENA"]
 
 ################# numerical value settings ############
 good_read_led_duration = [ord(c) for c in "GRLDUR"]  # from 1 to 2500 ms
@@ -211,6 +212,7 @@ modify_stop_scan_command = [
 bad_read_message = [ord(c) for c in "NGRSET"]  # up to 7 ascii characters
 set_custom_prefix = [ord(c) for c in "CPRSET"]  # up to 10 ascii characters
 set_custom_suffix = [ord(c) for c in "CSUSET"]  # up to 10 ascii characters
+set_terminating_suffix = [ord(c) for c in "TSUSET"]  # up to 2 ascii characters
 
 
 # special settings
