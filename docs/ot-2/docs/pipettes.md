@@ -63,7 +63,7 @@ OT-2 pipettes are designed to handle a wide range of liquid volumes and are comp
 !!!note
     You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration.
 
-The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](../../python-api/pipettes/characteristics/#pipette-flow-rates) in the Opentrons API documentation.
+The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](../python-api/pipettes/characteristics.md#pipette-flow-rates) in the Opentrons API documentation.
 
 ### Single-channel pipettes
 

@@ -28,6 +28,11 @@ nav:
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
       - Labware Definitions: labware/definitions.md
+  - Calibration:
+      - Calibration: calibration/index.md
+      - Robot Calibration: calibration/robot-calibration.md
+      - Labware Offsets: calibration/labware-offsets.md
+      - Jog Controls: calibration/jog-controls.md
   - Opentrons App:
       - Opentrons App: opentrons-app/index.md
       - Installing the App: opentrons-app/installation.md

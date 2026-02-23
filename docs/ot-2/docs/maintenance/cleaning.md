@@ -145,7 +145,7 @@ Follow these instructions to replace the O-rings on your OT-2 multi-channel pipe
     - Use the 300M side for a P300 pipette.
 
     <figure class="screenshot" markdown>
-    ![o-ring removal tool alignment](../images/o-ring-removal-tool.png){ #width="80%" }
+    ![o-ring removal tool alignment](../images/o-ring-removal-tool.png)
     </figure>
 
 2. Rotate and pull the tool gently to remove the O-ring. The O-ring may break during removal, which is common.
