@@ -1,5 +1,4 @@
-import { COLORS } from '@opentrons/components'
-
+import { COLORS } from '../../../../helix-design-system'
 import { INACCESSIBLE, SELECTED, SELECTED_ERROR } from '../Tips/constants'
 import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'

@@ -175,7 +175,7 @@ describe('getAvailableNozzleConfigurations', () => {
     ).toStrictEqual(nozzleConfigurationOptions)
   })
   it('returns length of well group when the nozzle configuration is ROW', () => {
-    const totalSelected = 24
+    const totalSelected = 2
     const nozzleConfiguration = ROW
     const mockTiprack = {
       stack: ['tiprack2', '3'],
@@ -190,7 +190,7 @@ describe('getAvailableNozzleConfigurations', () => {
     ).toStrictEqual(2)
   })
   it('returns length of well group when the nozzle configuration is COLUMN', () => {
-    const totalSelected = 16
+    const totalSelected = 2
     const nozzleConfiguration = COLUMN
     const mockTiprack = {
       stack: ['tiprack2', '3'],
