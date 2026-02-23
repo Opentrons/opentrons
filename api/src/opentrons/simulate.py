@@ -7,10 +7,12 @@ a protocol from the command line.
 import argparse
 import asyncio
 import atexit
+import json
 import logging
 import os
 import pathlib
 import queue
+import re
 import sys
 from contextlib import ExitStack, contextmanager
 from typing import (
@@ -53,6 +55,7 @@ from opentrons.legacy_commands import types as command_types
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_engine import error_recovery_policy
+from opentrons.protocol_engine.command_text import annotate_commands_with_command_text
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine,
     create_protocol_engine_in_thread,
@@ -899,6 +902,61 @@ def _create_live_context_pe(
     )
 
 
+def _get_command_text_strings() -> Dict[str, Dict[str, str]]:
+    """Load protocol_command_text and branded JSON (English) for runlog text.
+
+    Returns a dict mapping namespace name to key->template. Keys are
+    "protocol_command_text" and "branded". If files are not found (e.g. installed
+    package without app/components), returns empty dicts so callers fall back to
+    legacy payload["text"].
+    """
+    out: Dict[str, Dict[str, str]] = {
+        "protocol_command_text": {},
+        "branded": {},
+    }
+    # From api/src/opentrons/simulate.py, repo root is 3 levels up from parent.
+    try:
+        repo_root = pathlib.Path(__file__).resolve().parents[3]
+    except IndexError:
+        return out
+    protocol_text_path = repo_root / "components" / "src" / "assets" / "localization" / "en" / "protocol_command_text.json"
+    branded_path = repo_root / "app" / "src" / "assets" / "localization" / "en" / "branded.json"
+    for path, namespace in [(protocol_text_path, "protocol_command_text"), (branded_path, "branded")]:
+        if path.is_file():
+            try:
+                with open(path, encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    out[namespace] = {k: str(v) for k, v in data.items()}
+            except (json.JSONDecodeError, OSError):
+                pass
+    return out
+
+
+def _resolve_command_text_from_annotations(
+    command: Any,
+    strings_by_namespace: Dict[str, Dict[str, str]],
+) -> Optional[str]:
+    """Resolve display text from command's commandTextKey/Params/Namespace.
+
+    Returns None if the command has no commandTextKey or the key is missing.
+    """
+    key = getattr(command, "commandTextKey", None)
+    if not key:
+        return None
+    namespace = getattr(command, "commandTextNamespace", None) or "protocol_command_text"
+    params = getattr(command, "commandTextParams", None) or {}
+    templates = strings_by_namespace.get(namespace, {})
+    template = templates.get(key)
+    if template is None:
+        return None
+
+    def repl(match: re.Match[str]) -> str:
+        return str(params.get(match.group(1), ""))
+
+    return re.sub(r"\{\{(\w+)\}\}", repl, template)
+
+
 def _run_file_non_pe(
     protocol: Protocol,
     hardware_api: ThreadManagedHardware,
@@ -1022,12 +1080,60 @@ def _run_file_pe(
                 result.state_summary.errors
             )
 
+        # Annotate executed commands with commandTextKey/Params/Namespace so we can
+        # show shared copy (protocol_command_text / branded) in the runlog.
+        # This feature is intended for Flex; OT-2 runlogs may keep legacy text when
+        # broker message count does not match.
+        annotate_commands_with_command_text(
+            result.commands,
+            result.state_summary,
+            protocol_source.robot_type,
+        )
+        strings_by_namespace = _get_command_text_strings()
+
+        # For Flex, always build runlog from annotated commands so runlog text comes
+        # from protocol_command_text / branded. For OT-2, use broker runlog and
+        # replace text only when broker message count matches command count.
+        if protocol_source.robot_type == "OT-3 Standard":
+            runlog = []
+            for cmd in result.commands:
+                resolved = _resolve_command_text_from_annotations(
+                    cmd, strings_by_namespace
+                )
+                runlog.append({
+                    "level": 0,
+                    "payload": {"text": resolved if resolved is not None else ""},
+                    "logs": [],
+                })
+        elif scraper.commands:
+            runlog = scraper.commands
+            if len(runlog) == len(result.commands) - 1:
+                for i, entry in enumerate(runlog):
+                    cmd = result.commands[i + 1]
+                    resolved = _resolve_command_text_from_annotations(
+                        cmd, strings_by_namespace
+                    )
+                    if resolved is not None:
+                        entry["payload"] = dict(entry["payload"], text=resolved)
+        else:
+            # OT-2 JSON or other: broker empty, build from commands.
+            runlog = []
+            for cmd in result.commands:
+                resolved = _resolve_command_text_from_annotations(
+                    cmd, strings_by_namespace
+                )
+                runlog.append({
+                    "level": 0,
+                    "payload": {"text": resolved if resolved is not None else ""},
+                    "logs": [],
+                })
+
         # We don't currently support returning bundle contents from protocols run through
         # Protocol Engine. To get them, bundle_from_sim() requires direct access to the
         # ProtocolContext, which opentrons.protocol_runner does not grant us.
         bundle_contents = None
 
-        return scraper.commands, bundle_contents
+        return runlog, bundle_contents
 
     with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
         return asyncio.run(run(protocol_source))

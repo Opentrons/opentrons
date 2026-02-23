@@ -312,6 +312,23 @@ def test_liquid_probe_get_protocol_api() -> None:
     pipette.require_liquid_presence(well_plate["A1"])  # Should not raise MustHomeError.
 
 
+def test_simulate_flex_runlog_uses_annotated_command_text() -> None:
+    """Flex runlog text should come from protocol_command_text / branded (annotated commands)."""
+    protocol_contents = textwrap.dedent(
+        """\
+        requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+        def run(protocol):
+            protocol.home()
+        """
+    )
+    runlog, _ = simulate.simulate(protocol_file=io.StringIO(protocol_contents))
+    texts = [item["payload"]["text"] for item in runlog]
+    # First command is initial home; text should be from protocol_command_text (home_gantry).
+    assert any(
+        "Homing all gantry" in t for t in texts
+    ), f"Expected runlog to include annotated home text, got: {texts}"
+
+
 def test_liquid_probe_simulate_file() -> None:
     """Covers `opentrons_simulate`-specific issues with liquid probes.
 
