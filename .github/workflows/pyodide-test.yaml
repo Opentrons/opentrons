@@ -52,6 +52,9 @@ jobs:
       - name: setup pyodide
         working-directory: 'pyodide'
         run: make setup
+      - name: build wheels
+        working-directory: 'pyodide'
+        run: make build-wheels
       - name: test headless pyodide
         working-directory: 'pyodide'
         run: make test
