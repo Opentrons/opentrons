@@ -15,15 +15,20 @@ from typing import (
     Dict,
     List,
     Optional,
+    Tuple,
     Union,
 )
 
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons_shared_data.pipette import load_data as pipette_load_data
+from opentrons_shared_data.pipette import pipette_load_name_conversions as pipette_load_name
 from opentrons_shared_data.robot.types import RobotType
 
 from .commands import Command
 from .state.state_summary import StateSummary
 from .types import (
     DeckSlotLocation,
+    InStackerHopperLocation,
     LabwareLocation,
     LoadedLabware,
     LoadedModule,
@@ -66,6 +71,74 @@ _DIRECT_TRANSLATION_KEY_BY_COMMAND_TYPE: Dict[str, str] = {
 }
 
 
+def _uri_and_display_name_from_definition(defn: Any) -> Optional[Tuple[str, str]]:
+    """Get (uri, displayName) from a labware definition (Pydantic or dict). Returns None if invalid."""
+    if defn is None:
+        return None
+    try:
+        if hasattr(defn, "namespace") and hasattr(defn, "parameters") and hasattr(defn, "version"):
+            namespace = getattr(defn, "namespace", "")
+            load_name = getattr(getattr(defn, "parameters", None), "loadName", "") or ""
+            version = getattr(defn, "version", 1)
+            display_name = ""
+            if hasattr(defn, "metadata"):
+                display_name = str(getattr(getattr(defn, "metadata", None), "displayName", "") or "")
+        elif isinstance(defn, dict):
+            namespace = defn.get("namespace", "")
+            load_name = (defn.get("parameters") or {}).get("loadName", "")
+            version = defn.get("version", 1)
+            display_name = ((defn.get("metadata") or {}).get("displayName") or "")
+        else:
+            return None
+        if not namespace or not load_name:
+            return None
+        uri = uri_from_details(namespace=namespace, load_name=load_name, version=version)
+        return (uri, display_name)
+    except (TypeError, KeyError, AttributeError):
+        return None
+
+
+def _get_definitions_by_uri_from_commands(commands: List[Command]) -> Dict[str, str]:
+    """Build a mapping definition_uri -> metadata.displayName from loadLabware/loadLid/loadLidStack/setStoredLabware results."""
+    out: Dict[str, str] = {}
+    for command in commands:
+        command_type: str = getattr(command, "commandType", "") or ""
+        result = getattr(command, "result", None)
+        if result is None:
+            continue
+        if command_type in ("loadLabware", "reloadLabware"):
+            defn = getattr(result, "definition", None)
+            pair = _uri_and_display_name_from_definition(defn)
+            if pair:
+                uri, name = pair
+                if name:
+                    out[uri] = name
+        elif command_type == "loadLid":
+            defn = getattr(result, "definition", None)
+            pair = _uri_and_display_name_from_definition(defn)
+            if pair:
+                uri, name = pair
+                if name:
+                    out[uri] = name
+        elif command_type == "loadLidStack":
+            for attr in ("definition", "lidStackDefinition"):
+                defn = getattr(result, attr, None)
+                pair = _uri_and_display_name_from_definition(defn)
+                if pair:
+                    uri, name = pair
+                    if name:
+                        out[uri] = name
+        elif command_type == "flexStacker/setStoredLabware":
+            for attr in ("primaryLabwareDefinition", "adapterLabwareDefinition", "lidLabwareDefinition"):
+                defn = getattr(result, attr, None)
+                pair = _uri_and_display_name_from_definition(defn)
+                if pair:
+                    uri, name = pair
+                    if name:
+                        out[uri] = name
+    return out
+
+
 def _format_decimal(value: Optional[Union[int, float]]) -> str:
     """Format a number for display (strip trailing zeros after decimal)."""
     if value is None:
@@ -92,11 +165,15 @@ def _format_track_location(track_loc: Any) -> str:
 def _get_labware_display_name(
     labware_id: str,
     labware_list: List[LoadedLabware],
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> str:
-    """Resolve labware display name from state (displayName or loadName)."""
+    """Resolve labware display name: user nickname (displayName) or human-readable name, never loadName."""
     for lw in labware_list:
         if lw.id == labware_id:
-            return lw.displayName or lw.loadName
+            if getattr(lw, "displayName", None):
+                return str(lw.displayName)
+            # No nickname; use definition-based name when available, else generic.
+            return _get_display_name_for_labware_uri(lw.definitionUri, labware_list, definitions_by_uri)
     return ""
 
 
@@ -104,6 +181,7 @@ def _get_labware_location_display_string(
     location: LabwareLocation,
     modules: List[LoadedModule],
     labware_list: List[LoadedLabware],
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> str:
     """Produce a short display string for labware location (e.g. 'Slot 1', 'Temperature Module in Slot 3')."""
     if isinstance(location, DeckSlotLocation):
@@ -124,9 +202,19 @@ def _get_labware_location_display_string(
                 return f"Module in Slot {_module_slot_or_unknown(mod)}"
         return "on module"
     if isinstance(location, OnLabwareLocation):
-        parent_name = _get_labware_display_name(location.labwareId, labware_list)
+        parent_name = _get_labware_display_name(
+            location.labwareId, labware_list, definitions_by_uri
+        )
         return f"on {parent_name}" if parent_name else "on labware"
-    # AddressableAreaLocation, off-deck, etc.
+    if isinstance(location, InStackerHopperLocation):
+        # Flex stacker: show underlying slot (e.g. "Slot C3"), not module id
+        return _get_module_slot_display(
+            location.moduleId, modules, include_module_name=False
+        )
+    if hasattr(location, "addressableAreaName"):
+        area = str(getattr(location, "addressableAreaName", "?") or "?")
+        return _addressable_area_to_display_string(area)
+    # Off-deck, system, waste chute, etc.
     return str(location)
 
 
@@ -138,29 +226,103 @@ def _module_slot_or_unknown(mod: LoadedModule) -> str:
     return "?"
 
 
+def _addressable_area_to_display_string(area_name: str) -> str:
+    """Convert addressable area id to human-readable location (e.g. magneticBlockV1A3 -> Magnetic Block GEN1 in Slot A3)."""
+    if not area_name:
+        return "?"
+    # Flex magnetic block: magneticBlockV1 + slot suffix (e.g. A3)
+    if area_name.startswith("magneticBlockV1"):
+        slot = area_name[15:] if len(area_name) > 15 else area_name
+        return f"Magnetic Block GEN1 in Slot {slot}" if slot else "Magnetic Block GEN1"
+    # OT-2/Flex waste chute fixtures (96ChannelWasteChute, 8ChannelWasteChute, gripperWasteChute, wasteChuteD3, etc.)
+    lower = area_name.lower()
+    if "96channelwastechute" == lower or "8channelwastechute" == lower or "1channelwastechute" == lower or "gripperwastechute" == lower:
+        return "Waste Chute"
+    if "wastechute" in lower:
+        suffix = area_name[9:] if lower.startswith("wastechute") else area_name
+        if len(suffix) >= 2 and suffix[0].upper() in "ABCD" and suffix[1] in "1234":
+            return f"Waste Chute in Slot {suffix[:2].upper()}"
+        return "Waste Chute"
+    # Deck slot or plain addressable area (e.g. C2, A1)
+    return f"Slot {area_name}"
+
+
+def _normalize_pipette_name_for_lookup(name: Any) -> str:
+    """Strip enum prefix so 'PipetteNameType.P1000_96' -> 'P1000_96' for definition lookup."""
+    name_str = str(name) if name is not None else ""
+    if "PipetteNameType." in name_str:
+        name_str = name_str.replace("PipetteNameType.", "")
+    return name_str.strip()
+
+
+def _get_pipette_display_name_from_pipette_name(pipette_name: Any) -> str:
+    """Resolve human-readable pipette display name from PipetteNameType or string (e.g. p1000_96 -> Flex 96-Channel 1000 µL)."""
+    name_str = _normalize_pipette_name_for_lookup(pipette_name)
+    if not name_str:
+        return ""
+    try:
+        pipette_model = pipette_load_name.convert_pipette_name(name_str)
+        config = pipette_load_data.load_definition(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
+            pipette_model.oem_type,
+        )
+        return getattr(config, "display_name", "") or ""
+    except (KeyError, ValueError, FileNotFoundError, Exception):
+        return ""
+
+
 def _get_pipette_display_name(
     pipette_id: str,
     pipettes: List[LoadedPipette],
 ) -> str:
-    """Resolve pipette display name from state (pipetteName as fallback)."""
+    """Resolve pipette display name: human-readable from definition, never internal name or enum repr."""
     for p in pipettes:
         if p.id == pipette_id:
-            return str(getattr(p, "pipetteName", "") or "")
+            pipette_name = getattr(p, "pipetteName", None)
+            display = _get_pipette_display_name_from_pipette_name(pipette_name)
+            if display:
+                return display
+            # Fallback: normalized name (e.g. P1000_96), never "PipetteNameType.P1000_96"
+            return _normalize_pipette_name_for_lookup(pipette_name)
+    return ""
+
+
+def _get_pipette_display_name(
+    pipette_id: str,
+    pipettes: List[LoadedPipette],
+) -> str:
+    """Resolve pipette display name: human-readable from definition, never internal name or enum repr."""
+    for p in pipettes:
+        if p.id == pipette_id:
+            pipette_name = getattr(p, "pipetteName", None)
+            display = _get_pipette_display_name_from_pipette_name(pipette_name)
+            if display:
+                return display
+            # Fallback: normalized name (e.g. P1000_96), never "PipetteNameType.P1000_96"
+            return _normalize_pipette_name_for_lookup(pipette_name)
     return ""
 
 
 def _get_display_name_for_labware_uri(
     uri: str,
     labware_list: List[LoadedLabware],
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> str:
-    """Resolve labware display name from definition URI (displayName or loadName from loaded labware)."""
+    """Resolve labware display name from URI: user displayName or definition metadata.displayName; never loadName."""
     for lw in labware_list:
         if getattr(lw, "definitionUri", "") == uri:
-            return lw.displayName or lw.loadName
-    # Fallback: use last segment of URI (e.g. "generic_96_wellplate_380_ul/1" -> "generic_96_wellplate_380_ul")
-    if "/" in uri:
-        return uri.split("/")[-2] if uri.endswith("/") else uri.rsplit("/", 1)[-1]
-    return uri or "Labware"
+            if getattr(lw, "displayName", None):
+                return str(lw.displayName)
+            # No nickname; use definition display name from command-derived map when available
+            if definitions_by_uri and uri in definitions_by_uri:
+                return definitions_by_uri[uri]
+            break
+    # Fallback: use definition display name from map, else generic (never expose loadName).
+    if definitions_by_uri and uri in definitions_by_uri:
+        return definitions_by_uri[uri]
+    return "Labware"
 
 
 def _get_module_slot_display(
@@ -168,17 +330,63 @@ def _get_module_slot_display(
     modules: List[LoadedModule],
     include_module_name: bool = False,
 ) -> str:
-    """Resolve module slot to display string (e.g. 'Slot D1' or 'Stacker in Slot D1')."""
+    """Resolve module slot to display string (e.g. 'Slot D1' or 'Magnetic Block GEN1 in Slot A3')."""
     for mod in modules:
         if mod.id == module_id:
             slot = _module_slot_or_unknown(mod)
             if include_module_name:
                 model = str(getattr(mod, "model", "") or "")
-                if "stacker" in model.lower() or "flex" in model.lower():
-                    return f"Stacker in Slot {slot}"
+                if "stacker" in model.lower() or "flexstacker" in model.lower():
+                    return f"Flex Stacker in Slot {slot}"
+                if model == "magneticBlockV1":
+                    return f"Magnetic Block GEN1 in Slot {slot}"
+                if "magnetic" in model.lower():
+                    return f"Magnetic Module in Slot {slot}"
+                if "temperature" in model.lower():
+                    return f"Temperature Module in Slot {slot}"
+                if "thermocycler" in model.lower() or "thermo" in model.lower():
+                    return f"Thermocycler in Slot {slot}"
+                if "heater" in model.lower() or "heatershaker" in model.lower():
+                    return f"Heater-Shaker in Slot {slot}"
                 return f"Module in Slot {slot}"
             return f"Slot {slot}"
     return "?"
+
+
+def _component_module_id(c: Any) -> Optional[str]:
+    """Get moduleId from a sequence component (object or dict)."""
+    if c is None:
+        return None
+    if hasattr(c, "moduleId"):
+        v = getattr(c, "moduleId", None)
+        return str(v) if v else None
+    if isinstance(c, dict):
+        return c.get("moduleId") or None
+    return None
+
+
+def _component_addressable_area(c: Any) -> Optional[str]:
+    """Get addressableAreaName from a sequence component (object or dict)."""
+    if c is None:
+        return None
+    if hasattr(c, "addressableAreaName"):
+        v = getattr(c, "addressableAreaName", None)
+        return str(v) if v else None
+    if isinstance(c, dict):
+        return c.get("addressableAreaName") or None
+    return None
+
+
+def _component_slot_name(c: Any) -> Optional[str]:
+    """Get slotName from a sequence component (object or dict)."""
+    if c is None:
+        return None
+    if hasattr(c, "slotName"):
+        v = getattr(c, "slotName", None)
+        return str(v) if v else None
+    if isinstance(c, dict):
+        return c.get("slotName") or None
+    return None
 
 
 def _get_location_sequence_display_string(
@@ -186,29 +394,50 @@ def _get_location_sequence_display_string(
     modules: List[LoadedModule],
     labware_list: List[LoadedLabware],
 ) -> str:
-    """Produce a short display string from a location sequence (for flex stacker result)."""
+    """Produce a short display string from a location sequence (for flex stacker, move labware)."""
     if not seq:
         return "?"
-    # If it's a list (LabwareLocationSequence), take first component
-    if isinstance(seq, list) and len(seq) > 0:
-        first = seq[0]
-        if hasattr(first, "moduleId"):
-            return _get_module_slot_display(getattr(first, "moduleId", ""), modules, include_module_name=True)
-        if hasattr(first, "slotName"):
-            return f"Slot {getattr(first, 'slotName')}"
-        if hasattr(first, "addressableAreaName"):
-            return str(getattr(first, "addressableAreaName", "?"))
-    # Single location-like object
-    if hasattr(seq, "moduleId"):
-        return _get_module_slot_display(getattr(seq, "moduleId", ""), modules, include_module_name=True)
-    if hasattr(seq, "slotName"):
-        return f"Slot {getattr(seq, 'slotName')}"
-    return str(seq)
+    components = seq if isinstance(seq, list) and len(seq) > 0 else [seq]
+    # Prefer module component so we show "Magnetic Block GEN1 in Slot A3" not "Slot magneticBlockV1A3"
+    # Stacker (inStackerHopper): show only "Slot C3", not "Flex Stacker in Slot C3"
+    for c in components:
+        mod_id = _component_module_id(c)
+        if mod_id:
+            is_stacker = (
+                isinstance(c, InStackerHopperLocation)
+                or getattr(c, "kind", None) == "inStackerHopper"
+                or (isinstance(c, dict) and c.get("kind") == "inStackerHopper")
+            )
+            return _get_module_slot_display(
+                mod_id, modules, include_module_name=not is_stacker
+            )
+    for c in components:
+        area = _component_addressable_area(c)
+        if area:
+            return _addressable_area_to_display_string(area)
+    for c in components:
+        slot = _component_slot_name(c)
+        if slot:
+            return f"Slot {slot}"
+    # Single location-like object (non-list)
+    if not isinstance(seq, list):
+        if hasattr(seq, "moduleId"):
+            return _get_module_slot_display(
+                getattr(seq, "moduleId", ""), modules, include_module_name=True
+            )
+        if hasattr(seq, "addressableAreaName"):
+            return _addressable_area_to_display_string(
+                str(getattr(seq, "addressableAreaName", "?"))
+            )
+        if hasattr(seq, "slotName"):
+            return f"Slot {getattr(seq, 'slotName')}"
+    return "?"
 
 
 def _annotate_pipetting_command(
     command: Command,
     state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for pipetting commands."""
     params = getattr(command, "params", None)
@@ -219,7 +448,9 @@ def _annotate_pipetting_command(
     volume = getattr(params, "volume", None)
     flow_rate = getattr(params, "flowRate", None)
 
-    labware_name = _get_labware_display_name(labware_id or "", state_summary.labware)
+    labware_name = _get_labware_display_name(
+        labware_id or "", state_summary.labware, definitions_by_uri
+    )
     labware_location = ""
     if labware_id:
         for lw in state_summary.labware:
@@ -228,6 +459,7 @@ def _annotate_pipetting_command(
                     lw.location,
                     state_summary.modules,
                     state_summary.labware,
+                    definitions_by_uri,
                 )
                 break
 
@@ -291,8 +523,10 @@ def _annotate_pipetting_command(
         text_params = {"flow_rate": _format_decimal(flow_rate)}
     elif command_type == "pickUpTip":
         key = "pickup_tip"
+        # Display well range (e.g. "A1 - H1" when wellName is "A1:H1" for multi-nozzle)
+        well_range = (well_name or "").replace(":", " - ")
         text_params = {
-            "well_range": well_name,
+            "well_range": well_range,
             "labware": labware_name,
             "labware_location": labware_location,
         }
@@ -569,7 +803,9 @@ def _annotate_configure_nozzle_layout_command(
 
 
 def _annotate_liquid_probe_command(
-    command: Command, state_summary: StateSummary
+    command: Command,
+    state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for liquidProbe / tryLiquidProbe."""
     params = getattr(command, "params", None)
@@ -577,12 +813,17 @@ def _annotate_liquid_probe_command(
         return
     labware_id = getattr(params, "labwareId", "") or ""
     well_name = getattr(params, "wellName", "") or ""
-    labware_name = _get_labware_display_name(labware_id, state_summary.labware)
+    labware_name = _get_labware_display_name(
+        labware_id, state_summary.labware, definitions_by_uri
+    )
     labware_location = ""
     for lw in state_summary.labware:
         if lw.id == labware_id:
             labware_location = _get_labware_location_display_string(
-                lw.location, state_summary.modules, state_summary.labware
+                lw.location,
+                state_summary.modules,
+                state_summary.labware,
+                definitions_by_uri,
             )
             break
     command.commandTextKey = "detect_liquid_presence"
@@ -590,7 +831,9 @@ def _annotate_liquid_probe_command(
 
 
 def _annotate_set_tip_state_command(
-    command: Command, state_summary: StateSummary
+    command: Command,
+    state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for setTipState."""
     params = getattr(command, "params", None)
@@ -598,7 +841,9 @@ def _annotate_set_tip_state_command(
         return
     labware_id = getattr(params, "labwareId", "") or ""
     tip_well_state = getattr(params, "tipWellState", "") or ""
-    labware_name = _get_labware_display_name(labware_id, state_summary.labware)
+    labware_name = _get_labware_display_name(
+        labware_id, state_summary.labware, definitions_by_uri
+    )
     command.commandTextKey = "set_tip_state"
     command.commandTextParams = {"labware": labware_name, "tip_well_state": str(tip_well_state)}
 
@@ -640,7 +885,9 @@ def _annotate_absorbance_reader_command(command: Command) -> None:
 
 
 def _annotate_move_to_well_command(
-    command: Command, state_summary: StateSummary
+    command: Command,
+    state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for moveToWell."""
     params = getattr(command, "params", None)
@@ -654,12 +901,17 @@ def _annotate_move_to_well_command(
     y = _format_decimal(getattr(offset, "y", None) if offset else None)
     z = _format_decimal(getattr(offset, "z", None) if offset else None)
     origin = getattr(well_location, "origin", "") if well_location else ""
-    labware_name = _get_labware_display_name(labware_id, state_summary.labware)
+    labware_name = _get_labware_display_name(
+        labware_id, state_summary.labware, definitions_by_uri
+    )
     labware_location = ""
     for lw in state_summary.labware:
         if lw.id == labware_id:
             labware_location = _get_labware_location_display_string(
-                lw.location, state_summary.modules, state_summary.labware
+                lw.location,
+                state_summary.modules,
+                state_summary.labware,
+                definitions_by_uri,
             )
             break
     command.commandTextKey = "move_to_well"
@@ -683,11 +935,15 @@ def _annotate_move_to_addressable_area_command(command: Command) -> None:
     command_type = getattr(command, "commandType", "")
     key = "move_to_addressable_area_drop_tip" if command_type == "moveToAddressableAreaForDropTip" else "move_to_addressable_area"
     command.commandTextKey = key
-    command.commandTextParams = {"addressable_area": area}
+    command.commandTextParams = {
+        "addressable_area": _addressable_area_to_display_string(area),
+    }
 
 
 def _annotate_move_labware_command(
-    command: Command, state_summary: StateSummary
+    command: Command,
+    state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for moveLabware."""
     params = getattr(command, "params", None)
@@ -695,27 +951,43 @@ def _annotate_move_labware_command(
         return
     labware_id = getattr(params, "labwareId", "") or ""
     strategy = getattr(params, "strategy", "") or ""
-    labware_name = _get_labware_display_name(labware_id, state_summary.labware)
+    labware_name = _get_labware_display_name(
+        labware_id, state_summary.labware, definitions_by_uri
+    )
     result = getattr(command, "result", None)
-    old_loc = ""
-    new_loc = ""
+    old_loc = "?"
+    new_loc = "?"
     if result:
         orig_seq = getattr(result, "originLocationSequence", None)
         dest_seq = getattr(result, "immediateDestinationLocationSequence", None)
         if orig_seq is not None and dest_seq is not None:
-            old_loc = str(orig_seq)
-            new_loc = str(dest_seq)
-    if not old_loc and not new_loc:
+            old_loc = _get_location_sequence_display_string(
+                orig_seq, state_summary.modules, state_summary.labware
+            )
+            new_loc = _get_location_sequence_display_string(
+                dest_seq, state_summary.modules, state_summary.labware
+            )
+    if old_loc == "?" and new_loc == "?":
         new_location = getattr(params, "newLocation", None)
-        old_loc = "?"
-        new_loc = str(new_location) if new_location else "?"
+        new_loc = (
+            _get_labware_location_display_string(
+                new_location,
+                state_summary.modules,
+                state_summary.labware,
+                definitions_by_uri,
+            )
+            if new_location is not None
+            else "?"
+        )
     key = "move_labware_using_gripper" if strategy == "usingGripper" else "move_labware_manually"
     command.commandTextKey = key
     command.commandTextParams = {"labware": labware_name, "old_location": old_loc, "new_location": new_loc}
 
 
 def _annotate_load_command(
-    command: Command, state_summary: StateSummary
+    command: Command,
+    state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey and commandTextParams for loadLabware, loadModule, loadPipette, etc."""
     command_type = getattr(command, "commandType", "")
@@ -761,7 +1033,9 @@ def _annotate_load_command(
     elif command_type == "loadLiquid":
         liquid_id = getattr(params, "liquidId", "") if params else ""
         labware_id = getattr(params, "labwareId", "") if params else ""
-        labware_name = _get_labware_display_name(labware_id, state_summary.labware)
+        labware_name = _get_labware_display_name(
+            labware_id, state_summary.labware, definitions_by_uri
+        )
         command.commandTextKey = "load_liquids_info_protocol_setup"
         command.commandTextParams = {"liquid": liquid_id, "labware": labware_name}
     elif command_type == "loadLiquidClass":
@@ -778,6 +1052,7 @@ BRANDED_NAMESPACE = "branded"
 def _annotate_flex_stacker_command(
     command: Command,
     state_summary: StateSummary,
+    definitions_by_uri: Optional[Dict[str, str]] = None,
 ) -> None:
     """Set commandTextKey, commandTextParams, and commandTextNamespace for flex stacker commands (branded)."""
     command_type = getattr(command, "commandType", "")
@@ -793,7 +1068,9 @@ def _annotate_flex_stacker_command(
         if result is not None and hasattr(result, "primaryLabwareURI") and hasattr(result, "primaryLocationSequence"):
             primary_uri = getattr(result, "primaryLabwareURI", "") or ""
             primary_seq = getattr(result, "primaryLocationSequence", None)
-            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            display_name = _get_display_name_for_labware_uri(
+                primary_uri, state_summary.labware, definitions_by_uri
+            )
             slot_name = _get_location_sequence_display_string(
                 primary_seq, state_summary.modules, state_summary.labware
             )
@@ -806,7 +1083,9 @@ def _annotate_flex_stacker_command(
         if result is not None and hasattr(result, "primaryLabwareURI") and hasattr(result, "primaryOriginLocationSequence"):
             primary_uri = getattr(result, "primaryLabwareURI", "") or ""
             origin_seq = getattr(result, "primaryOriginLocationSequence", None)
-            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            display_name = _get_display_name_for_labware_uri(
+                primary_uri, state_summary.labware, definitions_by_uri
+            )
             slot_name = _get_location_sequence_display_string(
                 origin_seq, state_summary.modules, state_summary.labware
             )
@@ -837,7 +1116,9 @@ def _annotate_flex_stacker_command(
             primary_uri = getattr(result, "primaryLabwareURI", "") or ""
             module_id = getattr(params, "moduleId", "") or ""
             count = getattr(params, "count", 0) or 0
-            display_name = _get_display_name_for_labware_uri(primary_uri, state_summary.labware)
+            display_name = _get_display_name_for_labware_uri(
+                primary_uri, state_summary.labware, definitions_by_uri
+            )
             stacker_column = _get_module_slot_display(module_id, state_summary.modules, include_module_name=True)
             if display_name and stacker_column != "?":
                 set_branded(
@@ -908,7 +1189,10 @@ def annotate_commands_with_command_text(
     """Annotate each command with commandTextKey and commandTextParams in place.
 
     Keys and param names match protocol_command_text.json so consumers can
-    call t(key, params) or interpolate with the same templates.
+    call t(key, params) or interpolate with the same templates. Definition
+    display names (e.g. "Opentrons 96 Well Plate 200 µL") are derived from
+    loadLabware/loadLid/loadLidStack/setStoredLabware results in the command
+    list so runlog matches frontend human-readable names.
 
     Args:
         commands: Protocol engine commands (mutated in place).
@@ -916,6 +1200,7 @@ def annotate_commands_with_command_text(
         robot_type: Robot type (for future use, e.g. Flex vs OT-2 display).
     """
     _ = robot_type  # Reserved for robot-specific display (e.g. slot naming).
+    definitions_by_uri = _get_definitions_by_uri_from_commands(commands)
     for command in commands:
         command_type: str = getattr(command, "commandType", "") or ""
 
@@ -943,7 +1228,7 @@ def annotate_commands_with_command_text(
             "unsealPipetteFromTip",
             "pressureDispense",
         ):
-            _annotate_pipetting_command(command, state_summary)
+            _annotate_pipetting_command(command, state_summary, definitions_by_uri)
             continue
 
         if command_type == "comment":
@@ -1005,11 +1290,11 @@ def annotate_commands_with_command_text(
             continue
 
         if command_type in ("liquidProbe", "tryLiquidProbe"):
-            _annotate_liquid_probe_command(command, state_summary)
+            _annotate_liquid_probe_command(command, state_summary, definitions_by_uri)
             continue
 
         if command_type == "setTipState":
-            _annotate_set_tip_state_command(command, state_summary)
+            _annotate_set_tip_state_command(command, state_summary, definitions_by_uri)
             continue
 
         if command_type in ("heaterShaker/setAndWaitForShakeSpeed", "heaterShaker/setShakeSpeed"):
@@ -1026,13 +1311,13 @@ def annotate_commands_with_command_text(
             continue
 
         if command_type == "moveToWell":
-            _annotate_move_to_well_command(command, state_summary)
+            _annotate_move_to_well_command(command, state_summary, definitions_by_uri)
             continue
         if command_type in ("moveToAddressableArea", "moveToAddressableAreaForDropTip"):
             _annotate_move_to_addressable_area_command(command)
             continue
         if command_type == "moveLabware":
-            _annotate_move_labware_command(command, state_summary)
+            _annotate_move_labware_command(command, state_summary, definitions_by_uri)
             continue
 
         if command_type in (
@@ -1045,7 +1330,7 @@ def annotate_commands_with_command_text(
             "loadLiquid",
             "loadLiquidClass",
         ):
-            _annotate_load_command(command, state_summary)
+            _annotate_load_command(command, state_summary, definitions_by_uri)
             continue
 
         if command_type == "captureImage":
@@ -1066,7 +1351,7 @@ def annotate_commands_with_command_text(
             "flexStacker/fill",
             "flexStacker/empty",
         ):
-            _annotate_flex_stacker_command(command, state_summary)
+            _annotate_flex_stacker_command(command, state_summary, definitions_by_uri)
             continue
 
         # Unknown or not yet implemented: leave commandTextKey/Params unset

@@ -940,12 +940,15 @@ def _resolve_command_text_from_annotations(
     """Resolve display text from command's commandTextKey/Params/Namespace.
 
     Returns None if the command has no commandTextKey or the key is missing.
+    For comment commands, returns the user's message verbatim with no prefix.
     """
     key = getattr(command, "commandTextKey", None)
     if not key:
         return None
-    namespace = getattr(command, "commandTextNamespace", None) or "protocol_command_text"
     params = getattr(command, "commandTextParams", None) or {}
+    if key == "comment" and "message" in params:
+        return str(params["message"])
+    namespace = getattr(command, "commandTextNamespace", None) or "protocol_command_text"
     templates = strings_by_namespace.get(namespace, {})
     template = templates.get(key)
     if template is None:
@@ -1096,7 +1099,19 @@ def _run_file_pe(
         # replace text only when broker message count matches command count.
         if protocol_source.robot_type == "OT-3 Standard":
             runlog = []
+            load_command_types = (
+                "loadPipette",
+                "loadModule",
+                "loadLabware",
+                "reloadLabware",
+                "loadLid",
+                "loadLidStack",
+                "loadLiquid",
+                "loadLiquidClass",
+            )
             for cmd in result.commands:
+                if getattr(cmd, "commandType", "") in load_command_types:
+                    continue
                 resolved = _resolve_command_text_from_annotations(
                     cmd, strings_by_namespace
                 )

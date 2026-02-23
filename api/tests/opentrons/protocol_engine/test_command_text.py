@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocol_engine import (
     LoadedLabware,
     StateSummary,
@@ -17,6 +18,11 @@ from opentrons.protocol_engine.commands import (
     Home,
     HomeParams,
 )
+from opentrons.protocol_engine.commands.load_labware import (
+    LoadLabware,
+    LoadLabwareParams,
+    LoadLabwareResult,
+)
 from opentrons.protocol_engine.commands.thermocycler import CloseLid, CloseLidParams
 from opentrons.protocol_engine.commands.wait_for_duration import (
     WaitForDuration,
@@ -25,6 +31,7 @@ from opentrons.protocol_engine.commands.wait_for_duration import (
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     EngineStatus,
+    OnAddressableAreaLocationSequenceComponent,
 )
 from opentrons.types import DeckSlotName
 
@@ -137,7 +144,7 @@ def test_annotate_aspirate_with_labware_and_location() -> None:
     assert command.commandTextKey == "aspirate"
     assert command.commandTextParams is not None
     assert command.commandTextParams.get("well_name") == well_name
-    assert command.commandTextParams.get("labware") == "generic_96_wellplate_380_ul"
+    assert command.commandTextParams.get("labware") == "Labware"
     assert command.commandTextParams.get("labware_location") == "Slot 1"
     assert command.commandTextParams.get("volume") == "50.5"
     assert command.commandTextParams.get("flow_rate") == "300"
@@ -164,6 +171,7 @@ def test_annotate_aspirate_unknown_labware_id_leaves_empty_display() -> None:
     assert command.commandTextKey == "aspirate"
     assert command.commandTextParams is not None
     assert command.commandTextParams.get("well_name") == "A1"
+    # Unknown labware: empty display (no loadName exposed)
     assert command.commandTextParams.get("labware") == ""
     assert command.commandTextParams.get("labware_location") == ""
 
@@ -201,3 +209,71 @@ def test_annotate_custom_command_uses_comment_key() -> None:
     assert command.commandTextParams is not None
     assert "message" in command.commandTextParams
     assert "custom" in command.commandTextParams["message"]
+
+
+def test_annotate_aspirate_uses_definition_display_name_when_load_labware_in_commands(
+    well_plate_def,
+) -> None:
+    """When commands include loadLabware with result.definition, later commands use definition displayName."""
+    labware_id = "labware-plate-1"
+    definition_uri = uri_from_details(
+        namespace=well_plate_def.namespace,
+        load_name=well_plate_def.parameters.loadName,
+        version=well_plate_def.version,
+    )
+    expected_display_name = well_plate_def.metadata.displayName
+    load_command = LoadLabware(
+        id="cmd-load-1",
+        createdAt=_make_created_at(),
+        commandType="loadLabware",
+        key="load-1",
+        status="succeeded",
+        params=LoadLabwareParams(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            loadName=well_plate_def.parameters.loadName,
+            namespace=well_plate_def.namespace,
+            version=well_plate_def.version,
+        ),
+        result=LoadLabwareResult(
+            labwareId=labware_id,
+            definition=well_plate_def,
+            locationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="1"),
+            ],
+        ),
+    )
+    aspirate_command = Aspirate(
+        id="cmd-aspirate-1",
+        createdAt=_make_created_at(),
+        commandType="aspirate",
+        key="aspirate-1",
+        status="succeeded",
+        params=AspirateParams(
+            pipetteId="pipette-1",
+            labwareId=labware_id,
+            wellName="A1",
+            volume=50.0,
+            flowRate=300.0,
+        ),
+    )
+    state = StateSummary(
+        status=EngineStatus.SUCCEEDED,
+        errors=[],
+        labware=[
+            LoadedLabware(
+                id=labware_id,
+                loadName=well_plate_def.parameters.loadName,
+                definitionUri=definition_uri,
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            )
+        ],
+        pipettes=[],
+        modules=[],
+        labwareOffsets=[],
+        liquids=[],
+    )
+    annotate_commands_with_command_text(
+        [load_command, aspirate_command], state, "OT-2 Standard"
+    )
+    assert aspirate_command.commandTextParams is not None
+    assert aspirate_command.commandTextParams.get("labware") == expected_display_name
