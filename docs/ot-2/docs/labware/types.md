@@ -2,6 +2,8 @@
 title: "Opentrons OT-2: Labware Types"
 ---
 
+This section covers the different types of labware included in the Opentrons Labware Library for use with the OT-2.
+
 ## Reservoirs
 
 <figure class="side-by-side" markdown>

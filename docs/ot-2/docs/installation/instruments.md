@@ -17,8 +17,6 @@ After the initial robot setup, your next step is to attach and calibrate a pipet
 
     ![pipette attachment](../images/pipettes-and-modules.png)
 
-4. In the Opentrons App, follow the on-screen instructions to attach and calibrate your pipette.
-
-<font color="red">PLACEHOLDER REMINDER SHOW APP EXAMPLE HERE</font>
+4. In the Opentrons App, follow the on-screen instructions and animations to attach and [calibrate your pipette](../calibration/robot-calibration.md#pipette-offset-calibration).
 
 </div>

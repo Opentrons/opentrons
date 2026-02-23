@@ -40,20 +40,18 @@ The OT-2 deck slides in and out of the enclosure. You can pull it out part way, 
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
-!!! Note
-    Run a <font color="red">deck calibration</font> if you slide the deck out and replace it.
+!!! note
+    Remember to [calibrate the deck](../calibration/robot-calibration.md#deck-calibration) after removing, reinstalling, or replacing it.
 
 ## Other connections
 
-When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot.
-
-Behind the gantry, USB ports inside the enclosure provide connectivity between the OT-2 and its attached deck modules.
+Find the power switch, status lights, and Ethernet port on the left side and back of the OT-2. For module connectivity, use the internal USB ports located behind the gantry.
 
 ### Rear LEDs
 
 These status lights allow you to quickly assess the state of your OT-2.
 
-![Side panel showing 5 led status lights](../images/side-LEDs.png)
+![Side panel showing 5 led status lights](../images/side-LEDs.png){ width="50%" }
 
 The following table lists and describes these status lights.
 
@@ -104,9 +102,9 @@ See [First Run](../installation/first-run.md) for information on how to properly
 
 ### USB ports
 
-The OT-2 has 4 USB ports, located in the right rear of the enclosure, behind the gantry. These ports, labeled USB-1 through USB-4, are used for communication between connected Opentrons modules and the robot.
+The OT-2 has 4 USB ports, located in the left rear of the enclosure, behind the gantry. These ports, labeled USB-1 through USB-4, are used for communication between connected Opentrons modules and the robot.
 
-![USB ports](../images/usb-ports.png)
+![USB ports](../images/usb-ports.png){ width="80%" }
 
 See the [OT-2 Modules section](../modules/index.md) for more information on connecting these devices and using them in your protocols.
 

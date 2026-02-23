@@ -9,12 +9,12 @@ OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentro
 
 ## GEN1 pipettes
 
-OT-2 GEN1 pipettes are black and marked by a white Opentrons drop logo. They do not include any printed text or other markings to identify them as GEN1 pipettes or their volumetric capacity.
+OT-2 GEN1 pipettes are black and marked by a white or black Opentrons drop logo. They may not always display printed text or other markings to identify them as GEN1 pipettes or their volumetric capacity.
 
 <figure class="side-by-side" markdown>
 ![OT2 GEN1 single channel pipette](./images/OT2-gen1-single.png)
 ![OT2 GEN1 multi channel pipette](./images/OT2-gen1-multi.png)
-<figcaption>GEN1 single- and multi-channel pipettes</figcaption>
+<figcaption>Examples of GEN1 pipettes.</figcaption>
 </figure>
 
 GEN1 pipettes are no longer manufactured or supported. They have been replaced by the GEN2 models.
@@ -61,7 +61,7 @@ OT-2 pipettes are designed to handle a wide range of liquid volumes and are comp
     For best results, use the smallest capacity tips that meet the needs of your protocol.
 
 !!!note
-    You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration.
+    You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Robot Calibration](calibration/robot-calibration.md).
 
 The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](../python-api/pipettes/characteristics.md#pipette-flow-rates) in the Opentrons API documentation.
 

@@ -25,7 +25,10 @@ Working with a reputable shipping company is also a good idea. They can manage t
 
 Before moving your OT-2, use a 3 mm hex screwdriver to reattach the red transport brackets to the gantry. These brackets were attached when you first received the robot. Reattaching the brackets prevents the gantry from moving during shipping.
 
-![transport brackets](../images/transport-brackets.png)
+<figure class="screenshot" markdown>
+![transport brackets](../images/transport-brackets.png){ width="80%" }
+<figcaption>Reattach the transport brackets before moving the robot.</figcaption>
+</figure>
 
 ## Final thoughts about moving
 
