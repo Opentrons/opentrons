@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 
 import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
   PROTOCOL_ENGINE_LID_STACK_LOADNAME,
@@ -51,17 +50,12 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     selectedRunTimeCommand,
   } = props
   const { labware, modules, pipettes } = robotState
-  const { moduleEntities } = invariantContext
 
   return (
     <>
       {Object.entries(labware).map(([id, lw]) => {
         if (
-          Object.keys(modules).some(
-            moduleId =>
-              lw.stack.includes(moduleId) &&
-              moduleEntities[moduleId].type !== FLEX_STACKER_MODULE_TYPE
-          ) ||
+          Object.keys(modules).some(moduleId => lw.stack.includes(moduleId)) ||
           //  filter out the fake PE lid stack definition!
           //  we shouldn't be exposing it to users at all
           labwareEntitiesExtended[id].def.parameters.loadName ===
@@ -88,7 +82,6 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         )
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
-
         return (
           <Fragment key={id}>
             <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>

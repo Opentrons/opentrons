@@ -81,10 +81,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     getSelectedWells(stepType)
   )
 
-  const [hoveredWells, setHoveredWells] = useState<Set<string>>()
+  const [hoveredWells, setHoveredWells] = useState<Set<string> | null>(null)
   useEffect(() => {
-    setSelectedWells(getSelectedWells(stepType))
     setHoveredWells(new Set())
+    setSelectedWells(getSelectedWells(stepType))
   }, [stepType])
   const pipetteId = propsForFields.pipette.value as string
   const nozzleConfiguration = propsForFields.nozzles
@@ -130,7 +130,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const handleClickWell = (wellName: string): void => {
     const wellsToToggle = getEntireWellSelection(
       wellName,
-      labwareDef,
+      labwareDef.ordering,
       nozzleConfiguration,
       primaryNozzle,
       channels
@@ -150,7 +150,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       if (wellsField != null) {
         wellsField.updateValue(Array.from(next))
       }
-
       return next
     })
   }
@@ -185,7 +184,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         )
 
       default:
-        console.warn(`Unhandled step type ${stepType} for ${displayName}`)
         return (
           <StyledText desktopStyle="headingMediumBold">
             {displayName}
@@ -212,7 +210,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     const transformedWellNames: Set<string> = new Set(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         channels
@@ -251,7 +249,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       (acc, wellName) => {
         const wellsToUpdate = getEntireWellSelection(
           wellName,
-          labwareDef,
+          labwareDef.ordering,
           nozzleConfiguration,
           primaryNozzle,
           channels
@@ -280,7 +278,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     const hoveredIsSelected = hoveredWells
       ? [...hoveredWells].every(w => selectedWellNames.has(w))
       : false
-
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />
@@ -323,7 +320,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   return (
-    <div className={styles.column_wrapper}>
+    <>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
@@ -331,6 +328,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
         </div>
       </div>
-    </div>
+    </>
   )
 }

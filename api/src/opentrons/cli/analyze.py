@@ -361,6 +361,7 @@ async def _do_analyze(
                 hasEverEnteredErrorRecovery=False,
                 files=[],
                 liquidClasses=[],
+                commandAnnotations=[],
             ),
             parameters=[],
             command_annotations=[],
@@ -461,7 +462,7 @@ async def _analyze(  # noqa: C901
         pipettes=analysis.state_summary.pipettes,
         modules=analysis.state_summary.modules,
         liquids=analysis.state_summary.liquids,
-        commandAnnotations=analysis.command_annotations,
+        commandAnnotations=analysis.state_summary.commandAnnotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
     )

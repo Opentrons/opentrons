@@ -501,7 +501,7 @@ export function useModuleOverflowMenu(
             setSetting: t('overflow_menu_open_vent'),
             isSecondary: false,
             isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn],
+            menuButtons: [aboutModuleBtn, setupBtn],
             onClick: () => {
               console.log('TODO: open vent')
             },
@@ -510,7 +510,7 @@ export function useModuleOverflowMenu(
             setSetting: t('overflow_menu_close_vent'),
             isSecondary: false,
             isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn],
+            menuButtons: [aboutModuleBtn, setupBtn],
             onClick: () => {
               console.log('TODO: close vent')
             },

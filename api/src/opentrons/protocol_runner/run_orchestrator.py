@@ -35,13 +35,13 @@ from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.state.module_substates import FlexStackerSubState
 from ..protocol_engine.types import (
-    CommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyCommandAnnotation,
     LegacyLabwareOffsetCreate,
     ModuleModel,
     PostRunHardwareState,
@@ -275,7 +275,7 @@ class RunOrchestrator:
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_command_annotations(self) -> List[CommandAnnotation]:
+    def get_command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
         return (
             []

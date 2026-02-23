@@ -140,7 +140,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     >
                       {isTiprack ? (
                         <TipStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
                           type={statusByWellName[wellName] as TipType}
                           text={
                             selectedTipsByIndex != null &&
@@ -152,7 +152,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         />
                       ) : (
                         <WellStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
                           type={statusByWellName[wellName] as WellType}
                         />
                       )}

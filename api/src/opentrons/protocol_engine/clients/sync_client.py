@@ -60,7 +60,7 @@ class SyncClient:
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(
             params=cast(Any, params),
-            commandAnnotations=command_annotations
+            commandAnnotationIds=command_annotations
             if command_annotations is not None
             else [],
         )
@@ -215,7 +215,7 @@ class SyncClient:
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(
             params=cast(Any, params),
-            commandAnnotations=command_annotations
+            commandAnnotationIds=command_annotations
             if command_annotations is not None
             else [],
         )
