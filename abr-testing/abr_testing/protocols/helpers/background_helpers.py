@@ -66,6 +66,16 @@ def video_capture_buffer(max_time: int, m3u8_path: str):
     os.makedirs(storage_path, exist_ok=True)
 
     # Runs forever in the background
+
+
+    # Hello future programmer. Below is an ffmpeg command.
+    # ffmpeg makes no sense.
+    # just know that this is what this does:
+    # 1. streams from the givem m3u8_path
+    # 2. segments the stream into 1 second clips
+    # 3. converts each of these one second clips to mp4
+    # 4. stores these clips in the above "storage_path" directory
+    # it also runs perpetually (but don't worry, it is killed below)
     cmd = [
         "ffmpeg", "-y", "-i", m3u8_path,
         "-f", "segment",
