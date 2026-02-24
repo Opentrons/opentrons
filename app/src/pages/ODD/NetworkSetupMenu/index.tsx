@@ -11,6 +11,7 @@ import {
   SPACING,
   StepMeter,
   TYPOGRAPHY,
+  VIEWPORT,
 } from '@opentrons/components'
 
 import { CardButton } from '/app/molecules/CardButton'
@@ -42,16 +43,25 @@ export function NetworkSetupMenu(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
 
   return (
-    <>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      style={{
+        ...VIEWPORT.ODD_VIEWPORT_STYLES,
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
       <StepMeter totalSteps={6} currentStep={1} />
       <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing24} ${SPACING.spacing40} ${SPACING.spacing24}`}
         flexDirection={DIRECTION_COLUMN}
+        flex="1"
+        minHeight={0}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginBottom="3.09375rem"
+          marginBottom={SPACING.spacing16}
         >
           <LegacyStyledText
             forwardedAs="h2"
@@ -64,7 +74,7 @@ export function NetworkSetupMenu(): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacing40}
+          marginBottom={SPACING.spacing24}
         >
           <LegacyStyledText
             forwardedAs="h4"
@@ -78,18 +88,21 @@ export function NetworkSetupMenu(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           columnGap={SPACING.spacing8}
-          height="17rem"
+          flex="1"
+          minHeight={0}
+          minWidth={0}
         >
           {NetworkSetupOptions.map(networkOption => (
-            <CardButton
-              key={networkOption.title}
-              {...networkOption}
-              title={t(networkOption.title)}
-              description={t(networkOption.description)}
-            />
+            <Flex key={networkOption.title} flex="1" minWidth={0}>
+              <CardButton
+                {...networkOption}
+                title={t(networkOption.title)}
+                description={t(networkOption.description)}
+              />
+            </Flex>
           ))}
         </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }
