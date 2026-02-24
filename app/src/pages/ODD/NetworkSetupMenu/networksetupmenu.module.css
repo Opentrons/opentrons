@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-32) var(--spacing-60) var(--spacing-60);
+}
+
+.title_row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 3.0938rem;
+}
+
+.description_row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: var(--spacing-40);
+}
+
+.card_button_row {
+  display: flex;
+  height: 17rem;
+  flex-direction: row;
+  column-gap: var(--spacing-8);
+}
+
+.card_button_wrapper {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+}
