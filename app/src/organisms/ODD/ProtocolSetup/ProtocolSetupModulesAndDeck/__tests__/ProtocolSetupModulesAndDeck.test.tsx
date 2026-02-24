@@ -41,6 +41,7 @@ import { getUnmatchedModulesForProtocol } from '../utils'
 
 import type { UseQueryResult } from 'react-query'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
+import type * as ProtocolSetupUtils from '../utils'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/modules')
@@ -49,7 +50,7 @@ vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
 // Only mock getUnmatchedModulesForProtocol so ModuleTableItem's getDoesModuleRequireCalibration stays real
 vi.mock('../utils', async importOriginal => {
-  const actual = await importOriginal<typeof import('../utils')>()
+  const actual = await importOriginal<typeof ProtocolSetupUtils>()
   return {
     ...actual,
     getUnmatchedModulesForProtocol: vi.fn(),

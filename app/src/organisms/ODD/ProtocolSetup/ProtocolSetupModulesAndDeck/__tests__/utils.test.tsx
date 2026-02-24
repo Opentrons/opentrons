@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { AttachedModule } from '@opentrons/api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -18,6 +17,8 @@ import {
   getDoesModuleRequireCalibration,
   getUnmatchedModulesForProtocol,
 } from '../utils'
+
+import type { AttachedModule } from '@opentrons/api-client'
 
 const temperatureProtocolModule = {
   moduleId: 'mockTempModuleId',
