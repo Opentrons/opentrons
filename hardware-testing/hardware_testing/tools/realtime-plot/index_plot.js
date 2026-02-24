@@ -4,21 +4,33 @@ const plotConfigs = [
   {
     divId: 'plotly1',
     xColumn: 'Time(s)',
-    yColumns: ['current_gauge_pressure'],
+    yColumns: ['current_gauge_pressure', 'pressure_abs_a'],
     title: 'Pressure vs Time',
     yAxisLabel: 'Pressure (mbar)',
-    colors: ['#006fff'],
+    colors: ['#006fff', '#9900ff'],
     filePattern: 'PressureData', // matches CSV files containing "PressureData" in the name
   },
-  {
-    divId: 'plotly2',
-    xColumn: 'Time(s)',
-    yColumns: ['Flow_rate(sLM)'],
-    title: 'Flow Rate (sLM) vs Time',
-    yAxisLabel: 'Flow Rate (sLM)',
-    colors: ['#ff3a33'],
-    filePattern: 'FlowrateData', // matches CSV files containing "FlowrateData" in the name
-  }
+  // {
+  //   divId: 'plotly2',
+  //   xColumn: 'Time(s)',
+  //   yColumns: ['Flow_rate(sLM)'],
+  //   title: 'Flow Rate (sLM) vs Time',
+  //   yAxisLabel: 'Flow Rate (sLM)',
+  //   colors: ['#ff3a33'],
+  //   filePattern: 'FlowrateData', // matches CSV files containing "FlowrateData" in the name
+  // },
+  // This is example if we want to use a secondary axis
+  // {
+  //   divId: 'plotly3',
+  //   xColumn: 'Time(s)',
+  //   yColumns: ['temperature', 'humidity'], // Example: two curves on one plot
+  //   title: 'Environmental Conditions vs Time',
+  //   yAxisLabel: 'Temperature (°C)',
+  //   yAxis2Label: 'Humidity (%)', // Secondary axis label
+  //   colors: ['#ff9900', '#9900ff'], // Orange for temp, purple for humidity
+  //   filePattern: 'EnvironmentData', // matches CSV files containing "EnvironmentData" in the name
+  //   secondaryAxisColumns: ['humidity'], // Which columns use the secondary (right) y-axis
+  // }
 ];
 
 function createPlotContainers() {
@@ -55,7 +67,9 @@ function initializePlots() {
       type: 'scatter',
       mode: 'lines+markers',
       name: yCol,
-      marker: { color: config.colors[i] || '#006fff' },
+      // Use secondary axis if specified
+      yaxis: config.secondaryAxisColumns && config.secondaryAxisColumns.includes(yCol) ? 'y2' : 'y',
+      ...(config.colors && config.colors[i] ? { marker: { color: config.colors[i] } } : {}),
     }));
     const layout = {
       title: config.title,
@@ -63,6 +77,17 @@ function initializePlots() {
       yaxis: { title: config.yAxisLabel, autorange: true },
       uirevision: true,
     };
+    
+    // Add secondary y-axis if needed
+    if (config.yAxis2Label) {
+      layout.yaxis2 = {
+        title: config.yAxis2Label,
+        overlaying: 'y',
+        side: 'right',
+        autorange: true,
+      };
+    }
+    
     Plotly.newPlot(config.divId, emptyData, layout, { responsive: true }); // eslint-disable-line no-undef
   });
 }
@@ -94,6 +119,8 @@ function updatePlot(config, fileData) {
       type: 'scatter',
       mode: 'lines+markers',
       name: yColumn,
+      // Use secondary axis if specified
+      yaxis: config.secondaryAxisColumns && config.secondaryAxisColumns.includes(yColumn) ? 'y2' : 'y',
       marker: { color: config.colors[i] || '#006fff' },
     };
   }).filter(Boolean);
@@ -104,6 +131,16 @@ function updatePlot(config, fileData) {
     yaxis: { title: config.yAxisLabel, autorange: true },
     uirevision: true,
   };
+
+  // Add secondary y-axis if needed
+  if (config.yAxis2Label) {
+    layout.yaxis2 = {
+      title: config.yAxis2Label,
+      overlaying: 'y',
+      side: 'right',
+      autorange: true,
+    };
+  }
 
   Plotly.react(config.divId, newData, layout, { responsive: true }); // eslint-disable-line no-undef
 }
