@@ -127,7 +127,7 @@ function updatePlot(config, fileData) {
 
   const layout = {
     title: config.title,
-    xaxis: { title: config.xColumn + ' (s)', autorange: true },
+    xaxis: { title: config.xColumn, autorange: true },
     yaxis: { title: config.yAxisLabel, autorange: true },
     uirevision: true,
   };
