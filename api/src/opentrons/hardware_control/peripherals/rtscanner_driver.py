@@ -13,7 +13,6 @@ from .rtscanner_commands import (
     enable_code_id_prefix,
     enable_custom_prefix,
     enable_custom_suffix,
-    enable_prefix_suffixs,
     enable_terminating_suffix,
     good_read_beep_duration,
     good_read_beep_enable,
@@ -45,13 +44,28 @@ class RTScanner:
         self.conn = serial.Serial(device)
         self.set_scan_timeout(read_timeout_ms)
         # disable all weird suffix/prefix to start
-        self.set_menu_option(enable_prefix_suffixs + [ord("0")])
-        self.set_menu_option(enable_custom_prefix + [ord("0")])
-        self.set_menu_option(enable_aim_id + [ord("0")])
-        self.set_menu_option(enable_code_id_prefix + [ord("0")])
-        self.set_menu_option(enable_custom_suffix + [ord("0")])
-        self.set_menu_option(enable_terminating_suffix + [ord("0")])
-        self.set_suffix("\r\n")
+        self.enable_suffix(False)
+        self.enable_prefix(False)
+        self._enable_aim_id(False)
+        self._enable_code_id(False)
+        self._set_scan_terminator([0x03])  # End of Text non-printable character
+
+    def _enable_aim_id(self, enable: bool) -> None:
+        self._aim_id_ena = enable
+        arg = ord("1") if enable else ord("0")
+        self.set_menu_option(enable_aim_id + [arg])
+
+    def _enable_code_id(self, enable: bool) -> None:
+        self._code_id_ena = enable
+        arg = ord("1") if enable else ord("0")
+        self.set_menu_option(enable_code_id_prefix + [arg])
+
+    def _set_scan_terminator(self, terminator: List[int]) -> None:
+        self._scan_terminator = terminator
+        self.set_menu_option(enable_terminating_suffix + [ord("1")])
+        self.set_menu_option(
+            set_terminating_suffix + self.expand_ascii_args(terminator)
+        )
 
     def set_menu_option(self, cmd: List[int]) -> None:
         """Wrap a given command in the structure needed to pass the setting to the device."""
@@ -73,8 +87,13 @@ class RTScanner:
     def scan(self) -> Optional[str]:
         """Search for a barcode and return if found else None."""
         self.conn.write(scan_trigger)
-        self.conn.read_until(bytes(ack))  # eat the ack
+        self.conn.read_until(bytes(ack))  # eat the ack response
         barcode = self.conn.read_until(bytes(self._scan_terminator))
+        if len(barcode) == 0:
+            return None
+        else:
+            # strip off our internal terminator
+            barcode = barcode[: -1 * len(self._scan_terminator)]
         return None if len(barcode) == 0 else barcode
 
     def expand_ascii_args(self, byte_list: List[int]) -> List[int]:
@@ -90,9 +109,10 @@ class RTScanner:
         arg = ord("1") if enable else ord("0")
         self.set_menu_option(enable_custom_prefix + [arg])
 
-    def _enable_suffix(self) -> None:
-        """We always need a suffix so we know when we're done reading."""
-        self.set_menu_option(enable_terminating_suffix + [ord("1")])
+    def enable_suffix(self, enable: bool) -> None:
+        """Enable a custom suffix."""
+        arg = ord("1") if enable else ord("0")
+        self.set_menu_option(enable_custom_suffix + [arg])
 
     def set_prefix(self, prefix: str) -> None:
         """Set the custom prefix."""
@@ -103,13 +123,12 @@ class RTScanner:
 
     def set_suffix(self, suffix: str) -> None:
         """Set a custom suffix."""
-        self._enable_suffix()
+        self.enable_suffix(True)
         suffix_bytes = [ord(c) for c in suffix]
         assert len(suffix_bytes) <= 10
         self.set_menu_option(
             set_terminating_suffix + self.expand_ascii_args(suffix_bytes)
         )
-        self._scan_terminator = suffix_bytes
 
     def enable_success_beeps(
         self,
