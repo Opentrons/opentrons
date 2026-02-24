@@ -5,7 +5,7 @@ import pytest
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.database import Base, create_schema, sql_engine_ctx
+from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.persistence.tables import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (

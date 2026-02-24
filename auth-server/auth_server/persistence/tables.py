@@ -23,6 +23,7 @@ class ScopeListType(types.TypeDecorator[Any]):
     def process_bind_param(
         self, value: Any, dialect: sqlalchemy.engine.Dialect
     ) -> list[str]:
+        """Prepare a list of Scope objects to be inserted into SQL."""
         if not value:
             return []
         return sorted(s.api_name for s in value)
@@ -30,6 +31,7 @@ class ScopeListType(types.TypeDecorator[Any]):
     def process_result_value(
         self, value: Any, dialect: sqlalchemy.engine.Dialect
     ) -> list[Scope]:
+        """Convert a list of scope API-name strings to a list of Scope objects."""
         if not value:
             return []
         return [Scope.from_api_name(s) for s in value]
