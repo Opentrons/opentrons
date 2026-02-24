@@ -19,11 +19,11 @@ pkill -f "video_capture_buffer"
 pkill -f "detect_robot_status"
 
 
-
 (python3 -c "from background_helpers import detect_robot_status; detect_robot_status('$IP_ADDRESS')" &)
 sleep 0.5
 statusProcessID=$!
 
+VIDEO_LENGTH=30
 (python3 -c "from background_helpers import video_capture_buffer;
 video_capture_buffer($VIDEO_LENGTH, '/var/www/localhost/html/stream/hls/stream.m3u8')" &)
 videoBufferProcessID=$!
