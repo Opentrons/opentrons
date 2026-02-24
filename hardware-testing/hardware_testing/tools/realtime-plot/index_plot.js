@@ -130,7 +130,7 @@ function updatePlot(config, fileData) {
     xaxis: { title: config.xColumn, autorange: true },
     yaxis: { title: config.yAxisLabel, autorange: true },
     uirevision: true,
-  };
+  }; 
 
   // Add secondary y-axis if needed
   if (config.yAxis2Label) {
