@@ -17,6 +17,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
+import { getSlotDisplayName } from '../utils/getSlotDisplayName'
 import { WellContainer } from '../WellContainer'
 import { WellTooltip } from '../WellTooltip'
 import styles from './labwareslotcontainer.module.css'
@@ -203,7 +204,10 @@ export function LabwareSlotContainer(
                   )
                 } else {
                   return (
-                    <RobotInfoLabel key={`${item}-${index}`} deckLabel={slot} />
+                    <RobotInfoLabel
+                      key={`${item}-${index}`}
+                      deckLabel={getSlotDisplayName(slot, t)}
+                    />
                   )
                 }
               })}

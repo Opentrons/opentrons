@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame } from '../../utils/getAllWellContentsAtFrame'
+import { getSlotDisplayName } from '../../utils/getSlotDisplayName'
 import { WellTooltip } from '../../WellTooltip'
 import styles from './labwareslot.module.css'
 
@@ -183,7 +184,11 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
         <div className={styles.header_icons}>
           <RobotInfoLabel
             key="slotLabel"
-            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
+            deckLabel={
+              hasHopper
+                ? t('stacker_slot', { slot: slot })
+                : getSlotDisplayName(slot, t)
+            }
           />
           {moduleStackItems.map((item, index) => (
             <RobotInfoLabel
