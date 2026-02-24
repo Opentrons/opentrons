@@ -1,4 +1,5 @@
 import asyncio
+from typing import cast
 
 import jwt
 import structlog
@@ -11,10 +12,12 @@ from api.settings import Settings, get_settings
 settings: Settings = get_settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 
+EMAIL_NOT_VERIFIED_DETAIL = "Email address has not been verified. Please check your inbox and verify your email before continuing."
+
 
 class UnauthenticatedException(HTTPException):
-    def __init__(self) -> None:
-        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="This request was not authorized correctly.")
+    def __init__(self, detail: str = "This request was not authorized correctly.") -> None:
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
 
 
 class VerifyToken:
@@ -55,8 +58,11 @@ class VerifyToken:
                 issuer=self.config.auth0_issuer,
             )
             user = User(**payload)
+            if not cast(bool, user.m2m) and not user.email_verified:
+                logger.warning("Rejected unverified email", extra={"sub": user.sub})
+                raise UnauthenticatedException(detail=EMAIL_NOT_VERIFIED_DETAIL)
             structlog.contextvars.bind_contextvars(user_id=user.sub)
-            logger.info("User authenticated")
+            logger.info("User authenticated", extra={"is_m2m": user.m2m})
             return user
         except jwt.ExpiredSignatureError:
             logger.error("JWT expired", exc_info=True)

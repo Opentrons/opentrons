@@ -59,6 +59,10 @@ export const chatHistoryAtom = atom<Chat[]>([])
 
 export const feedbackModalAtom = atom<boolean>(false)
 
+/** Tracks whether the authenticated user has verified their email address.
+ * null = not yet determined, true = verified, false = unverified. */
+export const emailVerifiedAtom = atom<boolean | null>(null)
+
 // feature flag atoms are a bit more fancy
 // they leverage local storage to persist settings across browser refreshes
 
