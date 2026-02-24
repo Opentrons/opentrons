@@ -17,6 +17,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
+import { getResolvedWellViewParams } from '../utils/getResolvedWellViewParams'
 import { WellContainer } from '../WellContainer'
 import { WellTooltip } from '../WellTooltip'
 import styles from './labwareslotcontainer.module.css'
@@ -86,6 +87,11 @@ export function LabwareSlotContainer(
       ? labwareLoadCommandParams.displayName
       : null
   const { params, commandType } = currentCommand
+  const wellViewParams = getResolvedWellViewParams(
+    commands,
+    currentCommand,
+    topLabwareOnSlotId
+  )
   const commandWellName =
     'wellName' in params && typeof params.wellName === 'string'
       ? params.wellName
@@ -114,10 +120,14 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
+  const wellViewWellName =
+    'wellName' in wellViewParams && typeof wellViewParams.wellName === 'string'
+      ? wellViewParams.wellName
+      : null
   const selectedWellName =
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
-      : activeWellName
+      : wellViewWellName ?? activeWellName
   const shouldShowWellContainer =
     selectedWellName != null &&
     !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
@@ -168,7 +178,7 @@ export function LabwareSlotContainer(
       {shouldShowWellContainer ? (
         <WellContainer
           wells={wells}
-          params={params}
+          params={wellViewParams}
           selectedWellName={selectedWellName}
           wellColor={wellFill[selectedWellName]}
           labwareLocationLiquidState={labwareLocationLiquidState}
