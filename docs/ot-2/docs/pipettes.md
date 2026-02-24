@@ -12,9 +12,9 @@ OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentro
 OT-2 GEN1 pipettes are black and marked by a white or black Opentrons drop logo. They may have an affixed sticker that identifies these instruments as GEN1 pipettes and/or their volumetric capacity.
 
 <figure class="side-by-side" markdown>
-![OT2 GEN1 single channel pipette](./images/OT2-gen1-single.png)
-![OT2 GEN1 multi channel pipette](./images/OT2-gen1-multi.png)
-<figcaption>Examples of GEN1 pipettes.</figcaption>
+![OT2 GEN1 single channel pipette](./images/gen1-single-channel.png)
+![OT2 GEN1 multi channel pipette](./images/gen1-multi-channel.png)
+<figcaption>GEN1 single and multi-channel pipettes.</figcaption>
 </figure>
 
 GEN1 pipettes are discontinued and obsolete. They have been replaced by the more accurate and fully supported GEN2 models.
@@ -24,9 +24,9 @@ GEN1 pipettes are discontinued and obsolete. They have been replaced by the more
 OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and silver housing, and display exterior markings that identify these instruments as GEN2 pipettes along with their volumetric capacity.
 
 <figure class="side-by-side" markdown>
-![OT2 GEN2 single channel pipette](./images/gen2-p300-single.png)
-![OT2 GEN2 multi channel pipette](./images/GEN2-p300-multi.png)
-<figcaption>GEN2 300 µL (P300) pipettes</figcaption>
+![OT2 GEN2 single channel pipette](./images/gen2-single-channel.png)
+![OT2 GEN2 multi channel pipette](./images/gen2-multi-channel.png)
+<figcaption>GEN2 single and multi-channel pipettes.</figcaption>
 </figure>
 
 ## Installing OT-2 pipettes
