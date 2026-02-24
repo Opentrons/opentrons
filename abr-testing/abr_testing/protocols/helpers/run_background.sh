@@ -8,10 +8,14 @@ cd "$(dirname "$0")"
 
 # CHECK: Is there a lockfile?
 if [ -f "$LOCKFILE" ]; then
-    # Is the process ID inside that file actually still running?
-    if kill -0 "$(cat "$LOCKFILE")" 2>/dev/null; then
-        exit 0 # It's already running, so this script just give up.
-    fi
+    # Read the lockfile line by line
+    while read -r pid; do
+        # Is this specific PID actually still running?
+        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            echo "Process $pid is still running. Exiting."
+            exit 0
+        fi
+    done < "$LOCKFILE"
 fi
 
 # check what already exists and kill it
