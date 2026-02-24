@@ -8,7 +8,7 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import { G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
+import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -46,9 +46,8 @@ export function PipetteNozzleSelector(
 
   const nozzleConfiguration = propsForFields.nozzles
     .value as NozzleConfigurationStyle
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-
+  const primaryNozzle = (propsForFields.primaryNozzle?.value ??
+    A1_NOZZLE) as PrimaryNozzleConfigurationStyle
   const deckSetup = useSelector(getInitialDeckSetup)
   const is96Channel = channels === 96
 
@@ -78,7 +77,7 @@ export function PipetteNozzleSelector(
     let updatedNozzles: string[]
     if (!isPartialNozzle) {
       updatedNozzles = getEntireWellSelection(
-        propsForFields.primaryNozzle.value as string,
+        primaryNozzle,
         wellOrdering,
         nozzleConfiguration,
         primaryNozzle,
@@ -101,6 +100,14 @@ export function PipetteNozzleSelector(
     isPartialNozzle,
     propsForFields.primaryNozzle.value,
   ])
+
+  let subText = ''
+
+  if (isPartialNozzle) {
+    subText = t('number_of_nozzles_used')
+  } else if (nozzleConfiguration !== ALL) {
+    subText = t('click_on_highlighted_nozzles')
+  }
   return (
     <>
       <div className={styles.header_text_wrapper}>
@@ -167,9 +174,7 @@ export function PipetteNozzleSelector(
                 desktopStyle="bodyDefaultRegular"
                 color={isPartialNozzle ? COLORS.grey60 : COLORS.black90}
               >
-                {isPartialNozzle
-                  ? t('number_of_nozzles_used')
-                  : t('click_on_highlighted_nozzles')}
+                {subText}
               </StyledText>
               {isPartialNozzle && (
                 <DropdownMenu
