@@ -6,7 +6,7 @@ This section describes and lists the G-code commands and error codes used by the
 
 ## Understanding G-codes
 
-G-codes are instructions that machines can read to execute commands. They’re commonly used in industries such as machining to control devices like end-mills and lathes. In robotics applications, g-codes are useful if you're developing your own programs and process that work with Opentrons hardware independently of our programmatic systems for protocol development.
+G-codes are standard machine-readable instructions used to control hardware directly. While most users rely on our [Python API](../../python-api/) or [Protocol Designer](../../protocol-designer/), Opentrons provides G-codes to 3rd-party developers and integrators. They allow you to operate independently of our standard software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
 
 ### Command syntax
 
