@@ -11,7 +11,9 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.users.store import User, get, password_hash
+from auth_server.persistence.tables import User
+from auth_server.users.store import UserStore
+from auth_server.users.user_data_manager import password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -36,10 +38,10 @@ credentials" grant type.
 """
 
 
-def build() -> Backend:
+def build(user_store: UserStore) -> Backend:
     """Return a backend that our server can use to process OAuth 2 requests."""
     return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore()),
+        _RequestValidator(_TokenStore(), user_store),
         token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
     )
 
@@ -77,8 +79,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     oauthlib calling us with argument types that we weren't expecting.
     """
 
-    def __init__(self, token_store: _TokenStore) -> None:
+    def __init__(self, token_store: _TokenStore, user_store: UserStore) -> None:
         self.__token_store = token_store
+        self.__user_store = user_store
         super().__init__()
 
     @override
@@ -163,7 +166,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
-        user = get(username)
+        user = self.__user_store.get(username)
         if user is not None and password_hash.verify(password, user.hashed_password):
             request.user = user  # type: ignore[attr-defined]
             return True
@@ -241,9 +244,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=_now()
         )
         if issuance is not None:
-            user = get(issuance.username)
-            user = get(issuance.username)
-            # Set `.user` per the oauthlib docs.
+            user = self.__user_store.get(issuance.username)
             request.user = user  # type: ignore[attr-defined]
             return True
         else:
