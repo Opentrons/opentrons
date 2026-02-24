@@ -2,9 +2,11 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAtom } from 'jotai'
 
-import { featureFlagsAtom } from '../atoms'
+import { emailVerifiedAtom, featureFlagsAtom } from '../atoms'
 
 import type { AxiosRequestConfig } from 'axios'
+
+const EMAIL_NOT_VERIFIED_SUBSTRING = 'not been verified'
 
 interface UseApiCallResult<T> {
   data: T | null
@@ -18,6 +20,7 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [featureFlags] = useAtom(featureFlagsAtom)
+  const [, setEmailVerified] = useAtom(emailVerifiedAtom)
 
   const callApi = async (config?: AxiosRequestConfig): Promise<void> => {
     setIsLoading(true)
@@ -39,6 +42,14 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
       })
       setData(response.data)
     } catch (err: any) {
+      const detail: unknown = err?.response?.data?.detail
+      if (
+        err?.response?.status === 401 &&
+        typeof detail === 'string' &&
+        detail.includes(EMAIL_NOT_VERIFIED_SUBSTRING)
+      ) {
+        setEmailVerified(false)
+      }
       setError(err.message as string)
     } finally {
       setIsLoading(false)

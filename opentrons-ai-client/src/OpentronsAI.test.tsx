@@ -2,6 +2,7 @@ import * as auth0 from '@auth0/auth0-react'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { EmailVerificationRequired } from '/ai-client/components/molecules/EmailVerificationRequired'
 import { Footer } from '/ai-client/components/molecules/Footer'
 import { Header } from '/ai-client/components/molecules/Header'
 import { HeaderWithMeter } from '/ai-client/components/molecules/HeaderWithMeter'
@@ -21,6 +22,7 @@ vi.mock('/ai-client/components/molecules/Header')
 vi.mock('/ai-client/components/molecules/HeaderWithMeter')
 vi.mock('/ai-client/components/molecules/Footer')
 vi.mock('/ai-client/components/molecules/Loading')
+vi.mock('/ai-client/components/molecules/EmailVerificationRequired')
 vi.mock('./resources/hooks/useGetAccessToken')
 vi.mock('./analytics/mixpanel')
 
@@ -53,9 +55,13 @@ describe('OpentronsAI', () => {
       <div>mock Header With Meter component</div>
     )
     vi.mocked(Footer).mockReturnValue(<div>mock Footer component</div>)
+    vi.mocked(EmailVerificationRequired).mockReturnValue(
+      <div>mock Email Verification Required</div>
+    )
     ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
+      user: { email_verified: true },
     })
   })
 
@@ -63,9 +69,20 @@ describe('OpentronsAI', () => {
     ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
       isAuthenticated: false,
       isLoading: true,
+      user: undefined,
     })
     render()
     screen.getByText('mock Loading')
+  })
+
+  it('should render email verification screen when email is not verified', () => {
+    ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { email_verified: false },
+    })
+    render()
+    screen.getByText('mock Email Verification Required')
   })
 
   it('should render text', () => {

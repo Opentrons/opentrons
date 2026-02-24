@@ -12,6 +12,7 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
+import { EmailVerificationRequired } from '/ai-client/components/molecules/EmailVerificationRequired'
 import { ExitConfirmModal } from '/ai-client/components/molecules/ExitConfirmModal'
 import { Footer } from '/ai-client/components/molecules/Footer'
 import { Header } from '/ai-client/components/molecules/Header'
@@ -21,6 +22,7 @@ import { Loading } from '/ai-client/components/molecules/Loading'
 import { initializeMixpanel, setMixpanelTracking } from './analytics/mixpanel'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import {
+  emailVerifiedAtom,
   featureFlagsAtom,
   headerWithMeterAtom,
   mixpanelAtom,
@@ -39,8 +41,9 @@ export function OpentronsAI(): JSX.Element | null {
 }
 
 function OpentronsAIApp(): JSX.Element | null {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+  const { isAuthenticated, isLoading, loginWithRedirect, user } = useAuth0()
   const [, setToken] = useAtom(tokenAtom)
+  const [emailVerified, setEmailVerified] = useAtom(emailVerifiedAtom)
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
@@ -75,6 +78,12 @@ function OpentronsAIApp(): JSX.Element | null {
 
   useEffect(() => {
     if (isAuthenticated) {
+      setEmailVerified(user?.email_verified ?? false)
+    }
+  }, [isAuthenticated, user?.email_verified, setEmailVerified])
+
+  useEffect(() => {
+    if (isAuthenticated) {
       trackEvent({ name: 'user-login', properties: {} })
     }
   }, [isAuthenticated])
@@ -102,6 +111,10 @@ function OpentronsAIApp(): JSX.Element | null {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  if (emailVerified === false) {
+    return <EmailVerificationRequired />
   }
 
   global.enablePrereleaseMode = () => {
