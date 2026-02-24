@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, ContextManager, Dict, List, Literal, Optional
 
+import anthropic
 import requests
 import structlog
 import weave
@@ -600,6 +601,8 @@ class AnthropicPredict:
 
             logger.error("Unexpected response type")
             return None
+        except anthropic.APIError:
+            raise
         except Exception as e:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
@@ -632,6 +635,8 @@ class AnthropicPredict:
 
             logger.error("Unexpected response type")
             return None
+        except anthropic.APIError:
+            raise
         except Exception as e:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None

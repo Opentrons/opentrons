@@ -27,7 +27,7 @@ describe('useApiCall', () => {
     expect(result.current.error).toBe(null)
   })
 
-  it('should handle post error', async () => {
+  it('should handle network error as structured ApiErrorResponse', async () => {
     mock.onPost('/test').networkError()
 
     const { result } = renderHook(() => useApiCall())
@@ -38,6 +38,47 @@ describe('useApiCall', () => {
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.data).toBe(null)
-    expect(result.current.error).toBe('Network Error')
+    expect(result.current.error).toEqual({
+      message: 'Network Error',
+      error_type: 'network_error',
+    })
+  })
+
+  it('should extract structured error from API error response body', async () => {
+    mock.onPost('/test').reply(400, {
+      message: 'Your request is too large.',
+      error_type: 'context_length_exceeded',
+    })
+
+    const { result } = renderHook(() => useApiCall())
+
+    await act(async () => {
+      await result.current.callApi({ url: '/test', method: 'POST', data: {} })
+    })
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.data).toBe(null)
+    expect(result.current.error).toEqual({
+      message: 'Your request is too large.',
+      error_type: 'context_length_exceeded',
+    })
+  })
+
+  it('should clear error when clearError is called', async () => {
+    mock.onPost('/test').networkError()
+
+    const { result } = renderHook(() => useApiCall())
+
+    await act(async () => {
+      await result.current.callApi({ url: '/test', method: 'POST', data: {} })
+    })
+
+    expect(result.current.error).not.toBe(null)
+
+    act(() => {
+      result.current.clearError()
+    })
+
+    expect(result.current.error).toBe(null)
   })
 })
