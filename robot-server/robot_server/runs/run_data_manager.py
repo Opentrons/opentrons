@@ -561,7 +561,10 @@ class RunDataManager:
         """Get the total number of command annotations in the specified run."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_total_command_annotations_count()
-        return self._run_store.get_total_command_annotations_count(run_id)
+        else:
+            raise NotImplementedError(
+                "Fetching annotations from historical runs is not implemented yet"
+            )
 
     def get_command_annotations_slice(
         self, run_id: str, cursor: int, length: int
@@ -577,9 +580,10 @@ class RunDataManager:
             return self._run_orchestrator_store.get_command_annotations_slice(
                 cursor=cursor, length=length
             )
-        return self._run_store.get_command_annotations_slice(
-            run_id=run_id, cursor=cursor, length=length
-        )
+        else:
+            raise NotImplementedError(
+                "Fetching annotations from historical runs is not implemented yet"
+            )
 
     def get_command_annotation(
         self, run_id: str, annotation_id: str
@@ -587,7 +591,10 @@ class RunDataManager:
         """Get a run's command annotation by ID."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_annotation(annotation_id)
-        return self._run_store.get_command_annotation(run_id, annotation_id)
+        else:
+            raise NotImplementedError(
+                "Fetching annotations from historical runs is not implemented yet"
+            )
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
