@@ -16,6 +16,9 @@ from fastapi import (
     status,
 )
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+
 from .models import EnableOEMMode
 from .oem_settings_store import (
     OEMSettingsStore,
@@ -40,11 +43,12 @@ oem_mode_router = APIRouter()
     description="Enable or disable OEM Mode",
     responses={
         status.HTTP_200_OK: {"message": "OEM Mode changed successfully."},
-        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not changed."},
+        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not change."},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "message": "OEM Mode unhandled exception."
         },
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def enable_oem_mode_endpoint(
     response: Response,
@@ -80,6 +84,7 @@ async def enable_oem_mode_endpoint(
             "message": "OEM Mode splash unhandled exception."
         },
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def upload_splash_image(
     response: Response,
