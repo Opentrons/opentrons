@@ -1,24 +1,26 @@
+import { COLORS } from '../../../../helix-design-system'
 import { getWidthAndHeightOfWellSVG } from './utils'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface EmptyWellProps {
   wellMap: LabwareWellMap
-  outlineColor: string
+  isLabware: boolean
   size?: string
-  flipLine?: boolean
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap, flipLine, outlineColor } = props
+  const { size, wellMap, isLabware } = props
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
+  const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
   const circularDimension = 20
   const viewBoxWidth = isCircular ? circularDimension : width
   const viewBoxHeight = isCircular ? circularDimension : height
   const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
-  const lineProps = flipLine
+  const lineStrokeWidth = isCircular ? 2 : 1
+  const lineProps = isLabware
     ? {
         x1: 0,
         y1: 0,
@@ -72,11 +74,15 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             height={height}
             fill="#CBCCCC"
             stroke={outlineColor}
-            strokeWidth="1"
+            strokeWidth="2"
           />
         )}
 
-        <line {...lineProps} stroke={outlineColor} strokeWidth="2" />
+        <line
+          {...lineProps}
+          stroke={outlineColor}
+          strokeWidth={lineStrokeWidth}
+        />
       </g>
     </svg>
   )

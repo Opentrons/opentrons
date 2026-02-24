@@ -1,4 +1,3 @@
-import { COLORS } from '../../../../helix-design-system'
 import { INACCESSIBLE, SELECTED, SELECTED_ERROR } from '../Tips/constants'
 import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'
@@ -10,14 +9,13 @@ import type { WellType } from '../types'
 interface WellStatusProps {
   wellMap: LabwareWellMap
   type: WellType
-  flipLine?: boolean
+  isLabware: boolean
   showStroke?: boolean
   size?: string
 }
 
 export function WellStatus(props: WellStatusProps): JSX.Element {
-  const { type, size, wellMap, flipLine, showStroke = false } = props
-  const outlineColor = size ? COLORS.black90 : COLORS.grey50
+  const { type, size, wellMap, isLabware, showStroke = false } = props
   switch (type) {
     case SELECTED:
       return (
@@ -29,14 +27,7 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
         />
       )
     case INACCESSIBLE:
-      return (
-        <EmptyWell
-          wellMap={wellMap}
-          flipLine={flipLine}
-          size={size}
-          outlineColor={outlineColor}
-        />
-      )
+      return <EmptyWell wellMap={wellMap} size={size} isLabware={isLabware} />
     case UNSELECTED:
       return (
         <SelectedWell

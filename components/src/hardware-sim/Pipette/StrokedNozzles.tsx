@@ -35,18 +35,26 @@ export function StrokedNozzlesComponent(
 
   return (
     <>
-      {Object.entries(nozzleStatus).map(([key, wellType]) => (
-        <svg
-          key={key}
-          x={wells[key].x - 5}
-          y={wells[key].y - 5}
-          onClick={() => {
-            handleClickNozzle(key)
-          }}
-        >
-          <WellStatus type={wellType} size="8" wellMap={wells} showStroke />
-        </svg>
-      ))}
+      {Object.entries(nozzleStatus).map(([key, wellType]) => {
+        return (
+          <svg
+            key={key}
+            x={wells[key].x - 5}
+            y={wells[key].y - 5}
+            onClick={() => {
+              handleClickNozzle(key)
+            }}
+          >
+            <WellStatus
+              type={wellType}
+              size="8"
+              wellMap={wells}
+              showStroke
+              isLabware={false}
+            />
+          </svg>
+        )
+      })}
     </>
   )
 }

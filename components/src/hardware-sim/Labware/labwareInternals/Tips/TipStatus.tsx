@@ -1,4 +1,3 @@
-import { COLORS } from '../../../../helix-design-system'
 import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
@@ -33,9 +32,7 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
     case SELECTED:
       return <SelectedWell size={size} textInsideTip={text} wellMap={wellMap} />
     case NO:
-      return (
-        <EmptyWell size={size} wellMap={wellMap} outlineColor={COLORS.grey50} />
-      )
+      return <EmptyWell size={size} wellMap={wellMap} isLabware={true} />
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:

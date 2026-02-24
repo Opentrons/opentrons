@@ -37,16 +37,18 @@ export function SelectionLegend({
           {isTipSelection ? (
             <TipStatus
               type={type as TipType}
-              wellMap={labwareWellMap}
               size={size}
+              wellMap={labwareWellMap}
             />
           ) : (
-            <WellStatus
-              type={type as WellType}
-              wellMap={labwareWellMap}
-              size={size}
-              flipLine={false}
-            />
+            <div className={styles.well_legend_item}>
+              <WellStatus
+                type={type as WellType}
+                size={size}
+                isLabware={true}
+                wellMap={labwareWellMap}
+              />
+            </div>
           )}
 
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
