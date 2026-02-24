@@ -51,8 +51,8 @@ class UserResponse(BaseModel):
     def from_orm_user(cls, user: User) -> UserResponse:
         """Build a UserResponse from an ORM User."""
         return cls(
-            userName=user.username, # type: ignore[arg-type]
-            fullName=user.full_name,    # type: ignore[arg-type]
+            userName=user.username,  # type: ignore[arg-type]
+            fullName=user.full_name,  # type: ignore[arg-type]
             accountType=user.account_type,  # type: ignore[arg-type]
             scopes=[scope.api_name for scope in user.scopes or []],
         )
