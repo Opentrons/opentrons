@@ -208,8 +208,6 @@ def _get_analytics_preference(request: Request) -> bool:
     return analytics_header == "true"
 
 
-
-
 def _generate_llm_response_with_history(
     model_type: str,
     user_id: str,

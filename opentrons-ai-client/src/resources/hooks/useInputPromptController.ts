@@ -411,8 +411,13 @@ export function useInputPromptController(
       return
     }
 
-    await callApi(config)
-    handleSuccessfulSubmission(userInput, currentProtocolFormat)
+    // This path is not reachable through the current UI: update/create pages have no file
+    // attachment UI, so isUpdateOrCreateRequest with validatedFiles > 0 cannot be triggered.
+    // If that ever changes, a streaming endpoint should be added rather than falling back here.
+    console.error(
+      'Unexpected non-streaming path reached',
+      { isUpdateOrCreateRequest, validatedFilesLength: validatedFiles.length }
+    )
   }
 
   // Process API response
