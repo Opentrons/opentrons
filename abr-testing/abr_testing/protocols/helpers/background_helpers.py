@@ -11,6 +11,7 @@ from abr_testing.automation import slack
 from abr_testing.tools import check_robot_status as robot_status
 from abr_testing.protocols.helpers import run_helpers
 from collections import deque
+from datetime import datetime
 
 
 def detect_robot_status(ip: str) -> None:
@@ -25,7 +26,7 @@ def detect_robot_status(ip: str) -> None:
 
     # Process will be constantly running
     while True:
-        time.sleep(300)
+        time.sleep(30)
 
         # Reset running_robot and completed_robot information to prevent possible data corruption
         running_robots: List[str] = []
@@ -41,6 +42,83 @@ def detect_robot_status(ip: str) -> None:
             on_robot=True,
             past_run_status=past_run_statuses,
         )
+
+
+def change_robot_video_length(time: str, ip: str) -> None:
+    """Changes the length of the robot video to the given time."""
+    key = "hls_playlist_length"
+    ssh_command = f"""
+    mount -o remount,rw / &&
+    sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s;/g" /etc/nginx/nginx.conf &&
+    systemctl daemon-reload &&
+    systemctl restart nginx 
+    """
+
+    try:
+        subprocess.run(ssh_command, shell=True, check=True)
+        print(f"Successfully updated livestream length on {ip}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to update {ip}: {e}")
+
+def video_capture_buffer(max_time: int, m3u8_path: str):
+    """Keeps a running video capture buffer of given time."""
+    storage_path: str = "data/testing_data/video_capture_buffer"
+    os.makedirs(storage_path, exist_ok=True)
+
+    # Runs forever in the background
+    cmd = [
+        "ffmpeg", "-y", "-i", m3u8_path,
+        "-f", "segment",
+        "-segment_time", "1",
+        "-strftime", "1",
+        "-c:v", "libx264", "-c:a", "aac",
+        f"{storage_path}/%Y-%m-%d_%H-%M-%S.mp4"
+    ]
+    """
+    Note to self:
+        1. stdout and stderr are subprocess' way of outputing logs and errors to the terminal
+        2. DEVNULL is a "black hole" file
+        3. here, we are telling subprocess to stfu instead of attacking our terminal
+    """
+    process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # give ffmpeg a second to get started
+    time.sleep(1)
+
+    # cleans up
+    try:
+        while True:
+            # creates buffer
+
+            # Filter for .mp4 only so we don't accidentally try to delete temp files
+            buffer: list[str] = sorted([f for f in os.listdir(storage_path) if f.endswith(".mp4")])
+
+            # enforces maximum time
+            if len(buffer) >= max_time + 1:
+                attempted_removals: int = 0
+
+                def _remove_item(attempted_removals: int = 0):
+                    #only try 3 times
+                    if attempted_removals > 3:
+                        return
+
+                    try:
+                        os.remove(f"{storage_path}/{buffer[0]}")
+                    except IndexError:
+                        # assume ffmpeg hasn't done anything yet
+                        pass
+                    except OSError:
+                        # wait a second, then try again
+                        time.sleep(1)
+                        attempted_removals+=1
+                        _remove_item(attempted_removals)
+
+                _remove_item(attempted_removals)
+
+
+            time.sleep(1)
+    finally:
+        process.terminate()
+
 
 
 def launch_background_tasks() -> None:

@@ -4,7 +4,7 @@ IP_ADDRESS=$(networkctl status | grep "Address:" | awk '{print $2}')
 
 # Navigate to relevant file
 cd "$(dirname "$0")"
-pwd
+#pwd
 
 # CHECK: Is there a lockfile?
 if [ -f "$LOCKFILE" ]; then
@@ -15,18 +15,25 @@ if [ -f "$LOCKFILE" ]; then
 fi
 
 # check what already exists and kill it
-pkill -f "background_helpers"
+pkill -f "video_capture_buffer"
+pkill -f "detect_robot_status"
 
 
 
 (python3 -c "from background_helpers import detect_robot_status; detect_robot_status('$IP_ADDRESS')" &)
 sleep 0.5
-processID=$!
+statusProcessID=$!
 
-if kill -0 "$processID" 2>/dev/null; then
+(python3 -c "from background_helpers import video_capture_buffer;
+video_capture_buffer($VIDEO_LENGTH, '/var/www/localhost/html/stream/hls/stream.m3u8')" &)
+videoBufferProcessID=$!
+
+
+if kill -0 "$statusProcessID" 2>/dev/null && kill -0 "$videoBufferProcessID" 2>/dev/null; then
   # Push the Python process ID to the Lockfile
-  echo "$processID" > "$LOCKFILE"
-  echo "background process successfully launched"
+  echo "$statusProcessID" > "$LOCKFILE"
+  echo "$videoBufferProcessID" >> "$LOCKFILE"
+  echo "background processes successfully launched"
 else
-  echo "background process failed to launch"
+  echo "background processes failed to launch"
 fi
