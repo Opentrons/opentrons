@@ -48,7 +48,6 @@ class PreSerializedCommandAnnotationsNotAvailable(ErrorDetails):
     detail: str = "Pre-serialized command annotations are only available once a run has finished running."
 
 
-# Route to get a list of command annotations according to page length requested
 @PydanticResponse.wrap_route(
     command_annotations_router.get,
     path="/runs/{runId}/commandAnnotations",
@@ -166,6 +165,3 @@ async def get_command_annotation(
         content=SimpleBody.model_construct(data=annotation),
         status_code=status.HTTP_200_OK,
     )
-
-
-# Route to get the specific annotation by id
