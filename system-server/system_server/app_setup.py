@@ -1,7 +1,7 @@
 """Main FastAPI application."""
 
-import logging
-from typing import Any
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +17,14 @@ from system_server.settings import get_settings
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
-log = logging.getLogger(__name__)
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Load settings and (throw away the result) so that we detect errors early
+    # on in startup, instead of the first time someone happens to use a setting.
+    get_settings()
+
+    # Start serving requests.
+    yield
 
 
 app = FastAPI(
@@ -30,6 +37,7 @@ app = FastAPI(
     docs_url=None,
     # redoc_url is replaced by our own /redoc router, below.
     redoc_url=None,
+    lifespan=_lifespan,
 )
 
 app.add_middleware(
@@ -44,27 +52,6 @@ app.middleware("http")(server_timing_middleware())
 
 # main router
 app.include_router(router=router)
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
-    """Handle app startup."""
-    # Load settings and (throw away the result) so that we detect errors early
-    # on in startup, instead of the first time someone happens to use a setting.
-    get_settings()
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    """Handle app shutdown."""
-    # Placeholder for actual shutdown processes
-    shutdown_results: list[Any] = []
-    log.info("shutdown")
-
-    shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]
-
-    for e in shutdown_errors:
-        log.warning("Error during shutdown", exc_info=e)
 
 
 # This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.
