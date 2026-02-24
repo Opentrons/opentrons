@@ -2,7 +2,34 @@
 
 ## Overview
 
-The Opentrons AI server is a FastAPI server that handles complex tasks like running generative AI models and integrating with the OpenAI API. One challenge we faced was the long processing time for chat completion, which can take 1-3 minutes. This ruled out serverless options like Lambda, as they typically have strict time limits. Ultimately, we opted for a robust architecture using CloudFront, a load balancer, and an ECS Fargate container running our FastAPI server. This robust architecture ensures reliable performance and scalability, allowing users to seamlessly interact with our AI-powered tools and automate their lab workflows.
+The Opentrons AI server is a FastAPI server that runs generative AI models (Anthropic Claude) and streams responses to the frontend over [Server-Sent Events (SSE)][sse]. Because protocol generation can take 1-3 minutes, serverless options like Lambda are impractical; instead, the service runs in an ECS Fargate container behind CloudFront and an ALB.
+
+### Streaming endpoints
+
+All chat responses are streamed. The server exposes four SSE endpoints:
+
+| Endpoint                                     | Purpose                                                |
+| -------------------------------------------- | ------------------------------------------------------ |
+| `POST /api/chat/updateProtocol/stream`       | Update an existing protocol (no file attachments)      |
+| `POST /api/chat/createProtocol/stream`       | Generate a new protocol (no file attachments)          |
+| `POST /api/chat/completion/stream`           | General chat completion (no file attachments)          |
+| `POST /api/chat/completion-multipart/stream` | Chat completion with file attachments (multipart form) |
+
+Each endpoint streams `data: {"delta": "..."}` events as the model generates output, then sends `data: {"done": true}` to signal completion.
+
+### Fake responses and streaming fakes
+
+Every endpoint accepts `"fake": true` in the request body to bypass the LLM. The optional `"fake_key"` field selects a canned response from `api/domain/fake_responses.py`:
+
+| `fake_key`                          | Description                                                             |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `"streaming_3s"`                    | 3-second streaming fake (used by live tests and the interactive client) |
+| `"streaming_15s"`                   | 15-second streaming fake (used for UI load testing)                     |
+| `"reagent transfer"`, `"pcr"`, etc. | Static protocol fakes (non-streaming endpoints)                         |
+
+Streaming fake logic lives in `api/handler/fake_streaming.py`; the public entry points are `handle_fake_response` (non-streaming) and `make_fake_streaming_response` (streaming).
+
+[sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
 
 ## Deployed Environments
 
@@ -69,24 +96,34 @@ Now you are in the docker container and can inspect the environment and such.
 
 #### Direct API Interaction and Authentication
 
-> There is only 1 endpoint with the potential to call the Anthropic API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The Anthropic API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the Anthropic API.
+All endpoints require a Bearer token in the `Authorization` header: `"Authorization": "Bearer YOUR_TOKEN"`.
 
-To access the `/api/chat/completion` API endpoint, you will need to provide an Authorization header in your API calls.
-`"Authorization": "Bearer YOUR_TOKEN"`
+Setting `"fake": true` (and optionally `"fake_key"`) in the request body bypasses the LLM entirely and returns a canned or streaming fake response — useful for local UI development without Anthropic API calls.
+
+To get a token for direct API interaction:
 
 1. get the file `test.env` from a team member
 1. put the `test.env` file in the `opentrons-ai-server/tests/helpers` directory
-1. run `make live-client` and select local for the environment
-1. a token will now be cached `opentrons-ai-server/tests/helpers/cached_token.txt` directory
-1. use this token in the Authorization header of your favorite API client
+1. run `make live-client` and select local for the environment — this fetches a token, caches it at `tests/helpers/cached_token.txt`, and walks through a live demo including a streaming panel
+1. use the cached token in the `Authorization` header of your favorite API client
+
+The interactive client (`tests/helpers/client.py`) demonstrates a live SSE stream using `fake_key: "streaming_3s"` and renders the response in a Rich panel as chunks arrive.
 
 #### Live Tests
 
-The live-test target will run tests against any environment. The default is local. The environment can be set by setting the ENV variable.
+Live tests hit a running server (default: local). Run them with:
 
-1. have the server running locally
-1. run `make live-test`
-1. You should see the tests run and pass against the local environment
+```shell
+make live-test          # against local (default)
+ENV=staging make live-test
+```
+
+The streaming live tests (`test_live.py`) use the helpers in `tests/helpers/client.py`:
+
+- `SseResult` — dataclass returned by every streaming client method; holds `status_code`, `headers`, and `events` (a list of parsed SSE event dicts collected via `httpx.stream`)
+- `iter_sse_events(lines)` — universal SSE parser; takes any line iterator and yields parsed event dicts, skipping blank and non-`data:` lines
+
+Each streaming test asserts that at least one `delta` event was received and that the final event is `{"done": true}`.
 
 #### API Access from the UI
 

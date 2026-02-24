@@ -12,4 +12,4 @@ class UpdateProtocol(BaseModel):
     ] = Field(..., description="Type of update")
     update_details: str = Field(..., description="Details of the update")
     fake: Optional[bool] = Field(False, description="Fake response?")
-    fake_key: Optional[int] = Field(None, description="type of response")
+    fake_key: Optional[str] = Field(None, description="Fake response key, e.g. 'streaming_15s' for 15s streaming test")

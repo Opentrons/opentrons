@@ -3,7 +3,7 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, ContextManager, Dict, List, Literal, Optional
+from typing import Any, ContextManager, Dict, Generator, List, Literal, Optional, cast
 
 import requests
 import structlog
@@ -306,6 +306,152 @@ class AnthropicPredict:
         )
         return response
 
+    def _stream_process_message(
+        self, user_id: str, messages: List[MessageParam], message_type: MessageType
+    ) -> Generator[str, None, Message]:
+        """
+        Stream text deltas from the model, then return the final Message for tool_use handling.
+        """
+        with self.client.messages.stream(
+            max_tokens=self.max_tokens,
+            messages=messages,
+            model=self.model_name,
+            system=self.system_prompt,
+            tools=self.tools,
+            metadata={"user_id": user_id},
+            temperature=0.0,
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
+            response: Message = stream.get_final_message()
+
+        logger.info(
+            f"Token usage: {message_type.capitalize()}",
+            extra={
+                "input_tokens": response.usage.input_tokens,
+                "output_tokens": response.usage.output_tokens,
+                "cache_read": getattr(response.usage, "cache_read_input_tokens", "---"),
+                "cache_create": getattr(response.usage, "cache_creation_input_tokens", "---"),
+            },
+        )
+        return response  # noqa: R504
+
+    def stream_update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> Generator[str, None, None]:
+        """
+        Stream text deltas for an update-protocol request. Handles tool_use by streaming
+        the follow-up response after the tool call.
+        """
+        messages: List[MessageParam] = self.cached_docs.copy()
+        if history:
+            messages += history
+        user_message: MessageParam = {"role": "user", "content": [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]}
+        messages.append(user_message)
+        yield from self._stream_messages_with_tool_use(user_id=user_id, messages=messages, message_type="update")
+
+    def stream_create(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> Generator[str, None, None]:
+        """
+        Stream text deltas for a create-protocol request. Same structure as stream_update
+        but with message_type "create". Handles tool_use by streaming the follow-up.
+        """
+        messages: List[MessageParam] = self.cached_docs.copy()
+        if history:
+            messages += history
+        user_message: MessageParam = {"role": "user", "content": [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]}
+        messages.append(user_message)
+        yield from self._stream_messages_with_tool_use(user_id=user_id, messages=messages, message_type="create")
+
+    def _stream_messages_with_tool_use(
+        self, user_id: str, messages: List[MessageParam], message_type: MessageType
+    ) -> Generator[str, None, None]:
+        """Stream text from a message list, handling tool_use with a follow-up stream."""
+
+        def stream_phase() -> Generator[str, None, Message]:
+            gen = self._stream_process_message(user_id=user_id, messages=messages, message_type=message_type)
+            try:
+                while True:
+                    chunk = next(gen)
+                    yield chunk
+            except StopIteration as e:
+                return e.value  # type: ignore[no-any-return]
+
+        phase = stream_phase()
+        response: Message | None = None
+        try:
+            while True:
+                chunk = next(phase)
+                yield chunk
+        except StopIteration as e:
+            response = getattr(e, "value", None)
+
+        if not response or not response.content:
+            return
+        if response.content[-1].type == "tool_use":
+            tool_use = response.content[-1]
+            messages.append({"role": "assistant", "content": response.content})
+            result = self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "tool_result", "tool_use_id": tool_use.id, "content": result},
+                    ],
+                },
+            )
+            follow_up = self._stream_process_message(user_id=user_id, messages=messages, message_type=message_type)
+            try:
+                while True:
+                    yield next(follow_up)
+            except StopIteration:
+                pass
+
+    def _stream_process_message_pd(self, user_id: str, messages: List[MessageParam]) -> Generator[str, None, Optional[str]]:
+        """Stream text deltas from the PD model (no tools). Returns final text via StopIteration.value."""
+        with self.client.messages.stream(
+            max_tokens=self.max_tokens,
+            messages=messages,
+            model=self.model_name,
+            system=self.system_prompt_pd,
+            metadata={"user_id": user_id},
+            temperature=0.0,
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
+            response: Message = stream.get_final_message()
+        if response.content and response.content[0].type == "text":
+            return response.content[0].text
+        return None
+
+    def stream_create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> Generator[str, None, None]:
+        """Stream text deltas for a Protocol Designer create request."""
+        if history is None:
+            messages: List[MessageParam] = []
+        else:
+            messages = list(history)
+        messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
+        gen = self._stream_process_message_pd(user_id=user_id, messages=messages)
+        try:
+            while True:
+                yield next(gen)
+        except StopIteration:
+            pass
+
+    def stream_process_chat_with_attachments(
+        self,
+        user_id: str,
+        prompt: str,
+        history_with_attachments: List[Dict[str, Any]],
+        current_msg_files: Optional[List[Dict[str, str]]],
+    ) -> Generator[str, None, None]:
+        """
+        Stream text deltas for chat completion with history and optional file attachments.
+        Builds the same message list as process_chat_with_attachments then streams with tool_use handling.
+        """
+        messages: List[MessageParam] = self.cached_docs.copy()
+        messages += self._build_conversation_history(history_with_attachments, user_id)
+        current_user_message = self._create_current_user_message(prompt, current_msg_files, user_id)
+        messages.append(current_user_message)
+        yield from self._stream_messages_with_tool_use(user_id=user_id, messages=messages, message_type="update")
+
     def _create_file_attachment_blocks(
         self,
         file_references: Optional[List[Dict[str, str]]],
@@ -498,7 +644,7 @@ class AnthropicPredict:
         if response.content[-1].type == "tool_use":
             tool_use = response.content[-1]
             messages.append({"role": "assistant", "content": response.content})
-            result = self.handle_tool_use(tool_use.name, tool_use.input, user_id)  # type: ignore[arg-type]
+            result = self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
             messages.append(
                 {
                     "role": "user",
@@ -574,7 +720,7 @@ class AnthropicPredict:
             if response.content[-1].type == "tool_use":
                 tool_use = response.content[-1]
                 messages.append({"role": "assistant", "content": response.content})
-                result = self.handle_tool_use(tool_use.name, tool_use.input, user_id)  # type: ignore[arg-type]
+                result = self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
                 messages.append(
                     {
                         "role": "user",

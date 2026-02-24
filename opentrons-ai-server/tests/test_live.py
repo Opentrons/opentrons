@@ -99,3 +99,101 @@ def test_get_options(client: Client) -> None:
     print(response)
     for header, expected_value in expected_headers.items():
         assert body.get(header) == expected_value, f"{header} should be {expected_value}"
+
+
+@pytest.mark.live
+def test_update_protocol_stream_fake(client: Client) -> None:
+    """updateProtocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
+    body = {
+        "prompt": "Add a step",
+        "protocol_text": "def run(protocol): pass",
+        "regenerate": False,
+        "update_type": "other",
+        "update_details": "add step",
+        "fake": True,
+        "fake_key": "streaming_3s",
+    }
+    result = client.post_update_protocol_stream(body)
+    assert result.status_code == 200
+    assert "text/event-stream" in result.headers.get("content-type", "")
+    assert any("delta" in e for e in result.events), "expected at least one delta event"
+    assert result.events[-1].get("done") is True, "last event must be {done: true}"
+
+
+@pytest.mark.live
+def test_create_protocol_stream_fake(client: Client) -> None:
+    """createProtocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
+    body = {
+        "prompt": "Make a PCR protocol",
+        "regenerate": False,
+        "scientific_application_type": "pcr",
+        "description": "PCR",
+        "robots": "opentrons_flex",
+        "mounts": ["left"],
+        "flexGripper": False,
+        "modules": [],
+        "labware": [],
+        "liquids": [],
+        "steps": [],
+        "fake": True,
+        "fake_key": "streaming_3s",
+    }
+    result = client.post_create_protocol_stream(body)
+    assert result.status_code == 200
+    assert "text/event-stream" in result.headers.get("content-type", "")
+    assert any("delta" in e for e in result.events), "expected at least one delta event"
+    assert result.events[-1].get("done") is True, "last event must be {done: true}"
+
+
+@pytest.mark.live
+def test_completion_stream_fake(client: Client) -> None:
+    """completion/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
+    body = {
+        "message": "Hello",
+        "history": None,
+        "fake": True,
+        "fake_key": "streaming_3s",
+        "chat_options": "update",
+        "protocol_format": "Python",
+    }
+    result = client.post_completion_stream(body)
+    assert result.status_code == 200
+    assert "text/event-stream" in result.headers.get("content-type", "")
+    assert any("delta" in e for e in result.events), "expected at least one delta event"
+    assert result.events[-1].get("done") is True, "last event must be {done: true}"
+
+
+@pytest.mark.live
+def test_completion_multipart_stream_fake(client: Client) -> None:
+    """completion-multipart/stream with fake, streaming_3s, and 2 files returns 200 and SSE events (~3s)."""
+    file_uploads = [
+        ("msg0_first.txt", b"First file content for live test."),
+        ("msg0_second.txt", b"Second file content for live test."),
+    ]
+    result = client.post_completion_multipart_stream(
+        message="Hello",
+        history="[]",
+        fake=True,
+        fake_key="streaming_3s",
+        protocol_format="python",
+        file_uploads=file_uploads,
+    )
+    assert result.status_code == 200
+    assert "text/event-stream" in result.headers.get("content-type", "")
+    assert any("delta" in e for e in result.events), "expected at least one delta event"
+    assert result.events[-1].get("done") is True, "last event must be {done: true}"
+
+
+@pytest.mark.live
+def test_update_protocol_stream_bad_auth(client: Client) -> None:
+    """updateProtocol/stream with bad auth returns 401."""
+    body = {
+        "prompt": "Add a step",
+        "protocol_text": "def run(protocol): pass",
+        "regenerate": False,
+        "update_type": "other",
+        "update_details": "add step",
+        "fake": True,
+    }
+    result = client.post_update_protocol_stream(body, bad_auth=True)
+    assert result.status_code == 401

@@ -39,11 +39,17 @@ class Settings(BaseSettings):
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
     service_version: str = "hardcoded_default_from_settings"
-    allowed_origins: str = "*"
+    # Comma-separated origins for CORS. With allow_credentials=True, "*" is invalid; use explicit origins.
+    # Default allows local Vite dev server so the UI at http://localhost:5173 can call the API.
+    allowed_origins: str = "http://localhost:5173,http://localhost:3000"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
     google_sheet_worksheet: str = "Sheet1"
+
+    # Request timeout for streaming and long-running handlers (seconds).
+    # Production proxies (CloudFront, ALB) must be configured to allow at least this duration.
+    request_timeout_seconds: int = 300
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments

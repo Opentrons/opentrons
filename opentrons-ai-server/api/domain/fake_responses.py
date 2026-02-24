@@ -59,8 +59,38 @@ NoMarkdown = FakeResponse(key="no markdown", chat_response=no_markdown, descript
 EmptyReply = FakeResponse(key="empty reply", chat_response=empty_reply, description="Reply field has empty string ''")
 PDSerialDilution = FakeResponse(key="pd serial diliution", chat_response=pd_serial_dilution, description="PD v8 Protocol")
 
+# Used only for streaming endpoints; triggers 15s streaming fake. Non-streaming use returns this placeholder.
+streaming_15s_response: ChatResponse = ChatResponse(
+    reply="Use a streaming endpoint with fake_key=streaming_15s for the 15s streaming test.",
+    fake=True,
+)
+Streaming15s = FakeResponse(
+    key="streaming_15s",
+    chat_response=streaming_15s_response,
+    description="15s streaming fake for UI testing (streaming endpoints only)",
+)
 
-fake_responses: List[FakeResponse] = [ReagentTransfer, ReagentTransferFlex, PCR, PCRFlex, NoMarkdown, EmptyReply, PDSerialDilution]
+streaming_3s_response: ChatResponse = ChatResponse(
+    reply="Use a streaming endpoint with fake_key=streaming_3s for the 3s live-test stream.",
+    fake=True,
+)
+Streaming3s = FakeResponse(
+    key="streaming_3s",
+    chat_response=streaming_3s_response,
+    description="3s streaming fake for live tests (streaming endpoints only)",
+)
+
+fake_responses: List[FakeResponse] = [
+    ReagentTransfer,
+    ReagentTransferFlex,
+    PCR,
+    PCRFlex,
+    NoMarkdown,
+    EmptyReply,
+    PDSerialDilution,
+    Streaming15s,
+    Streaming3s,
+]
 fake_keys: List[str] = [response.key.lower() for response in fake_responses]
 
 

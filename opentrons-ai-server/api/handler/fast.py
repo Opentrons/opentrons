@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import queue
 import time
 from typing import Annotated, Any, Awaitable, Callable, Dict, List, Literal, Optional, Union, cast
 
@@ -13,15 +14,15 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
 from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
-from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
+from api.handler.fake_streaming import handle_fake_response, make_fake_streaming_response
 from api.handler.utils_fast import (
     extract_message_index_from_filename,
     parse_tagged_content,
@@ -71,10 +72,22 @@ ALLOWED_HEADERS: List[str] = ["content-type", "authorization", "origin", "accept
 ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: List[str] = ["content-type"]
 ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 
-# Add CORS middleware
+# Headers for SSE streaming responses (keep connection open, no proxy buffering)
+SSE_HEADERS: Dict[str, str] = {
+    "Cache-Control": "no-cache",
+    "X-Accel-Buffering": "no",
+    "Connection": "keep-alive",
+}
+
+# Add CORS middleware. Parse comma-separated origins.
+# When allow_credentials=True, wildcard "*" is invalid per CORS spec; use explicit origins only.
+# If allowed_origins is empty after parsing, default to localhost dev origins (same as Settings).
+_cors_origins: List[str] = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
+if not _cors_origins:
+    _cors_origins = ["http://localhost:5173", "http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=_cors_origins,
     allow_credentials=ALLOWED_CREDENTIALS,
     allow_methods=ALLOWED_METHODS,
     allow_headers=ALLOWED_HEADERS,
@@ -91,14 +104,23 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
         try:
             return await asyncio.wait_for(call_next(request), timeout=self.timeout_s)
         except asyncio.TimeoutError:
-            return JSONResponse({"detail": "API Request timed out"}, status_code=504)
+            return JSONResponse(
+                {
+                    "detail": "The request took too long to complete and was cancelled.",
+                    "message": (
+                        "Your request timed out. The operation took longer than the allowed time. "
+                        "Please try again with a smaller or simpler request, or try again later."
+                    ),
+                    "error_type": "request_timeout",
+                    "timeout_seconds": self.timeout_s,
+                },
+                status_code=504,
+            )
 
 
-# Control the timeout message by timing out before cloudfront would
-# 2 seconds before the CloudFront timeout (180 seconds)
-# 12 second before the uvicorn timeout (190 seconds)
-# 22 seconds before the ALB timeout (200 seconds)
-app.add_middleware(TimeoutMiddleware, timeout_s=178)
+# Request timeout (e.g. 300s for 5-minute streaming). Set via settings.request_timeout_seconds.
+# Production: ensure CloudFront and ALB timeouts are at least this value.
+app.add_middleware(TimeoutMiddleware, timeout_s=settings.request_timeout_seconds)
 
 
 @app.middleware("http")
@@ -186,20 +208,6 @@ def _get_analytics_preference(request: Request) -> bool:
     return analytics_header == "true"
 
 
-def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optional[ChatResponse]:
-    """Handle fake responses with optional fake_key."""
-    if fake_key is not None:
-        fake_response: FakeResponse = get_fake_response(fake_key)
-        return ChatResponse(
-            reply=fake_response.chat_response.reply,
-            fake=fake_response.chat_response.fake,
-            protocol_content=fake_response.chat_response.protocol_content,
-        )
-
-    if fake:
-        return ChatResponse(reply="Default fake response", fake=True)
-
-    return None
 
 
 def _generate_llm_response_with_history(
@@ -370,7 +378,7 @@ async def create_chat_completion(
 
         _validate_request(body, "message")
 
-        fake_response = _handle_fake_response(body.fake, getattr(body, "fake_key", None))
+        fake_response = handle_fake_response(body.fake, getattr(body, "fake_key", None))
         if fake_response:
             return fake_response
 
@@ -407,6 +415,105 @@ async def create_chat_completion(
         logger.exception("Error processing chat completion")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+        ) from e
+
+
+async def _sse_stream_chat_completion(
+    user_id: str,
+    prompt: str,
+    history_with_attachments: List[Dict[str, Any]],
+    protocol_format: ProtocolFormat,
+    protocol_action: str,
+    current_msg_files: Optional[List[Dict[str, str]]],
+    enable_analytics: bool,
+) -> Any:
+    """Stream chat completion: PD create, Python create, or chat with attachments."""
+    if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+        converted = [{"role": m["role"], "content": m["content"]} for m in history_with_attachments]
+        stream_gen = _sse_stream_from_sync_generator(
+            enable_analytics,
+            claude.stream_create_pd,
+            user_id=user_id,
+            prompt=prompt,
+            history=converted,
+        )
+    elif protocol_action == "create":
+        converted = [{"role": m["role"], "content": m["content"]} for m in history_with_attachments]
+        stream_gen = _sse_stream_from_sync_generator(
+            enable_analytics,
+            claude.stream_create,
+            user_id=user_id,
+            prompt=prompt,
+            history=converted,
+        )
+    else:
+        stream_gen = _sse_stream_from_sync_generator(
+            enable_analytics,
+            claude.stream_process_chat_with_attachments,
+            user_id=user_id,
+            prompt=prompt,
+            history_with_attachments=history_with_attachments,
+            current_msg_files=current_msg_files or [],
+        )
+    async for event in stream_gen:
+        yield event
+
+
+@app.post(
+    "/api/chat/completion/stream",
+    summary="Create Chat Completion (streaming)",
+    description="Stream a chat completion from the LLM. Returns Server-Sent Events with delta chunks.",
+)
+async def create_chat_completion_stream(
+    body: ChatRequest, user: Annotated[User, Security(auth.verify)], request: Request
+) -> StreamingResponse:
+    """Stream a chat completion. Yields SSE events: data: {\"delta\": \"...\"} and data: {\"done\": true}."""
+    logger.info("POST /api/chat/completion/stream", extra={"body": body.model_dump(), "user": user})
+    try:
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+        _validate_request(body, "message")
+        fake_stream = make_fake_streaming_response(body.fake, getattr(body, "fake_key", None), "completion/stream", SSE_HEADERS)
+        if fake_stream is not None:
+            return fake_stream
+        if "openai" in settings.model.lower():
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Streaming is not supported for the current model.",
+            )
+        protocol_format = getattr(body, "protocol_format", ProtocolFormat.PYTHON)
+        protocol_action = _determine_protocol_action(body)
+        history_with_attachments = []
+        if body.history:
+            for msg in body.history:
+                if isinstance(msg, dict):
+                    history_with_attachments.append(
+                        {
+                            "role": msg.get("role", ""),
+                            "content": msg.get("content", ""),
+                            "attachments": msg.get("attachments", []),
+                        }
+                    )
+        return StreamingResponse(
+            _sse_stream_chat_completion(
+                user_id=str(user.sub),
+                prompt=body.message,
+                history_with_attachments=history_with_attachments,
+                protocol_format=protocol_format,
+                protocol_action=protocol_action,
+                current_msg_files=[],
+                enable_analytics=enable_analytics,
+            ),
+            media_type="text/event-stream",
+            headers=SSE_HEADERS,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Error processing chat completion stream")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=InternalServerError(exception_object=e).model_dump(),
         ) from e
 
 
@@ -478,6 +585,71 @@ async def create_chat_completion_multipart(
         logger.exception("Error processing multipart chat completion")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+        ) from e
+
+
+@app.post(
+    "/api/chat/completion-multipart/stream",
+    summary="Create Chat Completion with File Uploads (streaming)",
+    description="Stream a chat completion with multipart file uploads. Returns SSE with delta chunks.",
+)
+async def create_chat_completion_multipart_stream(
+    request: Request,
+    user: Annotated[User, Security(auth.verify)],
+    message: str = Form(..., description="The chat message"),
+    history: str = Form(default="[]", description="Chat history as JSON string with attachments"),
+    fake: bool = Form(default=False, description="Whether this is a fake request for testing"),
+    fake_key: Optional[str] = Form(default=None, description="Fake key, e.g. 'streaming_15s' for 15s streaming test"),
+    protocol_format: str = Form(default="python", description="Protocol format"),
+    files: List[UploadFile] = File(default=[]),  # noqa: B008
+) -> StreamingResponse:
+    """Stream chat completion with multipart files. Yields SSE: data: {\"delta\": \"...\"} and data: {\"done\": true}."""
+    logger.info(
+        "POST /api/chat/completion-multipart/stream",
+        extra={"message": message, "num_files": len(files), "user": user},
+    )
+    try:
+        enable_analytics = _get_analytics_preference(request) if request else False
+        setup_weave_analytics(enable_analytics)
+        fake_stream = make_fake_streaming_response(fake, fake_key, "completion-multipart/stream", SSE_HEADERS)
+        if fake_stream is not None:
+            return fake_stream
+        if "openai" in settings.model.lower():
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Streaming is not supported for the current model.",
+            )
+        try:
+            parsed_history_with_attachments = json.loads(history) if history else []
+        except json.JSONDecodeError:
+            parsed_history_with_attachments = []
+        files_by_message, _ = await _process_multipart_files_with_mapping(files)
+        history_with_attachments = reconstruct_conversation_history(parsed_history_with_attachments, files_by_message)
+        current_msg_idx = len(history_with_attachments)
+        current_msg_files = files_by_message.get(current_msg_idx, [])
+        protocol_format_enum = ProtocolFormat.PYTHON
+        if protocol_format.lower() == "protocol_designer":
+            protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
+        return StreamingResponse(
+            _sse_stream_chat_completion(
+                user_id=str(user.sub),
+                prompt=message,
+                history_with_attachments=history_with_attachments,
+                protocol_format=protocol_format_enum,
+                protocol_action="update",
+                current_msg_files=current_msg_files,
+                enable_analytics=enable_analytics,
+            ),
+            media_type="text/event-stream",
+            headers=SSE_HEADERS,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Error processing multipart chat completion stream")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=InternalServerError(exception_object=e).model_dump(),
         ) from e
 
 
@@ -557,10 +729,10 @@ async def create_protocol(
         # Special handling for fake_key with delay in createProtocol
         if body.fake_key is not None:
             await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
-            fake_response = _handle_fake_response(True, body.fake_key)
+            fake_response = handle_fake_response(True, body.fake_key)
             return fake_response if fake_response else ChatResponse(reply="Fake response", fake=True)
 
-        fake_response = _handle_fake_response(bool(body.fake))
+        fake_response = handle_fake_response(bool(body.fake))
         if fake_response:
             return fake_response
 
@@ -601,6 +773,56 @@ async def create_protocol(
         ) from e
 
 
+async def _sse_stream_create_protocol(user_id: str, prompt: str, protocol_format: ProtocolFormat, enable_analytics: bool) -> Any:
+    """Stream create-protocol: PD or Python based on protocol_format."""
+    if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+        stream_gen = _sse_stream_from_sync_generator(
+            enable_analytics, claude.stream_create_pd, user_id=user_id, prompt=prompt, history=None
+        )
+    else:
+        stream_gen = _sse_stream_from_sync_generator(enable_analytics, claude.stream_create, user_id=user_id, prompt=prompt, history=None)
+    async for event in stream_gen:
+        yield event
+
+
+@app.post(
+    "/api/chat/createProtocol/stream",
+    summary="Creates protocol (streaming)",
+    description="Stream a new protocol from the LLM. Returns Server-Sent Events with delta chunks.",
+)
+async def create_protocol_stream(body: CreateProtocol, user: Annotated[User, Security(auth.verify)], request: Request) -> StreamingResponse:
+    """Stream a new protocol using the LLM. Yields SSE events: data: {\"delta\": \"...\"} and data: {\"done\": true}."""
+    logger.info("POST /api/chat/createProtocol/stream", extra={"body": body.model_dump(), "user": user})
+    try:
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+        _validate_request(body, "prompt")
+        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "createProtocol/stream", SSE_HEADERS)
+        if fake_stream is not None:
+            return fake_stream
+        if "openai" in settings.model.lower():
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Streaming is not supported for the current model.",
+            )
+        return StreamingResponse(
+            _sse_stream_create_protocol(
+                user_id=str(user.sub),
+                prompt=body.prompt,
+                protocol_format=body.protocol_format,
+                enable_analytics=enable_analytics,
+            ),
+            media_type="text/event-stream",
+            headers=SSE_HEADERS,
+        )
+    except Exception as e:
+        logger.exception("Error processing create protocol stream")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=InternalServerError(exception_object=e).model_dump(),
+        ) from e
+
+
 @app.post(
     "/api/chat/updateProtocol",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -624,7 +846,7 @@ async def update_protocol(
 
         _validate_request(body, "protocol_text")
 
-        fake_response = _handle_fake_response(bool(body.fake))
+        fake_response = handle_fake_response(bool(body.fake))
         if fake_response:
             return fake_response
 
@@ -644,6 +866,85 @@ async def update_protocol(
 
     except Exception as e:
         logger.exception("Error processing protocol update")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+        ) from e
+
+
+def _sse_stream_from_sync_generator(
+    enable_analytics: bool,
+    sync_stream_fn: Callable[..., Any],
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
+    """
+    Run a sync generator (from sync_stream_fn(*args, **kwargs)) in a thread and yield SSE.
+    Use for any Claude streaming method that yields str chunks.
+    """
+    chunk_queue: queue.Queue[str | None] = queue.Queue()
+
+    def run_stream() -> None:
+        with get_tracing_context(enable_analytics):
+            for chunk in sync_stream_fn(*args, **kwargs):
+                chunk_queue.put(chunk)
+        chunk_queue.put(None)
+
+    async def _async_gen() -> Any:
+        loop = asyncio.get_event_loop()
+        # run_in_executor returns a Future; do not pass it to create_task (which expects a coroutine).
+        stream_done_future = loop.run_in_executor(None, run_stream)
+        first_chunk = True
+        while True:
+            chunk = await loop.run_in_executor(None, chunk_queue.get)
+            if chunk is None:
+                break
+            if first_chunk:
+                logger.info("SSE stream started, first chunk sent")
+                first_chunk = False
+            yield f"data: {json.dumps({'delta': chunk})}\n\n"
+        await stream_done_future
+        logger.info("SSE stream completed")
+        yield 'data: {"done": true}\n\n'
+
+    return _async_gen()
+
+
+async def _sse_stream_update_protocol(user_id: str, prompt: str, enable_analytics: bool) -> Any:
+    """Async generator that yields SSE events from the sync stream_update generator."""
+    async for event in _sse_stream_from_sync_generator(
+        enable_analytics, claude.stream_update, user_id=user_id, prompt=prompt, history=None
+    ):
+        yield event
+
+
+@app.post(
+    "/api/chat/updateProtocol/stream",
+    summary="Updates protocol (streaming)",
+    description="Stream an updated protocol from the LLM. Returns Server-Sent Events with delta chunks.",
+)
+async def update_protocol_stream(body: UpdateProtocol, user: Annotated[User, Security(auth.verify)], request: Request) -> StreamingResponse:
+    """
+    Stream an updated protocol using the LLM. Yields SSE events: data: {"delta": "..."} and data: {"done": true}.
+    """
+    logger.info("POST /api/chat/updateProtocol/stream", extra={"body": body.model_dump(), "user": user})
+    try:
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+        _validate_request(body, "protocol_text")
+        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "updateProtocol/stream", SSE_HEADERS)
+        if fake_stream is not None:
+            return fake_stream
+        return StreamingResponse(
+            _sse_stream_update_protocol(
+                user_id=str(user.sub),
+                prompt=body.prompt,
+                enable_analytics=enable_analytics,
+            ),
+            media_type="text/event-stream",
+            headers=SSE_HEADERS,
+        )
+    except Exception as e:
+        logger.exception("Error processing protocol update stream")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
         ) from e

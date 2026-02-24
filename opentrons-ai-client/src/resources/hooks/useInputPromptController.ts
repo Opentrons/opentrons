@@ -7,6 +7,7 @@ import {
   chatDataAtom,
   chatHistoryAtom,
   createProtocolChatAtom,
+  featureFlagsAtom,
   regenerateProtocolAtom,
   tokenAtom,
   updateProtocolChatAtom,
@@ -18,6 +19,11 @@ import {
   buildChatHistory,
   buildRequestConfig,
   createUserInput,
+  getCompletionMultipartStreamEndpoint,
+  getCompletionStreamEndpoint,
+  getCreateStreamEndpoint,
+  getUpdateStreamEndpoint,
+  streamChatApi,
 } from '/ai-client/resources/utils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
@@ -61,11 +67,14 @@ export function useInputPromptController(
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
   const [token] = useAtom(tokenAtom)
+  const [featureFlags] = useAtom(featureFlagsAtom)
 
   const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
     useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
   const [requestId, setRequestId] = useState<string>(uuidv4())
+  const [isStreaming, setIsStreaming] = useState<boolean>(false)
+  const [streamingError, setStreamingError] = useState<string | null>(null)
 
   const { data, isLoading, callApi, error } = useApiCall()
 
@@ -215,6 +224,193 @@ export function useInputPromptController(
       }
     }
 
+    // Update-protocol (no files): call update stream endpoint
+    const isUpdateStream =
+      isUpdateOrCreateRequest && !isNewProtocol && validatedFiles.length === 0
+    if (isUpdateStream) {
+      handleSuccessfulSubmission(userInput, currentProtocolFormat)
+      setChatData(prev => [
+        ...prev,
+        {
+          requestId: newRequestId,
+          role: 'assistant',
+          reply: '',
+        },
+      ])
+      setStreamingError(null)
+      setIsStreaming(true)
+      const streamUrl = getUpdateStreamEndpoint()
+      const headers: Record<string, string> = {
+        ...(config.headers as Record<string, string>),
+        'x-enable-analytics': (featureFlags.enableAnalytics ?? true).toString(),
+      }
+      await streamChatApi(
+        streamUrl,
+        {
+          method: config.method ?? 'POST',
+          headers,
+          body: JSON.stringify(config.data),
+        },
+        {
+          onDelta: accumulated => {
+            setChatData(prev =>
+              prev.map(c =>
+                c.requestId === newRequestId && c.role === 'assistant'
+                  ? { ...c, reply: accumulated }
+                  : c
+              )
+            )
+          },
+          onDone: reply => {
+            setChatHistory(prev => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: reply,
+                protocol_content: undefined,
+              },
+            ])
+            setChatData(prev =>
+              prev.map(c =>
+                c.requestId === newRequestId && c.role === 'assistant'
+                  ? { ...c, reply }
+                  : c
+              )
+            )
+            trackEvent({
+              name: ANALYTICS.GENERATED_PROTOCOL,
+              properties: {
+                createOrUpdate: 'update',
+                protocol: reply,
+              },
+            })
+            setSubmitted(false)
+            setIsStreaming(false)
+          },
+          onError: err => {
+            setStreamingError(err.message)
+            setIsStreaming(false)
+            setSubmitted(false)
+            setChatData(prev =>
+              prev.filter(
+                c => !(c.requestId === newRequestId && c.role === 'assistant')
+              )
+            )
+          },
+        }
+      )
+      return
+    }
+
+    const runStreamingFlow = async (
+      streamUrl: string,
+      body: string | FormData
+    ): Promise<void> => {
+      handleSuccessfulSubmission(userInput, currentProtocolFormat)
+      setChatData(prev => [
+        ...prev,
+        {
+          requestId: newRequestId,
+          role: 'assistant',
+          reply: '',
+        },
+      ])
+      setStreamingError(null)
+      setIsStreaming(true)
+      const headers: Record<string, string> = {
+        ...(config.headers as Record<string, string>),
+        'x-enable-analytics': (featureFlags.enableAnalytics ?? true).toString(),
+      }
+      if (typeof body === 'string') {
+        headers['Content-Type'] = 'application/json'
+      }
+      await streamChatApi(
+        streamUrl,
+        {
+          method: config.method ?? 'POST',
+          headers,
+          body,
+        },
+        {
+          onDelta: accumulated => {
+            setChatData(prev =>
+              prev.map(c =>
+                c.requestId === newRequestId && c.role === 'assistant'
+                  ? { ...c, reply: accumulated }
+                  : c
+              )
+            )
+          },
+          onDone: reply => {
+            setChatHistory(prev => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: reply,
+                protocol_content: undefined,
+              },
+            ])
+            setChatData(prev =>
+              prev.map(c =>
+                c.requestId === newRequestId && c.role === 'assistant'
+                  ? { ...c, reply }
+                  : c
+              )
+            )
+            trackEvent({
+              name: ANALYTICS.GENERATED_PROTOCOL,
+              properties: {
+                createOrUpdate: isNewProtocol ? 'create' : 'update',
+                protocol: reply,
+              },
+            })
+            setSubmitted(false)
+            setIsStreaming(false)
+          },
+          onError: err => {
+            setStreamingError(err.message)
+            setIsStreaming(false)
+            setSubmitted(false)
+            setChatData(prev =>
+              prev.filter(
+                c => !(c.requestId === newRequestId && c.role === 'assistant')
+              )
+            )
+          },
+        }
+      )
+    }
+
+    const isCreateStream =
+      isUpdateOrCreateRequest && isNewProtocol && validatedFiles.length === 0
+    if (isCreateStream) {
+      await runStreamingFlow(
+        getCreateStreamEndpoint(),
+        JSON.stringify(config.data)
+      )
+      return
+    }
+
+    const isCompletionStream =
+      !isUpdateOrCreateRequest && validatedFiles.length === 0
+    if (isCompletionStream) {
+      await runStreamingFlow(
+        getCompletionStreamEndpoint(),
+        JSON.stringify(config.data)
+      )
+      return
+    }
+
+    const isCompletionMultipartStream =
+      !isUpdateOrCreateRequest && validatedFiles.length > 0
+    if (isCompletionMultipartStream) {
+      await runStreamingFlow(
+        getCompletionMultipartStreamEndpoint(),
+        config.data as FormData
+      )
+      return
+    }
+
     await callApi(config)
     handleSuccessfulSubmission(userInput, currentProtocolFormat)
   }
@@ -271,19 +467,14 @@ export function useInputPromptController(
 
   const errorMessage: string | null =
     fileError ??
-    (typeof error === 'string'
-      ? error
-      : error instanceof Error
-        ? error.message
-        : error != null
-          ? String(error)
-          : null)
+    streamingError ??
+    (error == null ? null : typeof error === 'string' ? error : String(error))
 
   return {
     submitChat: () => {
       void handleClick(false, false)
     },
-    isLoading,
+    isLoading: isLoading || isStreaming,
     errorMessage,
     attachedFiles,
     handleFileSelect: (files: FileList | null) => {

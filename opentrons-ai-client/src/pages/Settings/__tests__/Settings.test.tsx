@@ -45,7 +45,8 @@ describe('Settings', () => {
     screen.getByText(
       'Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data'
     )
-    screen.getByRole('switch')
+    const switches = screen.getAllByRole('switch')
+    expect(switches.length).toBeGreaterThanOrEqual(1)
   })
 
   it('should navigate to landing page when back button is clicked', () => {
@@ -74,6 +75,7 @@ describe('Settings', () => {
     screen.getByText('Feature Flags')
     screen.getByText('Protocol Designer Protocol Generation')
     screen.getByText('Enable Protocol Designer protocol generation features')
-    screen.getAllByRole('switch') // Should have 2 switches now
+    const switches = screen.getAllByRole('switch')
+    expect(switches.length).toBeGreaterThanOrEqual(2)
   })
 })

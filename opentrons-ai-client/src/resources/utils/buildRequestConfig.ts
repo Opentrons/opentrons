@@ -1,13 +1,25 @@
 import {
+  LOCAL_COMPLETION_MULTIPART_STREAM_END_POINT,
+  LOCAL_COMPLETION_STREAM_END_POINT,
   LOCAL_CREATE_PROTOCOL_END_POINT,
+  LOCAL_CREATE_PROTOCOL_STREAM_END_POINT,
   LOCAL_END_POINT,
   LOCAL_UPDATE_PROTOCOL_END_POINT,
+  LOCAL_UPDATE_PROTOCOL_STREAM_END_POINT,
+  PROD_COMPLETION_MULTIPART_STREAM_END_POINT,
+  PROD_COMPLETION_STREAM_END_POINT,
   PROD_CREATE_PROTOCOL_END_POINT,
+  PROD_CREATE_PROTOCOL_STREAM_END_POINT,
   PROD_END_POINT,
   PROD_UPDATE_PROTOCOL_END_POINT,
+  PROD_UPDATE_PROTOCOL_STREAM_END_POINT,
+  STAGING_COMPLETION_MULTIPART_STREAM_END_POINT,
+  STAGING_COMPLETION_STREAM_END_POINT,
   STAGING_CREATE_PROTOCOL_END_POINT,
+  STAGING_CREATE_PROTOCOL_STREAM_END_POINT,
   STAGING_END_POINT,
   STAGING_UPDATE_PROTOCOL_END_POINT,
+  STAGING_UPDATE_PROTOCOL_STREAM_END_POINT,
 } from '/ai-client/resources/constants'
 
 import { buildMultipartFormData } from './buildMultipartFormData'
@@ -43,6 +55,50 @@ const getUpdateEndpoint = (): string => {
       return LOCAL_UPDATE_PROTOCOL_END_POINT
     default:
       return STAGING_UPDATE_PROTOCOL_END_POINT
+  }
+}
+
+export const getUpdateStreamEndpoint = (): string => {
+  switch (_NODE_ENV_) {
+    case 'production':
+      return PROD_UPDATE_PROTOCOL_STREAM_END_POINT
+    case 'development':
+      return LOCAL_UPDATE_PROTOCOL_STREAM_END_POINT
+    default:
+      return STAGING_UPDATE_PROTOCOL_STREAM_END_POINT
+  }
+}
+
+export const getCreateStreamEndpoint = (): string => {
+  switch (_NODE_ENV_) {
+    case 'production':
+      return PROD_CREATE_PROTOCOL_STREAM_END_POINT
+    case 'development':
+      return LOCAL_CREATE_PROTOCOL_STREAM_END_POINT
+    default:
+      return STAGING_CREATE_PROTOCOL_STREAM_END_POINT
+  }
+}
+
+export const getCompletionStreamEndpoint = (): string => {
+  switch (_NODE_ENV_) {
+    case 'production':
+      return PROD_COMPLETION_STREAM_END_POINT
+    case 'development':
+      return LOCAL_COMPLETION_STREAM_END_POINT
+    default:
+      return STAGING_COMPLETION_STREAM_END_POINT
+  }
+}
+
+export const getCompletionMultipartStreamEndpoint = (): string => {
+  switch (_NODE_ENV_) {
+    case 'production':
+      return PROD_COMPLETION_MULTIPART_STREAM_END_POINT
+    case 'development':
+      return LOCAL_COMPLETION_MULTIPART_STREAM_END_POINT
+    default:
+      return STAGING_COMPLETION_MULTIPART_STREAM_END_POINT
   }
 }
 
