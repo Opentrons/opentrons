@@ -20,7 +20,7 @@ function parseStreamError(status: number, bodyText: string): string {
         : typeof json.message === 'string'
           ? json.message
           : null
-    if (detail) {
+    if (detail != null) {
       if (
         json.error_type === 'request_timeout' &&
         json.timeout_seconds != null
@@ -35,7 +35,7 @@ function parseStreamError(status: number, bodyText: string): string {
   if (bodyText.length > 200) {
     return `HTTP ${status}: ${bodyText.slice(0, 200)}…`
   }
-  return `HTTP ${status}: ${bodyText || 'No response body'}`
+  return `HTTP ${status}: ${bodyText.length > 0 ? bodyText : 'No response body'}`
 }
 
 /**

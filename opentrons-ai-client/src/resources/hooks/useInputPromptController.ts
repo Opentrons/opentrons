@@ -76,7 +76,7 @@ export function useInputPromptController(
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
   const [streamingError, setStreamingError] = useState<string | null>(null)
 
-  const { data, isLoading, callApi, error } = useApiCall()
+  const { data, isLoading, error } = useApiCall()
 
   const pdProtocolContent: null | ProtocolFile = useMemo(() => {
     if (
@@ -115,6 +115,7 @@ export function useInputPromptController(
       void handleClick(true)
       setSendAutoFilledPrompt(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendAutoFilledPrompt])
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export function useInputPromptController(
         regenerate: false,
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regenerateProtocol])
 
   const prepareValidatedFiles = (
@@ -414,24 +416,28 @@ export function useInputPromptController(
     // This path is not reachable through the current UI: update/create pages have no file
     // attachment UI, so isUpdateOrCreateRequest with validatedFiles > 0 cannot be triggered.
     // If that ever changes, a streaming endpoint should be added rather than falling back here.
-    console.error(
-      'Unexpected non-streaming path reached',
-      { isUpdateOrCreateRequest, validatedFilesLength: validatedFiles.length }
-    )
+    console.error('Unexpected non-streaming path reached', {
+      isUpdateOrCreateRequest,
+      validatedFilesLength: validatedFiles.length,
+    })
   }
 
   // Process API response
   useEffect(() => {
     if (submitted && !isLoading) {
-      if (error) {
+      if (error != null) {
         setSubmitted(false)
       } else if (data != null) {
-        const { role, reply, protocol_content } = data as ChatData
+        const {
+          role,
+          reply,
+          protocol_content: protocolContent,
+        } = data as ChatData
         const assistantResponse: ChatData = {
           requestId,
           role,
           reply,
-          protocol_content,
+          protocol_content: protocolContent,
         }
 
         setChatHistory(prev => [
@@ -440,7 +446,7 @@ export function useInputPromptController(
             role: 'assistant',
             content: reply,
             protocol_content: JSON.stringify(
-              protocol_content
+              protocolContent
             ) as unknown as string,
           },
         ])
