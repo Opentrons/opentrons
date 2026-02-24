@@ -31,7 +31,7 @@
   "flexStacker/openLatch": "Open",
   "flexStacker/prepareShuttle": "Prepare",
   "flexStacker/retrieve": "Retrieve",
-  "flexStacker/setStoredLabware": "Store",
+  "flexStacker/setStoredLabware": "Configure",
   "flexStacker/store": "Store",
   "getNextTip": "Get next tip",
   "getTipPresence": "Get tip",
