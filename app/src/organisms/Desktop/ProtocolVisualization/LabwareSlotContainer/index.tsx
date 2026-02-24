@@ -127,7 +127,7 @@ export function LabwareSlotContainer(
   const selectedWellName =
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
-      : wellViewWellName ?? activeWellName
+      : (wellViewWellName ?? activeWellName)
   const shouldShowWellContainer =
     selectedWellName != null &&
     !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
