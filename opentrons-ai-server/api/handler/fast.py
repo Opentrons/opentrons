@@ -395,7 +395,7 @@ def _format_response(
 )
 async def create_chat_completion(
     body: ChatRequest, user: Annotated[User, Security(auth.verify)], request: Request
-) -> Union[ChatResponse, ErrorResponse, JSONResponse]:  # noqa: B008
+) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate a chat completion response using LLM.
 
@@ -443,18 +443,8 @@ async def create_chat_completion(
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
-    except anthropic.BadRequestError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rejected chat completion request", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.RateLimitError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rate limit exceeded", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.APIError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.error("Anthropic API error in chat completion", extra={"error_type": type(e).__name__, "error": message}, exc_info=True)
-        return _anthropic_error_to_json_response(e)
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing chat completion")
         raise HTTPException(
@@ -476,7 +466,7 @@ async def create_chat_completion_multipart(
     fake: bool = Form(default=False, description="Whether this is a fake request for testing"),
     protocol_format: str = Form(default="python", description="Protocol format"),
     files: List[UploadFile] = File(default=[]),  # noqa: B008
-) -> Union[ChatResponse, ErrorResponse, JSONResponse]:
+) -> Union[ChatResponse, ErrorResponse]:
     """
     Generate a chat completion response using multipart/form-data for file uploads.
     This is more efficient than base64 encoding for binary files like PDFs.
@@ -526,20 +516,8 @@ async def create_chat_completion_multipart(
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 
-    except anthropic.BadRequestError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rejected multipart chat completion request", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.RateLimitError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rate limit exceeded", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.APIError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.error(
-            "Anthropic API error in multipart chat completion", extra={"error_type": type(e).__name__, "error": message}, exc_info=True
-        )
-        return _anthropic_error_to_json_response(e)
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing multipart chat completion")
         raise HTTPException(
@@ -605,7 +583,7 @@ def _determine_protocol_action(body: ChatRequest) -> str:
 )
 async def create_protocol(
     body: CreateProtocol, user: Annotated[User, Security(auth.verify)], request: Request
-) -> Union[ChatResponse, ErrorResponse, JSONResponse]:  # noqa: B008
+) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate an updated protocol using LLM.
 
@@ -651,18 +629,8 @@ async def create_protocol(
 
         return _format_response(response, protocol_format, bool(body.fake))
 
-    except anthropic.BadRequestError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rejected createProtocol request", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.RateLimitError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rate limit exceeded", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.APIError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.error("Anthropic API error in createProtocol", extra={"error_type": type(e).__name__, "error": message}, exc_info=True)
-        return _anthropic_error_to_json_response(e)
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.error(
             f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
@@ -687,7 +655,7 @@ async def create_protocol(
 )
 async def update_protocol(
     body: UpdateProtocol, user: Annotated[User, Security(auth.verify)], request: Request
-) -> Union[ChatResponse, ErrorResponse, JSONResponse]:  # noqa: B008
+) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate an updated protocol using LLM.
 
@@ -720,18 +688,8 @@ async def update_protocol(
 
         return ChatResponse(reply=response, fake=bool(body.fake))
 
-    except anthropic.BadRequestError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rejected updateProtocol request", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.RateLimitError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.warning("Anthropic rate limit exceeded", extra={"error": message})
-        return _anthropic_error_to_json_response(e)
-    except anthropic.APIError as e:
-        message = _extract_anthropic_error_message(e)
-        logger.error("Anthropic API error in updateProtocol", extra={"error_type": type(e).__name__, "error": message}, exc_info=True)
-        return _anthropic_error_to_json_response(e)
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing protocol update")
         raise HTTPException(
@@ -837,16 +795,18 @@ async def handle_options(request: Request) -> JSONResponse:
     return JSONResponse(response.model_dump(by_alias=True))
 
 
-# Catch Anthropic SDK errors that escape route handlers before they hit FastAPI's
-# default http_exception_handler, which would fail trying to json.dumps the error object.
+# Catch all Anthropic SDK errors at the app level so they are always serializable
+# and never reach FastAPI's default http_exception_handler as a raw Python object.
+# BadRequestError and RateLimitError are expected operational errors (warning);
+# everything else is unexpected (error + traceback).
 @app.exception_handler(anthropic.APIError)
 async def anthropic_error_handler(request: Request, exc: anthropic.APIError) -> JSONResponse:
     message = _extract_anthropic_error_message(exc)
-    logger.error(
-        "Anthropic API error",
-        extra={"error_type": type(exc).__name__, "message": message},
-        exc_info=True,
-    )
+    error_type = type(exc).__name__
+    if isinstance(exc, (anthropic.BadRequestError, anthropic.RateLimitError)):
+        logger.warning("Anthropic API error", extra={"error_type": error_type, "message": message})
+    else:
+        logger.error("Anthropic API error", extra={"error_type": error_type, "message": message}, exc_info=True)
     return _anthropic_error_to_json_response(exc)
 
 
