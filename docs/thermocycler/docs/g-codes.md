@@ -6,7 +6,7 @@ This section describes and lists the G-code commands and error codes used by the
 
 ## Understanding G-codes
 
-G-codes are standard machine-readable instructions used to control hardware directly. While most users rely on our [Python API](../../python-api/) or [Protocol Designer](../../protocol-designer/), Opentrons provides G-codes to 3rd-party developers and integrators. They allow you to operate independently of our standard software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
+G-codes are standard machine-readable instructions used to control hardware directly. While most users control modules using protocols developed with our [Python API](../../python-api/) or [Protocol Designer](../../protocol-designer/), Opentrons also provides G-codes to 3rd-party developers and integrators. These codes allow you to operate hardware independently of our software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
 
 ### Command syntax
 
