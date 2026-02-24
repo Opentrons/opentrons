@@ -106,6 +106,7 @@ def command_annotations() -> List[CommandAnnotation]:
     return [
         CommandAnnotation(
             id="annotation-id",
+            source="userCommand",
             name="My command annotation",
             description="This is a command annotation",
             params={},

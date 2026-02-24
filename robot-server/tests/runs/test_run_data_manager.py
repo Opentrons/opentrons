@@ -167,6 +167,7 @@ def command_annotations() -> List[pe_types.CommandAnnotation]:
     return [
         pe_types.CommandAnnotation(
             id="annotation-id",
+            source="userCommand",
             name="My command annotation",
             description="This is a command annotation",
             params={},
