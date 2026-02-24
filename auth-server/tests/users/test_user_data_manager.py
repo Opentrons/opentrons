@@ -214,7 +214,7 @@ def test_delete_user_success(
 def test_delete_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(mock_store.remove("ghost")).then_raise(
+    decoy.when(mock_store.remove("ghost")).then_raise(  # type: ignore[func-returns-value]
         ValueError("User 'ghost' not found")
     )
     with pytest.raises(UserNotFoundError):

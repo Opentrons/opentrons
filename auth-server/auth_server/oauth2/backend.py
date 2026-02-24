@@ -167,7 +167,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         user = self.__user_store.get(username)
-        if user is not None and password_hash.verify(password, user.hashed_password):
+        if user is not None and password_hash.verify(
+            password, str(user.hashed_password)
+        ):
             request.user = user  # type: ignore[attr-defined]
             return True
         return False

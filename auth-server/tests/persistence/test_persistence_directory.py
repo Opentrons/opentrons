@@ -4,13 +4,17 @@ from pathlib import Path
 
 import sqlalchemy
 
-from auth_server.persistence.file_and_directory_names import DB_FILE, LATEST_VERSION_DIRECTORY
+from auth_server.persistence.file_and_directory_names import (
+    DB_FILE,
+    LATEST_VERSION_DIRECTORY,
+)
 from auth_server.persistence.persistence_directory import (
     PersistenceResetter,
     make_migration_orchestrator,
     prepare_active_subdirectory,
     prepare_root,
 )
+
 
 async def test_prepare_root_creates_temp_dir_when_none() -> None:
     """When no path is given, prepare_root should create a fresh temporary directory."""
@@ -102,7 +106,9 @@ def test_make_migration_orchestrator(tmp_path: Path) -> None:
 # -- prepare_active_subdirectory --
 
 
-async def test_prepare_active_subdirectory_creates_db_with_users_table(tmp_path: Path) -> None:
+async def test_prepare_active_subdirectory_creates_db_with_users_table(
+    tmp_path: Path,
+) -> None:
     """prepare_active_subdirectory should run the v1 migration and create the DB."""
     subdirectory = await prepare_active_subdirectory(tmp_path)
 
@@ -119,7 +125,12 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(tmp_path:
 
     columns = {col["name"] for col in inspector.get_columns("users")}
     assert columns == {
-        "id", "username", "hashed_password", "full_name", "account_type", "scopes",
+        "id",
+        "username",
+        "hashed_password",
+        "full_name",
+        "account_type",
+        "scopes",
     }
 
     engine.dispose()

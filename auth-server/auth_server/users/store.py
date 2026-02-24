@@ -88,7 +88,9 @@ class UserStore:
         Raises ``ValueError`` if the user does not exist.
         """
         with self._session() as session:
-            user = session.query(User).filter(User.username == username).first()
+            user: User | None = (
+                session.query(User).filter(User.username == username).first()
+            )
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             updates: dict[str, object] = {
