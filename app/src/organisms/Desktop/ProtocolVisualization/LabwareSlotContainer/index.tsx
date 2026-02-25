@@ -114,16 +114,9 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
-  // For in-place commands, pipette position comes from robot state (step-generation);
-  const IN_PLACE_COMMANDS = [
-    'aspirateInPlace',
-    'blowoutInPlace',
-    'dispenseInPlace',
-    'airGapInPlace',
-  ]
-  const isInPlace = IN_PLACE_COMMANDS.includes(commandType)
+  // Use pipette position from robot state when available
   const activePipetteState =
-    isInPlace && 'pipetteId' in params && typeof params.pipetteId === 'string'
+    'pipetteId' in params && typeof params.pipetteId === 'string'
       ? pipettes[params.pipetteId]
       : null
   const pipetteWellLocation =
