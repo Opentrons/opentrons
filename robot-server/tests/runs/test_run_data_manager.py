@@ -27,6 +27,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import (
     BooleanParameter,
     CommandAnnotation,
@@ -164,7 +165,7 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
+def legacy_command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
     """Get a LegacyCommandAnnotation list."""
     return [
         pe_types.SecondOrderCommandAnnotationLegacy(
@@ -753,7 +754,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.LegacyCommandAnnotation],
+    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -771,7 +772,7 @@ async def test_update_current(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=command_annotations,
+            command_annotations=legacy_command_annotations,
             command_preconditions=command_preconditions,
         )
     )
@@ -902,7 +903,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[pe_types.LegacyCommandAnnotation],
+    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -923,7 +924,7 @@ async def test_create_archives_existing(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=command_annotations,
+            command_annotations=legacy_command_annotations,
             command_preconditions=command_preconditions,
         )
     )
@@ -1338,6 +1339,54 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
         subject.get_all_commands_as_preserialized_list("current-run-id", True)
+
+
+def test_get_command_annotations_slice_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+) -> None:
+    """It should get the specified slice of command annotations."""
+    annotations_slice = CommandAnnotationsSlice(
+        command_annotations=[
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
+                params={},
+            )
+        ],
+        cursor=2,
+        total_length=200,
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_run_orchestrator_store.get_command_annotations_slice(cursor=1, length=10)
+    ).then_return(annotations_slice)
+    result = subject.get_command_annotations_slice(
+        run_id="current-run-id", cursor=1, length=10
+    )
+    assert result == annotations_slice
+
+
+def test_get_command_annotation_from_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+) -> None:
+    """Should get the command annotation by id from run store."""
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
+        params={},
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
+    decoy.when(
+        mock_run_orchestrator_store.get_command_annotation("annotation-id")
+    ).then_return(cmd_annotation)
+    result = subject.get_command_annotation("run-id", "annotation-id")
+    assert result == cmd_annotation
 
 
 async def test_get_current_run_labware_definition(

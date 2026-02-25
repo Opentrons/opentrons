@@ -21,7 +21,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.read users.write
+        scope: &default_scope auth_settings.write runs.write users.read users.write
       save:
         json:
           initial_access_token: access_token
@@ -39,7 +39,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.read users.write
+        scope: *default_scope
 
   - name: Introspect the refresh token to confirm that it's active
     request:
@@ -53,7 +53,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.read users.write
+        scope: *default_scope
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -70,7 +70,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.read users.write
+        scope: *default_scope
       save:
         json:
           refreshed_access_token: access_token
@@ -88,7 +88,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.read users.write
+        scope: *default_scope
 
   - name: Introspect the new refresh token to confirm that it's active
     request:
@@ -102,7 +102,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.read users.write
+        scope: *default_scope
 
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
@@ -121,7 +121,7 @@ stages:
         grant_type: password
         username: test_user
         password: test_user_password
-        scope: runs.read runs.write users.write # test_user is not authorized for users.write.
+        scope: runs.write users.write # test_user is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -145,7 +145,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write
+        scope: runs.write
       save:
         json:
           refresh_token: refresh_token
@@ -158,7 +158,7 @@ stages:
         client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
-        scope: runs.read runs.write users.write # test_user is not authorized for users.write.
+        scope: runs.write users.write # test_user is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -183,7 +183,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: runs.read runs.write # test_admin would also be authorized for users.write.
+        scope: runs.write # test_admin would also be authorized for users.write.
     response:
       status_code: 200
       json:
@@ -191,7 +191,25 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write
+        scope: runs.write
+
+  - name: Send a password authorization request with default scope
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: auth_settings.write runs.write users.read users.write
       save:
         json:
           refresh_token: refresh_token
@@ -204,7 +222,7 @@ stages:
         client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
-        scope: runs.read # The request above set this to "runs.read runs.write". This narrows it to just "runs.read".
+        scope: runs.write # The request above had "runs.write users.write". This narrows it to just "runs.write".
     response:
       status_code: 200
       json:
@@ -212,7 +230,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read
+        scope: runs.write
 
 ---
 test_name: Wrong username and password credentials should be rejected

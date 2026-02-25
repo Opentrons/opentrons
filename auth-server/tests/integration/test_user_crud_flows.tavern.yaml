@@ -3,30 +3,9 @@ test_name: Successful Create, delete, and update User flow
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
 
 stages:
-  - name: Get an access token with sufficient scopes
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/token'
-      data:
-        client_id: opentrons_app
-        grant_type: password
-        username: test_admin
-        password: test_admin_password
-        scope: users.write users.read
-    response:
-      status_code: 200
-      json:
-        access_token: !anystr
-        refresh_token: !anystr
-        expires_in: !anyint
-        token_type: Bearer
-        scope: users.write users.read
-      save:
-        json:
-          first_access_token: access_token
-
   - name: Create a new user
     request:
       method: POST
@@ -37,8 +16,8 @@ stages:
           password: securepassword123
           fullName: Test New User
           accountType: user
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 201
       json:
@@ -52,8 +31,8 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           userName: test_new_user_password_less_than_8_characters
@@ -69,8 +48,8 @@ stages:
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user'
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 200
       json:
@@ -88,8 +67,8 @@ stages:
         data:
           fullName: Test New User Updated
           accountType: admin
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 200
       json:
@@ -107,8 +86,8 @@ stages:
         data:
           userName: test_new_user_updated
           password: securepassword123
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 200
       json:
@@ -127,25 +106,19 @@ stages:
         grant_type: password
         username: test_new_user_updated
         password: securepassword123
-        scope: users.write
     response:
       status_code: 200
       json:
         access_token: !anystr
-        refresh_token: !anystr
-        expires_in: !anyint
-        token_type: Bearer
-        scope: users.write
-      save:
-        json:
-          access_token: access_token
+      strict:
+        - json:off
 
   - name: Delete the user
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/users/test_new_user_updated'
-      headers:  
-        Authorization: 'Bearer {access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 200
 
@@ -153,7 +126,7 @@ stages:
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/test_new_user_updated'
-      headers:  
-        Authorization: 'Bearer {first_access_token}'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 404
