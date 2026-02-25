@@ -64,6 +64,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         set_sql_engine(app.state, engine)
 
         user_store = UserStore(sql_engine=engine)
+        user_service = UserDataManager(user_store=user_store)
+        user_service.seed_initial_users()
+        install_oath2_sql_engine(app.state, engine)
+
         settings_store = SettingsStore()
         install_settings_store(app.state, settings_store)
 
@@ -75,10 +79,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         install_authorization_checker(app.state, authorization_checker)
 
-        user_service = UserDataManager(user_store=user_store)
-        user_service.seed_initial_users()
-
-        install_oath2_sql_engine(app.state, engine)
         systemd_utils.notify_up()
         yield
 

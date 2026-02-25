@@ -247,6 +247,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if issuance is not None:
             user = self.__user_store.get(issuance.username)
+            # Set `.user` per the oauthlib docs.
             request.user = user  # type: ignore[attr-defined]
             return True
         else:
