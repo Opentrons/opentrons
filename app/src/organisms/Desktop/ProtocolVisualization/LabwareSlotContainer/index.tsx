@@ -123,14 +123,16 @@ export function LabwareSlotContainer(
   ]
   const isInPlace = IN_PLACE_COMMANDS.includes(commandType)
   const activePipetteState =
-    isInPlace &&
-    'pipetteId' in params &&
-    typeof params.pipetteId === 'string'
+    isInPlace && 'pipetteId' in params && typeof params.pipetteId === 'string'
       ? pipettes[params.pipetteId]
       : null
   const pipetteWellLocation =
     activePipetteState != null && 'wellLocation' in activePipetteState
-      ? (activePipetteState as typeof activePipetteState & { wellLocation?: unknown }).wellLocation
+      ? (
+          activePipetteState as typeof activePipetteState & {
+            wellLocation?: unknown
+          }
+        ).wellLocation
       : undefined
   const wellViewParams =
     activePipetteState != null &&
