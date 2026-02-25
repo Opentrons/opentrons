@@ -15,15 +15,14 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+from server_utils.persistence.persistence_directory import (
+    PersistenceResetter,
+)
 
 from .database import create_sql_engine
 from .file_and_directory_names import DB_FILE
 from .images_directory import ImagesResetter, prepare_images_directory
-from .persistence_directory import (
-    PersistenceResetter,
-    prepare_active_subdirectory,
-    prepare_root,
-)
+from .manage_persistence_directory import prepare_active_subdirectory, prepare_root
 from robot_server.errors.error_responses import ErrorDetails
 
 _log = logging.getLogger(__name__)
