@@ -197,8 +197,10 @@
   "tubes_must_be_secured": "All tubes must be securely connected to to maintain an airtight seal.",
   "use_dry_unused_tips": "Use dry, unused tips for best results",
   "vacuum_did_not_reach_pressure": "Vacuum did not reach target pressure in the allotted time. Check that tubing is securely connected and free of kinks.",
+  "vacuum_failure": "Vacuum failure",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
+  "waste_carboy_full": "Waste carboy full",
   "waste_carboy_must_be_emptied": "Waste carboy must be disconnected and emptied.",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
 }
