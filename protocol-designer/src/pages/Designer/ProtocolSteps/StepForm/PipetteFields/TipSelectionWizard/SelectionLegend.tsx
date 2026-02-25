@@ -1,5 +1,6 @@
 import {
   COLORS,
+  LABWARE,
   StyledText,
   TipStatus,
   WellStatus,
@@ -45,7 +46,7 @@ export function SelectionLegend({
               <WellStatus
                 type={type as WellType}
                 size={size}
-                isLabware={true}
+                parentType={LABWARE}
                 wellMap={labwareWellMap}
               />
             </div>

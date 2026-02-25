@@ -1,19 +1,22 @@
 import { COLORS } from '../../../../helix-design-system'
+import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
+import type { ParentType } from '../types'
 
 interface EmptyWellProps {
   wellMap: LabwareWellMap
-  isLabware: boolean
+  parentType: ParentType
   size?: string
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap, isLabware } = props
+  const { size, wellMap, parentType } = props
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
+  const isLabware = parentType === LABWARE
   const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
   const circularDimension = 20
   const viewBoxWidth = isCircular ? circularDimension : width

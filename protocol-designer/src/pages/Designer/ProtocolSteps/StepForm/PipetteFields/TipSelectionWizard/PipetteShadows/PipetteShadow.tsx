@@ -112,7 +112,9 @@ export function PipetteShadow(props: {
       setLabelHeight(labelRef.current.offsetHeight)
     }
   }, [hoveredWell, labelText])
-
+  if (isHoveredWellSelected && !isTiprack) {
+    return <></>
+  }
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
     selectedLabwareId,
     labwareState,
@@ -167,20 +169,16 @@ export function PipetteShadow(props: {
   })
   return (
     <g className={styles.shadow_overlay}>
-      {(!isHoveredWellSelected && !isTiprack) || isError ? (
-        <>
-          <PipetteLabel
-            ref={labelRef}
-            text={labelText}
-            isZoomed
-            x={slotX + xOffset + labelOffsetX}
-            y={slotY + yOffset + labelOffsetY}
-            placement={labelPlacement}
-            isError={isError}
-          />
-          <ShadowComponent {...shadowProps} />
-        </>
-      ) : null}
+      <PipetteLabel
+        ref={labelRef}
+        text={labelText}
+        isZoomed
+        x={slotX + xOffset + labelOffsetX}
+        y={slotY + yOffset + labelOffsetY}
+        placement={labelPlacement}
+        isError={isError}
+      />
+      <ShadowComponent {...shadowProps} />
     </g>
   )
 }

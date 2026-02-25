@@ -1,6 +1,6 @@
 import { memo } from 'react'
 
-import { WellStatus } from '../..'
+import { PIPETTE, WellStatus } from '../..'
 
 import type { MemoExoticComponent } from 'react'
 import type { LabwareWell, PipetteV2Specs } from '@opentrons/shared-data'
@@ -18,6 +18,8 @@ export function StrokedNozzlesComponent(
   const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpecs
   const { backLeftCorner } = pipetteBoundingBoxOffsets
   const nozzleDiameter = 20
+  const positioningConstant = 5
+  const nozzleSize = '8'
   const wells = Object.fromEntries(
     Object.entries(nozzleMap).map(([wellName, coordinates]) => {
       const [xOffset, yOffset] = coordinates
@@ -39,18 +41,18 @@ export function StrokedNozzlesComponent(
         return (
           <svg
             key={key}
-            x={wells[key].x - 5}
-            y={wells[key].y - 5}
+            x={wells[key].x - positioningConstant}
+            y={wells[key].y - positioningConstant}
             onClick={() => {
               handleClickNozzle(key)
             }}
           >
             <WellStatus
               type={wellType}
-              size="8"
+              size={nozzleSize}
               wellMap={wells}
               showStroke
-              isLabware={false}
+              parentType={PIPETTE}
             />
           </svg>
         )

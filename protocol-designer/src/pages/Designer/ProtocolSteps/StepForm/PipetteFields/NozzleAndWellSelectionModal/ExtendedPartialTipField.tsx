@@ -8,9 +8,10 @@ import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { partialNozzleMap, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, getWellGroupLength, partialNozzleMap } from './utils'
+import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
   LabwareDefinition,
@@ -116,10 +117,10 @@ export function ExtendedPartialTipField(
     }
     let positionType: string = 'wells'
     if (isColumn) {
-      positionType = 'columns'
+      positionType = PLURAL_COLUMNS
     }
     if (isRow) {
-      positionType = 'rows'
+      positionType = PLURAL_ROWS
     }
 
     let nozzleSelection = `${nozzleText} nozzles`

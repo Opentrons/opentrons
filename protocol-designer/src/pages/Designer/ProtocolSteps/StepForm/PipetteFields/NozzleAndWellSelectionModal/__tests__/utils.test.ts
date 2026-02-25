@@ -237,7 +237,6 @@ describe('getAvailableNozzleConfigurations', () => {
 })
 
 describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
-  const channels = 3
   const mockTiprack = {
     stack: ['tiprack2', '3'],
     id: 'tiprack2',
@@ -256,18 +255,35 @@ describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
       allWellsWithState[well] = UNSELECTED
     }
   }
-  const selectedWells = [
+  const threeChannels = 3
+  const selectedWells3Grouping = [
     ['A1', 'B1', 'C1'],
     ['F1', 'G1', 'H1'],
   ]
   it('marks wells D1 and E1 as inaccessible when two 3 well chunks are selected', () => {
     expect(
       getInaccessibleWellsForPartialNozzleRowMap(
-        selectedWells,
+        selectedWells3Grouping,
         wellDefMap,
         allWellsWithState,
-        channels
+        threeChannels
       )
     ).toStrictEqual(['D1', 'E1'])
+  })
+
+  it('marks wells A1 and H1 as inaccessible and [D1, E1] as accessible when two 2 well chunks are selected', () => {
+    const twoChannels = 2
+    const selectedWells2Grouping = [
+      ['B1', 'C1'],
+      ['F1', 'G1'],
+    ]
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells2Grouping,
+        wellDefMap,
+        allWellsWithState,
+        twoChannels
+      )
+    ).toStrictEqual(['A1', 'H1'])
   })
 })

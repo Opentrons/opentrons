@@ -32,12 +32,11 @@ import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP } from './constants'
+import { INACCESSIBLE_PARTIAL_TIP, partialNozzleMap } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
   getInaccessibleWellsForPartialNozzleRowMap,
-  partialNozzleMap,
 } from './utils'
 
 import type { WellMouseEvent, WellType } from '@opentrons/components'

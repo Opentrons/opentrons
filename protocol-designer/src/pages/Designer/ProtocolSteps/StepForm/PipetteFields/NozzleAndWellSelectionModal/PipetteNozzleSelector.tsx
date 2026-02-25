@@ -12,12 +12,12 @@ import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { partialNozzleMap } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
-  partialNozzleMap,
 } from './utils'
 
 import type { TFunction } from 'i18next'
@@ -46,8 +46,9 @@ export function PipetteNozzleSelector(
 
   const nozzleConfiguration = propsForFields.nozzles
     .value as NozzleConfigurationStyle
-  const primaryNozzle = (propsForFields.primaryNozzle?.value ??
-    A1_NOZZLE) as PrimaryNozzleConfigurationStyle
+  const primaryNozzle =
+    (propsForFields.primaryNozzle?.value as PrimaryNozzleConfigurationStyle) ??
+    A1_NOZZLE
   const deckSetup = useSelector(getInitialDeckSetup)
   const is96Channel = channels === 96
 

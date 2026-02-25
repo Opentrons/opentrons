@@ -4,18 +4,18 @@ import { UNSELECTED } from './constants'
 import { EmptyWell } from './EmptyWell'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
-import type { WellType } from '../types'
+import type { ParentType, WellType } from '../types'
 
 interface WellStatusProps {
   wellMap: LabwareWellMap
   type: WellType
-  isLabware: boolean
+  parentType: ParentType
   showStroke?: boolean
   size?: string
 }
 
 export function WellStatus(props: WellStatusProps): JSX.Element {
-  const { type, size, wellMap, isLabware, showStroke = false } = props
+  const { type, size, wellMap, parentType, showStroke = false } = props
   switch (type) {
     case SELECTED:
       return (
@@ -27,7 +27,7 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
         />
       )
     case INACCESSIBLE:
-      return <EmptyWell wellMap={wellMap} size={size} isLabware={isLabware} />
+      return <EmptyWell wellMap={wellMap} size={size} parentType={parentType} />
     case UNSELECTED:
       return (
         <SelectedWell
