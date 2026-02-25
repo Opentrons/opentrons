@@ -104,6 +104,7 @@ async def upload_splash_image(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="Unable to determine file type",
         )
+    await file.seek(0)
 
     # Only accept PNG files
     accepted_file_types = ["image/png", "png"]
