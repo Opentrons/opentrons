@@ -68,7 +68,7 @@ export const UpdateBanner = ({
       case 'calibration':
         return getCalibrationMessage()
       case 'firmware':
-        return t('firmware_update_available')
+        return t('firmware_update_available_period')
       default:
         return t('setup_module_for_use')
     }

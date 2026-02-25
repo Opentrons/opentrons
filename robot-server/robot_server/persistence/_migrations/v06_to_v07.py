@@ -13,7 +13,8 @@ from pathlib import Path
 
 import sqlalchemy
 
-from .._folder_migrator import Migration
+from server_utils.persistence.folder_migrator import Migration
+
 from ..database import sql_engine_ctx, sqlite_rowid
 from ..file_and_directory_names import (
     DB_FILE,

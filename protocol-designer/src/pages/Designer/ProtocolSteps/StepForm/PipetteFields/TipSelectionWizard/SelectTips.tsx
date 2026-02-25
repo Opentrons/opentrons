@@ -31,6 +31,7 @@ import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
+import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
@@ -138,6 +139,7 @@ export function SelectTips(
     INACCESSIBLE_COLLISION,
     INACCESSIBLE_INCOMPLETE,
     INACCESSIBLE_TOO_MANY_PICKUPS,
+    INACCESSIBLE_PARTIAL_TIP,
   ]
 
   const hoveredWellsInaccessibilityStatus =

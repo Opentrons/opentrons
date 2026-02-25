@@ -62,6 +62,10 @@
   gap: var(--spacing-4);
 }
 
+.well_legend_item {
+  transform: rotate(90deg);
+}
+
 .shadow_overlay {
   pointer-events: none;
 }

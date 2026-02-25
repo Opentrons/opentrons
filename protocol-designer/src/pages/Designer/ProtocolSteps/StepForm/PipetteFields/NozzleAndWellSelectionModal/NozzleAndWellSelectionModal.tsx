@@ -80,6 +80,7 @@ export function NozzleAndWellSelectionModal(
       showModal(false)
     }
   }
+
   const nozzleAndWellSelectionBaseModalProps = {
     robotType,
     propsForFields,
