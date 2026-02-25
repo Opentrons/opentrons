@@ -7,30 +7,32 @@ export interface StreamChatCallbacks {
 const SSE_ACCEPT = 'text/event-stream'
 const MAX_ERROR_TEXT_LENGTH = 200
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 function parseStreamError(status: number, bodyText: string): string {
   try {
-    const json = JSON.parse(bodyText) as {
+    const {
+      detail,
+      message,
+      errorType,
+      timeoutSeconds,
+    } = JSON.parse(bodyText) as {
       detail?: string
       message?: string
-      error_type?: string
-      timeout_seconds?: number
+      errorType?: string
+      timeoutSeconds?: number
     }
-    const detail =
-      typeof json.detail === 'string'
-        ? json.detail
-        : typeof json.message === 'string'
-          ? json.message
+    const errorDetail =
+      typeof detail === 'string'
+        ? detail
+        : typeof message === 'string'
+          ? message
           : null
-    if (detail != null) {
-      if (
-        json.error_type === 'request_timeout' &&
-        json.timeout_seconds != null
-      ) {
-        return `${detail} (${json.timeout_seconds}s timeout).`
+    if (errorDetail != null) {
+      if (errorType === 'request_timeout' && timeoutSeconds != null) {
+        return `${errorDetail} (${timeoutSeconds}s timeout).`
       }
-      return detail
+      return errorDetail
     }
   } catch {
     // ignore

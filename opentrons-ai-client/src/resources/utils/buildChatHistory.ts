@@ -28,10 +28,9 @@ export const buildChatHistory = (
     // Handle Protocol Designer content if needed
     if (
       protocolFormat === 'Protocol Designer' &&
-      msg.protocol_content != null
+      msg.protocolContent != null
     ) {
-      // Use helper to parse the protocol content into a plain object
-      const rawPdJson = parseProtocolContent(msg.protocol_content)
+      const rawPdJson = parseProtocolContent(msg.protocolContent)
 
       // Extract all properties except labwareDefinitions using destructuring
       const { labwareDefinitions, ...pdWithoutLabwareDefs } = rawPdJson

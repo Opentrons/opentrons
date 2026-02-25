@@ -43,10 +43,10 @@ export function Landing(): JSX.Element | null {
     // Set a special marker to indicate direct chat access
     setUpdateProtocolChatAtom({
       prompt: '',
-      protocol_text: '',
+      protocolText: '',
       regenerate: false,
-      update_type: 'other',
-      update_details: 'direct_chat_access', // Special marker
+      updateType: 'other',
+      updateDetails: 'direct_chat_access',
       fake: false,
     })
     navigate('/chat')

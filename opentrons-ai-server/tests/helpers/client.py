@@ -105,7 +105,7 @@ class Client:
         """Call the /chat/feedback endpoint and return the response."""
         request: dict[str, Any] = {"message": message, "fake": fake}
         if message != "":
-            request = FeedbackRequest(feedbackText=message, fake=fake).model_dump()
+            request = FeedbackRequest(feedback_text=message, fake=fake).model_dump(by_alias=True)
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
         return self.httpx.post("/chat/feedback", headers=headers, json=request)
 

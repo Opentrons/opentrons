@@ -38,7 +38,7 @@ export function Chat(): JSX.Element | null {
   const [updateProtocolChat] = useAtom(updateProtocolChatAtom)
   const [createProtocolChat] = useAtom(createProtocolChatAtom)
   const isDirectChatAccess =
-    updateProtocolChat.update_details === 'direct_chat_access'
+    updateProtocolChat.updateDetails === 'direct_chat_access'
 
   // Redirect to home page if there is no prompt (user has refreshed the page)
   // Exception: Allow direct chat access

@@ -27,6 +27,21 @@ import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { AxiosRequestConfig } from 'axios'
 
+type Env = 'production' | 'development' | 'staging'
+
+const getEnv = (): Env =>
+  _NODE_ENV_ === 'production'
+    ? 'production'
+    : _NODE_ENV_ === 'development'
+      ? 'development'
+      : 'staging'
+
+const pickEndpoint = (endpoints: {
+  production: string
+  development: string
+  staging: string
+}): string => endpoints[getEnv()]
+
 export function FeedbackModal(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const trackEvent = useTrackEvent()
@@ -43,18 +58,11 @@ export function FeedbackModal(): JSX.Element {
       'Content-Type': 'application/json',
     }
 
-    const getEndpoint = (): string => {
-      switch (_NODE_ENV_) {
-        case 'production':
-          return PROD_FEEDBACK_END_POINT
-        case 'development':
-          return LOCAL_FEEDBACK_END_POINT
-        default:
-          return STAGING_FEEDBACK_END_POINT
-      }
-    }
-
-    const url = getEndpoint()
+    const url = pickEndpoint({
+      production: PROD_FEEDBACK_END_POINT,
+      development: LOCAL_FEEDBACK_END_POINT,
+      staging: STAGING_FEEDBACK_END_POINT,
+    })
 
     const config = {
       url,

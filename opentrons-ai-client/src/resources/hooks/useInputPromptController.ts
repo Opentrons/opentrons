@@ -25,6 +25,7 @@ import {
   getUpdateStreamEndpoint,
   streamChatApi,
 } from '/ai-client/resources/utils'
+import type { HttpMethod } from '/ai-client/resources/utils/streamChatApi'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
   getPreFixText,
@@ -82,9 +83,9 @@ export function useInputPromptController(
     if (
       data != null &&
       typeof data === 'object' &&
-      'protocol_content' in data
+      'protocolContent' in data
     ) {
-      return (data as any).protocol_content as ProtocolFile
+      return (data as any).protocolContent as ProtocolFile
     }
     return null
   }, [data])
@@ -160,7 +161,7 @@ export function useInputPromptController(
       name: ANALYTICS.CHAT_SUBMITTED,
       properties: {
         chat: userPrompt,
-        protocol_format: protocolFormat,
+        protocolFormat: protocolFormat,
       },
     })
 
@@ -249,7 +250,7 @@ export function useInputPromptController(
       await streamChatApi(
         streamUrl,
         {
-          method: config.method ?? 'POST',
+          method: (config.method?.toUpperCase() ?? 'POST') as HttpMethod,
           headers,
           body: JSON.stringify(config.data),
         },
@@ -269,7 +270,7 @@ export function useInputPromptController(
               {
                 role: 'assistant',
                 content: reply,
-                protocol_content: undefined,
+                protocolContent: undefined,
               },
             ])
             setChatData(prev =>
@@ -329,7 +330,7 @@ export function useInputPromptController(
       await streamChatApi(
         streamUrl,
         {
-          method: config.method ?? 'POST',
+          method: (config.method?.toUpperCase() ?? 'POST') as HttpMethod,
           headers,
           body,
         },
@@ -349,7 +350,7 @@ export function useInputPromptController(
               {
                 role: 'assistant',
                 content: reply,
-                protocol_content: undefined,
+                protocolContent: undefined,
               },
             ])
             setChatData(prev =>
@@ -431,13 +432,13 @@ export function useInputPromptController(
         const {
           role,
           reply,
-          protocol_content: protocolContent,
+          protocolContent,
         } = data as ChatData
         const assistantResponse: ChatData = {
           requestId,
           role,
           reply,
-          protocol_content: protocolContent,
+          protocolContent,
         }
 
         setChatHistory(prev => [
@@ -445,7 +446,7 @@ export function useInputPromptController(
           {
             role: 'assistant',
             content: reply,
-            protocol_content: JSON.stringify(
+            protocolContent: JSON.stringify(
               protocolContent
             ) as unknown as string,
           },

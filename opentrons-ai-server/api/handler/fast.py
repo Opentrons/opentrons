@@ -40,6 +40,7 @@ from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
 from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
+from api.models.timeout_error import TimeoutError as TimeoutErrorResponse
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.services.file_processor import FileProcessor
@@ -104,18 +105,15 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
         try:
             return await asyncio.wait_for(call_next(request), timeout=self.timeout_s)
         except asyncio.TimeoutError:
-            return JSONResponse(
-                {
-                    "detail": "The request took too long to complete and was cancelled.",
-                    "message": (
-                        "Your request timed out. The operation took longer than the allowed time. "
-                        "Please try again with a smaller or simpler request, or try again later."
-                    ),
-                    "error_type": "request_timeout",
-                    "timeout_seconds": self.timeout_s,
-                },
-                status_code=504,
+            body = TimeoutErrorResponse(
+                detail="The request took too long to complete and was cancelled.",
+                message=(
+                    "Your request timed out. The operation took longer than the allowed time. "
+                    "Please try again with a smaller or simpler request, or try again later."
+                ),
+                timeout_seconds=self.timeout_s,
             )
+            return JSONResponse(body.model_dump(by_alias=True), status_code=504)
 
 
 # Request timeout (e.g. 300s for 5-minute streaming). Set via settings.request_timeout_seconds.
@@ -356,6 +354,7 @@ def _format_response(
 @app.post(
     "/api/chat/completion",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Create Chat Completion",
     description="Generate a chat response based on the provided prompt.",
 )
@@ -518,6 +517,7 @@ async def create_chat_completion_stream(
 @app.post(
     "/api/chat/completion-multipart",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Create Chat Completion with File Uploads",
     description="Generate a chat response with multipart file uploads (more efficient than base64).",
 )
@@ -704,6 +704,7 @@ def _determine_protocol_action(body: ChatRequest) -> str:
 @app.post(
     "/api/chat/create-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Creates protocol",
     description="Generate a chat response based on the provided prompt that will create a new protocol with the required changes.",
 )
@@ -824,6 +825,7 @@ async def create_protocol_stream(body: CreateProtocol, user: Annotated[User, Sec
 @app.post(
     "/api/chat/update-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Updates protocol",
     description="Generate a chat response based on the provided prompt that will update an existing protocol with the required changes.",
 )
@@ -993,6 +995,7 @@ async def redoc_html() -> HTMLResponse:
 @app.post(
     "/api/chat/feedback",
     response_model=Union[FeedbackResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Feedback",
     description="Send feedback to the team.",
 )
@@ -1003,7 +1006,7 @@ async def feedback(
     try:
         if body.fake:
             return FeedbackResponse(reply="Fake response", fake=bool(body.fake))
-        feedback_text = body.feedbackText
+        feedback_text = body.feedback_text
         logger.info("Feedback received", user_id=user.sub, feedback=feedback_text)
         background_tasks.add_task(google_sheets_client.append_feedback_to_sheet, user_id=str(user.sub), feedback=feedback_text)
         return FeedbackResponse(

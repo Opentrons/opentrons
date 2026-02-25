@@ -20,7 +20,7 @@ export const chatDataAtom = atom<ChatData[]>([])
 export const createProtocolChatAtom = atom<CreatePrompt>({
   prompt: '',
   regenerate: false,
-  scientific_application_type: '',
+  scientificApplicationType: '',
   description: '',
   robots: 'opentrons_flex',
   mounts: [],
@@ -28,7 +28,7 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   modules: [],
   labware: [],
   liquids: [],
-  runtime_parameters: '',
+  runtimeParameters: '',
   steps: [],
   fake: true,
 })
@@ -36,10 +36,10 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
 /** CreateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */
 export const updateProtocolChatAtom = atom<UpdatePrompt>({
   prompt: '',
-  protocol_text: '',
+  protocolText: '',
   regenerate: false,
-  update_type: 'adapt_python_protocol',
-  update_details: '',
+  updateType: 'adapt_python_protocol',
+  updateDetails: '',
   fake: false,
 })
 

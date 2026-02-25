@@ -105,7 +105,7 @@ export function CreateProtocol(): JSX.Element | null {
     setCreateProtocolChatAtom({
       prompt: '',
       regenerate: false,
-      scientific_application_type: '',
+      scientificApplicationType: '',
       description: '',
       robots: 'opentrons_flex',
       mounts: [],
@@ -118,10 +118,10 @@ export function CreateProtocol(): JSX.Element | null {
     })
     setUpdateProtocolChatAtom({
       prompt: '',
-      protocol_text: '',
+      protocolText: '',
       regenerate: false,
-      update_type: 'adapt_python_protocol',
-      update_details: '',
+      updateType: 'adapt_python_protocol',
+      updateDetails: '',
       fake: false,
     })
     setChatHistoryAtom([])

@@ -167,12 +167,11 @@ export const buildRequestConfig = (
         ? promptData
         : {
             message: watchUserPrompt,
-            history: completeHistory, // Send complete history with attachments
+            history: completeHistory,
             fake: false,
-            chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
-            pd_protocol_content: pdProtocolContent,
-            protocol_format: protocolFormat,
-            // No separate attachments parameter needed - they're in history now
+            chatOptions: isUpdateOrCreateRequest ? 'create' : 'update',
+            pdProtocolContent: pdProtocolContent,
+            protocolFormat: protocolFormat,
           },
     }
   }
