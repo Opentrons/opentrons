@@ -25,12 +25,8 @@ from typing import List
 import sqlalchemy
 
 from opentrons.protocol_engine import StateSummary
+from server_utils.persistence.folder_migrator import Migration
 
-from .._folder_migrator import Migration
-from ..database import (
-    sql_engine_ctx,
-    sqlite_rowid,
-)
 from ..file_and_directory_names import (
     DB_FILE,
     DECK_CONFIGURATION_FILE,
@@ -40,6 +36,10 @@ from ..pydantic import pydantic_to_json
 from ..tables import schema_02, schema_03
 from . import _up_to_v03_worker, up_to_v02
 from ._util import copy_if_exists, copy_rows_unmodified, copytree_if_exists
+from robot_server.persistence.database import (
+    sql_engine_ctx,
+    sqlite_rowid,
+)
 
 _log = getLogger(__name__)
 
