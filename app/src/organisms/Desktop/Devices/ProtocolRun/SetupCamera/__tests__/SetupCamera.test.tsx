@@ -146,7 +146,7 @@ describe('SetupCamera', () => {
 
     render(mockProps)
 
-    screen.getByText('Camera is required to run this protocol.')
+    screen.getByText('Camera is required to run this protocol')
     screen.getByText('Enable the camera to start the run.')
   })
 
@@ -210,7 +210,7 @@ describe('SetupCamera', () => {
   it('renders the image storage almost full notification if storage is almost full', () => {
     render(mockProps)
 
-    screen.getByText('Image storage almost full.')
+    screen.getByText('Image storage almost full')
     screen.getByText(
       'The run may fail if storage space is not freed up by clearing images from a previous run record.'
     )
