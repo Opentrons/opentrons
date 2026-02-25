@@ -7,6 +7,7 @@ watch:
 
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
+  - OT-2: '!include ot-2/mkdocs.yml'
   - Modules:
       - Modules home: modules/index.md
       - Flex Stacker: '!include stacker/mkdocs.yml'
@@ -17,7 +18,6 @@ nav:
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
-  - Opentrons OT-2: '!include ot-2/mkdocs.yml'
 
 plugins:
   - monorepo
