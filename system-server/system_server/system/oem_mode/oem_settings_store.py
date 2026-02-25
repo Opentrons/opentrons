@@ -63,7 +63,11 @@ class OEMSettingsStore:
         file_path.touch()
 
         try:
-            for key, val in dataclasses.asdict(settings).items():
+            # Sort for easier testing.
+            sorted_kvs = sorted(
+                dataclasses.asdict(settings).items(), key=lambda kv: kv[0]
+            )
+            for key, val in sorted_kvs:
                 name = f"{_VARIABLE_NAME_PREFIX}{key}"
                 value = str(val) if val is not None else ""
                 dotenv.set_key(file_path, name, value)
