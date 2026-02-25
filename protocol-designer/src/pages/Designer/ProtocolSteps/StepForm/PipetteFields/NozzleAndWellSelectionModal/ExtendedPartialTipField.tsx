@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { COLORS, ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { PARTIAL_NOZZLE_MAP, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
@@ -45,6 +45,8 @@ export function ExtendedPartialTipField(
     getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
+  const partialNozzleCount =
+    PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -97,7 +99,7 @@ export function ExtendedPartialTipField(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
     stepType: string,
-    channels: ActiveNozzleNumber
+    channels: number
   ): string {
     const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
     const isTransfer = stepType === 'transfer'
@@ -146,11 +148,7 @@ export function ExtendedPartialTipField(
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('pipette_nozzles_and_wells')}
         </StyledText>
-        <ListButton
-          type="noActive"
-          onClick={handleOpen}
-          testId="nozzle_and_well_modal"
-        >
+        <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
             {getNozzleWellText(
               primaryNozzle,

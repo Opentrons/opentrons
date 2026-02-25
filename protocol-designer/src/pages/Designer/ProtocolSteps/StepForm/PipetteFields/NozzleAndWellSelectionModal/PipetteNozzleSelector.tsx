@@ -8,16 +8,11 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import {
-  A1_NOZZLE,
-  ALL,
-  G1_NOZZLE,
-  PARTIAL_COLUMN,
-  PARTIAL_NOZZLE_MAP,
-} from '@opentrons/shared-data'
+import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { PARTIAL_NOZZLE_MAP } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
 import {

@@ -15,8 +15,7 @@ import {
 import {
   getDeckDefFromRobotType,
   getPositionFromSlotId,
-  PARTIAL_COLUMN,
-  PARTIAL_NOZZLE_MAP,
+  PARTIAL,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
@@ -30,8 +29,7 @@ import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP } from './constants'
-import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
+import { INACCESSIBLE_PARTIAL_TIP, PARTIAL_NOZZLE_MAP } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
@@ -67,7 +65,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const primaryNozzle = propsForFields.primaryNozzle
     .value as PrimaryNozzleConfigurationStyle
   const pipetteId = propsForFields.pipette.value as string
-  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
+  const isPartialNozzle = nozzleConfiguration === PARTIAL
 
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
@@ -92,7 +90,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
-  const allWells = labwareDef.ordering
+  const allWells = labwareDef.ordering.flat()
   const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
@@ -128,42 +126,34 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
 
-  useEffect(
-    () => {
-      setSelectedWells(getSelectedWells())
-      setHoveredWells(null)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stepType]
-  )
+  useEffect(() => {
+    setSelectedWells(getSelectedWells())
+    setHoveredWells(null)
+  }, [stepType])
 
   const flatSelectedWells = useMemo(() => selectedWells.flat(), [selectedWells])
+  const allWellsWithStatus = allWells.reduce<Record<string, number>>(
+    (acc, wellName) => {
+      const safe = robotState
+        ? getIsSafePipetteMovement({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: wellName,
+            primaryNozzle,
+            nozzleConfiguration,
+          })
+        : true
 
-  const allWellsWithStatus = useMemo(
-    () =>
-      getAllWellsSafetyStatus({
-        allWells,
-        robotState,
-        invariantContext,
-        pipetteId,
-        labwareId,
-        primaryNozzle,
-        nozzleConfiguration,
-      }),
-    [
-      allWells,
-      primaryNozzle,
-      nozzleConfiguration,
-      pipetteId,
-      labwareId,
-      robotState,
-      invariantContext,
-    ]
+      acc[wellName] = safe ? 0 : 1
+      return acc
+    },
+    {}
   )
-  const allWellsWithState = allWells
-    .flat()
-    .reduce<Record<string, WellType>>((acc, wellName) => {
+
+  const allWellsWithState = allWells.reduce<Record<string, WellType>>(
+    (acc, wellName) => {
       const accessible = allWellsWithStatus[wellName] === 0
 
       if (hoveredWells?.includes(wellName) && !accessible) {
@@ -179,22 +169,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         acc[wellName] = UNSELECTED
       }
       return acc
-    }, {})
-  const inaccessiblePartialWells = useMemo(
-    () => {
-      if (!isPartialNozzle || selectedWells.length === 0) return []
-
-      return getInaccessibleWellsForPartialNozzleRowMap(
-        selectedWells,
-        labwareDef.ordering,
-        allWellsWithState,
-        PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-      )
     },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering]
+    {}
   )
+  const inaccessiblePartialWells = useMemo(() => {
+    if (!isPartialNozzle || selectedWells.length === 0) return []
+
+    return getInaccessibleWellsForPartialNozzleRowMap(
+      selectedWells,
+      labwareDef.ordering,
+      allWellsWithState,
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    )
+  }, [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering])
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const slot = getSlotInLocationStack(labware.stack)
@@ -231,17 +218,26 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         channels
       )
     }
-    const allWellsWithStatus = getAllWellsSafetyStatus({
-      allWells,
-      robotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      primaryNozzle,
-      nozzleConfiguration,
+
+    const hasInaccessibleWell = wellsToToggle.some(well => {
+      const isSafe = robotState
+        ? getIsSafePipetteMovement({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: well,
+            primaryNozzle,
+            nozzleConfiguration,
+          })
+        : true
+
+      const isPartialBlocked = inaccessiblePartialWells.includes(well)
+
+      return !isSafe || isPartialBlocked
     })
 
-    if (allWellsWithStatus[wellName] === 1) {
+    if (hasInaccessibleWell) {
       return
     }
 
