@@ -4,14 +4,14 @@ from pathlib import Path
 
 from typing_extensions import Final
 
-from server_utils.folder_migrator import MigrationOrchestrator
-from server_utils.persistence_directory import (
+from server_utils.persistence.folder_migrator import MigrationOrchestrator
+from server_utils.persistence.persistence_directory import (
     PersistenceResetter,
 )
-from server_utils.persistence_directory import (
+from server_utils.persistence.persistence_directory import (
     prepare_active_subdirectory as server_utils_prepare_active_subdirectory,
 )
-from server_utils.persistence_directory import (
+from server_utils.persistence.persistence_directory import (
     prepare_root as _prepare_root,
 )
 
