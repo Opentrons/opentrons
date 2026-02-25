@@ -103,10 +103,10 @@ class _OEMSettingsReadModel(BaseSettings):
         # Prior versions of this server commingled OEM settings with server launch settings
         # like OT_SYSTEM_SERVER_persistence_directory. Ignore those if they turn up.
         "extra": "ignore",
+        # The write function serializes `foo=None` values as `foo=''`. Make sure those
+        # get round-tripped back to `foo=None` when we parse them instead of `foo=''`.
+        "env_ignore_empty": True,
     }
-
-    oem_mode_enabled: bool = False
-    oem_mode_splash_custom: str | None = None
 
     @classmethod
     @override
@@ -120,3 +120,8 @@ class _OEMSettingsReadModel(BaseSettings):
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Do not read values from environment variables; read only from the file."""
         return (dotenv_settings,)
+
+    # Note: These default values (used e.g. when the file doesn't exist)
+    # need to stay in sync with the defaults used by external shell scripts.
+    oem_mode_enabled: bool = False
+    oem_mode_splash_custom: str | None = None
