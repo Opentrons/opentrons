@@ -17,6 +17,8 @@ import {
   SINGLE,
 } from '@opentrons/shared-data'
 
+import { partialNozzleMap } from './constants'
+
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
@@ -26,14 +28,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
-export const partialNozzleMap: Record<PartialPrimaryNozzles, number> = {
-  G1: 2,
-  F1: 3,
-  E1: 4,
-  D1: 5,
-  C1: 6,
-  B1: 7,
-}
 function isPartialPrimaryNozzle(
   nozzle: string
 ): nozzle is PartialPrimaryNozzles {
@@ -166,12 +160,15 @@ export const getNozzleText = (
 }
 
 export const getEntireWellSelection = (
-  wellName: string,
+  wellName: string | null,
   wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
   channels: number
 ): string[] => {
+  if (wellName == null) {
+    return []
+  }
   if (nozzleConfiguration === SINGLE) return [wellName]
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)

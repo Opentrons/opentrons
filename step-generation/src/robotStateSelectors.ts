@@ -11,6 +11,7 @@ import {
   getLabwareDefURI,
   getTiprackVolume,
   orderWells,
+  ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -88,6 +89,14 @@ export function _getNextTip(args: {
   if (pipetteChannels === 96 && nozzles === ALL) {
     const allWellsHaveTip = orderedWells.every(hasCleanTip)
     return allWellsHaveTip ? orderedWells[0] : null
+  }
+  if (pipetteChannels === 96 && nozzles === ROW) {
+    const tiprackWells = tiprackDef.ordering
+    const tiprackOrderedByRows = tiprackWells[0].map((_, colIndex) =>
+      tiprackWells.map(row => row[colIndex])
+    )
+    const fullRow = tiprackOrderedByRows.find(row => row.every(hasCleanTip))
+    return fullRow != null ? fullRow[0] : null
   }
 
   console.assert(

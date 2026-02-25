@@ -12,12 +12,12 @@ import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { partialNozzleMap } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
-  partialNozzleMap,
 } from './utils'
 
 import type { TFunction } from 'i18next'

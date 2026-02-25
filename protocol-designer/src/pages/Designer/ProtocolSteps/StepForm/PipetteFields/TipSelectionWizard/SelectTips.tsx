@@ -22,6 +22,8 @@ import {
   ALL,
   COLUMN,
   getPositionFromSlotId,
+  PARTIAL,
+  ROW,
   SINGLE,
 } from '@opentrons/shared-data'
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
@@ -31,7 +33,11 @@ import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
-import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import {
+  INACCESSIBLE_PARTIAL_TIP,
+  partialNozzleMap,
+} from '../NozzleAndWellSelectionModal/constants'
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
@@ -44,8 +50,8 @@ import { PipetteShadow } from './PipetteShadows/PipetteShadow'
 import { SelectionLegend } from './SelectionLegend'
 import styles from './tipselectionwizard.module.css'
 import {
-  getAffectedWells,
   getAllWellsInColumn,
+  getAllWellsInRow,
   getViewboxFromSelectedLabware,
 } from './utils'
 
@@ -53,6 +59,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
@@ -121,12 +128,13 @@ export function SelectTips(
       ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
       : {}
 
-  const allWellsAffectedByHover = getAffectedWells({
-    wellName: hoveredWell,
-    labwareDef,
-    channels,
+  const allWellsAffectedByHover = getEntireWellSelection(
+    hoveredWell,
+    labwareDef.ordering,
     nozzles,
-  })
+    primaryNozzle,
+    channels
+  )
 
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
     well =>
@@ -194,6 +202,23 @@ export function SelectTips(
       } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, [wellName]])
       }
+    } else if (nozzles === PARTIAL) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
+        const totalTipSelection =
+          partialNozzleMap[primaryNozzle as PartialPrimaryNozzles] ?? 0
+        const allWellsinColumn = getAllWellsInColumn(wellName, labwareDef)
+        const indexOfWellInColumn = allWellsinColumn.findIndex(
+          well => well === wellName
+        )
+        const allWellsInPartialColumn = allWellsinColumn.slice(
+          indexOfWellInColumn,
+          indexOfWellInColumn + totalTipSelection
+        )
+        setSelectedTips(prevTips => [...prevTips, allWellsInPartialColumn])
+      }
     } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
@@ -203,6 +228,18 @@ export function SelectTips(
         setSelectedTips(prevTips => {
           const newTips = [...prevTips]
           newTips.push(allWellsInColumn)
+          return newTips
+        })
+      }
+    } else if (channels === 96 && nozzles === ROW) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
+        const allWellsInRow = getAllWellsInRow(wellName, labwareDef)
+        setSelectedTips(prevTips => {
+          const newTips = [...prevTips]
+          newTips.push(allWellsInRow)
           return newTips
         })
       }

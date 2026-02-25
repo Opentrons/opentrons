@@ -8,9 +8,10 @@ import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { partialNozzleMap } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, getWellGroupLength, partialNozzleMap } from './utils'
+import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
   LabwareDefinition,

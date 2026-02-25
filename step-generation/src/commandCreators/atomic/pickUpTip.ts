@@ -19,6 +19,7 @@ import {
 import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   CommandCreator,
@@ -28,6 +29,8 @@ import type {
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
   nozzles?: NozzleConfigurationStyle
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
+
   tipTrackingOption?: TipTrackingOption
 }
 
@@ -42,6 +45,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     wellName,
     tipTrackingOption = AUTOMATIC,
     nozzles,
+    primaryNozzle,
   } = args
   const errors: CommandCreatorError[] = []
 
@@ -56,13 +60,16 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     wellLocationOffset: { x: 0, y: 0 },
     wellTargetName: wellName,
   })
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels,
-  })
+  const confirmedPrimaryNozzle =
+    primaryNozzle ??
+    getDefaultPrimaryNozzle({
+      nozzles: nozzles ?? ALL,
+      channels,
+    })
+  const tipState = prevRobotState.tipState.tipracks[labwareId]
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
-    tipState: prevRobotState.tipState.tipracks[labwareId],
-    primaryNozzle,
+    tipState,
+    primaryNozzle: confirmedPrimaryNozzle,
     channels,
     nozzleConfiguration: nozzles ?? ALL,
     wellName,
