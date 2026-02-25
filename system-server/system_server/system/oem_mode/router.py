@@ -3,6 +3,7 @@
 import os
 import re
 from pathlib import Path
+from typing import Annotated
 
 import filetype  # type: ignore[import-untyped]
 from fastapi import (
@@ -15,11 +16,19 @@ from fastapi import (
     status,
 )
 
-from ...settings import SystemServerSettings, get_settings, save_settings
 from .models import EnableOEMMode
+from .oem_settings_store import (
+    OEMSettingsStore,
+    get_oem_settings_store,
+)
+from system_server.persistence import get_persistence_directory
 
-# regex to sanitize the filename
-FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-.]")
+# A regex to sanitize names of uploaded files.
+#
+# This is to avoid:
+# - Path traversal, e.g. if someone uploads a file named "../../foo.png".
+# - Shell injection and other parsing issues. See oem_settings_store.write_oem_settings().
+FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-_.]")
 
 
 oem_mode_router = APIRouter()
@@ -40,13 +49,14 @@ oem_mode_router = APIRouter()
 async def enable_oem_mode_endpoint(
     response: Response,
     enableRequest: EnableOEMMode,
-    settings: SystemServerSettings = Depends(get_settings),
+    oem_settings_store: Annotated[OEMSettingsStore, Depends(get_oem_settings_store)],
 ) -> Response:
     """Router for /system/oem_mode/enable endpoint."""
     enable = enableRequest.enable
+    oem_settings = oem_settings_store.read()
     try:
-        settings.oem_mode_enabled = enable
-        success = save_settings(settings)
+        oem_settings.oem_mode_enabled = enable
+        success = oem_settings_store.write(oem_settings)
         response.status_code = (
             status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
         )
@@ -73,12 +83,15 @@ async def enable_oem_mode_endpoint(
 )
 async def upload_splash_image(
     response: Response,
+    oem_settings_store: Annotated[OEMSettingsStore, Depends(get_oem_settings_store)],
+    persistence_directory: Annotated[Path, Depends(get_persistence_directory)],
     file: UploadFile = File(...),
-    settings: SystemServerSettings = Depends(get_settings),
 ) -> Response:
     """Router for /system/oem_mode/upload_splash endpoint."""
+    oem_settings = oem_settings_store.read()
+
     # Make sure oem mode is enabled before this request
-    if not settings.oem_mode_enabled:
+    if not oem_settings.oem_mode_enabled:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="OEM Mode needs to be enabled to upload splash image.",
@@ -112,29 +125,28 @@ async def upload_splash_image(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="File is larger than 5mb.",
             )
+    await file.seek(0)
 
     # TODO: Validate image dimensions
 
-    # return the pointer back to the starting point so that the next read starts from the starting point
-    await file.seek(0)
-
     try:
         # Remove the old image if exists
-        if settings.oem_mode_splash_custom:
-            os.unlink(settings.oem_mode_splash_custom)
+        if oem_settings.oem_mode_splash_custom:
+            os.unlink(oem_settings.oem_mode_splash_custom)
 
         # sanitize the filename
-        sanatized_filename = FILENAME_REGEX.sub("_", file.filename)
-        filename = f"{Path(sanatized_filename).stem}.{content_type}"
+        # todo(mm, 2026-02-24): Could we simplify this by just storing to some hard-coded path?
+        sanitized_filename = FILENAME_REGEX.sub("_", file.filename)
+        filename = f"{Path(sanitized_filename).stem}.{content_type}"
 
         # file is valid, save to final location
-        filepath = f"{settings.persistence_directory}/{filename}"
+        filepath = f"{persistence_directory}/{filename}"
         with open(filepath, "wb+") as f:
             f.write(file.file.read())
 
         # store the file location to settings and save the dotenv
-        settings.oem_mode_splash_custom = filepath
-        success = save_settings(settings)
+        oem_settings.oem_mode_splash_custom = filepath
+        success = oem_settings_store.write(oem_settings)
         response.status_code = (
             status.HTTP_201_CREATED if success else status.HTTP_400_BAD_REQUEST
         )
