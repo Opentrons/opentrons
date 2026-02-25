@@ -22,6 +22,7 @@ import type {
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  WellLocation,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -60,6 +61,8 @@ export interface PipetteTemporalProperties {
   entityId?: string
   //  primary nozzle's wellName if over a labware
   wellName?: string
+  //  well position (offset)
+  wellLocation?: WellLocation
   //  pipette's nozzle configuration
   nozzles?: NozzleConfigurationStyle
   //  current tiprack assosciated with pipette

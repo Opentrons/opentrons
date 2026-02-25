@@ -66,6 +66,12 @@ export function forDispense(
     robotState.pipettes[pipetteId] = {
       ...robotState.pipettes[pipetteId],
       entityId: params.labwareId,
+      ...('wellName' in params && params.wellName != null
+        ? { wellName: params.wellName }
+        : {}),
+      ...('wellLocation' in params && params.wellLocation != null
+        ? { wellLocation: params.wellLocation }
+        : {}),
     }
   }
 }

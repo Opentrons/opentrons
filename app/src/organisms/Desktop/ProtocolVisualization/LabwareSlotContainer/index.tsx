@@ -17,7 +17,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
-import { getResolvedWellViewParams } from '../utils/getResolvedWellViewParams'
 import { WellContainer } from '../WellContainer'
 import { WellTooltip } from '../WellTooltip'
 import styles from './labwareslotcontainer.module.css'
@@ -87,11 +86,6 @@ export function LabwareSlotContainer(
       ? labwareLoadCommandParams.displayName
       : null
   const { params, commandType } = currentCommand
-  const wellViewParams = getResolvedWellViewParams(
-    commands,
-    currentCommand,
-    topLabwareOnSlotId
-  )
   const commandWellName =
     'wellName' in params && typeof params.wellName === 'string'
       ? params.wellName
@@ -120,14 +114,40 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
-  const wellViewWellName =
-    'wellName' in wellViewParams && typeof wellViewParams.wellName === 'string'
-      ? wellViewParams.wellName
+  // For in-place commands, pipette position comes from robot state (step-generation);
+  const IN_PLACE_COMMANDS = [
+    'aspirateInPlace',
+    'blowoutInPlace',
+    'dispenseInPlace',
+    'airGapInPlace',
+  ]
+  const isInPlace = IN_PLACE_COMMANDS.includes(commandType)
+  const activePipetteState =
+    isInPlace &&
+    'pipetteId' in params &&
+    typeof params.pipetteId === 'string'
+      ? pipettes[params.pipetteId]
       : null
+  const pipetteWellLocation =
+    activePipetteState != null && 'wellLocation' in activePipetteState
+      ? (activePipetteState as typeof activePipetteState & { wellLocation?: unknown }).wellLocation
+      : undefined
+  const wellViewParams =
+    activePipetteState != null &&
+    activePipetteState.entityId === topLabwareOnSlotId &&
+    activePipetteState.wellName != null &&
+    pipetteWellLocation != null
+      ? {
+          ...params,
+          labwareId: activePipetteState.entityId,
+          wellName: activePipetteState.wellName,
+          wellLocation: pipetteWellLocation,
+        }
+      : params
   const selectedWellName =
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
-      : (wellViewWellName ?? activeWellName)
+      : activeWellName
   const shouldShowWellContainer =
     selectedWellName != null &&
     !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)

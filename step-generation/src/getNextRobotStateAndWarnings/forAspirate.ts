@@ -186,6 +186,9 @@ export function forAspirate(
       ...robotState.pipettes[pipetteId],
       entityId: params.labwareId,
       wellName,
+      ...('wellLocation' in params && params.wellLocation != null
+        ? { wellLocation: params.wellLocation }
+        : {}),
     }
   }
 }

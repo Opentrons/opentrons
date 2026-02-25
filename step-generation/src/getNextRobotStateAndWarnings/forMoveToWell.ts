@@ -6,11 +6,12 @@ export function forMoveToWell(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, labwareId, wellName } = params
+  const { pipetteId, labwareId, wellName, wellLocation } = params
   const { robotState } = robotStateAndWarnings
   robotState.pipettes[pipetteId] = {
     ...robotState.pipettes[pipetteId],
     entityId: labwareId,
     wellName: wellName,
+    ...(wellLocation != null ? { wellLocation } : {}),
   }
 }
