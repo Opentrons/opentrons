@@ -93,6 +93,8 @@ class MigrationOrchestrator:
             for sequence_index, migration in enumerate(sequence):
                 is_final_migration = sequence_index == len(sequence) - 1
                 if is_final_migration:
+                    # For the final migration, set things up so that if everything
+                    # goes well, we'll commit its output to persistent storage.
                     output_dir = exit_stack.enter_context(
                         _atomic_dir(
                             destination=self._root / migration.subdirectory,
@@ -100,6 +102,16 @@ class MigrationOrchestrator:
                         )
                     )
                 else:
+                    # Unlike the final migration, for intermediate migrations,
+                    # we use normal temporary directories in the default system
+                    # location. This is inherently safer in case we crash and leave
+                    # anything behind, and it's also possibly faster (tmpfs instead of
+                    # flash storage).
+                    #
+                    # TODO: Consider freeing each directory when we're done with it.
+                    # e.g. if we're migrating from v1 to v10, we can free the temporary
+                    # directory for v2 as soon as we move past it; we don't need to wait
+                    # for v10 to complete.
                     output_dir = Path(
                         exit_stack.enter_context(tempfile.TemporaryDirectory())
                     )
@@ -122,10 +134,14 @@ class MigrationOrchestrator:
         for item in to_clean:
             try:
                 if item.is_dir():
+                    # No need to be atomic about this, since it's just an abandoned
+                    # temporary directory.
                     shutil.rmtree(item)
                 else:
                     item.unlink()
             except Exception:
+                # We don't expect any exceptions to happen, but just in case
+                # there's a weird permissions error or something...
                 _log.warning(f"Error deleting {item.resolve()}.", exc_info=True)
 
     def _get_current(self) -> Union[int, None]:
@@ -148,6 +164,19 @@ class Migration(ABC):
     """
 
     def __init__(self, subdirectory: str) -> None:
+        """Configure the migration step.
+
+        :param subdirectory: The subdirectory name for this version. For example, if
+            you want a file tree like this:
+
+                our_data/
+                    v1/
+                    v2/
+                    ...
+
+            There would be one `Migration` where `subdirectory` is "v1", one where
+            `subdirectory` is "v2", and so on.
+        """
         _validate_bare_name(subdirectory)
         self.subdirectory: Final = subdirectory
 
@@ -191,6 +220,8 @@ def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, No
     clean it up in case this happens.
     """
     temp_dir = tempfile.mkdtemp(
+        # Manually specify `dir` to keep the temporary directory on the same filesystem
+        # as our target. Otherwise, the rename won't be atomic.
         dir=destination.parent,
         prefix=temp_prefix,
     )
@@ -201,11 +232,27 @@ def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, No
         shutil.rmtree(temp_dir)
         raise
     else:
+        # At this point, we have a directory full of files, but we haven't yet moved it into
+        # place. This os.sync() is a barrier to make sure that the kernel+filesystem don't
+        # reorder the "move into place" part before the "fill it with files" part, which
+        # would break our atomicity if we lost power between the two.
+        #
+        # We do a nuclear-option os.sync() instead of messing with the finer-grained
+        # os.fsync() because os.fsync() is difficult to get right.
+        # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
         os.sync()
+        # Atomically move the filled directory into place.
         os.replace(src=temp_dir, dst=destination)
 
 
 def _validate_bare_name(name: str) -> None:
+    """Ensure `name` is a bare file or directory name, without path components.
+
+    For example, `foo` is OK, but `bar/foo` is not.
+
+    This is a basic check against programmer mistakes and is not intended to guard
+    against untrusted input.
+    """
     if Path(name).name != name:
         raise ValueError(
             f"{name} is a nested path. Only bare file or directory names are allowed."

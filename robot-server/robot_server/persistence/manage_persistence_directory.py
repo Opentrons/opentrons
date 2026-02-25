@@ -9,7 +9,7 @@ from server_utils.persistence.persistence_directory import (
     prepare_active_subdirectory as server_utils_prepare_active_subdirectory,
 )
 from server_utils.persistence.persistence_directory import (
-    prepare_root as _prepare_root,
+    prepare_root as server_utils_prepare_root,
 )
 
 from ._migrations import (
@@ -79,4 +79,6 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
 
 async def prepare_root(persistence_directory_root: Path | None) -> Path:
     """Prepare the robot-server persistence root directory."""
-    return await _prepare_root(persistence_directory_root, _TEMP_PERSISTENCE_DIR_PREFIX)
+    return await server_utils_prepare_root(
+        persistence_directory_root, _TEMP_PERSISTENCE_DIR_PREFIX
+    )
