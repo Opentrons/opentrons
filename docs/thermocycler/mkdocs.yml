@@ -23,7 +23,10 @@ nav:
       - OT-2 Attachment Steps: installation-ot2.md
   - Thermocycler Lid Seals: lid-seals.md
   - Maintenance and Cleaning: maintenance.md
-  - Thermocycler Module G-codes: g-codes.md
+  - Thermocycler G-codes:
+      - Thermocycler G-codes: g-codes/index.md
+      - Understanding Thermocycler G-codes: g-codes/explanation.md
+      - Thermocycler G-code Index: g-codes/thermocycler-g-code-index.md
   - Additional Product Information: additional-info.md
 
 
