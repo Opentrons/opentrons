@@ -56,6 +56,12 @@ class OEMSettingsStore:
         and https://github.com/theskumar/python-dotenv/issues/544.
         """
         file_path = self._persistence_directory / _SETTINGS_FILE_NAME
+
+        # dotenv.set_key() claims it will fail if the file doesn't exist. It doesn't
+        # actually (https://github.com/theskumar/python-dotenv/issues/480), but let's
+        # make sure the file exists just in case.
+        file_path.touch()
+
         try:
             for key, val in dataclasses.asdict(settings).items():
                 name = f"{_VARIABLE_NAME_PREFIX}{key}"
