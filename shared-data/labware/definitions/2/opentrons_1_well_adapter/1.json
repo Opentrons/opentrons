@@ -1,0 +1,151 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons 1 Well Reservoir Temperature Module Adapter",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 27.75
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_1_well_adapter"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2, //NOTE: is this correct?
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "A1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "B1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "C1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "D1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "A3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "B3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "C3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "D3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  }
+}
