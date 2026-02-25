@@ -122,16 +122,16 @@ class Client:
         return self.httpx.options("/chat/completions", headers=self.type_headers)
 
     def post_update_protocol_stream(self, body: dict[str, Any], bad_auth: bool = False) -> SseResult:
-        """Stream /chat/updateProtocol/stream; collect and return all SSE events."""
+        """Stream /chat/update-protocol/stream; collect and return all SSE events."""
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        with self.httpx.stream("POST", "/chat/updateProtocol/stream", headers=headers, json=body) as r:
+        with self.httpx.stream("POST", "/chat/update-protocol/stream", headers=headers, json=body) as r:
             events = list(iter_sse_events(r.iter_lines()))
         return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
 
     def post_create_protocol_stream(self, body: dict[str, Any], bad_auth: bool = False) -> SseResult:
-        """Stream /chat/createProtocol/stream; collect and return all SSE events."""
+        """Stream /chat/create-protocol/stream; collect and return all SSE events."""
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        with self.httpx.stream("POST", "/chat/createProtocol/stream", headers=headers, json=body) as r:
+        with self.httpx.stream("POST", "/chat/create-protocol/stream", headers=headers, json=body) as r:
             events = list(iter_sse_events(r.iter_lines()))
         return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
 
@@ -219,7 +219,7 @@ def main() -> None:
         response = client.get_options()
         print_response(response)
 
-        console.print(Rule("Stream updateProtocol (fake, live)", style="bold"))
+        console.print(Rule("Stream update-protocol (fake, live)", style="bold"))
         body = {
             "prompt": "Add a step",
             "protocol_text": "def run(protocol): pass",
@@ -233,15 +233,15 @@ def main() -> None:
         headers["Content-Type"] = "application/json"
         accumulated = Text()
         with Live(
-            Panel(accumulated, title="[bold cyan]updateProtocol/stream[/bold cyan]", border_style="cyan"),
+            Panel(accumulated, title="[bold cyan]update-protocol/stream[/bold cyan]", border_style="cyan"),
             console=console,
             refresh_per_second=15,
         ) as live:
-            with client.httpx.stream("POST", "/chat/updateProtocol/stream", headers=headers, json=body) as stream_resp:
+            with client.httpx.stream("POST", "/chat/update-protocol/stream", headers=headers, json=body) as stream_resp:
                 live.update(
                     Panel(
                         accumulated,
-                        title=f"[bold cyan]updateProtocol/stream[/bold cyan] — {stream_resp.status_code}",
+                        title=f"[bold cyan]update-protocol/stream[/bold cyan] — {stream_resp.status_code}",
                         border_style="cyan",
                     )
                 )
@@ -251,7 +251,7 @@ def main() -> None:
                         live.update(
                             Panel(
                                 accumulated,
-                                title=f"[bold cyan]updateProtocol/stream[/bold cyan] — {stream_resp.status_code}",
+                                title=f"[bold cyan]update-protocol/stream[/bold cyan] — {stream_resp.status_code}",
                                 border_style="cyan",
                             )
                         )

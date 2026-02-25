@@ -702,7 +702,7 @@ def _determine_protocol_action(body: ChatRequest) -> str:
 
 
 @app.post(
-    "/api/chat/createProtocol",
+    "/api/chat/create-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
     summary="Creates protocol",
     description="Generate a chat response based on the provided prompt that will create a new protocol with the required changes.",
@@ -716,7 +716,7 @@ async def create_protocol(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/createProtocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/create-protocol", extra={"body": body.model_dump(), "user": user})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -784,18 +784,18 @@ async def _sse_stream_create_protocol(user_id: str, prompt: str, protocol_format
 
 
 @app.post(
-    "/api/chat/createProtocol/stream",
+    "/api/chat/create-protocol/stream",
     summary="Creates protocol (streaming)",
     description="Stream a new protocol from the LLM. Returns Server-Sent Events with delta chunks.",
 )
 async def create_protocol_stream(body: CreateProtocol, user: Annotated[User, Security(auth.verify)], request: Request) -> StreamingResponse:
     """Stream a new protocol using the LLM. Yields SSE events: data: {\"delta\": \"...\"} and data: {\"done\": true}."""
-    logger.info("POST /api/chat/createProtocol/stream", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/create-protocol/stream", extra={"body": body.model_dump(), "user": user})
     try:
         enable_analytics = _get_analytics_preference(request)
         setup_weave_analytics(enable_analytics)
         _validate_request(body, "prompt")
-        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "createProtocol/stream", SSE_HEADERS)
+        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "create-protocol/stream", SSE_HEADERS)
         if fake_stream is not None:
             return fake_stream
         if "openai" in settings.model.lower():
@@ -822,7 +822,7 @@ async def create_protocol_stream(body: CreateProtocol, user: Annotated[User, Sec
 
 
 @app.post(
-    "/api/chat/updateProtocol",
+    "/api/chat/update-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
     summary="Updates protocol",
     description="Generate a chat response based on the provided prompt that will update an existing protocol with the required changes.",
@@ -836,7 +836,7 @@ async def update_protocol(
     - **request**: The HTTP request containing the existing protocol and other relevant parameters.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/updateProtocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/update-protocol", extra={"body": body.model_dump(), "user": user})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -916,7 +916,7 @@ async def _sse_stream_update_protocol(user_id: str, prompt: str, enable_analytic
 
 
 @app.post(
-    "/api/chat/updateProtocol/stream",
+    "/api/chat/update-protocol/stream",
     summary="Updates protocol (streaming)",
     description="Stream an updated protocol from the LLM. Returns Server-Sent Events with delta chunks.",
 )
@@ -924,12 +924,12 @@ async def update_protocol_stream(body: UpdateProtocol, user: Annotated[User, Sec
     """
     Stream an updated protocol using the LLM. Yields SSE events: data: {"delta": "..."} and data: {"done": true}.
     """
-    logger.info("POST /api/chat/updateProtocol/stream", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/update-protocol/stream", extra={"body": body.model_dump(), "user": user})
     try:
         enable_analytics = _get_analytics_preference(request)
         setup_weave_analytics(enable_analytics)
         _validate_request(body, "protocol_text")
-        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "updateProtocol/stream", SSE_HEADERS)
+        fake_stream = make_fake_streaming_response(bool(body.fake), getattr(body, "fake_key", None), "update-protocol/stream", SSE_HEADERS)
         if fake_stream is not None:
             return fake_stream
         return StreamingResponse(

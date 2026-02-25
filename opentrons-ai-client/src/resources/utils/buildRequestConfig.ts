@@ -36,82 +36,71 @@ import type {
   UpdatePrompt,
 } from '/ai-client/resources/types'
 
-const getCreateEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_CREATE_PROTOCOL_END_POINT
-    case 'development':
-      return LOCAL_CREATE_PROTOCOL_END_POINT
-    default:
-      return STAGING_CREATE_PROTOCOL_END_POINT
-  }
+type Env = 'production' | 'development' | 'staging'
+
+interface EnvEndpoints {
+  production: string
+  development: string
+  staging: string
 }
 
-const getUpdateEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_UPDATE_PROTOCOL_END_POINT
-    case 'development':
-      return LOCAL_UPDATE_PROTOCOL_END_POINT
-    default:
-      return STAGING_UPDATE_PROTOCOL_END_POINT
-  }
-}
+const getEnv = (): Env =>
+  _NODE_ENV_ === 'production'
+    ? 'production'
+    : _NODE_ENV_ === 'development'
+      ? 'development'
+      : 'staging'
 
-export const getUpdateStreamEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_UPDATE_PROTOCOL_STREAM_END_POINT
-    case 'development':
-      return LOCAL_UPDATE_PROTOCOL_STREAM_END_POINT
-    default:
-      return STAGING_UPDATE_PROTOCOL_STREAM_END_POINT
-  }
-}
+const pickEndpoint = (endpoints: EnvEndpoints): string => endpoints[getEnv()]
 
-export const getCreateStreamEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_CREATE_PROTOCOL_STREAM_END_POINT
-    case 'development':
-      return LOCAL_CREATE_PROTOCOL_STREAM_END_POINT
-    default:
-      return STAGING_CREATE_PROTOCOL_STREAM_END_POINT
-  }
-}
+const getCreateEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_CREATE_PROTOCOL_END_POINT,
+    development: LOCAL_CREATE_PROTOCOL_END_POINT,
+    staging: STAGING_CREATE_PROTOCOL_END_POINT,
+  })
 
-export const getCompletionStreamEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_COMPLETION_STREAM_END_POINT
-    case 'development':
-      return LOCAL_COMPLETION_STREAM_END_POINT
-    default:
-      return STAGING_COMPLETION_STREAM_END_POINT
-  }
-}
+const getUpdateEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_UPDATE_PROTOCOL_END_POINT,
+    development: LOCAL_UPDATE_PROTOCOL_END_POINT,
+    staging: STAGING_UPDATE_PROTOCOL_END_POINT,
+  })
 
-export const getCompletionMultipartStreamEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_COMPLETION_MULTIPART_STREAM_END_POINT
-    case 'development':
-      return LOCAL_COMPLETION_MULTIPART_STREAM_END_POINT
-    default:
-      return STAGING_COMPLETION_MULTIPART_STREAM_END_POINT
-  }
-}
+export const getUpdateStreamEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_UPDATE_PROTOCOL_STREAM_END_POINT,
+    development: LOCAL_UPDATE_PROTOCOL_STREAM_END_POINT,
+    staging: STAGING_UPDATE_PROTOCOL_STREAM_END_POINT,
+  })
 
-const getChatEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_END_POINT
-    case 'development':
-      return LOCAL_END_POINT
-    default:
-      return STAGING_END_POINT
-  }
-}
+export const getCreateStreamEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_CREATE_PROTOCOL_STREAM_END_POINT,
+    development: LOCAL_CREATE_PROTOCOL_STREAM_END_POINT,
+    staging: STAGING_CREATE_PROTOCOL_STREAM_END_POINT,
+  })
+
+export const getCompletionStreamEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_COMPLETION_STREAM_END_POINT,
+    development: LOCAL_COMPLETION_STREAM_END_POINT,
+    staging: STAGING_COMPLETION_STREAM_END_POINT,
+  })
+
+export const getCompletionMultipartStreamEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_COMPLETION_MULTIPART_STREAM_END_POINT,
+    development: LOCAL_COMPLETION_MULTIPART_STREAM_END_POINT,
+    staging: STAGING_COMPLETION_MULTIPART_STREAM_END_POINT,
+  })
+
+const getChatEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_END_POINT,
+    development: LOCAL_END_POINT,
+    staging: STAGING_END_POINT,
+  })
 
 const getCreateOrUpdateEndpoint = (isNewProtocol: boolean): string => {
   return isNewProtocol ? getCreateEndpoint() : getUpdateEndpoint()

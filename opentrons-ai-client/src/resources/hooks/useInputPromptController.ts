@@ -476,10 +476,14 @@ export function useInputPromptController(
     setChatHistory,
   ])
 
+  const formatError = (err: unknown): string | null => {
+    if (err == null) return null
+    if (typeof err === 'string') return err
+    return String(err)
+  }
+
   const errorMessage: string | null =
-    fileError ??
-    streamingError ??
-    (error == null ? null : typeof error === 'string' ? error : String(error))
+    fileError ?? streamingError ?? formatError(error)
 
   return {
     submitChat: () => {

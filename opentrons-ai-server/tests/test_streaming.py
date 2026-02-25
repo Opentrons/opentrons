@@ -49,7 +49,7 @@ def test_update_protocol_stream_accepts_fake_request(client_with_auth: TestClien
         "fake": True,
     }
     response = client_with_auth.post(
-        "/api/chat/updateProtocol/stream",
+        "/api/chat/update-protocol/stream",
         json=body,
         headers={"Authorization": "Bearer test-token", "Content-Type": "application/json"},
     )
@@ -85,7 +85,7 @@ def test_create_protocol_stream_accepts_fake_request(client_with_auth: TestClien
         "fake": True,
     }
     response = client_with_auth.post(
-        "/api/chat/createProtocol/stream",
+        "/api/chat/create-protocol/stream",
         json=body,
         headers={"Authorization": "Bearer test-token", "Content-Type": "application/json"},
     )

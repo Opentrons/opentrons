@@ -103,7 +103,7 @@ def test_get_options(client: Client) -> None:
 
 @pytest.mark.live
 def test_update_protocol_stream_fake(client: Client) -> None:
-    """updateProtocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
+    """update-protocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
     body = {
         "prompt": "Add a step",
         "protocol_text": "def run(protocol): pass",
@@ -122,7 +122,7 @@ def test_update_protocol_stream_fake(client: Client) -> None:
 
 @pytest.mark.live
 def test_create_protocol_stream_fake(client: Client) -> None:
-    """createProtocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
+    """create-protocol/stream with fake and streaming_3s returns 200 and SSE events (~3s)."""
     body = {
         "prompt": "Make a PCR protocol",
         "regenerate": False,
@@ -186,7 +186,7 @@ def test_completion_multipart_stream_fake(client: Client) -> None:
 
 @pytest.mark.live
 def test_update_protocol_stream_bad_auth(client: Client) -> None:
-    """updateProtocol/stream with bad auth returns 401."""
+    """update-protocol/stream with bad auth returns 401."""
     body = {
         "prompt": "Add a step",
         "protocol_text": "def run(protocol): pass",

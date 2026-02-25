@@ -10,8 +10,8 @@ All chat responses are streamed. The server exposes four SSE endpoints:
 
 | Endpoint                                     | Purpose                                                |
 | -------------------------------------------- | ------------------------------------------------------ |
-| `POST /api/chat/updateProtocol/stream`       | Update an existing protocol (no file attachments)      |
-| `POST /api/chat/createProtocol/stream`       | Generate a new protocol (no file attachments)          |
+| `POST /api/chat/update-protocol/stream`      | Update an existing protocol (no file attachments)      |
+| `POST /api/chat/create-protocol/stream`      | Generate a new protocol (no file attachments)          |
 | `POST /api/chat/completion/stream`           | General chat completion (no file attachments)          |
 | `POST /api/chat/completion-multipart/stream` | Chat completion with file attachments (multipart form) |
 

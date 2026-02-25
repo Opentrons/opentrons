@@ -5,6 +5,9 @@ export interface StreamChatCallbacks {
 }
 
 const SSE_ACCEPT = 'text/event-stream'
+const MAX_ERROR_TEXT_LENGTH = 200
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 function parseStreamError(status: number, bodyText: string): string {
   try {
@@ -32,8 +35,8 @@ function parseStreamError(status: number, bodyText: string): string {
   } catch {
     // ignore
   }
-  if (bodyText.length > 200) {
-    return `HTTP ${status}: ${bodyText.slice(0, 200)}…`
+  if (bodyText.length > MAX_ERROR_TEXT_LENGTH) {
+    return `HTTP ${status}: ${bodyText.slice(0, MAX_ERROR_TEXT_LENGTH)}…`
   }
   return `HTTP ${status}: ${bodyText.length > 0 ? bodyText : 'No response body'}`
 }
@@ -46,7 +49,7 @@ function parseStreamError(status: number, bodyText: string): string {
 export async function streamChatApi(
   url: string,
   options: {
-    method: string
+    method: HttpMethod
     headers: Record<string, string>
     body: string | FormData
   },
@@ -56,13 +59,14 @@ export async function streamChatApi(
   let accumulated = ''
 
   try {
+    const baseHeaders = options.headers ?? {}
     const headers =
       options.body instanceof FormData
         ? (() => {
-            const { 'Content-Type': _ct, ...rest } = options.headers
+            const { 'Content-Type': _ct, ...rest } = baseHeaders
             return { ...rest, Accept: SSE_ACCEPT }
           })()
-        : { ...options.headers, Accept: SSE_ACCEPT }
+        : { ...baseHeaders, Accept: SSE_ACCEPT }
 
     const response = await fetch(url, {
       method: options.method,

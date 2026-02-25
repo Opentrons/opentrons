@@ -67,8 +67,8 @@ All chat responses are streamed via [Server-Sent Events (SSE)][sse]. The client 
 
 | Request type                 | Endpoint                                     |
 | ---------------------------- | -------------------------------------------- |
-| Update protocol (no files)   | `POST /api/chat/updateProtocol/stream`       |
-| Create protocol (no files)   | `POST /api/chat/createProtocol/stream`       |
+| Update protocol (no files)   | `POST /api/chat/update-protocol/stream`      |
+| Create protocol (no files)   | `POST /api/chat/create-protocol/stream`      |
 | Chat completion (no files)   | `POST /api/chat/completion/stream`           |
 | Chat completion (with files) | `POST /api/chat/completion-multipart/stream` |
 
