@@ -4,21 +4,27 @@ const plotConfigs = [
   {
     divId: 'plotly1',
     xColumn: 'Time(s)',
-    yColumns: ['current_gauge_pressure', 'pressure_abs_a'],
+    yColumns: ['current_guage_pressure', 
+      'target_guage_pressure', 
+      'pressure_abs_a', 
+      'pressure_abs_b', 
+      'pressure_atm'],
     title: 'Pressure vs Time',
     yAxisLabel: 'Pressure (mbar)',
-    colors: ['#006fff', '#9900ff'],
+    colors: ['#006fff', '#00ff2a','#9900ff','#115c49','#f34c22'],
     filePattern: 'PressureData', // matches CSV files containing "PressureData" in the name
+    lineStyles: ['solid', 'dash', 'solid', 'solid', 'solid'],
   },
-  // {
-  //   divId: 'plotly2',
-  //   xColumn: 'Time(s)',
-  //   yColumns: ['Flow_rate(sLM)'],
-  //   title: 'Flow Rate (sLM) vs Time',
-  //   yAxisLabel: 'Flow Rate (sLM)',
-  //   colors: ['#ff3a33'],
-  //   filePattern: 'FlowrateData', // matches CSV files containing "FlowrateData" in the name
-  // },
+  {
+    divId: 'plotly2',
+    xColumn: 'Time(s)',
+    yColumns: ['Flow_rate(sLM)'],
+    title: 'Flow Rate (sLM) vs Time',
+    yAxisLabel: 'Flow Rate (sLM)',
+    colors: ['#ff3a33'],
+    filePattern: 'FlowrateData', // matches CSV files containing "FlowrateData" in the name
+    lineStyles: ['solid'],
+  },
   // This is example if we want to use a secondary axis
   // {
   //   divId: 'plotly3',
@@ -70,6 +76,7 @@ function initializePlots() {
       // Use secondary axis if specified
       yaxis: config.secondaryAxisColumns && config.secondaryAxisColumns.includes(yCol) ? 'y2' : 'y',
       ...(config.colors && config.colors[i] ? { marker: { color: config.colors[i] } } : {}),
+      ...(config.lineStyles && config.lineStyles[i] ? { line: { dash: config.lineStyles[i] } } : {}), // Apply line style
     }));
     const layout = {
       title: config.title,
@@ -122,6 +129,7 @@ function updatePlot(config, fileData) {
       // Use secondary axis if specified
       yaxis: config.secondaryAxisColumns && config.secondaryAxisColumns.includes(yColumn) ? 'y2' : 'y',
       marker: { color: config.colors[i] || '#006fff' },
+      line: { dash: config.lineStyles[i] || 'solid' },
     };
   }).filter(Boolean);
 

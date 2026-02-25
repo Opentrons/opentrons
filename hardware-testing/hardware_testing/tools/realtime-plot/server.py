@@ -38,7 +38,7 @@ def infer_config_base_dir() -> Path:
         return Path("/data")
     else:
         search = (Path.cwd(), Path.home() / ".opentrons")
-        print(search)
+        # print(search)
         for path in search:
             if (path / _CONFIG_FILENAME).exists():
                 return path
@@ -168,7 +168,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         response_data: dict = {
             "directory": str(self.plot_directory.resolve()),
         }
-
+        # print(f'Dir: {response_data}')
         for pattern in file_patterns:
             path_list = self._list_file_paths_in_directory(
                 self.plot_directory, pattern

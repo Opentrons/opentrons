@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import datetime
+import time
 from opentrons.drivers import vacuum_module
 from hardware_testing.drivers.flowrate_sensor import driver
 import argparse
@@ -11,9 +12,9 @@ atm_pressure = 1023
 # Tunables (can move some to parameters)
 SETTLE_SEC = 21
 RUN_SEC = 35
-DECAY_SEC = 10
+DECAY_SEC = 20
 VENT_SEC = 10
-current_datetime = datetime.datetime.now(datetime.UTC).strftime("%y_%m_%d_%H_%M_%S")
+current_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%y_%m_%d_%H_%M_%S")
 
 # Configure logging
 logging.basicConfig(
@@ -23,22 +24,28 @@ logging.basicConfig(
     filemode='a'
 )
 
-def get_file_name(prefix: str) -> str:
-    """Generate a timestamped file name."""
-    current_datetime = datetime.datetime.now(datetime.UTC).strftime("%y_%m_%d_%H_%M_%S")
+async def read_data(pump, start_time, duration: int):
+    try:
+        await pump.read_continuous_data(start_time, duration)
+    except asyncio.TimeoutError:
+        # Expected: we stop after RUN_SEC
+        logging.info(f"continuous read duration reached ({duration}s)")
+    except Exception as e:
+        logging.info(f"continuous read error: {e}")
 
 async def flow_rate_thread(target_pressure):
-    file_name = f'/data/testing_data/example-test/FlowrateData_{target_pressure}_{current_datetime}.csv'
-    sensor = await driver.MassFlowSensor.create(port="/dev/ttyACM1", csv_path=file_name)
+    file_name = f'/data/testing_data/test-data/FlowrateData_{target_pressure}_{current_datetime}.csv'
+    sensor = await driver.MassFlowSensor.create(port="/dev/ttyACM0", csv_path=file_name)
     try:
         sensor.set_csv_filename(file_name)
-        await sensor.read_continuous_data(RUN_SEC+SETTLE_SEC)
+        await sensor.read_continuous_data(RUN_SEC+SETTLE_SEC+VENT_SEC+DECAY_SEC)
     except Exception as e:
         logging.critical("Critical failure: %s", e)
 
 async def vacuum_manifold(target_pressure):
-    file_name = f'/data/testing_data/example-test/PressureData_{target_pressure}_{current_datetime}.csv'
-    pump = await vacuum_module.VacuumModuleDriver.create(port='/dev/ttyACM0', loop=None)
+    file_name = f'/data/testing_data/test-data/PressureData_{target_pressure}_{current_datetime}.csv'
+    pump = await vacuum_module.VacuumModuleDriver.create(port='/dev/ttyACM1', loop=None)
+    start_time = time.perf_counter()
     target_to_pump = target_pressure - atm_pressure
     # Set Pressure and Vacuum to target for x amount of time. 
     await pump.set_vacuum_state(enable_vacuum = True,
@@ -54,26 +61,19 @@ async def vacuum_manifold(target_pressure):
     except Exception as e:
         logging.info(f"failed to set CSV filename: {e}")
     # Run the continuous data reader for RUN_SEC seconds.
-    try:
-        await pump.read_continuous_data(RUN_SEC+SETTLE_SEC)
-        
-    except asyncio.TimeoutError:
-        # Expected: we stop after RUN_SEC
-        logging.info(f"continuous read duration reached ({RUN_SEC}s)")
-    except Exception as e:
-        logging.info(f"continuous read error: {e}")
+    await read_data(pump, start_time, RUN_SEC+SETTLE_SEC)
 
     # Vent the pump system to atmospheric pressure while pump is on
     await pump.set_vent_state(False)
-    await asyncio.sleep(VENT_SEC)
+    await read_data(pump, start_time, VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(enable_vacuum = False,
                                 guage_pressure_mbar = target_to_pump,
                                 duration = None,
                                 )
-    logging.info(f"continuous read duration reached ({RUN_SEC}s)")
-    await asyncio.sleep(DECAY_SEC)
+    await read_data(pump, start_time, DECAY_SEC)
     await pump.set_vent_state(True)
+
 
 async def main(args):
     thread_1 = asyncio.create_task(flow_rate_thread(args.target_pressure))

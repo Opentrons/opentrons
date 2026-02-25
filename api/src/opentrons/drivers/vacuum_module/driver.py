@@ -243,6 +243,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             command.add_int("V", int(vent_after))
 
         resp = await self._connection.send_command(command)
+        print(f'response: {resp}')
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
 
@@ -338,11 +339,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self.csv_path = new_path
         self._csv_initialized = False
 
-    async def read_continuous_data(self, run_time):
+    async def read_continuous_data(self, start_time, run_time):
         """Read and print continuous data from the vacuum pump for the specified timeout duration."""
-        start_time = time.perf_counter()
+        loop_st = time.perf_counter()
         try:
-            while time.perf_counter() - start_time < run_time:
+            while time.perf_counter() - loop_st < run_time:
                 line = await self.get_vacuum_state()
                 await asyncio.sleep(0.1)
                 pressure_dict = dataclasses.asdict(line)
