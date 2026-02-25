@@ -4,7 +4,7 @@ export const INACCESSIBLE_PARTIAL_TIP: 'partial_tip' = 'partial_tip'
 
 type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
 
-export const partialNozzleMap: Record<
+export const PARTIAL_NOZZLE_MAP: Record<
   PartialPrimaryNozzles,
   PartialNozzles8Channel
 > = {

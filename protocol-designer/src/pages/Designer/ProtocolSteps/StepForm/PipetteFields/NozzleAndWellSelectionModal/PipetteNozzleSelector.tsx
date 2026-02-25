@@ -12,7 +12,7 @@ import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { partialNozzleMap } from './constants'
+import { PARTIAL_NOZZLE_MAP } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
 import {
@@ -58,12 +58,12 @@ export function PipetteNozzleSelector(
     t as TFunction
   )
 
-  const partialOptions: DropdownOption[] = Object.entries(partialNozzleMap).map(
-    ([nozzle, num]) => ({
-      name: t('num_nozzles', { num }),
-      value: nozzle as PartialPrimaryNozzles,
-    })
-  )
+  const partialOptions: DropdownOption[] = Object.entries(
+    PARTIAL_NOZZLE_MAP
+  ).map(([nozzle, num]) => ({
+    name: t('num_nozzles', { num }),
+    value: nozzle as PartialPrimaryNozzles,
+  }))
 
   const wellOrdering = Object.values(pipetteSpecs.orderedColumns).map(
     column => column.orderedNozzles
@@ -86,7 +86,7 @@ export function PipetteNozzleSelector(
       )
     } else {
       const numNozzles =
-        partialNozzleMap[
+        PARTIAL_NOZZLE_MAP[
           propsForFields.primaryNozzle.value as PartialPrimaryNozzles
         ]
       const col = wellOrdering[0]

@@ -17,7 +17,7 @@ import {
   SINGLE,
 } from '@opentrons/shared-data'
 
-import { partialNozzleMap } from './constants'
+import { PARTIAL_NOZZLE_MAP } from './constants'
 
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
@@ -31,7 +31,7 @@ import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/s
 function isPartialPrimaryNozzle(
   nozzle: string
 ): nozzle is PartialPrimaryNozzles {
-  return nozzle in partialNozzleMap
+  return nozzle in PARTIAL_NOZZLE_MAP
 }
 
 export const getAvailableNozzleConfigurations = (
@@ -191,7 +191,7 @@ export const getEntireWellSelection = (
       }
 
       const column = wellOrdering[columnIndex]
-      const count = partialNozzleMap[primaryNozzle]
+      const count = PARTIAL_NOZZLE_MAP[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {

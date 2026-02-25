@@ -8,7 +8,7 @@ import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { partialNozzleMap, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { PARTIAL_NOZZLE_MAP, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
@@ -45,7 +45,7 @@ export function ExtendedPartialTipField(
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
   const partialNozzleCount =
-    partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
+    PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -73,8 +73,8 @@ export function ExtendedPartialTipField(
         .def as LabwareDefinition)
     : null
   const partialChannels =
-    primaryNozzle in partialNozzleMap
-      ? partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
+    primaryNozzle in PARTIAL_NOZZLE_MAP
+      ? PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
       : 0
   const aspWellsLength = aspLabwareDef
     ? getWellGroupLength(

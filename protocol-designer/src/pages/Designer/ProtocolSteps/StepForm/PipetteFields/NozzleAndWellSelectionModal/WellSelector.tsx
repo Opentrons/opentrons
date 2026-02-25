@@ -32,7 +32,7 @@ import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP, partialNozzleMap } from './constants'
+import { INACCESSIBLE_PARTIAL_TIP, PARTIAL_NOZZLE_MAP } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
@@ -182,7 +182,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       selectedWells,
       labwareDef.ordering,
       allWellsWithState,
-      partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
     )
   }, [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering])
 
