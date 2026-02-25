@@ -73,7 +73,9 @@ export function InlineNotification(
     onLinkClick,
   } = props
   // TODO (sb: 8/20/25) RSQ-189 Remove punctuation from this component and add to translation strings
-  const fullHeading = `${heading}${message ? '. ' : ''}`
+  // Temp fix (nd: 2/25/26): Avoid double-period for translations that already end in a period.
+  const doesMessageEndInPeriod = message?.trim().endsWith('.') ?? false
+  const fullHeading = `${heading}${message && !doesMessageEndInPeriod ? '. ' : ''}`
   const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
   const iconProps = {
