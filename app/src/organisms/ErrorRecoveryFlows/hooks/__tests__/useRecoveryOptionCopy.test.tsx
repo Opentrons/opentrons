@@ -144,6 +144,24 @@ describe('useRecoveryOptionCopy', () => {
     screen.getByText('Clear obstruction in stacker and skip to next step')
   })
 
+  it(`renders the correct copy for ${RECOVERY_MAP.VACUUM_CARBOY_FULL_RETRY.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.VACUUM_CARBOY_FULL_RETRY.ROUTE })
+
+    screen.getByText('Empty waste and retry step')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE })
+
+    screen.getByText('Empty waste and skip step')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE })
+
+    screen.getByText('Inspect module and retry step')
+  })
+
   it('renders "Unknown action" for an unknown recovery option', () => {
     render({ route: 'unknown_route' as RecoveryRoute })
 
