@@ -775,7 +775,7 @@ describe('useModuleOverflowMenu', () => {
     const vacuumMenu = menuOverflowItemsByModuleType.vacuumModuleType
 
     expect(vacuumMenu).toHaveLength(2)
-    expect(vacuumMenu[1].menuButtons).toHaveLength(1)
+    expect(vacuumMenu[1].menuButtons).toHaveLength(2)
   })
 })
 

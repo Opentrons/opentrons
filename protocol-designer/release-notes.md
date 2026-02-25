@@ -23,6 +23,12 @@ This release introduces updated Thermocycler Module steps and includes other bug
 - The Flex Stacker Module shows the correct number of labware stored inside.
 - Add or remove a Flex Stacker Module or waste chute to the robot deck without triggering protocol errors.
 
+## Opentrons Protocol Designer Changes in 8.8.1
+
+**Welcome to Protocol Designer 8.8.1!**
+
+This hotfix release addresses a bug to allow manual tip selection in any column of a well plate.
+
 ## Opentrons Protocol Designer Changes in 8.8.0
 
 **Welcome to Protocol Designer 8.8.0!**

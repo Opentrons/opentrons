@@ -87,4 +87,9 @@ describe('getModuleImage', () => {
     const result = getModuleImage('flexStackerModuleV1')
     expect(result).toEqual('/app/src/assets/images/flex_stacker_no_labware.png')
   })
+
+  it('should render the vacuum module image when the module is vacuumModuleMilliporeV1', () => {
+    const result = getModuleImage('vacuumModuleMilliporeV1')
+    expect(result).toEqual('/app/src/assets/images/vacuum_module_v1.png')
+  })
 })

@@ -146,10 +146,12 @@ EXPECTED_STATEMENTS_LATEST = [
         name VARCHAR NOT NULL,
         description VARCHAR,
         source VARCHAR(6) NOT NULL,
+        parent VARCHAR,
         params VARCHAR,
         PRIMARY KEY (row_id),
         FOREIGN KEY(run_id) REFERENCES run (id),
-        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system'))
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system')),
+        FOREIGN KEY(parent) REFERENCES command_annotation (annotation_id)
     )
     """,
     """

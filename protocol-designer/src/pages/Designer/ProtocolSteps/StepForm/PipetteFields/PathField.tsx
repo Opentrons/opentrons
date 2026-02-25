@@ -177,7 +177,7 @@ export function PathField(props: PathFieldProps): JSX.Element {
                 updateValue(name)
               }}
             >
-              <img src={option.image} />
+              <img src={option.image} alt={`path field image-${name}`} />
             </PathButton>
           )
         })}

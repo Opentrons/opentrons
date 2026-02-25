@@ -42,9 +42,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
-    CommandAnnotation,
     CommandPreconditions,
     CustomCommandAnnotationLegacy,
+    LegacyCommandAnnotation,
 )
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
@@ -63,7 +63,7 @@ class RunResult(NamedTuple):
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
     command_annotations: List[
-        CommandAnnotation
+        LegacyCommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
 
@@ -104,7 +104,7 @@ class AbstractRunner(ABC):
         return []
 
     @property
-    def command_annotations(self) -> List[CommandAnnotation]:
+    def command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Command annotations defined by protocol, if any. Currently only for json protocols."""
         return []
 
@@ -335,10 +335,10 @@ class JsonRunner(AbstractRunner):
 
         hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
-        self._command_annotations: List[CommandAnnotation] = []
+        self._command_annotations: List[LegacyCommandAnnotation] = []
 
     @property
-    def command_annotations(self) -> List[CommandAnnotation]:
+    def command_annotations(self) -> List[LegacyCommandAnnotation]:
         """Command annotations defined by protocol, if any."""
         return self._command_annotations
 
@@ -361,7 +361,7 @@ class JsonRunner(AbstractRunner):
         # Now that annotations are embedded in commands, we need to insert them into the engine,
         # and add them to the relevant commands.
         _legacy_command_annotations: List[
-            CommandAnnotation
+            LegacyCommandAnnotation
         ] = await anyio.to_thread.run_sync(
             self._json_translator.translate_legacy_command_annotations,
             protocol,

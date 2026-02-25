@@ -5,6 +5,16 @@ marks:
       - run_server
 
 stages:
+  - name: Enable access control so protected resources require a valid token
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+
   - name: Accessing the resource without a token should fail
     request:
       method: POST
@@ -16,7 +26,7 @@ stages:
           fullName: Test User
           accountType: user
     response:
-      status_code: 403
+      status_code: 401
 
   - name: Accessing the resource with a bogus token should fail
     request:
@@ -31,7 +41,7 @@ stages:
       headers:
         Authorization: Bearer bogus_token_1234
     response:
-      status_code: 403
+      status_code: 401
 
   - name: Get an access token with insufficient scopes
     request:
@@ -42,7 +52,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: runs.read # Omit users.write.
+        scope: users.read runs.write # Omit users.write.
     response:
       status_code: 200
       json:
@@ -50,7 +60,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read
+        scope: users.read runs.write
       save:
         json:
           access_token: access_token

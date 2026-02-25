@@ -8,10 +8,16 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
+from server_utils.auth.resource_server.fastapi_dependencies import (
+    install_authorization_checker,
+)
 
-from auth_server.oauth2.fastapi_dependencies import init_oauth2_backend
+from auth_server.authorization_checker import build_authorization_checker
+from auth_server.oauth2.backend import build as build_oauth2_backend
+from auth_server.oauth2.fastapi_dependencies import install_oauth2_backend
 from auth_server.oauth2.router import router as oauth2_router
 from auth_server.settings.router import router as settings_router
+from auth_server.settings.store import SettingsStore, install_settings_store
 from auth_server.users.router import router as users_router
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
@@ -19,7 +25,15 @@ _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    init_oauth2_backend(app.state)
+    settings_store = SettingsStore()
+    install_settings_store(app.state, settings_store)
+
+    oauth2_backend = build_oauth2_backend()
+    install_oauth2_backend(app.state, oauth2_backend)
+
+    authorization_checker = build_authorization_checker(settings_store, oauth2_backend)
+    install_authorization_checker(app.state, authorization_checker)
+
     systemd_utils.notify_up()
     yield
 

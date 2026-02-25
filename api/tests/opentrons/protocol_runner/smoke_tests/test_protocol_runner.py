@@ -108,7 +108,7 @@ async def test_runner_with_python(
             tipDiameter=5.23,
             position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     assert expected_command in commands_result
@@ -172,7 +172,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             tipDiameter=5.23,
             position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     assert expected_command in commands_result
@@ -387,7 +387,7 @@ async def test_runner_with_python_and_run_time_parameters(
         ),
         notes=[],
         result=matchers.Anything(),
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     assert expected_command in commands_result

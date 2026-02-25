@@ -47,12 +47,12 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     EngineStatus,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
@@ -554,5 +554,5 @@ class AnalyzeResults(BaseModel):
     liquids: List[Liquid]
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
-    commandAnnotations: List[UserCommandAnnotation]
+    commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
