@@ -22,7 +22,14 @@ export function VacuumDisconnectEmptyCarboy(
     <Trans
       t={t}
       i18nKey="carefully_unscrew_and_empty_carboy"
-      components={{ block: <StyledText desktopStyle="bodyDefaultRegular" /> }}
+      components={{
+        block: (
+          <StyledText
+            oddStyle="bodyTextRegular"
+            desktopStyle="bodyDefaultRegular"
+          />
+        ),
+      }}
     />
   )
 
