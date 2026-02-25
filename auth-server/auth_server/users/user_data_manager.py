@@ -61,7 +61,7 @@ class UserDataManager:
             User(
                 username="test_user",
                 hashed_password=password_hash.hash("test_user_password"),
-                scopes=[Scope.RUNS_WRITE, Scope.RUNS_READ],
+                scopes=[Scope.RUNS_WRITE, Scope],
                 full_name="Test User",
                 account_type=AccountType.USER,
             ),

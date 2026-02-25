@@ -62,7 +62,7 @@ def test_create_user_success(
         username="new_user",
         full_name="New User",
         account_type=AccountType.USER,
-        scopes=[Scope.RUNS_READ],
+        scopes=[Scope.RUNS_WRITE],
     )
     decoy.when(mock_store.get("new_user")).then_return(None)
     decoy.when(
@@ -71,7 +71,7 @@ def test_create_user_success(
             hashed_password=matchers.IsA(str),
             full_name="New User",
             account_type=AccountType.USER,
-            scopes=[Scope.RUNS_READ],
+            scopes=[Scope.RUNS_WRITE],
         )
     ).then_return(expected)
 
@@ -80,7 +80,7 @@ def test_create_user_success(
         password="validpass123",
         full_name="New User",
         account_type=AccountType.USER,
-        scopes=[Scope.RUNS_READ],
+        scopes=[Scope.RUNS_WRITE],
     )
     assert result.username == "new_user"
     assert result.account_type == AccountType.USER
@@ -230,7 +230,7 @@ def test_update_user_username(
     expected = _make_orm_user(
         username="new_name",
         full_name="Name Test",
-        scopes=[Scope.RUNS_READ],
+        scopes=[Scope.RUNS_WRITE],
     )
     decoy.when(
         mock_store.update(
