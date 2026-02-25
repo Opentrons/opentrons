@@ -15,7 +15,14 @@ from auth_server.users.store import UserStore
 _app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
 
 
-def init_oauth2_backend(app_state: AppState, sql_engine: SQLEngine) -> None:
+def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
+    """Store the server's singleton OAuth 2 backend in server state for later retrieval.
+
+    This should be called once at server startup.
+    """
+    _app_state_accessor.set_on(app_state, backend)
+
+def install_oath2_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None:
     """Initialize the server's singleton OAuth 2 backend and store it for later retrieval.
 
     This should be called once at server startup.

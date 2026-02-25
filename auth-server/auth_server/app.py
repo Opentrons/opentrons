@@ -15,7 +15,7 @@ from server_utils.auth.resource_server.fastapi_dependencies import (
 
 from auth_server.authorization_checker import build_authorization_checker
 from auth_server.oauth2.backend import build as build_oauth2_backend
-from auth_server.oauth2.fastapi_dependencies import install_oauth2_backend
+from auth_server.oauth2.fastapi_dependencies import install_oath2_sql_engine, install_oauth2_backend
 from auth_server.oauth2.router import router as oauth2_router
 from auth_server.persistence.database import sql_engine_ctx
 from auth_server.persistence.fastapi_dependencies import (
@@ -46,6 +46,9 @@ def _get_persistence_directory(settings: AuthServerSettings) -> Optional[Path]:
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    settings_store = SettingsStore()
+    install_settings_store(app.state, settings_store)
+
     settings = get_settings()
     persistence_directory_root = _get_persistence_directory(settings)
     prepared_root = await prepare_root(persistence_directory_root)
@@ -58,10 +61,19 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         set_sql_engine(app.state, engine)
 
         user_store = UserStore(sql_engine=engine)
+        settings_store = SettingsStore()
+        install_settings_store(app.state, settings_store)
+
+        oauth2_backend = build_oauth2_backend(user_store)
+        install_oauth2_backend(app.state, oauth2_backend)
+    
+        authorization_checker = build_authorization_checker(settings_store, oauth2_backend)
+        install_authorization_checker(app.state, authorization_checker)
+        
         user_service = UserDataManager(user_store=user_store)
         user_service.seed_initial_users()
 
-        init_oauth2_backend(app.state, engine)
+        install_oath2_sql_engine(app.state, engine)
         systemd_utils.notify_up()
         yield
 
