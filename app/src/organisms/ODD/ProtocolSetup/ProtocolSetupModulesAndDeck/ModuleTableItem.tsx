@@ -16,7 +16,6 @@ import {
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import {
-  ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
   getModuleDeckLabel,
@@ -32,6 +31,8 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
+
+import { getDoesModuleRequireCalibration } from './utils'
 
 import type { TFunction } from 'i18next'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
@@ -81,12 +82,7 @@ export const getModuleDisplayStatus = (
       return 'connected'
     }
 
-    // Absorbance reader module does not require calibration
-    if (
-      attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
-      attachedModule.moduleOffset?.last_modified == null
-    ) {
-      // check if instrument ready to perform module calibration
+    if (getDoesModuleRequireCalibration(attachedModule)) {
       return !calibrationStatus.complete
         ? 'calibrationBlocked'
         : 'needsCalibration'

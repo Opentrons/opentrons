@@ -151,6 +151,15 @@ class CommandPointer:
 
 
 @dataclass(frozen=True)
+class CommandAnnotationsSlice:
+    """A subset of all commands annotations in state."""
+
+    command_annotations: List[CommandAnnotation]
+    cursor: int
+    total_length: int
+
+
+@dataclass(frozen=True)
 class _RecoveryTargetInfo:
     """Info about the failed command that we're currently recovering from."""
 
@@ -955,6 +964,25 @@ class CommandView:
     def get_all_command_annotations(self) -> List[CommandAnnotation]:
         """Return a list of all commands annotated so far."""
         return [annotation for annotation in self._state.command_annotations.values()]
+
+    def get_command_annotations_slice(
+        self, cursor: int, length: int
+    ) -> CommandAnnotationsSlice:
+        """Get a subset of command annotations around a given cursor."""
+        # start is inclusive, stop is exclusive
+        all_annotations = list(self._state.command_annotations.values())
+        total_length = len(all_annotations)
+        actual_cursor = max(
+            0, min(cursor, total_length - 1)
+        )  # 0 <= cursor < total_length
+        stop = min(total_length, actual_cursor + length)  # stop <= total_length
+
+        sliced_annotations = all_annotations[actual_cursor:stop]
+        return CommandAnnotationsSlice(
+            command_annotations=sliced_annotations,
+            cursor=actual_cursor,
+            total_length=total_length,
+        )
 
     def get_recovery_target(self) -> Optional[CommandPointer]:
         """Return the command currently undergoing error recovery, if any."""

@@ -88,13 +88,13 @@ def test_update_username() -> None:
         password="securepassword123",
         full_name="Original",
         account_type="user",
-        scopes=[Scope.RUNS_READ],
+        scopes=[Scope.RUNS_WRITE],
     )
     updated = update(added_user, username="new_name")
     assert updated.username == "new_name"
     assert updated.full_name == "Original"
     assert updated.account_type == AccountType.USER
-    assert updated.scopes == [Scope.RUNS_READ]
+    assert updated.scopes == [Scope.RUNS_WRITE]
     assert get("new_name") is updated
     assert get("orig_name") is None
 
