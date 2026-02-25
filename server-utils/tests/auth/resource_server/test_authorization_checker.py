@@ -94,7 +94,6 @@ async def test_auth_server_checker_given_a_token(
             active=True, scope=serialize_scopes({Scope.RUNS_WRITE})
         )
     )
-    assert (
-        await subject.check("test-token-abc123", {Scope.RUNS_WRITE, Scope.USERS_WRITE})
-        == InsufficientScopeResult(provided_scopes={Scope.RUNS_WRITE})
-    )
+    assert await subject.check(
+        "test-token-abc123", {Scope.RUNS_WRITE, Scope.USERS_WRITE}
+    ) == InsufficientScopeResult(provided_scopes={Scope.RUNS_WRITE})

@@ -4,17 +4,14 @@ from pathlib import Path
 
 from typing_extensions import Final
 
-from server_utils.persistence_directory import (
-    PersistenceResetter,
-)
-from server_utils.persistence_directory import (
+from server_utils.persistence.folder_migrator import MigrationOrchestrator
+from server_utils.persistence.persistence_directory import (
     prepare_active_subdirectory as server_utils_prepare_active_subdirectory,
 )
-from server_utils.persistence_directory import (
-    prepare_root as _prepare_root,
+from server_utils.persistence.persistence_directory import (
+    prepare_root as server_utils_prepare_root,
 )
 
-from ._folder_migrator import MigrationOrchestrator
 from ._migrations import (
     up_to_v03,
     v03_to_v04,
@@ -35,7 +32,6 @@ from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 
 __all__ = [
-    "PersistenceResetter",
     "make_migration_orchestrator",
     "prepare_active_subdirectory",
     "prepare_root",
@@ -83,4 +79,6 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
 
 async def prepare_root(persistence_directory_root: Path | None) -> Path:
     """Prepare the robot-server persistence root directory."""
-    return await _prepare_root(persistence_directory_root, _TEMP_PERSISTENCE_DIR_PREFIX)
+    return await server_utils_prepare_root(
+        persistence_directory_root, _TEMP_PERSISTENCE_DIR_PREFIX
+    )

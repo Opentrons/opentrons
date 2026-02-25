@@ -25,8 +25,8 @@ from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons_shared_data.deck import load as load_deck
+from server_utils.persistence.folder_migrator import Migration
 
-from .._folder_migrator import Migration
 from ._util import copy_contents
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
