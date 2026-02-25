@@ -2,10 +2,11 @@ import { useTranslation } from 'react-i18next'
 
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
-import { RecoveryContentProps } from '../types'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
+
+import type { RecoveryContentProps } from '../types'
 
 export function VacuumDisconnectEmptyCarboy(
   props: RecoveryContentProps
