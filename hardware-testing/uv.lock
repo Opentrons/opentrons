@@ -782,6 +782,7 @@ dev = [
     { name = "pyusb" },
     { name = "requests" },
     { name = "types-requests" },
+    { name = "types-setuptools" },
 ]
 
 [package.metadata]
@@ -815,6 +816,7 @@ dev = [
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "requests", specifier = "==2.27.1" },
     { name = "types-requests", specifier = "==2.25.6" },
+    { name = "types-setuptools", specifier = "==57.0.2" },
 ]
 
 [[package]]
@@ -2013,6 +2015,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/40/24/9eb2b39ae8b9d208627b0a1fb1c30a897adc4f674a2fdc1e8be46845354c/types-requests-2.25.6.tar.gz", hash = "sha256:e21541c0f55c066c491a639309159556dd8c5833e49fcde929c4c47bdb0002ee", size = 13551, upload-time = "2021-08-08T21:15:06.082Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6c/48/21c75a33a57c1da19b6a3de83a8928d8a7a59e6b08260bda3721441945c1/types_requests-2.25.6-py3-none-any.whl", hash = "sha256:a5a305b43ea57bf64d6731f89816946a405b591eff6de28d4c0fd58422cee779", size = 22623, upload-time = "2021-08-08T21:15:04.849Z" },
+]
+
+[[package]]
+name = "types-setuptools"
+version = "57.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7f/9e/b628ecd3ca767a66d30836f69e0264bdb012bdefcc74884b10889fdf748d/types-setuptools-57.0.2.tar.gz", hash = "sha256:4ead432cc394b8de5ee94a312494f3c730d21dbfef37f300a6ac5e742271d735", size = 4165, upload-time = "2021-08-08T18:21:40.858Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c4/4e/b7d607982880b48fa116ccf04a054c6775b1d1469e996c14bec56a1962e0/types_setuptools-57.0.2-py3-none-any.whl", hash = "sha256:62c8dc465f29eeaad6b9025645138738d3df1cafc70cb0b14aea700946f2cbb7", size = 4753, upload-time = "2021-08-08T18:21:40.002Z" },
 ]
 
 [[package]]

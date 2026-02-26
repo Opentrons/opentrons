@@ -83,6 +83,7 @@ dev = [
     "flake8-noqa~=1.4.0",
     "requests==2.27.1",
     "types-requests==2.25.6",
+    "types-setuptools==57.0.2",
     "pyusb==1.2.1",
     "build~=1.2.0",
     "matplotlib==3.10.0",
