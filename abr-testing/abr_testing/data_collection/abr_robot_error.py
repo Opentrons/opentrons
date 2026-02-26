@@ -7,6 +7,7 @@ from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_t
 import shutil
 import os
 import subprocess
+import platform
 from datetime import datetime, timedelta
 import sys
 import json
@@ -15,6 +16,17 @@ from pathlib import Path
 import pandas as pd
 from statistics import mean, StatisticsError
 from abr_testing.tools import plate_reader
+
+
+def open_folder(path: str) -> None:
+    """Open file folder on mac or windows."""
+    system = platform.system()
+    if system == "Windows":
+        subprocess.Popen(["explorer", path])
+    elif system == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        raise OSError("Unsupported operating system")
 
 
 def retrieve_version_file(
@@ -763,4 +775,4 @@ if __name__ == "__main__":
     else:
         print("Ticket created.")
     # Open folder directory incase uploads to ticket were incomplete - only works on windows
-    subprocess.Popen(["explorer", error_folder_path])
+    open_folder(error_folder_path)
