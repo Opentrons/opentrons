@@ -70,7 +70,7 @@ export function LiquidDefinitions({
             return (
               <ListItem
                 type="default"
-                key={`${liquid.displayName}_${liquid.displayColor}_${index}`}
+                key={`${liquid.displayName}_${liquid.displayColor}`}
               >
                 <ListItemDescriptor
                   type="large"

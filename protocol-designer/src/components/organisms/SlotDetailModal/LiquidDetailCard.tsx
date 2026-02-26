@@ -125,7 +125,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex
-                key={`${well.wellName}_${index}`}
+                key={well.wellName}
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 paddingBottom={

@@ -72,9 +72,6 @@ export function InlineNotification(
     linkText,
     onLinkClick,
   } = props
-  // TODO (sb: 8/20/25) RSQ-189 Remove punctuation from this component and add to translation strings
-  const fullHeading = `${heading}${message ? '. ' : ''}`
-  const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
   const iconProps = {
     ...inlineNotificationProps.icon,
@@ -105,7 +102,7 @@ export function InlineNotification(
                     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
                   `}
                 >
-                  {fullHeading}
+                  {heading}
                 </span>
                 {/* this break is because the desktop wants this on two lines, but also wants/
                   inline text layout on ODD. Soooo here you go */}
@@ -118,7 +115,7 @@ export function InlineNotification(
                 />
               </>
             )}
-            {message != null && fullmessage}
+            {message != null && message}
           </StyledText>
         </Flex>
       </Flex>

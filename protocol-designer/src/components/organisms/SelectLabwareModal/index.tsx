@@ -120,16 +120,13 @@ export function SelectLabwareModal(
   const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
   const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
 
-  const [areCategoriesExpanded, setAreCategoriesExpanded] =
+  const [userCategoryExpandState, setUserCategoryExpandState] =
     useState<CategoryExpand>(allCategoriesCollapsed)
 
   const [searchTerm, setSearchTerm] = useState<string>('')
-
-  useEffect(() => {
-    setAreCategoriesExpanded(
-      searchTerm ? allCategoriesExpanded : allCategoriesCollapsed
-    )
-  }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
+  const areCategoriesExpanded = searchTerm
+    ? allCategoriesExpanded
+    : userCategoryExpandState
 
   useEffect(() => {
     if (!hasNoLabware && error != null) {
@@ -138,7 +135,7 @@ export function SelectLabwareModal(
   }, [hasNoLabware])
 
   const handleResetLabwareTools = (): void => {
-    setAreCategoriesExpanded(allCategoriesCollapsed)
+    setUserCategoryExpandState(allCategoriesCollapsed)
     setSearchTerm('')
   }
 
@@ -274,10 +271,10 @@ export function SelectLabwareModal(
 
   const handleCategoryClick = (category: string, expand?: boolean): void => {
     const updatedExpandState = {
-      ...areCategoriesExpanded,
-      [category]: expand ?? !areCategoriesExpanded[category],
+      ...userCategoryExpandState,
+      [category]: expand ?? !userCategoryExpandState[category],
     }
-    setAreCategoriesExpanded(updatedExpandState)
+    setUserCategoryExpandState(updatedExpandState)
   }
 
   const validateQuantity = (): boolean => {

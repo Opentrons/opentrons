@@ -150,7 +150,7 @@ export function SelectLabwareOnAdapter(
                   isNestedDefALid={false}
                   allowInputField={false}
                   stackingProps={stackingProps ?? undefined}
-                  key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                  key={`${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   buttonText={nestedDef?.metadata.displayName ?? ''}
                   buttonValue={tiprackDefUri}

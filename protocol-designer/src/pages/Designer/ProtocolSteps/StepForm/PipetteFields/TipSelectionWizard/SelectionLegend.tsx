@@ -1,5 +1,6 @@
 import {
   COLORS,
+  LABWARE,
   StyledText,
   TipStatus,
   WellStatus,
@@ -14,7 +15,7 @@ import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectionLegendProps {
   selectionType: 'tip' | 'well'
-  size?: string
+  size: string
 }
 
 export function SelectionLegend({
@@ -37,15 +38,18 @@ export function SelectionLegend({
           {isTipSelection ? (
             <TipStatus
               type={type as TipType}
-              wellMap={labwareWellMap}
               size={size}
+              wellMap={labwareWellMap}
             />
           ) : (
-            <WellStatus
-              type={type as WellType}
-              wellMap={labwareWellMap}
-              size={size}
-            />
+            <div className={styles.well_legend_item}>
+              <WellStatus
+                type={type as WellType}
+                size={size}
+                parentType={LABWARE}
+                wellMap={labwareWellMap}
+              />
+            </div>
           )}
 
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

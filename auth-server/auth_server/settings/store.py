@@ -47,7 +47,12 @@ class SettingsStore:
 _accessor = AppStateAccessor[SettingsStore]("settings_store")
 
 
-async def get_settings_store(
+def install_settings_store(app_state: AppState, settings_store: SettingsStore) -> None:
+    """Place the server's singleton SettingsStore in server state, for later retrieval by get_settings_store()."""
+    _accessor.set_on(app_state, settings_store)
+
+
+def get_settings_store(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> SettingsStore:
     """Return the server's singleton SettingsStore."""

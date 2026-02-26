@@ -18,8 +18,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.types import (
     BooleanParameter,
-    CommandAnnotation,
     CommandPreconditions,
+    LegacyCommandAnnotation,
     RunTimeParameter,
     SecondOrderCommandAnnotationLegacy,
 )
@@ -102,8 +102,8 @@ def run_time_parameters() -> List[RunTimeParameter]:
 
 
 @pytest.fixture
-def command_annotations() -> List[CommandAnnotation]:
-    """Get a CommandAnnotation list."""
+def command_annotations() -> List[LegacyCommandAnnotation]:
+    """Get a LegacyCommandAnnotation list."""
     return [
         SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
@@ -186,7 +186,7 @@ async def test_create_play_action_to_start(
     mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
-    command_annotations: List[CommandAnnotation],
+    command_annotations: List[LegacyCommandAnnotation],
     command_preconditions: CommandPreconditions,
     protocol_commands: List[pe_commands.Command],
     run_id: str,

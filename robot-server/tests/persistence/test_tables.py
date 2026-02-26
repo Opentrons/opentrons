@@ -8,7 +8,9 @@ import sqlalchemy
 
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.persistence_directory import make_migration_orchestrator
+from robot_server.persistence.manage_persistence_directory import (
+    make_migration_orchestrator,
+)
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
 )
@@ -146,10 +148,12 @@ EXPECTED_STATEMENTS_LATEST = [
         name VARCHAR NOT NULL,
         description VARCHAR,
         source VARCHAR(6) NOT NULL,
+        parent VARCHAR,
         params VARCHAR,
         PRIMARY KEY (row_id),
         FOREIGN KEY(run_id) REFERENCES run (id),
-        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system'))
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system')),
+        FOREIGN KEY(parent) REFERENCES command_annotation (annotation_id)
     )
     """,
     """

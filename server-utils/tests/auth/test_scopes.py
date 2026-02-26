@@ -25,7 +25,7 @@ def test_no_invalid_characters_in_scope(scope: Scope) -> None:
 def test_parse() -> None:
     assert parse_scopes("") == set()
 
-    assert parse_scopes("runs.write runs.read") == {Scope.RUNS_WRITE, Scope.RUNS_READ}
+    assert parse_scopes("runs.write users.write") == {Scope.RUNS_WRITE, Scope.USERS_WRITE}
 
     with pytest.raises(UnrecognizedScopeError) as exception:
         parse_scopes("these are not valid scopes")
@@ -36,5 +36,8 @@ def test_serialize() -> None:
     assert serialize_scopes(set()) == ""
 
     assert (
-        serialize_scopes({Scope.RUNS_WRITE, Scope.RUNS_READ}) == "runs.read runs.write"
+        serialize_scopes({Scope.RUNS_WRITE, Scope.USERS_WRITE}) == "runs.write users.write"
+    )
+    assert (
+        serialize_scopes({Scope.USERS_WRITE, Scope.RUNS_WRITE}) == "runs.write users.write"
     )

@@ -2,6 +2,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -21,27 +22,6 @@ from auth_server.users.store import (
 )
 
 router = fastapi.APIRouter()
-
-
-def _verify_scopes(
-    request: fastapi.Request,
-    oauth2_backend: Backend,
-    scopes: list[Scope],
-    body: str | None = None,
-) -> None:
-    """Verify OAuth2 scopes. Raises 403 if invalid."""
-    valid, _ = oauth2_backend.verify_request(
-        str(request.url),
-        http_method=request.method,  # type: ignore[arg-type]
-        body=body,
-        headers=dict(request.headers),
-        scopes=[scope.api_name for scope in scopes],
-    )
-    if not valid:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_403_FORBIDDEN,
-            detail="Forbidden",
-        )
 
 
 def _validate_user_create_input(
@@ -81,6 +61,7 @@ def _validate_user_create_input(
     responses={
         fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def post_users(
     request: fastapi.Request,
@@ -88,8 +69,9 @@ async def post_users(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    scopes_required = [Scope.USERS_WRITE]
-    _verify_scopes(request, oauth2_backend, scopes_required)
+    # todo(mm, 2026-02-20): The new user's scopes should either depend on their account type,
+    # or they should be passed in the request body.
+    scopes_for_new_user = [Scope.USERS_WRITE]
     user_create = request_body.data
     _validate_user_create_input(
         user_create.userName,
@@ -108,7 +90,7 @@ async def post_users(
         password=user_create.password.get_secret_value(),
         full_name=user_create.fullName,
         account_type=user_create.accountType,
-        scopes=scopes_required,
+        scopes=scopes_for_new_user,
     )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
@@ -125,6 +107,7 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ))],
 )
 async def get_user(
     request: fastapi.Request,
@@ -132,7 +115,6 @@ async def get_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     user = get(userName)
     if user is None:
         raise fastapi.HTTPException(
@@ -153,6 +135,7 @@ async def get_user(
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
     request: fastapi.Request,
@@ -160,7 +143,6 @@ async def delete_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     user = get(userName)
     if user is None:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
@@ -179,6 +161,7 @@ async def delete_user(
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def update_user(
     request: fastapi.Request,
@@ -187,7 +170,6 @@ async def update_user(
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_user = request_body.data
     _validate_user_create_input(
         user_name=update_user.userName,
