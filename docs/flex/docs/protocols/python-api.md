@@ -103,7 +103,7 @@ Starting in API version 2.27, use start and end location parameters to control p
 
 Some module commands that take a long time to complete (such as executing a Thermocycler profile or heating to a high temperature) can be run in a *concurrent* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. 
 
-As of API version 2.27, concurrent commands are currently supported on the [Heater-Shaker](https://docs.opentrons.com/v2/modules/heater_shaker.html#heating-and-shaking), [Temperature](../../python-api/modules/temperature-module.md#temperature-control), and [Thermocyler](https://docs.opentrons.com/v2/modules/thermocycler.html) Modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](../../python-api/modules/concurrent.md) for more.
+As of API version 2.27, concurrent commands are currently supported on the [Heater-Shaker](../../python-api/modules/heater-shaker.md#heating-and-shaking), [Temperature](../../python-api/modules/temperature-module.md#temperature-control), and [Thermocyler](../../python-api/modules/thermocycler.md) Modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](../../python-api/modules/concurrent.md) for more.
 
 ### Python packages
 
