@@ -1,6 +1,6 @@
 """Router for /runs command annotations endpoints."""
 
-from typing import Annotated, Final, Literal, Optional, Union
+from typing import Annotated, Any, Dict, Final, Literal, Optional, Union
 
 from fastapi.params import Depends, Query
 from starlette import status
@@ -20,7 +20,10 @@ from server_utils.fastapi_utils.models.json_api import (
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.runs.dependencies import get_run_data_manager
 from robot_server.runs.router.base_router import RunNotFound
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_data_manager import (
+    PreSerializedCommandAnnotationsNotAvailableError,
+    RunDataManager,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import (
     CommandAnnotationNotFoundError as CommandAnnotationNotFoundInRunStoreError,
@@ -165,3 +168,97 @@ async def get_command_annotation(
         content=SimpleBody.model_construct(data=annotation),
         status_code=status.HTTP_200_OK,
     )
+
+
+@PydanticResponse.wrap_route(
+    command_annotations_router.get,
+    path="/runs/{runId}/commandAnnotationsAsUnverifiedObjects",
+    summary="Get all command annotations of a completed run as a list of unverified dictionaries of command annotations.",
+    description=(
+        "Get all command annotations of a completed run as a list of unverified dictionaries command annotations."
+        "\n\n"
+        "The command annotations are returned in the order that they were created"
+        "\n\n"
+        "**Warning:** This endpoint is experimental. We may change or remove it without warning."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[Dict[str, Any]]},
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorBody[RunNotFound],
+        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "model": ErrorBody[PreSerializedCommandAnnotationsNotAvailable],
+        },
+    },
+)
+async def get_list_of_unverified_command_annotation_dicts(
+    runId: str,
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleMultiBody[Dict[str, Any]]]:
+    """Get all command annotations of a completed run as a list of pre-serialized (string encoded) command annotations.
+
+    Arguments:
+        runId: Unique run identifier.
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        command_annotations = (
+            run_data_manager.get_command_annotations_as_unverified_objects_list(run_id=runId)
+        )
+    except RunNotFoundError as e:
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
+    except PreSerializedCommandAnnotationsNotAvailableError as e:
+        raise PreSerializedCommandAnnotationsNotAvailable.from_exc(e).as_error(
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        ) from e
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.model_construct(data=command_annotations, meta=None),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+# @PydanticResponse.wrap_route(
+#     command_annotations_router.get,
+#     path="/runs/{runId}/commandAnnotationsAsPreSerializedList",
+#     summary="Get all command annotations of a completed run as a list of pre-serialized (string encoded) command annotations.",
+#     description=(
+#         "Get all command annotations of a completed run as a list of pre-serialized command annotations."
+#         "\n\n"
+#         "The command annotations are returned in the order that they were created"
+#         "\n\n"
+#         "**Warning:** This endpoint is experimental. We may change or remove it without warning."
+#     ),
+#     responses={
+#         status.HTTP_200_OK: {"model": SimpleMultiBody[Dict[str, Any]]},
+#         status.HTTP_404_NOT_FOUND: {
+#             "model": ErrorBody[RunNotFound],
+#         },
+#         status.HTTP_503_SERVICE_UNAVAILABLE: {
+#             "model": ErrorBody[PreSerializedCommandAnnotationsNotAvailable],
+#         },
+#     },
+# )
+# async def get_pre_serialized_command_annotations(
+#     runId: str,
+#     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+# ) -> PydanticResponse[SimpleMultiBody[Dict[str, Any]]]:
+#     """Get all command annotations of a completed run as a list of pre-serialized (string encoded) command annotations.
+#
+#     Arguments:
+#         runId: Unique run identifier.
+#         run_data_manager: Run data retrieval interface.
+#     """
+#     try:
+#         command_annotations = (
+#             run_data_manager.get_command_annotations_as_unverified_objects_list(run_id=runId)
+#         )
+#     except RunNotFoundError as e:
+#         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
+#     except PreSerializedCommandAnnotationsNotAvailableError as e:
+#         raise PreSerializedCommandAnnotationsNotAvailable.from_exc(e).as_error(
+#             status.HTTP_503_SERVICE_UNAVAILABLE
+#         ) from e
+#     return await PydanticResponse.create(
+#         content=SimpleMultiBody.model_construct(data=command_annotations, meta=None),
+#         status_code=status.HTTP_200_OK,
+#     )

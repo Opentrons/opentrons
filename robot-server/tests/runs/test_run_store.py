@@ -1038,7 +1038,7 @@ def test_get_command_annotation_as_preserialized_list(
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
-    result = subject.get_command_annotations_as_preserialized_list("run-id")
+    result = subject.get_command_annotations_as_unverified_objects_list("run-id")
     assert result == [
         {
             "id": "annotation-1",

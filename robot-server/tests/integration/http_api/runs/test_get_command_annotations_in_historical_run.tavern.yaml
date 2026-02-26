@@ -245,3 +245,24 @@ stages:
           name: 'My step group 2'
           description: "Another comment!"
           params: {}
+
+  - name: Get all command annotations as a pre-serialized list
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commandAnnotationsAsUnverifiedObjects'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - source: userCommand
+            id: '{annotation_id_1}'
+            name: 'My step group'
+            description: "It's a comment, that's it."
+            params: '{{}}'
+            parentId: null
+          - source: userCommand
+            id: '{annotation_id_2}'
+            name: 'My step group 2'
+            description: "Another comment!"
+            params: '{{}}'
+            parentId: null

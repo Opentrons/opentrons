@@ -724,11 +724,10 @@ class RunStore:
 
         return _parse_command(command)
 
-    # This is not a pre-serialized list. Maybe an unverified list of command annotation dicts
-    def get_command_annotations_as_preserialized_list(
+    def get_command_annotations_as_unverified_objects_list(
         self, run_id: str
     ) -> List[Dict[str, Any]]:
-        """Get all command annotations of the run as a list of strings of json command objects."""
+        """Get all command annotations of the run as a list of unverified dict entries."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
