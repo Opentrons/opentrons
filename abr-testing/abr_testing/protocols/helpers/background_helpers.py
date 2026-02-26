@@ -11,7 +11,6 @@ from abr_testing.automation import slack
 from abr_testing.tools import check_robot_status as robot_status
 from abr_testing.protocols.helpers import run_helpers
 from collections import deque
-from datetime import datetime
 
 
 def detect_robot_status(ip: str) -> None:
@@ -51,7 +50,7 @@ def change_robot_video_length(time: str, ip: str) -> None:
     mount -o remount,rw / &&
     sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s;/g" /etc/nginx/nginx.conf &&
     systemctl daemon-reload &&
-    systemctl restart nginx 
+    systemctl restart nginx
     """
 
     try:
@@ -60,13 +59,13 @@ def change_robot_video_length(time: str, ip: str) -> None:
     except subprocess.CalledProcessError as e:
         print(f"Failed to update {ip}: {e}")
 
-def video_capture_buffer(max_time: int, m3u8_path: str):
+
+def video_capture_buffer(max_time: int, m3u8_path: str) -> None:
     """Keeps a running video capture buffer of given time."""
     storage_path: str = "data/testing_data/videos/video_capture_buffer"
     os.makedirs(storage_path, exist_ok=True)
 
     # Runs forever in the background
-
 
     # Hello future programmer. Below is an ffmpeg command.
     # ffmpeg is ugly. ffmpeg makes no sense.
@@ -77,12 +76,21 @@ def video_capture_buffer(max_time: int, m3u8_path: str):
     # 4. stores these clips in the above "storage_path" directory
     # it also runs perpetually (but don't worry, it is killed below)
     cmd = [
-        "ffmpeg", "-y", "-i", m3u8_path,
-        "-f", "segment",
-        "-segment_time", "1",
-        "-strftime", "1",
-        "-c:v", "libx264", "-c:a", "aac",
-        f"{storage_path}/%Y-%m-%d_%H-%M-%S.mp4"
+        "ffmpeg",
+        "-y",
+        "-i",
+        m3u8_path,
+        "-f",
+        "segment",
+        "-segment_time",
+        "1",
+        "-strftime",
+        "1",
+        "-c:v",
+        "libx264",
+        "-c:a",
+        "aac",
+        f"{storage_path}/%Y-%m-%d_%H-%M-%S.mp4",
     ]
     """
     Note to self:
@@ -90,7 +98,9 @@ def video_capture_buffer(max_time: int, m3u8_path: str):
         2. DEVNULL is a "black hole" file
         3. here, we are telling subprocess to stfu instead of attacking our terminal
     """
-    process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
     # give ffmpeg a second to get started
     time.sleep(1)
 
@@ -100,14 +110,16 @@ def video_capture_buffer(max_time: int, m3u8_path: str):
             # creates buffer
 
             # Filter for .mp4 only so we don't accidentally try to delete temp files
-            buffer: list[str] = sorted([f for f in os.listdir(storage_path) if f.endswith(".mp4")])
+            buffer: list[str] = sorted(
+                [f for f in os.listdir(storage_path) if f.endswith(".mp4")]
+            )
 
             # enforces maximum time
             if len(buffer) >= max_time + 1:
                 attempted_removals: int = 0
 
-                def _remove_item(attempted_removals: int = 0):
-                    #only try 3 times
+                def _remove_item(attempted_removals: int = 0) -> None:
+                    # only try 3 times
                     if attempted_removals > 3:
                         return
 
@@ -119,16 +131,14 @@ def video_capture_buffer(max_time: int, m3u8_path: str):
                     except OSError:
                         # wait a second, then try again
                         time.sleep(1)
-                        attempted_removals+=1
+                        attempted_removals += 1
                         _remove_item(attempted_removals)
 
                 _remove_item(attempted_removals)
 
-
             time.sleep(1)
     finally:
         process.terminate()
-
 
 
 def launch_background_tasks() -> None:

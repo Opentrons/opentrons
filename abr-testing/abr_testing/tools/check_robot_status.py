@@ -66,7 +66,9 @@ def get_current_run_details_from_robot(
                         if (len(past_run_status_list) == 0) or not (
                             past_run_status_list[-1] == run_status
                         ):
-                            slack_bot.send_slack_message(message, run_helpers.access_livestream_buffer())
+                            slack_bot.send_slack_message(
+                                message, [run_helpers.access_livestream_buffer()]
+                            )
                     else:
                         slack_bot.send_slack_message(message)
                         completed_robots.append(robot_name)
