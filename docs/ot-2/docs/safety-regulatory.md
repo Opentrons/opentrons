@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Safety and Regulatory Information"
-description: "Safety symbols, compliance guidelines, and regulatory information for the OT-2."
 ---
 
 ## Safety information

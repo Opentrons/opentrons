@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: App Features Summary"
-description: "Protocols, Labware, and Devices tab features and settings in the app."
 ---
 
 You control the OT-2 using the Opentrons App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.

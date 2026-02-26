@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Calibration"
-description: "Deck, tip length, pipette offset, and labware calibration procedures."
 ---
 
 This chapter covers the calibration procedures and software tools you will use to ensure your OT-2 moves around its working area with repeatable accuracy. By mapping the robot's hardware and labware to the deck and gantry-mounted instruments, these procedures help the robot operate with precision during a protocol run.

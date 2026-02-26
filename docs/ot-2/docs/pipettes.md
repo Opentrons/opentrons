@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Pipettes"
-description: "GEN1 and GEN2 pipette types, compatibility, and attachment for the OT-2."
 ---
 
 OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentrons OT-2 liquid handling robot. They move liquids throughout the working area during protocol execution. For an OT-2, this class of instruments includes single-channel and multi-channel GEN1 and GEN2 pipettes. 

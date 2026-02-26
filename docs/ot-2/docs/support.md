@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Product Support and Company Information"
-description: "Contact options for sales, technical support, warranty, and supplies."
 ---
 
 Contact us if you have any questions about the OT-2. Opentrons teams are here to help you with:

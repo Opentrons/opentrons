@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Unboxing"
-description: "Step-by-step unboxing, assembly, and initial preparation of your new OT-2."
 ---
 
 Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. This section provides instructions to walk you through unboxing, assembling, and preparing the OT-2 for use.

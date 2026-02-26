@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Additional Documentation"
-description: "Links to Knowledge Hub, Python API docs, and other Opentrons resources."
 ---
 
 In addition to this manual, Opentrons provides several online resources for our hardware and software products. These resources may be valuable as you use the OT-2.

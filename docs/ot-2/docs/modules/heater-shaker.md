@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Heater-Shaker"
-description: "Heater-Shaker Module: on-deck heating and orbital shaking (37–95 °C, 200–3000 rpm)."
 ---
 
 ![Heater-Shaker image](../images/heater-shaker-module.png)

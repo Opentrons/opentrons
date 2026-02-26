@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Installation and Relocation"
-description: "Prepare your lab, set up the robot, and relocate the OT-2 when needed."
 ---
 
 This chapter describes how to prepare your lab for an OT-2, how to set up the robot, and how to move it if necessary.

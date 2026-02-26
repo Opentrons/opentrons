@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Installation Requirements"
-description: "Site requirements: placement, power, and environmental conditions for the OT-2."
 ---
 
 Before setting up an OT-2, make sure that your installation site meets the requirements described in this section. Also, follow all of the safety guidance here and throughout the installation instructions.

@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Jog Controls"
-description: "Use jog controls to align the pipette during calibration and Labware Position Check."
 ---
 
 The Opentrons App displays various _jog controls_ while you perform robot calibrations or run Labware Position Check. These are movement controls that allow you to make fine adjustments along the X, Y, and Z-axes for better alignment with the deck, labware, and modules.

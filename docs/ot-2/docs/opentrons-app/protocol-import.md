@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Importing Protocols"
-description: "Upload or import protocol files and understand protocol analysis in the app."
 ---
 
 Regardless of how you create them, every protocol begins as a file on your computer. You must import the protocol into the Opentrons App to transfer it to your OT-2.

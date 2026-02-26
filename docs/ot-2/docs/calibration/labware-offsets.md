@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Labware Offsets"
-description: "Create and use labware offsets with Labware Position Check for accuracy."
 ---
 
 Labware offsets are fine-tuned positional coordinates that help the OT-2 align a pipette relative to a specific piece of labware used in a protocol. _Labware Position Check_ is the procedure your OT-2 runs to create these offset measurements.

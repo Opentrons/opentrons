@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Robot Components"
-description: "Frame, gantry, deck, working area, and visual indicators of the OT-2."
 ---
 
 ![OT-2 main parts with labels](../images/ot2-features-hero.png)

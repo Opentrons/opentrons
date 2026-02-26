@@ -38,9 +38,6 @@ nav:
       - Installing the App: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
-      - Updating the Robot: opentrons-app/update.md
-      - Resetting the Robot: opentrons-app/reset.md
-      - Downloading OT-2 Log Files: opentrons-app/log-files.md
       - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
       - Maintenance: maintenance/index.md
@@ -66,13 +63,6 @@ plugins:
   - search
   - autorefs
   - parent-css
-  - print-site:
-      exclude:
-        - index.md
-      add_cover_page: true
-      cover_page_template: "docs/cover.tpl"
-      include_css: false
-      enumerate_headings: false
 
 markdown_extensions:
   - admonition
@@ -92,8 +82,7 @@ markdown_extensions:
       permalink: true
 
 extra_css:
-  - ../shared/instruction-manuals.css
-  - ../shared/opentrons-theme.css
-  - ../shared/print-pdf.css
+  - manual.css
+  - ../opentrons-theme.css
 
-copyright: '© Opentrons 2026. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

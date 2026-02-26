@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Instrument Installation and Calibration"
-description: "Attach pipettes to the gantry and run calibration using the Opentrons App."
 ---
 
 After the initial robot setup, your next step is to attach and calibrate a pipette. The OT-2 has two pipette mounts; each can hold a single-channel or multi-channel pipette. The information in this section will help you get started; the Opentrons App provides detailed, illustrated instructions about the attachment and calibration workflows. To begin:

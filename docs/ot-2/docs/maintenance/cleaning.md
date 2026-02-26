@@ -1,6 +1,5 @@
 ---
 title: "Opentrons OT-2: Cleaning"
-description: "How to clean the OT-2 frame, deck, gantry, and which cleaning solutions to use."
 ---
 
 Routine cleaning helps keep your OT-2 free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. Review this section for information and instructions on how to clean your robot.
