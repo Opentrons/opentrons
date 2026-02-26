@@ -104,6 +104,7 @@ async def upload_splash_image(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="Unable to determine file type",
         )
+    await file.seek(0)
 
     # Only accept PNG files
     accepted_file_types = ["image/png", "png"]
@@ -125,11 +126,9 @@ async def upload_splash_image(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="File is larger than 5mb.",
             )
+    await file.seek(0)
 
     # TODO: Validate image dimensions
-
-    # return the pointer back to the starting point so that the next read starts from the starting point
-    await file.seek(0)
 
     try:
         # Remove the old image if exists
