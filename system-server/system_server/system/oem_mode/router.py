@@ -146,7 +146,7 @@ async def upload_splash_image(
         with open(filepath, "wb+") as f:
             f.write(file.file.read())
 
-        # store the file location to settings and save the dotenv
+        # store the file location
         oem_settings.oem_mode_splash_custom = filepath
         success = oem_settings_store.write(oem_settings)
         response.status_code = (
