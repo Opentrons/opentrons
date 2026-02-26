@@ -45,17 +45,15 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
   }
 
   return (
-    <label
-      className={clsx(styles.checkbox_label, {
-        [styles.checkbox_label_checked]: isChecked,
-        [styles.checkbox_label_unchecked]: !isChecked,
-        [styles.checkbox_label_round]: type === 'round',
-        [styles.checkbox_label_neutral]: type !== 'round',
-        [styles.checkbox_label_disabled]: disabled,
-        [styles.checkbox_label_enabled]: !disabled,
-      })}
-      // eslint-disable-next-line react/forbid-dom-props -- width is a runtime prop and cannot be represented with static classes.
-      style={checkboxStyle}
+    <Btn
+      display={DISPLAY_FLEX}
+      alignItems={ALIGN_CENTER}
+      role="checkbox"
+      aria-checked={isChecked}
+      onClick={onClick}
+      tabIndex={tabIndex}
+      disabled={disabled}
+      css={CHECKBOX_STYLE}
     >
       <input
         type="checkbox"
