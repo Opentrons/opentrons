@@ -254,6 +254,7 @@ settings = [
         ),
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
+        default_true_on_robot_types=[RobotTypeEnum.FLEX],
     ),
 ]
 
