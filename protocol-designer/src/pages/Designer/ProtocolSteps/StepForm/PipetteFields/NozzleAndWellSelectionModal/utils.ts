@@ -1,3 +1,4 @@
+import { INACCESSIBLE } from '@opentrons/components'
 import {
   A1_NOZZLE,
   A12_NOZZLE,
@@ -16,8 +17,10 @@ import {
   SINGLE,
 } from '@opentrons/shared-data'
 
+import { PARTIAL_NOZZLE_MAP } from './constants'
+
 import type { TFunction } from 'i18next'
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -25,18 +28,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
-export const partialNozzleMap: Record<PartialPrimaryNozzles, number> = {
-  G1: 2,
-  F1: 3,
-  E1: 4,
-  D1: 5,
-  C1: 6,
-  B1: 7,
-}
 function isPartialPrimaryNozzle(
   nozzle: string
 ): nozzle is PartialPrimaryNozzles {
-  return nozzle in partialNozzleMap
+  return nozzle in PARTIAL_NOZZLE_MAP
 }
 
 export const getAvailableNozzleConfigurations = (
@@ -191,13 +186,17 @@ export const getEntireWellSelection = (
     case ROW:
       return wellOrdering.map(column => column[rowIndex])
     case PARTIAL: {
-      if (!isPartialPrimaryNozzle(primaryNozzle)) return []
+      if (!isPartialPrimaryNozzle(primaryNozzle)) {
+        return []
+      }
+
       const column = wellOrdering[columnIndex]
-      const count = partialNozzleMap[primaryNozzle]
+      const count = PARTIAL_NOZZLE_MAP[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {
-        return []
+        const beginning = column.length - count
+        return column.slice(beginning, column.length)
       }
       const end = rowIndex + count
       return column.slice(rowIndex, Math.min(end, column.length))
@@ -207,18 +206,58 @@ export const getEntireWellSelection = (
   }
 }
 
+export const getInaccessibleWellsForPartialNozzleRowMap = (
+  selectedWells: string[][],
+  wellDefMap: string[][],
+  allWellsWithState: Record<string, WellType>,
+  channels: number
+): string[] => {
+  const inaccessible: string[] = []
+  const selectedFlat = selectedWells.flat()
+
+  for (const column of wellDefMap) {
+    // Find indices of selected wells within the column
+    const selectedIndices = selectedFlat
+      .map(well => column.indexOf(well))
+      .filter(index => index !== -1)
+    if (selectedIndices.length === 0) {
+      continue
+    }
+    // Split column into chunks of unselected wells around selected wells
+    const boundaries = [-1, ...selectedIndices, column.length] // include start/end
+    for (let i = 0; i < boundaries.length - 1; i++) {
+      const start = boundaries[i] + 1 // add one to get the next boundary
+      const end = boundaries[i + 1] // add one to the index to see where there is an index missing
+      const chunk = column
+        .slice(start, end)
+        .filter(well => allWellsWithState[well] !== INACCESSIBLE)
+      // Only mark inaccessible if chunk is smaller than channels
+      if (chunk.length > 0 && chunk.length < channels) {
+        chunk.forEach(well => {
+          if (!inaccessible.includes(well)) inaccessible.push(well)
+        })
+      }
+    }
+  }
+
+  return inaccessible
+}
+
 export function getWellGroupLength(
   totalSelected: number,
   ordering: string[][],
-  nozzleConfiguration: NozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle,
+  partialChannels: number
 ): number {
-  const rows = ordering.length
-  const columns = ordering[0]?.length ?? 0
   switch (nozzleConfiguration) {
     case ROW:
-      return totalSelected / rows
     case COLUMN:
-      return totalSelected / columns
+      return totalSelected
+    case PARTIAL:
+      if (ordering.length === 1) {
+        return totalSelected
+      }
+      return totalSelected * partialChannels
     default:
       return totalSelected / 1
   }

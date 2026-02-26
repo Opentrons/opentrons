@@ -35,13 +35,13 @@ from ..protocol_engine.errors import RunStoppedError
 from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.state.module_substates import FlexStackerSubState
 from ..protocol_engine.types import (
-    CommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyCommandAnnotation,
     LegacyLabwareOffsetCreate,
     ModuleModel,
     PostRunHardwareState,
@@ -51,6 +51,8 @@ from ..protocol_engine.types import (
 from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
 from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.types import CommandAnnotation
 from opentrons.types import NozzleMapInterface
 
 
@@ -275,12 +277,24 @@ class RunOrchestrator:
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_command_annotations(self) -> List[CommandAnnotation]:
-        """Get the list of command annotations defined in the protocol, if any."""
+    def get_all_legacy_command_annotations(self) -> List[LegacyCommandAnnotation]:
+        """Get the list of legacy command annotations defined in the protocol, if any."""
         return (
             []
             if self._protocol_runner is None
             else self._protocol_runner.command_annotations
+        )
+
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations defined in the protocol, if any."""
+        return len(
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
+
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the command annotation by ID."""
+        return self._protocol_engine.state_view.commands.get_command_annotation(
+            annotation_id
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
@@ -313,6 +327,14 @@ class RunOrchestrator:
         """
         return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
+
+    def get_command_annotations_slice(
+        self, cursor: int, length: int
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of command annotations in the run."""
+        return self._protocol_engine.state_view.commands.get_command_annotations_slice(
+            cursor=cursor, length=length
         )
 
     def get_command_error_slice(

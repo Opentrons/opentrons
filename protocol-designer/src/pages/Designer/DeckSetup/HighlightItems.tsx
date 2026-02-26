@@ -145,7 +145,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       return [
         ...acc,
         <LabwareLabel
-          key={`${labwareOnDeck.id}_${index}`}
+          key={labwareOnDeck.id}
           isSelected={isSelected}
           isLast
           showModuleIcon={labwareIdsFromFullStack.length > 1}

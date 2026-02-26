@@ -114,6 +114,14 @@ class CommandNotFoundError(ValueError):
         super().__init__(f"Command {command_id} was not found.")
 
 
+class CommandAnnotationNotFoundError(ValueError):
+    """Error raised when a given command annotation ID is not found in the store."""
+
+    def __init__(self, command_annotation_id: str) -> None:
+        """Initialize the error message from the missing ID."""
+        super().__init__(f"Command annotation {command_annotation_id} was not found.")
+
+
 class RunStore:
     """Methods for storing and retrieving run resources."""
 

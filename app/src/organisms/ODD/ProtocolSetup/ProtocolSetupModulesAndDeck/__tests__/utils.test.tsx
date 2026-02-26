@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
-import { getModuleDef } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleDef,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 
-import { getUnmatchedModulesForProtocol } from '../utils'
+import {
+  getDoesModuleRequireCalibration,
+  getUnmatchedModulesForProtocol,
+} from '../utils'
+
+import type { AttachedModule } from '@opentrons/api-client'
 
 const temperatureProtocolModule = {
   moduleId: 'mockTempModuleId',
@@ -71,6 +85,51 @@ describe('getUnmatchedModulesForProtocol', () => {
     expect(result).toEqual({
       missingModuleIds: ['mockMagneticModuleId'],
       remainingAttachedModules: [mockTemperatureModuleGen2],
+    })
+  })
+})
+
+describe('getDoesModuleRequireCalibration', () => {
+  ;[
+    TEMPERATURE_MODULE_TYPE,
+    MAGNETIC_MODULE_TYPE,
+    THERMOCYCLER_MODULE_TYPE,
+    HEATERSHAKER_MODULE_TYPE,
+  ].forEach(moduleType => {
+    const mockModule = {
+      moduleType,
+    } as AttachedModule
+    it(`returns true for ${moduleType} that requires calibration`, () => {
+      expect(getDoesModuleRequireCalibration(mockModule)).toBe(true)
+    })
+  })
+  ;[
+    TEMPERATURE_MODULE_TYPE,
+    MAGNETIC_MODULE_TYPE,
+    THERMOCYCLER_MODULE_TYPE,
+    HEATERSHAKER_MODULE_TYPE,
+  ].forEach(moduleType => {
+    const mockModule = {
+      moduleType,
+      moduleOffset: {
+        last_modified: '2026-02-23T14:42:20.131798+00:00',
+      },
+    } as AttachedModule
+    it(`returns false for ${moduleType} that has calibration data`, () => {
+      expect(getDoesModuleRequireCalibration(mockModule)).toBe(false)
+    })
+  })
+  ;[
+    ABSORBANCE_READER_TYPE,
+    FLEX_STACKER_MODULE_TYPE,
+    VACUUM_MODULE_TYPE,
+  ].forEach(moduleType => {
+    const mockModule = {
+      moduleType,
+      moduleOffset: undefined,
+    } as AttachedModule
+    it('returns false for modules that do not require calibration', () => {
+      expect(getDoesModuleRequireCalibration(mockModule)).toBe(false)
     })
   })
 })

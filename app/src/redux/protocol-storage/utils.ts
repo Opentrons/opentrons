@@ -1,47 +1,71 @@
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
 import type { GroupedCommands } from './types'
 
 export const getGroupedCommands = (
   mostRecentAnalysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
 ): GroupedCommands => {
   const annotations = mostRecentAnalysis?.commandAnnotations ?? []
-  return mostRecentAnalysis.commands.reduce<GroupedCommands>((acc, c) => {
-    const foundAnnotationIndex = annotations.findIndex(
-      a => c.key != null && a.commandKeys.includes(c.key)
+
+  // we won't support showing the command annotations if they are schema V1
+  if (
+    annotations.some(
+      a =>
+        a.annotationType === 'secondOrderCommand' ||
+        a.annotationType === 'custom'
     )
-    const lastAccNode = acc[acc.length - 1]
-    if (
-      acc.length > 0 &&
-      c.key != null &&
-      'annotationIndex' in lastAccNode &&
-      lastAccNode.annotationIndex != null &&
-      annotations[lastAccNode.annotationIndex]?.commandKeys.includes(c.key)
-    ) {
-      return [
-        ...acc.slice(0, -1),
-        {
-          ...lastAccNode,
-          subCommands: [
-            ...lastAccNode.subCommands,
-            { command: c, isHighlighted: false },
-          ],
-          isHighlighted: false,
-        },
-      ]
-    } else if (foundAnnotationIndex >= 0) {
-      return [
-        ...acc,
-        {
-          annotationIndex: foundAnnotationIndex,
-          subCommands: [{ command: c, isHighlighted: false }],
-          isHighlighted: false,
-        },
-      ]
-    } else {
-      return [...acc, { command: c, isHighlighted: false }]
-    }
-  }, [])
+  ) {
+    return []
+  } else {
+    const annotationsV2 = annotations as CommandAnnotationV2[]
+    const annotationMap = new Map(
+      annotationsV2.map(annotation => [annotation.annotationId, annotation])
+    )
+
+    return mostRecentAnalysis.commands.reduce<GroupedCommands>(
+      (acc: GroupedCommands, command: RunTimeCommand) => {
+        const annotationId = command.commandAnnotationIds?.[0]
+
+        const lastAccNode = acc[acc.length - 1]
+
+        if (
+          lastAccNode != null &&
+          annotationId != null &&
+          'annotationId' in lastAccNode &&
+          lastAccNode.annotationId === annotationId
+        ) {
+          return [
+            ...acc.slice(0, -1),
+            {
+              ...lastAccNode,
+              subCommands: [
+                ...lastAccNode.subCommands,
+                { command: command, isHighlighted: false },
+              ],
+              isHighlighted: false,
+            },
+          ]
+        }
+
+        if (annotationId != null) {
+          return [
+            ...acc,
+            {
+              annotationId,
+              annotation: annotationMap.get(annotationId),
+              subCommands: [{ command, isHighlighted: false }],
+              isHighlighted: false,
+            },
+          ]
+        }
+
+        return [...acc, { command, isHighlighted: false }]
+      },
+      []
+    )
+  }
 }

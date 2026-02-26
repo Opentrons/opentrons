@@ -10,8 +10,8 @@ from pathlib import Path
 import sqlalchemy
 
 from opentrons.protocol_engine import LabwareOffset, StateSummary
+from server_utils.persistence.folder_migrator import Migration
 
-from .._folder_migrator import Migration
 from ._util import copy_contents
 from robot_server.persistence.database import sql_engine_ctx, sqlite_rowid
 from robot_server.persistence.file_and_directory_names import DB_FILE
