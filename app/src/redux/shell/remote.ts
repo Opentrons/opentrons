@@ -61,6 +61,22 @@ export async function appShellRequestor<Data>(
   if (result?.error != null) {
     throw result.error
   }
+
+  // TODO(jh, 2026-02-26): The below is a hack to get around the fact that Blob data
+  // doesn't (de)serialize properly somewhere in the IPC chain, seemingly only on Windows. Investigate
+  // a more robust solution.
+
+  // Blob data doesn't serialize properly across the IPC, so we parse it from
+  // an Array type sent from the shell layer. On Windows, large arrays may be
+  // serialized as objects with numeric string keys (e.g., {"0":80,"1":75,...}).
+  if (config.responseType === 'blob' && result.data != null) {
+    const arrayData = Array.isArray(result.data)
+      ? result.data
+      : Object.values(result.data as Record<string, number>)
+
+    result.data = new Blob([new Uint8Array(arrayData as number[])]) as Data
+  }
+
   return result
 }
 
