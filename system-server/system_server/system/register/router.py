@@ -1,6 +1,7 @@
 """Router for /system/register endpoint."""
 
 from textwrap import dedent
+from typing import Annotated
 from uuid import UUID
 
 import sqlalchemy
@@ -28,7 +29,8 @@ register_router = APIRouter()
         This registers a client (basically just storing the information you pass in)
         and returns a registration token that you can pass to `/system/authorize`.
         Identical information is deduplicated, so this is safe to call multiple times.
-        """),
+        """
+    ),
     responses={
         status.HTTP_200_OK: {"model": PostRegisterResponse},
         status.HTTP_201_CREATED: {"model": PostRegisterResponse},
@@ -36,9 +38,9 @@ register_router = APIRouter()
 )
 async def register_endpoint(
     response: Response,
-    registrant: Registrant = Depends(create_registrant),
-    signing_uuid: UUID = Depends(get_persistent_uuid),
-    engine: sqlalchemy.engine.Engine = Depends(get_sql_engine),
+    registrant: Annotated[Registrant, Depends(create_registrant)],
+    signing_uuid: Annotated[UUID, Depends(get_persistent_uuid)],
+    engine: Annotated[sqlalchemy.engine.Engine, Depends(get_sql_engine)],
 ) -> PostRegisterResponse:
     """Router for /system/register endpoint."""
     token, new_token = get_or_create_registration_token(

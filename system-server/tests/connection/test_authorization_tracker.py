@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import List
 
 import pytest
 
@@ -8,7 +7,7 @@ from system_server.jwt import Registrant
 
 
 @pytest.fixture
-def registrant_list() -> List[Registrant]:
+def registrant_list() -> list[Registrant]:
     return [Registrant(f"sub{n}", f"agent{n}", f"agent_id{n}") for n in range(100)]
 
 
@@ -42,7 +41,7 @@ async def test_authorization_tracking_counting() -> None:
     assert subject.active_connections() == 1
 
 
-async def test_authorization_tracking_getter(registrant_list: List[Registrant]) -> None:
+async def test_authorization_tracking_getter(registrant_list: list[Registrant]) -> None:
     subject = AuthorizationTracker()
     # Generate a list of registrants
     expiration = datetime.now() + timedelta(days=100)
@@ -59,7 +58,7 @@ async def test_authorization_tracking_getter(registrant_list: List[Registrant]) 
 
 
 async def test_authorization_tracking_overwrite(
-    registrant_list: List[Registrant],
+    registrant_list: list[Registrant],
 ) -> None:
     subject = AuthorizationTracker()
     # Generate a list of registrants
