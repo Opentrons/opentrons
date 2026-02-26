@@ -44,6 +44,8 @@ async def post_users(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
+    # todo(mm, 2026-02-20): The new user's scopes should either depend on their account type,
+    # or they should be passed in the request body.
     user_create = request_body.data
     try:
         new_user = user_data_manager.create_user(
@@ -78,7 +80,7 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ))],
 )
 async def get_user(
     request: fastapi.Request,
