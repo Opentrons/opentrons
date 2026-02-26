@@ -112,7 +112,6 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                     #self.ctx.delay(seconds=1,msg=f"resp------- {resp}")
                     if resp:
                         resp1 = resp.decode('utf-8', errors='ignore')
-                        print(resp1)
                         if "Wrong Channel" in resp1:
                             send =(str("M115") + "\r\n").encode('utf-8')
                             ser.write(send)
@@ -125,15 +124,11 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                     #resp = ser.readline().decode(errors="ignore").strip()
                     #self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
                     #print(resp)
-                    time.sleep(0.5)
-                try:    
-                    if "VersionImpact" in resp1:
-                        self._ser = ser
-                        self.port = p.device
-                        return 
-                except Exception as err:
-                    #self.ctx.delay(seconds=1,msg=f"err {err}")
-                    pass
+                if "VersionImpact" in resp1:
+                    self._ser = ser
+                    self.port = p.device
+                    return True
+                
                 ser.close()
 
             except SerialException:
@@ -267,8 +262,11 @@ def BuildImpactProtection(
         return ImpactProtectionSimulate()
 
     dev = ImpactProtectionSerial(ctx=ctx)
-    dev.connect(autosearch=autosearch, port=port)
-    return dev
+    conret = dev.connect(autosearch=autosearch, port=port)
+    if conret:
+        return dev
+    else:
+        return False
 
 
 

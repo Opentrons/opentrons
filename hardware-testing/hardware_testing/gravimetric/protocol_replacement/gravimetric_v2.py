@@ -179,7 +179,6 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    ImpactSerial_U: BuildImpactProtection
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -421,7 +420,6 @@ class FixtureSettings:
         # do this after the set serial to overwrite where the name.
         test_report.set_robot_id(robot_serial)
         ctx.load_trash_bin("A3")
-        ImpactSerial_U = None
         return cls(
             ctx=ctx,
             name=name,
@@ -466,7 +464,6 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
-            ImpactSerial_U=ImpactSerial_U
         )
 
     def validate_settings(self) -> bool:
@@ -476,6 +473,25 @@ class FixtureSettings:
         # - Tips fit on the given pipette
 
         return True
+    
+    def close(self) -> None:
+        """Close all resources."""
+        try:
+            if hasattr(self, 'env_sensor') and hasattr(self.env_sensor, 'close'):
+                self.env_sensor.close()
+                print_info("Closed environment sensor")
+            if hasattr(self, 'recorder') and hasattr(self.recorder, 'close'):
+                self.recorder.close()
+                print_info("Closed recorder")
+            if hasattr(self, 'scale') and hasattr(self.scale, 'close'):
+                self.scale.close()
+                print_info("Closed scale")
+        except Exception as e:
+            print_error(f"Error closing resources: {e}")
+
+    def __del__(self) -> None:
+        """Destructor to ensure resources are released."""
+        self.close()
 
 
 def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
@@ -807,14 +823,14 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def remove_tip(fixture_settings: FixtureSettings) -> None:
+def remove_tip(fixture_settings: FixtureSettings,ImpactSerial_U:BuildImpactProtection = None) -> None:
     """Either return or drop tip(s)."""
     if fixture_settings.return_tip:
         fixture_settings.pipette.return_tip()
     else:
         if not fixture_settings.ctx.is_simulating():
-            if fixture_settings.ImpactSerial_U != None:
-                fixture_settings.ImpactSerial_U.close_all_gratings()
+            if ImpactSerial_U != None:
+                ImpactSerial_U.close_all_gratings()
         fixture_settings.pipette.drop_tip()
 
 
@@ -968,6 +984,7 @@ def aspirate_with_liquid_class(
     trial: int,
     channel: int,
     transfer_properties: TransferProperties,
+    ImpactSerial_U:BuildImpactProtection = None
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
@@ -975,8 +992,8 @@ def aspirate_with_liquid_class(
     # 添加这几行
     if not fixture_settings.ctx.is_simulating():
         swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
-        if fixture_settings.ImpactSerial_U != None:
-            impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+        if ImpactSerial_U != None:
+            impp = ImpactSerial_U.switch_mode(swichvaldict[tip])
             if "OK" not in impp.raw_response:
                 raise RuntimeError(f"Collision avoidance switch failed to activate.")
 
@@ -1043,6 +1060,7 @@ def run_blank_test(
     volume: float,
     trial: int,
     tip_well: Well,
+    ImpactSerial_U:BuildImpactProtection = None,
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
     channel = 0
@@ -1116,6 +1134,7 @@ def run_blank_test(
         trial,
         channel,
         transfer_properties=transfer_properties,
+        ImpactSerial_U=ImpactSerial_U
     )
     print_info("Post aspirate read.")
     post_aspirate = retract_and_wait(
@@ -1165,6 +1184,7 @@ def run_one_test(
     trial: int,
     channel: int,
     last_measurement: MeasurementData,
+    ImpactSerial_U:BuildImpactProtection = None
 ) -> List[MeasurementData]:
     """Run one trial of one test."""
     print_info(f"Running trial {trial} volume {volume} channel {channel} tip {tip}")
@@ -1251,7 +1271,7 @@ def run_one_test(
             )
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
-        fixture_settings, tip, volume, trial, channel, transfer_properties
+        fixture_settings, tip, volume, trial, channel, transfer_properties,ImpactSerial_U
     )
     print_info("Post aspirate read.")
     post_aspirate = retract_and_wait(
@@ -1267,7 +1287,7 @@ def run_one_test(
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel
     )
-    remove_tip(fixture_settings)
+    remove_tip(fixture_settings,ImpactSerial_U)
     report.store_encoder(
         fixture_settings.test_report,
         volume,
@@ -1302,6 +1322,7 @@ def calculate_evaporation(
     fixture_settings: FixtureSettings,
     liq: SupportedLiquid,
     tip: Well,
+    ImpactSerial_U:BuildImpactProtection = None
 ) -> Tuple[List[List[MeasurementData]], float, float]:
     """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
@@ -1324,6 +1345,7 @@ def calculate_evaporation(
                 fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
                 i,
                 tip,
+                ImpactSerial_U
             )
         )
     asp_evaps = [
@@ -1359,7 +1381,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
 
     ImpactSerial_U = BuildImpactProtection(fixture_settings.ctx.is_simulating(),ctx=ctx)
-    fixture_settings.ImpactSerial_U = ImpactSerial_U
+    if ImpactSerial_U == False:
+        raise "NOT connect ImpactProtection"
+
     swichvaldict = {20:"SET_LEFT_T50",
     50:"SET_LEFT_T50",
     200:"SET_LEFT_T50",
@@ -1385,36 +1409,15 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         msg=f"last_probed_tip_size {last_probed_tip_size}",
     )
     #开启针管防撞
-    # fixture_settings
-    # if not ctx.is_simulating():
-    #     impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[last_probed_tip_size])
-    #     if "OK" not in impp.raw_response:
-    #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
-
-    # if not ctx.is_simulating:
-    #     impp = ""
-    #     impp =  sync_pipette_by_tip(fixture_settings,ctx, side, last_probed_tip_size)
-    #     if "OK" not in impp:
-    #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
-        ctx, fixture_settings, liq, first_tip
+        ctx, fixture_settings, liq, first_tip,ImpactSerial_U
     )
     remove_tip(fixture_settings)
     measurements: Dict[float, List[List[MeasurementData]]] = {}
     last_measurement = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
-        # if not ctx.is_simulating:
-        #     impp2 = ""
-        #     impp2 = sync_pipette_by_tip(fixture_settings,ctx, side, tip)
-        #     if "OK" not in impp2:
-        #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
-        # if not ctx.is_simulating():
-        #     impp2 = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
-        #     if "OK" not in impp2.raw_response:
-        #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
-
         if tip != last_probed_tip_size:
             _configure_tip_count(fixture_settings, 0)
             probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
@@ -1463,7 +1466,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             avg_asp_evap,
                             avg_disp_evap,
                         ) = calculate_evaporation(
-                            ctx, fixture_settings, liq, tips.pop(0)
+                            ctx, fixture_settings, liq, tips.pop(0),ImpactSerial_U
                         )
                         remove_tip(fixture_settings)
                     print_header(
@@ -1478,6 +1481,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             trial,
                             channel,
                             last_measurement,
+                            ImpactSerial_U
                         )
                     )
                     asp_with_evap = (
@@ -1635,7 +1639,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         #     res = fixture_settings.ImpactSerial.close_all_gratings()
         #     print_info(f"close_all_gratings {res}")
         if not ctx.is_simulating():
-            fixture_settings.ImpactSerial_U.close_all_gratings()
+            ImpactSerial_U.close_all_gratings()
 
 def _override_check(
     aspirate_volume: float,
