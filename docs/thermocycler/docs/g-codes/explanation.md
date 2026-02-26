@@ -5,7 +5,7 @@ title: "Thermocycler Module: Understanding G-codes"
 This section provides an overview of G-codes, including the structure of a typical command and response. For the complete list of Thermocycler G-codes, see <font color="red">PLACEHOLDER TBD</font>.
 
 !!!note
-    Knowledge or use of G-codes are not required to work with Opentrons modules. Your protocol files contain all the information needed by Flex to work with any attached modules. This section is mainly a technical reference for developers building their own applications that work with our hardware.
+    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed by Flex to work with any attached modules. This section is mainly a technical reference for developers building their own applications that work with our hardware.
 
 ## Understanding G-codes
 
