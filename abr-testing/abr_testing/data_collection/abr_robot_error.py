@@ -561,6 +561,30 @@ Please confirm with the ABR-LPC sheet and re-LPC."
     )
 
 
+def write_errored_run_to_google_sheet() -> None:
+    """Add row to google sheet with run details and link to ticket."""
+    file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
+    (
+        runs_and_robots,
+        headers,
+        runs_and_lpc,
+        headers_lpc,
+    ) = abr_google_drive.create_data_dictionary(
+        run_id,
+        Path(error_folder_path),
+        issue_url,
+        file_values,
+    )
+    start_row = google_sheet.get_index_row() + 1
+    try:
+        google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
+    except requests.exceptions.RequestException as e:
+        print(
+            f"⚠️Warning: Did not record this run on ABR-run-data google sheet. Error: {e}"
+        )
+    print("Wrote run to ABR-run-data")
+
+
 if __name__ == "__main__":
     """Create ticket for specified robot."""
     parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
@@ -735,28 +759,7 @@ if __name__ == "__main__":
         except FileNotFoundError:
             print("Run file not uploaded.")
         run_id = os.path.basename(error_run_log).split("_")[1].split(".")[0]
-        # Get hellma readings
-        file_values = plate_reader.read_hellma_plate_files(storage_directory, 101934)
-
-        (
-            runs_and_robots,
-            headers,
-            runs_and_lpc,
-            headers_lpc,
-        ) = abr_google_drive.create_data_dictionary(
-            run_id,
-            Path(error_folder_path),
-            issue_url,
-            file_values,
-        )
-        start_row = google_sheet.get_index_row() + 1
-        try:
-            google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
-        except requests.exceptions.RequestException as e:
-            print(
-                f"⚠️Warning: Did not record this run on ABR-run-data google sheet. Error: {e}"
-            )
-        print("Wrote run to ABR-run-data")
+        write_errored_run_to_google_sheet()
     else:
         print("Ticket created.")
     # Open folder directory incase uploads to ticket were incomplete - only works on windows
