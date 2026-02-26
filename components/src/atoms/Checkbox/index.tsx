@@ -93,6 +93,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       display={DISPLAY_FLEX}
       alignItems={ALIGN_CENTER}
       role="checkbox"
+      aria-checked={isChecked}
       onClick={onClick}
       tabIndex={tabIndex}
       disabled={disabled}

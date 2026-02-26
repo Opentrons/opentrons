@@ -117,7 +117,14 @@ export const ListItemCustomizeImage: Story = {
     children: (
       <ListItemCustomize
         header="Header"
-        leftHeaderItem={<img width="60px" height="60px" src={exampleImage} />}
+        leftHeaderItem={
+          <img
+            width="60px"
+            height="60px"
+            src={exampleImage}
+            alt="Example image"
+          />
+        }
         linkText="Link text"
         label="Label"
         dropdown={dropdownProps}
