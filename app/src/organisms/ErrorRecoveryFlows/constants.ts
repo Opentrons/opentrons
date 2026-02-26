@@ -1041,10 +1041,10 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
   },
   [VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE]: {
     [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_COLLAR]: {
-      allowDoorOpen: false,
+      allowDoorOpen: true,
     },
     [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_TUBE_CONNECTIONS]: {
-      allowDoorOpen: false,
+      allowDoorOpen: true,
     },
     [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
