@@ -674,6 +674,37 @@ def get_livestream_video(length: int) -> str:
     convert_m3u8_to_mp4(video_path, new_video_path, length)
     return new_video_path
 
+def access_livestream_buffer() -> str:
+    """Get latest livestream buffer. Clips returned are a full 30 seconds long"""
+    """This is designed to be a replacement for the above function."""
+    storage_path: str = "data/testing_data/videos/video_capture_buffer"
+    video_clip_files: list[str] = sorted([f for f in os.listdir(storage_path) if f.endswith(".mp4")])
+
+    # Just skip the most recent second, ffmpeg might still be writing
+    # Note: This may create a 1-second blind spot. Ask how long the robot tends to take to enter error recovery/
+    # Error out after the error actually happens
+    if len(video_clip_files) > 1:
+        video_clip_files = video_clip_files[:-1]
+
+    txt_file_path: str = "data/testing_data/videos/buffer_addresses.txt"
+    output_file_path: str = "data/testing_data/videos/output.mp4"
+
+    # write all of the files in the buffer to a new file
+    with open(txt_file_path, "w") as file:
+        for files in video_clip_files:
+            file.write(f"file '{os.path.join(storage_path, files)}'\n")
+
+    # stitch all of the files in the buffer into one video
+    subprocess.run(f"ffmpeg -y -f concat -safe 0 -i {txt_file_path} -c copy {output_file_path}", shell=True)
+
+    # delete the text file
+    if os.path.exists(txt_file_path):
+        os.remove(txt_file_path)
+
+    # return the output file path
+    return output_file_path
+
+
 
 def create_robot_log_zip() -> Tuple[str, str]:
     """Create a zip file of logs saved locally on robot."""

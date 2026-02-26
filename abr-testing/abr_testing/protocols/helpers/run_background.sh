@@ -28,6 +28,8 @@ sleep 0.5
 statusProcessID=$!
 
 VIDEO_LENGTH=30
+(python3 -c "from background_helpers import change_robot_video_length; change_robot_video_length('$VIDEO_LENGTH',
+'$IP_ADDRESS'")
 (python3 -c "from background_helpers import video_capture_buffer;
 video_capture_buffer($VIDEO_LENGTH, '/var/www/localhost/html/stream/hls/stream.m3u8')" &)
 videoBufferProcessID=$!

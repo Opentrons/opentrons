@@ -62,16 +62,16 @@ def change_robot_video_length(time: str, ip: str) -> None:
 
 def video_capture_buffer(max_time: int, m3u8_path: str):
     """Keeps a running video capture buffer of given time."""
-    storage_path: str = "data/testing_data/video_capture_buffer"
+    storage_path: str = "data/testing_data/videos/video_capture_buffer"
     os.makedirs(storage_path, exist_ok=True)
 
     # Runs forever in the background
 
 
     # Hello future programmer. Below is an ffmpeg command.
-    # ffmpeg makes no sense.
+    # ffmpeg is ugly. ffmpeg makes no sense.
     # just know that this is what this does:
-    # 1. streams from the givem m3u8_path
+    # 1. streams from the given m3u8_path
     # 2. segments the stream into 1 second clips
     # 3. converts each of these one second clips to mp4
     # 4. stores these clips in the above "storage_path" directory
