@@ -140,13 +140,14 @@ async def upload_splash_image(
         sanitized_filename = FILENAME_REGEX.sub("_", file.filename)
         filename = f"{Path(sanitized_filename).stem}.{content_type}"
 
-        # file is valid, save to final location
-        filepath = f"{persistence_directory}/{filename}"
+        # file is valid, save to final location.
+        filepath = persistence_directory / filename
         with open(filepath, "wb+") as f:
             f.write(file.file.read())
 
-        # store the file location
-        oem_settings.oem_mode_splash_custom = filepath
+        # Store the file location. It can be read by external scripts that don't
+        # necessarily share our cwd, so make sure it's an absolute path.
+        oem_settings.oem_mode_splash_custom = str(filepath.resolve())
         success = oem_settings_store.write(oem_settings)
         response.status_code = (
             status.HTTP_201_CREATED if success else status.HTTP_400_BAD_REQUEST
