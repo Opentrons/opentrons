@@ -1381,6 +1381,62 @@ def test_get_command_annotation_from_current_run(
     assert result == cmd_annotation
 
 
+def test_get_command_annotations_slice_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should get the specified slice of command annotations."""
+    annotations_slice = CommandAnnotationsSlice(
+        command_annotations=[
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
+                description="user-specified-description",
+                params={},
+            ),
+        ],
+        cursor=2,
+        total_length=200,
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-id")
+    decoy.when(
+        mock_run_store.get_command_annotations_slice(
+            run_id="not-current-id", cursor=1, length=10
+        )
+    ).then_return(annotations_slice)
+    result = subject.get_command_annotations_slice(
+        run_id="not-current-id", cursor=1, length=10
+    )
+    assert result == annotations_slice
+
+
+def test_get_command_annotation_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """Should get the command annotation by id from run store."""
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
+        description="user-specified-description",
+        params={},
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_run_store.get_command_annotation(
+            run_id="not-current-run-id", command_annotation_id="annotation-id"
+        )
+    ).then_return(cmd_annotation)
+    result = subject.get_command_annotation("not-current-run-id", "annotation-id")
+    assert result == cmd_annotation
+
+
 async def test_get_current_run_labware_definition(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,

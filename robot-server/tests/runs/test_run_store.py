@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine import (
     types as pe_types,
 )
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
@@ -40,6 +41,7 @@ from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import (
     BadStateSummary,
+    CommandAnnotationNotFoundError,
     CommandNotFoundError,
     CSVParameterRunResource,
     RunResource,
@@ -869,6 +871,192 @@ def test_get_command(
     result = subject.get_command(run_id="run-id", command_id="pause-2")
 
     assert result == protocol_commands[1]
+
+
+def test_get_command_annotation(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    command_annotations: List[pe_types.CommandAnnotation],
+    state_summary: StateSummary,
+) -> None:
+    """Should return a run command annotation from the db."""
+    subject.insert(
+        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        command_annotations=command_annotations,
+        run_time_parameters=[],
+    )
+    result = subject.get_command_annotation(
+        run_id="run-id", command_annotation_id="annotation-2"
+    )
+    assert result == command_annotations[1]
+
+
+def test_get_command_annotation_missing(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    command_annotations: List[pe_types.CommandAnnotation],
+    state_summary: StateSummary,
+) -> None:
+    """Should raise if the command annotation does not exist."""
+    subject.insert(
+        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        command_annotations=command_annotations,
+        run_time_parameters=[],
+    )
+    with pytest.raises(
+        CommandAnnotationNotFoundError, match="non-existent-annotation-id"
+    ):
+        subject.get_command_annotation(
+            run_id="run-id", command_annotation_id="non-existent-annotation-id"
+        )
+
+
+def test_get_total_command_annotations_count(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    command_annotations: List[pe_types.CommandAnnotation],
+    state_summary: StateSummary,
+) -> None:
+    """Should return a run command annotation from the db."""
+    subject.insert(
+        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        command_annotations=command_annotations,
+        run_time_parameters=[],
+    )
+    result = subject.get_total_command_annotations_count(run_id="run-id")
+    assert result == 2
+
+
+_many_command_annotations = [
+    CommandAnnotation(
+        id=f"annotation-{i}",
+        name=f"My annotation {i}",
+        description=f"This is annotation {i}",
+        source="userCommand",
+        parentId=None,
+        params={f"param-{i}": "nothing"},
+    )
+    for i in range(20)
+]
+
+
+@pytest.mark.parametrize(
+    argnames=["cursor", "length", "expected_result"],
+    argvalues=[
+        (
+            0,
+            5,
+            CommandAnnotationsSlice(
+                command_annotations=_many_command_annotations[0:5],
+                cursor=0,
+                total_length=20,
+            ),
+        ),
+        (
+            5,
+            3,
+            CommandAnnotationsSlice(
+                command_annotations=_many_command_annotations[5:8],
+                cursor=5,
+                total_length=20,
+            ),
+        ),
+        (
+            18,
+            10,
+            CommandAnnotationsSlice(
+                command_annotations=_many_command_annotations[18:20],
+                cursor=18,
+                total_length=20,
+            ),
+        ),
+        (
+            0,
+            25,
+            CommandAnnotationsSlice(
+                command_annotations=_many_command_annotations, cursor=0, total_length=20
+            ),
+        ),
+    ],
+)
+def test_get_command_annotations_slice(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    state_summary: StateSummary,
+    cursor: int,
+    length: int,
+    expected_result: CommandAnnotationsSlice,
+) -> None:
+    """Should return a run command annotation from the db."""
+    subject.insert(
+        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        command_annotations=_many_command_annotations,
+        run_time_parameters=[],
+    )
+    result = subject.get_command_annotations_slice(
+        run_id="run-id",
+        cursor=cursor,
+        length=length,
+    )
+    assert result == expected_result
+
+
+def test_get_command_annotation_as_preserialized_list(
+    subject: RunStore,
+    protocol_commands: List[pe_commands.Command],
+    command_annotations: List[pe_types.CommandAnnotation],
+    state_summary: StateSummary,
+) -> None:
+    """Should return a run command annotation from the db."""
+    subject.insert(
+        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=protocol_commands,
+        command_annotations=command_annotations,
+        run_time_parameters=[],
+    )
+    result = subject.get_command_annotations_as_preserialized_list("run-id")
+    assert result == [
+        {
+            "id": "annotation-1",
+            "source": "userCommand",
+            "name": "A notation",
+            "description": "A notation description",
+            "parentId": None,
+            "params": "{}",
+        },
+        {
+            "id": "annotation-2",
+            "source": "userCommand",
+            "name": "An other notation",
+            "description": "An other notation description",
+            "parentId": "annotation-1",
+            "params": "{}",
+        },
+    ]
 
 
 @pytest.mark.parametrize(

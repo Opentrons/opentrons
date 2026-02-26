@@ -361,18 +361,6 @@ command_to_annotation_table = sqlalchemy.Table(
         "annotation_id",
         unique=True,
     ),
-    # sqlalchemy.Index(
-    #     "ix_c2a_run_id_annotation_id",
-    #     "run_id",
-    #     "annotation_id",
-    #     unique=True,
-    # ),
-    # sqlalchemy.Index(
-    #     "ix_c2a_run_id_command_id",
-    #     "run_id",
-    #     "command_id",
-    #     unique=True,
-    # ),
 )
 
 # stores the metadata describing the physical file

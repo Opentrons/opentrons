@@ -1,0 +1,247 @@
+test_name: Get command annotations from a historical run
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: Set allowStepGrouping to True
+    request:
+      method: POST
+      url: '{ot3_server_base_url}/settings'
+      json:
+        id: 'allowStepGrouping'
+        value: true
+    response:
+      status_code: 200
+
+  - name: Upload a protocol with user command annotations
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_step_grouping.py'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create a run from protocol
+    request:
+      url: '{ot3_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          hasEverEnteredErrorRecovery: False
+          pipettes: []
+          modules: []
+          labware: []
+          labwareOffsets: []
+          runTimeParameters: []
+          outputFileIds: []
+          protocolId: '{protocol_id}'
+          liquids: []
+          liquidClasses: []
+      save:
+        json:
+          original_run_data: data
+          run_id: data.id
+
+  - name: Play the protocol
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          actionType: play
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+      save:
+        json:
+          play_action_id: data.id
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Un-current the run
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}'
+      method: PATCH
+      json:
+        data: { 'current' : false }
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{run_id}'
+          status: succeeded
+          current: false
+
+  - name: Verify commands have annotations
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current:
+            href: !anystr
+            meta:
+              runId: '{run_id}'
+              commandId: !anystr
+              index: 5
+              key: !anystr
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+        meta:
+          cursor: 0
+          totalLength: 6
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params: { }
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params:
+              message: 'This is not in a step group.'
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params:
+              message: 'This will have a command annotation ID.'
+            commandAnnotationIds:
+              - !anystr
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params:
+              message: 'This is also not in a step group.'
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params:
+              message: 'This will have a command annotation ID as well.'
+            commandAnnotationIds:
+              - !anystr
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            status: succeeded
+            notes: [ ]
+            params:
+              message: 'This is also also not in a step group.'
+      save:
+        json:
+          annotation_id_1: data[2].commandAnnotationIds[0]
+          annotation_id_2: data[4].commandAnnotationIds[0]
+
+  - name: Fetch the full list of command annotations
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commandAnnotations?pageLength=10'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - source: userCommand
+            id: '{annotation_id_1}'
+            name: 'My step group'
+            description: "It's a comment, that's it."
+            params: {}
+          - source: userCommand
+            id: '{annotation_id_2}'
+            name: 'My step group 2'
+            description: "Another comment!"
+            params: {}
+        meta:
+          cursor: 0
+          totalLength: 2
+
+  - name: Fetch the command annotations by ID 1
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commandAnnotations/{annotation_id_1}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          source: userCommand
+          id: '{annotation_id_1}'
+          name: 'My step group'
+          description: "It's a comment, that's it."
+          params: {}
+
+  - name: Fetch the command annotations by ID 2
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commandAnnotations/{annotation_id_2}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          source: userCommand
+          id: '{annotation_id_2}'
+          name: 'My step group 2'
+          description: "Another comment!"
+          params: {}

@@ -21,6 +21,7 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
 from opentrons_shared_data.errors.exceptions import (
@@ -723,15 +724,133 @@ class RunStore:
 
         return _parse_command(command)
 
+    # This is not a pre-serialized list. Maybe an unverified list of command annotation dicts
+    def get_command_annotations_as_preserialized_list(
+        self, run_id: str
+    ) -> List[Dict[str, Any]]:
+        """Get all command annotations of the run as a list of strings of json command objects."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            select_command_annotations = (
+                sqlalchemy.select(command_annotation_table)
+                .where(command_annotation_table.c.run_id == run_id)
+                .order_by(sqlite_rowid.asc())
+            )
+            result = transaction.execute(select_command_annotations).all()
+        return [
+            {
+                "id": row.annotation_id,
+                "source": row.source.value,
+                "name": row.name,
+                "description": row.description,
+                "parentId": row.parent_id,
+                "params": row.params,
+            }
+            for row in result
+        ]
+
+    def get_total_command_annotations_count(self, run_id: str) -> int:
+        """Get total command annotations count of the run."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                command_annotation_table.c.run_id == run_id
+            )
+            count_result: int = transaction.execute(select_count).scalar_one()
+            return count_result
+
+    def get_command_annotations_slice(
+        self,
+        run_id: str,
+        cursor: int,
+        length: int,
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of the run's command annotations list."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+
+            total_count = transaction.execute(
+                sqlalchemy.select(sqlalchemy.func.count()).where(
+                    command_annotation_table.c.run_id == run_id
+                )
+            ).scalar_one()
+
+            select_annotations = (
+                sqlalchemy.select(
+                    (
+                        sqlalchemy.func.row_number().over(
+                            order_by=command_annotation_table.c.row_id
+                        )
+                        - 1
+                    ).label("row_num"),
+                    command_annotation_table,
+                )
+                .where(
+                    command_annotation_table.c.run_id == run_id,
+                )
+                .order_by(command_annotation_table.c.row_id)
+                .subquery()
+            )
+
+            select_slice = (
+                sqlalchemy.select(
+                    select_annotations,
+                )
+                .where(
+                    and_(
+                        select_annotations.c.row_num >= cursor,
+                        select_annotations.c.row_num < cursor + length,
+                    )
+                )
+                .order_by(select_annotations.c.row_id)
+            )
+            slice_result = transaction.execute(select_slice).all()
+            command_annotations = [
+                _convert_sql_row_to_command_annotation(row) for row in slice_result
+            ]
+            return CommandAnnotationsSlice(
+                command_annotations=command_annotations,
+                cursor=cursor,
+                total_length=total_count,
+            )
+
+    def get_command_annotation(
+        self, run_id: str, command_annotation_id: str
+    ) -> CommandAnnotation:
+        """Get run command annotation by id."""
+        select_command_annotation = sqlalchemy.select(command_annotation_table).where(
+            and_(
+                command_annotation_table.c.run_id == run_id,
+                command_annotation_table.c.annotation_id == command_annotation_id,
+            )
+        )
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+
+            try:
+                command_annotation_row = transaction.execute(
+                    select_command_annotation
+                ).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise CommandAnnotationNotFoundError(
+                    command_annotation_id=command_annotation_id
+                )
+
+        return _convert_sql_row_to_command_annotation(command_annotation_row)
+
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier."""
         delete_run = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
         delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
         )
-        delete_command_to_annotation_mappings = sqlalchemy.delete(command_to_annotation_table).where(
-            command_to_annotation_table.c.run_id == run_id
-        )
+        delete_command_to_annotation_mappings = sqlalchemy.delete(
+            command_to_annotation_table
+        ).where(command_to_annotation_table.c.run_id == run_id)
         delete_command_annotations = sqlalchemy.delete(command_annotation_table).where(
             command_annotation_table.c.run_id == run_id
         )
@@ -914,3 +1033,30 @@ def _convert_command_annotation_to_sql_values(
         "parent_id": command_annotation.parentId,
         "params": json.dumps(command_annotation.params),
     }
+
+
+def _convert_sql_row_to_command_annotation(
+    annotation_row: sqlalchemy.engine.Row,
+) -> CommandAnnotation:
+    annotation_id = annotation_row.annotation_id
+    name = annotation_row.name
+    description = annotation_row.description
+    source = str(annotation_row.source)
+    params = json.loads(annotation_row.params)
+    parent_id = annotation_row.parent_id
+
+    assert isinstance(annotation_id, str)
+    assert isinstance(name, str)
+    assert isinstance(description, str)
+    assert isinstance(source, str)
+    assert isinstance(parent_id, str) or parent_id is None
+    assert isinstance(params, dict)
+
+    return CommandAnnotation(
+        id=annotation_row.annotation_id,
+        source=annotation_row.source.value,
+        name=name,
+        description=description,
+        parentId=parent_id,
+        params=params,
+    )
