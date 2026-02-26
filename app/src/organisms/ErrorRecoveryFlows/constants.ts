@@ -32,6 +32,8 @@ export const DEFINED_ERROR_TYPES = {
   STACKER_SHUTTLE_EMPTY: 'flexStackerLabwareRetrieveFailed',
   STACKER_SHUTTLE_STORE_EMPTY: 'flexStackerLabwareStoreFailed',
   STACKER_SHUTTLE_OCCUPIED: 'flexStackerShuttleOccupied',
+  VACUUM_CARBOY_FULL: 'vacuumCarboyFull',
+  VACUUM_PRESSURE_NOT_REACHED: 'vacuumPressureNotReached',
 } as const
 
 // Client-defined error-handling flows.
@@ -52,6 +54,8 @@ export const ERROR_KINDS = {
   STACKER_SHUTTLE_STORE_EMPTY: 'STACKER_SHUTTLE_STORE_EMPTY',
   STACKER_SHUTTLE_OCCUPIED: 'STACKER_SHUTTLE_OCCUPIED',
   STACKER_HOPPER_OR_SHUTTLE_EMPTY: 'STACKER_HOPPER_OR_SHUTTLE_EMPTY',
+  VACUUM_CARBOY_FULL: 'VACUUM_CARBOY_FULL',
+  VACUUM_PRESSURE_NOT_REACHED: 'VACUUM_PRESSURE_NOT_REACHED',
 } as const
 
 export const STACKER_ERROR_KINDS: ErrorKind[] = [
@@ -61,6 +65,11 @@ export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.STACKER_SHUTTLE_EMPTY,
   ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED,
   ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY,
+] as const
+
+export const VACUUM_ERROR_KINDS: ErrorKind[] = [
+  ERROR_KINDS.VACUUM_CARBOY_FULL,
+  ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED,
 ] as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.
@@ -375,6 +384,30 @@ export const RECOVERY_MAP = {
       SKIP: 'skip',
     },
   },
+  VACUUM_CARBOY_FULL_RETRY: {
+    ROUTE: 'vacuum-carboy-full-retry',
+    STEPS: {
+      DISCONNECT_AND_EMPTY_CARBOY: 'disconnect-and-empty-carboy',
+      RECONNECT_WASTE_TUBE: 'reconnect-waste-tube',
+      RETRY: 'retry',
+    },
+  },
+  VACUUM_CARBOY_FULL_SKIP: {
+    ROUTE: 'vacuum-carboy-full-skip',
+    STEPS: {
+      DISCONNECT_AND_EMPTY_CARBOY: 'disconnect-and-empty-carboy',
+      RECONNECT_WASTE_TUBE: 'reconnect-waste-tube',
+      SKIP: 'skip',
+    },
+  },
+  VACUUM_PRESSURE_NOT_REACHED_RETRY: {
+    ROUTE: 'vacuum-pressure-not-reached-retry',
+    STEPS: {
+      CHECK_COLLAR: 'check-collar',
+      CHECK_TUBE_CONNECTIONS: 'check-tube-connections',
+      RETRY: 'retry',
+    },
+  },
 } as const
 
 const {
@@ -417,6 +450,9 @@ const {
   STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   STACKER_SHUTTLE_EMPTY_STORE_SKIP,
   STACKER_HOPPER_OR_SHUTTLE_EMPTY,
+  VACUUM_CARBOY_FULL_RETRY,
+  VACUUM_CARBOY_FULL_SKIP,
+  VACUUM_PRESSURE_NOT_REACHED_RETRY,
 } = RECOVERY_MAP
 
 // The deterministic ordering of steps for a given route.
@@ -594,6 +630,21 @@ export const STEP_ORDER: StepOrder = {
     HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY,
     HOME_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME,
     HOME_AND_RETRY.STEPS.CONFIRM_RETRY,
+  ],
+  [VACUUM_CARBOY_FULL_RETRY.ROUTE]: [
+    VACUUM_CARBOY_FULL_RETRY.STEPS.DISCONNECT_AND_EMPTY_CARBOY,
+    VACUUM_CARBOY_FULL_RETRY.STEPS.RECONNECT_WASTE_TUBE,
+    VACUUM_CARBOY_FULL_RETRY.STEPS.RETRY,
+  ],
+  [VACUUM_CARBOY_FULL_SKIP.ROUTE]: [
+    VACUUM_CARBOY_FULL_SKIP.STEPS.DISCONNECT_AND_EMPTY_CARBOY,
+    VACUUM_CARBOY_FULL_SKIP.STEPS.RECONNECT_WASTE_TUBE,
+    VACUUM_CARBOY_FULL_SKIP.STEPS.SKIP,
+  ],
+  [VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE]: [
+    VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_COLLAR,
+    VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_TUBE_CONNECTIONS,
+    VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.RETRY,
   ],
 }
 
@@ -969,6 +1020,33 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [SKIP_STEP_WITH_SAME_TIPS.STEPS.SKIP]: {
       allowDoorOpen: true,
     },
+  },
+  [VACUUM_CARBOY_FULL_RETRY.ROUTE]: {
+    [VACUUM_CARBOY_FULL_RETRY.STEPS.DISCONNECT_AND_EMPTY_CARBOY]: {
+      allowDoorOpen: false,
+    },
+    [VACUUM_CARBOY_FULL_RETRY.STEPS.RECONNECT_WASTE_TUBE]: {
+      allowDoorOpen: false,
+    },
+    [VACUUM_CARBOY_FULL_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
+  },
+  [VACUUM_CARBOY_FULL_SKIP.ROUTE]: {
+    [VACUUM_CARBOY_FULL_SKIP.STEPS.DISCONNECT_AND_EMPTY_CARBOY]: {
+      allowDoorOpen: false,
+    },
+    [VACUUM_CARBOY_FULL_SKIP.STEPS.RECONNECT_WASTE_TUBE]: {
+      allowDoorOpen: false,
+    },
+    [VACUUM_CARBOY_FULL_SKIP.STEPS.SKIP]: { allowDoorOpen: false },
+  },
+  [VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE]: {
+    [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_COLLAR]: {
+      allowDoorOpen: true,
+    },
+    [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.CHECK_TUBE_CONNECTIONS]: {
+      allowDoorOpen: true,
+    },
+    [VACUUM_PRESSURE_NOT_REACHED_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
 } as const
 

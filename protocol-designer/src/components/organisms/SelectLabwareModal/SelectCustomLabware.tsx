@@ -123,7 +123,7 @@ export function SelectCustomLabware(
                   customLabwareDefs[uri]
                 )}
                 allowInputField={isOnHopper}
-                key={`${index}_${uri}`}
+                key={uri}
                 id={`${index}_${uri}`}
                 buttonText={customLabwareDefs[uri].metadata.displayName}
                 buttonValue={uri}

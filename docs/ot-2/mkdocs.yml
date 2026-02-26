@@ -1,0 +1,88 @@
+site_name: ot-2
+
+nav:
+  - OT-2 Instruction Manual: index.md
+  - Introduction: introduction.md
+  - Safety and Regulatory Information: safety-regulatory.md
+  - Installation and Relocation:
+      - Installation and Relocation: installation/index.md
+      - Installation Requirements: installation/requirements.md
+      - Unboxing: installation/unboxing.md
+      - First Run: installation/first-run.md
+      - Instrument Installation and Calibration: installation/instruments.md
+      - Relocation: installation/relocation.md
+  - System Description:
+      - System Description: system-description/index.md
+      - Robot Components: system-description/robot.md
+      - System Specifications: system-description/specs.md
+  - OT-2 Pipettes: pipettes.md
+  - OT-2 Modules:
+      - Modules: modules/index.md
+      - Heater-Shaker: modules/heater-shaker.md
+      - HEPA Module: modules/hepa.md
+      - Magnetic Module: modules/magnetic.md
+      - Temperature Module: modules/temperature.md
+      - Thermocycler: modules/thermocycler.md
+  - Labware:
+      - Labware: labware/index.md
+      - Labware Concepts: labware/concepts.md
+      - Labware Types: labware/types.md
+      - Labware Definitions: labware/definitions.md
+  - Calibration:
+      - Calibration: calibration/index.md
+      - Robot Calibration: calibration/robot-calibration.md
+      - Labware Offsets: calibration/labware-offsets.md
+      - Jog Controls: calibration/jog-controls.md
+  - Opentrons App:
+      - Opentrons App: opentrons-app/index.md
+      - Installing the App: opentrons-app/installation.md
+      - Importing Protocols: opentrons-app/protocol-import.md
+      - Running Protocols: opentrons-app/protocol-run.md
+      - App Features Summary: opentrons-app/features-summary.md
+  - Maintenance:
+      - Maintenance: maintenance/index.md
+      - Cleaning: maintenance/cleaning.md
+      - Services: maintenance/services.md
+  - Appendices:
+      - Additional Documentation: additional-docs.md
+      # - Open-Source Software: open-source.md
+      - Product Support and Company Information: support.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - manual.css
+  - ../opentrons-theme.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

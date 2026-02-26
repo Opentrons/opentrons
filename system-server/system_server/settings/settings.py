@@ -1,7 +1,7 @@
 """System server configuration options."""
 
-import typing
 from functools import lru_cache
+from typing import Annotated
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -21,10 +21,10 @@ def get_settings() -> "SystemServerSettings":
 class Environment(BaseSettings):
     """Environment related settings."""
 
-    dot_env_path: typing.Optional[str] = Field(
-        default=None,
-        description="Path to a .env file to define system server settings.",
-    )
+    dot_env_path: Annotated[
+        str | None,
+        Field(description="Path to a .env file to define system server settings."),
+    ] = None
     model_config = SettingsConfigDict(env_prefix="OT_SYSTEM_SERVER_")
 
 
@@ -35,16 +35,18 @@ class SystemServerSettings(BaseSettings):
     OT_SYSTEM_SERVER_, e.g. OT_SYSTEM_SERVER_persistence_directory.
     """
 
-    persistence_directory: typing.Optional[str] = Field(
-        default=None,
-        description=(
-            "A directory for the server to store things persistently across boots."
-            " If this directory doesn't already exist, the server will create it."
-            " If this is the string `automatically_make_temporary`,"
-            " the server will use a fresh temporary directory"
-            " (effectively not persisting anything)."
+    persistence_directory: Annotated[
+        str | None,
+        Field(
+            description=(
+                "A directory for the server to store things persistently across boots."
+                " If this directory doesn't already exist, the server will create it."
+                " If this is the string `automatically_make_temporary`,"
+                " the server will use a fresh temporary directory"
+                " (effectively not persisting anything)."
+            )
         ),
-    )
+    ] = None
 
     model_config = SettingsConfigDict(
         env_file=Environment().dot_env_path, env_prefix="OT_SYSTEM_SERVER_"
