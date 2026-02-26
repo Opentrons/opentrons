@@ -53,12 +53,6 @@ from opentrons.protocol_engine.types import (
 from opentrons.types import Point
 
 
-@pytest.fixture
-def available_sensors() -> AvailableSensorDefinition:
-    """Provide a list of sensors."""
-    return AvailableSensorDefinition(sensors=["pressure", "capacitive", "environment"])
-
-
 @pytest.mark.parametrize(
     argnames=["request_model", "expected_nozzlemap", "nozzle_params"],
     argvalues=[
@@ -113,7 +107,6 @@ async def test_configure_nozzle_layout_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     tip_handler: TipHandler,
-    available_sensors: AvailableSensorDefinition,
     request_model: Union[
         AllNozzleLayoutConfiguration,
         ColumnNozzleLayoutConfiguration,
@@ -126,35 +119,6 @@ async def test_configure_nozzle_layout_implementation(
     """A ConfigureForVolume command should have an execution implementation."""
     subject = ConfigureNozzleLayoutImplementation(
         equipment=equipment, tip_handler=tip_handler
-    )
-
-    config = LoadedStaticPipetteData(
-        model="some-model",
-        display_name="Hello",
-        min_volume=0,
-        max_volume=251,
-        channels=8,
-        home_position=123.1,
-        nozzle_offset_z=331.0,
-        flow_rates=FlowRates(
-            default_aspirate={}, default_dispense={}, default_blow_out={}
-        ),
-        tip_configuration_lookup_table={},
-        nominal_tip_overlap={},
-        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
-        back_left_corner_offset=Point(10, 20, 30),
-        front_right_corner_offset=Point(40, 50, 60),
-        pipette_lld_settings={},
-        plunger_positions={
-            "top": 0.0,
-            "bottom": 5.0,
-            "blow_out": 19.0,
-            "drop_tip": 20.0,
-        },
-        shaft_ul_per_mm=5.0,
-        available_sensors=available_sensors,
-        volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={},
     )
 
     requested_nozzle_layout = ConfigureNozzleLayoutParams(
@@ -192,14 +156,7 @@ async def test_configure_nozzle_layout_implementation(
             pipette_id="pipette-id",
             **nozzle_params,
         )
-    ).then_return(
-        LoadedConfigureNozzleLayoutData(
-            pipette_id="pipette-id",
-            serial_number="some number",
-            nozzle_map=expected_nozzlemap,
-            static_config=config,
-        )
-    )
+    ).then_return(expected_nozzlemap)
 
     result = await subject.execute(requested_nozzle_layout)
 
@@ -209,9 +166,6 @@ async def test_configure_nozzle_layout_implementation(
             pipette_nozzle_map=PipetteNozzleMapUpdate(
                 pipette_id="pipette-id",
                 nozzle_map=expected_nozzlemap,
-            ),
-            pipette_config=update_types.PipetteConfigUpdate(
-                pipette_id="pipette-id", serial_number="some number", config=config
-            ),
+            )
         ),
     )
