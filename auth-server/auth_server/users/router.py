@@ -2,6 +2,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -24,27 +25,6 @@ from auth_server.users.user_data_manager import (
 router = fastapi.APIRouter()
 
 
-def _verify_scopes(
-    request: fastapi.Request,
-    oauth2_backend: Backend,
-    scopes: list[Scope],
-    body: str | None = None,
-) -> None:
-    """Verify OAuth2 scopes. Raises 403 if invalid."""
-    valid, _ = oauth2_backend.verify_request(
-        str(request.url),
-        http_method=request.method,  # type: ignore[arg-type]
-        body=body,
-        headers=dict(request.headers),
-        scopes=[scope.api_name for scope in scopes],
-    )
-    if not valid:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_403_FORBIDDEN,
-            detail="Forbidden",
-        )
-
-
 @PydanticResponse.wrap_route(
     router.post,
     path="/auth/users",
@@ -53,6 +33,7 @@ def _verify_scopes(
     responses={
         fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def post_users(
     request: fastapi.Request,
@@ -63,7 +44,6 @@ async def post_users(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     user_create = request_body.data
     try:
         new_user = user_data_manager.create_user(
@@ -98,6 +78,7 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def get_user(
     request: fastapi.Request,
@@ -108,7 +89,6 @@ async def get_user(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     try:
         user = user_data_manager.get_user(userName)
     except UserNotFoundError:
@@ -130,6 +110,7 @@ async def get_user(
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
     request: fastapi.Request,
@@ -140,7 +121,6 @@ async def delete_user(
     ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     try:
         user_data_manager.delete_user(userName)
     except UserNotFoundError:
@@ -162,6 +142,7 @@ async def delete_user(
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def update_user(
     request: fastapi.Request,
@@ -173,7 +154,6 @@ async def update_user(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
     update_data = request_body.data
     try:
         updated_user = user_data_manager.update_user(
