@@ -771,6 +771,7 @@ async def test_update_current(
             run_id=run_id,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     ).then_return(run_resource)
@@ -845,6 +846,7 @@ async def test_update_current_noop(
             run_id=run_id,
             summary=matchers.Anything(),
             commands=matchers.Anything(),
+            command_annotations=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -969,6 +971,7 @@ async def test_create_archives_existing(
             run_id=run_id_old,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     )

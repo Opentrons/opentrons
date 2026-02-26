@@ -1,11 +1,12 @@
 """Runs' on-db store."""
 
+import json
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import sqlalchemy
 from pydantic import TypeAdapter, ValidationError
@@ -20,7 +21,7 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
-from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -39,6 +40,8 @@ from robot_server.persistence.pydantic import (
 )
 from robot_server.persistence.tables import (
     action_table,
+    command_annotation_table,
+    command_to_annotation_table,
     input_data_files_table,
     output_data_files_table,
     run_command_table,
@@ -137,6 +140,7 @@ class RunStore:
         run_id: str,
         summary: StateSummary,
         commands: List[Command],
+        command_annotations: List[CommandAnnotation],
         run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
         """Update the run's state summary and commands list.
@@ -145,6 +149,7 @@ class RunStore:
             run_id: The run to update
             summary: The run's equipment and status summary.
             commands: The run's commands.
+            command_annotations: The run's command annotations.
             run_time_parameters: The run's run time parameters, if any.
 
         Returns:
@@ -165,12 +170,21 @@ class RunStore:
                 )
             )
         )
-
+        delete_existing_command_annotations_mapping = sqlalchemy.delete(
+            command_to_annotation_table
+        ).where(command_to_annotation_table.c.run_id == run_id)
         delete_existing_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
-        insert_command = sqlalchemy.insert(run_command_table)
+        delete_existing_command_annotations = sqlalchemy.delete(
+            command_annotation_table
+        ).where(command_annotation_table.c.run_id == run_id)
 
+        insert_command = sqlalchemy.insert(run_command_table)
+        insert_command_annotation = sqlalchemy.insert(command_annotation_table)
+        insert_command_annotation_mapping = sqlalchemy.insert(
+            command_to_annotation_table
+        )
         select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
@@ -185,7 +199,16 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
             transaction.execute(update_run)
+            transaction.execute(delete_existing_command_annotations_mapping)
             transaction.execute(delete_existing_commands)
+            transaction.execute(delete_existing_command_annotations)
+            for command_annotation in command_annotations:
+                transaction.execute(
+                    insert_command_annotation,
+                    _convert_command_annotation_to_sql_values(
+                        run_id, command_annotation
+                    ),
+                )
             for command_index, command in enumerate(commands):
                 transaction.execute(
                     insert_command,
@@ -205,6 +228,15 @@ class RunStore:
                         ),
                     },
                 )
+                for annotation_id in command.commandAnnotationIds:
+                    transaction.execute(
+                        insert_command_annotation_mapping,
+                        {
+                            "run_id": run_id,
+                            "command_id": command.id,
+                            "annotation_id": annotation_id,
+                        },
+                    )
 
             run_row = transaction.execute(select_run_resource).one()
             action_rows = transaction.execute(select_actions).all()
@@ -697,6 +729,12 @@ class RunStore:
         delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
         )
+        delete_command_to_annotation_mappings = sqlalchemy.delete(command_to_annotation_table).where(
+            command_to_annotation_table.c.run_id == run_id
+        )
+        delete_command_annotations = sqlalchemy.delete(command_annotation_table).where(
+            command_annotation_table.c.run_id == run_id
+        )
         delete_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
@@ -712,7 +750,9 @@ class RunStore:
 
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
+            transaction.execute(delete_command_to_annotation_mappings)
             transaction.execute(delete_commands)
+            transaction.execute(delete_command_annotations)
             transaction.execute(delete_csv_rtps)
             transaction.execute(delete_input_files)
             transaction.execute(delete_output_files)
@@ -857,3 +897,20 @@ def _convert_commands_status_to_sql_command_status(
             return CommandStatusSQLEnum.FAILED
         case CommandStatus.SUCCEEDED:
             return CommandStatusSQLEnum.SUCCEEDED
+
+
+def _convert_command_annotation_to_sql_values(
+    run_id: str,
+    command_annotation: CommandAnnotation,
+) -> Dict[str, Any]:
+    return {
+        "run_id": run_id,
+        "annotation_id": command_annotation.id,
+        "name": command_annotation.name,
+        "description": command_annotation.description,
+        "source": str(command_annotation.source),
+        # This is fine because a parent annotation would be added to the table before the child is added
+        # since the command annotations are added into the database in the order they were created.
+        "parent_id": command_annotation.parentId,
+        "params": json.dumps(command_annotation.params),
+    }

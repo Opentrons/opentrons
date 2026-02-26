@@ -228,6 +228,7 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
+                command_annotations=prev_run_result.command_annotations,
                 run_time_parameters=prev_run_result.parameters,
             )
 
@@ -422,6 +423,7 @@ class RunDataManager:
                     run_id=run_id,
                     summary=run_result.state_summary,
                     commands=run_result.commands,
+                    command_annotations=run_result.command_annotations,
                     run_time_parameters=run_result.parameters,
                 )
             )

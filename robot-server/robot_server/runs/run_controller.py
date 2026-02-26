@@ -133,6 +133,7 @@ class RunController:
             run_id=self._run_id,
             summary=result.state_summary,
             commands=result.commands,
+            command_annotations=result.command_annotations,
             run_time_parameters=result.parameters,
         )
         self._runs_publisher.publish_pre_serialized_commands_notification(self._run_id)
