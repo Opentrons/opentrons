@@ -71,7 +71,6 @@ export function SelectedWell(props: SelectedWellProps): JSX.Element {
           y={shouldShowStroke ? 1 : 0}
           width={width}
           height={height}
-          rx={2} // subtle rounding; remove if you want sharp corners
           fill={getFillColor(isSelected, isError, isUsed)}
           stroke={shouldShowStroke ? COLORS.black90 : undefined}
           strokeWidth={shouldShowStroke ? 2 : undefined}

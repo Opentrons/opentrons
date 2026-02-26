@@ -20,7 +20,10 @@ import protocolSchema7 from '../protocol/schemas/7.json'
 import protocolSchema8 from '../protocol/schemas/8.json'
 
 import type { CreateCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 import type * as ProtocolSchemas from '../protocol'
 
 export type { ProtocolSchemas }
@@ -75,7 +78,7 @@ const validateCommands8 = (
 
 const validateCommandAnnotations8 = (
   toValidate: ProtocolSchemas.ProtocolStructureV8
-): Promise<CommandAnnotation[]> =>
+): Promise<CommandAnnotationV1[] | CommandAnnotationV2> =>
   new Promise<object>((resolve, reject) => {
     const requestedSchema = toValidate.commandAnnotationSchemaId
     switch (requestedSchema) {

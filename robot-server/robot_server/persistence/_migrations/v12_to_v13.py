@@ -17,8 +17,8 @@ from typing import Dict, List
 import sqlalchemy
 
 from opentrons_shared_data.data_files import MimeType
+from server_utils.persistence.folder_migrator import Migration
 
-from .._folder_migrator import Migration
 from ..database import sql_engine_ctx
 from ._util import add_column, copy_contents
 from robot_server.persistence.file_and_directory_names import DB_FILE

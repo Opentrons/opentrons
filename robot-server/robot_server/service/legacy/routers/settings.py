@@ -36,6 +36,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
@@ -52,7 +53,6 @@ from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
-from robot_server.persistence.persistence_directory import PersistenceResetter
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (

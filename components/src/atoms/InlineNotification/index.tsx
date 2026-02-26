@@ -76,7 +76,7 @@ export function InlineNotification(
   // Temp fix (nd: 2/25/26): Avoid double-period for translations that already end in a period.
   const doesMessageEndInPeriod = message?.trim().match(/(?<!\.)\.$/) ?? false
   const fullHeading = `${heading}${message && !doesMessageEndInPeriod ? '. ' : ''}`
-  const fullmessage = `${message}${doesMessageEndInPeriod ? '' : '.'}`
+  const fullMessage = `${message}${doesMessageEndInPeriod ? '' : '.'}`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
   const iconProps = {
     ...inlineNotificationProps.icon,
@@ -120,7 +120,7 @@ export function InlineNotification(
                 />
               </>
             )}
-            {message != null && fullmessage}
+            {message != null && fullMessage}
           </StyledText>
         </Flex>
       </Flex>
