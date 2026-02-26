@@ -57,7 +57,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.grey60}
-                key={`${uri}_${index}`}
+                key={uri}
               >
                 {allLabware[uri].metadata.displayName}
               </StyledText>
