@@ -9,8 +9,10 @@ from types import TracebackType
 
 
 class DevServer:
-    def __init__(self, port: int, persistence_directory: Path | None = None) -> None:
-        """Initialize a dev server with the given port."""
+    def __init__(
+        self, port: int | None = None, persistence_directory: Path | None = None
+    ) -> None:
+        """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
         self.persistence_directory: Path = (
             persistence_directory

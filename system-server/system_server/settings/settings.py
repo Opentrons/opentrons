@@ -48,24 +48,27 @@ class SystemServerSettings(BaseSettings):
         ),
     ] = None
 
-    auth_server_uds: Annotated[
-        str | None,
+    oem_mode_enabled: Annotated[
+        bool | None,
         Field(
             description=(
-                "The path to the Unix domain socket where auth-server is listening."
-                " This is mutually exclusive with auth_server_url."
-                " If both are unset, access control is not enforced."
+                "A flag used to change the default splash screen on system startup."
+                " If this flag is disabled (default), the Opentrons loading video will be shown."
+                " If this flag is enabled but `oem_mode_splash_custom` is not set,"
+                " then the default OEM Mode splash screen will be shown."
+                " If this flag is enabled and `oem_mode_splash_custom` is set to a"
+                " PNG filepath, the custom splash screen will be shown."
             ),
         ),
-    ] = None
+    ] = False
 
-    auth_server_url: Annotated[
+    oem_mode_splash_custom: Annotated[
         str | None,
         Field(
             description=(
-                "The base URL (e.g. `http://localhost:1234`) where auth-server is listening."
-                " This is mutually exclusive with auth_server_uds."
-                " If both are unset, access control is not enforced."
+                "The filepath of the PNG image used as the custom splash screen."
+                " Read the description of the `oem_mode_enabled` flag to know how"
+                " the splash screen changes when the flag is enabled/disabled."
             ),
         ),
     ] = None
