@@ -3,6 +3,7 @@
 import os
 import re
 from pathlib import Path
+from textwrap import dedent
 from typing import Annotated
 
 import filetype  # type: ignore[import-untyped]
@@ -40,7 +41,22 @@ oem_mode_router = APIRouter()
 @oem_mode_router.put(
     "/system/oem_mode/enable",
     summary="Enable or disable OEM Mode",
-    description="Enable or disable OEM Mode",
+    description=dedent(
+        """\
+        Enable or disable OEM Mode.
+
+        Currently, this endpoint does not *completely* enable OEM mode, so it should not
+        be used directly. Use `POST /settings` instead. This may change in the future.
+        """
+        # To elaborate on the description above:
+        # The part of OEM mode that this endpoint doesn't do is telling the ODD to avoid
+        # branded language in its UX copy. That's currently done by the ODD querying
+        # the OEM mode status in robot-server's `GET /settings`, which in turn is set
+        # via robot-server's `POST /settings`. Ideally, system-server would have a pair
+        # of PUT+GET endpoints serving as the single source of truth, and either
+        # robot-server's `/settings` endpoints would proxy to them, or we'd outright
+        # delete OEM mode from `/settings`.
+    ),
     responses={
         status.HTTP_200_OK: {"message": "OEM Mode changed successfully."},
         status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not change."},
