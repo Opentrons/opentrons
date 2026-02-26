@@ -62,15 +62,15 @@ async def vacuum_manifold(target_pressure):
         logging.info(f"failed to set CSV filename: {e}")
     # Run the continuous data reader for RUN_SEC seconds.
     await read_data(pump, start_time, RUN_SEC+SETTLE_SEC)
-
-    # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(False)
-    await read_data(pump, start_time, VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(enable_vacuum = False,
                                 guage_pressure_mbar = target_to_pump,
                                 duration = None,
                                 )
+    # Vent the pump system to atmospheric pressure while pump is on
+    await pump.set_vent_state(False)
+    await read_data(pump, start_time, VENT_SEC)
+
     await read_data(pump, start_time, DECAY_SEC)
     await pump.set_vent_state(True)
 
