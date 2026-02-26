@@ -585,14 +585,6 @@ if __name__ == "__main__":
         nargs=1,
         help="Email connected to JIRA account.",
     )
-    # TODO: write function to get reporter_id from email.
-    parser.add_argument(
-        "reporter_id",
-        metavar="REPORTER_ID",
-        type=str,
-        nargs=1,
-        help="JIRA Reporter ID.",
-    )
     # TODO: improve help comment on jira board id.
     parser.add_argument(
         "board_id",
@@ -614,10 +606,10 @@ if __name__ == "__main__":
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
-    reporter_id = args.reporter_id[0]
     log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    users_file_path = ticket.get_jira_users(storage_directory)
+    project_key = "RABR"
+    users_file_path = ticket.get_jira_users(storage_directory, project_key)
     assignee_id = get_user_id(users_file_path, assignee)
     run_log_file_path = ""
     protocol_found = False
@@ -677,16 +669,12 @@ if __name__ == "__main__":
     image_files = retrieve_protocol_images(one_run, ip, storage_directory)
 
     print(f"Making ticket for {summary}.")
-    # TODO: make argument or see if I can get rid of with using board_id.
-    project_key = "RABR"
-    # TODO: read board to see if ticket for run id already exists.
     all_issues = ticket.issues_on_board(project_key)
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
         summary,
         whole_description_str,
         project_key,
-        reporter_id,
         assignee_id,
         "Bug",
         "Medium",
@@ -761,17 +749,15 @@ if __name__ == "__main__":
             issue_url,
             file_values,
         )
-
         start_row = google_sheet.get_index_row() + 1
-        google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
+        try:
+            google_sheet.batch_update_cells(runs_and_robots, "A", start_row, "0")
+        except requests.exceptions.RequestException as e:
+            print(
+                f"⚠️Warning: Did not record this run on ABR-run-data google sheet. Error: {e}"
+            )
         print("Wrote run to ABR-run-data")
-        # Add LPC to google sheet
-        google_sheet_lpc = google_sheets_tool.google_sheet(
-            credentials_path, "ABR-LPC", 0
-        )
-        start_row_lpc = google_sheet_lpc.get_index_row() + 1
-        google_sheet_lpc.batch_update_cells(runs_and_lpc, "A", start_row_lpc, "0")
     else:
         print("Ticket created.")
-    # Open folder directory incase uploads to ticket were incomplete
+    # Open folder directory incase uploads to ticket were incomplete - only works on windows
     subprocess.Popen(["explorer", error_folder_path])
