@@ -24,9 +24,9 @@ nav:
   - Thermocycler Lid Seals: lid-seals.md
   - Maintenance and Cleaning: maintenance.md
   - Thermocycler G-codes:
-      - Thermocycler G-codes: g-codes/index.md
       - Understanding Thermocycler G-codes: g-codes/explanation.md
-      - Thermocycler G-code Index: g-codes/thermocycler-g-code-index.md
+      - Thermocycler VIDs and PIDs: g-codes/thermocycler-ids.md
+      - Thermocycler G-codes: g-codes/thermocycler-g-code-list.md
   - Additional Product Information: additional-info.md
 
 
