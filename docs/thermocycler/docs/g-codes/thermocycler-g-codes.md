@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler Module: Thermocycler G-code Index"
+title: "Thermocycler Module: Thermocycler Module G-Codes"
 ---
 
 The Thermocycler uses the following g-code commands.

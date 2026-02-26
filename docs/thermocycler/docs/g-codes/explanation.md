@@ -1,11 +1,11 @@
 ---
-title: "Thermocycler Module: Understanding G-codes"
+title: "Thermocycler Module: G-codes and Device IDs"
 ---
 
-This section provides an overview of G-codes, including the structure of a typical command and response. For the complete list of Thermocycler G-codes, see <font color="red">PLACEHOLDER TBD</font>.
+This section provides an overview of G-codes, including the structure of a typical command and response. It also defines the vendor and device IDs used by every Thermocycler. For a complete list of Thermocycler G-codes, see <font color="red">PLACEHOLDER TBD</font>.
 
 !!!note
-    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed by Flex to work with any attached modules. This section is mainly a technical reference for developers building their own applications that work with our hardware.
+    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed for a Flex robot to work with any attached modules. This section is a technical resource for developers building their own applications that work with our hardware.
 
 ## Understanding G-codes
 
@@ -37,17 +37,26 @@ Every G-code command sent to an Opentrons module will trigger a response from th
 | Response | This response echoes the command code and appends `OK` to the response string. For example, successfully sending the command `M119` (get the Thermocycler lid and seal motor status) would return `M119 Lid: open Seal: retracted OK`. Other responses can return `OK` only or an error only. |
 | Error | This response does not echo the command code. Instead it appears as an error string formatted as `ERRNNN:error`, where `N` is an error code number. For example, sending too many commands to a Heater-Shaker too quickly might result in the response `ERR004:gcode cache full`. See the <font color="red">Module Error Code section</font> for a complete list of g-code error responses. |
 
-## Vendor and module identifiers
+## Vendor and product IDs
 
-When making a USB connection to a Thermocycler, the computer's operating system reads two hexadecimal codes to identify the attached device. These are the Vendor ID (VID) and Product ID (PID).
+After making a USB connection, the Thermocycler broadcasts two special hexicecimal codes that the computer's operating system can read to identify the attached device. These are the Vendor ID (VID) and Product ID (PID).
 
-- **VID**: Identifies the device manufacturer. An Opentrons Thermocycler VID is based on the manufacturer of the integrated circuit that runs the module's firmware. 
+- **VID**: Identifies the device manufacturer. A Thermocycler VID is based on the manufacturer of the integrated circuit that runs the module's firmware. 
 
-- **PID**: Identifies the specific module type. Every Opentrons Thermocycler has the same PID.
+- **PID**: Identifies the specific module type. Every Opentrons Thermocycler has a similar or the same PID.
 
-### Thermocycler VID and PID
+Every Thermocycler uses the VIDs and PIDs listed below.
 
 | Module name | VID | PID |
 |----|----|----|
-|Thermocycler GEN1 | 0x04D8 or 0x239a | 0xED8C or 0x800b |
+|Thermocycler GEN1 | 0x04D8<br>or 0x239a | 0xED8C<br>or 0x800b |
 |Thermocycler GEN2 | 0x0483 | 0xED8D |
+
+The VID and PID 
+
+When making automation scripts for your hardware, these IDs come in handy. Coding a specific serial port, for example, COM3 for Windows or /dev/ttyUSB0 for macOS/Linux, that is not a good approach. If you plug the module into a different USB port, use a different computer, or connect the devices in a different order, the OS will assign a different port name, and your script will break.
+
+To achieve a more reliable approach, allocate a module by its VID and PID in your code. Your code can use the pyserial library, allowing your application to iterate through the available USB ports and find the module by its VID and PID, and create a serial connection to that port, no matter what name the OS has assigned.
+
+
+<!-- not sure, but might need to say something about these IDs and why they're needed -->
