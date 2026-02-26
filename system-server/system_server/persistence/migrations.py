@@ -58,7 +58,7 @@ def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> int | None
     )
     migration = transaction.execute(select_latest_version).first()
 
-    return migration["version"] if migration is not None else None
+    return migration.version if migration is not None else None
 
 
 def _mark_latest_revision(transaction: sqlalchemy.engine.Connection) -> None:
