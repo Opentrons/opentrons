@@ -1,12 +1,8 @@
 """Test OT-2 protocol creation workflow."""
 
-import sys
-from pathlib import Path
-
 import pytest
 from playwright.sync_api import Page, expect
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from automation.pd_pages import DeckConfigPage, LandingPage, PipetteModal, ProtocolEditorPage
 from automation.pd_pages.heater_shaker_step_form_page import _add_heater_shaker_step
 from automation.pd_pages.magnetic_module_step_form_page import AddMagneticModule
@@ -93,7 +89,6 @@ def test_ot2_robot_modules(page: Page, pd_base_url: str, eyes: Eyes | None) -> N
         ],
     )
     # Add Magnetic Module
-    editor.select_confirm_text()
     editor.add_step("Magnet")
     magnetic = AddMagneticModule(page)
     magnetic.magnetic_module_engage_height(10)
