@@ -53,9 +53,10 @@ jobs:
           python-version: '3.12'
 
       - name: Setup Project
-        uses: './.github/actions/python/setup'
+        uses: './.github/actions/python/setup-uv'
         with:
           project: 'hardware-testing'
+          python-version: '3.12'
 
       - name: Test-Integration
         run: make -C hardware-testing test-integration
