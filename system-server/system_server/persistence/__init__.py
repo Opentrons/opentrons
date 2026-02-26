@@ -3,6 +3,7 @@
 import logging
 from asyncio import Lock
 from pathlib import Path
+from typing import Annotated
 from uuid import UUID
 
 import sqlalchemy
@@ -43,7 +44,7 @@ _authorization_tracker_lock = Lock()
 
 
 async def get_persistence_directory(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the root persistence directory, creating it if necessary."""
     async with _persistence_dir_lock:
@@ -68,8 +69,8 @@ async def get_persistence_directory(
 
 
 async def get_sql_engine(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_persistence_directory),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    persistence_directory: Annotated[Path, Depends(get_persistence_directory)],
 ) -> sqlalchemy.engine.Engine:
     """Return a singleton SQL engine referring to a ready-to-use database."""
     async with _sql_lock:
@@ -87,8 +88,8 @@ async def get_sql_engine(
 
 
 async def get_persistent_uuid(
-    app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_persistence_directory),
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    persistence_directory: Annotated[Path, Depends(get_persistence_directory)],
 ) -> UUID:
     """Return a singleton UUID for signing purposes."""
     async with _uuid_lock:
@@ -102,7 +103,7 @@ async def get_persistent_uuid(
 
 
 async def get_authorization_tracker(
-    app_state: AppState = Depends(get_app_state),
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> AuthorizationTracker:
     """Return a singleton authorization tracker for the server instance."""
     async with _authorization_tracker_lock:

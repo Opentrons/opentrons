@@ -2,6 +2,7 @@
 
 import typing
 from functools import lru_cache
+from typing import Annotated
 
 from dotenv import load_dotenv, set_key
 from pydantic import Field
@@ -21,10 +22,10 @@ def get_settings() -> "SystemServerSettings":
 class Environment(BaseSettings):
     """Environment related settings."""
 
-    dot_env_path: typing.Optional[str] = Field(
-        default=None,
-        description="Path to a .env file to define system server settings.",
-    )
+    dot_env_path: Annotated[
+        typing.Optional[str],
+        Field(description="Path to a .env file to define system server settings."),
+    ] = None
     model_config = SettingsConfigDict(env_prefix="OT_SYSTEM_SERVER_")
 
 
@@ -35,37 +36,44 @@ class SystemServerSettings(BaseSettings):
     OT_SYSTEM_SERVER_, e.g. OT_SYSTEM_SERVER_persistence_directory.
     """
 
-    persistence_directory: typing.Optional[str] = Field(
-        default=None,
-        description=(
-            "A directory for the server to store things persistently across boots."
-            " If this directory doesn't already exist, the server will create it."
-            " If this is the string `automatically_make_temporary`,"
-            " the server will use a fresh temporary directory"
-            " (effectively not persisting anything)."
+    persistence_directory: Annotated[
+        typing.Optional[str],
+        Field(
+            description=(
+                "A directory for the server to store things persistently across boots."
+                " If this directory doesn't already exist, the server will create it."
+                " If this is the string `automatically_make_temporary`,"
+                " the server will use a fresh temporary directory"
+                " (effectively not persisting anything)."
+            )
         ),
-    )
+    ] = None
 
-    oem_mode_enabled: typing.Optional[bool] = Field(
-        default=False,
-        description=(
-            "A flag used to change the default splash screen on system startup."
-            " If this flag is disabled (default), the Opentrons loading video will be shown."
-            " If this flag is enabled but `oem_mode_splash_custom` is not set,"
-            " then the default OEM Mode splash screen will be shown."
-            " If this flag is enabled and `oem_mode_splash_custom` is set to a"
-            " PNG filepath, the custom splash screen will be shown."
+    oem_mode_enabled: Annotated[
+        typing.Optional[bool],
+        Field(
+            description=(
+                "A flag used to change the default splash screen on system startup."
+                " If this flag is disabled (default), the Opentrons loading video will be shown."
+                " If this flag is enabled but `oem_mode_splash_custom` is not set,"
+                " then the default OEM Mode splash screen will be shown."
+                " If this flag is enabled and `oem_mode_splash_custom` is set to a"
+                " PNG filepath, the custom splash screen will be shown."
+            ),
         ),
-    )
+    ] = False
 
-    oem_mode_splash_custom: typing.Optional[str] = Field(
-        default=None,
-        description=(
-            "The filepath of the PNG image used as the custom splash screen."
-            " Read the description of the `oem_mode_enabled` flag to know how"
-            " the splash screen changes when the flag is enabled/disabled."
+    oem_mode_splash_custom: Annotated[
+        typing.Optional[str],
+        Field(
+            description=(
+                "The filepath of the PNG image used as the custom splash screen."
+                " Read the description of the `oem_mode_enabled` flag to know how"
+                " the splash screen changes when the flag is enabled/disabled."
+            ),
         ),
-    )
+    ] = None
+
     model_config = SettingsConfigDict(
         env_file=Environment().dot_env_path, env_prefix="OT_SYSTEM_SERVER_"
     )
