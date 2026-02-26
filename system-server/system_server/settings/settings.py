@@ -1,6 +1,5 @@
 """System server configuration options."""
 
-import typing
 from functools import lru_cache
 from typing import Annotated
 
@@ -23,7 +22,7 @@ class Environment(BaseSettings):
     """Environment related settings."""
 
     dot_env_path: Annotated[
-        typing.Optional[str],
+        str | None,
         Field(description="Path to a .env file to define system server settings."),
     ] = None
     model_config = SettingsConfigDict(env_prefix="OT_SYSTEM_SERVER_")
@@ -37,7 +36,7 @@ class SystemServerSettings(BaseSettings):
     """
 
     persistence_directory: Annotated[
-        typing.Optional[str],
+        str | None,
         Field(
             description=(
                 "A directory for the server to store things persistently across boots."
@@ -50,7 +49,7 @@ class SystemServerSettings(BaseSettings):
     ] = None
 
     oem_mode_enabled: Annotated[
-        typing.Optional[bool],
+        bool | None,
         Field(
             description=(
                 "A flag used to change the default splash screen on system startup."
@@ -64,7 +63,7 @@ class SystemServerSettings(BaseSettings):
     ] = False
 
     oem_mode_splash_custom: Annotated[
-        typing.Optional[str],
+        str | None,
         Field(
             description=(
                 "The filepath of the PNG image used as the custom splash screen."

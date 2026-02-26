@@ -1,7 +1,7 @@
 """Router for all /system/ endpoints."""
 
 from textwrap import dedent
-from typing import Annotated, List, Optional
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -77,7 +77,7 @@ async def check_authorization(
     token: Annotated[str, Depends(get_authorization_token_header)],
     signing_uuid: Annotated[UUID, Depends(get_persistent_uuid)],
     scopes: Annotated[
-        Optional[List[str]],
+        list[str] | None,
         Query(description="List of scopes to verify token access to."),
     ] = None,
 ) -> Response:

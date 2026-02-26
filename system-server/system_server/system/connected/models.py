@@ -1,6 +1,6 @@
 """Models for /system/register."""
 
-from typing import Annotated, List
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -21,5 +21,5 @@ class GetConnectedResponse(BaseModel):
     """Model for the response to GET /system/connected."""
 
     connections: Annotated[
-        List[Connection], Field(description="the current active connections")
+        list[Connection], Field(description="the current active connections")
     ]

@@ -3,12 +3,11 @@
 import logging
 from asyncio import Lock
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Final
 from uuid import UUID
 
 import sqlalchemy
 from fastapi import Depends
-from typing_extensions import Final
 
 from server_utils.fastapi_utils.app_state import (
     AppState,

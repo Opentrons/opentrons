@@ -17,10 +17,9 @@ Database schema versions:
 
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Final
 
 import sqlalchemy
-from typing_extensions import Final
 
 from .tables import migration_table
 
@@ -47,7 +46,7 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
             _mark_latest_revision(transaction)
 
 
-def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
+def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> int | None:
     """Get the starting version of the database.
 
     Returns:
