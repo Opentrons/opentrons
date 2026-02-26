@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
@@ -8,6 +9,15 @@ from auth_server.persistence.tables import AccountType
 
 if TYPE_CHECKING:
     from auth_server.persistence.tables import User
+
+
+class AccountType(StrEnum):
+    """The type of account."""
+
+    ADMIN = "admin"
+    USER = "user"
+    AUDITOR = "auditor"
+    SERVICE = "service"
 
 
 class UserCreate(BaseModel):

@@ -12,6 +12,7 @@ from sqlalchemy import Column, Enum, Integer, String
 from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import Base
+from auth_server.users.models import AccountType
 
 
 class ScopeListType(types.TypeDecorator[Any]):
@@ -35,15 +36,6 @@ class ScopeListType(types.TypeDecorator[Any]):
         if not value:
             return []
         return [Scope.from_api_name(s) for s in value]
-
-
-class AccountType(StrEnum):
-    """The type of account."""
-
-    ADMIN = "admin"
-    USER = "user"
-    AUDITOR = "auditor"
-    SERVICE = "service"
 
 
 class User(Base):
