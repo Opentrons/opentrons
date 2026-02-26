@@ -7,6 +7,7 @@ watch:
 
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
+  - OT-2: '!include ot-2/mkdocs.yml'
   - Modules:
       - Modules home: modules/index.md
       - Flex Stacker: '!include stacker/mkdocs.yml'
