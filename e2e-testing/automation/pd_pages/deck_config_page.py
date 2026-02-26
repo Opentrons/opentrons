@@ -1,5 +1,7 @@
 """Deck configuration page object."""
 
+from typing import List, Literal, Union
+
 from playwright.sync_api import Page, TimeoutError
 
 from automation.base_page import BasePage
@@ -11,18 +13,26 @@ class DeckConfigPage(BasePage):
     def __init__(self, page: Page) -> None:
         super().__init__(page)
 
-    def OT2_module_selection(self, module_name: list) -> None:
-        """Select a module for OT-2 from the module list.
+    OT2ModuleName = Literal[
+        "Temperature Module GEN1",
+        "Temperature Module GEN2",
+        "Heater-Shaker Module GEN1",
+        "Magnetic Module GEN1",
+        "Magnetic Module GEN2",
+        "Thermocycler Module GEN1",
+        "Thermocycler Module GEN2",
+    ]
 
+    def ot2_module_selection(self, module_name: Union[str, List[str]]) -> None:
+        """Select one or more OT-2 modules from the module list.
         Args:
-            module_name: Name of the module, e.g., "Temperature Module GEN1",
-            "Temperature Module GEN2", "Heater-Shaker Module GEN1",
-            "Magnetic Module GEN1","Magnetic Module GEN2",
-            "Thermocycler Module GEN1", "Thermocycler Module GEN2"
+            module_name: A single module name or a list of names.
+                         Supported: "Temperature Module GEN1", "Magnetic Module GEN2", etc.
         """
-        for module in module_name:
-            module_button = self.page.get_by_text(module)
-            module_button.first.click(force=True)
+        # Ensure we are working with a list
+        modules_to_click = [module_name] if isinstance(module_name, str) else module_name
+        for module in modules_to_click:
+            self.page.get_by_text(module, exact=True).first.click(force=True)
 
     def expect_module_overview(self) -> None:
         """Validate Step 4 deck hardware content is visible."""

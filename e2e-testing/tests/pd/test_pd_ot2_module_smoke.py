@@ -9,12 +9,15 @@ from playwright.sync_api import Page, expect
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from automation.pd_pages import DeckConfigPage, LandingPage, PipetteModal, ProtocolEditorPage
 from automation.pd_pages.heater_shaker_step_form_page import _add_heater_shaker_step
+from automation.pd_pages.magnetic_module_step_form_page import AddMagneticModule
 from automation.pd_pages.tc_step_form_page import _add_thermocycler_profile_step, _add_thermocycler_state_step
 from automation.pd_pages.tempdeck_step_form_page import _add_temperature_module_step
+from eyes import Eyes
 
 
 @pytest.mark.pdE2E
-def test_ot2_robot_modules(page: Page, base_url: str) -> None:
+@pytest.mark.slow
+def test_ot2_robot_modules(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     """The Opentrons Ot-2 needs to be tested as well so we're going
     through the onboarding flow, deck configuration
     Then going through each module with basic steps
@@ -25,7 +28,8 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     """
     # Landing Page
     landing_page = LandingPage(page)
-    landing_page.goto(base_url)
+    print(f"DEBUG base_url: '{pd_base_url}'")
+    landing_page.goto(pd_base_url)
     landing_page.wait_for_page_load()
     print("✓ Main page loaded")
 
@@ -43,7 +47,7 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     pipette_modal = PipetteModal(page)
     editor = ProtocolEditorPage(page)
     print("✓ Pipette selection modal opened")
-    pipette_modal.OT2_select_pipette_type(channels="1-Channel", gen="GEN2", volume="1000 µL")
+    pipette_modal.ot2_select_pipette_type(channels="1-Channel", gen="GEN2", volume="1000 µL")
     print("✓ Pipette type selected: 1-Channel GEN2 1000 µL")
     pipette_modal.select_tip_racks(["Filter Tip Rack 1000 µL"])
     editor.select_save_text()
@@ -58,11 +62,13 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
         "Magnetic Module GEN2",
         "Thermocycler Module GEN2",
     ]
-    deck_config.OT2_module_selection(list_of_modules)
+    deck_config.ot2_module_selection(list_of_modules)
     deck_config.confirm_deck_configuration()
     editor.select_confirm_text()
     deck_config.enter_edit_mode()
-
+    if eyes is not None:
+        # This works because 'eyes' is an object that 'knows' your current page
+        eyes.check("OT-2 Modules Added")
     print("✓ File uploaded, ready for module steps")
     editor.add_step("Temperature")
     _add_temperature_module_step(page, "50")
@@ -89,7 +95,9 @@ def test_ot2_robot_modules(page: Page, base_url: str) -> None:
     # Add Magnetic Module
     editor.select_confirm_text()
     editor.add_step("Magnet")
-    page.get_by_role("textbox").fill("10")
-    editor.select_save_text()
+    magnetic = AddMagneticModule(page)
+    magnetic.magnetic_module_engage_height(10)
+    print("✓ Magnetic module engage height set to 10")
     editor.add_step("Magnet")
-    editor.select_save_text()
+    magnetic.magnetic_module_disengage()
+    print("✓ Magnetic module steps added with engage height 10 and disengage")
