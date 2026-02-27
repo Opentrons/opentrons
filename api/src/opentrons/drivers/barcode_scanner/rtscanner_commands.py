@@ -216,6 +216,12 @@ set_terminating_suffix = [ord(c) for c in "TSUSET"]  # up to 2 ascii characters
 
 
 # special settings
+
+do_beep = [
+    ord(c) for c in "BEEPON"
+]  # BEEPON2000F50T20V command[frequency]F[duration]T[volume]V
+
+
 class ScanMode(enum.Enum):
     level = ord("0")  # decoder starts on trigger pull or serial command
     sense = ord("2")  # the decoder starts when the camera sees motion

@@ -6,9 +6,11 @@ from typing import List, Optional
 import serial  # type: ignore[import-untyped]
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
+from .abstract import AbstractBarcodeScannerDriver
 from .rtscanner_commands import (
     ack,
     decode_timeout,
+    do_beep,
     enable_aim_id,
     enable_code_id_prefix,
     enable_custom_prefix,
@@ -155,3 +157,22 @@ class RTScanner:
             )
         else:
             self.set_menu_option(good_read_beep_enable + [ord("0")])
+
+    def do_beep(
+        self, level: int = 20, duration_ms: int = 80, frequency_hz: int = 2730
+    ) -> None:
+        # level must be between 1 and 20
+        assert level in range(1, 21)
+        # duration must be between 20 and 300
+        assert duration_ms in range(20, 301)
+        # frequency must be between 20 and 20000
+        assert frequency_hz in range(20, 20000)
+        self.set_menu_option(
+            do_beep
+            + [ord(c) for c in str(frequency_hz)]
+            + [ord("F")]
+            + [ord(c) for c in str(duration_ms)]
+            + [ord("T")]
+            + [ord(c) for c in str(level)]
+            + [ord("V")]
+        )
