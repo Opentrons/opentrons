@@ -1,0 +1,5 @@
+# Requirements for pure Python real-time CSV plotter
+dash>=2.14.0
+plotly>=5.15.0
+pandas>=2.0.0
+watchdog>=3.0.0
