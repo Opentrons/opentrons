@@ -178,5 +178,5 @@ async def update_user(
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(data=UserResponse.from_orm_user(updated_user)),
+        content=SimpleBody(data=updated_user),
     )

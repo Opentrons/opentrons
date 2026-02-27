@@ -6,9 +6,6 @@ from typing_extensions import Final
 
 from server_utils.persistence.folder_migrator import MigrationOrchestrator
 from server_utils.persistence.persistence_directory import (
-    PersistenceResetter,
-)
-from server_utils.persistence.persistence_directory import (
     prepare_active_subdirectory as server_utils_prepare_active_subdirectory,
 )
 from server_utils.persistence.persistence_directory import (
@@ -19,13 +16,6 @@ from ._migrations import up_to_v01
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-auth-server-"
-
-__all__ = [
-    "PersistenceResetter",
-    "make_migration_orchestrator",
-    "prepare_active_subdirectory",
-    "prepare_root",
-]
 
 
 def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:

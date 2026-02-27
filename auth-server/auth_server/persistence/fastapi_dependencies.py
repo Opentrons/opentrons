@@ -11,8 +11,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-
-from .persistence_directory import PersistenceResetter
+from server_utils.persistence.persistence_directory import PersistenceResetter
 
 _sql_engine_accessor = AppStateAccessor[SQLEngine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")

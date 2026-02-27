@@ -4,12 +4,15 @@ from pathlib import Path
 
 import sqlalchemy
 
+from server_utils.persistence.persistence_directory import (
+    PersistenceResetter,
+)
+
 from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
 )
 from auth_server.persistence.persistence_directory import (
-    PersistenceResetter,
     make_migration_orchestrator,
     prepare_active_subdirectory,
     prepare_root,

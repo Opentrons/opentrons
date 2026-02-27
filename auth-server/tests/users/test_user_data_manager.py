@@ -3,7 +3,7 @@ from decoy import Decoy, matchers
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.tables import User
+from auth_server.persistence.orm_models import User
 from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
@@ -235,8 +235,10 @@ def test_update_user_username(
     ).then_return(expected)
 
     result = manager.update_user("old_name", new_username="new_name")
-    assert result.username == "new_name"
-    assert result.full_name == "Name Test"
+    assert result.userName == "new_name"
+    assert result.fullName == "Name Test"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_update_user_password_is_hashed(

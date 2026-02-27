@@ -3,7 +3,7 @@
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from auth_server.persistence.tables import User
+from auth_server.persistence.orm_models import User
 from auth_server.users.models import AccountType
 
 

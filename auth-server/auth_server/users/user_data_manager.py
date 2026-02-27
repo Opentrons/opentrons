@@ -2,7 +2,7 @@
 
 from pwdlib import PasswordHash
 
-from auth_server.persistence.tables import User
+from auth_server.persistence.orm_models import User
 from auth_server.users.models import AccountType, UserResponse
 from auth_server.users.store import UserStore
 
@@ -110,7 +110,7 @@ class UserDataManager:
         password: str | None = None,
         full_name: str | None = None,
         account_type: str | None = None,
-    ) -> User:
+    ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
             user_name=new_username,
@@ -119,7 +119,7 @@ class UserDataManager:
             account_type=account_type,
         )
         try:
-            return self._store.update(
+            updated_user = self._store.update(
                 username,
                 new_username=new_username,
                 hashed_password=password_hash.hash(password)
@@ -128,5 +128,6 @@ class UserDataManager:
                 full_name=full_name,
                 account_type=account_type,
             )
+            return UserResponse.from_orm_user(updated_user)
         except ValueError as e:
             raise UserNotFoundError(str(e)) from e

@@ -11,7 +11,7 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.persistence.tables import User
+from auth_server.persistence.orm_models import User
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import password_hash
 
