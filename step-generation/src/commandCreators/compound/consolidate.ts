@@ -307,6 +307,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       pipetteId: pipette,
       labwareId: sourceLabware,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
+      primaryNozzle,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -314,6 +315,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       pipetteId: pipette,
       labwareId: destLabware,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
+      primaryNozzle,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())

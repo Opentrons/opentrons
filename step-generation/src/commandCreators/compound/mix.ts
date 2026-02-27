@@ -378,6 +378,7 @@ export const mix: CommandCreator<MixArgs> = (
       labwareId: labware,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
+      primaryNozzle,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -386,6 +387,7 @@ export const mix: CommandCreator<MixArgs> = (
       labwareId: labware,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
+      primaryNozzle,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       return {

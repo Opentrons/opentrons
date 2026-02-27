@@ -62,6 +62,7 @@ import type {
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { HopperLocationMapKey } from '../constants'
@@ -598,6 +599,7 @@ interface DispenseLocationHelperArgs {
   xOffset: number
   yOffset: number
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -614,6 +616,7 @@ export const dispenseLocationHelper: CommandCreator<
     xOffset,
     yOffset,
     tipRack,
+    primaryNozzle,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -646,6 +649,7 @@ export const dispenseLocationHelper: CommandCreator<
           },
         },
         tipRack,
+        primaryNozzle,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {

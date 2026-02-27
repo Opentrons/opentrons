@@ -330,6 +330,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       labwareId: sourceLabware,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
       wellTargetName: sourceWell,
+      primaryNozzle,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -338,6 +339,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       labwareId: destLabware,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
       wellTargetName: destWells[0],
+      primaryNozzle,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())

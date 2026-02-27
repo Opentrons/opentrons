@@ -1,4 +1,8 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -47,6 +51,8 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
+  const primaryNozzle =
+    prevRobotState.pipettes[pipetteId].primaryNozzle ?? A1_NOZZLE
 
   const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
@@ -190,6 +196,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         z: 0,
       },
       wellTargetName: wellName,
+      primaryNozzle,
     })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())

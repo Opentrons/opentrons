@@ -9,6 +9,7 @@ import {
   getOt2SurroundingSlots,
   getPositionFromSlotId,
   getRobotDefFromRobotType,
+  H1_NOZZLE,
   OT2_ROBOT_TYPE,
   PARTIAL,
   PARTIAL_NOZZLE_MAP,
@@ -298,7 +299,7 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
-  primaryNozzle?: PrimaryNozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzleConfiguration?: NozzleConfigurationStyle
 }): boolean => {
   const {
@@ -379,12 +380,6 @@ export const getIsSafePipetteMovement = (args: {
   )
 
   const { channels } = pipetteEntity.spec
-  const confirmedPrimaryNozzle =
-    primaryNozzle ??
-    getDefaultPrimaryNozzle({
-      nozzles: nozzleConfiguration,
-      channels,
-    })
 
   const tipOverlapOnNozzle =
     tiprackEntity != null
@@ -398,7 +393,7 @@ export const getIsSafePipetteMovement = (args: {
     pipetteEntity,
     tipLength,
     wellTargetPoint,
-    confirmedPrimaryNozzle,
+    primaryNozzle,
     tipOverlapOnNozzle
   )
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
@@ -536,7 +531,10 @@ export const getIsSafePickupWithinTiprack = (args: {
     const rowsPreOrdering = ordering[0].map((_, rowIndex) =>
       ordering.map(column => column[rowIndex])
     )
-    const tipRowsOrdered = rowsPreOrdering
+    const shouldReverse = primaryNozzle === H1_NOZZLE
+    const tipRowsOrdered = shouldReverse
+      ? [...rowsPreOrdering].reverse()
+      : rowsPreOrdering
     const targetRowIndex = tipRowsOrdered.findIndex(row =>
       row.some(rowWell => rowWell === wellName)
     )

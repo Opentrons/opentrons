@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
+  A1_NOZZLE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   OT2_ROBOT_TYPE,
@@ -78,6 +79,7 @@ describe('aspirate', () => {
       } as AspDispAirgapParams),
       tipRack: 'tiprack1Id',
       nozzles: null,
+      primaryNozzle: A1_NOZZLE,
     }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -128,6 +130,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tiprack1Id',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -156,6 +159,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -177,6 +181,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -195,6 +200,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       initialRobotState
@@ -216,6 +222,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -240,6 +247,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       initialRobotState
@@ -273,6 +281,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -306,6 +315,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -344,6 +354,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -377,6 +388,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -415,6 +427,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -444,6 +457,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -472,6 +486,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -501,6 +516,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
@@ -531,6 +547,7 @@ mock_pipette.aspirate(
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
         nozzles: null,
+        primaryNozzle: A1_NOZZLE,
       },
       invariantContext,
       robotStateWithTip
