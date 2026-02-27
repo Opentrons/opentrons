@@ -7,22 +7,13 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.pipette.pipette_definition import (
-    AvailableSensorDefinition,
     ValidNozzleMaps,
 )
-from opentrons_shared_data.pipette.types import (
-    LiquidClasses as VolumeModes,
-)
-from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
-)
 
-import opentrons.protocol_engine.state.update_types as update_types
 from ..pipette_fixtures import (
     NINETY_SIX_COLS,
     NINETY_SIX_MAP,
     NINETY_SIX_ROWS,
-    get_default_nozzle_map,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.commands.command import SuccessData
@@ -33,11 +24,7 @@ from opentrons.protocol_engine.commands.configure_nozzle_layout import (
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
-    LoadedConfigureNozzleLayoutData,
     TipHandler,
-)
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
 )
 from opentrons.protocol_engine.state.update_types import (
     PipetteNozzleMapUpdate,
@@ -46,7 +33,6 @@ from opentrons.protocol_engine.state.update_types import (
 from opentrons.protocol_engine.types import (
     AllNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
-    FlowRates,
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
