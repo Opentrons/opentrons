@@ -777,6 +777,12 @@ class RunStore:
                 )
             ).scalar_one()
 
+            # Note here that we have to order all queries using the `row_id` column rather than `sqlite.rowid`
+            # because we have CASCADE ON DELETE enabled on the command annotation table which deletes foreign-keyed children
+            # before parents and this cascaded order will not match insertion order. A result of that is that SQLite re-uses
+            # the freed ROWIDs from the cascaded deletions when re-inserting new annotations, while maintaining the
+            # insertion order of the annotations. So the ROWIDs are no longer representative of the insertion order
+            # but thankfully, the `row_id` column still is.
             select_annotations = (
                 sqlalchemy.select(
                     (
