@@ -1,7 +1,8 @@
 """Implementation for talking to the RT214C scanner."""
 
 import logging
-from typing import List, Optional
+from math import ceil
+from typing import ByteString, Optional
 
 import serial  # type: ignore[import-untyped]
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
@@ -9,6 +10,7 @@ from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 from .abstract import AbstractBarcodeScannerDriver
 from .rtscanner_commands import (
     ack,
+    aiming_led_enable,
     decode_timeout,
     do_beep,
     enable_aim_id,
@@ -20,18 +22,20 @@ from .rtscanner_commands import (
     good_read_beep_enable,
     good_read_beep_frequency,
     good_read_beep_volume,
+    illumination_led_enable,
     menu_prefix,
     menu_suffix,
     permanent_write,
     scan_trigger,
     set_custom_prefix,
     set_terminating_suffix,
-    illumination_led_enable,
-    aiming_led_enable,
+    int_conv,
+    bool_conv,
 )
 from .types import BarcodeModuleInfo, SoundProfile
 
 log = logging.getLogger(__name__)
+
 
 
 class RTScanner(AbstractBarcodeScannerDriver):
@@ -60,9 +64,9 @@ class RTScanner(AbstractBarcodeScannerDriver):
         self._enable_aim_id(False)
         self._enable_code_id(False)
         self.set_sound_profile(self._sound_profile)
-        self.set_menu_option(illumination_led_enable + [ord("1")])
-        self.set_menu_option(aiming_led_enable + [ord("1")])
-        self._set_scan_terminator([0x03])  # End of Text non-printable character
+        self.set_menu_option(illumination_led_enable + bool_conv(True))
+        self.set_menu_option(aiming_led_enable + bool_conv(True))
+        self._set_scan_terminator(b"\x03")  # End of Text non-printable character
 
     def disconnect(self) -> None:
         self.conn.close()
@@ -73,43 +77,44 @@ class RTScanner(AbstractBarcodeScannerDriver):
 
     def _enable_aim_id(self, enable: bool) -> None:
         self._aim_id_ena = enable
-        arg = ord("1") if enable else ord("0")
-        self.set_menu_option(enable_aim_id + [arg])
+        self.set_menu_option(enable_aim_id + bool_conv(enable))
 
     def _enable_code_id(self, enable: bool) -> None:
         self._code_id_ena = enable
-        arg = ord("1") if enable else ord("0")
-        self.set_menu_option(enable_code_id_prefix + [arg])
+        self.set_menu_option(enable_code_id_prefix + bool_conv(enable))
 
-    def _set_scan_terminator(self, terminator: List[int]) -> None:
+    def _set_scan_terminator(self, terminator: ByteString) -> None:
         self._scan_terminator = terminator
-        self.set_menu_option(enable_terminating_suffix + [ord("1")])
+        self.set_menu_option(enable_terminating_suffix + bool_conv(True))
         self.set_menu_option(
-            set_terminating_suffix + self.expand_ascii_args(terminator)
+            set_terminating_suffix + self.expand_ascii_args(terminator.decode("ascii"))  # type: ignore[union-attr]
         )
 
-    def set_menu_option(self, cmd: List[int]) -> None:
+    def set_menu_option(self, cmd: ByteString) -> None:
         """Wrap a given command in the structure needed to pass the setting to the device."""
-        self.conn.write(menu_prefix + permanent_write + cmd + menu_suffix)
+        cmd_bytes = bytes(menu_prefix + permanent_write + cmd + menu_suffix)
+        log.debug(f"sending {' '.join(f'{b:02x}' for b in cmd_bytes)}")
+        self.conn.write(cmd_bytes)
         recv = self.conn.read_until(bytes(menu_suffix))
-        if len(recv) < 3 or recv[-3] != ack[0]:
+        if len(recv) < 3 or recv[-3] != bytes(ack)[0]:
             log.exception(
                 f"Error writing setting recieved {' '.join(f'{b:02x}' for b in recv)}."
             )
+        log.debug(f"received {' '.join(f'{b:02x}' for b in recv)}")
 
     def set_scan_timeout(self, timeout_ms: int) -> None:
         """Tell the scanner how long to keep decoding before failing."""
         assert timeout_ms <= 3000
         self._timeout_ms = timeout_ms
-        timeout_param = [ord(c) for c in str(timeout_ms)]
-        self.set_menu_option(decode_timeout + timeout_param)
+        self.set_menu_option(decode_timeout + int_conv(timeout_ms))
         self.conn.timeout = timeout_ms / 1000.0
 
     def scan_barcode(self) -> Optional[str]:
         """Search for a barcode and return if found else None."""
-        self.conn.write(scan_trigger)
+        self.conn.write(bytes(scan_trigger))
         self.conn.read_until(bytes(ack))  # eat the ack response
         barcode: str = self.conn.read_until(bytes(self._scan_terminator))
+        log.debug(f"Scanned {barcode}")
         if len(barcode) == 0:
             if self._do_err_beep:
                 self.do_beep()
@@ -119,39 +124,37 @@ class RTScanner(AbstractBarcodeScannerDriver):
             barcode = barcode[: -1 * len(self._scan_terminator)]
         return barcode
 
-    def expand_ascii_args(self, byte_list: List[int]) -> List[int]:
+    def expand_ascii_args(self, text: str) -> ByteString:
         """Double encode ascii for some reason."""
+        bytestring = text.encode("ascii")
+        bytes_as_str = [f"{b:02x}" for b in bytestring]
         expanded = []
-        bytes_str = [f"{b:02x}" for b in byte_list]
-        for b in bytes_str:
+        for b in bytes_as_str:
             expanded += [ord(c) for c in b]
-        return expanded
+        return bytes(expanded)
 
     def enable_prefix(self, enable: bool) -> None:
         """Enable a custom prefix."""
-        arg = ord("1") if enable else ord("0")
-        self.set_menu_option(enable_custom_prefix + [arg])
+        self.set_menu_option(enable_custom_prefix + bool_conv(enable))
 
     def enable_suffix(self, enable: bool) -> None:
         """Enable a custom suffix."""
-        arg = ord("1") if enable else ord("0")
-        self.set_menu_option(enable_custom_suffix + [arg])
+        self.set_menu_option(enable_custom_suffix + bool_conv(enable))
 
     def set_prefix(self, prefix: str) -> None:
         """Set the custom prefix."""
         self.enable_prefix(True)
-        prefix_bytes = [ord(c) for c in prefix]
-        assert len(prefix_bytes) <= 10
-        self.set_menu_option(set_custom_prefix + self.expand_ascii_args(prefix_bytes))
+        prefix_bytestr = self.expand_ascii_args(prefix)
+        assert len(prefix_bytestr) <= 10
+        self.set_menu_option(set_custom_prefix + prefix_bytestr)
 
     def set_suffix(self, suffix: str) -> None:
         """Set a custom suffix."""
         self.enable_suffix(True)
-        suffix_bytes = [ord(c) for c in suffix]
-        assert len(suffix_bytes) <= 10
-        self.set_menu_option(
-            set_terminating_suffix + self.expand_ascii_args(suffix_bytes)
-        )
+
+        suffix_bytestr = self.expand_ascii_args(suffix)
+        assert len(suffix_bytestr) <= 10
+        self.set_menu_option(set_terminating_suffix + suffix_bytestr)
 
     def enable_success_beeps(
         self,
@@ -161,6 +164,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         frequency_hz: int = 2730,
     ) -> None:
         """Set the success UI settings."""
+        self.set_menu_option(good_read_beep_enable + bool_conv(enable))
         if enable:
             # level must be between 1 and 20
             assert level in range(1, 21)
@@ -168,16 +172,9 @@ class RTScanner(AbstractBarcodeScannerDriver):
             assert duration_ms in range(20, 301)
             # frequency must be between 20 and 20000
             assert frequency_hz in range(20, 20000)
-            self.set_menu_option(good_read_beep_enable + [ord("1")])
-            self.set_menu_option(
-                good_read_beep_duration + [ord(c) for c in str(duration_ms)]
-            )
-            self.set_menu_option(good_read_beep_volume + [ord(c) for c in str(level)])
-            self.set_menu_option(
-                good_read_beep_frequency + [ord(c) for c in str(frequency_hz)]
-            )
-        else:
-            self.set_menu_option(good_read_beep_enable + [ord("0")])
+            self.set_menu_option(good_read_beep_duration + int_conv(duration_ms))
+            self.set_menu_option(good_read_beep_volume + int_conv(level))
+            self.set_menu_option(good_read_beep_frequency + int_conv(frequency_hz))
 
     def do_beep(
         self, level: int = 20, duration_ms: int = 80, frequency_hz: int = 2730
@@ -190,12 +187,12 @@ class RTScanner(AbstractBarcodeScannerDriver):
         assert frequency_hz in range(20, 20000)
         self.set_menu_option(
             do_beep
-            + [ord(c) for c in str(frequency_hz)]
-            + [ord("F")]
-            + [ord(c) for c in str(duration_ms)]
-            + [ord("T")]
-            + [ord(c) for c in str(level)]
-            + [ord("V")]
+            + int_conv(frequency_hz)
+            + b"F"
+            + int_conv(duration_ms)
+            + b"T"
+            + int_conv(level)
+            + b"V"
         )
 
     def set_sound_profile(self, profile: SoundProfile) -> None:
