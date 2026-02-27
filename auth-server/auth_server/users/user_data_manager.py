@@ -49,28 +49,6 @@ class UserDataManager:
     def __init__(self, user_store: UserStore) -> None:
         self._store = user_store
 
-    # def seed_account_type_scopes(self) -> None:
-    #     """Insert default account type scopes if they don't already exist."""
-    #     defaults = [
-    #         AccountTypeScope(
-    #             account_type=AccountType.ADMIN,
-    #             scope=[scope.api_name for scope in Scope],
-    #         ),
-    #         AccountTypeScope(
-    #             account_type=AccountType.USER,
-    #             scope=[scope.api_name for scope in Scope.USER],
-    #         ),
-    #         AccountTypeScope(
-    #             account_type=AccountType.AUDITOR,
-    #             scope=[scope.api_name for scope in Scope.AUDITOR],
-    #         ),
-    #         AccountTypeScope(
-    #             account_type=AccountType.SERVICE,
-    #             scope=[scope.api_name for scope in Scope.SERVICE],
-    #         ),
-    #     ]
-    #     self._store.seed(defaults)
-
     def seed_initial_users(self) -> None:
         """Insert default placeholder users if they don't already exist."""
         defaults = [

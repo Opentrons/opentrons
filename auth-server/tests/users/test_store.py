@@ -3,8 +3,6 @@ from typing import Generator
 
 import pytest
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
@@ -97,7 +95,6 @@ def test_update_username(user_store: UserStore) -> None:
     assert updated.username == "new_name"
     assert updated.full_name == "Original"
     assert updated.account_type == AccountType.USER
-    assert updated.scopes == [Scope.RUNS_WRITE]
     assert user_store.get("new_name") is not None
     assert user_store.get("orig_name") is None
 

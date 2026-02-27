@@ -1,34 +1,8 @@
 """ORM table definitions and supporting column types."""
 
-from typing import List
-
-import sqlalchemy
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
-
-from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import Base
-from auth_server.users.models import AccountType
-
-ACCOUNT_TYPE_SCOPES = {
-    AccountType.ADMIN: list(Scope),  # all scopes
-    AccountType.USER: [Scope.RUNS_WRITE],  # limited scopes
-    AccountType.AUDITOR: [Scope.USERS_READ],
-    AccountType.SERVICE: [Scope.RUNS_WRITE],
-}
-
-
-class AccountTypeScope(Base):
-    """Maps each account type to its allowed scopes."""
-
-    __tablename__ = "account_type_scopes"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    account_type = Column(String, nullable=False)
-    scope = Column(String, nullable=False)
-
-    __table_args__ = (sqlalchemy.UniqueConstraint("account_type", "scope"),)
 
 
 class User(Base):
@@ -41,18 +15,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     account_type = Column(String, nullable=False)
-    # we can also just query it when needed.
-    scope_mappings: List[AccountTypeScope] = relationship(
-        "AccountTypeScope",
-        primaryjoin="User.account_type == foreign(AccountTypeScope.account_type)",
-        viewonly=True,
-        lazy="joined",
-    )
-
-    @property
-    def scopes(self) -> list[Scope]:
-        """Get the scopes for the user."""
-        return [Scope.from_api_name(str(m.scope)) for m in self.scope_mappings]
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"

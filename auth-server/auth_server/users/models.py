@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
+from server_utils.auth.scopes import Scope
+
+# todo(tz, 2026-02-27): remove this when we move AccountType to its own file.
 if TYPE_CHECKING:
     from auth_server.persistence.tables import User
 
@@ -17,6 +20,15 @@ class AccountType(StrEnum):
     USER = "user"
     AUDITOR = "auditor"
     SERVICE = "service"
+
+
+# move this to db if we need to support updating scopes.
+ACCOUNT_TYPE_TO_SCOPES = {
+    AccountType.ADMIN: list(Scope),  # all scopes
+    AccountType.USER: [Scope.RUNS_WRITE],  # limited scopes
+    AccountType.AUDITOR: [Scope.USERS_READ],
+    AccountType.SERVICE: [Scope.RUNS_WRITE],
+}
 
 
 class UserCreate(BaseModel):
@@ -63,5 +75,9 @@ class UserResponse(BaseModel):
             userName=user.username,  # type: ignore[arg-type]
             fullName=user.full_name,  # type: ignore[arg-type]
             accountType=user.account_type,  # type: ignore[arg-type]
-            scopes=[scope.api_name for scope in user.scopes or []],
+            scopes=[
+                scope.api_name
+                for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType(str(user.account_type))]
+                or []
+            ],
         )
