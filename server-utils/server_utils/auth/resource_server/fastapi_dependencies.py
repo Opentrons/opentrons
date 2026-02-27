@@ -164,6 +164,6 @@ def _get_authorization_checker(
     """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`."""
     authorization_checker = _authorization_checker_accessor.get_from(app_state)
     assert authorization_checker is not None, (
-        "Forgot to initialize notification client as part of server startup?"
+        "Forgot to initialize authorization checker as part of server startup?"
     )
     return authorization_checker
