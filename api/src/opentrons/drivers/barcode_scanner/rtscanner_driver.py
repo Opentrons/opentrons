@@ -92,7 +92,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         """Wrap a given command in the structure needed to pass the setting to the device."""
         self.conn.write(menu_prefix + permanent_write + cmd + menu_suffix)
         recv = self.conn.read_until(bytes(menu_suffix))
-        if len(recv) < 3 or recv[-3] == 0x06:
+        if len(recv) < 3 or recv[-3] != ack[0]:
             log.exception(
                 f"Error writing setting recieved {' '.join(f'{b:02x}' for b in recv)}."
             )
