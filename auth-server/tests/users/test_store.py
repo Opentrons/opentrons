@@ -91,8 +91,8 @@ def test_update_username(user_store: UserStore) -> None:
         username="orig_name",
         hashed_password=HASHED_PW,
         full_name="Original",
-        account_type="user"    
-        )
+        account_type="user",
+    )
     updated = user_store.update("orig_name", new_username="new_name")
     assert updated.username == "new_name"
     assert updated.full_name == "Original"

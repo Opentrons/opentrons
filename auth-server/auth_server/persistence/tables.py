@@ -1,12 +1,8 @@
 """ORM table definitions and supporting column types."""
 
-from __future__ import annotations
-
-from enum import StrEnum
-from typing import Any, List
+from typing import List
 
 import sqlalchemy
-import sqlalchemy.types as types
 from sqlalchemy import Column, Enum, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -55,7 +51,8 @@ class User(Base):
 
     @property
     def scopes(self) -> list[Scope]:
-        return [Scope.from_api_name(m.scope) for m in self.scope_mappings]
+        """Get the scopes for the user."""
+        return [Scope.from_api_name(str(m.scope)) for m in self.scope_mappings]
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"

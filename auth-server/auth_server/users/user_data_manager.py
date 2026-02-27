@@ -4,7 +4,7 @@ from pwdlib import PasswordHash
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.tables import AccountTypeScope, User
+from auth_server.persistence.tables import User
 from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 
@@ -49,7 +49,6 @@ class UserDataManager:
     def __init__(self, user_store: UserStore) -> None:
         self._store = user_store
 
-
     # def seed_account_type_scopes(self) -> None:
     #     """Insert default account type scopes if they don't already exist."""
     #     defaults = [
@@ -71,7 +70,7 @@ class UserDataManager:
     #         ),
     #     ]
     #     self._store.seed(defaults)
-        
+
     def seed_initial_users(self) -> None:
         """Insert default placeholder users if they don't already exist."""
         defaults = [
