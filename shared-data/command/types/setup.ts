@@ -286,6 +286,20 @@ interface LoadLiquidClassResult {
   liquidClassId: string
 }
 
+type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
+
+export const PARTIAL_NOZZLE_MAP: Record<
+  PartialPrimaryNozzles,
+  PartialNozzles8Channel
+> = {
+  G1: 2,
+  F1: 3,
+  E1: 4,
+  D1: 5,
+  C1: 6,
+  B1: 7,
+}
+
 export const COLUMN = 'COLUMN'
 export const SINGLE = 'SINGLE'
 export const ROW = 'ROW'

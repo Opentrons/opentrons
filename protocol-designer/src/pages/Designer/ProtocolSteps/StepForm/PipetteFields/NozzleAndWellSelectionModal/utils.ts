@@ -13,11 +13,10 @@ import {
   H1_NOZZLE,
   H12_NOZZLE,
   PARTIAL,
+  PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
-
-import { PARTIAL_NOZZLE_MAP } from './constants'
 
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
@@ -160,12 +159,15 @@ export const getNozzleText = (
 }
 
 export const getEntireWellSelection = (
-  wellName: string,
+  wellName: string | null,
   wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
   channels: number
 ): string[] => {
+  if (!wellName) {
+    return []
+  }
   if (nozzleConfiguration === SINGLE) return [wellName]
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)

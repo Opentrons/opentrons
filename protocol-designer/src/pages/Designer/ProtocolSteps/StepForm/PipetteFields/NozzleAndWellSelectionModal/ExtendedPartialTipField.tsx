@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { COLORS, ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
+import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { PARTIAL_NOZZLE_MAP, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'

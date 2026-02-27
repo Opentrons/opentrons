@@ -16,11 +16,9 @@ import {
   getDeckDefFromRobotType,
   getPositionFromSlotId,
   PARTIAL,
+  PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
-import {
-  getIsSafePipetteMovement,
-  getSlotInLocationStack,
-} from '@opentrons/step-generation'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
@@ -32,7 +30,8 @@ import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP, PARTIAL_NOZZLE_MAP } from './constants'
+import { INACCESSIBLE_PARTIAL_TIP } from './constants'
+import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
@@ -93,7 +92,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
-  const allWells = labwareDef.ordering.flat()
+  const allWells = labwareDef.ordering
   const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
@@ -135,28 +134,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }, [stepType])
 
   const flatSelectedWells = useMemo(() => selectedWells.flat(), [selectedWells])
-  const allWellsWithStatus = allWells.reduce<Record<string, number>>(
-    (acc, wellName) => {
-      const safe = robotState
-        ? getIsSafePipetteMovement({
-            robotState,
-            invariantContext,
-            pipetteId,
-            labwareId,
-            wellTargetName: wellName,
-            primaryNozzle,
-            nozzleConfiguration,
-          })
-        : true
 
-      acc[wellName] = safe ? 0 : 1
-      return acc
-    },
-    {}
-  )
-
-  const allWellsWithState = allWells.reduce<Record<string, WellType>>(
-    (acc, wellName) => {
+  const allWellsWithStatus = getAllWellsSafetyStatus({
+    allWells,
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    primaryNozzle,
+    nozzleConfiguration,
+  })
+  const allWellsWithState = allWells
+    .flat()
+    .reduce<Record<string, WellType>>((acc, wellName) => {
       const accessible = allWellsWithStatus[wellName] === 0
 
       if (hoveredWells?.includes(wellName) && !accessible) {
@@ -172,9 +162,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         acc[wellName] = UNSELECTED
       }
       return acc
-    },
-    {}
-  )
+    }, {})
   const inaccessiblePartialWells = useMemo(() => {
     if (!isPartialNozzle || selectedWells.length === 0) return []
 
@@ -221,26 +209,17 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         channels
       )
     }
-
-    const hasInaccessibleWell = wellsToToggle.some(well => {
-      const isSafe = robotState
-        ? getIsSafePipetteMovement({
-            robotState,
-            invariantContext,
-            pipetteId,
-            labwareId,
-            wellTargetName: well,
-            primaryNozzle,
-            nozzleConfiguration,
-          })
-        : true
-
-      const isPartialBlocked = inaccessiblePartialWells.includes(well)
-
-      return !isSafe || isPartialBlocked
+    const allWellsWithStatus = getAllWellsSafetyStatus({
+      allWells,
+      robotState,
+      invariantContext,
+      pipetteId,
+      labwareId,
+      primaryNozzle,
+      nozzleConfiguration,
     })
 
-    if (hasInaccessibleWell) {
+    if (allWellsWithStatus[wellName] === 1) {
       return
     }
 
