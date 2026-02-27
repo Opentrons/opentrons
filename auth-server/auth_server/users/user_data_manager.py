@@ -4,7 +4,8 @@ from pwdlib import PasswordHash
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.tables import AccountType, User
+from auth_server.persistence.tables import AccountTypeScope, User
+from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
@@ -48,20 +49,41 @@ class UserDataManager:
     def __init__(self, user_store: UserStore) -> None:
         self._store = user_store
 
+
+    # def seed_account_type_scopes(self) -> None:
+    #     """Insert default account type scopes if they don't already exist."""
+    #     defaults = [
+    #         AccountTypeScope(
+    #             account_type=AccountType.ADMIN,
+    #             scope=[scope.api_name for scope in Scope],
+    #         ),
+    #         AccountTypeScope(
+    #             account_type=AccountType.USER,
+    #             scope=[scope.api_name for scope in Scope.USER],
+    #         ),
+    #         AccountTypeScope(
+    #             account_type=AccountType.AUDITOR,
+    #             scope=[scope.api_name for scope in Scope.AUDITOR],
+    #         ),
+    #         AccountTypeScope(
+    #             account_type=AccountType.SERVICE,
+    #             scope=[scope.api_name for scope in Scope.SERVICE],
+    #         ),
+    #     ]
+    #     self._store.seed(defaults)
+        
     def seed_initial_users(self) -> None:
         """Insert default placeholder users if they don't already exist."""
         defaults = [
             User(
                 username="test_admin",
                 hashed_password=password_hash.hash("test_admin_password"),
-                scopes=list(Scope),
                 full_name="Test Admin",
                 account_type=AccountType.ADMIN,
             ),
             User(
                 username="test_user",
                 hashed_password=password_hash.hash("test_user_password"),
-                scopes=[Scope.RUNS_WRITE],
                 full_name="Test User",
                 account_type=AccountType.USER,
             ),
@@ -90,7 +112,6 @@ class UserDataManager:
             hashed_password=password_hash.hash(password),
             full_name=full_name,
             account_type=account_type,
-            scopes=scopes,
         )
 
     def get_user(self, username: str) -> User:

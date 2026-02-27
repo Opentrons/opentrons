@@ -23,8 +23,6 @@ from auth_server.persistence.persistence_directory import (
     prepare_root,
 )
 from auth_server.persistence.tables import (
-    AccountType,
-    ScopeListType,
     User,
 )
 

@@ -3,39 +3,36 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, List
 
 import sqlalchemy
 import sqlalchemy.types as types
 from sqlalchemy import Column, Enum, Integer, String
+from sqlalchemy.orm import relationship
 
 from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import Base
 from auth_server.users.models import AccountType
 
+ACCOUNT_TYPE_SCOPES = {
+    AccountType.ADMIN: list(Scope),  # all scopes
+    AccountType.USER: [Scope.RUNS_WRITE],  # limited scopes
+    AccountType.AUDITOR: [Scope.USERS_READ],
+    AccountType.SERVICE: [Scope.RUNS_WRITE],
+}
 
-class ScopeListType(types.TypeDecorator[Any]):
-    """Store a ``list[Scope]`` as a JSON array of scope API-name strings."""
 
-    impl = types.JSON
-    cache_ok = True
+class AccountTypeScope(Base):
+    """Maps each account type to its allowed scopes."""
 
-    def process_bind_param(
-        self, value: Any, dialect: sqlalchemy.engine.Dialect
-    ) -> list[str]:
-        """Prepare a list of Scope objects to be inserted into SQL."""
-        if not value:
-            return []
-        return sorted(s.api_name for s in value)
+    __tablename__ = "account_type_scopes"
 
-    def process_result_value(
-        self, value: Any, dialect: sqlalchemy.engine.Dialect
-    ) -> list[Scope]:
-        """Convert a list of scope API-name strings to a list of Scope objects."""
-        if not value:
-            return []
-        return [Scope.from_api_name(s) for s in value]
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    account_type = Column(String, nullable=False)
+    scope = Column(String, nullable=False)
+
+    __table_args__ = (sqlalchemy.UniqueConstraint("account_type", "scope"),)
 
 
 class User(Base):
@@ -48,7 +45,17 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     account_type = Column(Enum(AccountType), nullable=False)
-    scopes = Column(ScopeListType, nullable=False)
+    # we can also just query it when needed.
+    scope_mappings: List[AccountTypeScope] = relationship(
+        "AccountTypeScope",
+        primaryjoin="User.account_type == foreign(AccountTypeScope.account_type)",
+        viewonly=True,
+        lazy="joined",
+    )
+
+    @property
+    def scopes(self) -> list[Scope]:
+        return [Scope.from_api_name(m.scope) for m in self.scope_mappings]
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"

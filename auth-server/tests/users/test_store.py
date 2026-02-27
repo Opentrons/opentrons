@@ -6,7 +6,7 @@ import pytest
 from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.database import create_schema, sql_engine_ctx
-from auth_server.persistence.tables import AccountType
+from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     UserDataManager,
@@ -48,7 +48,6 @@ def test_get_returns_dynamically_added_user(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Dynamic User",
         account_type=AccountType.SERVICE,
-        scopes=[],
     )
     assert added_user is not None
     assert added_user.username == "dynamic_user"
@@ -62,7 +61,6 @@ def test_add_and_get_user(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Add Test",
         account_type=AccountType.USER,
-        scopes=[],
     )
     fetched = user_store.get("add_test_user")
     assert fetched is not None
@@ -76,7 +74,6 @@ def test_remove_and_get_user(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Remove Test",
         account_type=AccountType.USER,
-        scopes=[],
     )
     user_store.remove("remove_test_user")
     assert user_store.get("remove_test_user") is None
@@ -94,9 +91,8 @@ def test_update_username(user_store: UserStore) -> None:
         username="orig_name",
         hashed_password=HASHED_PW,
         full_name="Original",
-        account_type="user",
-        scopes=[Scope.RUNS_WRITE],
-    )
+        account_type="user"    
+        )
     updated = user_store.update("orig_name", new_username="new_name")
     assert updated.username == "new_name"
     assert updated.full_name == "Original"
@@ -113,7 +109,6 @@ def test_update_preserves_password_when_none(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Keep Pwd",
         account_type=AccountType.USER,
-        scopes=[],
     )
     updated = user_store.update("keep_pwd", full_name="Updated Name")
     assert updated.hashed_password == added_user.hashed_password
@@ -126,7 +121,6 @@ def test_update_persists(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Before",
         account_type=AccountType.USER,
-        scopes=[],
     )
     user_store.update("persist_test", full_name="After")
     fetched = user_store.get("persist_test")

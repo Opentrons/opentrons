@@ -3,7 +3,8 @@ from decoy import Decoy, matchers
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.tables import AccountType, User
+from auth_server.users.models import AccountType
+from auth_server.persistence.tables import User
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
@@ -37,9 +38,8 @@ def _make_orm_user(
         username=username,
         hashed_password=hashed_password,
         full_name=full_name,
-        account_type=account_type,
-        scopes=scopes if scopes is not None else [],
-    )
+        account_type=account_type
+        )
 
 
 # ── seed_initial_users ──────────────────────────────────────────────
@@ -70,9 +70,7 @@ def test_create_user_success(
             username="new_user",
             hashed_password=matchers.IsA(str),
             full_name="New User",
-            account_type=AccountType.USER,
-            scopes=[Scope.RUNS_WRITE],
-        )
+            account_type=AccountType.USER,        )
     ).then_return(expected)
 
     result = manager.create_user(
@@ -95,9 +93,7 @@ def test_create_user_hashes_password(
             username="hash_check",
             hashed_password=matchers.IsA(str),
             full_name="X",
-            account_type=AccountType.USER,
-            scopes=[],
-        )
+            account_type=AccountType.USER,        )
     ).then_return(_make_orm_user(username="hash_check", full_name="X"))
 
     manager.create_user(
@@ -114,7 +110,6 @@ def test_create_user_hashes_password(
             hashed_password="plaintextpw",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         ),
         times=0,
     )

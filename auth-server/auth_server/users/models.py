@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
-from auth_server.persistence.tables import AccountType
-
 if TYPE_CHECKING:
     from auth_server.persistence.tables import User
 
