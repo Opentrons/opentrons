@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .types import BarcodeModuleInfo, LEDProfile, SoundProfile
+from .types import BarcodeModuleInfo, SoundProfile
 
 
 class AbstractBarcodeScannerDriver(ABC):
@@ -41,11 +41,6 @@ class AbstractBarcodeScannerDriver(ABC):
     @abstractmethod
     async def set_sound_profile(self, profile: SoundProfile) -> None:
         """Set the sound profile."""
-        ...
-
-    @abstractmethod
-    async def set_led_profile(self, profile: LEDProfile) -> None:
-        """Set the led profile."""
         ...
 
     @abstractmethod

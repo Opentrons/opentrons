@@ -9,12 +9,6 @@ class SoundProfile(Enum):
     OFF = 3
 
 
-class LEDProfile(Enum):
-    SUCCESS_AND_FAILURE = 1
-    FAILURE_ONLY = 2
-    OFF = 3
-
-
 @dataclass
 class BarcodeModuleInfo:
     serial: str

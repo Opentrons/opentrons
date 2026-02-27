@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .abstract import AbstractBarcodeScannerDriver
-from .types import BarcodeModuleInfo, LEDProfile, SoundProfile
+from .types import BarcodeModuleInfo, SoundProfile
 
 
 class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
@@ -55,12 +55,6 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.sound_profile = profile
-
-    async def set_led_profile(self, profile: LEDProfile) -> None:
-        """Set the led profile."""
-        if not self.connected:
-            raise ConnectionError("Barcode scanner simulator not connected.")
-        self.led_profile = profile
 
     async def get_device_info(self) -> BarcodeModuleInfo:
         """Get Device Info."""
