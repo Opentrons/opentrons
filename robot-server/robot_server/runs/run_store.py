@@ -726,7 +726,7 @@ class RunStore:
 
     def get_command_annotations_as_unverified_objects_list(
         self, run_id: str
-    ) -> List[Dict[str, Any]]:
+    ) -> List[Dict[str, Optional[str]]]:
         """Get all command annotations of the run as a list of unverified dict entries."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):

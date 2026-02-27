@@ -15,8 +15,12 @@ from robot_server.runs.router.command_annotations_router import (
     _DEFAULT_COMMAND_ANNOTATIONS_LIST_LENGTH,
     get_command_annotation,
     get_command_annotations_list,
+    get_list_of_unverified_command_annotation_dicts,
 )
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_data_manager import (
+    PreSerializedCommandAnnotationsNotAvailableError,
+    RunDataManager,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import (
     CommandAnnotationNotFoundError as CommandAnnotationNotFoundInRunStoreError,
@@ -243,6 +247,86 @@ async def test_get_command_annotation_raises_errors(
         )
 
     assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
+        "womp womp womp"
+    )
+
+
+async def test_get_command_annotations_as_unverified_objects(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should return the expected command annotation dictionaries."""
+    expected_annotations = [
+        {
+            "id": "annotation-id",
+            "source": "userCommand",
+            "name": "foo",
+            "description": None,
+            "params": "{}",
+            "parentId": None,
+        },
+        {
+            "id": "annotation-id-2",
+            "source": "systemCommand",
+            "name": "bar",
+            "description": "A system command group",
+            "params": "{}",
+            "parentId": None,
+        },
+    ]
+    decoy.when(
+        mock_run_data_manager.get_command_annotations_as_unverified_objects_list(
+            "run-id"
+        )
+    ).then_return(expected_annotations)
+    result = await get_list_of_unverified_command_annotation_dicts(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+    )
+    assert result.content.data == expected_annotations
+    assert result.status_code == 200
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
+
+
+async def test_get_command_annotations_as_unverified_objects_raises_404_error(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 404 if you attempt to get a non-existent command annotation."""
+    decoy.when(
+        mock_run_data_manager.get_command_annotations_as_unverified_objects_list(
+            "run-id"
+        )
+    ).then_raise(RunNotFoundError("womp womp womp"))
+    with pytest.raises(ApiError) as exc_info:
+        await get_list_of_unverified_command_annotation_dicts(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
+        "womp womp womp"
+    )
+
+
+async def test_get_command_annotations_as_unverified_objects_raises_503_error(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 503 if you attempt to get unverified command annotation dicts from a current, unfinished run."""
+    decoy.when(
+        mock_run_data_manager.get_command_annotations_as_unverified_objects_list(
+            "run-id"
+        )
+    ).then_raise(PreSerializedCommandAnnotationsNotAvailableError("womp womp womp"))
+    with pytest.raises(ApiError) as exc_info:
+        await get_list_of_unverified_command_annotation_dicts(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
+    assert exc_info.value.status_code == 503
     assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
         "womp womp womp"
     )

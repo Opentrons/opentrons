@@ -256,13 +256,16 @@ stages:
         data:
           - source: userCommand
             id: '{annotation_id_1}'
-            name: 'My step group'
-            description: "It's a comment, that's it."
+            name: My step group
+            description: It's a comment, that's it.
             params: '{{}}'
             parentId: null
           - source: userCommand
             id: '{annotation_id_2}'
-            name: 'My step group 2'
-            description: "Another comment!"
+            name: My step group 2
+            description: Another comment!
             params: '{{}}'
             parentId: null
+        meta:
+          cursor: 0
+          totalLength: 2

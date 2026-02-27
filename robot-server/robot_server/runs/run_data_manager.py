@@ -1,7 +1,7 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons import config
 from opentrons.protocol_engine import (
@@ -595,7 +595,7 @@ class RunDataManager:
 
     def get_command_annotations_as_unverified_objects_list(
         self, run_id: str
-    ) -> List[Dict[str, Any]]:
+    ) -> List[Dict[str, Optional[str]]]:
         """Get all command annotations of a run in a serialized json list."""
         if (
             run_id == self._run_orchestrator_store.current_run_id
@@ -604,7 +604,9 @@ class RunDataManager:
             raise PreSerializedCommandAnnotationsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
             )
-        return self._run_store.get_command_annotations_as_unverified_objects_list(run_id)
+        return self._run_store.get_command_annotations_as_unverified_objects_list(
+            run_id
+        )
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
