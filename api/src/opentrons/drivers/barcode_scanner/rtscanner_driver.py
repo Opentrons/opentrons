@@ -27,11 +27,12 @@ from .rtscanner_commands import (
     set_custom_prefix,
     set_terminating_suffix,
 )
+from .types import BarcodeModuleInfo, SoundProfile
 
 log = logging.getLogger(__name__)
 
 
-class RTScanner:
+class RTScanner(AbstractBarcodeScannerDriver):
     """Driver for the RTC214C."""
 
     def __init__(self, read_timeout_ms: int = 2000):
@@ -43,14 +44,28 @@ class RTScanner:
                 device = p.device
         if device is None:
             raise RuntimeError("No RT scanner found.")
-        self.conn = serial.Serial(device)
-        self.set_scan_timeout(read_timeout_ms)
+        self._device = device
+        self._timeout_ms = read_timeout_ms
+        self._sound_profile = SoundProfile.OFF
+
+    def connect(self) -> None:
+        self.conn = serial.Serial(self._device)
+        self._connected = True
+        self.set_scan_timeout(self._timeout_ms)
         # disable all weird suffix/prefix to start
         self.enable_suffix(False)
         self.enable_prefix(False)
         self._enable_aim_id(False)
         self._enable_code_id(False)
+        self.set_sound_profile(self._sound_profile)
         self._set_scan_terminator([0x03])  # End of Text non-printable character
+
+    def disconnect(self) -> None:
+        self.conn.close()
+        self._connected = False
+
+    def is_connected(self) -> bool:
+        return self._connected
 
     def _enable_aim_id(self, enable: bool) -> None:
         self._aim_id_ena = enable
@@ -81,22 +96,24 @@ class RTScanner:
     def set_scan_timeout(self, timeout_ms: int) -> None:
         """Tell the scanner how long to keep decoding before failing."""
         assert timeout_ms <= 3000
-        self.conn.timeout = timeout_ms / 1000.0
+        self._timeout_ms = timeout_ms
         timeout_param = [ord(c) for c in str(timeout_ms)]
         self.set_menu_option(decode_timeout + timeout_param)
         self.conn.timeout = timeout_ms / 1000.0
 
-    def scan(self) -> Optional[str]:
+    def scan_barcode(self) -> Optional[str]:
         """Search for a barcode and return if found else None."""
         self.conn.write(scan_trigger)
         self.conn.read_until(bytes(ack))  # eat the ack response
-        barcode = self.conn.read_until(bytes(self._scan_terminator))
+        barcode: str = self.conn.read_until(bytes(self._scan_terminator))
         if len(barcode) == 0:
+            if self._do_err_beep:
+                self.do_beep()
             return None
         else:
             # strip off our internal terminator
             barcode = barcode[: -1 * len(self._scan_terminator)]
-        return None if len(barcode) == 0 else barcode
+        return barcode
 
     def expand_ascii_args(self, byte_list: List[int]) -> List[int]:
         """Double encode ascii for some reason."""
@@ -176,3 +193,15 @@ class RTScanner:
             + [ord(c) for c in str(level)]
             + [ord("V")]
         )
+
+    def set_sound_profile(self, profile: SoundProfile) -> None:
+        """Set the sound profile."""
+        self._do_err_beep = profile in [
+            SoundProfile.FULL_SOUND,
+            SoundProfile.ONLY_ERROR,
+        ]
+        self.enable_success_beeps(enable=profile == SoundProfile.FULL_SOUND)
+
+    def get_device_info(self) -> BarcodeModuleInfo:
+        """Get Device Info."""
+        return BarcodeModuleInfo(serial="Fake serial.")

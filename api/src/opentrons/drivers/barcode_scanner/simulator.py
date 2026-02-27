@@ -9,54 +9,53 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         self.connected = False
         self.prefix = ""
         self.suffix = ""
-        self.scan_timeout = 1.0
+        self.scan_timeout = 1000
         self.serial_number = "fake-serial"
         self.sound_profile = SoundProfile.FULL_SOUND
-        self.led_profile = LEDProfile.SUCCESS_AND_FAILURE
 
-    async def connect(self) -> None:
+    def connect(self) -> None:
         """Connect to the barcode scanner."""
         self.connected = True
 
-    async def disconnect(self) -> None:
+    def disconnect(self) -> None:
         """Disconnect from the barcode scanner."""
         self.connected = False
 
-    async def is_connected(self) -> bool:
+    def is_connected(self) -> bool:
         """Check connection to barcode scanner"""
         return self.connected
 
-    async def set_prefix(self, prefix: str) -> None:
+    def set_prefix(self, prefix: str) -> None:
         """Set the automatic prefix for the barcode data."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.prefix = prefix
 
-    async def set_suffix(self, suffix: str) -> None:
+    def set_suffix(self, suffix: str) -> None:
         """Set the automatic suffix for the barcode data."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.suffix = suffix
 
-    async def set_scan_timeout(self, timeout: float) -> None:
+    def set_scan_timeout(self, timeout_ms: int) -> None:
         """Set how long to run the decoder before timing out."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
-        self.scan_timeout = timeout
+        self.scan_timeout = timeout_ms
 
-    async def scan_barcode(self) -> Optional[str]:
+    def scan_barcode(self) -> Optional[str]:
         """Scan and return a barcode."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
         return f"{self.prefix}FakeBarcodeData{self.suffix}"
 
-    async def set_sound_profile(self, profile: SoundProfile) -> None:
+    def set_sound_profile(self, profile: SoundProfile) -> None:
         """Set the sound profile."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.sound_profile = profile
 
-    async def get_device_info(self) -> BarcodeModuleInfo:
+    def get_device_info(self) -> BarcodeModuleInfo:
         """Get Device Info."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
