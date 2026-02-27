@@ -26,6 +26,8 @@ from .rtscanner_commands import (
     scan_trigger,
     set_custom_prefix,
     set_terminating_suffix,
+    illumination_led_enable,
+    aiming_led_enable,
 )
 from .types import BarcodeModuleInfo, SoundProfile
 
@@ -58,6 +60,8 @@ class RTScanner(AbstractBarcodeScannerDriver):
         self._enable_aim_id(False)
         self._enable_code_id(False)
         self.set_sound_profile(self._sound_profile)
+        self.set_menu_option(illumination_led_enable + [ord("1")])
+        self.set_menu_option(aiming_led_enable + [ord("1")])
         self._set_scan_terminator([0x03])  # End of Text non-printable character
 
     def disconnect(self) -> None:
