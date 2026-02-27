@@ -3,7 +3,7 @@
 from typing import List
 
 import sqlalchemy
-from sqlalchemy import Column, Enum, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from server_utils.auth.scopes import Scope
@@ -40,7 +40,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
-    account_type = Column(Enum(AccountType), nullable=False)
+    account_type = Column(String, nullable=False)
     # we can also just query it when needed.
     scope_mappings: List[AccountTypeScope] = relationship(
         "AccountTypeScope",

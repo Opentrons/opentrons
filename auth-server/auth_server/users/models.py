@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from auth_server.persistence.tables import User
 
 
+# leave this outside of the db. this will not change.
 class AccountType(StrEnum):
     """The type of account."""
 
