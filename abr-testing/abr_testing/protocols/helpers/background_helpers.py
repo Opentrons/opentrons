@@ -66,15 +66,11 @@ def video_capture_buffer(max_time: int, m3u8_path: str) -> None:
     os.makedirs(storage_path, exist_ok=True)
 
     # Runs forever in the background
-
-    # Hello future programmer. Below is an ffmpeg command.
-    # ffmpeg is ugly. ffmpeg makes no sense.
-    # just know that this is what this does:
-    # 1. streams from the given m3u8_path
-    # 2. segments the stream into 1 second clips
-    # 3. converts each of these one second clips to mp4
-    # 4. stores these clips in the above "storage_path" directory
-    # it also runs perpetually (but don't worry, it is killed below)
+    # FMMPEG Command Description:
+    # 1. Streams from the given m3u8_path
+    # 2. Segments the stream into 1 second clips
+    # 3. Converts each of these one second clips to mp4
+    # 4. Stores these clips in the above "storage_path" directory
     cmd = [
         "ffmpeg",
         "-y",
@@ -92,12 +88,7 @@ def video_capture_buffer(max_time: int, m3u8_path: str) -> None:
         "aac",
         f"{storage_path}/%Y-%m-%d_%H-%M-%S.mp4",
     ]
-    """
-    Note to self:
-        1. stdout and stderr are subprocess' way of outputing logs and errors to the terminal
-        2. DEVNULL is a "black hole" file
-        3. here, we are telling subprocess to stfu instead of attacking our terminal
-    """
+
     process = subprocess.Popen(
         cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )

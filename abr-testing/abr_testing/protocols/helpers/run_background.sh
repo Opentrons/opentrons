@@ -4,7 +4,6 @@ IP_ADDRESS=$(networkctl status | grep "Address:" | awk '{print $2}')
 
 # Navigate to relevant file
 cd "$(dirname "$0")"
-#pwd
 
 # CHECK: Is there a lockfile?
 if [ -f "$LOCKFILE" ]; then

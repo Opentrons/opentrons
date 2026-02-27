@@ -670,25 +670,14 @@ def convert_m3u8_to_mp4(m3u8_pth: str, mp4_pth: str, dur: int = 30) -> None:
     )
 
 
-def get_livestream_video(length: int) -> str:
-    """Get latest livestream video."""
-    video_path = "/var/www/localhost/html/stream/hls/stream.m3u8"
-    new_video_path = "/data/testing_data/livestream_video.mp4"
-    convert_m3u8_to_mp4(video_path, new_video_path, length)
-    return new_video_path
-
-
 def access_livestream_buffer() -> str:
     """Get latest livestream buffer. Clips returned are a full 30 seconds long."""
-    """This is designed to be a replacement for the above function."""
     storage_path: str = "data/testing_data/videos/video_capture_buffer"
     video_clip_files: list[str] = sorted(
         [f for f in os.listdir(storage_path) if f.endswith(".mp4")]
     )
 
     # Just skip the most recent second, ffmpeg might still be writing
-    # Note: This may create a 1-second blind spot. Ask how long the robot tends to take to
-    # enter error recovery/error out after the error actually happens
     if len(video_clip_files) > 1:
         video_clip_files = video_clip_files[:-1]
 
@@ -706,11 +695,9 @@ def access_livestream_buffer() -> str:
         shell=True,
     )
 
-    # delete the text file
     if os.path.exists(txt_file_path):
         os.remove(txt_file_path)
 
-    # return the output file path
     return output_file_path
 
 
@@ -732,7 +719,7 @@ def send_slack_error_message_with_attachments(
 ) -> None:
     """Send error slack message with log files and video clip attached."""
     log_path, ip = create_robot_log_zip()
-    video_path = get_livestream_video(length)
+    video_path = access_livestream_buffer()
     slack_bot.send_error_message(protocol_name, error_str, ip, [log_path, video_path])
 
 
