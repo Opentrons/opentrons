@@ -1,7 +1,6 @@
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy.engine import Engine as SQLEngine
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -9,8 +8,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .backend import Backend, build
-from auth_server.users.store import UserStore
+from .backend import Backend
 
 _app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
 
@@ -20,16 +18,6 @@ def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
 
     This should be called once at server startup.
     """
-    _app_state_accessor.set_on(app_state, backend)
-
-
-def install_oath2_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None:
-    """Initialize the server's singleton OAuth 2 backend and store it for later retrieval.
-
-    This should be called once at server startup.
-    """
-    user_store = UserStore(sql_engine=sql_engine)
-    backend = build(user_store)
     _app_state_accessor.set_on(app_state, backend)
 
 
