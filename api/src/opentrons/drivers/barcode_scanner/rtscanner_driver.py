@@ -184,9 +184,9 @@ class RTScanner(AbstractBarcodeScannerDriver):
     ) -> None:
         # level must be between 1 and 20
         assert level in range(1, 21)
-        # duration must be between 20 and 300
-        assert duration_ms in range(20, 301)
-        # frequency must be between 20 and 20000
+        # duration must be between 20 and 10000
+        assert duration_ms in range(20, 10000)
+        # frequency must be between 1 and 20000
         assert frequency_hz in range(20, 20000)
         self.set_menu_option(
             do_beep
