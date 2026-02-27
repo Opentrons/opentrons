@@ -1139,7 +1139,7 @@
                 [20.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
                   "location": "destination",
                   "flowRate": 50.0
