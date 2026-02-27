@@ -2,6 +2,8 @@ import merge from 'lodash/merge'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  A1_NOZZLE,
+  A12_NOZZLE,
   COLUMN,
   fixture96Plate,
   fixtureTiprack300ul,
@@ -54,6 +56,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialRobotState
@@ -100,6 +103,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialRobotState
@@ -114,6 +118,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -148,6 +153,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialTestRobotState
@@ -173,6 +179,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialTestRobotState
@@ -212,6 +219,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           nozzles: COLUMN,
+          primaryNozzle: A12_NOZZLE,
         },
         invariantContext,
         initialTestRobotState
@@ -249,6 +257,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialTestRobotState
@@ -288,6 +297,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: 'wasteChuteId',
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         initialTestRobotState
@@ -310,6 +320,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         {
@@ -335,6 +346,7 @@ describe('replaceTip', () => {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         {
@@ -360,6 +372,8 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          primaryNozzle: A1_NOZZLE,
+
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           tipSelectionArgs: {
@@ -387,6 +401,8 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          primaryNozzle: A1_NOZZLE,
+
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
         },
@@ -419,6 +435,7 @@ describe('replaceTip', () => {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         robotStateWithTipA1Missing
@@ -448,6 +465,7 @@ describe('replaceTip', () => {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
+          primaryNozzle: A1_NOZZLE,
         },
         invariantContext,
         robotStateWithTipsOnMulti
@@ -499,6 +517,7 @@ describe('replaceTip', () => {
           dropTipLocation: 'wasteChuteId',
           tipRack: tiprackURI2,
           nozzles: COLUMN,
+          primaryNozzle: A12_NOZZLE,
         },
         invariantContext,
         initialRobotState

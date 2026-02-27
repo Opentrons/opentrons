@@ -18,8 +18,8 @@ describe('getAllWellsSafetyStatus', () => {
   const singleNozzle = 'SINGLE' as any
 
   const allWells = [
-    ['A1', 'B1', 'C1'], 
-    ['A2', 'B2', 'C2'], 
+    ['A1', 'B1', 'C1'],
+    ['A2', 'B2', 'C2'],
   ]
 
   beforeEach(() => {

@@ -9,7 +9,6 @@ import {
 } from '../../errorCreators'
 import {
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
@@ -19,6 +18,7 @@ import {
 import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   CommandCreator,
@@ -27,6 +27,7 @@ import type {
 } from '../../types'
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzles?: NozzleConfigurationStyle
   tipTrackingOption?: TipTrackingOption
 }
@@ -42,11 +43,10 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     wellName,
     tipTrackingOption = AUTOMATIC,
     nozzles,
+    primaryNozzle,
   } = args
   const errors: CommandCreatorError[] = []
-
   const channels = invariantContext.pipetteEntities[pipetteId].spec.channels
-
   const isSafePipetteMovement = getIsSafePipetteMovement({
     robotState: prevRobotState,
     invariantContext,
@@ -55,11 +55,10 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     //  we don't adjust the offset when moving to the tiprack
     wellLocationOffset: { x: 0, y: 0 },
     wellTargetName: wellName,
+    nozzleConfiguration: nozzles,
+    primaryNozzle: primaryNozzle,
   })
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels,
-  })
+
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
     tipState: prevRobotState.tipState.tipracks[labwareId],
     primaryNozzle,

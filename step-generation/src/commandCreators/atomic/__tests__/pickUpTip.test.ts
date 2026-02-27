@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { A1_NOZZLE } from '@opentrons/shared-data'
+
 import { pickUpTip } from '..'
 import {
   DEFAULT_PIPETTE,
@@ -26,6 +28,7 @@ describe('pickUpTip', () => {
       pipetteId: DEFAULT_PIPETTE,
       labwareId: TIPRACK_1,
       wellName: 'B1',
+      primaryNozzle: A1_NOZZLE,
     }
     const result = pickUpTip(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([

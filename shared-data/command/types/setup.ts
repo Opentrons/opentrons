@@ -314,17 +314,17 @@ export type NozzleConfigurationStyle =
   | typeof QUADRANT
   | typeof ALL
   | typeof PARTIAL
-export const A1_NOZZLE = 'A1'
-export const A12_NOZZLE = 'A12'
-export const H1_NOZZLE = 'H1'
-export const H12_NOZZLE = 'H12'
+export const A1_NOZZLE = 'A1' as const
+export const A12_NOZZLE = 'A12' as const
+export const H1_NOZZLE = 'H1' as const
+export const H12_NOZZLE = 'H12' as const
 
-export const G1_NOZZLE = 'G1'
-export const E1_NOZZLE = 'E1'
-export const F1_NOZZLE = 'F1'
-export const D1_NOZZLE = 'D1'
-export const C1_NOZZLE = 'C1'
-export const B1_NOZZLE = 'B1'
+export const G1_NOZZLE = 'G1' as const
+export const E1_NOZZLE = 'E1' as const
+export const F1_NOZZLE = 'F1' as const
+export const D1_NOZZLE = 'D1' as const
+export const C1_NOZZLE = 'C1' as const
+export const B1_NOZZLE = 'B1' as const
 
 export type PartialPrimaryNozzles =
   | typeof B1_NOZZLE

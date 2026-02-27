@@ -17,7 +17,6 @@ import {
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
-  getDefaultPrimaryNozzle,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -289,6 +288,7 @@ export const mix: CommandCreator<MixArgs> = (
     zOffset,
     finalPushOut,
     nozzles,
+    primaryNozzle,
     tipsSelected,
     tiprackSelected,
     tipTracking,
@@ -413,10 +413,7 @@ export const mix: CommandCreator<MixArgs> = (
     tiprackSelected != null &&
     tipsSelected != null &&
     tipsSelected.length > 0
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
+
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
@@ -437,6 +434,7 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            primaryNozzle,
             // the tip will only be dropped on the first time through this loop if we are returning tip to tiprack
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null

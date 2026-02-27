@@ -30,7 +30,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -150,6 +149,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     mixInDestination,
     pipette,
     preWetTip,
+    primaryNozzle,
     pushOut,
     sourceLabware,
     nozzles,
@@ -481,11 +481,6 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
-
   const shouldSelectManualTips =
     tipTracking === MANUAL &&
     tiprackSelected != null &&
@@ -639,6 +634,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             tipCommands = [
               curryCommandCreator(replaceTip, {
                 pipette,
+                primaryNozzle,
                 dropTipLocation:
                   isReturnTip && fallBackTrashLikeId != null
                     ? fallBackTrashLikeId
