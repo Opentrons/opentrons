@@ -774,5 +774,5 @@ if __name__ == "__main__":
         write_errored_run_to_google_sheet()
     else:
         print("Ticket created.")
-    # Open folder directory incase uploads to ticket were incomplete - only works on windows
+    # Open folder directory incase uploads to ticket were incomplete
     open_folder(error_folder_path)
