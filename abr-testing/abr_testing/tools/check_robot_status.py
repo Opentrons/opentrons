@@ -63,7 +63,7 @@ def get_current_run_details_from_robot(
                         past_run_status_list: list = list(past_run_status)
 
                         if (len(past_run_status_list) == 0) or not (
-                            past_run_status_list[-1] == run_status
+                            "awaiting-recovery" in past_run_status_list[-1]
                         ):
                             slack_bot.send_slack_message(message)
                     else:
