@@ -15,8 +15,8 @@ classifiers = [
 ]
 dependencies = [
     "opentrons[flex-hardware]",
-    "opentrons-shared-data",
-    "opentrons-hardware[FLEX]",
+    "opentrons-shared-data==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
     "hardware-testing",
     "abr-testing",
     "pyserial==3.5",
