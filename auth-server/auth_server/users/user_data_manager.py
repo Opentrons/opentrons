@@ -2,10 +2,8 @@
 
 from pwdlib import PasswordHash
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.persistence.tables import User
-from auth_server.users.models import AccountType
+from auth_server.users.models import AccountType, UserResponse
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
@@ -73,8 +71,7 @@ class UserDataManager:
         password: str,
         full_name: str,
         account_type: str,
-        scopes: list[Scope],
-    ) -> User:
+    ) -> UserResponse:
         """Validate inputs, check for duplicates, and create a new user."""
         _validate_fields(
             user_name=username,
@@ -84,19 +81,20 @@ class UserDataManager:
         )
         if self._store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
-        return self._store.add(
+        new_user = self._store.add(
             username=username,
             hashed_password=password_hash.hash(password),
             full_name=full_name,
             account_type=account_type,
         )
+        return UserResponse.from_orm_user(new_user)
 
-    def get_user(self, username: str) -> User:
+    def get_user(self, username: str) -> UserResponse:
         """Return the user or raise UserNotFoundError."""
         user = self._store.get(username)
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
-        return user
+        return UserResponse.from_orm_user(user)
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""

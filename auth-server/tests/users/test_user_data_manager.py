@@ -79,10 +79,10 @@ def test_create_user_success(
         password="validpass123",
         full_name="New User",
         account_type=AccountType.USER,
-        scopes=[Scope.RUNS_WRITE],
     )
-    assert result.username == "new_user"
-    assert result.account_type == AccountType.USER
+    assert result.userName == "new_user"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_create_user_hashes_password(
@@ -103,7 +103,6 @@ def test_create_user_hashes_password(
         password="plaintextpw",
         full_name="X",
         account_type=AccountType.USER,
-        scopes=[],
     )
 
     decoy.verify(
@@ -129,7 +128,6 @@ def test_create_user_duplicate_raises(
             password="validpass123",
             full_name="Second",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -140,7 +138,6 @@ def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
             password="validpass123",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -151,7 +148,6 @@ def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
             password="",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -162,7 +158,6 @@ def test_create_user_short_password_raises(manager: UserDataManager) -> None:
             password="1234567",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -173,7 +168,6 @@ def test_create_user_empty_full_name_raises(manager: UserDataManager) -> None:
             password="validpass123",
             full_name="",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -186,8 +180,9 @@ def test_get_user_returns_existing(
     expected = _make_orm_user(username="admin", account_type=AccountType.ADMIN)
     decoy.when(mock_store.get("admin")).then_return(expected)
     result = manager.get_user("admin")
-    assert result.username == "admin"
-    assert result.account_type == AccountType.ADMIN
+    assert result.userName == "admin"
+    assert result.accountType == AccountType.ADMIN
+    assert result.scopes == [scope.api_name for scope in Scope]
 
 
 def test_get_user_not_found_raises(
