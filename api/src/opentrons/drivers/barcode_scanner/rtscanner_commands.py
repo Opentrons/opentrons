@@ -17,35 +17,13 @@ sense_trigger = [0x1B, 0x32]
 continuous_trigger = [0x1B, 0x33]
 
 
-class ledColor(enum.Enum):
-    """Used for the good/bad read led color."""
-
-    red = ord("0")
-    white = ord("1")
-    green = ord("2")
-    blue = ord("3")
-
-
-def create_activate_good_read_led_cmd(color: ledColor, duration: int) -> List[int]:
-    """Creates a bytestring used to turn on the good read led."""
-    # input from 10 to 3600000ms
-    assert duration >= 10 and duration <= 3600000
-    cmd = (
-        [ord(c) for c in "LEDONS"]
-        + [color.value, ord("C")]
-        + [ord(c) for c in str(duration)]
-        + [ord("D")]
-    )
-    return cmd
-
-
-def create_activate_illumination_led_cmd(color: ledColor, duration: int) -> List[int]:
+def create_activate_illumination_led_cmd(duration: int) -> List[int]:
     """Creates a bytestring used to turn on the illumination led."""
     # input from 10 to 3600000ms
     assert duration >= 10 and duration <= 3600000
     cmd = (
         [ord(c) for c in "LEDONI"]
-        + [color.value, ord("C")]
+        + [ord(c) for c in "0C"]
         + [ord(c) for c in str(duration)]
         + [ord("D")]
     )
