@@ -247,16 +247,6 @@ def test_update_user_username(
 def test_update_user_password_is_hashed(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(
-        mock_store.update(
-            "pw_user",
-            new_username=None,
-            hashed_password=matchers.IsA(str),
-            full_name=None,
-            account_type=None,
-        )
-    ).then_return(_make_orm_user(username="pw_user"))
-
     manager.update_user("pw_user", password="newpassword2")
 
     decoy.verify(
@@ -274,16 +264,6 @@ def test_update_user_password_is_hashed(
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(
-        mock_store.update(
-            "ghost",
-            new_username=None,
-            hashed_password=None,
-            full_name="Nope",
-            account_type=None,
-        )
-    ).then_raise(ValueError("User 'ghost' not found"))
-
     with pytest.raises(UserNotFoundError):
         manager.update_user("ghost", full_name="Nope")
 
