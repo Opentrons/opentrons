@@ -337,7 +337,7 @@ class ProtocolEditorPage(BasePage):
             field_name: The name of the checkbox field to toggle.
         """
 
-        self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+        self.click_checkbox_label(field_name)
 
     def _add_lid(self, labware: str, test_id: str) -> None:
         """Add a lid to the selected labware.
