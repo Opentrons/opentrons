@@ -1,5 +1,5 @@
 .checkbox_label,
-.chckbox_label {
+.checkbox_label {
   display: flex;
   width: var(--checkbox-width, max-content);
   flex-direction: row;
@@ -56,7 +56,7 @@
 }
 
 .checkbox_label:has(.checkbox_input_hidden:focus-visible),
-.chckbox_label:has(.checkbox_input_hidden:focus-visible) {
+.checkbox_label:has(.checkbox_input_hidden:focus-visible) {
   outline: 3px solid var(--blue-50);
   outline-offset: 2px;
 }
@@ -71,7 +71,7 @@
 
 @media (height = 600px) and (width = 1024px) {
   .checkbox_label,
-  .chckbox_label {
+  .checkbox_label {
     width: 100%;
     padding: var(--spacing-20);
     border-radius: var(--border-radius-16);

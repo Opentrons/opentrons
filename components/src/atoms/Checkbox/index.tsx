@@ -13,12 +13,19 @@ type CheckboxStyle = CSSProperties & {
 }
 
 export interface CheckboxProps {
+  /** checkbox is checked if value is true */
   isChecked: boolean
+  /** label text that describes the option */
   labelText: string
+  /** callback change handler */
   onChange: ChangeEventHandler<HTMLInputElement>
+  /** html tabindex property */
   tabIndex?: number
+  /** if disabled is true, mouse events will not trigger onClick callback */
   disabled?: boolean
+  /** optional borderRadius type */
   type?: 'round' | 'neutral'
+  /** optional width for helix */
   width?: string
 }
 
@@ -39,7 +46,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
   return (
     <label
-      className={clsx(styles.chckbox_label, {
+      className={clsx(styles.checkbox_label, {
         [styles.checkbox_label_checked]: isChecked,
         [styles.checkbox_label_unchecked]: !isChecked,
         [styles.checkbox_label_round]: type === 'round',
