@@ -12,6 +12,9 @@ import pytest
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
 
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+)
 from tests.common.config import FakeRootPartElem
 
 from otupdate import buildroot, common, openembedded
@@ -35,6 +38,7 @@ async def test_cli(
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
+        authorization_checker=AlwaysAllowedAuthorizationChecker(),
     )
     client = await aiohttp_client(app)
     return client, cli_client_pkg.__name__
