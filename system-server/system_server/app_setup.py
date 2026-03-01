@@ -1,7 +1,7 @@
 """Main FastAPI application."""
 
 import logging
-from typing import Any, List
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -58,7 +58,7 @@ async def on_startup() -> None:
 async def on_shutdown() -> None:
     """Handle app shutdown."""
     # Placeholder for actual shutdown processes
-    shutdown_results: List[Any] = []
+    shutdown_results: list[Any] = []
     log.info("shutdown")
 
     shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]

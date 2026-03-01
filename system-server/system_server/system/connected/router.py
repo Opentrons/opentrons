@@ -1,6 +1,7 @@
 """Router for all /system/connected endpoints."""
 
 from textwrap import dedent
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
@@ -29,7 +30,9 @@ connected_router = APIRouter()
     response_model=GetConnectedResponse,
 )
 async def get_connected(
-    authorization_tracker: AuthorizationTracker = Depends(get_authorization_tracker),
+    authorization_tracker: Annotated[
+        AuthorizationTracker, Depends(get_authorization_tracker)
+    ],
 ) -> GetConnectedResponse:
     """Get connected registrants."""
     connections = authorization_tracker.get_connected()

@@ -8,13 +8,15 @@
 
 <div class="grid cards" markdown>
 
--   :opentrons-robot:{ .xl .middle } __Opentrons Flex__
+-   :opentrons-robot:{ .xl .middle } __Opentrons Robots__
 
     ---
 
-    Everything you need to know to set up and use Flex in your lab.
+    Everything you need to know to set up and use Flex or OT-2 in your lab.
 
-    [:octicons-arrow-right-24: Instruction Manual](flex/index.md)
+    [:octicons-arrow-right-24: Flex Instruction Manual](flex/index.md)
+
+    [:octicons-arrow-right-24: OT-2 Instruction Manual](ot-2/index.md)
 
 -   :opentrons-modules:{ .xl .middle } __Modules__
 

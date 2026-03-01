@@ -2,15 +2,16 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ListButton, StyledText } from '@opentrons/components'
+import { COLORS, ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { PARTIAL_NOZZLE_MAP, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, getWellGroupLength, partialNozzleMap } from './utils'
+import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
   LabwareDefinition,
@@ -44,7 +45,7 @@ export function ExtendedPartialTipField(
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
   const partialNozzleCount =
-    partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
+    PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -71,12 +72,16 @@ export function ExtendedPartialTipField(
     ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
         .def as LabwareDefinition)
     : null
-
+  const partialChannels =
+    primaryNozzle in PARTIAL_NOZZLE_MAP
+      ? PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      : 0
   const aspWellsLength = aspLabwareDef
     ? getWellGroupLength(
         aspWells.length,
         aspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 
@@ -84,14 +89,16 @@ export function ExtendedPartialTipField(
     ? getWellGroupLength(
         dspWells.length,
         dspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 
   function getNozzleWellText(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
-    stepType: string
+    stepType: string,
+    channels: number
   ): string {
     const nozzleText = getNozzleText(
       primaryNozzle,
@@ -99,19 +106,25 @@ export function ExtendedPartialTipField(
       partialNozzleCount
     )
     const isTransfer = stepType === 'transfer'
-    const isRowOrColumn =
-      nozzleConfiguration === ROW || nozzleConfiguration === COLUMN
+    const isColumn =
+      (channels === 8 && nozzleConfiguration === ALL) ||
+      nozzleConfiguration === COLUMN
+    const isRow = nozzleConfiguration === ROW
     const hasRequiredWells =
       aspWells.length > 0 && (!isTransfer || dspWells.length > 0)
     if (!nozzleText || !hasRequiredWells) {
       return t('no_nozzles_and_wells_selected')
     }
-    const positionType = isRowOrColumn
-      ? `${nozzleConfiguration.toLowerCase()}s`
-      : 'wells'
+    let positionType: string = 'wells'
+    if (isColumn) {
+      positionType = PLURAL_COLUMNS
+    }
+    if (isRow) {
+      positionType = PLURAL_ROWS
+    }
 
     let nozzleSelection = `${nozzleText} nozzles`
-    if (isRowOrColumn) {
+    if ((isRow || isColumn) && channels === 96) {
       nozzleSelection = `${nozzleText}${positionType} nozzles`
     } else if (isTransfer) {
       nozzleSelection = nozzleText
@@ -135,9 +148,17 @@ export function ExtendedPartialTipField(
   return (
     <>
       <div className={styles.nozzle_selection_text}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {t('pipette_nozzles_and_wells')}
+        </StyledText>
         <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
-            {getNozzleWellText(primaryNozzle, nozzleConfiguration, stepType)}
+            {getNozzleWellText(
+              primaryNozzle,
+              nozzleConfiguration,
+              stepType,
+              channels
+            )}
           </StyledText>
         </ListButton>
       </div>
