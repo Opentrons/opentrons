@@ -34,7 +34,9 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
     guideType: 'footprint',
     insertCategory,
     irregular,
-  })?.map((src, index) => <img width="250px" src={src} key={index} />)
+  })?.map(src => (
+    <img width="250px" src={src} key={src} alt="Footprint diagram" />
+  ))
 
   return (
     <Box marginBottom={SPACING.spacing16}>

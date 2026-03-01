@@ -437,6 +437,7 @@ export function ModulesListItem({
                   ? getFixtureImage(comboFixtureId)
                   : getModuleImage(moduleModel)
               }
+              alt={comboFixtureId != null ? 'Fixture image' : 'Module image'}
             />
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText

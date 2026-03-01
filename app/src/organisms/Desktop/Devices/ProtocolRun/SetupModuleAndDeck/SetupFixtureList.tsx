@@ -203,6 +203,7 @@ export function FixtureListItem({
                           compatibleCutoutFixtureIds?.[0]
                       )
                 }
+                alt={cutoutFixtureId != null ? 'Fixture image' : 'Module image'}
               />
             ) : null}
             <Flex

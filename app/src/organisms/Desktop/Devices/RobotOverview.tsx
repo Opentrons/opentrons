@@ -91,6 +91,7 @@ export function RobotOverview({
                 height: '5.4375rem',
               }}
               id="RobotOverview_robotImage"
+              alt={robotModel === 'OT-2' ? 'OT-2 image' : 'Flex image'}
             />
           </Flex>
           <Box padding={SPACING.spacing8} width="100%">

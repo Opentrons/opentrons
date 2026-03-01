@@ -49,7 +49,11 @@ export function HowCalibrationWorksModal({
           {t('learn_more_about_robot_cal_link')}
         </ExternalLink>
         <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing16}>
-          <img src={RobotCalHelpImage} width="100%" />
+          <img
+            src={RobotCalHelpImage}
+            width="100%"
+            alt="Calibration help image"
+          />
         </Box>
         {/* deck calibration */}
         <LegacyStyledText
