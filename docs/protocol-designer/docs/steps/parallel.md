@@ -21,12 +21,9 @@ If you leave this Thermocycler step as is, the robot will wait for the profile t
 <figcaption>The robot will perform other steps in parallel while running a Thermocycler profile.</figcaption>
 </figure>
 
-Here, your Flex will transfer and mix liquids, pause the protocol so you can move labware, and set the Temperature Module while the Thermocycler profile runs.
+Here, your Flex will transfer and mix liquids, and pause the protocol so you can move labware while the Thermocycler profile runs.
 
 !!! note
-    Reaching a target temperature for any module takes time. In the example above, a Temperature Module step inside the Thermocycler profile sets the target temperature to 10 °C. If your Thermocycler profile takes less time to run than it takes a Temperature or Heater-Shaker Module to reach or hold at their set temperature:
-    
-    - The Temperature or Heater-Shaker Module will continue heating or cooling even after the profile is complete.
-    - The Thermocycler will hold samples either at the module's last state or your specified ending hold until the protocol reaches Step 8, a pause step to wait for the Temperature Module to reach 10 °C. 
-    
-        Add an ending hold in your [Thermocycler profile](module.md#thermocycler-module-steps) step.
+    There's no limit to how many steps you can add inside a Thermocycler profile. If it takes the robot longer to execute these parallel steps than it takes to complete the profile, your Thermocycler will hold samples either at the module's last state, like its last step, or your specified ending hold.
+
+    You can add an ending hold in your [Thermocycler profile](module.md#thermocycler-module-steps) step.
