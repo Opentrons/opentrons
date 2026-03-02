@@ -16,7 +16,7 @@ Thermocycler error codes are formatted as colon-separated text strings that star
 
 ## Error code list
 
-The following table defines these Thermocycler error codes.
+The following table defines the Thermocycler error codes. The descriptions include literal fimrware output but some may be modified slightly for brevity and clarity.
 
 | Error code | Description |
 |---|---|
@@ -24,9 +24,9 @@ The following table defines these Thermocycler error codes.
 | `ERR003` | Indicates an unhandled G-code. This means the G-code is unknown or misspelled. |
 | `ERR004` | The module's G-code cache is full. This can happen when the module receives too many G-codes too quickly. |
 | `ERR005` | This is a bad message acknowledgement. It's a type of internal error that indicates something sent an acknowledgement for a G-code that was already acknowledged. |
-| `ERR201` | Indicates the module's heatsink thermistor is disconnected. This can happen when the thermistor on the heatsink reads off-scale high, which indicates a disconnected or broken wire. |
-| `ERR202` | Indicates the module's heatsink thermistor is shorted. This can happen when the thermistor on the heatsink reads off-scale low, which indicates a short circuit. |
-| `ERR203` | Indicates a heatsink thermistor overtemp condition. This can happen when the thermistor on the heatsink reaches a temperature over its internal limits. |
+| `ERR201` | Indicates the module's heat sink thermistor is disconnected. This can happen when the thermistor on the heat sink reads off-scale high, which indicates a disconnected or broken wire. |
+| `ERR202` | Indicates the module's heat sink thermistor is shorted. This can happen when the thermistor on the heat sink reads off-scale low, which indicates a short circuit. |
+| `ERR203` | Indicates a heat sink thermistor overtemp condition. This can happen when the thermistor on the heat sink reaches a temperature over its internal limits. |
 | `ERR204` | Indicates the front-right thermistor is disconnected. This can happen when the thermistor reads off-scale high, which indicates a disconnected or broken wire. |
 | `ERR205` | Indicates the front-right thermistor is shorted. This can happen when the thermistor reads off-scale low, which indicates a short circuit. |
 | `ERR206` | Indicates a front-right thermistor overtemp condition. This can happen when the thermistor reads a temperature over its internal limits. |
@@ -53,7 +53,7 @@ The following table defines these Thermocycler error codes.
 | `ERR303` | Indicates an EEPROM communication error. This can happen when the on-board EEPROM could not be communicated with. |
 | `ERR401` | Indicates the thermal plate is busy. This can happen when the thermal plate is currently executing a command that cannot be interrupted. |
 | `ERR402` | Indicates the Peltier drivers could not activate the module's heating/cooling plates. |
-| `ERR403` | Indicates the module could not control the heatsink fan. This can happen when the heatsink fan driver indicates a problem. |
+| `ERR403` | Indicates the module could not control the heat sink fan. This can happen when the heat sink fan driver indicates a problem. |
 | `ERR404` | Indicates the module's lid heater is executing a command that cannot be interrupted. |
 | `ERR405` | Indicates the module cannot control its lid heater. |
 | `ERR406` | Indicates the PID controller is reporting that the set of numbers defining how the thermal control loop should behave are invalid or outside the device's acceptable limits. |
