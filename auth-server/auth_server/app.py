@@ -39,8 +39,10 @@ from auth_server.users.user_data_manager import UserDataManager
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
-def _get_persistence_directory(settings: AuthServerSettings) -> Optional[Path]:
-    """Extract the persistence directory from settings."""
+def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Path]:
+    """Return the root persistence directory.
+
+    It may be undergoing creation or a reset. This will only return after that's done."""
     if settings.persistence_directory == "automatically_make_temporary":
         return None
     return settings.persistence_directory
@@ -52,7 +54,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     install_settings_store(app.state, settings_store)
 
     settings = get_settings()
-    persistence_directory_root = _get_persistence_directory(settings)
+    persistence_directory_root = _get_persistence_directory_root(settings)
     prepared_root = await prepare_root(persistence_directory_root)
     set_persistence_directory(app.state, prepared_root)
 
