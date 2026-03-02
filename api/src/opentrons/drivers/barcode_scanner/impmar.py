@@ -30,18 +30,20 @@ aH = 880
 level = 1
 
 
-def march(scanner: RTScanner) -> None:
-    def fun_beep(frequency: int, duration_ms: int) -> None:
+async def march(scanner: RTScanner) -> None:
+    async def fun_beep(frequency: int, duration_ms: int) -> None:
         if frequency != 0:
-            scanner.do_beep(
+            await scanner.do_beep(
                 level=level, duration_ms=duration_ms, frequency_hz=frequency
             )
             if frequency < 550:
-                scanner.set_menu_option(
+                await scanner.set_menu_option(
                     create_activate_illumination_led_cmd(duration_ms - 30)
                 )
             else:
-                scanner.set_menu_option(turn_on_aimer + int_conv(duration_ms - 30))
+                await scanner.set_menu_option(
+                    turn_on_aimer + int_conv(duration_ms - 30)
+                )
         time.sleep(duration_ms / 1000)
 
     impmar = [
@@ -116,4 +118,4 @@ def march(scanner: RTScanner) -> None:
         (a, 1000),
     ]
     for freq, dur in impmar:
-        fun_beep(freq, dur)
+        await fun_beep(freq, dur)

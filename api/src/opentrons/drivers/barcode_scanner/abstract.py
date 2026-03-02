@@ -6,11 +6,11 @@ from .types import BarcodeModuleInfo, SoundProfile
 
 class AbstractBarcodeScannerDriver(ABC):
     @abstractmethod
-    def connect(self) -> None:
+    async def connect(self) -> None:
         """Connect to the barcode scanner."""
 
     @abstractmethod
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         """Disconnect from the barcode scanner."""
 
     @abstractmethod
@@ -19,27 +19,27 @@ class AbstractBarcodeScannerDriver(ABC):
         ...
 
     @abstractmethod
-    def set_prefix(self, prefix: str) -> None:
+    async def set_prefix(self, prefix: str) -> None:
         """Set the automatic prefix for the barcode data."""
         ...
 
     @abstractmethod
-    def set_suffix(self, suffix: str) -> None:
+    async def set_suffix(self, suffix: str) -> None:
         """Set the automatic suffix for the barcode data."""
         ...
 
     @abstractmethod
-    def set_scan_timeout(self, timeout_ms: int) -> None:
+    async def set_scan_timeout(self, timeout_ms: int) -> None:
         """Set how long to run the decoder before timing out."""
         ...
 
     @abstractmethod
-    def scan_barcode(self) -> Optional[str]:
+    async def scan_barcode(self) -> Optional[str]:
         """Scan and return a barcode."""
         ...
 
     @abstractmethod
-    def set_sound_profile(self, profile: SoundProfile) -> None:
+    async def set_sound_profile(self, profile: SoundProfile) -> None:
         """Set the sound profile."""
         ...
 
