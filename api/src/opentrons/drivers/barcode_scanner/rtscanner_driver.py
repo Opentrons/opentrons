@@ -18,6 +18,7 @@ from .rtscanner_commands import (
     enable_custom_prefix,
     enable_custom_suffix,
     enable_terminating_suffix,
+    expand_ascii_args,
     good_read_beep_duration,
     good_read_beep_enable,
     good_read_beep_frequency,
@@ -85,7 +86,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         self._scan_terminator = terminator
         self.set_menu_option(enable_terminating_suffix + bool_conv(True))
         self.set_menu_option(
-            set_terminating_suffix + self.expand_ascii_args(terminator.decode("ascii"))  # type: ignore[union-attr]
+            set_terminating_suffix + expand_ascii_args(terminator.decode("ascii"))  # type: ignore[union-attr]
         )
 
     def set_menu_option(self, cmd: ByteString) -> None:
@@ -122,15 +123,6 @@ class RTScanner(AbstractBarcodeScannerDriver):
             barcode = barcode[: -1 * len(self._scan_terminator)]
         return barcode
 
-    def expand_ascii_args(self, text: str) -> ByteString:
-        """Double encode ascii for some reason."""
-        bytestring = text.encode("ascii")
-        bytes_as_str = [f"{b:02x}" for b in bytestring]
-        expanded = []
-        for b in bytes_as_str:
-            expanded += [ord(c) for c in b]
-        return bytes(expanded)
-
     def enable_prefix(self, enable: bool) -> None:
         """Enable a custom prefix."""
         self.set_menu_option(enable_custom_prefix + bool_conv(enable))
@@ -142,7 +134,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
     def set_prefix(self, prefix: str) -> None:
         """Set the custom prefix."""
         self.enable_prefix(True)
-        prefix_bytestr = self.expand_ascii_args(prefix)
+        prefix_bytestr = expand_ascii_args(prefix)
         assert len(prefix_bytestr) <= 10
         self.set_menu_option(set_custom_prefix + prefix_bytestr)
 
@@ -150,7 +142,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         """Set a custom suffix."""
         self.enable_suffix(True)
 
-        suffix_bytestr = self.expand_ascii_args(suffix)
+        suffix_bytestr = expand_ascii_args(suffix)
         assert len(suffix_bytestr) <= 10
         self.set_menu_option(set_terminating_suffix + suffix_bytestr)
 

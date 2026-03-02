@@ -11,6 +11,14 @@ def bool_conv(boolean: bool) -> ByteString:
 def int_conv(num: int) -> ByteString:
     return bytes([ord(c) for c in str(num)])
 
+def expand_ascii_args(text: str) -> ByteString:
+    """Double encode ascii for some reason."""
+    bytestring = text.encode("ascii")
+    bytes_as_str = [f"{b:02x}" for b in bytestring]
+    expanded = []
+    for b in bytes_as_str:
+        expanded += [ord(c) for c in b]
+    return bytes(expanded)
 
 menu_prefix = b"~\x010000"
 menu_suffix = b";\x03"
