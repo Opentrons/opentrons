@@ -20,7 +20,7 @@ export interface DimensionsProps {
 export function Dimensions(props: DimensionsProps): JSX.Element {
   const { t } = useTranslation('labware_details')
   const { definition, irregular, insertCategory } = props
-  const { displayCategory } = definition.metadata
+  const { displayCategory, displayName } = definition.metadata
   const { xDimension, yDimension, zDimension } =
     getSchema2Dimensions(definition)
   const dimensions = [
@@ -35,7 +35,7 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
     insertCategory,
     irregular,
   })?.map(src => (
-    <img width="250px" src={src} key={src} alt="Footprint diagram" />
+    <img width="250px" src={src} key={src} alt={`Image of ${displayName}`} />
   ))
 
   return (

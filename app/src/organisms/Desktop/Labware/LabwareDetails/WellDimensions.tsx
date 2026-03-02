@@ -26,7 +26,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   const {
     shape,
     depth,
-    metadata: { wellBottomShape },
+    metadata: { wellBottomShape, displayName },
   } = wellProperties
   const { isTiprack, tipLength } = labwareParams
   const dimensions = []
@@ -54,7 +54,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
     shape: shape?.shape,
     wellBottomShape,
   })?.map(src => (
-    <img width="250px" src={src} key={src} alt="Measurement Diagram" />
+    <img width="250px" src={src} key={src} alt={`Image of ${displayName}`} />
   ))
 
   return (
