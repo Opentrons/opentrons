@@ -52,7 +52,7 @@ export function HowCalibrationWorksModal({
           <img
             src={RobotCalHelpImage}
             width="100%"
-            alt="Calibration help image"
+            alt="Visual instructions for robot calibration"
           />
         </Box>
         {/* deck calibration */}
