@@ -1,7 +1,6 @@
 """A big long list of all of the specific byte strings this device recognizes."""
 
 import enum
-from math import ceil
 from typing import ByteString
 
 
@@ -11,6 +10,7 @@ def bool_conv(boolean: bool) -> ByteString:
 
 def int_conv(num: int) -> ByteString:
     return bytes([ord(c) for c in str(num)])
+
 
 menu_prefix = b"~\x010000"
 menu_suffix = b";\x03"

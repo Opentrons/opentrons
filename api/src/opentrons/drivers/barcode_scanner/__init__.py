@@ -1,6 +1,6 @@
 from .abstract import AbstractBarcodeScannerDriver
-from .types import BarcodeModuleInfo, SoundProfile
 from .rtscanner_driver import RTScanner
+from .types import BarcodeModuleInfo, SoundProfile
 
 __all__ = [
     "AbstractBarcodeScannerDriver",

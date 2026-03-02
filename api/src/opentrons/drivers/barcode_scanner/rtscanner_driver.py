@@ -1,7 +1,6 @@
 """Implementation for talking to the RT214C scanner."""
 
 import logging
-from math import ceil
 from typing import ByteString, Optional
 
 import serial  # type: ignore[import-untyped]
@@ -11,6 +10,7 @@ from .abstract import AbstractBarcodeScannerDriver
 from .rtscanner_commands import (
     ack,
     aiming_led_enable,
+    bool_conv,
     decode_timeout,
     do_beep,
     enable_aim_id,
@@ -23,19 +23,17 @@ from .rtscanner_commands import (
     good_read_beep_frequency,
     good_read_beep_volume,
     illumination_led_enable,
+    int_conv,
     menu_prefix,
     menu_suffix,
     permanent_write,
     scan_trigger,
     set_custom_prefix,
     set_terminating_suffix,
-    int_conv,
-    bool_conv,
 )
 from .types import BarcodeModuleInfo, SoundProfile
 
 log = logging.getLogger(__name__)
-
 
 
 class RTScanner(AbstractBarcodeScannerDriver):
