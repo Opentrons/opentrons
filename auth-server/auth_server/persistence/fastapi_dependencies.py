@@ -44,10 +44,13 @@ def set_persistence_directory(app_state: AppState, directory: Path) -> None:
     _persistence_directory_accessor.set_on(app_state, directory)
 
 
-async def get_persistence_directory(
+async def get_persistence_directory_root(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
-    """Return the root persistence directory."""
+    """Return the root persistence directory.
+
+    It may be undergoing creation or a reset. This will only return after that's done.
+    """
     directory = _persistence_directory_accessor.get_from(app_state)
     assert directory is not None, (
         "Forgot to initialize persistence directory as part of server startup?"
@@ -56,7 +59,7 @@ async def get_persistence_directory(
 
 
 async def get_persistence_resetter(
-    directory_to_reset: Annotated[Path, Depends(get_persistence_directory)],
+    directory_to_reset: Annotated[Path, Depends(get_persistence_directory_root)],
 ) -> PersistenceResetter:
     """Get a ``PersistenceResetter`` to reset the auth-server's stored data."""
     return PersistenceResetter(directory_to_reset)

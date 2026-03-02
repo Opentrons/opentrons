@@ -8,7 +8,7 @@ from auth_server.persistence.database import Base
 class User(Base):
     """ORM model for user accounts."""
 
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True, nullable=False)
