@@ -84,7 +84,7 @@ def _extract_bearer_token(request: web.Request) -> str | None:
     if header_value is None:
         return None
     # Syntax reference: https://datatracker.ietf.org/doc/html/rfc6750#section-2.1
-    match = re.fullmatch(r"^bearer +(.+)$", header_value)
+    match = re.fullmatch(r"^bearer +(.+)$", header_value, re.IGNORECASE)
     if match is None:
         return None
     return match.group(1)
