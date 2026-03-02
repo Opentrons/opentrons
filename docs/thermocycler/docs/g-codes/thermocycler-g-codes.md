@@ -7,7 +7,7 @@ The Thermocycler uses the following g-code commands.
 <table>
   <thead>
     <tr>
-      <th>Thermocycler G-code</th>
+      <th>G-code</th>
       <th>Description</th>
     </tr>
   </thead>
