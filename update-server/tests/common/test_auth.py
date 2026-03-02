@@ -1,4 +1,4 @@
-"""Tests for update-server authorization checking on protected endpoints."""
+"""Tests for the machinery that checks whether access to protected endpoints is authorized."""
 
 import pytest
 
