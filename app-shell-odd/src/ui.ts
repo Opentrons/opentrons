@@ -76,6 +76,21 @@ export function waitForRobotServerAndShowMainWindow(
     mainWindow.webContents.send('window-type', 'odd-main')
   })
 
+  // prevent Ctrl + Shift + I from opening devtools
+  // Reload Ctrl + R / Ctrl + Shift + R
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (
+      input.control &&
+      input.shift &&
+      (input.key === 'i' || input.key === 'I')
+    ) {
+      event.preventDefault()
+    }
+    if (input.control && (input.key === 'r' || input.key === 'R')) {
+      event.preventDefault()
+    }
+  })
+
   _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd
