@@ -64,9 +64,6 @@ export const PD_DO_NOT_LIST = new Set([
   'ev_resin_tips_flex_96_labware',
   'ev_resin_tips_flex_tall_adapter',
   'ev_resin_tips_flex_short_adapter',
-  // temporarily blocking 20 uL Flex tip racks until they launch
-  'opentrons_flex_96_tiprack_20ul',
-  'opentrons_flex_96_filtertiprack_20ul',
 ])
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
