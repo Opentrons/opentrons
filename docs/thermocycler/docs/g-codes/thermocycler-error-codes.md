@@ -2,11 +2,19 @@
 title: "Thermocycler Module: Error Codes"
 ---
 
-This section lists all the error codes that can be returned by the Thermocycler and a provides a plain-text description of the error.
+This section lists all the error codes that can be returned by the Thermocycler, including descriptions of each code.
 
-Thermocycler errors are colon separated text strings formatted with `ERR`, then a numeric value, and a brief description. For example, you might see an error like this:
+!!! note
+    These error codes are not Thermocycler-specific and can be returned by other devices.
+
+
+## Error code syntax
+
+Thermocycler error codes are formatted as colon-separated text strings that start with `ERR`, followed by a numeric value, and a brief description. For example, you might see an error like this:
 
 `ERR002:unhandled gcode:Unknown or misspelled gcode`
+
+## Error code list
 
 The following table defines these Thermocycler error codes.
 

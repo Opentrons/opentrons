@@ -2,7 +2,7 @@
 title: "Thermocycler Module: Thermocycler Module G-Codes"
 ---
 
-The Thermocycler uses the following g-code commands.
+The Thermocycler accepts the following G-code commands.
 
 <table>
   <thead>

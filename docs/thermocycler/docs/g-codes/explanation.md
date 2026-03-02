@@ -2,14 +2,14 @@
 title: "Thermocycler Module: G-codes and Device IDs"
 ---
 
-This section provides an overview of G-codes, including the structure of a typical command and response. It also defines the vendor and device IDs used by every Thermocycler. For a complete list of Thermocycler G-codes, see <font color="red">PLACEHOLDER TBD</font>.
+This section provides an overview of G-codes, including the structure of a typical command and response. It also defines the vendor and device IDs used by every Thermocycler. See [Thermocycler Module G-codes](./thermocycler-g-codes.md) for a complete list of codes used by this device.
 
 !!!note
-    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed for a Flex robot to work with any attached modules. This section is a technical resource for developers building their own applications that work with Opentrons hardware.
+    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed for a Flex robot to work with its attached devices. This section is a technical resource for developers building their own applications that work with Opentrons hardware.
 
 ## Understanding G-codes
 
-G-codes are machine-readable instructions used to control hardware directly. While most users control modules using protocols developed with our [Python API](../../python-api/index.md) or [Protocol Designer](../../protocol-designer/index.md), Opentrons also provides G-codes to third-party developers and integrators. These codes allow you to operate hardware independently of our software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
+G-codes are machine-readable instructions used to control hardware directly. While most users control modules using protocols developed with the Opentrons [Python API](../../python-api/index.md) or [Protocol Designer](../../protocol-designer/index.md), we also provide G-codes to third-party developers and integrators. These codes allow you to operate hardware independently of our software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
 
 ## G-code command syntax
 
@@ -39,25 +39,17 @@ Every G-code command sent to an Opentrons module will trigger a response from th
 
 ## Device IDs
 
-After making a USB connection, the Thermocycler broadcasts two special hexicecimal codes that the computer's operating system can read to identify the attached device. These are the Vendor ID (VID) and Product ID (PID).
+After making a USB connection, the Thermocycler broadcasts two special hexicecimal codes that a computer's operating system can read to identify the attached device. These are the Vendor ID (VID) and Product ID (PID).
 
 - **VID**: Identifies the device manufacturer. An Opentrons Thermocycler VID is based on the manufacturer of the integrated circuit that runs the module's firmware. 
 
 - **PID**: Identifies the specific module type. Every Opentrons Thermocycler uses the same PID, depending on its model generation (e.g., GEN1 or GEN1).
 
-Every Thermocycler VID and PID is listed below.
+Every Thermocycler uses one of the VID and PID combinations listed below.
 
 | Module | VID | PID |
 |----|----|----|
 |Thermocycler GEN1 | 0x04D8<br>or 0x239a | 0xED8C<br>or 0x800b |
 |Thermocycler GEN2 | 0x0483 | 0xED8D |
 
-
-
-
-When making automation scripts for your hardware, these IDs come in handy. Coding a specific serial port, for example, `COM3` for Windows or `/dev/ttyUSB0` for macOS/Linux, is not a good approach. If you plug the module into a different USB port, use a different computer, or connect the devices in a different order, the OS will assign a different port name, and your script will break.
-
-To write more effective code, you can identify a module by its VID and PID instead of by connection port. Your code can use the pyserial library, allowing your application to iterate through the available USB ports and find the module by its VID and PID, and create a serial connection to that port, no matter what name the OS has assigned.
-
-
-<!-- not sure, but might need to say something about these IDs and why they're needed -->
+Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g. `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes your code brittle; your software will fail if the module is plugged in to a different USB port. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically search for, find, and connect to the correct Opentrons module regardless of its physical connection point.
