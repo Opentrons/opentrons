@@ -29,4 +29,4 @@ Here, your Flex will transfer and mix liquids, pause the protocol so you can mov
     - The Temperature or Heater-Shaker Module will continue heating or cooling even after the profile is complete.
     - The Thermocycler will hold samples either at the module's last state or your specified ending hold until the protocol reaches Step 8, a pause step to wait for the Temperature Module to reach 10 °C. 
     
-        Add an ending hold in your [Thermocycler profile](steps/module.md#thermocycler-module-steps) step.
+        Add an ending hold in your [Thermocycler profile](module.md#thermocycler-module-steps) step.
