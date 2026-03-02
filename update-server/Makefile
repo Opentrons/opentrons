@@ -37,9 +37,12 @@ lock:
 	$(UV) lock
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate --log-level debug --port $(port)
+	$(python) -m otupdate.buildroot --log-level debug --port $(port)
+
+.PHONY: dev-flex
+dev-flex:
+	$(python) -m otupdate.openembedded --log-level debug --port $(port)
 
 .PHONY: clean
 clean:
