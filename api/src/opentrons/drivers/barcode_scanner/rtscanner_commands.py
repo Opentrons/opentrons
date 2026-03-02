@@ -14,7 +14,7 @@ def int_conv(num: int) -> ByteString:
 def expand_ascii_args(text: str) -> ByteString:
     """Double encode ascii for some reason."""
     bytestring = text.encode("ascii")
-    bytes_as_str = [f"{b:02x}" for b in bytestring]
+    bytes_as_str = [f"{b:02X}" for b in bytestring]
     expanded = []
     for b in bytes_as_str:
         expanded += [ord(c) for c in b]
