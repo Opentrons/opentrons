@@ -4,9 +4,17 @@ from typing import Generator
 import pytest
 import requests
 
+from server_utils.auth.scopes import Scope, serialize_scopes
 from tests.dev_server import DevServer
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
+
+
+@pytest.fixture
+def all_scopes() -> str:
+    """All OAuth 2 scopes the server supports, as a sorted space-separated string, as returned for admin tokens."""
+    all_scopes = set(Scope)
+    return serialize_scopes(all_scopes)
 
 
 @pytest.fixture
