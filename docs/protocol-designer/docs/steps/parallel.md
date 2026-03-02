@@ -24,6 +24,4 @@ If you leave this Thermocycler step as is, the robot will wait for the profile t
 Here, your Flex will transfer and mix liquids, and pause the protocol so you can move labware while the Thermocycler profile runs.
 
 !!! note
-    There's no limit to how many steps you can add inside a Thermocycler profile. If it takes the robot longer to execute these parallel steps than it takes to complete the profile, your Thermocycler will hold samples either at the module's last state, like its last step, or your specified ending hold.
-
-    You can add an ending hold in your [Thermocycler profile](module.md#thermocycler-module-steps) step.
+    There's no limit to how many steps you can add inside a Thermocycler profile. If it takes the robot longer to execute these parallel steps than it takes to complete the profile, your Thermocycler will hold samples at the module's last state, like its last step or cycle temperature.
