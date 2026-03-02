@@ -18,7 +18,7 @@ export function ErrorContent({
   isSingleError,
   runStatus,
 }: ErrorContentProps): JSX.Element {
-  const { t, i18n } = useTranslation('run_details')
+  const { t } = useTranslation('run_details')
   return (
     <>
       <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
