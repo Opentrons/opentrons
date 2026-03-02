@@ -79,11 +79,12 @@ async def test_enable_beeps(subject: RTScanner, connection: AsyncMock) -> None:
     connection.write.assert_has_calls(
         calls=[
             call(b"~\x010000@GRBENA1;\x03"),  # enable beeps
-            call(b"~\x010000@GRBDUR80;\x03"), # set duration to 80"
+            call(b"~\x010000@GRBDUR80;\x03"),  # set duration to 80"
             call(b"~\x010000@GRBVLL20;\x03"),  # set volume to 20"
             call(b"~\x010000@GRBFRQ2730;\x03"),  # set frequency to 2730"
         ]
     )
+
 
 async def test_do_beep(subject: RTScanner, connection: AsyncMock) -> None:
     """Make sure the right messages are sent down the wire."""
@@ -94,5 +95,3 @@ async def test_do_beep(subject: RTScanner, connection: AsyncMock) -> None:
             # beep at 2730HZ for 80ms at vol 20
         ]
     )
-
-
