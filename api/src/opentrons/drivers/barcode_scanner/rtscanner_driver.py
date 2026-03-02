@@ -28,6 +28,14 @@ from .rtscanner_commands import (
     menu_prefix,
     menu_suffix,
     permanent_write,
+    request_data_format_ver,
+    request_decoder_ver,
+    request_fw_ver,
+    request_hw_ver,
+    request_manuf_date,
+    request_oem_sn,
+    request_product_name,
+    request_serial,
     scan_trigger,
     set_custom_prefix,
     set_terminating_suffix,
@@ -193,6 +201,40 @@ class RTScanner(AbstractBarcodeScannerDriver):
         ]
         self.enable_success_beeps(enable=profile == SoundProfile.FULL_SOUND)
 
+    def _fetch_info(self, tag: ByteString) -> str:
+        cmd_bytes = bytes(menu_prefix + permanent_write + tag + menu_suffix)
+        self.conn.write(cmd_bytes)
+        recv = self.conn.read_until(bytes(menu_suffix))
+        if len(recv) < 3 or recv[-3] != bytes(ack)[0]:
+            log.exception(
+                f"Error writing setting recieved {' '.join(f'{b:02x}' for b in recv)}."
+            )
+        relevant_data: str = (
+            recv[13:-3].decode("ascii").strip()
+        )  # remove the 6 char header, 7 char command echo and 3 char tail
+        return relevant_data
+
+    def _fetch_device_info(self) -> None:
+        serial = self._fetch_info(request_serial)
+        fw_ver = self._fetch_info(request_fw_ver)
+        decoder_ver = self._fetch_info(request_decoder_ver)
+        hw_ver = self._fetch_info(request_hw_ver)
+        manuf_date = self._fetch_info(request_manuf_date)
+        oem_sn = self._fetch_info(request_oem_sn)
+        data_format_ver = self._fetch_info(request_data_format_ver)
+        product_name = self._fetch_info(request_product_name)
+
+        self._device_info = BarcodeModuleInfo(
+            serial=serial,
+            oem_serial=oem_sn,
+            manufacturing_date=manuf_date,
+            firmware_version=fw_ver,
+            decoder_version=decoder_ver,
+            hardware_version=hw_ver,
+            product_name=product_name,
+            data_formating_version=data_format_ver,
+        )
+
     def get_device_info(self) -> BarcodeModuleInfo:
         """Get Device Info."""
-        return BarcodeModuleInfo(serial="Fake serial.")
+        return self._device_info

@@ -59,4 +59,13 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         """Get Device Info."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
-        return BarcodeModuleInfo(serial=self.serial_number)
+        return BarcodeModuleInfo(
+            serial=self.serial_number,
+            oem_serial="otserialnumber",
+            manufacturing_date="2025-08-29",
+            firmware_version="U6102.ST.T13S.4",
+            decoder_version="IOTC0610",
+            hardware_version="V1.2",
+            product_name="R214",
+            data_formating_version="3.06.049",
+        )

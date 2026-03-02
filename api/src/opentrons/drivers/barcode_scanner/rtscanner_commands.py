@@ -33,6 +33,18 @@ scan_trigger = b"\x1b1"
 sense_trigger = b"\x1b2"
 continuous_trigger = b"\x1b3"
 
+# Device info query's
+request_serial = b"QRYPSN"
+request_fw_ver = b"QRYFWV"
+request_decoder_ver = b"QRYDCV"
+request_hw_ver = b"QRYHWV"
+request_product_name = b"QRYPDN"
+request_manuf_date = b"QRYDAT"
+request_oem_sn = b"QRYESN"
+request_data_format_ver = b"QRYDFM"
+request_ccs = b"QRYCCS"
+request_ccf = b"QRYCCF"
+
 
 def create_activate_illumination_led_cmd(duration: int) -> ByteString:
     """Creates a bytestring used to turn on the illumination led."""
