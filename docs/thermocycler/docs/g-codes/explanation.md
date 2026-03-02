@@ -5,7 +5,7 @@ title: "Thermocycler Module: G-codes and Device IDs"
 This section provides an overview of G-codes, including the structure of a typical command and response. It also defines the vendor and device IDs used by every Thermocycler. See [Thermocycler Module G-codes](./thermocycler-g-codes.md) for a complete list of codes used by this device.
 
 !!!note
-    Knowledge or use of G-codes is not required to work with Opentrons modules. Your protocol files contain all the information needed for a Flex robot to work with its attached devices. This section is a technical resource for developers building their own applications that work with Opentrons hardware.
+    You do not need to understand or use G-codes to operate a Thermocycler with your Flex robot or protocols. This section is a technical resource for developers building custom applications that work with Opentrons hardware.
 
 ## Understanding G-codes
 
@@ -49,7 +49,7 @@ Every Thermocycler uses one of the VID and PID combinations listed below.
 
 | Module | VID | PID |
 |----|----|----|
-|Thermocycler GEN1 | 0x04D8<br>or 0x239a | 0xED8C<br>or 0x800b |
+|Thermocycler GEN1 | 0x04D8 or<br> 0x239a | 0xED8C or <br> 0x800b |
 |Thermocycler GEN2 | 0x0483 | 0xED8D |
 
 Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g. `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes your code brittle; your software will fail if the module is plugged in to a different USB port. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically search for, find, and connect to the correct Opentrons module regardless of its physical connection point.
