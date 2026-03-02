@@ -412,6 +412,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     tiprackURI,
     invariantContext,
     prevRobotState,
+    primaryNozzle,
     ...(nozzles != null ? [nozzles] : [])
   )
 

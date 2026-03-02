@@ -403,6 +403,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     tiprackURI,
     invariantContext,
     prevRobotState,
+    primaryNozzle,
     ...(nozzles != null ? [nozzles] : [])
   )
   const liquidClassValuesForTip =

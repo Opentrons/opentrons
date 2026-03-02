@@ -87,6 +87,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       tipRack,
       invariantContext,
       prevRobotState,
+      primaryNozzle,
       nozzles
     )
 

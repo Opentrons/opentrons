@@ -366,6 +366,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     tiprackURI,
     invariantContext,
     prevRobotState,
+    primaryNozzle,
     ...(nozzles != null ? [nozzles] : [])
   )
 

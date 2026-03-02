@@ -1,4 +1,5 @@
 import {
+  A12_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -299,7 +300,7 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
-  primaryNozzle: PrimaryNozzleConfigurationStyle
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
   nozzleConfiguration?: NozzleConfigurationStyle
 }): boolean => {
   const {
@@ -389,11 +390,17 @@ export const getIsSafePipetteMovement = (args: {
           nozzles: nozzleConfiguration,
         })
       : 0
+  const confirmedPrimaryNozzle =
+    primaryNozzle ??
+    getDefaultPrimaryNozzle({
+      nozzles: nozzleConfiguration ?? ALL,
+      channels: pipetteSpecs.channels,
+    })
   const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
     pipetteEntity,
     tipLength,
     wellTargetPoint,
-    primaryNozzle,
+    confirmedPrimaryNozzle,
     tipOverlapOnNozzle
   )
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
@@ -508,12 +515,14 @@ export const getIsSafePickupWithinTiprack = (args: {
   }
   // channels = 96, 8 nozzles configured
   if (nozzleConfiguration === COLUMN) {
-    const shouldReverseColumns = primaryNozzle === 'A12'
+    const shouldReverseColumns = primaryNozzle === A12_NOZZLE
     const columnIndex = getTipColumnIndex(wellName)
     const columnPreOrdering = ordering[columnIndex]
+
     const tipColumnsOrdered = shouldReverseColumns
       ? [...ordering].reverse()
       : ordering
+
     const targetColumnIndex = tipColumnsOrdered.indexOf(columnPreOrdering)
     return {
       isSafe: tipColumnsOrdered

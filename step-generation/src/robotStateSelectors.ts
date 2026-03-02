@@ -2,6 +2,7 @@
 import min from 'lodash/min'
 
 import {
+  A1_NOZZLE,
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
@@ -19,7 +20,10 @@ import {
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
 import { getSlotInLocationStack } from './utils'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
   FlexStackerModuleState,
@@ -62,10 +66,18 @@ export function _getNextTip(args: {
   tiprackId: string
   invariantContext: InvariantContext
   robotState: RobotState
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzles?: NozzleConfigurationStyle
 }): string | null {
   // return the well name of the next available tip for a pipette (or null)
-  const { pipetteId, tiprackId, invariantContext, robotState, nozzles } = args
+  const {
+    pipetteId,
+    tiprackId,
+    invariantContext,
+    robotState,
+    nozzles,
+    primaryNozzle,
+  } = args
   const pipetteChannels =
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
@@ -79,13 +91,19 @@ export function _getNextTip(args: {
     const well = orderedWells.find(hasCleanTip)
     return well || null
   }
-
   if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
+    if (primaryNozzle === A1_NOZZLE && pipetteChannels !== 8) {
+      const reversedFullColumn = [...tiprackColumns]
+        .reverse()
+        .find(col => col.every(hasCleanTip))
+      return reversedFullColumn != null ? reversedFullColumn[0] : null
+    }
     const fullColumn = tiprackColumns.find(col => col.every(hasCleanTip))
     return fullColumn != null ? fullColumn[0] : null
   }
+
   if (pipetteChannels === 96 && nozzles === ALL) {
     const allWellsHaveTip = orderedWells.every(hasCleanTip)
     return allWellsHaveTip ? orderedWells[0] : null
@@ -95,6 +113,12 @@ export function _getNextTip(args: {
     const tiprackOrderedByRows = tiprackWells[0].map((_, colIndex) =>
       tiprackWells.map(row => row[colIndex])
     )
+    if (primaryNozzle === A1_NOZZLE) {
+      const reversedFullRow = [...tiprackOrderedByRows]
+        .reverse()
+        .find(row => row.every(hasCleanTip))
+      return reversedFullRow != null ? reversedFullRow[0] : null
+    }
     const fullRow = tiprackOrderedByRows.find(row => row.every(hasCleanTip))
     return fullRow != null ? fullRow[0] : null
   }
@@ -122,6 +146,7 @@ export function getNextTiprack(
   tipRackUri: string,
   invariantContext: InvariantContext,
   robotState: RobotState,
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
   nozzles?: NozzleConfigurationStyle
 ): NextTiprackInfo {
   /** Returns the next tiprack that has tips.
@@ -130,7 +155,6 @@ export function getNextTiprack(
     If there are no available tipracks, returns null.
   */
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
-
   if (!pipetteEntity) {
     throw new Error(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
@@ -187,7 +211,6 @@ export function getNextTiprack(
     }
     return locationHasLid == null
   })
-
   const firstAvailableTiprack = filteredSortedTiprackIds.find(tiprackId =>
     _getNextTip({
       pipetteId,
@@ -195,6 +218,7 @@ export function getNextTiprack(
       nozzles,
       invariantContext,
       robotState,
+      primaryNozzle,
     })
   )
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
@@ -206,6 +230,7 @@ export function getNextTiprack(
       nozzles,
       invariantContext,
       robotState,
+      primaryNozzle,
     })
 
   if (firstAvailableTiprack && nextTip) {

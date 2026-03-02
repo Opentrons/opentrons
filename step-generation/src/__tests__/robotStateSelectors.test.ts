@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   fixtureTiprack300ul as _fixtureTiprack300ul,
+  A1_NOZZLE,
+  A12_NOZZLE,
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -35,7 +37,6 @@ const mockTiprackURI = getLabwareDefURI(
 beforeEach(() => {
   invariantContext = makeContext()
 })
-
 describe('sortLabwareBySlot', () => {
   it('sorts all labware by slot', () => {
     const labwareState = {
@@ -95,6 +96,7 @@ describe('_getNextTip', () => {
       tiprackId,
       invariantContext: _invariantContext,
       robotState,
+      primaryNozzle: A12_NOZZLE,
     })
   }
   it('empty tiprack should return null', () => {
@@ -164,7 +166,8 @@ describe('getNextTiprack - single-channel', () => {
       DEFAULT_PIPETTE,
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -183,7 +186,8 @@ describe('getNextTiprack - single-channel', () => {
       DEFAULT_PIPETTE,
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
     expect(result.nextTiprack).toEqual(null)
   })
@@ -202,7 +206,8 @@ describe('getNextTiprack - single-channel', () => {
       DEFAULT_PIPETTE,
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -226,7 +231,8 @@ describe('getNextTiprack - single-channel', () => {
       DEFAULT_PIPETTE,
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -247,7 +253,8 @@ describe('getNextTiprack - single-channel', () => {
       DEFAULT_PIPETTE,
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result.nextTiprack).toBe(null)
@@ -269,7 +276,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -295,7 +303,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -315,7 +324,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result.nextTiprack).toEqual(null)
@@ -350,7 +360,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result.nextTiprack).toEqual(null)
@@ -371,7 +382,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
@@ -431,7 +443,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
 
     expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack3Id')
@@ -457,7 +470,8 @@ describe('getNextTiprack - 8-channel', () => {
       'p300MultiId',
       mockTiprackURI,
       invariantContext,
-      robotState
+      robotState,
+      A1_NOZZLE
     )
     expect(result.nextTiprack).toEqual(null)
   })
