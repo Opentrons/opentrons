@@ -86,7 +86,7 @@ export const SecureLabwareModal = (
               width="288px"
               height="100%"
               style={{ marginBottom: SPACING.spacing16 }}
-              // alt="Visual instructions to secure the Thermocycler latch"
+              alt="Visual instructions to secure the Thermocycler latch"
             />
           </Flex>
         )}
