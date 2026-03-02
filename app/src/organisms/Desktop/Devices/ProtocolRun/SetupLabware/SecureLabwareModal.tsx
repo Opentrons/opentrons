@@ -69,7 +69,7 @@ export const SecureLabwareModal = (
               height="100%"
               src={secureMagModBracketImage}
               style={{ marginBottom: SPACING.spacing24 }}
-              alt="Secure MagMod bracket image"
+              alt="Visual instructions to secure the Magnetic Module bracket"
             />
           </Flex>
         )}
