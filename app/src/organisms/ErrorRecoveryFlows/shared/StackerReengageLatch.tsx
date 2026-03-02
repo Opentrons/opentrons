@@ -28,7 +28,7 @@ export function StackerReengageLatch(props: RecoveryContentProps): JSX.Element {
           headline={t('prepare_for_stacker_latch_reengage')}
           message={t('stacker_latch_will_reengage')}
         />
-        <img src={ReengageLatch} width="100%" alt="Stacker reengage latch" />
+        <img src={ReengageLatch} width="100%" alt="Visual preview of re-engaging the Flex Stacker latch" />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
