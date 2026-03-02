@@ -80,11 +80,8 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         
 
     # ---------- connection ----------
-    def connect(self, autosearch: bool = True, port: str = "") -> None:
-        
-
+    def connect(self, autosearch: bool = True, port: str = "",skip_port:str = "") -> None:
         ports = comports()
-        #self.ctx.delay(seconds= 3,msg=f"ports {ports} {type(ports)}")
         if not ports:
             raise ImpactProtectionError("No serial ports found")
 
@@ -92,7 +89,9 @@ class ImpactProtectionSerial(ImpactProtectionBase):
             print(p)
             if port and port not in p.device:
                 continue
-            #self.ctx.delay(seconds=1,msg=f"p {p}")
+            elif skip_port and skip_port in p.device:
+                continue
+            self.ctx.delay(seconds=1,msg=f"p {p}")
             try:
                 ser = serial.Serial(
                     port=p.device,
@@ -256,13 +255,14 @@ def BuildImpactProtection(
     simulate: bool = False,
     autosearch: bool = True,
     port: str = "",
+    skip_port: str = '',
     ctx = None
 ) -> ImpactProtectionBase:
     if simulate:
         return ImpactProtectionSimulate()
 
     dev = ImpactProtectionSerial(ctx=ctx)
-    conret = dev.connect(autosearch=autosearch, port=port)
+    conret = dev.connect(autosearch=autosearch, port=port,skip_port=skip_port)
     if conret:
         return dev
     else:

@@ -106,7 +106,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV3
+from hardware_testing.drivers import ImpactProtectionV2
   
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
@@ -179,7 +179,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    ImpactSerial_U:ImpactProtectionV3.ImpactProtectionBase
+    ImpactSerial_U:ImpactProtectionV2.ImpactProtectionBase
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -341,8 +341,6 @@ class FixtureSettings:
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
         print_info(f"Fast simulate {fast_simulate}")
-        #链接防撞工装
-        ImpactSerial = ImpactProtectionV3.BuildImpactProtection(simulate=simulating,ctx=ctx)
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
@@ -363,9 +361,10 @@ class FixtureSettings:
             recorder.set_simulation_mass(10)
          
         recorder.record(in_thread=True)
-        env_sensor = AsairDriver.BuildAsairSensor(simulating)
+        env_sensor,link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
-        
+        #链接防撞工装
+        ImpactSerial = ImpactProtectionV2.BuildImpactProtection(simulate=simulating,ctx=ctx,skip_port=link_port)
         
         ctx.delay(seconds= 3,msg=f"simulating {simulating} {type(simulating)}")
 
@@ -804,11 +803,17 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
     """Either return or drop tip(s)."""
+    if not fixture_settings.ctx.is_simulating():
+        impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"close_all_gratings state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}")
     if fixture_settings.return_tip:
         fixture_settings.pipette.return_tip()
     else:
-        if not fixture_settings.ctx.is_simulating():
-            fixture_settings.ImpactSerial_U.close_all_gratings()
         fixture_settings.pipette.drop_tip()
 
 
@@ -870,6 +875,13 @@ def retract_and_wait(
     if fixture_settings.fast_simulate:
         # just simulate the physical movement and return to speed up the analysis
         fixture_settings.pipette._retract()
+        # Z轴离开秤的上方后，关闭所有光栅
+        if not fixture_settings.ctx.is_simulating():
+            ret= fixture_settings.ImpactSerial_U.close_all_gratings()
+            fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"close_all_gratings state :{ret.raw_response}",
+            )
         return_val = copy.deepcopy(fast_simulate_measurement)
         if not blank:
             if mode == MeasurementType.ASPIRATE:
@@ -903,6 +915,13 @@ def retract_and_wait(
         )
     )
     _update_environment_first_last_min_max(fixture_settings.test_report)
+    # Z轴离开秤的上方后，关闭所有光栅
+    if not fixture_settings.ctx.is_simulating():
+        ret = fixture_settings.ImpactSerial_U.close_all_gratings()
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"close_all_gratings state :{ret.raw_response}",
+            )
     return m_data
 
 
@@ -965,6 +984,17 @@ def aspirate_with_liquid_class(
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
+    # 添加这几行
+    if not fixture_settings.ctx.is_simulating():
+        swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
+        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"switch_mode state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"Collision avoidance switch failed to activate.")
+        
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -1044,6 +1074,13 @@ def run_blank_test(
         liquid_height = 10.0
     else:
         liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
+    # 移动到垃圾桶前，关闭所有光栅
+    if not fixture_settings.ctx.is_simulating():
+        ret=fixture_settings.ImpactSerial_U.close_all_gratings()
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"close_all_gratings state :{ret.raw_response}",
+            )
     fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
     fixture_settings.pipette.move_to(
         fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
@@ -1063,6 +1100,16 @@ def run_blank_test(
     else:
         blank_move_to_height = liquid_height - fixture_settings.submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
+    # Z轴在秤的上方，调用switch_mode
+    if not fixture_settings.ctx.is_simulating():
+        swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
+        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"switch_mode state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"Collision avoidance switch failed to activate.")
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
@@ -1217,6 +1264,16 @@ def run_one_test(
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
+    # Z轴在秤的上方，调用switch_mode
+    if not fixture_settings.ctx.is_simulating():
+        swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
+        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+        fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"switch_mode state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"Collision avoidance switch failed to activate.")
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
@@ -1290,12 +1347,26 @@ def calculate_evaporation(
 ) -> Tuple[List[List[MeasurementData]], float, float]:
     """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
+
+    # Z轴在秤的上方，调用switch_mode
+    fixture_settings.pipette._retract()
+    if not fixture_settings.ctx.is_simulating():
+        swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
+        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[fixture_settings.tip_sizes[0]])
+        fixture_settings.ctx.delay(
+                seconds=1,
+                msg=f"switch_mode state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"Collision avoidance switch failed to activate.")
+
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
     fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
+
     ctx.delay(
         seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
@@ -1343,16 +1414,14 @@ def calculate_evaporation(
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
 
-    swichvaldict = {20:"SET_LEFT_T50",
-    50:"SET_LEFT_T50",
-    200:"SET_LEFT_T50",
-    1000:"SET_LEFT_T1000"
-    }
-
-    ctx.delay(
-        seconds=1,
-        msg=f"fixture_settings.tip_sizes {fixture_settings.tip_sizes[0]} {type(fixture_settings.tip_sizes[0])}",
-    )
+    #close all gratings
+    impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+    fixture_settings.ctx.delay(
+            seconds=1,
+            msg=f"close_all_gratings state :{impp.raw_response}",
+        )
+    if "OK" not in impp.raw_response:
+        raise RuntimeError(f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}")
 
     first_tip = _get_tips_for_test(
         fixture_settings, fixture_settings.tip_sizes[0], True
@@ -1367,18 +1436,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         seconds=1,
         msg=f"last_probed_tip_size {last_probed_tip_size}",
     )
-    #开启针管防撞
-    
-    if not ctx.is_simulating():
-        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[last_probed_tip_size])
-        if "OK" not in impp.raw_response:
-            raise RuntimeError(f"Collision avoidance switch failed to activate.")
-
-    # if not ctx.is_simulating:
-    #     impp = ""
-    #     impp =  sync_pipette_by_tip(fixture_settings,ctx, side, last_probed_tip_size)
-    #     if "OK" not in impp:
-    #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
         ctx, fixture_settings, liq, first_tip
@@ -1388,16 +1445,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     last_measurement = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
-        # if not ctx.is_simulating:
-        #     impp2 = ""
-        #     impp2 = sync_pipette_by_tip(fixture_settings,ctx, side, tip)
-        #     if "OK" not in impp2:
-        #         raise RuntimeError(f"Collision avoidance switch failed to activate.")
-        if not ctx.is_simulating():
-            impp2 = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
-            if "OK" not in impp2.raw_response:
-                raise RuntimeError(f"Collision avoidance switch failed to activate.")
-
         if tip != last_probed_tip_size:
             _configure_tip_count(fixture_settings, 0)
             probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
@@ -1614,11 +1661,14 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 flag="",
             )
         tip_sizes_done.append(tip)
-        # if not ctx.is_simulating:
-        #     res = fixture_settings.ImpactSerial.close_all_gratings()
-        #     print_info(f"close_all_gratings {res}")
         if not ctx.is_simulating():
-            fixture_settings.ImpactSerial_U.close_all_gratings()
+            impp=fixture_settings.ImpactSerial_U.close_all_gratings()
+            fixture_settings.ctx.delay(
+                seconds=0.1,
+                msg=f"close_all_gratings state :{impp.raw_response}",
+            )
+            if "OK" not in impp.raw_response:
+                raise RuntimeError(f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}")
 
 def _override_check(
     aspirate_volume: float,

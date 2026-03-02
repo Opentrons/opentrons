@@ -35,7 +35,6 @@ from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
-
 metadata = {"protocolName": "Gravimetric QC V2 wy"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
@@ -179,6 +178,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
+    envsensor_port:str
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -365,7 +365,7 @@ class FixtureSettings:
 
             
         recorder.record(in_thread=True)
-        env_sensor = AsairDriver.BuildAsairSensor(simulating)
+        env_sensor,getport = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
 
         
@@ -464,6 +464,7 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
+            envsensor_port=getport
         )
 
     def validate_settings(self) -> bool:
@@ -825,12 +826,12 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def remove_tip(fixture_settings: FixtureSettings,ImpactSerial_U:BuildImpactProtection = None) -> None:
     """Either return or drop tip(s)."""
+    if not fixture_settings.ctx.is_simulating():
+        if ImpactSerial_U != None:
+            ImpactSerial_U.close_all_gratings()
     if fixture_settings.return_tip:
         fixture_settings.pipette.return_tip()
     else:
-        if not fixture_settings.ctx.is_simulating():
-            if ImpactSerial_U != None:
-                ImpactSerial_U.close_all_gratings()
         fixture_settings.pipette.drop_tip()
 
 
@@ -1380,10 +1381,14 @@ def calculate_evaporation(
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
 
-    ImpactSerial_U = BuildImpactProtection(fixture_settings.ctx.is_simulating(),ctx=ctx)
-    if ImpactSerial_U == False:
-        raise "NOT connect ImpactProtection"
+    envget =fixture_settings.env_sensor.get_reading()
+    ctx.delay(
+        seconds=1,
+        msg=f"envget=== {envget}",
+    )
 
+    ImpactSerial_U = BuildImpactProtection(fixture_settings.ctx.is_simulating(),ctx=ctx,skip_port=fixture_settings.envsensor_port)
+    
     swichvaldict = {20:"SET_LEFT_T50",
     50:"SET_LEFT_T50",
     200:"SET_LEFT_T50",

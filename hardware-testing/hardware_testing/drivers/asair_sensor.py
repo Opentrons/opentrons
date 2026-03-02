@@ -8,7 +8,7 @@ import abc
 import codecs
 import logging
 import time
-from typing import Tuple
+from typing import Tuple,Optional
 from abc import ABC
 from dataclasses import dataclass
 from . import list_ports_and_select
@@ -110,7 +110,40 @@ def BuildAsairSensor(
                 raise SerialException("No sensor found")
     ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
-
+def BuildAsairSensorWithPort(
+    simulate: bool, autosearch: bool = True, port_substr: str = ""
+) -> Tuple[AsairSensorBase, Optional[str]]:
+    """Try to find and return an Asair sensor with its port, if not found return a simulator."""
+    ui.print_title("Connecting to Environmental sensor")
+    if not simulate:
+        if not autosearch:
+            port = list_ports_and_select(
+                device_name="Asair environmental sensor", port_substr=port_substr
+            )
+            sensor = AsairSensor.connect(port)
+            ui.print_info(f"Found sensor on port {port}")
+            return sensor, port
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(f"Trying to connect to env sensor on port {port}")
+                    sensor = AsairSensor.connect(port)
+                    ser_id = sensor.get_serial()
+                    if len(ser_id) == 8:
+                        ui.print_info(f"Found env sensor {ser_id} on port {port}")
+                        return sensor, port
+                    sensor.close()  # 防泄漏
+                
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No env sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no sensor found returning simulator")
+    return SimAsairSensor(), None
 
 class AsairSensor(AsairSensorBase):
     """Asair sensor driver."""
