@@ -46,7 +46,10 @@ export function useRunQuery<TError = Error>(
     ) {
       queryClient.invalidateQueries([host, '/robot/control'])
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     runId,
     query.isSuccess,
     query.data?.data?.current,

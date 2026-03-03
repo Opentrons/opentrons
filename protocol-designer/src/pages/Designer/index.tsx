@@ -61,7 +61,10 @@ export function Designer(): JSX.Element {
       })
       dispatch(generateNewProtocol({ isNewProtocol: false }))
     }
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     if (fileMetadata?.created == null) {
@@ -70,7 +73,10 @@ export function Designer(): JSX.Element {
       )
       navigate('/')
     }
-  }, [fileMetadata])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [fileMetadata])
 
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {

@@ -43,7 +43,10 @@ export function ChooseNumber({
     // @ts-expect-error keyboard should expose for `setInput` method
     keyboardRef.current?.setInput(arbitraryInput)
     setPrevKeyboardValue(arbitraryInput)
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
     console.log(`Incorrect parameter type: ${parameter.type as string}`)

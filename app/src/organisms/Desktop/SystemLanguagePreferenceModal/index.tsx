@@ -135,7 +135,10 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
           systemLanguage !== storedSystemLanguage
       )
     }
-  }, [i18n, systemLanguage, showBootModal])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [i18n, systemLanguage, showBootModal])
 
   return showBootModal || showUpdateModal ? (
     <Modal title={title}>

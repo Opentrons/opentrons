@@ -97,7 +97,10 @@ export function useNotifyDataReady<TData, TError = Error>({
         })
       }
     }
-  }, [topic, hostname, shouldUseNotifications])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [topic, hostname, shouldUseNotifications])
 
   const onDataEvent = useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
@@ -122,7 +125,10 @@ export function useNotifyDataReady<TData, TError = Error>({
         }
       })
     }
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
@@ -134,6 +140,8 @@ export function useNotifyDataReady<TData, TError = Error>({
       }
       options.onSettled?.(data, error)
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refetch, pendingRefetch, options.onSettled]
   )
 

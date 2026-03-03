@@ -223,7 +223,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     if (toolboxStep === 2 && !hasSeenAdvancedSettings) {
       setHasSeenAdvancedSettings(true)
     }
-  }, [toolboxStep])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [toolboxStep])
   const isConfirmationRequired =
     robotType === FLEX_ROBOT_TYPE &&
     fieldsChangedRequiringConfirmation.length > 0 &&
@@ -288,7 +291,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
     dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
     dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
-  }, [visibleFormWarningsTypes, visibleFormErrorsTypes])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [visibleFormWarningsTypes, visibleFormErrorsTypes])
   const moduleEntities = Object.values(useSelector(getModuleEntities))
   const stackerModules = moduleEntities.filter(moduleEntity => {
     return moduleEntity.type === FLEX_STACKER_MODULE_TYPE

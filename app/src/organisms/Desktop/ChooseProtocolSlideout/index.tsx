@@ -135,7 +135,10 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
     )
-  }, [selectedProtocol?.protocolKey])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [selectedProtocol?.protocolKey])
 
   useEffect(() => {
     setHasParamError(errors.length > 0)
@@ -145,7 +148,10 @@ export function ChooseProtocolSlideoutComponent(
           parameter.type === 'csv_file' && parameter.file?.file == null
       )
     )
-  }, [runTimeParametersOverrides])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runTimeParametersOverrides])
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
@@ -747,7 +753,10 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
   )
   useEffect(() => {
     handleSelectProtocol(first(storedProtocols) ?? null)
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   return storedProtocols.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

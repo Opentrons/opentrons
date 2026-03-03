@@ -65,7 +65,10 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
       )
       dispatch(toggleConfigValue('update.hasJustUpdated'))
     }
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     if (createAppUpdateAvailableToast) {
@@ -84,7 +87,10 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
     } else if (removeToast && toastIdRef.current) {
       removeActiveAppUpdateToast()
     }
-  }, [isAppUpdateAvailable, isAppUpdateIgnored])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isAppUpdateAvailable, isAppUpdateIgnored])
 
   return (
     <>

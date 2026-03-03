@@ -98,7 +98,10 @@ export const FirmwareUpdateModal = (
         updateSubsystem(subsystem)
       }
     }, 2000)
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
 
@@ -123,7 +126,10 @@ export const FirmwareUpdateModal = (
           proceed()
         })
     }
-  }, [status, proceed, refetchInstruments, instrumentToUpdate, updateNeeded])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [status, proceed, refetchInstruments, instrumentToUpdate, updateNeeded])
 
   return (
     <Flex css={MODAL_STYLE}>

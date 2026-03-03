@@ -56,12 +56,18 @@ export function useRunAnalytics({
         properties: robotAnalyticsData ?? undefined,
       })
     }
-  }, [runStatus, isRunCurrent, runId, robotAnalyticsData])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runStatus, isRunCurrent, runId, robotAnalyticsData])
 
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
   useEffect(() => {
     if (isRunCurrent) {
       reportRecoveredRunResult(runStatus, enteredER)
     }
-  }, [isRunCurrent, enteredER])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isRunCurrent, enteredER])
 }

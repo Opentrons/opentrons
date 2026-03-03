@@ -85,7 +85,10 @@ export function LabwareModal({
     }
 
     return groupedLabware
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   const populatedCategories: Record<string, boolean> = useMemo(
     () =>
@@ -100,6 +103,8 @@ export function LabwareModal({
             }
           : acc
       }, {}),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, searchTerm]
   )
 
@@ -107,7 +112,10 @@ export function LabwareModal({
     if (displayLabwareModal) {
       setSelectedLabwares(labwares.map(lw => lw.labwareURI))
     }
-  }, [displayLabwareModal])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [displayLabwareModal])
 
   const handleCategoryClick = (category: string): void => {
     setSelectedCategory(selectedCategory === category ? null : category)

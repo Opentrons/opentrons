@@ -243,7 +243,10 @@ function usePositionChangeReset(
 
     previousInitialRef.current = initialPosition
     previousFinalRef.current = finalPosition
-  }, [initialPosition, finalPosition])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [initialPosition, finalPosition])
 
   const previousInitialRef = useRef(initialPosition)
   const previousFinalRef = useRef(finalPosition)

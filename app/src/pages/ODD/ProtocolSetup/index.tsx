@@ -205,7 +205,10 @@ function PrepareToRun({
         transactionId: runId,
       })
     }
-  }, [storageInfo.isImageStorageLow != null])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [storageInfo.isImageStorageLow != null])
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -865,7 +868,10 @@ export function ProtocolSetup(): JSX.Element {
         })
       )
     }
-  }, [initialRobotCameraSettings])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [initialRobotCameraSettings])
 
   const appCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)

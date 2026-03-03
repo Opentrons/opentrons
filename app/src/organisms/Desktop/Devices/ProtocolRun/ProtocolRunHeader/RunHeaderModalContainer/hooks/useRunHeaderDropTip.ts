@@ -51,6 +51,8 @@ export function useRunHeaderDropTip({
   const isRunCurrent = useIsRunCurrent(runId)
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const {
@@ -130,7 +132,10 @@ export function useRunHeaderDropTip({
         void determineTipStatus()
       }
     }
-  }, [runStatus, robotType, isRunCurrent, runSummaryNoFixit, isEREnabled])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runStatus, robotType, isRunCurrent, runSummaryNoFixit, isEREnabled])
 
   // If the run terminates with a "stopped" status, close the run if no tips are attached after running tip check at least once.
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
@@ -142,7 +147,10 @@ export function useRunHeaderDropTip({
     ) {
       closeCurrentRun()
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     isRunTerminatingOrTerminal,
     isRunCurrent,
     enteredER,

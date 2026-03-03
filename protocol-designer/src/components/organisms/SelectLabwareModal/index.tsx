@@ -128,11 +128,16 @@ export function SelectLabwareModal(
     ? allCategoriesExpanded
     : userCategoryExpandState
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!hasNoLabware && error != null) {
       setError(null)
     }
-  }, [hasNoLabware])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [hasNoLabware])
 
   const handleResetLabwareTools = (): void => {
     setUserCategoryExpandState(allCategoriesCollapsed)
@@ -202,6 +207,8 @@ export function SelectLabwareModal(
         parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
   )
 
@@ -228,7 +235,10 @@ export function SelectLabwareModal(
       },
       {}
     )
-  }, [permittedTipracks])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [permittedTipracks])
 
   const filteredLabwareByCategory: Record<string, LabwareInfo[]> = useMemo(
     () =>
@@ -266,6 +276,8 @@ export function SelectLabwareModal(
           ),
         }
       }, {}),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
 

@@ -147,6 +147,8 @@ export function useRecoveryCommands({
       chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
         .catch((e: Error) => reportAndRouteFailedCmd(e)),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [analytics, selectedRecoveryOption]
   )
 
@@ -298,7 +300,10 @@ export function useRecoveryCommands({
         { commandType, params }, // retry the command that failed
       ].filter(c => c != null) as CreateCommand[]
     ) // the created command is the same command that failed
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand?.key])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand?.key])
 
   // Homes the Z-axis of all attached pipettes.
   const homePipetteZAxes = useCallback((): Promise<CommandData[]> => {
@@ -323,7 +328,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([pickUpTipCmd])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand, failedLabwareUtils])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand, failedLabwareUtils])
 
   const ignoreErrorKindThisRun = (ignoreErrors: boolean): Promise<void> => {
     setIgnoreErrors(ignoreErrors)
@@ -362,7 +370,10 @@ export function useRecoveryCommands({
     } else {
       return Promise.resolve()
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     unvalidatedFailedCommand?.error?.errorType,
     unvalidatedFailedCommand?.commandType,
     ignoreErrors,
@@ -378,7 +389,10 @@ export function useRecoveryCommands({
         )
         makeSuccessToast()
       })
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     runId,
     ignoreErrors,
     resumeRunFromRecovery,
@@ -390,7 +404,10 @@ export function useRecoveryCommands({
   const cancelRun = useCallback((): void => {
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
     stopRun(runId)
-  }, [runId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runId])
 
   const handleResumeAction = (): Promise<RunAction> => {
     if (isAssumeFalsePositiveResumeKind(failedCommand)) {
@@ -410,7 +427,10 @@ export function useRecoveryCommands({
         makeSuccessToast()
       })
     )
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     runId,
     resumeRunFromRecovery,
     handleIgnoringErrorKind,
@@ -431,7 +451,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([buildOpenLatchCommand])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
     const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
@@ -442,7 +465,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([buildCloseLatchCommand])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
@@ -470,7 +496,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([manualRetrieveCommand])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const manualStore = useCallback((): Promise<CommandData[]> => {
     const manualStoreCommand = buildManualStore(unvalidatedFailedCommand)
@@ -481,7 +510,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([manualStoreCommand])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
@@ -494,7 +526,10 @@ export function useRecoveryCommands({
     } else {
       return chainRunRecoveryCommands([moveLabwareCmd])
     }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   return {
     resumeRun,

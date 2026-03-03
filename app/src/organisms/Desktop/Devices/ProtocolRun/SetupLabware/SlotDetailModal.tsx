@@ -114,7 +114,10 @@ export function SlotDetailModal(
         ? filteredLiquidsInLoadOrder[0].id
         : undefined
     )
-  }, [selectedLabware])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [selectedLabware])
 
   if (protocolData == null) return null
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)

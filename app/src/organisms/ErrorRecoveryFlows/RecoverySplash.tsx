@@ -115,7 +115,10 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
     ) {
       recoveryActionMutationUtils.resumeRecovery()
     }
-  }, [runStatus, resumePausedRecovery])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runStatus, resumePausedRecovery])
   const buildDoorOpenAlert = (): void => {
     makeToast(t('close_door_to_resume') as string, WARNING_TOAST)
   }

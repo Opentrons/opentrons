@@ -134,7 +134,10 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
     if (!isOnDevice) {
       props.setSelectedUri(labwareInfo[0].uri)
     }
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   return (
     <TextListTableContent header={t('select_labware_to_view_data')}>

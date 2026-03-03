@@ -264,8 +264,10 @@ function StartingWell({
       selectWells({ A1: null })
     }
     setStartingWellState({ A1: true, A2: false, B1: false, B2: false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>

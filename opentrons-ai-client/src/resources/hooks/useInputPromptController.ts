@@ -98,15 +98,20 @@ export function useInputPromptController(
       setUserPrompt(prefilledPrompt)
       setSendAutoFilledPrompt(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     if (sendAutoFilledPrompt) {
       void handleClick(true)
       setSendAutoFilledPrompt(false)
     }
-  }, [sendAutoFilledPrompt])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [sendAutoFilledPrompt])
 
   useEffect(() => {
     if (regenerateProtocol.regenerate) {
@@ -116,7 +121,10 @@ export function useInputPromptController(
         regenerate: false,
       })
     }
-  }, [regenerateProtocol])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [regenerateProtocol])
 
   const prepareValidatedFiles = (
     isUpdateOrCreateRequest: boolean

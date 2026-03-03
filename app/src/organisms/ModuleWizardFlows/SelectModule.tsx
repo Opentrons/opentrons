@@ -89,7 +89,10 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
       setSelectedModule(newModules[0])
       sendIdentifyStacker(newModules[0], true)
     }
-  }, [shortCircuitFlow])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [shortCircuitFlow])
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {

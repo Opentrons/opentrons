@@ -93,7 +93,10 @@ export function useLPCFlows({
       compatibleRobotAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [compatibleRobotAnalysis?.commands.length])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [compatibleRobotAnalysis?.commands.length])
 
   const {
     labwareInfo,
@@ -150,7 +153,10 @@ export function useLPCFlows({
           setIsLaunching(false)
         })
     }
-  }, [maintenanceRunId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [maintenanceRunId])
 
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.

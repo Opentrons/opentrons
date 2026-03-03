@@ -173,7 +173,10 @@ export function ProtocolSteps({
     if (selectedStepId != null) {
       handleScrollToTop()
     }
-  }, [selectedStepId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [selectedStepId])
 
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
@@ -206,7 +209,10 @@ export function ProtocolSteps({
     ) {
       setDeckView(rightString)
     }
-  }, [zoomedInSlot, labware, zoomedInOnOffDeck])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [zoomedInSlot, labware, zoomedInOnOffDeck])
 
   //  zoom out if you select on any step other than starting deck state in the timeline toolbox
   useEffect(() => {
@@ -217,7 +223,10 @@ export function ProtocolSteps({
       dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
       setViewBox(initialViewBox)
     }
-  }, [zoomedInSlot, selectedTerminalItemId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [zoomedInSlot, selectedTerminalItemId])
 
   return (
     <>

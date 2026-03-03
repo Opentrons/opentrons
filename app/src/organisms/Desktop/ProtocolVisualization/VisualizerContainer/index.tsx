@@ -179,7 +179,10 @@ export function VisualizerContainer(
     if (nextSpotlight.slot != null && nextSpotlight.command != null) {
       dispatch(stepDetailViewerUpdateAction(nextSpotlight))
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     selectedCommandId,
     selectedSlot,
     protocolKey,
@@ -229,7 +232,10 @@ export function VisualizerContainer(
         setSelectedSlot('7')
       }
     }
-  }, [isThermocyclerAttached, selectedSlot])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isThermocyclerAttached, selectedSlot])
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,

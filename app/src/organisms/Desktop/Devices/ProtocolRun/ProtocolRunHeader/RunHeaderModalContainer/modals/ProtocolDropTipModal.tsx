@@ -66,7 +66,10 @@ export function useProtocolDropTipModal({
     } else if (!isRunCurrent) {
       setShowModal(false)
     }
-  }, [isRunCurrent, areTipsAttached, showModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isRunCurrent, areTipsAttached, showModal]) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
   const onSkip = (): void => {
     void homePipettes()

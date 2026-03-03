@@ -103,6 +103,8 @@ export function useRouteUpdateActions(
         resolve()
       })
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -131,7 +133,10 @@ export function useRouteUpdateActions(
         resolve()
       }
     })
-  }, [currentRoute, currentStep, isDoorOpen])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [currentRoute, currentStep, isDoorOpen])
 
   const setRobotInMotion = useCallback(
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
@@ -162,6 +167,8 @@ export function useRouteUpdateActions(
         resolve()
       })
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentRoute, currentStep]
   )
 

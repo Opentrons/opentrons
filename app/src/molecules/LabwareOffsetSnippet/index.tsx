@@ -43,7 +43,10 @@ export function LabwareOffsetSnippet(
         onSnippetUpdate(generatedSnippet)
       }
     }
-  }, [labware, labwareOffsets, mode, onSnippetUpdate])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [labware, labwareOffsets, mode, onSnippetUpdate])
 
   return robotType === FLEX_ROBOT_TYPE ? (
     <JsonTextArea readOnly value={snippet ?? ''} spellCheck={false} />

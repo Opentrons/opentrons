@@ -49,6 +49,8 @@ export function useDropTipRouting(
 ): UseDropTipRoutingResult {
   const [initialRoute, initialStep] = useMemo(
     () => getInitialRouteAndStep(fixitUtils),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -209,7 +211,10 @@ export function useReportMap(
     if (fixitUtils != null) {
       fixitUtils.reportMap({ route: currentRoute, step: currentStep })
     }
-  }, [currentStep, currentRoute])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [currentStep, currentRoute])
 }
 
 // If present, return fixit route overrides for setting the initial Drop Tip Wizard route.

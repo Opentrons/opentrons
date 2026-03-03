@@ -41,7 +41,10 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
         estopStatus.data.status !== DISENGAGED || isWaitingForResumeOperation
       )
     }
-  }, [estopStatus])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [estopStatus])
 
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {

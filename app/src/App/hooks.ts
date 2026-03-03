@@ -139,8 +139,10 @@ export function useProtocolReceiptToast(): void {
     }
     protocolIdsRef.current = protocolIds
     // dont want this hook to rerun when other deps change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [protocolIds])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [protocolIds])
 }
 
 const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
@@ -234,8 +236,10 @@ export function useModuleAttachedToast(
     moduleSerialsRef.current = moduleSerials
     setFirstRun(false)
     // dont want this hook to rerun when other deps change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress, firstRun])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [moduleSerials, runInProgress, firstRun])
 
   useEffect(() => {
     // Close toast if there are no new modules to setup
@@ -244,7 +248,10 @@ export function useModuleAttachedToast(
       eatToast(toastID)
       setToastID('')
     }
-  }, [toastID, currentlySetuppableModules])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [toastID, currentlySetuppableModules])
 }
 
 export function useScrollRef(): {

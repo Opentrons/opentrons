@@ -32,7 +32,10 @@ export function useCurrentlyRecoveringFrom(
     } else {
       setIsReadyToShow(false)
     }
-  }, [isRunInRecoveryMode, host, runId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isRunInRecoveryMode, host, runId])
 
   const { data: allCommandsQueryData, isFetching: isAllCommandsFetching } =
     useNotifyAllCommandsQuery(

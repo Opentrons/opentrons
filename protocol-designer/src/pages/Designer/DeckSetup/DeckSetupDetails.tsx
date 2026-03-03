@@ -170,11 +170,16 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckDef,
       pendingCreationStateForHopper,
     })
-  }, [activeDeckSetup, selectedZoomInSlot])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [activeDeckSetup, selectedZoomInSlot])
 
   const createdTopLabwareForSlot = activeLabware[createdStackForSlot[0]]
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (
       createdTopLabwareForSlot ||
@@ -192,7 +197,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         })
       )
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     createdAdapterForSlot,
     createdLidForSlot,
     createdTopLabwareForSlot,

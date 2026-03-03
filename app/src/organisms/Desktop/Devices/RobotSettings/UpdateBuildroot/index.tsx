@@ -43,14 +43,20 @@ const UpdateBuildroot = NiceModal.create(
       if (robotName.current) {
         dispatch(setRobotUpdateSeen(robotName.current))
       }
-    }, [robotName])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [robotName])
 
     const ignoreUpdate = useCallback(() => {
       if (robotName.current) {
         dispatch(robotUpdateIgnored(robotName.current))
       }
       modal.remove()
-    }, [robotName, close])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [robotName, close])
 
     if (hasSeenSessionOnce.current)
       return (

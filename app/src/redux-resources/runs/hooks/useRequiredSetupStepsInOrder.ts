@@ -123,7 +123,10 @@ export function useRequiredSetupStepsInOrder({
         ),
       })
     )
-  }, [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun])
   return protocolAnalysis == null
     ? {
         orderedSteps: NO_ANALYSIS_STEPS_IN_ORDER,

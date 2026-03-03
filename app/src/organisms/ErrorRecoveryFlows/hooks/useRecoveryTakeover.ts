@@ -53,7 +53,10 @@ export function useRecoveryTakeover(
     if (isActiveUser && activeId !== thisUserId) {
       setIsActiveUser(false)
     }
-  }, [activeId]) // Not all dependencies added for intended behavior!
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [activeId]) // Not all dependencies added for intended behavior!
 
   // If Error Recovery unrenders and this client is the active user, revoke the client's active user status.
   useEffect(() => {
@@ -62,7 +65,10 @@ export function useRecoveryTakeover(
         clearClientData()
       }
     }
-  }, [isActiveUser])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isActiveUser])
 
   const showTakeover = !(activeId == null || thisUserId === activeId)
 

@@ -105,7 +105,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     ).catch(error => {
       setFatalError(error.message as string)
     })
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   if (pipetteName == null || pipetteMount == null) return null
 

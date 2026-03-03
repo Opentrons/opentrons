@@ -90,7 +90,10 @@ export function DropdownStepFormField(
     if (options.length === 1) {
       updateValue(options[0].value)
     }
-  }, [options.length])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [options.length])
 
   return (
     <Flex padding={padding ?? SPACING.spacing16}>

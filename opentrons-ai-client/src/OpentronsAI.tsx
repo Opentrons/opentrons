@@ -71,13 +71,19 @@ function OpentronsAIApp(): JSX.Element | null {
     if (isAuthenticated) {
       void fetchAccessToken()
     }
-  }, [isAuthenticated, isLoading, loginWithRedirect])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isAuthenticated, isLoading, loginWithRedirect])
 
   useEffect(() => {
     if (isAuthenticated) {
       trackEvent({ name: 'user-login', properties: {} })
     }
-  }, [isAuthenticated])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isAuthenticated])
 
   // Sync feature flag changes with Mixpanel analytics state
   useEffect(() => {

@@ -137,7 +137,10 @@ export function RunSummary(): JSX.Element {
     if (isRunCurrent && typeof enteredER === 'boolean') {
       reportRecoveredRunResult(runStatus, enteredER)
     }
-  }, [isRunCurrent, enteredER])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isRunCurrent, enteredER])
 
   const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
@@ -242,7 +245,10 @@ export function RunSummary(): JSX.Element {
     ) {
       void determineTipStatus()
     }
-  }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isRunCurrent, runSummaryNoFixit, isEREnabled])
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {

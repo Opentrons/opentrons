@@ -72,7 +72,10 @@ export function DropTipWizardFlows(
         void dropTipWithTypeUtils.dropTipCommands.handleCleanUpAndClose()
       }
     }
-  }, [issuedCommandsType])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [issuedCommandsType])
 
   return (
     <DropTipWizard

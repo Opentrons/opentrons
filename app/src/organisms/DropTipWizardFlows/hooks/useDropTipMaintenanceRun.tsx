@@ -115,7 +115,10 @@ function useCreateDropTipMaintenanceRun({
         'Could not create maintenance run due to missing pipette data.'
       )
     }
-  }, [mount, instrumentModelName])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [mount, instrumentModelName])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {
@@ -155,5 +158,8 @@ function useMonitorMaintenanceRunForDeletion({
         setClosedOnce(true)
       }
     }
-  }, [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
 }

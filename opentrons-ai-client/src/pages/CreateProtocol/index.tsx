@@ -126,14 +126,20 @@ export function CreateProtocol(): JSX.Element | null {
     })
     setChatHistoryAtom([])
     setChatData([])
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     setHeaderWithMeterAtom({
       displayHeaderWithMeter: true,
       progress: calculateProgress(),
     })
-  }, [currentSection])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [currentSection])
 
   useEffect(() => {
     return () => {
@@ -148,7 +154,10 @@ export function CreateProtocol(): JSX.Element | null {
         focusSection: 0,
       })
     }
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     if (parentRef.current != null) {
@@ -173,7 +182,10 @@ export function CreateProtocol(): JSX.Element | null {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [isResizing])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isResizing])
 
   function calculateProgress(): number {
     return currentSection > 0 ? currentSection / TOTAL_STEPS : 0

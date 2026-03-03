@@ -127,7 +127,10 @@ export function useHlsVideo(
 
       retryCountRef.current = 0
     }
-  }, [host, runStatus])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [host, runStatus])
 
   return { videoRef, videoError: error }
 }

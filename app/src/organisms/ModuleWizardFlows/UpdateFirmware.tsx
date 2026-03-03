@@ -97,7 +97,10 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
         proceed()
       }, NO_UPDATE_FOUND_TIMEOUT_MS)
     }
-  }, [
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [
     attachedModules,
     requestStatus,
     moduleRequestTimeoutId,
@@ -116,7 +119,10 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
         }, NO_UPDATE_FOUND_TIMEOUT_MS)
       }
     }, CHECKING_UPDATE_TIMEOUT_MS)
-  }, [])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [])
 
   useEffect(() => {
     if (requestStatus === PENDING) {
@@ -137,7 +143,10 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       }, MODULE_TIMEOUT_MS)
       setModuleRequestTimeoutId(timeoutId)
     }
-  }, [requestStatus, setInProgress])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [requestStatus, setInProgress])
 
   const handleUpdateFirmware = (): void => {
     setIsModuleUpdating(true)

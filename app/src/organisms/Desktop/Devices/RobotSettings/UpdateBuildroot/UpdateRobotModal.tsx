@@ -95,7 +95,10 @@ export function UpdateRobotModal({
 
   useEffect(() => {
     dispatch(robotUpdateChangelogSeen(robotName))
-  }, [robotName])
+  },
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [robotName])
 
   let heading = ''
   if (updateType === UPGRADE || updateType === DOWNGRADE) {
