@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import os
 import sys
@@ -179,7 +179,8 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    ImpactSerial_U:ImpactProtectionV2.ImpactProtectionBase
+    use_impact_protection: bool
+    ImpactSerial_U:Optional[ImpactProtectionV2.ImpactProtectionBase]
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -267,6 +268,7 @@ class FixtureSettings:
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+        use_impact_protection = ctx.params.use_impact_protection
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -364,8 +366,12 @@ class FixtureSettings:
         env_sensor,link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
         #链接防撞工装
-        ImpactSerial = ImpactProtectionV2.BuildImpactProtection(simulate=simulating,ctx=ctx,skip_port=link_port)
-        
+        ImpactSerial = None
+        if use_impact_protection:
+            # 确保skip_port是字符串，即使link_port为None
+            skip_port = link_port if link_port is not None else ''
+            ImpactSerial = ImpactProtectionV2.BuildImpactProtection(simulate=simulating,ctx=ctx,skip_port=skip_port)
+            
         ctx.delay(seconds= 3,msg=f"simulating {simulating} {type(simulating)}")
 
         ot3api = ctx._core.get_hardware()
@@ -460,6 +466,7 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
+            use_impact_protection=use_impact_protection,
             ImpactSerial_U = ImpactSerial
         )
 
@@ -685,6 +692,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         description="Operator for this QC run",
     )
+    
+    parameters.add_bool(
+        display_name="Use Impact Protection",
+        variable_name="use_impact_protection",
+        default=True,
+        description="Whether to use impact protection device during testing.",
+    )
 
     parameters.add_str(
         display_name="Tip Cavity for 50ul tips",
@@ -803,7 +817,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
     """Either return or drop tip(s)."""
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         impp = fixture_settings.ImpactSerial_U.close_all_gratings()
         fixture_settings.ctx.delay(
                 seconds=0.1,
@@ -876,7 +890,7 @@ def retract_and_wait(
         # just simulate the physical movement and return to speed up the analysis
         fixture_settings.pipette._retract()
         # Z轴离开秤的上方后，关闭所有光栅
-        if not fixture_settings.ctx.is_simulating():
+        if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
             ret= fixture_settings.ImpactSerial_U.close_all_gratings()
             fixture_settings.ctx.delay(
                 seconds=0.1,
@@ -916,7 +930,7 @@ def retract_and_wait(
     )
     _update_environment_first_last_min_max(fixture_settings.test_report)
     # Z轴离开秤的上方后，关闭所有光栅
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         ret = fixture_settings.ImpactSerial_U.close_all_gratings()
         fixture_settings.ctx.delay(
                 seconds=0.1,
@@ -985,7 +999,7 @@ def aspirate_with_liquid_class(
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
     # 添加这几行
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
         impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
         fixture_settings.ctx.delay(
@@ -1101,7 +1115,7 @@ def run_blank_test(
         blank_move_to_height = liquid_height - fixture_settings.submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
     # Z轴在秤的上方，调用switch_mode
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
         impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
         fixture_settings.ctx.delay(
@@ -1265,7 +1279,7 @@ def run_one_test(
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
     # Z轴在秤的上方，调用switch_mode
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
         impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
         fixture_settings.ctx.delay(
@@ -1415,13 +1429,14 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
 
     #close all gratings
-    impp = fixture_settings.ImpactSerial_U.close_all_gratings()
-    fixture_settings.ctx.delay(
-            seconds=1,
-            msg=f"close_all_gratings state :{impp.raw_response}",
-        )
-    if "OK" not in impp.raw_response:
-        raise RuntimeError(f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}")
+    if fixture_settings.use_impact_protection:
+        impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+        fixture_settings.ctx.delay(
+                seconds=1,
+                msg=f"close_all_gratings state :{impp.raw_response}",
+            )
+        if "OK" not in impp.raw_response:
+            raise RuntimeError(f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}")
 
     first_tip = _get_tips_for_test(
         fixture_settings, fixture_settings.tip_sizes[0], True
@@ -1661,7 +1676,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 flag="",
             )
         tip_sizes_done.append(tip)
-        if not ctx.is_simulating():
+        if not ctx.is_simulating() and fixture_settings.use_impact_protection:
             impp=fixture_settings.ImpactSerial_U.close_all_gratings()
             fixture_settings.ctx.delay(
                 seconds=0.1,
