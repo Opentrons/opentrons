@@ -38,15 +38,17 @@ export function ChooseNumber({
   // same length as the initial parameter value (as string) when the component mounts
   // so that the delete button operates properly on the exisiting input field value.
   const [prevKeyboardValue, setPrevKeyboardValue] = useState<string>('')
-  useEffect(() => {
-    const arbitraryInput = new Array(paramValue).join('*')
-    // @ts-expect-error keyboard should expose for `setInput` method
-    keyboardRef.current?.setInput(arbitraryInput)
-    setPrevKeyboardValue(arbitraryInput)
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [])
+  useEffect(
+    () => {
+      const arbitraryInput = new Array(paramValue).join('*')
+      // @ts-expect-error keyboard should expose for `setInput` method
+      keyboardRef.current?.setInput(arbitraryInput)
+      setPrevKeyboardValue(arbitraryInput)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
     console.log(`Incorrect parameter type: ${parameter.type as string}`)

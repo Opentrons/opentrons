@@ -259,26 +259,28 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     'not_available_for_a_completed_run'
   )}`
 
-  useEffect(() => {
-    // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
-    if (
-      currentRunStatus !== RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'run-preview' &&
-      protocolRunDetailsTab !== 'camera'
-    ) {
-      navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-    }
-    // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
-    else if (
-      currentRunStatus === RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'setup'
-    ) {
-      navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`)
-    }
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [currentRunStatus])
+  useEffect(
+    () => {
+      // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
+      if (
+        currentRunStatus !== RUN_STATUS_IDLE &&
+        protocolRunDetailsTab !== 'run-preview' &&
+        protocolRunDetailsTab !== 'camera'
+      ) {
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+      }
+      // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
+      else if (
+        currentRunStatus === RUN_STATUS_IDLE &&
+        protocolRunDetailsTab !== 'setup'
+      ) {
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRunStatus]
+  )
 
   return (
     <RoundTab

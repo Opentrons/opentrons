@@ -312,14 +312,16 @@ function useStatusBarAnimation(isError: boolean): void {
 
 function useCleanupRobotUpdateSessionOnDismount(): void {
   const dispatch = useDispatch()
-  useEffect(() => {
-    return () => {
-      dispatch(clearRobotUpdateSession())
-    }
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [])
+  useEffect(
+    () => {
+      return () => {
+        dispatch(clearRobotUpdateSession())
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 }
 
 function useGetModalText(

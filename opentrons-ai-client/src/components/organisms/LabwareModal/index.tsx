@@ -61,34 +61,36 @@ export function LabwareModal({
 
   const defs = getOnlyLatestDefs()
 
-  const labwareByCategory: Record<string, LabwareDefinition[]> = useMemo(() => {
-    const groupedLabware = reduce<
-      LabwareDefByDefURI,
-      Record<string, LabwareDefinition[]>
-    >(
-      defs,
-      (acc, def) => {
-        const category = def.metadata.displayCategory
-        return {
-          ...acc,
-          [category]: [...(acc[category] ?? []), def],
-        }
-      },
-      {}
-    )
-
-    // Sort each category's labware by display name in place
-    for (const category in groupedLabware) {
-      groupedLabware[category].sort((a, b) =>
-        a.metadata.displayName.localeCompare(b.metadata.displayName)
+  const labwareByCategory: Record<string, LabwareDefinition[]> = useMemo(
+    () => {
+      const groupedLabware = reduce<
+        LabwareDefByDefURI,
+        Record<string, LabwareDefinition[]>
+      >(
+        defs,
+        (acc, def) => {
+          const category = def.metadata.displayCategory
+          return {
+            ...acc,
+            [category]: [...(acc[category] ?? []), def],
+          }
+        },
+        {}
       )
-    }
 
-    return groupedLabware
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [])
+      // Sort each category's labware by display name in place
+      for (const category in groupedLabware) {
+        groupedLabware[category].sort((a, b) =>
+          a.metadata.displayName.localeCompare(b.metadata.displayName)
+        )
+      }
+
+      return groupedLabware
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const populatedCategories: Record<string, boolean> = useMemo(
     () =>
@@ -108,14 +110,16 @@ export function LabwareModal({
     [labwareByCategory, searchTerm]
   )
 
-  useEffect(() => {
-    if (displayLabwareModal) {
-      setSelectedLabwares(labwares.map(lw => lw.labwareURI))
-    }
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [displayLabwareModal])
+  useEffect(
+    () => {
+      if (displayLabwareModal) {
+        setSelectedLabwares(labwares.map(lw => lw.labwareURI))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [displayLabwareModal]
+  )
 
   const handleCategoryClick = (category: string): void => {
     setSelectedCategory(selectedCategory === category ? null : category)

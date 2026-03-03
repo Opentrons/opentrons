@@ -131,27 +131,31 @@ export function ChooseProtocolSlideoutComponent(
     }
   }, [currentPage])
 
-  useEffect(() => {
-    setRunTimeParametersOverrides(
-      selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-    )
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [selectedProtocol?.protocolKey])
-
-  useEffect(() => {
-    setHasParamError(errors.length > 0)
-    setHasMissingFileParam(
-      runTimeParametersOverrides.some(
-        parameter =>
-          parameter.type === 'csv_file' && parameter.file?.file == null
+  useEffect(
+    () => {
+      setRunTimeParametersOverrides(
+        selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
       )
-    )
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [runTimeParametersOverrides])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedProtocol?.protocolKey]
+  )
+
+  useEffect(
+    () => {
+      setHasParamError(errors.length > 0)
+      setHasMissingFileParam(
+        runTimeParametersOverrides.some(
+          parameter =>
+            parameter.type === 'csv_file' && parameter.file?.file == null
+        )
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runTimeParametersOverrides]
+  )
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
@@ -751,12 +755,14 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
   ).filter(
     protocol => protocol.mostRecentAnalysis?.robotType === robot.robotModel
   )
-  useEffect(() => {
-    handleSelectProtocol(first(storedProtocols) ?? null)
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [])
+  useEffect(
+    () => {
+      handleSelectProtocol(first(storedProtocols) ?? null)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return storedProtocols.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

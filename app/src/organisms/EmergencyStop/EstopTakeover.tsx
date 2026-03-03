@@ -34,17 +34,19 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
       ? ESTOP_CURRENTLY_ENGAGED_REFETCH_INTERVAL_MS
       : ESTOP_CURRENTLY_DISENGAGED_REFETCH_INTERVAL_MS,
   })
-  useEffect(() => {
-    if (estopStatus) {
-      setEstopState(estopStatus.data.status)
-      setShowEmergencyStopModal(
-        estopStatus.data.status !== DISENGAGED || isWaitingForResumeOperation
-      )
-    }
-  },
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [estopStatus])
+  useEffect(
+    () => {
+      if (estopStatus) {
+        setEstopState(estopStatus.data.status)
+        setShowEmergencyStopModal(
+          estopStatus.data.status !== DISENGAGED || isWaitingForResumeOperation
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [estopStatus]
+  )
 
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {
