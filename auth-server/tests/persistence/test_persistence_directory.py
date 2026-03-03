@@ -124,7 +124,7 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
     engine = sqlalchemy.create_engine(f"sqlite:///{db_file}")
     inspector = sqlalchemy.inspect(engine)
 
-    assert "users" in inspector.get_table_names()
+    assert "user" in inspector.get_table_names()
 
     columns = {col["name"] for col in inspector.get_columns("users")}
     assert columns == {
