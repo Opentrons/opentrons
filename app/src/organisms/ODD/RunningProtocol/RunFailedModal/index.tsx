@@ -18,7 +18,6 @@ import type {
   RunError,
   RunStatus,
 } from '@opentrons/api-client'
-import type { RunCommandError } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RunFailedModalProps {

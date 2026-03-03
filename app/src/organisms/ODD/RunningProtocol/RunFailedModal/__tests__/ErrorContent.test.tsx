@@ -1,6 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
-import be from 'date-fns/esm/locale/be/index.js'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
 
 import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
