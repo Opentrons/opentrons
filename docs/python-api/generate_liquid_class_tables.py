@@ -6,10 +6,9 @@ glycerol_50) from shared-data and writes Aspirate, Dispense, and Multi-Dispense
 tables in the mixed markdown/HTML format used by the mkdocs documentation.
 
 Usage:
-    python generate_liquid_class_tables.py [--hide-20ul-tips]
+    python generate_liquid_class_tables.py
 """
 
-import argparse
 import json
 import re
 from pathlib import Path
@@ -378,7 +377,7 @@ def render_section(
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-def generate_tables(data: dict, hide_20ul: bool = False) -> str:
+def generate_tables(data: dict) -> str:
     """Build Aspirate, Dispense, and Multi-dispense table sections from definition data."""
     by_model = {p["pipetteModel"]: p for p in data["byPipette"]}
 
@@ -394,7 +393,6 @@ def generate_tables(data: dict, hide_20ul: bool = False) -> str:
                 (tip_capacity(t["tiprack"]), t)
                 for t in p["byTipType"]
                 if not is_filter(t["tiprack"])
-                and not (hide_20ul and tip_capacity(t["tiprack"]) == 20)
             ],
             key=lambda x: x[0],
         )
@@ -405,13 +403,13 @@ def generate_tables(data: dict, hide_20ul: bool = False) -> str:
         pipettes_data.append((model, tab_name, caps, tips))
 
     version = data["version"]
-    preamble = (
+    version_statement = (
         f"Values below are taken from version {version}"
         f" of the liquid class definition.\n"
     )
 
     sections = [
-        preamble,
+        version_statement,
         render_section("Aspirate", "aspirate", pipettes_data, aspirate_rows),
         render_section("Dispense", "singleDispense", pipettes_data, dispense_rows),
         render_section(
@@ -421,13 +419,13 @@ def generate_tables(data: dict, hide_20ul: bool = False) -> str:
     return "\n".join(sections)
 
 
-def main(hide_20ul: bool = False):
+def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for source_name, output_name in LIQUID_CLASSES:
         definitions_dir = DEFINITIONS_BASE / source_name
         data = get_latest_definition(definitions_dir)
-        content = generate_tables(data, hide_20ul=hide_20ul)
+        content = generate_tables(data)
         output_path = OUTPUT_DIR / output_name
 
         # Only write when content has changed, so that mkdocs serve
@@ -444,18 +442,8 @@ def main(hide_20ul: bool = False):
 # when this file is listed under the `hooks` key in mkdocs.yml.
 # ---------------------------------------------------------------------------
 def on_pre_build(**kwargs):
-    main(hide_20ul=False)
+    main()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Generate liquid class definition tables for mkdocs."
-    )
-    parser.add_argument(
-        "--hide-20ul-tips",
-        action="store_true",
-        default=False,
-        help="Omit 20 µL tip columns from all tables (pre-release feature).",
-    )
-    args = parser.parse_args()
-    main(hide_20ul=args.hide_20ul_tips)
+    main()
