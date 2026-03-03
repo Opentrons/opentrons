@@ -1,3 +1,5 @@
+Values below are taken from version 2 of the liquid class definition.
+
 ### Aspirate
 
 === "1-ch. 50 µL"

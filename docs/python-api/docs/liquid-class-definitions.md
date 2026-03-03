@@ -22,7 +22,7 @@ In a liquid class transfer, flow rates and air gap or push out volumes vary base
 When your aspirate volume falls in between, like 100 µL, a linear interpolation automatically determines the flow rate.
 
 ## Aqueous
-The Opentrons-verified ``aqueous`` liquid class is based on deionized water.
+The Opentrons-verified aqueous liquid class is based on deionized water.
 
 {% include 'python-api/liquid-class-tables/aqueous.md' %}
 

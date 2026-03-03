@@ -404,7 +404,14 @@ def generate_tables(data: dict, hide_20ul: bool = False) -> str:
         tips = [t for _, t in non_filter]
         pipettes_data.append((model, tab_name, caps, tips))
 
+    version = data["version"]
+    preamble = (
+        f"Values below are taken from version {version}"
+        f" of the liquid class definition.\n"
+    )
+
     sections = [
+        preamble,
         render_section("Aspirate", "aspirate", pipettes_data, aspirate_rows),
         render_section("Dispense", "singleDispense", pipettes_data, dispense_rows),
         render_section(
