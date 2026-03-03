@@ -396,8 +396,9 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        # Use the new history-aware response generation
-        response = _generate_llm_response_with_history(
+        # Use the new history-aware response generation (run in thread to avoid blocking event loop)
+        response = await asyncio.to_thread(
+            _generate_llm_response_with_history,
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
@@ -568,7 +569,8 @@ async def create_chat_completion_multipart(
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        response = _generate_llm_response_with_history(
+        response = await asyncio.to_thread(
+            _generate_llm_response_with_history,
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
@@ -739,7 +741,8 @@ async def create_protocol(
         protocol_format = body.protocol_format
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
-        response = _generate_llm_response(
+        response = await asyncio.to_thread(
+            _generate_llm_response,
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
@@ -851,7 +854,8 @@ async def update_protocol(
         if fake_response:
             return fake_response
 
-        response = _generate_llm_response(
+        response = await asyncio.to_thread(
+            _generate_llm_response,
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
