@@ -27,6 +27,7 @@ import {
   getUpdateOrCreatePrompt,
 } from '/ai-client/resources/utils/protocolUtils'
 
+import type { TFunction } from 'i18next'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { ChatData, ProtocolFormat } from '/ai-client/resources/types'
 
@@ -273,7 +274,8 @@ export function useInputPromptController(
     setChatHistory,
   ])
 
-  const errorMessage: string | null = fileError ?? resolveErrorMessage(error, t)
+  const errorMessage: string | null =
+    fileError ?? resolveErrorMessage(error, t as TFunction)
 
   return {
     submitChat: () => {
