@@ -3,6 +3,7 @@
 import os
 import re
 from pathlib import Path
+from textwrap import dedent
 from typing import Annotated
 
 import filetype  # type: ignore[import-untyped]
@@ -15,6 +16,9 @@ from fastapi import (
     UploadFile,
     status,
 )
+
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 
 from .models import EnableOEMMode
 from .oem_settings_store import (
