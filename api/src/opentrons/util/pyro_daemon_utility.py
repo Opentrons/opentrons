@@ -1,10 +1,13 @@
 """Pyro related utilities for daemons and request handling."""
 
+import logging
 from typing import Any, Callable
 
 import Pyro5.api as pyro
 
 from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
+
+log = logging.getLogger(__name__)
 
 
 def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None:  # type: ignore
@@ -12,7 +15,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     Registers the resource with the NameServer at the given PyroName.
     Runs the type registry provided before creating the Pyro Daemon request loop.
     """
-    print(f"Running Pyro type registry for {pyroname}.")
+    log.info(f"Running Pyro type registry for {pyroname}.")
     registry()
 
     # Create a guaranteed synchronous adapted alias to the resource
@@ -28,7 +31,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
             # Register our objects URI with the system nameserver
             ns.register(pyroname, pyro_uri)
 
-        print(f"{pyroname} Pyro5 Dameon available: uri={pyro_uri}")
+        log.info(f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}")
 
         # Maintain a request loop to handle requests on our resource instance from remote processes
         daemon.requestLoop()
