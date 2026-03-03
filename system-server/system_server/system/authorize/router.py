@@ -1,7 +1,7 @@
 """Router for all /system/ endpoints."""
 
 from textwrap import dedent
-from typing import List, Optional
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -41,9 +41,11 @@ authorize_router = APIRouter()
     dependencies=[Depends(check_registration_token_header)],
 )
 async def authorize(
-    token: str = Depends(get_registration_token_header),
-    signing_uuid: UUID = Depends(get_persistent_uuid),
-    authorization_tracker: AuthorizationTracker = Depends(get_authorization_tracker),
+    token: Annotated[str, Depends(get_registration_token_header)],
+    signing_uuid: Annotated[UUID, Depends(get_persistent_uuid)],
+    authorization_tracker: Annotated[
+        AuthorizationTracker, Depends(get_authorization_tracker)
+    ],
 ) -> PostAuthorizeResponse:
     """Router for /system/authorize endpoint."""
     key = str(signing_uuid)
@@ -72,11 +74,12 @@ async def authorize(
     },
 )
 async def check_authorization(
-    token: str = Depends(get_authorization_token_header),
-    signing_uuid: UUID = Depends(get_persistent_uuid),
-    scopes: Optional[List[str]] = Query(
-        None, description="List of scopes to verify token access to."
-    ),
+    token: Annotated[str, Depends(get_authorization_token_header)],
+    signing_uuid: Annotated[UUID, Depends(get_persistent_uuid)],
+    scopes: Annotated[
+        list[str] | None,
+        Query(description="List of scopes to verify token access to."),
+    ] = None,
 ) -> Response:
     """Check an authorization token for validity."""
     # NOTE: The `scopes` parameter is included as a placeholder for future validation.

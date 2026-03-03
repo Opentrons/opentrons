@@ -137,6 +137,7 @@ dependency-metadata = [
 addopts = ["--cov=system_server", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
+    "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
 ]
 

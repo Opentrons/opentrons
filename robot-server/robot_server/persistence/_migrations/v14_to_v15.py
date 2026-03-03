@@ -8,7 +8,8 @@ Summary of changes from schema 14:
 
 from pathlib import Path
 
-from .._folder_migrator import Migration
+from server_utils.persistence.folder_migrator import Migration
+
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
 from ..tables import schema_15

@@ -26,7 +26,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   const {
     shape,
     depth,
-    metadata: { wellBottomShape },
+    metadata: { wellBottomShape, displayName },
   } = wellProperties
   const { isTiprack, tipLength } = labwareParams
   const dimensions = []
@@ -49,11 +49,13 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   }
 
   const diagram = getMeasurementDiagram({
-    category: category,
+    category,
     guideType: 'measurements',
     shape: shape?.shape,
-    wellBottomShape: wellBottomShape,
-  })?.map((src, index) => <img width="250px" src={src} key={index} />)
+    wellBottomShape,
+  })?.map(src => (
+    <img width="250px" src={src} key={src} alt={`Image of ${displayName}`} />
+  ))
 
   return (
     <Box marginBottom={SPACING.spacing16}>

@@ -241,7 +241,6 @@ def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, No
         # os.fsync() because os.fsync() is difficult to get right.
         # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
         os.sync()
-
         # Atomically move the filled directory into place.
         os.replace(src=temp_dir, dst=destination)
 

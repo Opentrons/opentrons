@@ -5,7 +5,7 @@ from typing import Set
 
 import pytest
 
-from robot_server.persistence._folder_migrator import Migration, MigrationOrchestrator
+from server_utils.persistence.folder_migrator import Migration, MigrationOrchestrator
 
 
 def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
