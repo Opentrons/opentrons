@@ -54,11 +54,6 @@ class Scope(enum.Enum):
         "Restart the robot.",
     )
 
-    ROBOT_SETTINGS_WRITE = (
-        "robot_settings.write",
-        "Edit general robot settings."
-    )
-
     # We actually want access control mode to totally disable SSH, so this scope is
     # kind of moot. At some point, we might delete this, and replace the SSH endpoints'
     # use of `require_scopes(SSH_KEYS_WRITE)` with something like
