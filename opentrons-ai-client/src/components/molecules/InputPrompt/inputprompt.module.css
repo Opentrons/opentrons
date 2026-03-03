@@ -20,8 +20,8 @@
 }
 
 .error_text_wrapper {
-  flex: 1;
   min-width: 0;
+  flex: 1;
 }
 
 .error_dismiss {
