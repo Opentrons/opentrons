@@ -87,6 +87,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${String(robotName)}_robotImage`}
+        alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

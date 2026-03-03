@@ -23,6 +23,7 @@ module.exports = {
     'testing-library',
     'opentrons',
     '@eslint-react',
+    'jsx-a11y',
   ],
 
   rules: {
@@ -148,6 +149,7 @@ module.exports = {
       rules: {
         'import/no-absolute-path': 'off',
         '@eslint-react/no-nested-component-definitions': 'error',
+        'jsx-a11y/alt-text': 'error',
       },
     },
     {
