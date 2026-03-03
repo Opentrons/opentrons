@@ -120,9 +120,9 @@ export function FeedbackModal(): JSX.Element {
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        {error && (
+        {error != null && (
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
-            {error}
+            {error.message}
           </StyledText>
         )}
         <InputField

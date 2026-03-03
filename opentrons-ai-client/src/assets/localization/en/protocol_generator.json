@@ -107,7 +107,7 @@
   "error_context_length": "Your request is too large for the AI to process. Try removing attached files or shortening your message.",
   "error_rate_limit": "The AI is currently busy. Please wait a moment and try again.",
   "error_timeout": "The request timed out. Please try again.",
-  "error_connection": "Could not reach the AI service. Please check your connection and try again.",
+  "error_connection": "Could not reach the AI service.",
   "error_generic": "Something went wrong. Please try again.",
   "error_dismiss": "Dismiss"
 }

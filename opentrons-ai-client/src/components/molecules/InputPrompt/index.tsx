@@ -41,19 +41,16 @@ export function InputPrompt(): JSX.Element {
       {/* Error message */}
       {errorMessage != null && errorMessage !== '' && (
         <div className={styles.error_container}>
-          <Icon
-            name="alert"
-            className={styles.error_icon}
-            color={COLORS.red50}
-          />
-          <StyledText
-            color={COLORS.red50}
-            fontSize={TYPOGRAPHY.fontSizeH3}
-            lineHeight={TYPOGRAPHY.lineHeight20}
-            className={styles.error_text}
-          >
-            {errorMessage}
-          </StyledText>
+          <Icon name="alert" className={styles.error_icon} size="1rem" />
+          <div className={styles.error_text_wrapper}>
+            <StyledText
+              color={COLORS.red50}
+              fontSize={TYPOGRAPHY.fontSizeH3}
+              lineHeight={TYPOGRAPHY.lineHeight20}
+            >
+              {errorMessage}
+            </StyledText>
+          </div>
           <button
             type="button"
             className={styles.error_dismiss}

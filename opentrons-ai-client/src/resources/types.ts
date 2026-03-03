@@ -152,5 +152,5 @@ export type FeatureFlags = Flags
 
 export interface ApiErrorResponse {
   message: string
-  errorType: string
+  error_type: string
 }

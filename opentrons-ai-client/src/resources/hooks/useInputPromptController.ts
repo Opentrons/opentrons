@@ -19,6 +19,7 @@ import {
   buildChatHistory,
   buildRequestConfig,
   createUserInput,
+  resolveErrorMessage,
 } from '/ai-client/resources/utils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
@@ -26,29 +27,13 @@ import {
   getUpdateOrCreatePrompt,
 } from '/ai-client/resources/utils/protocolUtils'
 
-import type { TFunction } from 'react-i18next'
 import type { ProtocolFile } from '@opentrons/shared-data'
-import type {
-  ApiErrorResponse,
-  ChatData,
-  ProtocolFormat,
-} from '/ai-client/resources/types'
+import type { ChatData, ProtocolFormat } from '/ai-client/resources/types'
 
 interface UseInputPromptControllerArgs {
   userPrompt: string
   resetForm: () => void
   setUserPrompt: (value: string) => void
-}
-
-// Maps server error_type values to i18n keys. Types not listed here fall back
-// to the raw server message (which is already human-readable for Anthropic errors).
-const ERROR_TYPE_I18N_KEY: Record<string, string> = {
-  context_length_exceeded: 'error_context_length',
-  RateLimitError: 'error_rate_limit',
-  APITimeoutError: 'error_timeout',
-  APIConnectionError: 'error_connection',
-  network_error: 'error_connection',
-  unknown: 'error_generic',
 }
 
 interface UseInputPromptControllerResult {
@@ -304,13 +289,4 @@ export function useInputPromptController(
     },
     handleRemoveFile,
   }
-}
-
-function resolveErrorMessage(
-  error: ApiErrorResponse | null,
-  t: TFunction
-): string | null {
-  if (error == null) return null
-  const i18nKey = ERROR_TYPE_I18N_KEY[error.error_type]
-  return i18nKey != null ? t(i18nKey) : error.message
 }

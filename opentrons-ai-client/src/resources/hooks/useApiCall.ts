@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useAtom } from 'jotai'
 
 import { featureFlagsAtom } from '../atoms'
+import { isApiErrorResponse } from '../utils'
 
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ApiErrorResponse } from '../types'
@@ -13,17 +14,6 @@ interface UseApiCallResult<T> {
   isLoading: boolean
   clearError: () => void
   callApi: (config?: AxiosRequestConfig) => Promise<void>
-}
-
-function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
-  return (
-    value != null &&
-    typeof value === 'object' &&
-    'message' in value &&
-    'error_type' in value &&
-    typeof (value as Record<string, unknown>).message === 'string' &&
-    typeof (value as Record<string, unknown>).error_type === 'string'
-  )
 }
 
 export const useApiCall = <T>(): UseApiCallResult<T> => {
