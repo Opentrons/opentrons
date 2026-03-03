@@ -5,18 +5,18 @@ title: "Thermocycler Module: Error Codes"
 This section lists all the error codes that can be returned by the Thermocycler, including descriptions of each code.
 
 !!! note
-    These error codes are not Thermocycler-specific and can be returned by other devices.
+    These error codes are not unique to the Thermocycler and can be returned by other Opentrons modules.
 
 
 ## Error code syntax
 
-Thermocycler error codes are formatted as colon-separated text strings that start with `ERR`, followed by a numeric value, and a brief description. For example, you might see an error like this:
+Thermocycler error codes are formatted as colon-separated text strings that start with `ERR`, followed by an integer, and a brief description. For example, you might see an error like this:
 
 `ERR002:unhandled gcode:Unknown or misspelled gcode`
 
 ## Error code list
 
-The following table defines the Thermocycler error codes. The descriptions include literal fimrware output but some may be modified slightly for brevity and clarity.
+The following table lists the Thermocycler error codes. The descriptions include literal firmware output but some text has been modified slightly for brevity and clarity.
 
 | Error code | Description |
 |---|---|
