@@ -41,7 +41,11 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor12GridSubwells"
+    ],
     "loadName": "nest_1_reservoir_290ml"
   },
   "namespace": "opentrons",
