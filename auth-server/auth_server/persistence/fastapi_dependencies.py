@@ -14,7 +14,7 @@ from server_utils.fastapi_utils.app_state import (
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 _sql_engine_accessor = AppStateAccessor[SQLEngine]("sql_engine")
-_persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
+_persistence_directory_root_accessor = AppStateAccessor[Path]("persistence_directory")
 
 
 def set_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None:
@@ -41,7 +41,7 @@ def set_persistence_directory(app_state: AppState, directory: Path) -> None:
 
     This should be called once at server startup.
     """
-    _persistence_directory_accessor.set_on(app_state, directory)
+    _persistence_directory_root_accessor.set_on(app_state, directory)
 
 
 async def get_persistence_directory_root(
@@ -51,7 +51,7 @@ async def get_persistence_directory_root(
 
     It may be undergoing creation or a reset. This will only return after that's done.
     """
-    directory = _persistence_directory_accessor.get_from(app_state)
+    directory = _persistence_directory_root_accessor.get_from(app_state)
     assert directory is not None, (
         "Forgot to initialize persistence directory as part of server startup?"
     )
