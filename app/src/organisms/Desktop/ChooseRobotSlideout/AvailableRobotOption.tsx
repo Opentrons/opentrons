@@ -133,6 +133,7 @@ export function AvailableRobotOption(
             width: 4rem;
             height: 3.5625rem;
           `}
+          alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

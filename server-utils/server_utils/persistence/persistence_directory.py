@@ -4,29 +4,13 @@ from logging import getLogger
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
-from typing import Optional
+from typing import List, Optional
 
 from anyio import Path as AsyncPath
 from anyio import to_thread
 from typing_extensions import Final
 
-from ._folder_migrator import MigrationOrchestrator
-from ._migrations import (
-    up_to_v03,
-    v03_to_v04,
-    v04_to_v05,
-    v05_to_v06,
-    v06_to_v07,
-    v07_to_v08,
-    v08_to_v09,
-    v09_to_v10,
-    v10_to_v11,
-    v11_to_v12,
-    v12_to_v13,
-    v13_to_v14,
-    v14_to_v15,
-)
-from .file_and_directory_names import LATEST_VERSION_DIRECTORY
+from .folder_migrator import Migration, MigrationOrchestrator
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _RESET_MARKER_FILE_NAME: Final = "_TO_BE_DELETED_ON_REBOOT"
@@ -57,7 +41,9 @@ class PersistenceResetter:
         await file.write_text(encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS)
 
 
-def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
+def make_migration_orchestrator(
+    prepared_root: Path, migrations: List[Migration]
+) -> MigrationOrchestrator:
     """Return a `MigrationOrchestrator` configured for robot-server production use.
 
     Production code should not use this directly. Use `prepare_active_subdirectory()` instead.
@@ -65,54 +51,36 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
     """
     return MigrationOrchestrator(
         root=prepared_root,
-        migrations=[
-            up_to_v03.MigrationUpTo3(subdirectory="3"),
-            v03_to_v04.Migration3to4(subdirectory="4"),
-            v04_to_v05.Migration4to5(subdirectory="5"),
-            v05_to_v06.Migration5to6(subdirectory="6"),
-            # Subdirectory "7" was previously used on our edge branch for an in-dev
-            # schema that was never released to the public. It may be present on
-            # internal robots.
-            v06_to_v07.Migration6to7(subdirectory="7.1"),
-            v07_to_v08.Migration7to8(subdirectory="8"),
-            # Subdirectories "9" and "10" were used during robot software v8.4.0
-            # development and were not released to the public. They may be present on
-            # internal robots.
-            v08_to_v09.Migration8to9(subdirectory="9"),
-            v09_to_v10.Migration9to10(subdirectory="10"),
-            v10_to_v11.Migration10to11(subdirectory="11"),
-            v11_to_v12.Migration11to12(subdirectory="12"),
-            v12_to_v13.Migration12to13(subdirectory="13"),
-            v13_to_v14.Migration13to14(subdirectory="14"),
-            v14_to_v15.Migration14to15(subdirectory=LATEST_VERSION_DIRECTORY),
-        ],
+        migrations=migrations,
         temp_file_prefix="temp-",
     )
 
 
-async def prepare_active_subdirectory(prepared_root: Path) -> Path:
+async def prepare_active_subdirectory(
+    migration_orchestrator: MigrationOrchestrator,
+) -> Path:
     """Return the active persistence subdirectory after preparing it, if necessary."""
-    migration_orchestrator = make_migration_orchestrator(prepared_root)
-
     await to_thread.run_sync(migration_orchestrator.clean_up_stray_temp_files)
     subdirectory = await to_thread.run_sync(migration_orchestrator.migrate_to_latest)
 
     return subdirectory
 
 
-async def prepare_root(persistence_directory_root: Optional[Path]) -> Path:
+async def prepare_root(
+    persistence_directory_root: Optional[Path], temp_dir_prefix: str
+) -> Path:
     """Return `persistence_directory_root` after preparing it, if necessary.
 
     This will create the directory if it doesn't already exist,
     and clear its contents it if it was previously marked for reset.
 
-    If `persistence_directory_root` is `None`, this will return a fresh temporary
-    directory.
+    If ``persistence_directory_root`` is ``None``, this will return a fresh
+    temporary directory whose name starts with *temp_dir_prefix*.
     """
     if persistence_directory_root is None:
         # It's bad for this blocking I/O to be in this async function,
         # but we don't have an async mkdtemp().
-        new_temporary_directory = Path(mkdtemp(prefix=_TEMP_PERSISTENCE_DIR_PREFIX))
+        new_temporary_directory = Path(mkdtemp(prefix=temp_dir_prefix))
         _log.info(
             f"Using auto-created temporary directory {new_temporary_directory}"
             f" for persistence."
@@ -120,7 +88,7 @@ async def prepare_root(persistence_directory_root: Optional[Path]) -> Path:
         return new_temporary_directory
 
     else:
-        if await _is_marked_for_reset(directory_to_reset=persistence_directory_root):
+        if await is_marked_for_reset(directory_to_reset=persistence_directory_root):
             _log.info(
                 f"{persistence_directory_root} was marked for reset. Deleting it."
             )
@@ -135,6 +103,6 @@ async def prepare_root(persistence_directory_root: Optional[Path]) -> Path:
         return persistence_directory_root
 
 
-async def _is_marked_for_reset(directory_to_reset: Path) -> bool:
+async def is_marked_for_reset(directory_to_reset: Path) -> bool:
     """Return whether the persistence directory has been marked to be reset."""
     return await (AsyncPath(directory_to_reset) / _RESET_MARKER_FILE_NAME).exists()

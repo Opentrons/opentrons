@@ -3,7 +3,6 @@
 from .settings import (
     SystemServerSettings,
     get_settings,
-    save_settings,
 )
 
-__all__ = ["save_settings", "get_settings", "SystemServerSettings"]
+__all__ = ["get_settings", "SystemServerSettings"]

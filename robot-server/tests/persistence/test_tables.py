@@ -8,7 +8,9 @@ import sqlalchemy
 
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.persistence_directory import make_migration_orchestrator
+from robot_server.persistence.manage_persistence_directory import (
+    make_migration_orchestrator,
+)
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
 )
