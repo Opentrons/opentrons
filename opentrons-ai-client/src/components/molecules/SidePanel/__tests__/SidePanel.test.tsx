@@ -25,6 +25,7 @@ describe('SidePanel', () => {
 
   beforeEach(() => {
     mockSetValue.mockClear()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     vi.mocked(useFormContext).mockReturnValue({
       setValue: mockSetValue,
     } as any)
