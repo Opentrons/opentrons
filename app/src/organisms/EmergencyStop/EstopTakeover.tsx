@@ -50,8 +50,8 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const localRobotName = localRobot?.name ?? 'no name'
 
-  const TargetEstopModal = (): JSX.Element | null => {
-    return estopState === NOT_PRESENT ? (
+  const targetEstopModal =
+    estopState === NOT_PRESENT ? (
       <EstopMissingModal
         robotName={robotName != null ? robotName : localRobotName}
         closeModal={closeModal}
@@ -68,13 +68,12 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
         }}
       />
     ) : null
-  }
 
   return (
     <>
-      {showEmergencyStopModal && !isUnboxingFlowOngoing ? (
-        <TargetEstopModal />
-      ) : null}
+      {showEmergencyStopModal && !isUnboxingFlowOngoing
+        ? targetEstopModal
+        : null}
     </>
   )
 }
