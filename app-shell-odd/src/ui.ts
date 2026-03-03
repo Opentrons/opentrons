@@ -79,14 +79,12 @@ export function waitForRobotServerAndShowMainWindow(
   // prevent Ctrl + Shift + I from opening devtools
   // Reload Ctrl + R / Ctrl + Shift + R
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (
-      input.control &&
-      input.shift &&
-      (input.key === 'i' || input.key === 'I')
-    ) {
+    const key = input.key.toLowerCase()
+    const ctrlOrMeta = input.control || input.meta
+    if (ctrlOrMeta && input.shift && key === 'i') {
       event.preventDefault()
     }
-    if (input.control && (input.key === 'r' || input.key === 'R')) {
+    if (ctrlOrMeta && key === 'r') {
       event.preventDefault()
     }
   })
