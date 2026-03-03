@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.9.0 
+
+Welcome to the v8.9.0 release of the Opentrons robot software! 
+
+This release includes support for Opentrons Flex 20 µL pipette tips. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands. 
+
 ## Opentrons Robot Software Changes in 8.8.1
 
 The 8.8.1 hotfix release includes a small fix to allow all robots to properly boot after a recent upgrade.
