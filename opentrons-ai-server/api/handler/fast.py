@@ -145,19 +145,20 @@ async def logging_middleware(request: Request, call_next) -> Response:  # type: 
         client_port = request.client.port if request.client and request.client.port else "unknown"
         http_method = request.method if request.method else "unknown"
         http_version = request.scope["http_version"]
-        # Recreate the Uvicorn access log format, but add all parameters as structured information
-        access_logger.info(
-            f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
-            http={
-                "url": str(request.url),
-                "status_code": status_code,
-                "method": http_method,
-                "request_id": request_id,
-                "version": http_version,
-            },
-            network={"client": {"ip": client_host, "port": client_port}},
-            duration=process_time,
-        )
+        # Skip access log for health checks to avoid spam from load balancers in deployed environments
+        if request.url.path not in ("/health", "/api/health"):
+            access_logger.info(
+                f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
+                http={
+                    "url": str(request.url),
+                    "status_code": status_code,
+                    "method": http_method,
+                    "request_id": request_id,
+                    "version": http_version,
+                },
+                network={"client": {"ip": client_host, "port": client_port}},
+                duration=process_time,
+            )
         response.headers["X-Process-Time"] = str(process_time / 10**9)
     return response
 
