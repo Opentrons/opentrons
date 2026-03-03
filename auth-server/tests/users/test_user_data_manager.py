@@ -89,31 +89,20 @@ def test_create_user_hashes_password(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
     decoy.when(mock_store.get("hash_check")).then_return(None)
-    decoy.when(
-        mock_store.add(
-            username="hash_check",
-            hashed_password=matchers.IsA(str),
-            full_name="X",
-            account_type=AccountType.USER,
-        )
-    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
 
-    manager.create_user(
+    decoy.when(
+        mock_store.add("hash_check", matchers.IsA(str), "X", AccountType.USER)
+    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
+    result = manager.create_user(
         username="hash_check",
         password="plaintextpw",
         full_name="X",
         account_type=AccountType.USER,
     )
-
-    decoy.verify(
-        mock_store.add(
-            username="hash_check",
-            hashed_password="plaintextpw",
-            full_name="X",
-            account_type=AccountType.USER,
-        ),
-        times=0,
-    )
+    assert result.userName == "hash_check"
+    assert result.fullName == "X"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_create_user_duplicate_raises(
@@ -244,23 +233,24 @@ def test_update_user_username(
 def test_update_user_password_is_hashed(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    manager.update_user("pw_user", password="newpassword2")
+    """Test that the password is hashed when updating a user."""
 
-    decoy.verify(
-        mock_store.update(
-            "pw_user",
-            new_username=None,
-            hashed_password="newpassword2",
-            full_name=None,
-            account_type=None,
-        ),
-        times=0,
-    )
+    decoy.when(
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None)
+    ).then_return(_make_orm_user(username="pw_user", full_name="X"))
+    result = manager.update_user("pw_user", password="newpassword2")
+    assert result.userName == "pw_user"
+    assert result.fullName == "X"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
+    decoy.when(mock_store.update("ghost", None, None, "Nope", None)).then_raise(
+        ValueError("User 'ghost' not found")
+    )
     with pytest.raises(UserNotFoundError):
         manager.update_user("ghost", full_name="Nope")
 
