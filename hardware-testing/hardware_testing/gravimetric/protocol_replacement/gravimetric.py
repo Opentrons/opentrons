@@ -953,6 +953,7 @@ def aspirate_with_liquid_class(
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
+    print_info(f"transfer props {transfer_properties.aspirate._correction_by_volume.as_dict()}")
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -992,6 +993,7 @@ def dispense_with_liquid_class(
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("dispense", volume, channel, trial)
     )
+    print_info(f"transfer props {transfer_properties.dispense._correction_by_volume.as_dict()}")
     override_retract_discontinuity(fixture_settings)
     fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
