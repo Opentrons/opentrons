@@ -101,7 +101,7 @@ class UserDataManager:
         try:
             self._store.remove(username)
         except ValueError as e:
-            raise UserNotFoundError(str(e)) from e
+            raise UserNotFoundError(e) from e
 
     def update_user(
         self,
@@ -130,4 +130,4 @@ class UserDataManager:
             )
             return UserResponse.from_orm_user(updated_user)
         except ValueError as e:
-            raise UserNotFoundError(str(e)) from e
+            raise UserNotFoundError(e) from e
