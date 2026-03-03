@@ -24,10 +24,8 @@ import {
   featureFlagsAtom,
   headerWithMeterAtom,
   mixpanelAtom,
-  tokenAtom,
 } from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
-import { useGetAccessToken } from './resources/hooks'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
 export function OpentronsAI(): JSX.Element | null {
@@ -40,24 +38,13 @@ export function OpentronsAI(): JSX.Element | null {
 
 function OpentronsAIApp(): JSX.Element | null {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
-  const [, setToken] = useAtom(tokenAtom)
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
-  const { getAccessToken } = useGetAccessToken()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
   const location = useLocation()
   const isOnChatPage = location.pathname === '/chat'
 
   const trackEvent = useTrackEvent()
-
-  const fetchAccessToken = async (): Promise<void> => {
-    try {
-      const accessToken = await getAccessToken()
-      setToken(accessToken)
-    } catch (error) {
-      console.error('Error fetching access token:', error)
-    }
-  }
 
   if (mixpanelState?.isInitialized === false) {
     setMixpanelState({ ...mixpanelState, isInitialized: true })
@@ -67,9 +54,6 @@ function OpentronsAIApp(): JSX.Element | null {
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
       void loginWithRedirect()
-    }
-    if (isAuthenticated) {
-      void fetchAccessToken()
     }
   }, [isAuthenticated, isLoading, loginWithRedirect])
 

@@ -51,13 +51,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
 
   const [showProtocolContent, setShowProtocolContent] = useState(false)
-  const {
-    role,
-    reply,
-    requestId,
-    protocolContent,
-    attachments,
-  } = chat
+  const { role, reply, requestId, protocolContent, attachments } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {

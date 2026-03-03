@@ -24,7 +24,7 @@ def send_post_request(payload: str) -> str:
     hf_token: str = settings.huggingface_api_key.get_secret_value()
     headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
     logger.info("Sending POST request to the simulate API", extra={"url": url, "protocolName": data["name"]})
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.post(url, json=data, headers=headers, timeout=60)
 
     if response.status_code != 200:
         logger.error("Error: " + response.text)

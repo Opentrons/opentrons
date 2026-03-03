@@ -16,13 +16,14 @@ import {
 } from '@opentrons/components'
 
 import { ANALYTICS } from '/ai-client/analytics/constants'
-import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
+import { feedbackModalAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
   PROD_FEEDBACK_END_POINT,
   STAGING_FEEDBACK_END_POINT,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
+import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { AxiosRequestConfig } from 'axios'
@@ -48,11 +49,18 @@ export function FeedbackModal(): JSX.Element {
 
   const [feedbackValue, setFeedbackValue] = useState<string>('')
   const [, setShowFeedbackModal] = useAtom(feedbackModalAtom)
-  const [token] = useAtom(tokenAtom)
+  const { getAccessToken } = useGetAccessToken()
   const { callApi, error, isLoading, data } = useApiCall()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSendFeedback = async (): Promise<void> => {
+    let token: string
+    try {
+      token = await getAccessToken()
+    } catch {
+      return
+    }
+
     const headers = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',

@@ -9,11 +9,11 @@ import {
   createProtocolChatAtom,
   featureFlagsAtom,
   regenerateProtocolAtom,
-  tokenAtom,
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
+import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import {
   buildChatHistory,
@@ -25,7 +25,6 @@ import {
   getUpdateStreamEndpoint,
   streamChatApi,
 } from '/ai-client/resources/utils'
-import type { HttpMethod } from '/ai-client/resources/utils/streamChatApi'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
   getPreFixText,
@@ -34,6 +33,7 @@ import {
 
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { ChatData, ProtocolFormat } from '/ai-client/resources/types'
+import type { HttpMethod } from '/ai-client/resources/utils/streamChatApi'
 
 interface UseInputPromptControllerArgs {
   userPrompt: string
@@ -67,7 +67,7 @@ export function useInputPromptController(
 
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
-  const [token] = useAtom(tokenAtom)
+  const { getAccessToken } = useGetAccessToken()
   const [featureFlags] = useAtom(featureFlagsAtom)
 
   const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
@@ -80,11 +80,7 @@ export function useInputPromptController(
   const { data, isLoading, error } = useApiCall()
 
   const pdProtocolContent: null | ProtocolFile = useMemo(() => {
-    if (
-      data != null &&
-      typeof data === 'object' &&
-      'protocolContent' in data
-    ) {
+    if (data != null && typeof data === 'object' && 'protocolContent' in data) {
       return (data as any).protocolContent as ProtocolFile
     }
     return null
@@ -182,6 +178,14 @@ export function useInputPromptController(
 
     const validatedFiles = prepareValidatedFiles(isUpdateOrCreateRequest)
     if (validatedFiles === null) return
+
+    let token: string
+    try {
+      token = await getAccessToken()
+    } catch {
+      setStreamingError('Session expired. Please log in again.')
+      return
+    }
 
     const userInput = createUserInput(
       newRequestId,
@@ -429,11 +433,7 @@ export function useInputPromptController(
       if (error != null) {
         setSubmitted(false)
       } else if (data != null) {
-        const {
-          role,
-          reply,
-          protocolContent,
-        } = data as ChatData
+        const { role, reply, protocolContent } = data as ChatData
         const assistantResponse: ChatData = {
           requestId,
           role,

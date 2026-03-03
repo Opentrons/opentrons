@@ -1058,7 +1058,7 @@ class AnthropicPredict:
         data = {"name": protocol_name, "content": protocol}
         hf_token: str = self.settings.huggingface_api_key.get_secret_value()
         headers = {"Content-Type": "application/json", "Authorization": "Bearer {}".format(hf_token)}
-        response = requests.post(url, json=data, headers=headers)
+        response = requests.post(url, json=data, headers=headers, timeout=60)
 
         if response.status_code != 200:
             logger.error("Simulation request failed", extra={"status": response.status_code, "error": response.text})

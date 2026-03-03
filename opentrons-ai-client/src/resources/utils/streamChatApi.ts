@@ -11,12 +11,9 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 function parseStreamError(status: number, bodyText: string): string {
   try {
-    const {
-      detail,
-      message,
-      errorType,
-      timeoutSeconds,
-    } = JSON.parse(bodyText) as {
+    const { detail, message, errorType, timeoutSeconds } = JSON.parse(
+      bodyText
+    ) as {
       detail?: string
       message?: string
       errorType?: string

@@ -59,8 +59,6 @@ export const chatHistoryAtom = atom<Chat[]>([])
 
 export const feedbackModalAtom = atom<boolean>(false)
 
-export const tokenAtom = atom<string | null>(null)
-
 // feature flag atoms are a bit more fancy
 // they leverage local storage to persist settings across browser refreshes
 

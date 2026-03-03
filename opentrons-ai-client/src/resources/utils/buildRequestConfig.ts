@@ -107,7 +107,7 @@ const getCreateOrUpdateEndpoint = (isNewProtocol: boolean): string => {
 }
 
 export const buildRequestConfig = (
-  token: string | null,
+  token: string,
   validatedFiles: File[],
   isUpdateOrCreateRequest: boolean,
   completeHistory: ChatMessage[],
