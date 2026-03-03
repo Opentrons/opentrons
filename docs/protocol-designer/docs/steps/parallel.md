@@ -11,14 +11,14 @@ First, add a Thermocycler step and create a profile. Protocol Designer separates
 
 <figure class="screenshot" markdown>
 ![Image showing the two parts of a Thermocycler profile step.](../images/thermocycler-profile.png)
-<figcaption>Two Thermocycler profile parts, **Start profile** and **Wait for profile**, are added to the protocol timeline.
+<figcaption markdown>Two Thermocycler profile parts, **Start profile** and **Wait for profile**, are added to the protocol timeline.
 </figure>
 
 If you leave this Thermocycler step as is, the robot will wait for the profile to complete before executing any other step. To perform other steps while the profile runs, click and drag to move additional steps inside the Thermocycler profile. 
 
 <figure class="screenshot" markdown>
 ![Image showing steps moved inside the Thermocycler profile to run in parallel.](../images/parallel-steps.png)
-<figcaption>The robot will perform other steps in parallel while running a Thermocycler profile.</figcaption>
+<figcaption markdown>The robot will perform other steps in parallel while running a Thermocycler profile.</figcaption>
 </figure>
 
 Here, your Flex will transfer and mix liquids, and pause the protocol so you can move labware while the Thermocycler profile runs.

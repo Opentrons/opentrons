@@ -137,6 +137,9 @@ Changes to the module state include simple changes like opening
 the lid or setting an initial lid temperature, while programming a
 profile sets timed temperature cycles for your experiment.
 
+!!! note
+    When adding a Thermocycler Module step, labware in the module is not automatically displayed. Load labware in the Thermocycler on the protocol starting deck or move your labware to the Thermocycler module in a move step. To move labware to and from the Thermocycler, first open the lid by clicking **Change Thermocycler state**.
+
 Click **Change Thermocycler state** to set a block or lid
 temperature, or to open or close the lid. You can set the block at
 any temperature between 4 and 99 °C and the lid at any
@@ -159,11 +162,7 @@ in your experiment. Click **Add cycle** to add steps to a cycle. At the
 bottom of the menu, enter the number of times the cycle should
 repeat before saving your work.
 
-Running Thermocyler profiles is time consuming, so you can choose to run other protocols steps [in parallel](../steps/parallel.md) with your profiles.
-
-
-!!! note
-    When adding a Thermocycler Module step, labware in the module is not automatically displayed. Load labware in the Thermocycler on the protocol starting deck or move your labware to the Thermocycler module in a move step. To move labware to and from the Thermocycler, first open the lid by clicking **Change Thermocycler state**.
+Running Thermocyler profiles is time-consuming, so you can choose to run other protocols steps [in parallel](../steps/parallel.md) with your profiles.
 
 
 
