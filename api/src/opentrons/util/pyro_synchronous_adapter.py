@@ -4,7 +4,7 @@ import asyncio
 import functools
 import inspect
 from types import FunctionType, MethodType
-from typing import Any, Callable, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Iterator, Optional, ParamSpec, TypeVar
 
 import Pyro5.api as pyro
 
@@ -51,10 +51,15 @@ def synchronous(func: Callable[P, T]) -> Callable[P, T]:
     return wrapper
 
 
-class PyroSynchronousObject:
-    """A Pyro-ready class. It takes the base object (such as an OT3API) and makes it synchronous and exposed via pyro.
-    Bound methods of that base object execute in the original instance of a native process, with the generated class
-    attributes here acting as an alias referencing them.
+class _PSO:
+    pass
+
+
+def PyroSynchronousObject(core_obj: Any) -> _PSO:
+    """A Pyro-ready class generator. It takes the base object (such as an OT3API); makes an object wrapper with a
+    synchronous version of the base object's methods; and exposes the wrapper via pyro. Pyro requests to the wrapper
+    synchronous methods are forwarded to the original bound async methods of that base object in the original event
+    loop and thread, with the generated class attributes here acting as an alias referencing them.
 
     When a PyroSynchronousObject is created the result is a per-instance constructed class, unique per instantiation.
     This is done so that multiple instances of a PyroSynchronousObject can be created within a single process, without
@@ -62,7 +67,12 @@ class PyroSynchronousObject:
     based on the original core object (as described above). Each of these bound methods/properties are guaranteed
     to be synchronous and execute on the original core object instance.
 
-    Class wrapping Example:
+    In simplest terms, the result of this class generator is a wrapper object containing attributes with the same names
+    as the `core_obj` that is passed in. When the wrapper's attributes are called, they will forward the call to the
+    original `core_obj` and it will then execute them. Asynchronous functions will block until finished.
+
+    Class wrapping Example
+    -------
     Lets say we have a class called `OT3Basic` that looks something like the following -
 
     .. code-block::
@@ -92,9 +102,11 @@ class PyroSynchronousObject:
             return asyncio.run_coroutine_threadsafe(self._core_object.home(*args, **kwargs), self._core_object._loop))
 
 
-    For developer implementation with Pyro, this class was built to be relatively turnkey. A base object, such as an
+    For developer implementation with Pyro, this class generator was built to be relatively turnkey. A base object, such as an
     instance of an OT3API, may be provided. The resulting object instance is ready to serve via pyro, and will provide
     blocking callables to any client which is served.
+
+    NOTE: The wrapper should only be called via pyro, never directly.
 
     Server-side Example
     -------
@@ -103,9 +115,6 @@ class PyroSynchronousObject:
     >>> # ... This example assumes instances of OT3API and Thermocycler ...
     >>> pyro_ot3api = PyroSynchronousObject(ot3api)
     >>> pyro_thermocycler = PyroSynchronousObject(thermocycler_attached_module)
-    >>> # Direct synchronous behavior is supported in-process
-    >>> pyro_ot3api.home()
-    >>> pyro_thermocycler.open()
     >>> # Serve to clients
     >>> pyro.serve({"OT3API" : pyro_ot3api})
     >>> pyro.serve({"THERMOCYCLER" : pyro_thermocycler})
@@ -115,56 +124,49 @@ class PyroSynchronousObject:
     .. code-block::
     >>> ot3_proxy_uri = pyro.resolve("PYRONAME:OT3API")
     >>> ot3_proxy = pyro.Proxy(ot3_proxy_uri)
+    >>> thermocycler_proxy_uri = pyro.resolve("PYRONAME:THERMOCYCLER")
+    >>> thermocycler_proxy = pyro.Proxy(thermocycler_proxy_uri)
     >>> # The proxy object can now call the original instance running on the server-process
     >>> ot3_proxy.home()
+    >>> thermocycler_proxy.open_lid()
     """
+    SyncCls = type(
+        f"PyroSynchronousObject_{core_obj.__class__.__name__}_{id(core_obj)}",
+        (_PSO,),
+        dict(_build_classdict(core_obj)),
+    )
+    return SyncCls()  # type: ignore
 
-    def __init__(self, core_obj: Any):
-        self._core_obj = core_obj
 
-        # Create a per-instance subclass of the current class
-        # This is done to ensure that if a process creates multiple instances of a PyroSynchronousObject that
-        # each individual instance only contains the attributes of the `core_obj` it was provided, and not others.
-        # This also ensures that all attributes of the specific instance of a PyroSynchronousObject are exposed
-        # through Pyro, which operates on class-based exposure.
-        SyncCls = type(
-            f"PyroSynchronousObject_{core_obj.__class__.__name__}_{id(core_obj)}",
-            (self.__class__,),
-            {},
-        )
+def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
+    for name, attr in inspect.getmembers(core_obj.__class__):
+        if "__" not in name:
+            if (
+                isinstance(attr, FunctionType)
+                and asyncio.iscoroutinefunction(attr)
+                and not name.startswith("_")
+            ):
+                # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
+                exposed = pyro.expose(synchronous(attr))
+                bound_method = MethodType(exposed, core_obj)
+                yield (name, bound_method)
+            elif isinstance(attr, FunctionType) and not name.startswith("_"):
+                # Expose standard functions and bound the exposed function to the original instance
+                exposed = pyro.expose(attr)
+                bound_method = MethodType(exposed, core_obj)
+                yield (name, bound_method)
+            elif isinstance(attr, property) and not name.startswith("_"):
+                # Bound property to the original instance and expose the bounded property
+                def bound(func):  # type: ignore
+                    if func is None:
+                        return None
+                    return lambda self, *a, **kw: func(core_obj, *a, **kw)
 
-        for name, attr in inspect.getmembers(core_obj.__class__):
-            if "__" not in name:
-                if (
-                    isinstance(attr, FunctionType)
-                    and asyncio.iscoroutinefunction(attr)
-                    and not name.startswith("_")
-                ):
-                    # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
-                    exposed = pyro.expose(synchronous(attr))
-                    bound_method = MethodType(exposed, self._core_obj)
-                    setattr(SyncCls, name, bound_method)
-                elif isinstance(attr, FunctionType) and not name.startswith("_"):
-                    # Expose standard functions and bound the exposed function to the original instance
-                    exposed = pyro.expose(attr)
-                    bound_method = MethodType(exposed, self._core_obj)
-                    setattr(SyncCls, name, bound_method)
-                elif isinstance(attr, property) and not name.startswith("_"):
-                    # Bound property to the original instance and expose the bounded property
-                    def bound(func):  # type: ignore
-                        if func is None:
-                            return None
-                        return lambda self, *a, **kw: func(self._core_obj, *a, **kw)
-
-                    bound_property = property(
-                        fget=bound(attr.fget),  # type: ignore
-                        fset=bound(attr.fset),  # type: ignore
-                        fdel=bound(attr.fdel),  # type: ignore
-                        doc=attr.__doc__,
-                    )
-                    exposed = pyro.expose(bound_property)
-                    setattr(SyncCls, name, exposed)
-
-        # Ensure the individual instance of the PyroSynchronousObject returned is the constructed SyncCls
-        # containing all exposed attributes.
-        self.__class__ = SyncCls
+                bound_property = property(
+                    fget=bound(attr.fget),  # type: ignore
+                    fset=bound(attr.fset),  # type: ignore
+                    fdel=bound(attr.fdel),  # type: ignore
+                    doc=attr.__doc__,
+                )
+                exposed = pyro.expose(bound_property)
+                yield (name, exposed)
