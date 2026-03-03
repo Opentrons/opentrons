@@ -21,7 +21,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: &default_scope auth_settings.write runs.write users.read users.write
+        scope: &default_scope auth_settings.write robot_settings.write runs.write users.read users.write
       save:
         json:
           initial_access_token: access_token
@@ -209,7 +209,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: auth_settings.write runs.write users.read users.write
+        scope: auth_settings.write robot_settings.write runs.write users.read users.write
       save:
         json:
           refresh_token: refresh_token
