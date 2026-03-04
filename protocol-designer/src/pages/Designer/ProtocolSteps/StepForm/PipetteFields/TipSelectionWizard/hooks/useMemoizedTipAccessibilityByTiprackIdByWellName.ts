@@ -95,15 +95,13 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
         if (tipState == null) {
           return acc
         }
-        const pipetteChannels = pipetteSpecs.channels
-        const wellNamesToCheck = getWellsToCheck(nozzles, def.ordering)
         return {
           ...acc,
-          [id]: wellNamesToCheck.reduce((acc, wellName) => {
+          [id]: Object.keys(def.wells).reduce((acc, wellName) => {
             const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
               tipState,
               primaryNozzle,
-              channels: pipetteChannels,
+              channels: pipetteSpecs.channels,
               nozzleConfiguration: nozzles,
               wellName,
               tiprackDef: def,
@@ -127,26 +125,12 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
             } else if (!isComplete) {
               inaccessibleReason = INACCESSIBLE_INCOMPLETE
             }
-            const wellGroup = getEntireWellSelection(
-              wellName,
-              def.ordering,
-              nozzles,
-              primaryNozzle,
-              pipetteChannels
-            )
-            const groupEntries = Object.fromEntries(
-              wellGroup.map(well => [
-                well,
-                {
-                  isAccessible,
-                  ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
-                },
-              ])
-            )
-
             return {
               ...acc,
-              ...groupEntries,
+              [wellName]: {
+                isAccessible,
+                ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
+              },
             }
           }, {}),
         }

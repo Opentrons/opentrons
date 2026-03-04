@@ -130,11 +130,18 @@ export function SelectLabwareModal(
     ? allCategoriesExpanded
     : userCategoryExpandState
 
-  useEffect(() => {
-    if (!hasNoLabware && error != null) {
-      setError(null)
-    }
-  }, [hasNoLabware])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    () => {
+      if (!hasNoLabware && error != null) {
+        setError(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNoLabware]
+  )
 
   const handleResetLabwareTools = (): void => {
     setUserCategoryExpandState(allCategoriesCollapsed)

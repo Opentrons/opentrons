@@ -134,7 +134,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
     []
   )
-  const enableVacuumModule = useSelector(getEnableVacuumModule)
   useEffect(
     () => {
       const options = [
@@ -148,13 +147,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ]
       setAllFixtureOptions(options)
       const moduleOptions = [
-        ...getModuleOptions(
-          cutoutId,
-          addressableAreaId,
-          deckDef,
-          fixtures,
-          enableVacuumModule
-        ),
+        ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
       ]
       setAllModuleOptions(moduleOptions)
     },
