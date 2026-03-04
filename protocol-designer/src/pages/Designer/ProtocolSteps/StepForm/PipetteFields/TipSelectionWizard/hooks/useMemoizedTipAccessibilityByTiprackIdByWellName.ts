@@ -80,64 +80,80 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
       if (robotState == null) {
         return {}
       }
-      const tipState = robotState?.tipState.tipracks[id] ?? null
-      if (tipState == null) {
-        return acc
-      }
-      const pipetteChannels = pipetteSpecs.channels
-      const wellNamesToCheck = wellsToCheck(nozzles, def.ordering)
-      return {
-        ...acc,
-        [id]: wellNamesToCheck.reduce((acc, wellName) => {
-          const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
-            tipState,
-            primaryNozzle,
-            channels: pipetteChannels,
-            nozzleConfiguration: nozzles,
-            wellName,
-            tiprackDef: def,
-            tipsToIgnore: selectedTips.flat(),
-          })
-          const isCollision = !getIsSafePipetteMovement({
-            robotState,
-            invariantContext,
-            pipetteId,
-            labwareId: id,
-            wellTargetName: wellName,
-            primaryNozzle,
-            nozzleConfiguration: nozzles,
-          })
-          const isAccessible = isSafe && isComplete && !isCollision
-          let inaccessibleReason: InaccessibleReason | null = null
-          if (isCollision) {
-            inaccessibleReason = INACCESSIBLE_COLLISION
-          } else if (!isSafe) {
-            inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
-          } else if (!isComplete) {
-            inaccessibleReason = INACCESSIBLE_INCOMPLETE
-          }
-          const wellGroup = getEntireWellSelection(
-            wellName,
-            def.ordering,
-            nozzles,
-            primaryNozzle,
-            pipetteChannels
-          )
-          const groupEntries = Object.fromEntries(
-            wellGroup.map(well => [
-              well,
-              {
-                isAccessible,
-                ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
-              },
-            ])
-          )
-          return {
-            ...acc,
-            ...groupEntries,
-          }
-        }, {}),
-      }
-    }, {})
-  }, [selectedTips])
+      return Object.entries(robotState.labware).reduce<
+        Record<string, Record<string, AccessibilityStatus>>
+      >((acc, [id, { stack }]) => {
+        const { def, labwareDefURI } = labwareEntities[id]
+        const isMatchingTiprackOnDeck =
+          !stack.includes(OFFDECK) &&
+          def.parameters.isTiprack &&
+          labwareDefURI === tiprackUri
+        if (!isMatchingTiprackOnDeck) {
+          return acc
+        }
+        const tipState = robotState?.tipState.tipracks[id] ?? null
+        if (tipState == null) {
+          return acc
+        }
+        const pipetteChannels = pipetteSpecs.channels
+        const wellNamesToCheck = wellsToCheck(nozzles, def.ordering)
+        return {
+          ...acc,
+          [id]: wellNamesToCheck.reduce((acc, wellName) => {
+            const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
+              tipState,
+              primaryNozzle,
+              channels: pipetteChannels,
+              nozzleConfiguration: nozzles,
+              wellName,
+              tiprackDef: def,
+              tipsToIgnore: selectedTips.flat(),
+            })
+            const isCollision = !getIsSafePipetteMovement({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId: id,
+              wellTargetName: wellName,
+              primaryNozzle,
+              nozzleConfiguration: nozzles,
+            })
+            const isAccessible = isSafe && isComplete && !isCollision
+            let inaccessibleReason: InaccessibleReason | null = null
+            if (isCollision) {
+              inaccessibleReason = INACCESSIBLE_COLLISION
+            } else if (!isSafe) {
+              inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
+            } else if (!isComplete) {
+              inaccessibleReason = INACCESSIBLE_INCOMPLETE
+            }
+            const wellGroup = getEntireWellSelection(
+              wellName,
+              def.ordering,
+              nozzles,
+              primaryNozzle,
+              pipetteChannels
+            )
+            const groupEntries = Object.fromEntries(
+              wellGroup.map(well => [
+                well,
+                {
+                  isAccessible,
+                  ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
+                },
+              ])
+            )
+
+            return {
+              ...acc,
+              ...groupEntries,
+            }
+          }, {}),
+        }
+      }, {})
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTips]
+  )
 }
