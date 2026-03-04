@@ -7,6 +7,9 @@ from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
+from . import (
+    validation,
+)  # isort: skip  # Imported after other protocol_api imports to avoid circular import
 from .core.common import (
     AbsorbanceReaderCore,
     FlexStackerCore,
@@ -42,7 +45,6 @@ from opentrons.protocols.api_support.util import (
     requires_version,
 )
 
-from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -118,9 +120,9 @@ class ModuleContext(CommandPublisher):
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
 
-        assert labware.parent == self._core.geometry, (
-            "Labware is not configured with this module as its parent"
-        )
+        assert (
+            labware.parent == self._core.geometry
+        ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
 
@@ -709,8 +711,8 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
-                the block heats or cools. 
+                *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+                the block heats or cools.
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -722,7 +724,7 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 28) and ramp_rate:
+        if self._api_version < APIVersion(2, 29) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
@@ -763,13 +765,13 @@ class ThermocyclerContext(ModuleContext):
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
 
-        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
-        the block heats or cools. 
+        *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        the block heats or cools.
         """
 
         if block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 28) and ramp_rate:
+        if self._api_version < APIVersion(2, 29) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
@@ -1858,7 +1860,7 @@ class VacuumModuleContext(ModuleContext):
     _core: VacuumModuleCore
 
     @property
-    @requires_version(2, 28)
+    @requires_version(2, 29)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
