@@ -39,6 +39,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
+import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -133,6 +134,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
     []
   )
+  const enableVacuumModule = useSelector(getEnableVacuumModule)
   useEffect(
     () => {
       const options = [
@@ -146,7 +148,13 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ]
       setAllFixtureOptions(options)
       const moduleOptions = [
-        ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
+        ...getModuleOptions(
+          cutoutId,
+          addressableAreaId,
+          deckDef,
+          fixtures,
+          enableVacuumModule
+        ),
       ]
       setAllModuleOptions(moduleOptions)
     },
@@ -171,6 +179,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     deckDefinition: deckDef,
     addressableAreaId,
     fixtures,
+    enableVacuumModule,
   })
 
   let nextStageOptions = null
