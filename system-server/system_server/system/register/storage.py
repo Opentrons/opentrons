@@ -115,7 +115,7 @@ def get_or_create_registration_token(
         The JWT, and a boolean that is True if the JWT is newly created or False if
         it is a cached value.
     """
-    with sql_engine.connect() as conn:
+    with sql_engine.begin() as conn:
         token = _get_registration_token(conn, registrant)
         token_is_new = False
 

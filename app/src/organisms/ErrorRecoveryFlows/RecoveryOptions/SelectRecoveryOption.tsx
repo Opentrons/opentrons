@@ -85,7 +85,7 @@ export function SelectRecoveryOptionHome({
           isSticky: true,
         }}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex css={CONTENT_STYLE}>
           <StyledText
             oddStyle="level4HeaderSemiBold"
             desktopStyle="headingSmallBold"
@@ -120,6 +120,11 @@ const CONTENT_WRAPPER_OVERRIDE_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: ${SPACING.spacing12};
   }
+`
+
+const CONTENT_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing16};
 `
 
 interface RecoveryOptionsProps {
@@ -175,9 +180,14 @@ const RECOVERY_OPTION_CONTAINER_STYLE = css`
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {
-  useEffect(() => {
-    void determineTipStatus()
-  }, [])
+  useEffect(
+    () => {
+      void determineTipStatus()
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 }
 
 export function getRecoveryOptions(

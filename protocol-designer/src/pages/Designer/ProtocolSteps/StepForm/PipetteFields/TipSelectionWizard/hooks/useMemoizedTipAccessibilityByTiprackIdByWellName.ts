@@ -75,20 +75,10 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   const invariantContext = useSelector(getInvariantContext)
   const { labwareEntities } = invariantContext
 
-  return useMemo(() => {
-    if (robotState == null) {
-      return {}
-    }
-    return Object.entries(robotState.labware).reduce<
-      Record<string, Record<string, AccessibilityStatus>>
-    >((acc, [id, { stack }]) => {
-      const { def, labwareDefURI } = labwareEntities[id]
-      const isMatchingTiprackOnDeck =
-        !stack.includes(OFFDECK) &&
-        def.parameters.isTiprack &&
-        labwareDefURI === tiprackUri
-      if (!isMatchingTiprackOnDeck) {
-        return acc
+  return useMemo(
+    () => {
+      if (robotState == null) {
+        return {}
       }
       const tipState = robotState?.tipState.tipracks[id] ?? null
       if (tipState == null) {

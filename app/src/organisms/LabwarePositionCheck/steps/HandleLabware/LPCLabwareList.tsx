@@ -130,11 +130,16 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
   // On the initial render, select the first uri from the list of labware (for desktop app purposes).
-  useLayoutEffect(() => {
-    if (!isOnDevice) {
-      props.setSelectedUri(labwareInfo[0].uri)
-    }
-  }, [])
+  useLayoutEffect(
+    () => {
+      if (!isOnDevice) {
+        props.setSelectedUri(labwareInfo[0].uri)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <TextListTableContent header={t('select_labware_to_view_data')}>

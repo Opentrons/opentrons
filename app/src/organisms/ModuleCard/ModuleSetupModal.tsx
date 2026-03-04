@@ -134,7 +134,12 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
               />
             </Link>
           </Flex>
-          <img width="192px" height="194px" src={instructionQRCode()} />
+          <img
+            width="192px"
+            height="194px"
+            src={instructionQRCode()}
+            alt="Module setup QR code"
+          />
         </Flex>
         <PrimaryButton onClick={props.close} alignSelf={ALIGN_FLEX_END}>
           {i18n.format(t('shared:close'), 'capitalize')}

@@ -113,11 +113,16 @@ export const DisconnectModal = ({
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
 
-  useEffect(() => {
-    if (isDisconnected) {
-      dispatch(clearWifiStatus(robotName))
-    }
-  }, [isDisconnected])
+  useEffect(
+    () => {
+      if (isDisconnected) {
+        dispatch(clearWifiStatus(robotName))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isDisconnected]
+  )
 
   return (
     <Modal
