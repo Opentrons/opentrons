@@ -1,5 +1,3 @@
-import { ALL } from '@opentrons/shared-data'
-
 import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
 import {
   incompletePickup,
@@ -9,6 +7,7 @@ import {
 } from '../../errorCreators'
 import {
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
@@ -28,7 +27,7 @@ import type {
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
   primaryNozzle: PrimaryNozzleConfigurationStyle
-  nozzles?: NozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   tipTrackingOption?: TipTrackingOption
 }
 
@@ -61,9 +60,10 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
 
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
     tipState: prevRobotState.tipState.tipracks[labwareId],
-    primaryNozzle,
+    primaryNozzle:
+      primaryNozzle ?? getDefaultPrimaryNozzle({ channels, nozzles }),
     channels,
-    nozzleConfiguration: nozzles ?? ALL,
+    nozzleConfiguration: nozzles,
     wellName,
     tiprackDef: invariantContext.labwareEntities[labwareId].def,
   })

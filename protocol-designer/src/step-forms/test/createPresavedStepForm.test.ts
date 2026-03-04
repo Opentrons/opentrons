@@ -267,7 +267,7 @@ describe('createPresavedStepForm', () => {
         dropTip_location: 'mockTrash',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
-        primaryNozzle: null,
+        primaryNozzle: 'A1',
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,

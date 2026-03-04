@@ -2,7 +2,13 @@ import isEmpty from 'lodash/isEmpty'
 import range from 'lodash/range'
 import uniq from 'lodash/uniq'
 
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  PARTIAL,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import {
   AIR,
@@ -16,6 +22,7 @@ import * as warningCreators from '../warningCreators'
 import type {
   AspDispAirgapParams,
   AspirateInPlaceParams,
+  PartialPrimaryNozzles,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -37,14 +44,21 @@ export function forAspirate(
       : (robotState.pipettes[pipetteId].wellName ?? '')
   const { liquidState } = robotState
   const nozzles = robotState.pipettes[pipetteId].nozzles
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const isReservoir = labwareDef.metadata.displayCategory === 'reservoir'
-  let channels = pipetteSpec.channels
+  let channels: number = pipetteSpec.channels
   if (nozzles === COLUMN) {
     channels = 8
   } else if (nozzles === SINGLE) {
     channels = 1
+  } else if (nozzles === ROW) {
+    channels = 12
+  } else if (nozzles === PARTIAL) {
+    channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
   }
 
   const { allWellsShared, wellsForTips } = getWellsForTips(

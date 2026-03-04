@@ -44,8 +44,6 @@ export function ExtendedPartialTipField(
     getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
-  const partialNozzleCount =
-    PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -100,11 +98,7 @@ export function ExtendedPartialTipField(
     stepType: string,
     channels: number
   ): string {
-    const nozzleText = getNozzleText(
-      primaryNozzle,
-      nozzleConfiguration,
-      partialNozzleCount
-    )
+    const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
     const isTransfer = stepType === 'transfer'
     const isColumn =
       (channels === 8 && nozzleConfiguration === ALL) ||

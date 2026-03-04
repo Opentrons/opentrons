@@ -1,6 +1,12 @@
 import range from 'lodash/range'
 
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  PARTIAL,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
@@ -8,6 +14,7 @@ import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type {
   AspDispAirgapParams,
   DispenseInPlaceParams,
+  PartialPrimaryNozzles,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -29,17 +36,23 @@ export function forDispense(
   const pipetteState = robotState.liquidState.pipettes[pipetteId]
   const firstTipState = Object.values(pipetteState)[0] // airGap volume is the same for each tip
   const airGapVolume = firstTipState?.[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
 
   // NOTE: (ja, 1/10/26): if airGapVolume is not null, assume that the dispense command
   // is for dispensing the air gap - NOTE: this is only used for PV right now
   if (airGapVolume > 0) {
     const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
     const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-    let channels = pipetteSpec.channels
+    let channels: number = pipetteSpec.channels
     if (nozzles === COLUMN) {
       channels = 8
     } else if (nozzles === SINGLE) {
       channels = 1
+    } else if (nozzles === ROW) {
+      channels = 12
+    } else if (nozzles === PARTIAL) {
+      channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
     }
     range(channels).forEach((tipIndex): void => {
       const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}

@@ -308,6 +308,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       labwareId: sourceLabware,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -316,6 +317,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       labwareId: destLabware,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())
@@ -367,7 +369,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     invariantContext,
     prevRobotState,
     primaryNozzle,
-    ...(nozzles != null ? [nozzles] : [])
+    nozzles
   )
 
   const aspirateCorrectionVolumeForSampleAspiration =
@@ -429,7 +431,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles: nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -681,12 +683,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           curryCommandCreator(replaceTip, {
             pipette,
             primaryNozzle,
+            nozzles,
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack: tiprackURI,
-            ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

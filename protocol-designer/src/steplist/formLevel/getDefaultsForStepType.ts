@@ -1,3 +1,4 @@
+import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import {
@@ -51,7 +52,7 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
-        primaryNozzle: null,
+        primaryNozzle: A1_NOZZLE,
         pushOut_checkbox: null,
         pushOut_volume: null,
         times: null,
@@ -142,7 +143,7 @@ export function getDefaultsForStepType(
         dropTip_wellNames: undefined,
         liquidClassesSupported: true,
         liquidClass: 'none',
-        nozzles: null,
+        nozzles: ALL,
         path: 'single',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,

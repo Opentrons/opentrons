@@ -2,7 +2,6 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
-  ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
@@ -404,7 +403,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     invariantContext,
     prevRobotState,
     primaryNozzle,
-    ...(nozzles != null ? [nozzles] : [])
+    nozzles
   )
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
@@ -490,7 +489,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles: nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -636,6 +635,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               curryCommandCreator(replaceTip, {
                 pipette,
                 primaryNozzle,
+                nozzles,
                 dropTipLocation:
                   isReturnTip && fallBackTrashLikeId != null
                     ? fallBackTrashLikeId

@@ -3,6 +3,7 @@ import { when } from 'vitest-when'
 
 import {
   A1_NOZZLE,
+  ALL,
   getPipetteSpecsV2,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -67,6 +68,7 @@ describe('dispense', () => {
         flowRate: 6,
         tipRack: 'tiprack1Id',
         primaryNozzle: A1_NOZZLE,
+        nozzles: ALL,
       }
     })
     it('dispense normally (with tip)', () => {
@@ -125,6 +127,7 @@ mock_pipette.dispense(
           wellName: 'A1',
           tipRack: 'tiprack1Id',
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialRobotState

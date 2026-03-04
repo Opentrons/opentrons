@@ -36,7 +36,7 @@ interface ReplaceTipArgs {
   dropTipLocation: string
   // tipRack URI with which to automatically find next tip
   tipRack: string | null
-  nozzles?: NozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   primaryNozzle: PrimaryNozzleConfigurationStyle
 
   //  we need to emit atomic commands for python
@@ -234,7 +234,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
 
   const tipTrackingOption = tipSelectionArgs ? MANUAL : AUTOMATIC
-
   let commandCreators: CurriedCommandCreator[] = [
     curryCommand(dropTip, {
       pipette,

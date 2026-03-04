@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   A1_NOZZLE,
   A12_NOZZLE,
+  ALL,
   COLUMN,
   fixture96Plate,
   fixtureTiprack300ul,
@@ -13,6 +14,7 @@ import {
 
 import { EMPTY, FIXED_TRASH_ID } from '../../../constants'
 import {
+  configureNozzleLayoutHelper,
   DEFAULT_PIPETTE,
   dropTipHelper,
   dropTipInPlaceHelper,
@@ -57,6 +59,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialRobotState
@@ -104,6 +107,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialRobotState
@@ -119,6 +123,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -154,6 +159,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialTestRobotState
@@ -180,6 +186,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialTestRobotState
@@ -258,6 +265,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialTestRobotState
@@ -298,6 +306,7 @@ describe('replaceTip', () => {
           dropTipLocation: 'wasteChuteId',
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         initialTestRobotState
@@ -321,6 +330,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         {
@@ -347,6 +357,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         {
@@ -373,7 +384,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           primaryNozzle: A1_NOZZLE,
-
+          nozzles: ALL,
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           tipSelectionArgs: {
@@ -402,6 +413,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
 
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
@@ -411,6 +423,10 @@ describe('replaceTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        configureNozzleLayoutHelper(p300MultiId, {
+          style: ALL,
+          primaryNozzle: A1_NOZZLE,
+        }),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
         }),
@@ -436,12 +452,17 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         robotStateWithTipA1Missing
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        configureNozzleLayoutHelper(p300MultiId, {
+          style: ALL,
+          primaryNozzle: A1_NOZZLE,
+        }),
         pickUpTipHelper('A2', {
           pipetteId: p300MultiId,
         }),
@@ -466,6 +487,7 @@ describe('replaceTip', () => {
           dropTipLocation: FIXED_TRASH_ID,
           tipRack: tiprackURI1,
           primaryNozzle: A1_NOZZLE,
+          nozzles: ALL,
         },
         invariantContext,
         robotStateWithTipsOnMulti
@@ -473,6 +495,10 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...dropTipHelper(p300MultiId),
+        configureNozzleLayoutHelper(p300MultiId, {
+          style: ALL,
+          primaryNozzle: A1_NOZZLE,
+        }),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
         }),

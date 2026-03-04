@@ -300,12 +300,12 @@ export const PARTIAL_NOZZLE_MAP: Record<
   B1: 7,
 }
 
-export const COLUMN = 'COLUMN'
-export const SINGLE = 'SINGLE'
-export const ROW = 'ROW'
-export const QUADRANT = 'QUADRANT'
-export const ALL = 'ALL'
-export const PARTIAL = 'PARTIAL'
+export const COLUMN = 'COLUMN' as const
+export const SINGLE = 'SINGLE' as const
+export const ROW = 'ROW' as const
+export const QUADRANT = 'QUADRANT' as const
+export const ALL = 'ALL' as const
+export const PARTIAL = 'PARTIAL' as const
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -340,7 +340,8 @@ export type PrimaryNozzleConfigurationStyle =
   | typeof A12_NOZZLE
   | typeof H1_NOZZLE
   | typeof H12_NOZZLE
-interface NozzleConfigurationParams {
+
+export interface NozzleConfigurationParams {
   primaryNozzle?: PrimaryNozzleConfigurationStyle
   style: NozzleConfigurationStyle
 }

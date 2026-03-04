@@ -331,6 +331,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
       wellTargetName: sourceWell,
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -340,6 +341,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
       wellTargetName: destWells[0],
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())
@@ -413,7 +415,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     invariantContext,
     prevRobotState,
     primaryNozzle,
-    ...(nozzles != null ? [nozzles] : [])
+    nozzles
   )
 
   const dispenseCorrectionVolumeForDestination =
@@ -474,7 +476,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles: nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -660,13 +662,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            nozzles,
             primaryNozzle,
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack: tiprackURI,
-            ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

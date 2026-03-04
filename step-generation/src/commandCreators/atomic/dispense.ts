@@ -24,6 +24,7 @@ import {
 import type {
   CreateCommand,
   DispenseParams,
+  NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -32,6 +33,7 @@ import type { Point } from '../../utils'
 export interface DispenseAtomicCommandParams extends DispenseParams {
   tipRack: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   isAirGap?: boolean
 }
 /** Dispense with given args. Requires tip. */
@@ -50,6 +52,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     wellLocation,
     pushOut,
     primaryNozzle,
+    nozzles,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -132,6 +135,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
       },
       wellTargetName: wellName,
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())

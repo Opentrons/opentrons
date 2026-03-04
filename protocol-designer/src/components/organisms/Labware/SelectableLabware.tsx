@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components'
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
+import { COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
 
 import {
   arrayToWellGroup,
@@ -39,11 +39,14 @@ export interface SelectableLabwareProps {
   showBorder: boolean
 }
 
-type ChannelType = 8 | 96
+type ChannelType = 8 | 96 | 12
 
 const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
+  }
+  if (nozzleType === ROW) {
+    return 12
   } else {
     return 96
   }

@@ -59,6 +59,7 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLidParams,
   LoadLidStackRunTimeCommand,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
@@ -339,7 +340,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8 | 96,
+  channels: number,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -600,6 +601,7 @@ interface DispenseLocationHelperArgs {
   yOffset: number
   tipRack: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -617,6 +619,7 @@ export const dispenseLocationHelper: CommandCreator<
     yOffset,
     tipRack,
     primaryNozzle,
+    nozzles,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -650,6 +653,7 @@ export const dispenseLocationHelper: CommandCreator<
         },
         tipRack,
         primaryNozzle,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -680,6 +684,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (

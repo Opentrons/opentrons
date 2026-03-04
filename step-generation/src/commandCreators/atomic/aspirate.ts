@@ -33,7 +33,7 @@ import type { Point } from '../../utils'
 
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
   primaryNozzle: PrimaryNozzleConfigurationStyle
   isAirGap?: boolean
 }
@@ -53,6 +53,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     tipRack,
     wellLocation,
     primaryNozzle,
+    nozzles,
   } = args
   const actionName = 'aspirate'
   const labwareState = prevRobotState.labware
@@ -134,6 +135,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
       },
       wellTargetName: wellName,
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())

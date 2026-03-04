@@ -1,11 +1,22 @@
 import assert from 'assert'
 
-import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  getIsTiprack,
+  PARTIAL,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import { EMPTY } from '../constants'
 import { getNozzleConfig } from '../utils'
 
-import type { PickUpTipParams } from '@opentrons/shared-data'
+import type {
+  PartialPrimaryNozzles,
+  PickUpTipParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forPickUpTip(
@@ -22,18 +33,63 @@ export function forPickUpTip(
   )
   const tipState = robotStateAndWarnings.robotState.tipState
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
   const nozzleConfiguration = getNozzleConfig(nozzles, pipetteSpec)
+
   const getTiprackColumnForWell = (
     ordering: string[][],
     targetWellName: string
   ): string[] | undefined =>
     ordering.find(column => column.includes(targetWellName))
+
+  const getTiprackRowForWell = (
+    ordering: string[][],
+    targetWell: string
+  ): string[] | undefined => {
+    const columnIndex = ordering.findIndex(column =>
+      column.includes(targetWell)
+    )
+    if (columnIndex === -1) return undefined
+    const rowIndex = ordering[columnIndex].indexOf(targetWell)
+    return ordering.map(column => column[rowIndex])
+  }
+
+  const getTipsForPartial = (
+    ordering: string[][],
+    targetWell: string
+  ): string[] | undefined => {
+    const numberOfTips =
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    const columnIndex = ordering.findIndex(column => column.includes(wellName))
+    const rowIndex = ordering[columnIndex].indexOf(wellName)
+    const column = ordering[columnIndex]
+
+    const remainingWells = column.length - rowIndex
+    if (remainingWells < numberOfTips) {
+      const beginning = column.length - numberOfTips
+      return column.slice(beginning, column.length)
+    }
+    const end = rowIndex + numberOfTips
+    return column.slice(rowIndex, Math.min(end, column.length))
+  }
   // pipette now has tip(s)
   tipState.pipettes[pipetteId].hasTip = true
   tipState.pipettes[pipetteId].tiprackURI = labwareId
   // remove tips from tiprack
   if (nozzleConfiguration === SINGLE) {
     tipState.tipracks[labwareId][wellName] = EMPTY
+  } else if (nozzleConfiguration === PARTIAL && primaryNozzle) {
+    const partialTips = getTipsForPartial(tiprackDef.ordering, wellName)
+    if (partialTips == null) {
+      throw new Error(
+        'Invalid priamry well for tip pick up for partial config: ' + wellName
+      )
+    } else {
+      partialTips.forEach(function (wellName) {
+        tipState.tipracks[labwareId][wellName] = EMPTY
+      })
+    }
   } else if (nozzleConfiguration === COLUMN) {
     const allWells = getTiprackColumnForWell(tiprackDef.ordering, wellName)
     if (allWells == null) {
@@ -42,6 +98,14 @@ export function forPickUpTip(
     }
 
     allWells.forEach(function (wellName) {
+      tipState.tipracks[labwareId][wellName] = EMPTY
+    })
+  } else if (nozzleConfiguration === ROW) {
+    const wellsInRow = getTiprackRowForWell(tiprackDef.ordering, wellName)
+    if (wellsInRow == null) {
+      throw new Error('Invalid priamry well for tip pickup: ' + wellName)
+    }
+    wellsInRow.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = EMPTY
     })
   } else if (nozzleConfiguration === ALL) {

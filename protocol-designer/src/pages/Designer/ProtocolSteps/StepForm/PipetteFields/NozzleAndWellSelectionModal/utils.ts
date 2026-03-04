@@ -135,19 +135,18 @@ export const getAvailablePrimaryNozzles = (
 }
 
 export const getNozzleText = (
-  primaryNozzle: PrimaryNozzleConfigurationStyle | null,
-  nozzleConfiguration: NozzleConfigurationStyle,
-  partialNozzleCount?: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
+  nozzleConfiguration: NozzleConfigurationStyle
 ): string | null => {
   const nozzleTextMapping: Record<
     NozzleConfigurationStyle,
-    (primary: PrimaryNozzleConfigurationStyle | null) => string | null
+    (primary: PrimaryNozzleConfigurationStyle) => string | null
   > = {
     ALL: () => 'All',
     PARTIAL: () =>
-      partialNozzleCount != null ? `${partialNozzleCount} nozzles` : null,
+      `${PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]} nozzles`,
 
-    SINGLE: primary => (primary ? `${primary} nozzle` : null),
+    SINGLE: primary => `${primary} nozzle`,
 
     ROW: primary => (primary === A1_NOZZLE ? 'Top ' : 'Bottom '),
 
@@ -155,7 +154,7 @@ export const getNozzleText = (
     QUADRANT: () => null,
   }
 
-  return nozzleTextMapping[nozzleConfiguration](primaryNozzle) ?? null
+  return nozzleTextMapping[nozzleConfiguration](primaryNozzle)
 }
 
 export const getEntireWellSelection = (

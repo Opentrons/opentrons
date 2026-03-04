@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   A1_NOZZLE,
   A12_NOZZLE,
+  ALL,
   COLUMN,
   fixture96Plate,
   fixtureP100096V2Specs,
@@ -110,6 +111,7 @@ describe('getIsSafePipetteMovement', () => {
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
       primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
     })
     expect(result).toEqual(true)
   })
@@ -131,6 +133,7 @@ describe('getIsSafePipetteMovement', () => {
       wellLocationOffset: { x: -12, y: -100, z: 20 },
       wellTargetName: mockWellName,
       primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })
@@ -154,6 +157,7 @@ describe('getIsSafePipetteMovement', () => {
       wellLocationOffset: { x: -1, y: 5, z: 20 },
       wellTargetName: mockWellName,
       primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
     })
     expect(result).toEqual(true)
   })
@@ -182,6 +186,7 @@ describe('getIsSafePipetteMovement', () => {
       wellLocationOffset: { x: -1, y: 5, z: 0 },
       wellTargetName: mockWellName,
       primaryNozzle: A12_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })
@@ -223,6 +228,7 @@ describe('getIsSafePipetteMovement', () => {
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
       primaryNozzle: A12_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })

@@ -1,7 +1,6 @@
 import flatMap from 'lodash/flatMap'
 
 import {
-  ALL,
   getByVolumeValue,
   getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -379,6 +378,7 @@ export const mix: CommandCreator<MixArgs> = (
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -388,6 +388,7 @@ export const mix: CommandCreator<MixArgs> = (
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
       primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       return {
@@ -419,7 +420,7 @@ export const mix: CommandCreator<MixArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles: nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -443,7 +444,7 @@ export const mix: CommandCreator<MixArgs> = (
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack,
-            ...(nozzles != null ? { nozzles } : {}),
+            nozzles,
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

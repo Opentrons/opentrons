@@ -242,7 +242,7 @@ export function SelectTips(
           return newTips
         })
       }
-    } else if (channels === 96) {
+    } else if (channels === 96 && nozzles === ALL) {
       const allWells = Object.keys(labwareDef.wells)
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
@@ -264,6 +264,9 @@ export function SelectTips(
       transformedWellName = `A${column}`
     } else if (channels === 96 && nozzles === ALL) {
       transformedWellName = NINETY_SIX_ALL_TARGET_WELL
+    } else if (channels === 96 && nozzles === ROW) {
+      const rowName = wellName.slice(0, 1)
+      transformedWellName = `${rowName}1`
     }
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)

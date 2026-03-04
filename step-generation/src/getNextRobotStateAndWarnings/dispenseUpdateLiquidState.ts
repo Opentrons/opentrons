@@ -1,7 +1,13 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  PARTIAL,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import {
   getLocationTotalVolume,
@@ -10,6 +16,7 @@ import {
   splitLiquid,
 } from '../utils/misc'
 
+import type { PartialPrimaryNozzles } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LocationLiquidState,
@@ -47,11 +54,18 @@ export function dispenseUpdateLiquidState(
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
-  let channels = pipetteSpec.channels
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+
+  let channels: number = pipetteSpec.channels
   if (nozzles === COLUMN) {
     channels = 8
   } else if (nozzles === SINGLE) {
     channels = 1
+  } else if (nozzles === ROW) {
+    channels = 12
+  } else if (nozzles === PARTIAL) {
+    channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
   }
 
   const well = wellName ?? null
