@@ -1,8 +1,4 @@
-# Run tests, build the app, and deploy it cross platform
-
-name: 'OpentronsAI client test, build, and deploy'
-
-# ToDo (kk:04/16/2024) Add build and deploy task
+name: 'OpentronsAI client test and build'
 
 on:
   pull_request:

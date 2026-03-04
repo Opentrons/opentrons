@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - edge
-      - ai-deploy-fixes # remove before merging
     paths:
       - 'opentrons-ai-server/**'
       - '.github/workflows/opentrons-ai-server-staging-continuous-deploy.yaml'
