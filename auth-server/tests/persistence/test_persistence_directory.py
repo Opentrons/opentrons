@@ -8,6 +8,7 @@ from server_utils.persistence.persistence_directory import (
     PersistenceResetter,
 )
 
+from auth_server.persistence.database import sql_engine_ctx
 from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
@@ -121,22 +122,17 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
     db_file = subdirectory / DB_FILE
     assert db_file.exists()
 
-    engine = sqlalchemy.create_engine(f"sqlite:///{db_file}")
-    inspector = sqlalchemy.inspect(engine)
-
-    assert "user" in inspector.get_table_names()
-
-    columns = {col["name"] for col in inspector.get_columns("users")}
-    assert columns == {
-        "id",
-        "username",
-        "hashed_password",
-        "full_name",
-        "account_type",
-        "scopes",
-    }
-
-    engine.dispose()
+    with sql_engine_ctx(db_file) as engine:
+        inspector = sqlalchemy.inspect(engine)
+        assert "user" in inspector.get_table_names()
+        columns = {col["name"] for col in inspector.get_columns("user")}
+        assert columns == {
+            "id",
+            "username",
+            "hashed_password",
+            "full_name",
+            "account_type",
+        }
 
 
 async def test_prepare_active_subdirectory_is_created_once(tmp_path: Path) -> None:

@@ -33,4 +33,7 @@ def sql_engine_ctx(
 
 def create_schema(engine: sqlalchemy.engine.Engine) -> None:
     """Create all ORM-mapped tables that don't yet exist."""
+    # we need to import the User model to ensure it is created in the database
+    from auth_server.persistence.orm_models import User  # noqa: F401
+
     Base.metadata.create_all(engine)
