@@ -199,7 +199,7 @@ class FixtureSettings:
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
-        if pipette_channels == 8 and not increment:
+        if pipette_channels == 8:
             channels = [
                 int(ch) for ch in lookup_key("multi_channels_to_test", csv_params)
             ]
@@ -503,7 +503,7 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
 
 
 def _get_tips_for_test_single_multi(
-    fixture_settings: FixtureSettings, tip: int, channel: int
+    fixture_settings: FixtureSettings, tip: int, channel: int, blank: bool
 ) -> List[Well]:
     wells = []
     loaded_labwares = fixture_settings.ctx.loaded_labwares
@@ -519,10 +519,13 @@ def _get_tips_for_test_single_multi(
     ]
     if fixture_settings.pipette_channels == 8:
         if fixture_settings.increment:
-            a_row_tips = tips.get_tips_for_all_channels_on_multi(
-                fixture_settings.ctx, tip
-            )
-            return [t for t in a_row_tips if t.has_tip]
+            if len(fixture_settings.channels) == 8:
+                a_row_tips = tips.get_tips_for_all_channels_on_multi(
+                    fixture_settings.ctx, tip
+                )
+                return [t for t in a_row_tips if t.has_tip]
+            else:
+                return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         elif fixture_settings.cavity_test:
             # This should only ever be called once so hopefully this doesn't break anything
             # consume tips bottom to top, left to right
@@ -645,7 +648,7 @@ def _get_tips_for_test(
     if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
         # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
-    return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
+    return _get_tips_for_test_single_multi(fixture_settings, tip, channel, blank)
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -804,7 +807,7 @@ def _get_offset_for_channel(
     fixture_settings: FixtureSettings, channel: int, submerge_depth: float = 0
 ) -> Coordinate:
     offset = Coordinate(x=0, y=0, z=submerge_depth)
-    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
+    if fixture_settings.pipette_channels == 8:
         if channel in [0, 1, 2, 3]:
             offset.y = channel * 9.0
         else:
@@ -1255,8 +1258,11 @@ def run_one_test(
 
 
 def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
+    full_tip_increment = (
+        len(fixture_settings.channels) == 8 and fixture_settings.increment
+    )
     if (
-        fixture_settings.pipette_channels == 8 and not fixture_settings.increment
+        fixture_settings.pipette_channels == 8 and not full_tip_increment
     ) or fixture_settings.single_tip_96:
         primary = "A1"
         if channel in [4, 5, 6, 7]:
@@ -1431,7 +1437,12 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         )
                         + avg_disp_evap
                     )
-                    if fixture_settings.increment or (
+
+                    full_tip_increment = (
+                        len(fixture_settings.channels) == 8
+                        and fixture_settings.increment
+                    )
+                    if full_tip_increment or (
                         fixture_settings.pipette_channels == 96
                         and not fixture_settings.single_tip_96
                     ):
