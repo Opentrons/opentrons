@@ -26,25 +26,30 @@ export function useHandleClientAppliedOffsets(
     }
   )
 
-  useEffect(() => {
-    if (isFlex) {
-      if (isThisRunCurrent) {
-        if (clientDataRunId !== thisRunId && clientDataRunId != null) {
-          clearClientData()
-        }
-        // Offsets applied by another user but not locally - mark as applied locally
-        else if (
-          clientDataUserId != null &&
-          clientDataRunId === thisRunId &&
-          thisRunId != null
-        ) {
-          dispatch(appliedOffsetsToRun(thisRunId))
-        }
-      } else {
-        if (clientDataRunId === thisRunId) {
-          clearClientData()
+  useEffect(
+    () => {
+      if (isFlex) {
+        if (isThisRunCurrent) {
+          if (clientDataRunId !== thisRunId && clientDataRunId != null) {
+            clearClientData()
+          }
+          // Offsets applied by another user but not locally - mark as applied locally
+          else if (
+            clientDataUserId != null &&
+            clientDataRunId === thisRunId &&
+            thisRunId != null
+          ) {
+            dispatch(appliedOffsetsToRun(thisRunId))
+          }
+        } else {
+          if (clientDataRunId === thisRunId) {
+            clearClientData()
+          }
         }
       }
-    }
-  }, [isThisRunCurrent, clientDataRunId, clientDataUserId, thisRunId, isFlex])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isThisRunCurrent, clientDataRunId, clientDataUserId, thisRunId, isFlex]
+  )
 }
