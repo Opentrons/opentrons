@@ -40,10 +40,10 @@ class VerifyToken:
             jwk = await asyncio.to_thread(self.jwks_client.get_signing_key_from_jwt, credentials.credentials)
             signing_key = jwk.key
         except jwt.PyJWKClientError as error:
-            logger.error("Client Error", extra={"credentials": credentials}, exc_info=True)
+            logger.error("JWT client error", exc_info=True)
             raise UnauthenticatedException() from error
         except jwt.exceptions.DecodeError as error:
-            logger.error("Decode Error", extra={"credentials": credentials}, exc_info=True)
+            logger.error("JWT decode error", exc_info=True)
             raise UnauthenticatedException() from error
 
         try:
@@ -55,12 +55,12 @@ class VerifyToken:
                 issuer=self.config.auth0_issuer,
             )
             user = User(**payload)
-            logger.info("User object", extra={"user": user})
+            logger.info("User authenticated", extra={"user_id": user.sub})
             return user
         except jwt.ExpiredSignatureError:
-            logger.error("Expired Signature", extra={"credentials": credentials}, exc_info=True)
+            logger.error("JWT expired", exc_info=True)
             # Handle token expiration, e.g., refresh token, re-authenticate, etc.
         except jwt.PyJWTError:
-            logger.error("General JWT Error", extra={"credentials": credentials}, exc_info=True)
+            logger.error("JWT validation error", exc_info=True)
             # Handle other JWT errors
         raise UnauthenticatedException()

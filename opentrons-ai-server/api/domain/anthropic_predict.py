@@ -1,3 +1,4 @@
+import asyncio
 import json
 import re
 import uuid
@@ -9,7 +10,7 @@ import anthropic
 import requests
 import structlog
 import weave
-from anthropic import Anthropic
+from anthropic import Anthropic, AsyncAnthropic
 from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam, ToolParam
 from weave.trace.context.call_context import set_tracing_enabled
 
@@ -57,7 +58,8 @@ class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
         self.max_tokens: int = int(settings.anthropic_max_tokens)
-        self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
+        self.client: AsyncAnthropic = AsyncAnthropic(api_key=settings.anthropic_api_key.get_secret_value())
+        self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
         self.system_prompt: str = SYSTEM_PROMPT
@@ -232,17 +234,11 @@ class AnthropicPredict:
         xml_content += "</relevant_file_content>"
         return xml_content
 
-    def get_relevant_api_docs(self, query: str, user_id: str) -> str:
+    async def get_relevant_api_docs(self, query: str, user_id: str) -> str:
         """
         Get relevant API docs based on the user's prompt
         """
-        logger.info(
-            "get_relevant_api_docs method called",
-            extra={
-                "user_id": user_id,
-                "query_preview": query[:100] if query else "empty",
-            },
-        )
+        logger.info("get_relevant_api_docs method called", extra={"user_id": user_id})
 
         with open(self.path_api_docs, "r") as f:
             api_docs_structure = f.read()
@@ -263,7 +259,7 @@ class AnthropicPredict:
             }
         ]
 
-        response = self.client.messages.create(  # type: ignore[call-overload]
+        response = await self.client.messages.create(  # type: ignore[call-overload]
             model=self.model_helper,
             messages=msg,
             max_tokens=1024,
@@ -276,7 +272,7 @@ class AnthropicPredict:
         xml_content = self.parse_relevant_files_and_get_content(files_content)
         return xml_content
 
-    def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
+    async def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
         """
         Internal method to handle message processing with different system prompts.
         For now, system prompt is the same.
@@ -285,7 +281,7 @@ class AnthropicPredict:
         # With the Files API, uploaded files should be automatically accessible
         # when file IDs are mentioned in the message content (which we do in _create_file_attachment_blocks)
         # Use streaming to avoid the SDK's 10-minute limit for long-running requests (e.g. large max_tokens).
-        with self.client.messages.stream(
+        async with self.client.messages.stream(
             max_tokens=self.max_tokens,
             messages=messages,
             model=self.model_name,
@@ -294,7 +290,7 @@ class AnthropicPredict:
             metadata={"user_id": user_id},
             temperature=0.0,
         ) as stream:
-            response: Message = stream.get_final_message()
+            response: Message = await stream.get_final_message()
 
         logger.info(
             f"Token usage: {message_type.capitalize()}",
@@ -450,7 +446,7 @@ class AnthropicPredict:
 
         return {"role": "user", "content": current_user_content}
 
-    def process_chat_with_attachments(
+    async def process_chat_with_attachments(
         self,
         user_id: str,
         prompt: str,
@@ -486,20 +482,22 @@ class AnthropicPredict:
                 },
             )
 
-            response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-            return self._handle_response(response, messages, user_id, message_type)
+            response = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+            return await self._handle_response(response, messages, user_id, message_type)
 
         except Exception as e:
             logger.error(f"Error in process_chat_with_attachments: {str(e)}", exc_info=True)
             raise
 
-    def _handle_response(self, response: Message, messages: List[MessageParam], user_id: str, message_type: MessageType) -> str | None:
+    async def _handle_response(
+        self, response: Message, messages: List[MessageParam], user_id: str, message_type: MessageType
+    ) -> str | None:
         """Handle the response from the AI model, including tool use."""
         # Handle tool use if present
         if response.content[-1].type == "tool_use":
             tool_use = response.content[-1]
             messages.append({"role": "assistant", "content": response.content})
-            result = self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
+            result = await self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
             messages.append(
                 {
                     "role": "user",
@@ -512,7 +510,7 @@ class AnthropicPredict:
                     ],
                 }
             )
-            follow_up = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+            follow_up = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
             if follow_up.content and follow_up.content[0].type == "text":
                 return follow_up.content[0].text
             logger.error("Unexpected follow-up response type")
@@ -533,7 +531,7 @@ class AnthropicPredict:
         }
         return type_mapping.get(file_type, "text/plain")
 
-    def process_message(
+    async def process_message(
         self,
         user_id: str,
         prompt: str,
@@ -570,12 +568,12 @@ class AnthropicPredict:
                     },
                 )
             messages.append(user_message)
-            response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+            response = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
 
             if response.content[-1].type == "tool_use":
                 tool_use = response.content[-1]
                 messages.append({"role": "assistant", "content": response.content})
-                result = self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
+                result = await self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
                 messages.append(
                     {
                         "role": "user",
@@ -588,7 +586,7 @@ class AnthropicPredict:
                         ],
                     }
                 )
-                follow_up = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+                follow_up = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
                 if follow_up.content and follow_up.content[0].type == "text":
                     # Simply return the text directly
                     return follow_up.content[0].text
@@ -607,7 +605,7 @@ class AnthropicPredict:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
 
-    def process_message_pd(
+    async def process_message_pd(
         self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
         """return a partial json protocol"""
@@ -620,7 +618,7 @@ class AnthropicPredict:
             messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
 
             # Use streaming to avoid the SDK's 10-minute limit for long-running requests.
-            with self.client.messages.stream(
+            async with self.client.messages.stream(
                 max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
@@ -628,7 +626,7 @@ class AnthropicPredict:
                 metadata={"user_id": user_id},
                 temperature=0.0,
             ) as stream:
-                response: Message = stream.get_final_message()
+                response: Message = await stream.get_final_message()
             if response.content and response.content[0].type == "text":
                 response_text = response.content[0].text
                 return response_text
@@ -641,11 +639,11 @@ class AnthropicPredict:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
 
-    def create(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
-        return self.process_message(user_id, prompt, history, "create")
+    async def create(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
+        return await self.process_message(user_id, prompt, history, "create")
 
-    def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
-        return self.process_message_pd(user_id, prompt, history, "create")
+    async def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
+        return await self.process_message_pd(user_id, prompt, history, "create")
 
     def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
         """
@@ -877,34 +875,23 @@ class AnthropicPredict:
         except (FileNotFoundError, json.JSONDecodeError, KeyError):
             return ""
 
-    def update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
-        return self.process_message(user_id, prompt, history, "update")
+    async def update(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
+        return await self.process_message(user_id, prompt, history, "update")
 
-    def handle_tool_use(self, func_name: str, func_params: Dict[str, Any], user_id: str) -> str:
-        logger.info("Tool use invoked", extra={"tool_name": func_name, "user_id": user_id, "params": func_params})
+    async def handle_tool_use(self, func_name: str, func_params: Dict[str, Any], user_id: str) -> str:
+        logger.info("Tool use invoked", extra={"tool_name": func_name, "user_id": user_id})
 
         if func_name == "simulate_protocol":
             logger.info("Simulating protocol", extra={"user_id": user_id})
-            results = self.simulate_protocol(**func_params)
+            results = await asyncio.to_thread(self.simulate_protocol, **func_params)
             return results
         elif func_name == "get_relevant_api_docs":
             query = func_params.get("query", "")
-            logger.info(
-                "get_relevant_api_docs tool called",
-                extra={
-                    "user_id": user_id,
-                    "query": query[:200] if query else "empty_query",  # Log first 200 chars of query
-                    "query_length": len(query),
-                },
-            )
-            results = self.get_relevant_api_docs(query, user_id)
+            logger.info("get_relevant_api_docs tool called", extra={"user_id": user_id})
+            results = await self.get_relevant_api_docs(query, user_id)
             logger.info(
                 "get_relevant_api_docs tool completed",
-                extra={
-                    "user_id": user_id,
-                    "result_length": len(results) if results else 0,
-                    "result_preview": results[:100] + "..." if results and len(results) > 100 else results,
-                },
+                extra={"user_id": user_id, "result_length": len(results) if results else 0},
             )
             return results
 
@@ -949,7 +936,7 @@ def main() -> None:
     llm = AnthropicPredict(get_settings())
     Prompt.ask("Type a prompt to send to the Anthropic API:")
 
-    completion = llm.create(user_id="1", prompt="hi", history=None)
+    completion = asyncio.run(llm.create(user_id="1", prompt="hi", history=None))
     print(completion)
 
 

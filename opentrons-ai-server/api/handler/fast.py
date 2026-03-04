@@ -255,7 +255,7 @@ def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optiona
     return None
 
 
-def _generate_llm_response_with_history(
+async def _generate_llm_response_with_history(
     model_type: str,
     user_id: str,
     prompt: str,
@@ -283,13 +283,13 @@ def _generate_llm_response_with_history(
 
         # Use existing Claude logic with all files
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
-            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+            return await claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
 
         # For regular chat, use the new history-aware method or fallback to create
         if protocol_action == "create":
-            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+            return await claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
         else:
-            return claude.process_chat_with_attachments(
+            return await claude.process_chat_with_attachments(
                 user_id=user_id,
                 prompt=prompt,
                 history_with_attachments=history_with_attachments,
@@ -298,7 +298,7 @@ def _generate_llm_response_with_history(
             )
 
 
-def _generate_llm_response(
+async def _generate_llm_response(
     model_type: str,
     user_id: str,
     prompt: str,
@@ -316,11 +316,11 @@ def _generate_llm_response(
 
         # Claude models
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
-            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+            return await claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
         # For regular chat, we use the process_message method directly with file references
         if file_references and protocol_action != "create":
-            return claude.process_message(
+            return await claude.process_message(
                 user_id=user_id,
                 prompt=prompt,
                 history=cast(Optional[List[MessageParam]], history),
@@ -329,10 +329,10 @@ def _generate_llm_response(
             )
 
         if protocol_action == "create":
-            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+            return await claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
         # Default to update for chat completion and update_protocol
-        return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+        return await claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
 
 def _format_response(
@@ -416,7 +416,7 @@ async def create_chat_completion(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/completion", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/completion", extra={"user_id": user.sub})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -444,9 +444,7 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        # Use the new history-aware response generation (run in thread to avoid blocking event loop)
-        response = await asyncio.to_thread(
-            _generate_llm_response_with_history,
+        response = await _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
@@ -489,7 +487,7 @@ async def create_chat_completion_multipart(
     """
     logger.info(
         "POST /api/chat/completion-multipart",
-        extra={"message": message, "num_files": len(files), "file_names": [f.filename for f in files], "user": user},
+        extra={"user_id": user.sub, "num_files": len(files)},
     )
     try:
         # Setup Weave analytics based on frontend preference
@@ -520,8 +518,7 @@ async def create_chat_completion_multipart(
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        response = await asyncio.to_thread(
-            _generate_llm_response_with_history,
+        response = await _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
@@ -571,7 +568,12 @@ async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tupl
     all_files = [file for file_list in files_by_message.values() for file in file_list]
     token_warning = None
     if all_files:
-        token_warning = FileProcessor.check_files_token_warning(all_files, claude.client, settings.anthropic_model_name)
+        token_warning = await asyncio.to_thread(
+            FileProcessor.check_files_token_warning,
+            all_files,
+            claude._sync_client,
+            settings.anthropic_model_name,
+        )
 
     return files_by_message, token_warning
 
@@ -608,7 +610,7 @@ async def create_protocol(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/create-protocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/create-protocol", extra={"user_id": user.sub})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -616,21 +618,14 @@ async def create_protocol(
 
         _validate_request(body, "prompt")
 
-        # Special handling for fake_key with delay in createProtocol
-        if body.fake_key is not None:
-            await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
-            fake_response = _handle_fake_response(True, body.fake_key)
-            return fake_response if fake_response else ChatResponse(reply="Fake response", fake=True)
-
-        fake_response = _handle_fake_response(bool(body.fake))
+        fake_response = _handle_fake_response(bool(body.fake), body.fake_key)
         if fake_response:
             return fake_response
 
         protocol_format = body.protocol_format
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
-        response = await asyncio.to_thread(
-            _generate_llm_response,
+        response = await _generate_llm_response(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
@@ -682,7 +677,7 @@ async def update_protocol(
     - **request**: The HTTP request containing the existing protocol and other relevant parameters.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/update-protocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/update-protocol", extra={"user_id": user.sub})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -694,8 +689,7 @@ async def update_protocol(
         if fake_response:
             return fake_response
 
-        response = await asyncio.to_thread(
-            _generate_llm_response,
+        response = await _generate_llm_response(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
@@ -775,7 +769,7 @@ async def feedback(
         if body.fake:
             return FeedbackResponse(reply="Fake response", fake=bool(body.fake))
         feedback_text = body.feedback_text
-        logger.info("Feedback received", user_id=user.sub, feedback=feedback_text)
+        logger.info("Feedback received", extra={"user_id": user.sub})
         background_tasks.add_task(google_sheets_client.append_feedback_to_sheet, user_id=str(user.sub), feedback=feedback_text)
         return FeedbackResponse(
             reply=f"Feedback Received and sanitized: {google_sheets_client.sanitize_for_google_sheets(feedback_text)}", fake=False

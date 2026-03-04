@@ -24,8 +24,6 @@ FakeKeys = Literal[
     "no markdown",
     "empty reply",
     "pd serial diliution",
-    "streaming_15s",
-    "streaming_3s",
 ]
 FakeKeyType = Annotated[
     Optional[FakeKeys], Field(None, description="The key to use for the fake response. If not provided, the default is used.")
