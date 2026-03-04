@@ -51,11 +51,16 @@ export function ChooseLocation({
     useState<DropTipBlowoutLocationDetails | null>(null)
 
   // On initial render with values, synchronously set the first option as the selected option.
-  useLayoutEffect(() => {
-    if (dropTipCommandLocations.length > 0) {
-      setSelectedLocation(dropTipCommandLocations[0])
-    }
-  }, [dropTipCommandLocations.length])
+  useLayoutEffect(
+    () => {
+      if (dropTipCommandLocations.length > 0) {
+        setSelectedLocation(dropTipCommandLocations[0])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dropTipCommandLocations.length]
+  )
 
   const buildTitleCopy = (): string => {
     if (currentRoute === DT_ROUTES.BLOWOUT) {

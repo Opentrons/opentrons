@@ -128,11 +128,18 @@ export function SelectLabwareModal(
     ? allCategoriesExpanded
     : userCategoryExpandState
 
-  useEffect(() => {
-    if (!hasNoLabware && error != null) {
-      setError(null)
-    }
-  }, [hasNoLabware])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    () => {
+      if (!hasNoLabware && error != null) {
+        setError(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNoLabware]
+  )
 
   const handleResetLabwareTools = (): void => {
     setUserCategoryExpandState(allCategoriesCollapsed)
@@ -202,33 +209,40 @@ export function SelectLabwareModal(
         parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
   )
 
-  const labwareByCategory = useMemo(() => {
-    return reduce<
-      LabwareDefByDefURI,
-      { [category: string]: LabwareDefinition2[] }
-    >(
-      defs,
-      (acc, def: (typeof defs)[keyof typeof defs]) => {
-        const category: string = def.metadata.displayCategory
-        //  filter out non-permitted tipracks
-        if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
-        ) {
-          return acc
-        }
+  const labwareByCategory = useMemo(
+    () => {
+      return reduce<
+        LabwareDefByDefURI,
+        { [category: string]: LabwareDefinition2[] }
+      >(
+        defs,
+        (acc, def: (typeof defs)[keyof typeof defs]) => {
+          const category: string = def.metadata.displayCategory
+          //  filter out non-permitted tipracks
+          if (
+            category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))
+          ) {
+            return acc
+          }
 
-        return {
-          ...acc,
-          [category]: [...(acc[category] || []), def],
-        }
-      },
-      {}
-    )
-  }, [permittedTipracks])
+          return {
+            ...acc,
+            [category]: [...(acc[category] || []), def],
+          }
+        },
+        {}
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [permittedTipracks]
+  )
 
   const filteredLabwareByCategory: Record<string, LabwareInfo[]> = useMemo(
     () =>
@@ -266,6 +280,8 @@ export function SelectLabwareModal(
           ),
         }
       }, {}),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
 

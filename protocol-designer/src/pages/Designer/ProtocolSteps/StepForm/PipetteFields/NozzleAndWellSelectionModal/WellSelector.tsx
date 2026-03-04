@@ -129,10 +129,17 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
 
-  useEffect(() => {
-    setSelectedWells(getSelectedWells())
-    setHoveredWells(null)
-  }, [stepType])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    () => {
+      setSelectedWells(getSelectedWells())
+      setHoveredWells(null)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stepType]
+  )
 
   const flatSelectedWells = useMemo(() => selectedWells.flat(), [selectedWells])
   const allWellsWithStatus = allWells.reduce<Record<string, number>>(
@@ -175,16 +182,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     },
     {}
   )
-  const inaccessiblePartialWells = useMemo(() => {
-    if (!isPartialNozzle || selectedWells.length === 0) return []
+  const inaccessiblePartialWells = useMemo(
+    () => {
+      if (!isPartialNozzle || selectedWells.length === 0) return []
 
-    return getInaccessibleWellsForPartialNozzleRowMap(
-      selectedWells,
-      labwareDef.ordering,
-      allWellsWithState,
-      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-    )
-  }, [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering])
+      return getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells,
+        labwareDef.ordering,
+        allWellsWithState,
+        PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering]
+  )
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const slot = getSlotInLocationStack(labware.stack)

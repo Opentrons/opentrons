@@ -26,13 +26,18 @@ export function useCurrentlyRecoveringFrom(
   const isRunInRecoveryMode = isRecoveryStatus(runStatus)
 
   // Prevent stale data on subsequent recoveries by clearing the query cache at the start of each recovery.
-  useEffect(() => {
-    if (isRunInRecoveryMode) {
-      void queryClient.invalidateQueries([host, 'runs', runId])
-    } else {
-      setIsReadyToShow(false)
-    }
-  }, [isRunInRecoveryMode, host, runId])
+  useEffect(
+    () => {
+      if (isRunInRecoveryMode) {
+        void queryClient.invalidateQueries([host, 'runs', runId])
+      } else {
+        setIsReadyToShow(false)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunInRecoveryMode, host, runId]
+  )
 
   const { data: allCommandsQueryData, isFetching: isAllCommandsFetching } =
     useNotifyAllCommandsQuery(

@@ -94,34 +94,48 @@ export function useInputPromptController(
     clearFiles,
   } = useAttachFiles()
 
-  useEffect(() => {
-    const prefilledPrompt = isNewProtocol
-      ? createProtocol.prompt
-      : updateProtocol.prompt
+  useEffect(
+    () => {
+      const prefilledPrompt = isNewProtocol
+        ? createProtocol.prompt
+        : updateProtocol.prompt
 
-    if (prefilledPrompt !== '') {
-      setUserPrompt(prefilledPrompt)
-      setSendAutoFilledPrompt(true)
-    }
+      if (prefilledPrompt !== '') {
+        setUserPrompt(prefilledPrompt)
+        setSendAutoFilledPrompt(true)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    []
+  )
 
-  useEffect(() => {
-    if (sendAutoFilledPrompt) {
-      void handleClick(true)
-      setSendAutoFilledPrompt(false)
-    }
-  }, [sendAutoFilledPrompt])
+  useEffect(
+    () => {
+      if (sendAutoFilledPrompt) {
+        void handleClick(true)
+        setSendAutoFilledPrompt(false)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sendAutoFilledPrompt]
+  )
 
-  useEffect(() => {
-    if (regenerateProtocol.regenerate) {
-      void handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
-      setRegenerateProtocol({
-        isCreateOrUpdateProtocol: false,
-        regenerate: false,
-      })
-    }
-  }, [regenerateProtocol])
+  useEffect(
+    () => {
+      if (regenerateProtocol.regenerate) {
+        void handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
+        setRegenerateProtocol({
+          isCreateOrUpdateProtocol: false,
+          regenerate: false,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [regenerateProtocol]
+  )
 
   const prepareValidatedFiles = (
     isUpdateOrCreateRequest: boolean
