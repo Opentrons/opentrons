@@ -133,22 +133,27 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
     []
   )
-  useEffect(() => {
-    const options = [
-      ...getAllFixtureOptions(
-        cutoutId,
-        addressableAreaId,
-        fixtures,
-        existingCutoutFixtureId
-      ),
-      ...getWasteChuteOptions(cutoutId),
-    ]
-    setAllFixtureOptions(options)
-    const moduleOptions = [
-      ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
-    ]
-    setAllModuleOptions(moduleOptions)
-  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
+  useEffect(
+    () => {
+      const options = [
+        ...getAllFixtureOptions(
+          cutoutId,
+          addressableAreaId,
+          fixtures,
+          existingCutoutFixtureId
+        ),
+        ...getWasteChuteOptions(cutoutId),
+      ]
+      setAllFixtureOptions(options)
+      const moduleOptions = [
+        ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
+      ]
+      setAllModuleOptions(moduleOptions)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cutoutId, addressableAreaId, existingCutoutFixtureId]
+  )
 
   const modalProps: ModalProps = {
     title: t('add_to_slot', {

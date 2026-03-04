@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, ContextManager, Dict, Generator, List, Literal, Optional, cast
 
+import anthropic
 import requests
 import structlog
 import weave
@@ -55,7 +56,7 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
-        self.max_tokens: int = settings.anthropic_max_tokens
+        self.max_tokens: int = int(settings.anthropic_max_tokens)
         self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
@@ -746,6 +747,8 @@ class AnthropicPredict:
 
             logger.error("Unexpected response type")
             return None
+        except anthropic.APIError:
+            raise
         except Exception as e:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None
@@ -778,6 +781,8 @@ class AnthropicPredict:
 
             logger.error("Unexpected response type")
             return None
+        except anthropic.APIError:
+            raise
         except Exception as e:
             logger.error(f"Error in {message_type} method", extra={"error": str(e)})
             return None

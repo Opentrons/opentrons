@@ -43,25 +43,35 @@ export function useRunAnalytics({
     source: SOURCE_RUN_RECORD,
     robotType: robotType,
   })
-  useEffect(() => {
-    const areReportConditionsValid =
-      isRunCurrent && runId != null && isTerminalRunStatus(runStatus)
-    if (areReportConditionsValid) {
-      reportImageCaptureUsage({
-        transactionId: runId,
-        amount: numberOfImages,
-      })
-      trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
-        properties: robotAnalyticsData ?? undefined,
-      })
-    }
-  }, [runStatus, isRunCurrent, runId, robotAnalyticsData])
+  useEffect(
+    () => {
+      const areReportConditionsValid =
+        isRunCurrent && runId != null && isTerminalRunStatus(runStatus)
+      if (areReportConditionsValid) {
+        reportImageCaptureUsage({
+          transactionId: runId,
+          amount: numberOfImages,
+        })
+        trackProtocolRunEvent({
+          name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
+          properties: robotAnalyticsData ?? undefined,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runStatus, isRunCurrent, runId, robotAnalyticsData]
+  )
 
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
-  useEffect(() => {
-    if (isRunCurrent) {
-      reportRecoveredRunResult(runStatus, enteredER)
-    }
-  }, [isRunCurrent, enteredER])
+  useEffect(
+    () => {
+      if (isRunCurrent) {
+        reportRecoveredRunResult(runStatus, enteredER)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunCurrent, enteredER]
+  )
 }

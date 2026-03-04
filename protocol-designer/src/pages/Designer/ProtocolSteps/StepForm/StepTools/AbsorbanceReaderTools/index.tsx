@@ -51,15 +51,20 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
 
   // pre-select radio button on module change if compound command (read/initialize)
   // we useRef to avoid changing data from a previously created form
-  useEffect(() => {
-    if (isAfterMount.current) {
-      propsForFields.absorbanceReaderFormType.updateValue(
-        compoundCommandType ?? ABSORBANCE_READER_LID
-      )
-      return
-    }
-    isAfterMount.current = true
-  }, [formData.moduleId])
+  useEffect(
+    () => {
+      if (isAfterMount.current) {
+        propsForFields.absorbanceReaderFormType.updateValue(
+          compoundCommandType ?? ABSORBANCE_READER_LID
+        )
+        return
+      }
+      isAfterMount.current = true
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formData.moduleId]
+  )
 
   const lidRadioButton = (
     <RadioButton

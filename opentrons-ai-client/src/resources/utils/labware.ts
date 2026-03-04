@@ -30,26 +30,33 @@ let _latestDefs: LabwareDef2ByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDef2ByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
-    const allURIs = Object.keys(allDefs)
+    const allURIs = Object.keys(allDefs as Record<string, LabwareDefinition>)
+    const defsArray: LabwareDefinition[] = allURIs.map(
+      (uri: string) => allDefs[uri] as LabwareDefinition
+    )
     const labwareDefGroups: Record<string, LabwareDefinition[]> = groupBy(
-      allURIs.map((uri: string) => allDefs[uri]),
+      defsArray,
       d => `${d.namespace}/${d.parameters.loadName}`
     )
-    _latestDefs = Object.keys(labwareDefGroups).reduce(
-      (acc, groupKey: string) => {
-        const group = labwareDefGroups[groupKey]
-        const allVersions = group.map(d => d.version)
+    const initialValue: LabwareDef2ByDefURI = {}
+    const result = Object.keys(labwareDefGroups).reduce<LabwareDef2ByDefURI>(
+      (acc: LabwareDef2ByDefURI, groupKey: string) => {
+        const group: LabwareDefinition[] = labwareDefGroups[groupKey] ?? []
+        const allVersions: number[] = group.map(d => d.version)
         const highestVersionNum = Math.max(...allVersions)
         const resultIdx = group.findIndex(d => d.version === highestVersionNum)
         const latestDefInGroup = group[resultIdx]
-        return {
+        // Defs from getAllDefinitions() are LabwareDefinition2; reduce type is union
+        const next = {
           ...acc,
           [getLabwareDefURI(latestDefInGroup)]: latestDefInGroup,
         }
+        return next as LabwareDef2ByDefURI
       },
-      {}
+      initialValue
     )
+    _latestDefs = result
   }
 
-  return _latestDefs
+  return _latestDefs!
 }

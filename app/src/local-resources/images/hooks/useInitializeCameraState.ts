@@ -16,31 +16,36 @@ export function useInitializeCameraState(runId: string): void {
   const cameraSettingsExist = cameraSettings != null
   const runCameraSettingsExist = runCameraSettings != null
 
-  useEffect(() => {
-    if (runCameraSettings != null) {
-      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
-        runCameraSettings
+  useEffect(
+    () => {
+      if (runCameraSettings != null) {
+        const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
+          runCameraSettings
 
-      dispatch(
-        updateCameraUsageSettings({
-          runId,
-          cameraEnabled,
-          liveStreamEnabled,
-          recoveryEnabled: errorRecoveryCameraEnabled,
-        })
-      )
-    } else if (cameraSettings != null) {
-      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
-        cameraSettings
+        dispatch(
+          updateCameraUsageSettings({
+            runId,
+            cameraEnabled,
+            liveStreamEnabled,
+            recoveryEnabled: errorRecoveryCameraEnabled,
+          })
+        )
+      } else if (cameraSettings != null) {
+        const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
+          cameraSettings
 
-      dispatch(
-        updateCameraUsageSettings({
-          runId,
-          cameraEnabled,
-          liveStreamEnabled,
-          recoveryEnabled: errorRecoveryCameraEnabled,
-        })
-      )
-    }
-  }, [cameraSettingsExist, runCameraSettingsExist])
+        dispatch(
+          updateCameraUsageSettings({
+            runId,
+            cameraEnabled,
+            liveStreamEnabled,
+            recoveryEnabled: errorRecoveryCameraEnabled,
+          })
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cameraSettingsExist, runCameraSettingsExist]
+  )
 }

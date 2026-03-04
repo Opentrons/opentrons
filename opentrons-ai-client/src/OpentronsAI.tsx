@@ -26,6 +26,7 @@ import {
   mixpanelAtom,
 } from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
+import { useGetAccessToken } from './resources/hooks/useGetAccessToken'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
 export function OpentronsAI(): JSX.Element | null {
@@ -45,23 +46,37 @@ function OpentronsAIApp(): JSX.Element | null {
   const isOnChatPage = location.pathname === '/chat'
 
   const trackEvent = useTrackEvent()
+  const { getAccessToken } = useGetAccessToken()
 
   if (mixpanelState?.isInitialized === false) {
     setMixpanelState({ ...mixpanelState, isInitialized: true })
     initializeMixpanel(mixpanelState)
   }
 
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      void loginWithRedirect()
-    }
-  }, [isAuthenticated, isLoading, loginWithRedirect])
+  useEffect(
+    () => {
+      if (!isAuthenticated && !isLoading) {
+        void loginWithRedirect()
+      }
+      if (isAuthenticated) {
+        void getAccessToken()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isAuthenticated, isLoading, loginWithRedirect]
+  )
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      trackEvent({ name: 'user-login', properties: {} })
-    }
-  }, [isAuthenticated])
+  useEffect(
+    () => {
+      if (isAuthenticated) {
+        trackEvent({ name: 'user-login', properties: {} })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isAuthenticated]
+  )
 
   // Sync feature flag changes with Mixpanel analytics state
   useEffect(() => {
