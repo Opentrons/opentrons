@@ -170,8 +170,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
       return acc
     }, {})
-  const inaccessiblePartialWells = useMemo(() => {
-    if (!isPartialNozzle || selectedWells.length === 0) return []
+  const inaccessiblePartialWells = useMemo(
+    () => {
+      if (!isPartialNozzle || selectedWells.length === 0) return []
 
       return getInaccessibleWellsForPartialNozzleRowMap(
         selectedWells,
