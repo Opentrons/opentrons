@@ -45,6 +45,8 @@ export function useImageInfo(runId: string): UseImagesInfoResult {
       protocolAnalysis != null
         ? getLabwareDefinitionsFromCommands(protocolAnalysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidProtocolAnalysis]
   )
   const items = useMemo(() => {
