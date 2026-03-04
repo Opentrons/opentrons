@@ -119,7 +119,7 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
 
 # Request timeout (e.g. 300s for 5-minute streaming). Set via settings.request_timeout_seconds.
 # Production: ensure CloudFront and ALB timeouts are at least this value.
-app.add_middleware(TimeoutMiddleware, timeout_s=settings.request_timeout_seconds)
+app.add_middleware(TimeoutMiddleware, timeout_s=int(settings.request_timeout_seconds))
 
 
 @app.middleware("http")

@@ -49,7 +49,7 @@ class Settings(BaseSettings):
 
     # Request timeout for streaming and long-running handlers (seconds).
     # Production proxies (CloudFront, ALB) must be configured to allow at least this duration.
-    request_timeout_seconds: int = 300
+    request_timeout_seconds: str = "300"
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments
