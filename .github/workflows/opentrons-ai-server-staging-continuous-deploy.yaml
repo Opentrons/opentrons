@@ -1,11 +1,13 @@
-name: 'OpentronsAI edge continuous deployment to dev'
+name: 'OpentronsAI edge continuous deployment to staging'
 
 on:
   push:
     branches:
       - edge
+      - ai-deploy-fixes # remove before merging
     paths:
       - 'opentrons-ai-server/**'
+      - '.github/workflows/opentrons-ai-server-staging-continuous-deploy.yaml'
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +18,7 @@ env:
   CI: true
 
 jobs:
-  js-unit-test:
+  build-and-deploy:
     runs-on: 'ubuntu-latest'
     permissions:
       id-token: write
@@ -38,7 +40,7 @@ jobs:
         working-directory: ./opentrons-ai-server
         run: make setup
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
           aws-region: ${{ secrets.STAGING_AI_REGION }}
