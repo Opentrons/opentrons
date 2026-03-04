@@ -108,7 +108,7 @@ export function SelectCustomLabware(
                                 labwareDefURI:
                                   selectedLidLabware === universalLid[0]
                                     ? null
-                                    : `opentrons/${universalLid[1].parameters.loadName}/${universalLid[1].version}`,
+                                    : `${universalLid[1].namespace}/${universalLid[1].parameters.loadName}/${universalLid[1].version}`,
                               })
                             )
                           },
