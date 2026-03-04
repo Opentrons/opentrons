@@ -6,9 +6,9 @@ import requests
 import structlog
 from openai.types.chat import ChatCompletionToolParam
 
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
-settings: Settings = Settings()
+settings: Settings = get_settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 
 

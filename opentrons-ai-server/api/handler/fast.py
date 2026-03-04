@@ -45,9 +45,9 @@ from api.models.timeout_error import TimeoutError as TimeoutErrorResponse
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.services.file_processor import FileProcessor
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
-settings: Settings = Settings()
+settings: Settings = get_settings()
 setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
 
 access_logger = structlog.stdlib.get_logger("api.access")
@@ -86,7 +86,7 @@ SSE_HEADERS: Dict[str, str] = {
 # If allowed_origins is empty after parsing, default to localhost dev origins (same as Settings).
 _cors_origins: List[str] = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
 if not _cors_origins:
-    _cors_origins = ["http://localhost:5173", "http://localhost:3000"]
+    raise ValueError("allowed_origins setting is empty")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,

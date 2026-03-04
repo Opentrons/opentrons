@@ -82,7 +82,7 @@ export function useInputPromptController(
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
   const [streamingError, setStreamingError] = useState<string | null>(null)
 
-  const { data, isLoading, callApi, error, clearError } = useApiCall()
+  const { data, isLoading, error, clearError } = useApiCall()
 
   const pdProtocolContent: null | ProtocolFile = useMemo(() => {
     if (data != null && typeof data === 'object' && 'protocolContent' in data) {
@@ -274,6 +274,7 @@ export function useInputPromptController(
           method: (config.method?.toUpperCase() ?? 'POST') as HttpMethod,
           headers,
           body: JSON.stringify(config.data),
+          t: t as TFunction,
         },
         {
           onDelta: accumulated => {
@@ -354,6 +355,7 @@ export function useInputPromptController(
           method: (config.method?.toUpperCase() ?? 'POST') as HttpMethod,
           headers,
           body,
+          t: t as TFunction,
         },
         {
           onDelta: accumulated => {

@@ -6,6 +6,7 @@ const ERROR_TYPE_I18N_KEY: Record<string, string> = {
   context_length_exceeded: 'error_context_length',
   RateLimitError: 'error_rate_limit',
   APITimeoutError: 'error_timeout',
+  request_timeout: 'error_timeout',
   APIConnectionError: 'error_connection',
   network_error: 'error_connection',
   unknown: 'error_generic',

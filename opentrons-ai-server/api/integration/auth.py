@@ -1,12 +1,14 @@
+import asyncio
+
 import jwt
 import structlog
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
 
 from api.models.user import User
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
-settings: Settings = Settings()
+settings: Settings = get_settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 
 
@@ -19,7 +21,7 @@ class VerifyToken:
     """Does all the token verification using PyJWT"""
 
     def __init__(self) -> None:
-        self.config = Settings()
+        self.config = get_settings()
 
         # This gets the JWKS from a given URL and does processing so you can
         # use any of the keys available
@@ -35,7 +37,8 @@ class VerifyToken:
             raise UnauthenticatedException()
 
         try:
-            signing_key = self.jwks_client.get_signing_key_from_jwt(credentials.credentials).key
+            jwk = await asyncio.to_thread(self.jwks_client.get_signing_key_from_jwt, credentials.credentials)
+            signing_key = jwk.key
         except jwt.PyJWKClientError as error:
             logger.error("Client Error", extra={"credentials": credentials}, exc_info=True)
             raise UnauthenticatedException() from error

@@ -1,3 +1,9 @@
+import { isApiErrorResponse } from './isApiErrorResponse'
+import { resolveErrorMessage } from './resolveErrorMessage'
+
+import type { TFunction } from 'i18next'
+import type { ApiErrorResponse } from '../types'
+
 export interface StreamChatCallbacks {
   onDelta: (accumulated: string) => void
   onDone: (reply: string) => void
@@ -9,41 +15,45 @@ const MAX_ERROR_TEXT_LENGTH = 200
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
-function parseStreamError(status: number, bodyText: string): string {
-  try {
-    const { detail, message, errorType, timeoutSeconds } = JSON.parse(
-      bodyText
-    ) as {
-      detail?: string
-      message?: string
-      errorType?: string
-      timeoutSeconds?: number
-    }
-    const errorDetail =
-      typeof detail === 'string'
-        ? detail
-        : typeof message === 'string'
-          ? message
-          : null
-    if (errorDetail != null) {
-      if (errorType === 'request_timeout' && timeoutSeconds != null) {
-        return `${errorDetail} (${timeoutSeconds}s timeout).`
-      }
-      return errorDetail
-    }
-  } catch {
-    // ignore
-  }
+function parseStreamErrorFallback(status: number, bodyText: string): string {
   if (bodyText.length > MAX_ERROR_TEXT_LENGTH) {
     return `HTTP ${status}: ${bodyText.slice(0, MAX_ERROR_TEXT_LENGTH)}…`
   }
   return `HTTP ${status}: ${bodyText.length > 0 ? bodyText : 'No response body'}`
 }
 
+function parseErrorBody(
+  bodyText: string
+): ApiErrorResponse | { message: string } | null {
+  try {
+    const parsed = JSON.parse(bodyText) as Record<string, unknown>
+    const message =
+      typeof parsed.message === 'string'
+        ? parsed.message
+        : typeof parsed.detail === 'string'
+          ? parsed.detail
+          : null
+    if (message == null) return null
+    const errorType =
+      typeof parsed.error_type === 'string'
+        ? parsed.error_type
+        : typeof parsed.errorType === 'string'
+          ? parsed.errorType
+          : undefined
+    if (errorType != null) {
+      return { message, error_type: errorType } as ApiErrorResponse
+    }
+    return { message }
+  } catch {
+    return null
+  }
+}
+
 /**
  * Fetch any streaming chat API endpoint (SSE) and parse events.
  * Used for update-protocol, create-protocol, completion, and completion-multipart streams.
  * Supports JSON body or FormData (for multipart). For FormData, do not set Content-Type in headers.
+ * Uses `t` for localized error messages consistent with resolveErrorMessage / API error handling.
  */
 export async function streamChatApi(
   url: string,
@@ -51,10 +61,12 @@ export async function streamChatApi(
     method: HttpMethod
     headers: Record<string, string>
     body: string | FormData
+    t: TFunction
   },
   callbacks: StreamChatCallbacks
 ): Promise<void> {
   const { onDelta, onDone, onError } = callbacks
+  const { t } = options
   let accumulated = ''
 
   try {
@@ -75,13 +87,20 @@ export async function streamChatApi(
 
     if (!response.ok) {
       const text = await response.text()
-      onError(new Error(parseStreamError(response.status, text)))
+      const parsed = parseErrorBody(text)
+      const message =
+        parsed != null && isApiErrorResponse(parsed)
+          ? (resolveErrorMessage(parsed, t) ?? parsed.message)
+          : parsed != null && 'message' in parsed
+            ? parsed.message
+            : parseStreamErrorFallback(response.status, text)
+      onError(new Error(message))
       return
     }
 
     const reader = response.body?.getReader()
     if (reader == null) {
-      onError(new Error('No response body'))
+      onError(new Error(t('error_generic')))
       return
     }
 
@@ -140,9 +159,7 @@ export async function streamChatApi(
       lower.includes('networkerror') ||
       lower.includes('load failed') ||
       lower.includes('network request failed')
-    const friendlyMessage = isNetworkError
-      ? `Cannot reach the API. Ensure the server is running at ${url} and CORS allows your origin (e.g. http://localhost:5173).`
-      : message
+    const friendlyMessage = isNetworkError ? t('error_connection') : message
     onError(new Error(friendlyMessage))
   }
 }

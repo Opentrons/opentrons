@@ -70,6 +70,17 @@ class Settings(BaseSettings):
         return "app.logger"
 
 
+_settings: Settings | None = None
+
+
+def get_settings() -> Settings:
+    """Return the singleton Settings instance. Parses .env only on first call."""
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings
+
+
 def get_settings_from_json(json_str: str) -> Settings:
     """
     Validates the settings from a json string.
@@ -92,5 +103,4 @@ def generate_env_file(settings: Settings) -> None:
 
 # Example usage
 if __name__ == "__main__":
-    config: Settings = Settings()
-    generate_env_file(config)
+    generate_env_file(get_settings())

@@ -15,7 +15,7 @@ from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
 MessageType = Literal["create", "update"]
 
@@ -47,7 +47,7 @@ def get_tracing_context(enable_analytics: bool) -> ContextManager[None]:
     return set_tracing_enabled(enable_analytics)
 
 
-settings: Settings = Settings()
+settings: Settings = get_settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
 REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
@@ -1092,8 +1092,7 @@ def main() -> None:
     from rich import print
     from rich.prompt import Prompt
 
-    settings = Settings()
-    llm = AnthropicPredict(settings)
+    llm = AnthropicPredict(get_settings())
     Prompt.ask("Type a prompt to send to the Anthropic API:")
 
     completion = llm.create(user_id="1", prompt="hi", history=None)
