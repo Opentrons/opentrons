@@ -47,10 +47,7 @@ def set_persistence_directory(app_state: AppState, directory: Path) -> None:
 async def get_persistence_directory_root(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
-    """Return the root persistence directory.
-
-    It may be undergoing creation or a reset. This will only return after that's done.
-    """
+    """Return the root persistence directory."""
     directory = _persistence_directory_root_accessor.get_from(app_state)
     assert directory is not None, (
         "Forgot to initialize persistence directory as part of server startup?"

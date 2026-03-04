@@ -40,10 +40,7 @@ _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.
 
 
 def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Path]:
-    """Return the root persistence directory.
-
-    It may be undergoing creation or a reset. This will only return after that's done.
-    """
+    """Return the root persistence directory."""
     if settings.persistence_directory == "automatically_make_temporary":
         return None
     return settings.persistence_directory

@@ -39,19 +39,6 @@ def test_get_returns_none_for_nonexistent_user(user_store: UserStore) -> None:
     assert user_store.get("nonexistent_user") is None
 
 
-def test_get_returns_dynamically_added_user(user_store: UserStore) -> None:
-    """get should find a user that was added via add()."""
-    added_user = user_store.add(
-        username="dynamic_user",
-        hashed_password=HASHED_PW,
-        full_name="Dynamic User",
-        account_type=AccountType.SERVICE,
-    )
-    assert added_user is not None
-    assert added_user.username == "dynamic_user"
-    assert added_user.account_type == AccountType.SERVICE
-
-
 def test_add_and_get_user(user_store: UserStore) -> None:
     """add should persist the user so get can find it."""
     user_store.add(

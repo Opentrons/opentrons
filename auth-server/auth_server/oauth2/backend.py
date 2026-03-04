@@ -172,7 +172,6 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             and user.hashed_password is not None
             and password_hash.verify(password, user.hashed_password)
         ):
-            # ask max why we need to ignore this error
             request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
             return True
         return False
