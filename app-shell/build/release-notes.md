@@ -10,9 +10,9 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 Welcome to the v8.9.0 release of the Opentrons App! This release updates quick transfer protocols with the same features as any other Flex protocol: 
 
-- Click in the Protocols tab to start a quick transfer.
-- Find quick transfer protocols in the run log.
-- Pin a quick transfer protocol to find it quickly.
+- Click the **Quick transfer** button in the Protocols tab to get started.
+- Find quick transfer protocols in the Flex's run log.
+- Pin quick transfer protocols to find them quickly in the Protocols tab.
 
 ## Opentrons App Changes in 8.8.1
 
