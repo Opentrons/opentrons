@@ -112,7 +112,9 @@ async def flow_rate_thread(target_pressure):
         logging.error("Could not find mass flow sensor port")
         return
     loop = asyncio.get_running_loop()
-    file_name = f'/data/testing_data/test-data/FlowrateData_{target_pressure}_{current_datetime}.csv'
+    path = f'/data/testing_data/test-data/'
+    f_name = f'FlowrateData_{target_pressure}_{current_datetime}_{args.test_name}.csv'
+    file_name = path + f_name
     sensor = await driver.MassFlowSensor.create(port=m_port,
                                                 csv_path = file_name,  
                                                 loop= loop)
@@ -129,7 +131,9 @@ async def vacuum_manifold(target_pressure):
         logging.error("Could not find vacuum module port")
         return
     loop = asyncio.get_running_loop()
-    file_name = f'/data/testing_data/test-data/PressureData_{target_pressure}_{current_datetime}.csv'
+    path = f'/data/testing_data/test-data/'
+    f_name = f'PressureData_{target_pressure}_{current_datetime}_{args.test_name}.csv'
+    file_name = path + f_name
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
     start_time = time.perf_counter()
     target_to_pump = target_pressure - atm_pressure
@@ -165,6 +169,7 @@ if __name__ == "__main__":
     parser.add_argument("--vent_sec", type=int, default = 10)
     parser.add_argument("--decay_sec", type=int, default = 20)
     parser.add_argument("--settle_sec", type=int, default = 21)
+    parser.add_argument("--test_name", type=str, default="test_name")
     args = parser.parse_args()
 
     logging.info("Flow rate sensor initialized.")
