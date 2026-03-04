@@ -159,7 +159,6 @@ export function useDropTipCommands({
         .then((commandData: CommandData[]) => {
           const error = commandData[0].data.error
           if (error != null) {
-            // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw error
           }
           resolve()
@@ -272,7 +271,6 @@ export function useDropTipCommands({
       const handleSuccess = (commandData: CommandData[]): void => {
         const error = commandData[0].data.error
         if (error != null) {
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw error
         }
         proceed()

@@ -166,7 +166,6 @@ export function cleanupReleaseFiles(
     .then(files => {
       return (
         files
-          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
           .filter(f => f.isDirectory() && f.name !== currentRelease)
           .map(f => path.join(downloadsDir, f.name))
       )

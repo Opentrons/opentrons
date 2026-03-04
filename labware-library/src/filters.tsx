@@ -53,7 +53,6 @@ export function useFilters(location: Location<any>): FilterParams {
 export function buildFiltersUrl(filters: FilterParams): string {
   const params = pickBy(filters, v => v !== FILTER_OFF)
 
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   return `/?${queryString.stringify(params)}`
 }
 

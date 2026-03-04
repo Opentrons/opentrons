@@ -181,7 +181,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(
     () => {
       if (

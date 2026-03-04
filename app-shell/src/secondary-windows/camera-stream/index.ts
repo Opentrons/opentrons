@@ -68,7 +68,6 @@ function createCameraStreamUi({
   })
 
   cameraStreamWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // eslint-disable-next-line no-void
     void shell.openExternal(url)
     return { action: 'deny' }
   })

@@ -119,13 +119,11 @@ export const LabwareControls = (
   )
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     canDropRef.current = canDrop
   }, [canDrop])
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(
     () => {
       if (draggedLabware != null) {

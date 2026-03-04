@@ -121,7 +121,6 @@ export function LabwareStackToolbox({
     selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (selectedLabware[0] != null) {
       dispatch(openIngredientSelector(selectedLabware[0]))
