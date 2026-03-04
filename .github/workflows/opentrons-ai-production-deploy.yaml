@@ -29,7 +29,6 @@ jobs:
         env:
           OT_AI_CLIENT_MIXPANEL_ID: ${{ secrets.OT_AI_CLIENT_MIXPANEL_ID }}
         run: |
-          make build-ts
           make -C opentrons-ai-client build-production
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
