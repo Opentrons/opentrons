@@ -85,8 +85,10 @@ export function waitForRobotServerAndShowMainWindow(
     const ctrlOrMeta = input.control || input.meta
     const ctrlMeta = input.control && input.meta
 
-    // Ctrl + Shift + I from opening devtools
-    const isDevTools = ctrlOrMeta && input.shift && key === 'i'
+    // Open Chrome Devtools: Ctrl + Shift + i / ⌘+⌥+I
+    const isDevToolsByShift = ctrlOrMeta && input.shift && key === 'i'
+    const isDevToolsByAltMeta = input.meta && input.alt && key === 'i'
+    const isDevTools = isDevToolsByShift || isDevToolsByAltMeta
 
     // Reload Ctrl + R / Ctrl + Shift + R
     const isReload = ctrlOrMeta && key === 'r'
