@@ -1,22 +1,20 @@
 import asyncio
 import re
-from typing import Optional, Dict
-import time
-import csv
+from typing import Dict, Optional
+
+from serial.tools import list_ports
 
 from .abstract import AbstractVacuumModuleDriver
 from .errors import VacuumModuleErrorCodes
 from .types import (
     GCODE,
-    HardwareRevision,
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
     PressureState,
     PumpState,
-    VacuumModuleInfo,
     VentState,
 )
-import dataclasses
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 VM_BAUDRATE = 115200
@@ -42,7 +40,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     """Driver for Opentrons Vacuum Module."""
 
     @classmethod
-    def parse_device_info(cls, response: str) -> VacuumModuleInfo:
+    def parse_device_info(cls, response: str) -> Dict[str, str]:
         """Parse vacuum module info."""
         _RE = re.compile(
             f"^{GCODE.GET_DEVICE_INFO} FW:(?P<fw>\\S+) HW:Opentrons-vacuum-module-(?P<hw>\\S+) SerialNo:(?P<sn>\\S+)$"
@@ -50,9 +48,12 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         m = _RE.match(response)
         if not m:
             raise ValueError(f"Incorrect Response for device info: {response}")
-        return VacuumModuleInfo(
-            m.group("fw"), HardwareRevision(m.group("hw")), m.group("sn")
-        )
+
+        return {
+            "serial": m.group("sn"),
+            "version": m.group("fw"),
+            "model": m.group("hw"),
+        }
 
     @classmethod
     def parse_reset_reason(cls, response: str) -> int:
@@ -79,6 +80,23 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("H")),
             bool(int(match.group("E"))),
             VentState(int(match.group("V"))),
+        )
+
+    @classmethod
+    def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
+        """Parse the get pressure pid."""
+        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+)"
+        _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for get pressure pid: {response}")
+        return PressureControlTunings(
+            float(match.group("P")),
+            float(match.group("I")),
+            float(match.group("D")),
+            float(match.group("O")),
+            float(match.group("V")),
+            float(match.group("H")),
         )
 
     @classmethod
@@ -117,7 +135,24 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         )
         return cls(connection)
 
-    def __init__(self, connection: AsyncResponseSerialConnection, csv_path: str = "pump_test.csv") -> None:
+    @classmethod
+    async def create_from_sn(
+        cls, sn: str, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> "VacuumModuleDriver":
+        """Create a Vacuum Module driver using its serial number.."""
+        port_name = None
+        for port in list_ports.comports():
+            if port.serial_number == sn:
+                port_name = port.device
+                break
+        if not port_name:
+            raise ValueError(
+                f"Could not find connected vacuum module with serial number {sn}"
+            )
+
+        return await cls.create(port=port_name, loop=loop)
+
+    def __init__(self, connection: AsyncResponseSerialConnection) -> None:
         """
         Constructor
 
@@ -125,10 +160,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             connection: connection to the vacuum module
         """
         self._connection = connection
-        self._stop_requested = False
-        self._csv_initialized = False
-        self.csv_path = csv_path
-        self.st = time.perf_counter()
 
     async def connect(self) -> None:
         """Connect to vacuum module."""
@@ -147,7 +178,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self._connection._serial.reset_input_buffer()
         self._connection._serial.reset_output_buffer()
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         response = await self._connection.send_command(
             GCODE.GET_DEVICE_INFO.build_command()
@@ -157,7 +188,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             GCODE.GET_RESET_REASON.build_command()
         )
         reason = self.parse_reset_reason(reason_resp)
-        device_info.rr = reason
+        device_info["reset_reason"] = str(reason)
         return device_info
 
     async def enter_programming_mode(self) -> None:
@@ -243,7 +274,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             command.add_int("V", int(vent_after))
 
         resp = await self._connection.send_command(command)
-        print(f'response: {resp}')
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
 
@@ -289,71 +319,40 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")
 
-    async def _write_to_csv(self, timestamp: float, data: Dict) -> None:
-        """Append a data line to the CSV file (offloaded to a thread).
+    async def set_pressure_control_tunings(
+        self,
+        kp: Optional[float] = None,
+        ki: Optional[float] = None,
+        kd: Optional[float] = None,
+        overshoot: Optional[float] = None,
+        k_velocity: Optional[float] = None,
+        k_holding: Optional[float] = None,
+        reset: bool = False,
+    ) -> None:
+        """Sets the PID tuning parameters for the pressure control."""
 
-        Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
-        Adds the current `pressure_set` as the last column (may be None).
-        """
-        if len(data) < 7:
-            # Skip malformed/short lines quietly; caller should already filter, but be defensive
-            return
+        command = GCODE.SET_PRESSURE_PID.build_command()
+        if kp is not None:
+            command.add_float("P", kp, GCODE_ROUNDING_PRECISION)
+        if ki is not None:
+            command.add_float("I", ki, GCODE_ROUNDING_PRECISION)
+        if kd is not None:
+            command.add_float("D", kd, GCODE_ROUNDING_PRECISION)
+        if overshoot is not None:
+            command.add_float("O", overshoot, GCODE_ROUNDING_PRECISION)
+        if k_velocity is not None:
+            command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
+        if k_holding is not None:
+            command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
+        command.add_int("R", int(reset))
 
-        def _append() -> None:
-            write_header = not self._csv_initialized
-            with open(self.csv_path, "a", newline="") as f:
-                writer = csv.writer(f)
-                if write_header:
-                    writer.writerow([
-                        "Time(s)",
-                        "target_guage_pressure",
-                        "current_guage_pressure",
-                        "pressure_abs_a",
-                        "pressure_abs_b",
-                        "pressure_atm",
-                        "vacuum_enabled",
-                        "vent_state"
-                                     ])
-                    self._csv_initialized = True
-                writer.writerow([
-                    f"{timestamp:.2f}",
-                    f"{data['target_guage_pressure']}",
-                    f"{data['current_guage_pressure']}",
-                    f"{data['pressure_abs_a']}",
-                    f"{data['pressure_abs_b']}",
-                    f"{data['pressure_atm']}",
-                    f"{data['vacuum_enabled']}",
-                    f"{data['vent_state']}"
-                ])
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_PRESSURE_PID}$", resp):
+            raise ValueError(f"Incorrect Response for set pressure pid: {resp}")
 
-        await asyncio.to_thread(_append)
-    
-    def set_csv_filename(self, new_path: str) -> None:
-        """Set a new CSV file path for subsequent continuous logging.
-
-        Resets header initialization so the next write creates a header.
-        """
-        # If unchanged, do nothing
-        if new_path == self.csv_path:
-            return
-        self.csv_path = new_path
-        self._csv_initialized = False
-
-    async def read_continuous_data(self, start_time, run_time):
-        """Read and print continuous data from the vacuum pump for the specified timeout duration."""
-        loop_st = time.perf_counter()
-        try:
-            while time.perf_counter() - loop_st < run_time:
-                line = await self.get_vacuum_state()
-                await asyncio.sleep(0.1)
-                pressure_dict = dataclasses.asdict(line)
-                # Timestamp
-                ts = time.perf_counter() - start_time
-                # Record Pressure Data
-                await self._write_to_csv(ts, pressure_dict)
-        except Exception as e:
-            raise(e)
-        
-
-
-    
+    async def get_pressure_control_tunings(self) -> PressureControlTunings:
+        """Get the pressure control pid tunings."""
+        resp = await self._connection.send_command(
+            GCODE.GET_PRESSURE_PID.build_command()
+        )
+        return self.parse_get_pressure_pid(resp)

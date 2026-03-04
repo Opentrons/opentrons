@@ -1,21 +1,22 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from .abstract import AbstractVacuumModuleDriver
 from .types import (
-    HardwareRevision,
     LEDColor,
     LEDPattern,
     PressureState,
     PumpState,
-    VacuumModuleInfo,
     VentState,
 )
 from opentrons.util.async_helpers import ensure_yield
 
 
 class SimulatingDriver(AbstractVacuumModuleDriver):
-    def __init__(self, serial_number: Optional[str] = None) -> None:
-        self._serial_number = serial_number or "dummySerialFS"
+    def __init__(
+        self, model: Optional[str] = None, serial_number: Optional[str] = None
+    ) -> None:
+        self._serial_number = serial_number or "dummySerialVM"
+        self._model = model if model else "vacuumModuleV1"
         self.vent_state = VentState.OPENED
         self.vacuum_on = False
         self.pump_enabled = False
@@ -24,6 +25,9 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.current_pressure = 0.0
         self.target_rpm = 0
         self.current_rpm = 0
+
+    def model(self) -> str:
+        return self._model
 
     @ensure_yield
     async def connect(self) -> None:
@@ -40,10 +44,13 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     def reset_serial_buffers(self) -> None:
         pass
 
-    async def get_device_info(self) -> VacuumModuleInfo:
-        return VacuumModuleInfo(
-            fw="vacuum-fw", hw=HardwareRevision.NFF, sn=self._serial_number
-        )
+    async def get_device_info(self) -> Dict[str, str]:
+        return {
+            "serial": self._serial_number,
+            "version": "vacuum-fw",
+            "model": self._model,
+            "reset_reason": str(0),
+        }
 
     async def enter_programming_mode(self) -> None:
         pass
