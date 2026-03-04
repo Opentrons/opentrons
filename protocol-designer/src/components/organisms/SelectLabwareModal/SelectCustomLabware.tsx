@@ -80,7 +80,6 @@ export function SelectCustomLabware(
               },
               model: FLEX_STACKER_MODULE_V1,
             })
-
             const lidProps: StackingProps | null =
               slot !== 'offDeck' &&
               universalLid != null &&
@@ -109,7 +108,7 @@ export function SelectCustomLabware(
                                 labwareDefURI:
                                   selectedLidLabware === universalLid[0]
                                     ? null
-                                    : uri,
+                                    : `opentrons/${universalLid[1].parameters.loadName}/${universalLid[1].version}`,
                               })
                             )
                           },
