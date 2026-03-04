@@ -52,3 +52,7 @@ export const getEnableAdditionalPartialTipSelection: Selector<boolean> =
     getFeatureFlagData,
     flags => flags.OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION ?? false
   )
+export const getEnableVacuumModule: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_VACUUM_MODULE ?? false
+)
