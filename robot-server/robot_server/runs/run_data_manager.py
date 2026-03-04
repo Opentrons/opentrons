@@ -147,10 +147,6 @@ class PreSerializedCommandsNotAvailableError(LookupError):
     """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
 
-class PreSerializedCommandAnnotationsNotAvailableError(Exception):
-    """Exception raised when a run's command annotations are not available as pre-serialized list."""
-
-
 class RunDataManager:
     """Collaborator to manage current and historical run data.
 
@@ -592,21 +588,6 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_command_annotation(annotation_id)
         return self._run_store.get_command_annotation(run_id, annotation_id)
-
-    def get_command_annotations_as_unverified_objects_list(
-        self, run_id: str
-    ) -> List[Dict[str, Optional[str]]]:
-        """Get all command annotations of a run in a serialized json list."""
-        if (
-            run_id == self._run_orchestrator_store.current_run_id
-            and not self._run_orchestrator_store.get_is_run_terminal()
-        ):
-            raise PreSerializedCommandAnnotationsNotAvailableError(
-                "Pre-serialized commands are only available after a run has ended."
-            )
-        return self._run_store.get_command_annotations_as_unverified_objects_list(
-            run_id
-        )
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""

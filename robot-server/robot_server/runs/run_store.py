@@ -724,31 +724,6 @@ class RunStore:
 
         return _parse_command(command)
 
-    def get_command_annotations_as_unverified_objects_list(
-        self, run_id: str
-    ) -> List[Dict[str, Optional[str]]]:
-        """Get all command annotations of the run as a list of unverified dict entries."""
-        with self._sql_engine.begin() as transaction:
-            if not self._run_exists(run_id, transaction):
-                raise RunNotFoundError(run_id=run_id)
-            select_command_annotations = (
-                sqlalchemy.select(command_annotation_table)
-                .where(command_annotation_table.c.run_id == run_id)
-                .order_by(sqlite_rowid.asc())
-            )
-            result = transaction.execute(select_command_annotations).all()
-        return [
-            {
-                "id": row.annotation_id,
-                "source": row.source.value,
-                "name": row.name,
-                "description": row.description,
-                "parentId": row.parent_id,
-                "params": row.params,
-            }
-            for row in result
-        ]
-
     def get_total_command_annotations_count(self, run_id: str) -> int:
         """Get total command annotations count of the run."""
         with self._sql_engine.begin() as transaction:

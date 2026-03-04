@@ -1021,44 +1021,6 @@ def test_get_command_annotations_slice(
     assert result == expected_result
 
 
-def test_get_command_annotation_as_preserialized_list(
-    subject: RunStore,
-    protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
-    state_summary: StateSummary,
-) -> None:
-    """Should return a run command annotation from the db."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=protocol_commands,
-        command_annotations=command_annotations,
-        run_time_parameters=[],
-    )
-    result = subject.get_command_annotations_as_unverified_objects_list("run-id")
-    assert result == [
-        {
-            "id": "annotation-1",
-            "source": "userCommand",
-            "name": "A notation",
-            "description": "A notation description",
-            "parentId": None,
-            "params": "{}",
-        },
-        {
-            "id": "annotation-2",
-            "source": "userCommand",
-            "name": "An other notation",
-            "description": "An other notation description",
-            "parentId": "annotation-1",
-            "params": "{}",
-        },
-    ]
-
-
 @pytest.mark.parametrize(
     "input_run_id, input_command_id, expected_exception",
     [
