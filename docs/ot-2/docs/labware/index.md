@@ -1,6 +1,6 @@
 ---
 title: "Opentrons OT-2: Labware"
-description: "How the OT-2 uses labware in software and on the deck; concepts and definitions."
+description: "How the OT-2 uses labware in software and on the deck."
 ---
 
 This chapter covers how the OT-2 works with labware, both in software and on the robot deck itself.

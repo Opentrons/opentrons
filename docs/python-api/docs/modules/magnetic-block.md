@@ -1,6 +1,6 @@
 ---
 title: "Python API: Magnetic Block"
-description: "Control the Flex Magnetic Block: engage and disengage in protocols."
+description: "Use the Magnetic Block with the Flex Gripper in protocols."
 ---
 
 !!! note "Flex only"

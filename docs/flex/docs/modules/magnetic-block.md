@@ -1,6 +1,6 @@
 ---
 title: "Opentrons Flex: Magnetic Block"
-description: "Magnetic Block for bead-based purification on Flex; installation and use."
+description: "Installation and use of the Magnetic Block for bead-based purification on Flex."
 ---
 
 ![The Magnetic Block has an array of 96 high-strength magnets.](../images/magnetic-block.png "Magnetic Block")

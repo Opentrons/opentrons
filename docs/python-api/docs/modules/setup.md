@@ -1,6 +1,6 @@
 ---
 title: "Python API: Module Setup"
-description: "Load modules and connect them to the protocol context."
+description: "Load modules and make them available in your protocol."
 ---
 
 ## Loading modules onto the deck

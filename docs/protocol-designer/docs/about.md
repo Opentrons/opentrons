@@ -1,6 +1,6 @@
 ---
 title: "Protocol Designer: About"
-description: "Four-step workflow: create protocol, starting deck, steps, and export."
+description: "How to use Protocol Designer to build protocols for the Opentrons Flex or OT-2."
 ---
 
 In Protocol Designer, you'll define the hardware, labware, and liquids the robot will use during a protocol. This manual details how to use Protocol Designer to build protocols for the Opentrons Flex or OT-2 in four steps: 

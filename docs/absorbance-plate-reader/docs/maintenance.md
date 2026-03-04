@@ -1,6 +1,6 @@
 ---
 title: "Plate Reader: Maintenance and Cleaning"
-description: "Cleaning procedures and when to contact support; no user-repairable parts."
+description: "Cleaning procedures and when to contact support for the Absorbance Plate Reader."
 hide: toc
 ---
 

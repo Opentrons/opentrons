@@ -1,6 +1,6 @@
 ---
 title: "Opentrons OT-2: Labware Types"
-description: "Reservoirs, well plates, tube racks, and other labware types in the Library."
+description: "Reservoirs, well plates, tube racks, and other labware types in the Labware Library."
 ---
 
 This section covers the different types of labware included in the Opentrons Labware Library for use with the OT-2.

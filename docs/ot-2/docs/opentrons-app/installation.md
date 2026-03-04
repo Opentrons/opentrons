@@ -1,6 +1,6 @@
 ---
 title: "Opentrons OT-2: Installing the App"
-description: "System requirements, download, and install the Opentrons App on Windows, macOS, or Linux."
+description: "System requirements, download, and installation for the Opentrons App on Windows, macOS, or Linux."
 ---
 
 Start here for step-by-step instructions for downloading, installing, and updating the Opentrons App.

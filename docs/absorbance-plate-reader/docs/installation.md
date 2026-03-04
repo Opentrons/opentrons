@@ -1,6 +1,6 @@
 ---
 title: "Plate Reader: Installation"
-description: "Attach the plate reader to a Flex deck slot and connect USB; no calibration needed."
+description: "How to attach the plate reader in a deck slot and connect to Opentrons Flex."
 hide: toc
 ---
 

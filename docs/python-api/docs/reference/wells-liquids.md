@@ -1,6 +1,6 @@
 ---
 title: "Python API Reference: Wells and Liquids"
-description: "Well and liquid handling API reference for the Python Protocol API."
+description: "Well and Liquid class reference for the Python Protocol API."
 ---
 
 ::: opentrons.protocol_api.Well

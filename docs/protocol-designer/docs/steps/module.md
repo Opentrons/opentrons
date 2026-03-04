@@ -1,6 +1,6 @@
 ---
 title: "Protocol Designer: Module steps"
-description: "Control module actions: temperature, thermocycler, magnet, and more."
+description: "Control module actions: Heater-Shaker, Temperature Module, Thermocycler, and more."
 ---
 
 When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:

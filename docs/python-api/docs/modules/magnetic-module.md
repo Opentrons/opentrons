@@ -1,6 +1,6 @@
 ---
 title: "Python API: Magnetic Module"
-description: "Control the Magnetic Module: engage and disengage height in protocols."
+description: "Control the OT-2 Magnetic Module: engage and disengage height in protocols."
 ---
 
 !!! note "OT-2 only"
