@@ -1,5 +1,6 @@
 ---
 title: "Thermocycler Module"
+description: "On-deck thermocycler for PCR; heated lid, 96-well format, Flex and OT-2 compatible."
 hide: toc
 ---
 

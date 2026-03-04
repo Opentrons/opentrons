@@ -1,5 +1,6 @@
 ---
 title: "Python API: Liquid Classes"
+description: "Liquid classes for flow rates and tip handling in the Python API."
 ---
 
 Accounting for properties of liquids in your protocol can increase pipetting accuracy on the Flex. For example, a slower flow rate can improve pipetting for a viscous liquid, and an air gap can prevent a volatile liquid from dripping onto the deck.

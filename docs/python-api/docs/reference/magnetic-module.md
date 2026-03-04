@@ -1,5 +1,6 @@
 ---
 title: "Python API Reference: Magnetic Module"
+description: "Magnetic Module class reference for the Python Protocol API (OT-2)."
 ---
 
 ::: opentrons.protocol_api.MagneticModuleContext

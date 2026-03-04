@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Modules"
+description: "OT-2-compatible modules: Heater-Shaker, HEPA, Magnetic, Temperature, Thermocycler."
 ---
 
 Modules are a class of deck or externally mounted hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.

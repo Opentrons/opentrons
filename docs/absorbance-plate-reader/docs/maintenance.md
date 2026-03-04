@@ -1,5 +1,6 @@
 ---
 title: "Plate Reader: Maintenance and Cleaning"
+description: "Cleaning procedures and when to contact support; no user-repairable parts."
 hide: toc
 ---
 

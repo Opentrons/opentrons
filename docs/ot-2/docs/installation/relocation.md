@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Relocation"
+description: "How to prepare and move the OT-2 for short or long-distance relocation."
 ---
 
 This section provides instructions about how prepare your OT-2 for moving and transportation.

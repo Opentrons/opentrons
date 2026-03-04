@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Modules"
+description: "Flex-compatible modules: Heater-Shaker, HEPA/UV, Temperature, Thermocycler, and more."
 ---
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.

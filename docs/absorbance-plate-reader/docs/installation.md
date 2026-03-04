@@ -1,5 +1,6 @@
 ---
 title: "Plate Reader: Installation"
+description: "Attach the plate reader to a Flex deck slot and connect USB; no calibration needed."
 hide: toc
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Thermocycler"
+description: "Thermocycler Module on Flex: on-deck PCR; installation and use."
 ---
 
 ![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../images/thermocycler.png "Thermocycler")

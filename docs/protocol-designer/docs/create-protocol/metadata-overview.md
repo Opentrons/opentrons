@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Metadata and Overview"
+description: "Protocol title, description, author, and overview summary."
 ---
 
 ## Protocol metadata

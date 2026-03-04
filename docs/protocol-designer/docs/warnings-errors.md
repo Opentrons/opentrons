@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Warnings and Errors"
+description: "How to resolve validation warnings and errors before exporting."
 ---
 
 To prevent errors, Protocol Designer displays hints, warnings, and error descriptions as you create a protocol. This section covers types and causes of warnings and errors in Protocol Designer. 

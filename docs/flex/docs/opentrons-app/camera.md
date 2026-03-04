@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Using the Camera"
+description: "Live monitoring, automatic image capture, and downloading protocol images."
 ---
 
 ## Camera features and controls

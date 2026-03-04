@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Magnetic Module"
+description: "Magnetic Module for bead-based purification; discontinued but specifications included."
 ---
 
 ![Magnetic module](../images/magnetic-module.png)
