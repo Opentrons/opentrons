@@ -25,7 +25,7 @@ stages:
           userName: test_new_user
           fullName: Test New User
           accountType: user
-          scopes: [users.write]
+          scopes: [runs.write]
 
   - name: Create a new user with a password less than 8 characters
     request:
@@ -57,7 +57,7 @@ stages:
           accountType: user
           fullName: Test New User
           userName: test_new_user
-          scopes: [users.write]
+          scopes: [runs.write]
 
   - name: Update the user
     request:
@@ -76,7 +76,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user
-          scopes: [users.write]
+          scopes: [auth_settings.write, runs.write, users.read, users.write]
 
   - name: Update the username and password
     request:
@@ -95,7 +95,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user_updated
-          scopes: [users.write]
+          scopes: [auth_settings.write, runs.write, users.read, users.write]
 
   - name: Get a new access token with the updated username and password
     request:
