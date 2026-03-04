@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - edge
+      - AUTH-2174-streaming # remove before merging
     paths:
       - 'opentrons-ai-server/**'
       - '.github/workflows/opentrons-ai-server-staging-continuous-deploy.yaml'
