@@ -76,6 +76,9 @@ export function waitForRobotServerAndShowMainWindow(
     mainWindow.webContents.send('window-type', 'odd-main')
   })
 
+  // prevent fullscreen for safe
+  mainWindow.setFullScreen(false)
+
   // prevent Electron shortcuts that Desktop app shows in menu
   mainWindow.webContents.on('before-input-event', (event, input) => {
     const key = input.key.toLowerCase()
