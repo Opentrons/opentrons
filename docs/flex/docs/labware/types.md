@@ -57,41 +57,36 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
 
+!!! note
+    Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes.
+
 ### Tip sterility
 
 Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants. Tips are sterilized based on ANSI/AAMI/ISO 11137 standards with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package includes a letter describing our test procedures and certifies that every lot is free of common contaminants such as DNase, RNase, endotoxins (pyrogens), human DNA, PCR inhibitors, and protease.
 
 ### Tip racks 
 
-Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid. 
+Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a labelled mid-plate that holds 96 tips, and a lid.
 
-To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Opentrons recommends using sealed tips within three years from the production date. Additionally, racks are color coded based on the maximum rated volume for each tip type: 
+To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Opentrons recommends using sealed tips within three years from the production date. Additionally, racks are color coded and labelled based on the maximum rated volume for each tip type.
 
-- 50 µL: magenta 
-- 200 µL: yellow 
-- 1000 µL: blue 
-
-![50 µL tip rack in magenta, 200 µL tip rack in yellow, and 1000 µL tip rack in blue.](../images/labware-flex-tip-racks.png "Flex tip racks")
+<figure markdown>
+![test](../images/tip-rack-with-labels.png)
+</figure>
+<!---
+![20 µL tip rack in green, 50 µL tip rack in magenta, 200 µL tip rack in yellow, and 1000 µL tip rack in blue.](../images/labware-flex-tip-racks.png "Flex tip racks") --->
 
 When ordering or reordering, tips and racks come in two different packaged configurations: 
 
 - **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse. 
 - **Refills:** Consist of one complete tip rack (base plate, mid plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
 
-### Tip-pipette compatibility 
+### Tip-pipette combinations
 
-Flex pipette tips are designed for the Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
+You can attach any Flex pipette tip to any Flex pipette, regardless of tip size. However, to help ensure optimal accuracy and prevent damage to the pipette, always select a tip based on transfer volume and the pipette's volume range. When selecting a tip and pipette combination:
 
-Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
-
-| Pipette capacity | Compatible tips             |
-| :--------------- | :-------------------------- |
-| 1–50 µL          | 50 µL tips only             |
-| 5–1000 µL        | 50 µL, 200 µL, and 1000 µL tips |
-
-For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate. See [Pipette specifications][pipette-specifications] for examples. 
-
-Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes. 
+- **Do not exceed tip capacity**: To prevent liquid entering the pipette body, never aspirate a volume larger than the tip's rated capacity.
+- **Match tip to volume**: For best performance, use the smallest tip and pipette that can hold your target volume. For example, using a 1000 µL tip to move 5 µL of liquid may not give you the best results.
 
 ### Tip rack adapter 
 
