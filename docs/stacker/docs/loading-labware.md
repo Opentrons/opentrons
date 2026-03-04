@@ -1,6 +1,6 @@
 ---
 title: "Flex Stacker: Loading Labware"
-description: "How to load and unload labware in the Stacker; one labware type per Stacker."
+description: "How to load and unload labware in the Stacker."
 ---
 
 ## Loading Labware

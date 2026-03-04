@@ -1,6 +1,6 @@
 ---
 title: "Flex Stacker: Maintenance and Cleaning"
-description: "Cleaning procedures and when to contact support; no user servicing."
+description: "Cleaning procedures and when to contact support."
 ---
 
 ## Maintenance

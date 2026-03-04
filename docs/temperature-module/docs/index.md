@@ -1,6 +1,6 @@
 ---
 title: "Temperature Module GEN2 Instruction Manual"
-description: "Hot and cold plate module (4–95 °C) for Flex and OT-2; thermal block adapters."
+description: "Hot and cold plate module (4–95 °C) for Flex and OT-2."
 hide: toc
 ---
 

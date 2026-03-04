@@ -1,4 +1,5 @@
 site_name: Opentrons Documentation
+site_description: Documentation for Opentrons liquid handling robots, hardware, and software.
 
 docs_dir: ./shared
 
