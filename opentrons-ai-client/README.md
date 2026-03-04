@@ -2,7 +2,7 @@
 
 ## Overview
 
-OpentronsAI is a web application that generates and updates Opentrons Python protocols from natural language descriptions. It communicates with the [opentrons-ai-server][] backend over a streaming HTTP (SSE) API.
+OpentronsAI is a web application that generates and updates Opentrons Python protocols from natural language descriptions. It communicates with the [opentrons-ai-server][] backend over a JSON HTTP API.
 
 ## Developing
 
@@ -54,25 +54,23 @@ The UI stack is built using:
 
 Some important directories and files:
 
-- `src/resources/hooks/useInputPromptController.ts` — main submit logic; dispatches to the correct SSE stream endpoint
-- `src/resources/utils/streamChatApi.ts` — SSE stream client (parses `data: {"delta": "..."}` and `data: {"done": true}` events)
+- `src/resources/hooks/useInputPromptController.ts` — main submit logic; builds the request config and calls the appropriate API endpoint
+- `src/resources/utils/buildRequestConfig.ts` — builds the Axios request config (URL, headers, body) for each endpoint type
 - `src/resources/atoms.ts` — Jotai atoms; feature flags are persisted in `localStorage` via `atomWithStorage`
 - `src/feature-flags/types.ts` — feature flag type definitions; `DEPRECATED_FLAGS` lists removed flags so stale `localStorage` values are cleaned up
 - `src/resources/constants.ts` — API base URL and Auth0 configuration (environment-driven)
 - [opentrons-ai-server][] — backend server
 
-## Streaming
+## API endpoints
 
-All chat responses are streamed via [Server-Sent Events (SSE)][sse]. The client calls one of four endpoints depending on request type:
+The client calls one of four JSON endpoints depending on request type:
 
-| Request type                 | Endpoint                                     |
-| ---------------------------- | -------------------------------------------- |
-| Update protocol (no files)   | `POST /api/chat/update-protocol/stream`      |
-| Create protocol (no files)   | `POST /api/chat/create-protocol/stream`      |
-| Chat completion (no files)   | `POST /api/chat/completion/stream`           |
-| Chat completion (with files) | `POST /api/chat/completion-multipart/stream` |
-
-The server streams `data: {"delta": "..."}` events as the model generates output, followed by `data: {"done": true}` when complete. `streamChatApi` accumulates deltas and calls `onDelta` / `onDone` / `onError` callbacks.
+| Request type                 | Endpoint                              |
+| ---------------------------- | ------------------------------------- |
+| Update protocol (no files)   | `POST /api/chat/update-protocol`      |
+| Create protocol (no files)   | `POST /api/chat/create-protocol`      |
+| Chat completion (no files)   | `POST /api/chat/completion`           |
+| Chat completion (with files) | `POST /api/chat/completion-multipart` |
 
 ## Feature flags
 
@@ -119,4 +117,3 @@ Test tasks accept these arguments:
 [jotai]: https://jotai.org/
 [styled-components]: https://styled-components.com/
 [opentrons-ai-server]: https://github.com/Opentrons/opentrons/tree/edge/opentrons-ai-server
-[sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events

@@ -5,32 +5,16 @@ export const STAGING_FEEDBACK_END_POINT =
   'https://staging.opentrons.ai/api/chat/feedback'
 export const STAGING_CREATE_PROTOCOL_END_POINT =
   'https://staging.opentrons.ai/api/chat/create-protocol'
-export const STAGING_CREATE_PROTOCOL_STREAM_END_POINT =
-  'https://staging.opentrons.ai/api/chat/create-protocol/stream'
 export const STAGING_UPDATE_PROTOCOL_END_POINT =
   'https://staging.opentrons.ai/api/chat/update-protocol'
-export const STAGING_UPDATE_PROTOCOL_STREAM_END_POINT =
-  'https://staging.opentrons.ai/api/chat/update-protocol/stream'
-export const STAGING_COMPLETION_STREAM_END_POINT =
-  'https://staging.opentrons.ai/api/chat/completion/stream'
-export const STAGING_COMPLETION_MULTIPART_STREAM_END_POINT =
-  'https://staging.opentrons.ai/api/chat/completion-multipart/stream'
 
 export const PROD_END_POINT = 'https://ai.opentrons.com/api/chat/completion'
 export const PROD_FEEDBACK_END_POINT =
   'https://ai.opentrons.com/api/chat/feedback'
 export const PROD_CREATE_PROTOCOL_END_POINT =
   'https://ai.opentrons.com/api/chat/create-protocol'
-export const PROD_CREATE_PROTOCOL_STREAM_END_POINT =
-  'https://ai.opentrons.com/api/chat/create-protocol/stream'
 export const PROD_UPDATE_PROTOCOL_END_POINT =
   'https://ai.opentrons.com/api/chat/update-protocol'
-export const PROD_UPDATE_PROTOCOL_STREAM_END_POINT =
-  'https://ai.opentrons.com/api/chat/update-protocol/stream'
-export const PROD_COMPLETION_STREAM_END_POINT =
-  'https://ai.opentrons.com/api/chat/completion/stream'
-export const PROD_COMPLETION_MULTIPART_STREAM_END_POINT =
-  'https://ai.opentrons.com/api/chat/completion-multipart/stream'
 
 // auth0 domain
 export const AUTH0_DOMAIN = 'identity.auth.opentrons.com'
@@ -50,16 +34,8 @@ export const LOCAL_AUTH0_DOMAIN = 'identity.auth-dev.opentrons.com'
 export const LOCAL_END_POINT = 'http://localhost:8000/api/chat/completion'
 export const LOCAL_CREATE_PROTOCOL_END_POINT =
   'http://localhost:8000/api/chat/create-protocol'
-export const LOCAL_CREATE_PROTOCOL_STREAM_END_POINT =
-  'http://localhost:8000/api/chat/create-protocol/stream'
 export const LOCAL_UPDATE_PROTOCOL_END_POINT =
   'http://localhost:8000/api/chat/update-protocol'
-export const LOCAL_UPDATE_PROTOCOL_STREAM_END_POINT =
-  'http://localhost:8000/api/chat/update-protocol/stream'
-export const LOCAL_COMPLETION_STREAM_END_POINT =
-  'http://localhost:8000/api/chat/completion/stream'
-export const LOCAL_COMPLETION_MULTIPART_STREAM_END_POINT =
-  'http://localhost:8000/api/chat/completion-multipart/stream'
 export const LOCAL_FEEDBACK_END_POINT =
   'http://localhost:8000/api/chat/feedback'
 

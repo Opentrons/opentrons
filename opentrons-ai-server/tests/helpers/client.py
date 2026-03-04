@@ -1,15 +1,12 @@
-import json
 import time
-from dataclasses import dataclass, field
 from functools import wraps
-from typing import Any, Callable, Iterator, Optional, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 from api.models.chat_request import ChatRequest, FakeKeys
 from api.models.feedback_request import FeedbackRequest
 from httpx import Client as HttpxClient
 from httpx import Response, Timeout
 from rich.console import Console, Group
-from rich.live import Live
 from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.prompt import Prompt
@@ -38,32 +35,6 @@ def timeit(func: F) -> F:
 console = Console()
 
 
-@dataclass
-class SseResult:
-    """Collected result from a streaming SSE endpoint."""
-
-    status_code: int
-    headers: dict[str, str]
-    events: list[dict[str, Any]] = field(default_factory=list)
-
-
-def iter_sse_events(lines: Iterator[str]) -> Iterator[dict[str, Any]]:
-    """Yield parsed SSE event payloads from a line iterator (e.g. httpx stream.iter_lines()).
-
-    Skips blank lines and non-data lines; silently drops malformed JSON.
-    """
-    for line in lines:
-        if not line.startswith("data: "):
-            continue
-        payload_str = line[6:].strip()
-        if not payload_str:
-            continue
-        try:
-            yield json.loads(payload_str)
-        except json.JSONDecodeError:
-            continue
-
-
 class Client:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -75,7 +46,7 @@ class Client:
             **self.type_headers,
             **self.auth_headers,
         }
-        # Read/write allow 5-minute streaming (match server request_timeout_seconds) plus buffer
+        # Read/write allow 5-minute requests (match server request_timeout_seconds) plus buffer
         self.timeout = Timeout(connect=5.0, read=320.0, write=320.0, pool=5.0)
         self.httpx = HttpxClient(base_url=self.settings.BASE_URL, timeout=self.timeout)
 
@@ -121,59 +92,6 @@ class Client:
         """Call the OPTIONS endpoint and return the response."""
         return self.httpx.options("/chat/completions", headers=self.type_headers)
 
-    def post_update_protocol_stream(self, body: dict[str, Any], bad_auth: bool = False) -> SseResult:
-        """Stream /chat/update-protocol/stream; collect and return all SSE events."""
-        headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        with self.httpx.stream("POST", "/chat/update-protocol/stream", headers=headers, json=body) as r:
-            events = list(iter_sse_events(r.iter_lines()))
-        return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
-
-    def post_create_protocol_stream(self, body: dict[str, Any], bad_auth: bool = False) -> SseResult:
-        """Stream /chat/create-protocol/stream; collect and return all SSE events."""
-        headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        with self.httpx.stream("POST", "/chat/create-protocol/stream", headers=headers, json=body) as r:
-            events = list(iter_sse_events(r.iter_lines()))
-        return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
-
-    def post_completion_stream(self, body: dict[str, Any], bad_auth: bool = False) -> SseResult:
-        """Stream /chat/completion/stream; collect and return all SSE events."""
-        headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        with self.httpx.stream("POST", "/chat/completion/stream", headers=headers, json=body) as r:
-            events = list(iter_sse_events(r.iter_lines()))
-        return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
-
-    def post_completion_multipart_stream(
-        self,
-        message: str = "Hello",
-        history: str = "[]",
-        fake: bool = True,
-        fake_key: Optional[str] = None,
-        protocol_format: str = "python",
-        bad_auth: bool = False,
-        file_uploads: Optional[list[tuple[str, bytes]]] = None,
-    ) -> SseResult:
-        """Stream /chat/completion-multipart/stream with form fields and optional files; return all SSE events.
-
-        file_uploads: list of (filename, content) for the current message. Filenames must be
-        msgN_originalname (e.g. msg0_doc.txt) so the server maps them to the message index.
-        """
-        headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        headers = {k: v for k, v in headers.items() if k.lower() != "content-type"}
-        form: list[tuple[str, tuple[Any, Any]]] = [
-            ("message", (None, message)),
-            ("history", (None, history)),
-            ("fake", (None, str(fake).lower())),
-            ("protocol_format", (None, protocol_format)),
-        ]
-        if fake_key is not None:
-            form.append(("fake_key", (None, fake_key)))
-        if file_uploads:
-            for filename, content in file_uploads:
-                form.append(("files", (filename, content)))
-        with self.httpx.stream("POST", "/chat/completion-multipart/stream", headers=headers, files=form) as r:
-            events = list(iter_sse_events(r.iter_lines()))
-        return SseResult(status_code=r.status_code, headers=dict(r.headers), events=events)
-
 
 def print_response(response: Response) -> None:
     """Prints the HTTP response using rich."""
@@ -218,43 +136,6 @@ def main() -> None:
         console.print(Rule("Getting OPTIONS", style="bold"))
         response = client.get_options()
         print_response(response)
-
-        console.print(Rule("Stream update-protocol (fake, live)", style="bold"))
-        body = {
-            "prompt": "Add a step",
-            "protocol_text": "def run(protocol): pass",
-            "regenerate": False,
-            "update_type": "other",
-            "update_details": "add step",
-            "fake": True,
-            "fake_key": "streaming_3s",
-        }
-        headers = {k: v for k, v in client.standard_headers.items() if k.lower() != "content-type"}
-        headers["Content-Type"] = "application/json"
-        accumulated = Text()
-        with Live(
-            Panel(accumulated, title="[bold cyan]update-protocol/stream[/bold cyan]", border_style="cyan"),
-            console=console,
-            refresh_per_second=15,
-        ) as live:
-            with client.httpx.stream("POST", "/chat/update-protocol/stream", headers=headers, json=body) as stream_resp:
-                live.update(
-                    Panel(
-                        accumulated,
-                        title=f"[bold cyan]update-protocol/stream[/bold cyan] — {stream_resp.status_code}",
-                        border_style="cyan",
-                    )
-                )
-                for evt in iter_sse_events(stream_resp.iter_lines()):
-                    if "delta" in evt:
-                        accumulated.append(evt["delta"])
-                        live.update(
-                            Panel(
-                                accumulated,
-                                title=f"[bold cyan]update-protocol/stream[/bold cyan] — {stream_resp.status_code}",
-                                border_style="cyan",
-                            )
-                        )
 
         console.print(Rule("Now interact", style="bold"))
         real = Prompt.ask("Actually call Anthropic API?", choices=["y", "n"], default="n")
