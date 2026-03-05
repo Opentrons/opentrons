@@ -25,35 +25,6 @@ from auth_server.users.user_data_manager import (
 router = fastapi.APIRouter()
 
 
-def _validate_user_create_input(
-    user_name: str | None = None,
-    password: str | None = None,
-    full_name: str | None = None,
-    account_type: str | None = None,
-) -> None:
-    """Validate required fields for user creation. Raises HTTPException if any are empty."""
-    if (
-        user_name is not None
-        and user_name == ""
-        or password is not None
-        and password == ""
-        or full_name is not None
-        and full_name == ""
-        or account_type is not None
-        and account_type == ""
-    ):
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="Bad request",
-        )
-
-    if password is not None and len(password) < 8:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters long",
-        )
-
-
 @PydanticResponse.wrap_route(
     router.post,
     path="/auth/users",
@@ -75,7 +46,6 @@ async def post_users(
     """Create a user."""
     # todo(mm, 2026-02-20): The new user's scopes should either depend on their account type,
     # or they should be passed in the request body.
-    scopes_for_new_user = [Scope.USERS_WRITE]
     user_create = request_body.data
     try:
         new_user = user_data_manager.create_user(
@@ -89,14 +59,11 @@ async def post_users(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
         )
-    # once we store it in the db we can have a unique id as well.
-    new_user = add(
-        username=user_create.userName,
-        password=user_create.password.get_secret_value(),
-        full_name=user_create.fullName,
-        account_type=user_create.accountType,
-        scopes=scopes_for_new_user,
-    )
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(data=new_user),
@@ -123,8 +90,9 @@ async def get_user(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    user = get(userName)
-    if user is None:
+    try:
+        user = user_data_manager.get_user(userName)
+    except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
@@ -154,10 +122,13 @@ async def delete_user(
     ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    user = get(userName)
-    if user is None:
-        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-    remove(user)
+    try:
+        user_data_manager.delete_user(userName)
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
         status_code=fastapi.status.HTTP_200_OK,
@@ -184,28 +155,27 @@ async def update_user(
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
-    update_user = request_body.data
-    _validate_user_create_input(
-        user_name=update_user.userName,
-        password=update_user.password.get_secret_value()
-        if update_user.password is not None
-        else None,
-        full_name=update_user.fullName,
-        account_type=update_user.accountType,
-    )
-    user = get(userName)
-    if user is None:
-        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-
-    updated_user = update(
-        user,
-        username=update_user.userName,
-        password=update_user.password.get_secret_value()
-        if update_user.password is not None
-        else None,
-        full_name=update_user.fullName,
-        account_type=update_user.accountType,
-    )
+    update_data = request_body.data
+    try:
+        updated_user = user_data_manager.update_user(
+            userName,
+            new_username=update_data.userName,
+            password=update_data.password.get_secret_value()
+            if update_data.password is not None
+            else None,
+            full_name=update_data.fullName,
+            account_type=update_data.accountType,
+        )
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=updated_user),

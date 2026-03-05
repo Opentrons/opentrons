@@ -15,7 +15,9 @@ from server_utils.auth.resource_server.fastapi_dependencies import (
 
 from auth_server.authorization_checker import build_authorization_checker
 from auth_server.oauth2.backend import build as build_oauth2_backend
-from auth_server.oauth2.fastapi_dependencies import install_oauth2_backend
+from auth_server.oauth2.fastapi_dependencies import (
+    install_oauth2_backend,
+)
 from auth_server.oauth2.router import router as oauth2_router
 from auth_server.persistence.database import sql_engine_ctx
 from auth_server.persistence.fastapi_dependencies import (
@@ -49,14 +51,33 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     settings_store = SettingsStore()
     install_settings_store(app.state, settings_store)
 
-    oauth2_backend = build_oauth2_backend()
-    install_oauth2_backend(app.state, oauth2_backend)
+    settings = get_settings()
+    persistence_directory_root = _get_persistence_directory_root(settings)
+    prepared_root = await prepare_root(persistence_directory_root)
+    set_persistence_directory(app.state, prepared_root)
 
-    authorization_checker = build_authorization_checker(settings_store, oauth2_backend)
-    install_authorization_checker(app.state, authorization_checker)
+    active_subdirectory = await prepare_active_subdirectory(prepared_root)
+    db_path = active_subdirectory / DB_FILE
 
-    systemd_utils.notify_up()
-    yield
+    with sql_engine_ctx(db_path) as engine:
+        set_sql_engine(app.state, engine)
+
+        user_store = UserStore(sql_engine=engine)
+        oauth2_backend = build_oauth2_backend(user_store)
+        install_oauth2_backend(app.state, oauth2_backend)
+        user_service = UserDataManager(user_store=user_store)
+        user_service.seed_initial_users()
+
+        settings_store = SettingsStore()
+        install_settings_store(app.state, settings_store)
+
+        authorization_checker = build_authorization_checker(
+            settings_store, oauth2_backend
+        )
+        install_authorization_checker(app.state, authorization_checker)
+
+        systemd_utils.notify_up()
+        yield
 
 
 app = FastAPI(
