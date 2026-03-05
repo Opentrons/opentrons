@@ -31,7 +31,7 @@ def upgrade() -> None:
     )
     op.execute(
     users.update()
-    .where(users.c.email is None)
+    .where(users.c.email.is_(None))
     .values(email=sa.func.concat(users.c.username, 'test_user@opentrons.com'))
 )
 
