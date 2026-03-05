@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useRef } from 'react'
 import styled, { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -12,7 +12,7 @@ import {
   TEXT_ALIGN_RIGHT,
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 import { Tooltip } from '../Tooltip'
 
@@ -20,10 +20,9 @@ import type {
   ChangeEventHandler,
   FocusEvent,
   MouseEvent,
-  MutableRefObject,
   ReactNode,
+  RefObject,
 } from 'react'
-import type { IconName } from '../../icons'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const LEGACY_INPUT_TYPE_TEXT = 'text' as const
@@ -48,7 +47,7 @@ export interface InputFieldProps {
   /** if included, InputField will use error style and display error instead of caption */
   error?: string | null
   /** optional title */
-  title?: string | null
+  title?: string | null // ToDo chnage this prop to "label"
   /** optional text for tooltip */
   tooltipText?: string
   /** optional caption. hidden when `error` is given */
@@ -81,14 +80,10 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
-  /** react useRef to control input field instead of react event */
-  ref?: MutableRefObject<HTMLInputElement | null>
-  /** optional IconName to display icon aligned to left of input field */
-  leftIcon?: IconName
-  /** if true, show delete icon aligned to right of input field */
-  showDeleteIcon?: boolean
-  /** callback passed to optional delete icon onClick */
-  onDelete?: () => void
+  /** optional element to display aligned to the left of the input field */
+  leftElement?: ReactNode
+  /** optional element to display aligned to the right of the input field */
+  rightElement?: ReactNode
   /** if true, style the background of input field to error state */
   hasBackgroundError?: boolean
   /** optional prop to override input field border radius */
@@ -97,41 +92,35 @@ export interface InputFieldProps {
   padding?: string
 }
 
+/**
+ * InputField is for the Destkop application and web applications
+ * Please do not use this for the touchscreen application
+ */
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   (props, ref): JSX.Element => {
     const {
-      placeholder,
       textAlign = TYPOGRAPHY.textAlignLeft,
       size = 'small',
       title,
       tooltipText,
       tabIndex = 0,
-      showDeleteIcon = false,
       hasBackgroundError = false,
-      onDelete,
       borderRadius,
       padding,
       id,
       disabled,
       error,
+      leftElement,
+      rightElement,
       ...inputProps
     } = props
+    const [targetProps, tooltipProps] = useHoverTooltip()
+    const internalRef = useRef<HTMLInputElement>(null)
+    const inputRef = (ref ?? internalRef) as RefObject<HTMLInputElement>
     const hasError = props.error != null
     const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
     const placeHolder =
       (props.isIndeterminate ?? false) ? '-' : props.placeholder
-    const [targetProps, tooltipProps] = useHoverTooltip()
-
-    const OUTER_CSS = css`
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        grid-gap: ${SPACING.spacing8};
-        &:focus-within {
-          filter: ${hasError
-            ? 'none'
-            : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
-        }
-      }
-    `
 
     const INPUT_FIELD = css`
       display: flex;
@@ -189,48 +178,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         -webkit-appearance: none;
         margin: 0;
       }
-
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        height: ${size === 'small' ? '4.25rem' : '5rem'};
-        font-size: ${size === 'small'
-          ? TYPOGRAPHY.fontSize28
-          : TYPOGRAPHY.fontSize38};
-        padding: ${SPACING.spacing16} ${SPACING.spacing24};
-        border: 2px ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.grey50};
-
-        &:focus-within {
-          box-shadow: none;
-          border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
-            ${hasError ? COLORS.red50 : COLORS.blue50};
-        }
-
-        & input {
-          color: ${COLORS.black90};
-          flex: 1 1 auto;
-          width: 100%;
-          height: 100%;
-          font-size: ${size === 'small'
-            ? TYPOGRAPHY.fontSize28
-            : TYPOGRAPHY.fontSize38};
-          line-height: ${size === 'small'
-            ? TYPOGRAPHY.lineHeight36
-            : TYPOGRAPHY.lineHeight48};
-        }
-
-        /* the size of dot for password is handled by font-size */
-        input[type='password'] {
-          font-size: ${size === 'small' ? '71px' : '77px'};
-        }
-      }
-    `
-
-    const FORM_BOTTOM_SPACE_STYLE = css`
-      padding-top: ${SPACING.spacing4};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        padding: ${SPACING.spacing8} 0rem;
-        padding-bottom: 0;
-      }
     `
 
     const TITLE_STYLE = css`
@@ -240,22 +187,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       font-size: ${TYPOGRAPHY.fontSizeH3};
       line-height: ${TYPOGRAPHY.lineHeight20};
       font-weight: ${TYPOGRAPHY.fontWeightRegular};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-size: ${TYPOGRAPHY.fontSize22};
-        font-weight: ${TYPOGRAPHY.fontWeightRegular};
-        line-height: ${TYPOGRAPHY.lineHeight28};
-        justify-content: ${textAlign};
-      }
-    `
-
-    const ERROR_TEXT_STYLE = css`
-      color: ${COLORS.red50};
-      padding-top: ${SPACING.spacing4};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-size: ${TYPOGRAPHY.fontSize22};
-        color: ${COLORS.red50};
-        padding-top: ${SPACING.spacing8};
-      }
     `
 
     const UNITS_STYLE = css`
@@ -263,13 +194,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       font: ${TYPOGRAPHY.bodyTextRegular};
       text-align: ${TYPOGRAPHY.textAlignRight};
       white-space: ${NO_WRAP};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
-        font-size: ${TYPOGRAPHY.fontSize22};
-        font-weight: ${TYPOGRAPHY.fontWeightRegular};
-        line-height: ${TYPOGRAPHY.lineHeight28};
-        justify-content: ${textAlign};
-      }
     `
 
     return (
@@ -309,7 +233,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           <Flex
             width="100%"
             flexDirection={DIRECTION_COLUMN}
-            css={OUTER_CSS}
             onClick={props.disabled === true ? undefined : props.onClick}
           >
             <Flex
@@ -317,19 +240,11 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               css={INPUT_FIELD}
               alignItems={ALIGN_CENTER}
               onClick={() => {
-                if (props.id != null) {
-                  document.getElementById(props.id)?.focus()
-                }
+                inputRef.current?.focus()
               }}
             >
-              {props.leftIcon != null ? (
-                <Flex marginRight={SPACING.spacing8}>
-                  <Icon
-                    name={props.leftIcon}
-                    color={COLORS.grey60}
-                    size="1.25rem"
-                  />
-                </Flex>
+              {leftElement != null ? (
+                <Flex marginRight={SPACING.spacing8}>{leftElement}</Flex>
               ) : null}
               <StyledInput
                 {...inputProps}
@@ -341,18 +256,19 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                 }} // prevent value change with scrolling
                 type={props.type}
                 disabled={disabled}
-                ref={ref}
+                ref={inputRef}
               />
               {props.units != null ? (
                 <Flex css={UNITS_STYLE}>{props.units}</Flex>
               ) : null}
-              {showDeleteIcon ? (
+              {rightElement != null ? (
                 <Flex
                   alignSelf={TEXT_ALIGN_RIGHT}
-                  onClick={onDelete}
-                  cursor="pointer"
+                  onClick={e => {
+                    e.stopPropagation()
+                  }}
                 >
-                  <Icon name="close" size="1.75rem" />
+                  {rightElement}
                 </Flex>
               ) : null}
             </Flex>
@@ -379,6 +295,15 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     )
   }
 )
+
+const ERROR_TEXT_STYLE = css`
+  color: ${COLORS.red50};
+  padding-top: ${SPACING.spacing4};
+`
+
+const FORM_BOTTOM_SPACE_STYLE = css`
+  padding-top: ${SPACING.spacing4};
+`
 
 const StyledInput = styled.input`
   background-color: transparent;
