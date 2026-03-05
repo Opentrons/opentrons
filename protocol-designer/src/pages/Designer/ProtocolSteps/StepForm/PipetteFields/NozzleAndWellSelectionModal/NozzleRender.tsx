@@ -26,6 +26,7 @@ import { getAvailablePrimaryNozzles, getEntireWellSelection } from './utils'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Channels, WellType } from '@opentrons/components'
 import type {
+  ActiveNozzleNumber,
   NozzleConfigurationStyle,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
@@ -68,7 +69,7 @@ const getAvailableNozzles = (
     nozzles: string[]
     wellOrdering: string[][]
     primaryNozzle: PrimaryNozzleConfigurationStyle
-    channels: number
+    channels: ActiveNozzleNumber
   }
 ): string[] => {
   const { allNozzles, nozzles, wellOrdering, primaryNozzle, channels } = params

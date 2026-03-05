@@ -17,6 +17,7 @@ import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleLayoutConfig,
   PipetteV2Specs,
@@ -54,7 +55,7 @@ export interface NozzleLayoutDetails {
 export interface WellSetForMultiChannelParams {
   labwareDef: LabwareDefinition
   wellName: string
-  channels: number
+  channels: ActiveNozzleNumber
   pipetteNozzleDetails?: NozzleLayoutDetails
 }
 

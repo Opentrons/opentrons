@@ -1,20 +1,12 @@
 import range from 'lodash/range'
 
-import {
-  COLUMN,
-  PARTIAL,
-  PARTIAL_NOZZLE_MAP,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
-
 import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
+import { getActiveNozzleAmount } from '../utils/getActiveNozzleAmount'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
 import type {
   AspDispAirgapParams,
   DispenseInPlaceParams,
-  PartialPrimaryNozzles,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -44,17 +36,13 @@ export function forDispense(
   if (airGapVolume > 0) {
     const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
     const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-    let channels: number = pipetteSpec.channels
-    if (nozzles === COLUMN) {
-      channels = 8
-    } else if (nozzles === SINGLE) {
-      channels = 1
-    } else if (nozzles === ROW) {
-      channels = 12
-    } else if (nozzles === PARTIAL) {
-      channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-    }
-    range(channels).forEach((tipIndex): void => {
+    const activeChannels = getActiveNozzleAmount({
+      pipetteSpec,
+      nozzles,
+      primaryNozzle,
+    })
+
+    range(activeChannels).forEach((tipIndex): void => {
       const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}
 
       robotState.liquidState.pipettes[pipetteId][tipIndex] = {

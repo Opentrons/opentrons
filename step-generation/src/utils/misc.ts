@@ -50,6 +50,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
 import type {
+  ActiveNozzleNumber,
   AddressableAreaName,
   BlowoutParams,
   CutoutFixtureId,
@@ -340,7 +341,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: number,
+  channels: ActiveNozzleNumber,
   labwareDef: LabwareDefinition2,
   well: string
 ): {

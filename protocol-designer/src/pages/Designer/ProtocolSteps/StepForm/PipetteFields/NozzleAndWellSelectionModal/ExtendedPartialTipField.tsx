@@ -14,6 +14,7 @@ import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -96,7 +97,7 @@ export function ExtendedPartialTipField(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
     stepType: string,
-    channels: number
+    channels: ActiveNozzleNumber
   ): string {
     const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
     const isTransfer = stepType === 'transfer'

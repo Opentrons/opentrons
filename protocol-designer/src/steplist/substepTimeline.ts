@@ -14,6 +14,7 @@ import {
 } from '@opentrons/step-generation'
 
 import type {
+  ActiveNozzleNumber,
   CreateCommand,
   PartialPrimaryNozzles,
 } from '@opentrons/shared-data'
@@ -233,7 +234,7 @@ export const substepTimelineMultiChannel = (
           const channels = pipetteEntities[pipetteId].spec.channels
           const nozzles = pipetteEntity.nozzles
           const primaryNozzle = pipetteEntity.primaryNozzle
-          let numChannels: number
+          let numChannels: ActiveNozzleNumber
           if (nozzles === ALL && channels === 96) {
             numChannels = 96
           } else if (nozzles === COLUMN) {

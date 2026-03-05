@@ -21,6 +21,7 @@ import {
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
+  ActiveNozzleNumber,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
@@ -162,7 +163,7 @@ export const getEntireWellSelection = (
   wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
-  channels: number
+  channels: ActiveNozzleNumber
 ): string[] => {
   if (!wellName) {
     return []

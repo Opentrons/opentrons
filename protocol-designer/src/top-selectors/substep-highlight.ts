@@ -24,6 +24,7 @@ import { getWellSetForMultichannel } from '../utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
+  ActiveNozzleNumber,
   CreateCommand,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -43,7 +44,7 @@ function _wellsForPipette(
   const pipChannels = pipetteEntity.spec.channels
   // `wells` is all the wells that pipette interacts with.
   if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
-    let channels: number = pipChannels
+    let channels: ActiveNozzleNumber = pipChannels
     if ((nozzles === COLUMN && pipChannels === 96) || pipChannels === 8) {
       channels = 8
     }
@@ -139,7 +140,7 @@ function _getSelectedWellsForStep(
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
-      let channels: number = pipetteSpec.channels
+      let channels: ActiveNozzleNumber = pipetteSpec.channels
       if ('nozzles' in stepArgs) {
         if (stepArgs.nozzles === COLUMN) {
           channels = 8

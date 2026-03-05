@@ -286,7 +286,8 @@ interface LoadLiquidClassResult {
   liquidClassId: string
 }
 
-type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
+export type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
+export type RowChannels = 12
 
 export const PARTIAL_NOZZLE_MAP: Record<
   PartialPrimaryNozzles,

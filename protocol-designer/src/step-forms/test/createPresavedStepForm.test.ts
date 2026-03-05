@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
   fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -267,7 +268,7 @@ describe('createPresavedStepForm', () => {
         dropTip_location: 'mockTrash',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
-        primaryNozzle: 'A1',
+        primaryNozzle: A1_NOZZLE,
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
