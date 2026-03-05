@@ -1,13 +1,17 @@
 """Pyro related utilities for daemons and request handling."""
 
 import logging
+import socket
 from typing import Any, Callable
 
 import Pyro5.api as pyro
+import Pyro5.errors as errors
 
 from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
 
 log = logging.getLogger(__name__)
+
+PYRO_TIMEOUT = 10
 
 
 def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None:  # type: ignore
@@ -22,16 +26,21 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     pyro_object = PyroSynchronousObject(resource)
 
     # Handle Pyro registration and publication of our synchronized object
+    pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
     with pyro.Daemon() as daemon:
         pyro_uri = daemon.register(pyro_object)
 
         # Find the currently running nameserver
-        # todo(chb, 2026-02-18): Need error handling if the namerserver is not present
-        with pyro.locate_ns() as ns:
-            # Register our objects URI with the system nameserver
-            ns.register(pyroname, pyro_uri)
+        try:
+            with pyro.locate_ns() as ns:
+                # Register our objects URI with the system nameserver
+                ns.register(pyroname, pyro_uri)
 
-        log.info(f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}")
+            log.info(f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}")
 
-        # Maintain a request loop to handle requests on our resource instance from remote processes
-        daemon.requestLoop()
+            # Maintain a request loop to handle requests on our resource instance from remote processes
+            daemon.requestLoop()
+        except (errors.NamingError, errors.CommunicationError, socket.timeout):
+            raise errors.CommunicationError(
+                f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
+            )
