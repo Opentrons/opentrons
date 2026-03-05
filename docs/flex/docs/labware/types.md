@@ -66,15 +66,13 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 ### Tip racks 
 
-Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a labelled mid-plate that holds 96 tips, and a lid.
+Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
 
 To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, racks are color coded and labelled based on the maximum rated volume for each tip type.
 
 <figure markdown>
-![test](../images/tip-rack-with-labels.png)
+![test](../images/tip-rack-with-labels.png){ width="80%" }
 </figure>
-<!---
-![20 µL tip rack in green, 50 µL tip rack in magenta, 200 µL tip rack in yellow, and 1000 µL tip rack in blue.](../images/labware-flex-tip-racks.png "Flex tip racks") --->
 
 !!! tip
     Opentrons recommends using sealed tips within three years from the production date.
