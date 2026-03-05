@@ -302,6 +302,7 @@
       "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to after aspirating.",
       "aspirate_submerge_mmFromBottom": "Change where in the well the robot submerges from before aspirating.",
       "aspirate_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
+      "blowout_mmFromBottom": "Change where in the well the robot blows out from.",
       "blowout_z_offset": "Change where in the well the robot performs the blowout.",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing.",
       "dispense_mmFromBottom": "Change where in the well the robot dispenses from.",
