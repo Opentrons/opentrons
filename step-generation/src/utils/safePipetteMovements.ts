@@ -12,6 +12,7 @@ import {
   getPositionFromSlotId,
   getRobotDefFromRobotType,
   H1_NOZZLE,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   PARTIAL,
   PARTIAL_NOZZLE_MAP,
@@ -139,9 +140,21 @@ const getModuleHeightFromDeckDefinition = (
   // OT-2
   return getModuleDef(moduleModel).dimensions.bareOverallHeight
 }
-
+const getWasteChuteHeightFromDeckDefinition = (
+  robotType: RobotType
+): number => {
+  if (robotType === FLEX_ROBOT_TYPE) {
+    const deckDef = getDeckDefFromRobotType(robotType)
+    const wasteChute = Object.values(deckDef.locations.addressableAreas).find(
+      addressableArea =>
+        addressableArea.id === NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+    )
+    return wasteChute?.offsetFromCutoutFixture[2] ?? 0
+  }
+  return 0
+}
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
-//  adapters, and modules on adapters)
+//  adapters, waste chutes, and modules on adapters)
 const getHighestZInSlot = (
   robotState: RobotState,
   invariantContext: InvariantContext,
@@ -149,7 +162,8 @@ const getHighestZInSlot = (
   robotType: RobotType
 ): number => {
   const { modules, labware } = robotState
-  const { moduleEntities, labwareEntities } = invariantContext
+  const { moduleEntities, labwareEntities, wasteChuteEntities } =
+    invariantContext
 
   let totalHeight: number = 0
   const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
@@ -157,6 +171,10 @@ const getHighestZInSlot = (
     moduleId => modules[moduleId].slot === slotId
   )
 
+  // if slot has waste chute
+  if (wasteChuteEntities && slotId === 'D3') {
+    totalHeight += getWasteChuteHeightFromDeckDefinition(robotType)
+  }
   //  if slot has labware, includes labware, adapters, and module
   if (largestLabwareStack.length > 0) {
     largestLabwareStack.forEach(item => {
