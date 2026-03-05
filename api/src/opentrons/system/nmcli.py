@@ -114,8 +114,8 @@ class BackedUpModify(AbstractAsyncContextManager[str]):
                         "modify",
                         "id",
                         self._clone_name,
-                        "id",
-                        self._clone_name,
+                        "connection.id",
+                        self._name,
                     ]
                 )
                 self._result = (True, res)
@@ -143,6 +143,11 @@ def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
     return scan_out
 
 
+async def _physical_rescan() -> None:
+    cmd = ["device", "wifi", "rescan"]
+    _1, _2, _3 = await _call(cmd, suppress_err=True)
+
+
 async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]]:
     """List the visible (broadcasting SSID) wireless networks.
 
@@ -155,8 +160,7 @@ async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]
     # We ignore errors here because NetworkManager yells at you if you do it twice in a
     # row without another operation in between
     if rescan:
-        cmd = ["device", "wifi", "rescan"]
-        _1, _2 = await _call(cmd, suppress_err=True)
+        await _physical_rescan()
 
     fields = ["ssid", "signal", "active", "security"]
     cmd = ["--terse", "--fields", ",".join(fields), "device", "wifi", "list"]
@@ -174,6 +178,54 @@ async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]
     )
 
     return [_add_security_type_to_scan(nw) for nw in output if nw["ssid"]]
+
+
+async def _best_bssid(ssid: str, rescan: Optional[bool] = False) -> str:
+    """List the BSSIDs providing the specified SSID.
+
+    The common case of calling this method is while connected to the SSID that's specified.
+    This is important, because otherwise the SSID that's specified might be a hidden one
+    that we haven't seen yet (it's common for wireless backends to cache so-called hidden
+    SSIDs and have them show up in subsequent lists). We'll return all the BSSIDs that
+    - Are broadcasting on the specified BSSID
+    - Are currently connected
+
+    That means that if you have a hidden SSID that is broadcast by multiple BSSIDs and you
+    either aren't connected to it or the other stations didn't respond to the probe request
+    and thus isn't cached we may not see the other BSSIDs.
+    """
+    if rescan:
+        await _physical_rescan()
+
+    fields = ["ssid", "signal", "active", "bssid"]
+    cmd = ["--terse", "--fields", ",".join(fields), "device", "wifi", "list"]
+    out, err, code = await _call(cmd)
+    if err or code != 0:
+        raise RuntimeError(err)
+    output = _dict_from_terse_tabular(
+        fields,
+        out,
+        transformers={
+            "signal": lambda s: int(s) if s.isdigit() else None,
+            "active": lambda a: a.lower() == "yes",
+            "ssid": lambda s: s if s != "--" else None,
+        },
+    )
+    active = [nw for nw in output if nw["active"]]
+    this_ssid = [nw for nw in output if nw["ssid"] == ssid]
+    candidates = active + this_ssid
+    log.info(
+        f"best_bssid for {ssid}: narrowed {len(active)} nets to {len(active)} active nets and {len(this_ssid)} common-ssid nets"
+    )
+    best = sorted(candidates, key=lambda nw: nw["signal"], reverse=True)
+    if len(best) == 0:
+        raise RuntimeError(
+            f"No networks found providing SSID {ssid} or a current connection"
+        )
+    log.info(
+        f"best_bssid for {ssid} is {best[0]['bssid']} at signal {best[0]['signal']}; worst was {best[-1]['bssid']} at signal {best[-1]['signal']}"
+    )
+    return cast(str, best[0]["bssid"])
 
 
 async def is_connected() -> str:
@@ -420,6 +472,61 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
         return True, res
     else:
         return False, err
+
+
+async def wifi_unlimit_from_bssid(ssid: str) -> Tuple[bool, str]:
+    """
+    Remove a BSSID limit from the wifi connection.
+
+    This will reenable automatic roaming based on background signal strength checks. See
+    wifi_limit_to_bssid for more on why this is an option.
+
+    This should be called only on a network that exists.
+    """
+    res, err, code = await _call(["connection", "show", ssid])
+    if "no such connection profile" in res or code != 0:
+        raise RuntimeError(f"No connection known for {ssid}")
+    modifier = BackedUpModify(ssid)
+    async with modifier as cloned_network:
+        backup_mod_res, backup_mod_err, _ = await _call(
+            ["connection", "modify", "id", cloned_network, "802-11-wireless.bssid", ""]
+        )
+        log.info(
+            f"wifi_unlimit_from_bssid: removal call result: {backup_mod_res}, {backup_mod_err}"
+        )
+    return modifier.result()
+
+
+async def wifi_limit_to_bssid(ssid: str) -> Tuple[bool, str]:
+    """
+    Limit the wifi system to connect to only the currently-strongest provider of the SSID.
+
+    This will disable automatic roaming based on background signal strength checks. This
+    automatic roaming can cause connection failures in some physical wifi network setups,
+    and robots don't tend to move around enough to need the roaming. However, it also means
+    that if a site switches out its wifi access points the robot may need to be reconnected.
+
+    It must be called only on the network that is currently connected.
+    """
+    res, err, code = await _call(["connection", "show", ssid])
+    if "no such connection profile" in res or code != 0:
+        raise RuntimeError(f"No connection known for {ssid}")
+    modifier = BackedUpModify(ssid)
+    async with modifier as cloned_network:
+        best_bssid = await _best_bssid(ssid)
+        mod_res, mod_err, mod_code = await _call(
+            [
+                "connection",
+                "modify",
+                "id",
+                cloned_network,
+                "802-11-wireless.bssid",
+                best_bssid,
+            ]
+        )
+        log.info(f"Added {best_bssid} limit to {ssid}: {mod_res}, {mod_err}")
+
+    return modifier.result()
 
 
 async def remove(

@@ -325,7 +325,14 @@ async def test_backed_up_modify_success(monkeypatch: MonkeyPatch) -> None:
             )
         if cmd == ["connection", "up", "id", "my-wifi-1"]:
             return "Connection successfully activated", "", 0
-        if cmd == ["connection", "modify", "id", "my-wifi-1", "id", "my-wifi-1"]:
+        if cmd == [
+            "connection",
+            "modify",
+            "id",
+            "my-wifi-1",
+            "connection.id",
+            "my-wifi",
+        ]:
             return "", "", 0
         assert False, f"Unexpected call: {cmd}"
 
@@ -348,7 +355,14 @@ async def test_backed_up_modify_success(monkeypatch: MonkeyPatch) -> None:
     assert "successfully activated" in msg
     assert "my-wifi" in removed
     assert "my-wifi-1" not in removed
-    assert ["connection", "modify", "id", "my-wifi-1", "id", "my-wifi-1"] in calls
+    assert [
+        "connection",
+        "modify",
+        "id",
+        "my-wifi-1",
+        "connection.id",
+        "my-wifi",
+    ] in calls
 
 
 async def test_backed_up_modify_clone_up_fails(monkeypatch: MonkeyPatch) -> None:
@@ -426,3 +440,380 @@ async def test_backed_up_modify_exception_deletes_clone(
     assert ["connection", "delete", "id", "my-wifi-1"] in calls
     with pytest.raises(RuntimeError, match="Results not yet available"):
         cm.result()
+
+
+class _FakeBackedUpModify:
+    """Stand-in for BackedUpModify that records construction args and uses sync CM."""
+
+    instances: List["_FakeBackedUpModify"] = []
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.clone_name = f"{name}-1"
+        self._result: Tuple[bool, str] = (True, "Connection successfully activated")
+        _FakeBackedUpModify.instances.append(self)
+
+    async def __aenter__(self) -> str:
+        return self.clone_name
+
+    async def __aexit__(self, *args: object) -> None:
+        pass
+
+    def result(self) -> Tuple[bool, str]:
+        return self._result
+
+
+async def test_wifi_unlimit_from_bssid_no_connection(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Raises RuntimeError when the specified connection does not exist."""
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        if cmd == ["connection", "show", "nonexistent-wifi"]:
+            return (
+                "Error: no such connection profile - nonexistent-wifi.",
+                "",
+                10,
+            )
+        assert False, f"Unexpected call: {cmd}"
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+
+    with pytest.raises(RuntimeError, match="No connection known for nonexistent-wifi"):
+        await nmcli.wifi_unlimit_from_bssid("nonexistent-wifi")
+
+
+async def test_wifi_unlimit_from_bssid_uses_cloned_network(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The modify command targets the cloned network, not the original."""
+    _FakeBackedUpModify.instances.clear()
+    calls: List[List[str]] = []
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        calls.append(cmd)
+        if cmd == ["connection", "show", "my-wifi"]:
+            return "connection.id: my-wifi\n", "", 0
+        if cmd == [
+            "connection",
+            "modify",
+            "id",
+            "my-wifi-1",
+            "802-11-wireless.bssid",
+            "",
+        ]:
+            return "", "", 0
+        assert False, f"Unexpected call: {cmd}"
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    monkeypatch.setattr(nmcli, "BackedUpModify", _FakeBackedUpModify)
+
+    ok, msg = await nmcli.wifi_unlimit_from_bssid("my-wifi")
+
+    assert len(_FakeBackedUpModify.instances) == 1
+    assert _FakeBackedUpModify.instances[0].name == "my-wifi"
+    assert ok is True
+    assert [
+        "connection",
+        "modify",
+        "id",
+        "my-wifi-1",
+        "802-11-wireless.bssid",
+        "",
+    ] in calls
+
+
+async def test_wifi_unlimit_from_bssid_returns_modifier_result(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The function returns whatever the modifier's result() produces."""
+    _FakeBackedUpModify.instances.clear()
+
+    class _FailingModify(_FakeBackedUpModify):
+        def __init__(self, name: str) -> None:
+            super().__init__(name)
+            self._result = (False, "Error: activation failed")
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return "", "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    monkeypatch.setattr(nmcli, "BackedUpModify", _FailingModify)
+
+    ok, msg = await nmcli.wifi_unlimit_from_bssid("my-wifi")
+    assert ok is False
+    assert msg == "Error: activation failed"
+
+
+async def test_wifi_limit_to_bssid_no_connection(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Raises RuntimeError when the specified connection does not exist."""
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        if cmd == ["connection", "show", "nonexistent-wifi"]:
+            return (
+                "Error: no such connection profile - nonexistent-wifi.",
+                "",
+                10,
+            )
+        assert False, f"Unexpected call: {cmd}"
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+
+    with pytest.raises(RuntimeError, match="No connection known for nonexistent-wifi"):
+        await nmcli.wifi_limit_to_bssid("nonexistent-wifi")
+
+
+async def test_wifi_limit_to_bssid_uses_cloned_network_and_best_bssid(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The modify command targets the cloned network with the best BSSID."""
+    _FakeBackedUpModify.instances.clear()
+    calls: List[List[str]] = []
+    best_bssid = "AA:BB:CC:DD:EE:FF"
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        calls.append(cmd)
+        if cmd == ["connection", "show", "my-wifi"]:
+            return "connection.id: my-wifi\n", "", 0
+        if cmd == [
+            "connection",
+            "modify",
+            "id",
+            "my-wifi-1",
+            "802-11-wireless.bssid",
+            best_bssid,
+        ]:
+            return "", "", 0
+        assert False, f"Unexpected call: {cmd}"
+
+    async def mock_best_bssid(ssid: str, rescan: Optional[bool] = False) -> str:
+        return best_bssid
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    monkeypatch.setattr(nmcli, "_best_bssid", mock_best_bssid)
+    monkeypatch.setattr(nmcli, "BackedUpModify", _FakeBackedUpModify)
+
+    ok, msg = await nmcli.wifi_limit_to_bssid("my-wifi")
+
+    assert len(_FakeBackedUpModify.instances) == 1
+    assert _FakeBackedUpModify.instances[0].name == "my-wifi"
+    assert ok is True
+    assert [
+        "connection",
+        "modify",
+        "id",
+        "my-wifi-1",
+        "802-11-wireless.bssid",
+        best_bssid,
+    ] in calls
+
+
+async def test_wifi_limit_to_bssid_returns_modifier_result(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The function returns whatever the modifier's result() produces."""
+    _FakeBackedUpModify.instances.clear()
+
+    class _FailingModify(_FakeBackedUpModify):
+        def __init__(self, name: str) -> None:
+            super().__init__(name)
+            self._result = (False, "Error: activation failed")
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return "", "", 0
+
+    async def mock_best_bssid(ssid: str, rescan: Optional[bool] = False) -> str:
+        return "AA:BB:CC:DD:EE:FF"
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    monkeypatch.setattr(nmcli, "_best_bssid", mock_best_bssid)
+    monkeypatch.setattr(nmcli, "BackedUpModify", _FailingModify)
+
+    ok, msg = await nmcli.wifi_limit_to_bssid("my-wifi")
+    assert ok is False
+    assert msg == "Error: activation failed"
+
+
+async def test_best_bssid_picks_strongest_signal(monkeypatch: MonkeyPatch) -> None:
+    """When multiple BSSIDs provide the target SSID, the strongest signal wins."""
+    mock_output = (
+        "my-wifi:50:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "my-wifi:90:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+        "my-wifi:70:no:AA\\:BB\\:CC\\:DD\\:EE\\:03\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:02"
+
+
+async def test_best_bssid_tiebreak_is_stable(monkeypatch: MonkeyPatch) -> None:
+    """When two BSSIDs share the best signal, the first one in the list wins."""
+    mock_output = (
+        "my-wifi:80:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "my-wifi:80:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+        "my-wifi:60:no:AA\\:BB\\:CC\\:DD\\:EE\\:03\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:01"
+
+
+async def test_best_bssid_ignores_other_ssids(monkeypatch: MonkeyPatch) -> None:
+    """BSSIDs for a different SSID are not considered unless they are active."""
+    mock_output = (
+        "other-wifi:99:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "my-wifi:30:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+        "my-wifi:50:no:AA\\:BB\\:CC\\:DD\\:EE\\:03\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:03"
+
+
+async def test_best_bssid_no_match_no_active_raises(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Raises RuntimeError when no BSSID provides the SSID and nothing is active."""
+    mock_output = (
+        "other-wifi:80:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "another-wifi:60:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    with pytest.raises(RuntimeError, match="No networks found providing SSID my-wifi"):
+        await nmcli._best_bssid("my-wifi")
+
+
+async def test_best_bssid_no_match_falls_back_to_active(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """When no BSSID has the target SSID, the active connection's BSSID is returned."""
+    mock_output = (
+        "other-wifi:80:yes:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "another-wifi:60:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:01"
+
+
+async def test_best_bssid_hidden_ssid_ignored(monkeypatch: MonkeyPatch) -> None:
+    """BSSIDs with SSID '--' (hidden) are not matched by name."""
+    mock_output = (
+        "--:95:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "my-wifi:40:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:02"
+
+
+async def test_best_bssid_empty_scan_raises(monkeypatch: MonkeyPatch) -> None:
+    """Raises RuntimeError when the scan returns no networks at all."""
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return "", "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    with pytest.raises(RuntimeError, match="No networks found"):
+        await nmcli._best_bssid("my-wifi")
+
+
+async def test_best_bssid_ssid_with_spaces(monkeypatch: MonkeyPatch) -> None:
+    """SSIDs containing spaces are matched correctly."""
+    mock_output = (
+        "my cool wifi:75:no:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "other:90:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my cool wifi")
+    assert result == "AA:BB:CC:DD:EE:01"
+
+
+async def test_best_bssid_prefers_ssid_match_over_active(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """An SSID-matched BSSID with a stronger signal beats the active connection."""
+    mock_output = (
+        "other-wifi:60:yes:AA\\:BB\\:CC\\:DD\\:EE\\:01\n"
+        "my-wifi:80:no:AA\\:BB\\:CC\\:DD\\:EE\\:02\n"
+    )
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return mock_output, "", 0
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    result = await nmcli._best_bssid("my-wifi")
+    assert result == "AA:BB:CC:DD:EE:02"
+
+
+async def test_best_bssid_scan_error_raises(monkeypatch: MonkeyPatch) -> None:
+    """Raises RuntimeError when the scan command fails."""
+
+    async def mock_call(
+        cmd: List[str], suppress_err: bool = False
+    ) -> Tuple[str, str, int]:
+        return "", "scan failed", 1
+
+    monkeypatch.setattr(nmcli, "_call", mock_call)
+    with pytest.raises(RuntimeError, match="scan failed"):
+        await nmcli._best_bssid("my-wifi")
