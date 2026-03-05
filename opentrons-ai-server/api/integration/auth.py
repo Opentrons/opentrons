@@ -55,7 +55,8 @@ class VerifyToken:
                 issuer=self.config.auth0_issuer,
             )
             user = User(**payload)
-            logger.info("User authenticated", extra={"user_id": user.sub})
+            structlog.contextvars.bind_contextvars(user_id=user.sub)
+            logger.info("User authenticated")
             return user
         except jwt.ExpiredSignatureError:
             logger.error("JWT expired", exc_info=True)

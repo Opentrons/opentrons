@@ -416,7 +416,7 @@ async def create_chat_completion(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/completion", extra={"user_id": user.sub})
+    logger.info("POST /api/chat/completion")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -485,10 +485,7 @@ async def create_chat_completion_multipart(
     Generate a chat completion response using multipart/form-data for file uploads.
     This is more efficient than base64 encoding for binary files like PDFs.
     """
-    logger.info(
-        "POST /api/chat/completion-multipart",
-        extra={"user_id": user.sub, "num_files": len(files)},
-    )
+    logger.info("POST /api/chat/completion-multipart", extra={"num_files": len(files)})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request) if request else False
@@ -610,7 +607,7 @@ async def create_protocol(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/create-protocol", extra={"user_id": user.sub})
+    logger.info("POST /api/chat/create-protocol")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -677,7 +674,7 @@ async def update_protocol(
     - **request**: The HTTP request containing the existing protocol and other relevant parameters.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/update-protocol", extra={"user_id": user.sub})
+    logger.info("POST /api/chat/update-protocol")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -769,7 +766,7 @@ async def feedback(
         if body.fake:
             return FeedbackResponse(reply="Fake response", fake=bool(body.fake))
         feedback_text = body.feedback_text
-        logger.info("Feedback received", extra={"user_id": user.sub})
+        logger.info("Feedback received")
         background_tasks.add_task(google_sheets_client.append_feedback_to_sheet, user_id=str(user.sub), feedback=feedback_text)
         return FeedbackResponse(
             reply=f"Feedback Received and sanitized: {google_sheets_client.sanitize_for_google_sheets(feedback_text)}", fake=False

@@ -238,7 +238,7 @@ class AnthropicPredict:
         """
         Get relevant API docs based on the user's prompt
         """
-        logger.info("get_relevant_api_docs method called", extra={"user_id": user_id})
+        logger.info("get_relevant_api_docs method called")
 
         with open(self.path_api_docs, "r") as f:
             api_docs_structure = f.read()
@@ -553,7 +553,7 @@ class AnthropicPredict:
                 user_content.extend(file_blocks)
                 logger.info(
                     "Added file attachments to message",
-                    extra={"user_id": user_id, "num_files": len(file_references), "file_ids": [ref["id"] for ref in file_references]},
+                    extra={"num_files": len(file_references), "file_ids": [ref["id"] for ref in file_references]},
                 )
 
             user_message: MessageParam = {"role": "user", "content": user_content}
@@ -879,19 +879,19 @@ class AnthropicPredict:
         return await self.process_message(user_id, prompt, history, "update")
 
     async def handle_tool_use(self, func_name: str, func_params: Dict[str, Any], user_id: str) -> str:
-        logger.info("Tool use invoked", extra={"tool_name": func_name, "user_id": user_id})
+        logger.info("Tool use invoked", extra={"tool_name": func_name})
 
         if func_name == "simulate_protocol":
-            logger.info("Simulating protocol", extra={"user_id": user_id})
+            logger.info("Simulating protocol")
             results = await asyncio.to_thread(self.simulate_protocol, **func_params)
             return results
         elif func_name == "get_relevant_api_docs":
             query = func_params.get("query", "")
-            logger.info("get_relevant_api_docs tool called", extra={"user_id": user_id})
+            logger.info("get_relevant_api_docs tool called")
             results = await self.get_relevant_api_docs(query, user_id)
             logger.info(
                 "get_relevant_api_docs tool completed",
-                extra={"user_id": user_id, "result_length": len(results) if results else 0},
+                extra={"result_length": len(results) if results else 0},
             )
             return results
 
