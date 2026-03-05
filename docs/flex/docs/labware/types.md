@@ -55,7 +55,7 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 ## Tips and tip racks 
 
-Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
+Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
 
 !!! note
     Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes.
@@ -68,7 +68,7 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
 
-To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, racks are color coded and labelled based on the maximum rated volume for each tip type.
+To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labelled based on the maximum rated volume for each tip type.
 
 <figure markdown>
 ![test](../images/tip-rack-with-labels.png){ width="80%" }
