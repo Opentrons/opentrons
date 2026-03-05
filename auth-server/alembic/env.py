@@ -1,9 +1,17 @@
 from logging.config import fileConfig
+from pathlib import Path
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+
+from auth_server.persistence import orm_models as _orm_models  # noqa: F401
+from auth_server.persistence.database import Base
+from auth_server.persistence.file_and_directory_names import (
+    DB_FILE,
+    LATEST_VERSION_DIRECTORY,
+)
+from auth_server.server_settings import get_settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,12 +26,22 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+settings = get_settings()
+if isinstance(settings.persistence_directory, Path):
+    db_path = settings.persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE
+else:
+    raise RuntimeError(
+        "Set OT_AUTH_SERVER_persistence_directory to a real path for Alembic migrations."
+    )
+db_url = f"sqlite:///{db_path}"
+
+config.set_main_option("sqlalchemy.url", db_url)
 
 
 def run_migrations_offline() -> None:
@@ -64,9 +82,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
