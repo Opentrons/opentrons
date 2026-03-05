@@ -30,6 +30,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
+    # We need to do batch alter bc of sqlite constraints
     with op.batch_alter_table('users') as batch_op:
         batch_op.drop_constraint('uq_users_email', type_='unique')
 
