@@ -25,7 +25,6 @@ def upgrade() -> None:
     # creating a unique constraint is not supported by Alembic, so we need to do it in a batch operation
     with op.batch_alter_table('users') as batch_op:
         batch_op.alter_column('email', nullable=False)
-        batch_op.create_unique_constraint('uq_users_email', ['email'])
 
 
 def downgrade() -> None:

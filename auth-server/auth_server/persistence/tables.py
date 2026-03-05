@@ -7,7 +7,7 @@ from typing import Any
 
 import sqlalchemy
 import sqlalchemy.types as types
-from sqlalchemy import Column, Enum, Integer, String
+from sqlalchemy import Column, Enum, ForeignKey, Integer, String
 
 from server_utils.auth.scopes import Scope
 
@@ -60,3 +60,10 @@ class User(Base):
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    action = Column(String, nullable=False)
+    timestamp = Column(String, nullable=False)
