@@ -69,12 +69,12 @@ class AnthropicPredict:
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
 
         docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
-        local_api_docs_path = REPO_ROOT / "api"
-
-        if (docker_api_docs_path / "docs").exists():
-            self.api_docs_base_path = docker_api_docs_path
+        python_api_docs_path = REPO_ROOT / "docs" / "python-api" / "docs"
+        # Real API docs live in docs/python-api/docs (md, kebab-case). In Docker they are copied to api_docs/docs/v2.
+        if (docker_api_docs_path / "docs" / "v2").exists():
+            self._api_docs_content_root: Path = docker_api_docs_path / "docs" / "v2"
         else:
-            self.api_docs_base_path = local_api_docs_path
+            self._api_docs_content_root = python_api_docs_path
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = [
@@ -199,10 +199,24 @@ class AnthropicPredict:
             v2_doc_content = f.read()
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
+    def _api_doc_resolve_path(self, filename: str) -> Optional[Path]:
+        """
+        Resolve a structure path (e.g. docs/v2/adapting_ot2_flex.rst) to the real file path.
+        API docs now live in docs/python-api/docs as .md with kebab-case names.
+        """
+        if not filename.startswith("docs/v2/"):
+            return None
+        rel = filename[8:]  # strip "docs/v2/"
+        p = Path(rel)
+        # .rst or .md -> always use .md; underscores -> hyphens
+        base_name = p.stem.replace("_", "-") + ".md"
+        rel_path = p.parent / base_name
+        return self._api_docs_content_root / rel_path
+
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
-        Now reads directly from the main API docs location using paths like 'docs/v2/...'
+        Reads from docs/python-api/docs (md, kebab-case); structure still references docs/v2/... .rst.
         """
         match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
         if not match:
@@ -213,23 +227,24 @@ class AnthropicPredict:
         xml_content = "<relevant_file_content>\n"
 
         for filename in filenames:
-            # Combine base path with filename (e.g., 'api' + 'docs/v2/file.rst' = 'api/docs/v2/file.rst')
-            filepath = self.api_docs_base_path / filename
+            filepath = self._api_doc_resolve_path(filename)
+            if filepath is None:
+                logger.debug("API doc path not resolved (skip)", extra={"path": filename})
+                continue
             try:
                 with open(filepath, "r") as f:
                     content = f.read()
-
-                xml_content += f"<file name='{filename}'>\n"
-                xml_content += "<content>\n"
-                xml_content += content
-                xml_content += "\n</content>\n"
-                xml_content += "</file>\n"
             except FileNotFoundError:
-                logger.warning(f"File not found: {filepath}")
-                continue  # Skip files that don't exist
+                logger.debug("API doc file not found", extra={"path": str(filepath)})
+                continue
             except Exception as e:
-                logger.warning(f"Error reading file {filepath}: {e}")
-                continue  # Skip files that can't be read
+                logger.warning("Error reading API doc file", extra={"path": str(filepath), "error": str(e)})
+                continue
+            xml_content += f"<file name='{filename}'>\n"
+            xml_content += "<content>\n"
+            xml_content += content
+            xml_content += "\n</content>\n"
+            xml_content += "</file>\n"
 
         xml_content += "</relevant_file_content>"
         return xml_content
