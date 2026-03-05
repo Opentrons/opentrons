@@ -76,7 +76,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user
-          scopes: [auth_settings.write, runs.write, users.read, users.write]
+          scopes: [auth_settings.write, robot_settings.write, runs.write, users.read, users.write]
 
   - name: Update the username and password
     request:
@@ -95,7 +95,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user_updated
-          scopes: [auth_settings.write, runs.write, users.read, users.write]
+          scopes: [auth_settings.write, robot_settings.write, runs.write, users.read, users.write]
 
   - name: Get a new access token with the updated username and password
     request:
