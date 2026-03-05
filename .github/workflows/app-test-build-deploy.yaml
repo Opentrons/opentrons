@@ -141,6 +141,7 @@ jobs:
     outputs:
       variants: ${{steps.determine-build-type.outputs.variants}}
       type: ${{steps.determine-build-type.outputs.type}}
+      is_production: ${{steps.determine-build-type.outputs.is_production}}
     steps:
       - id: determine-build-type
         run: |
@@ -204,9 +205,17 @@ jobs:
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
+          # Check if this is a production release (vX.Y.Z with no prerelease suffix)
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Production release detected: ${{ github.ref_name }}"
+            echo 'is_production=true' >> $GITHUB_OUTPUT
+          else
+            echo 'is_production=false' >> $GITHUB_OUTPUT
+          fi
+
       - name: set summary
         run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}} Production: ${{steps.determine-build-type.outputs.is_production}}' >> $GITHUB_STEP_SUMMARY
 
   build-app:
     needs: [determine-build-type]
@@ -383,6 +392,14 @@ jobs:
       - name: 'deploy internal-release release builds to s3'
         run: |
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+
+      - name: 'invalidate CloudFront cache for production release'
+        if: needs.determine-build-type.outputs.is_production == 'true'
+        run: |
+          echo "Invalidating CloudFront cache for production release"
+          aws --profile=deploy cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_ROBOTSTACK }} \
+            --paths "/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/*"
 
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
