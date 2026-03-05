@@ -56,7 +56,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     display_name = Column(String, nullable=False)
     account_type = Column(Enum(AccountType), nullable=False)
-    email = Column(String, nullable=True)
+    email = Column(String, nullable=False)
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
