@@ -1,18 +1,18 @@
 """create user table
 
-Revision ID: 49c660a9c4d7
+Revision ID: ac554957bc08
 Revises: 
-Create Date: 2026-03-05 11:06:59.372077
+Create Date: 2026-03-05 12:07:05.807048
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from auth_server.persistence.tables import ScopeListType
 
 # revision identifiers, used by Alembic.
-revision: str = '49c660a9c4d7'
+revision: str = 'ac554957bc08'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('hashed_password', sa.String(), nullable=False),
     sa.Column('full_name', sa.String(), nullable=False),
     sa.Column('account_type', sa.Enum('ADMIN', 'USER', 'AUDITOR', 'SERVICE', name='accounttype'), nullable=False),
-    sa.Column('scopes', auth_server.persistence.tables.ScopeListType(), nullable=False),
+    sa.Column('scopes', ScopeListType(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
