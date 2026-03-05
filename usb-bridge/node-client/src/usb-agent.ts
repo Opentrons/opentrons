@@ -35,7 +35,9 @@ interface SerialPortListMonitorOptions {
   logger?: Logger
 }
 
-export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
+export function buildUSBAgent(opts: {
+  serialPort: string
+}): ReturnType<typeof agent> {
   const port = new SerialPort({ path: opts.serialPort, baudRate: 115200 })
   const usbAgent = agent(
     (req: http.ClientRequest, opts: http.RequestOptions): Duplex => {

@@ -1,10 +1,10 @@
-// import { SketchPicker } from 'react-color'
 import { Controller } from 'react-hook-form'
 import { Sketch } from '@uiw/react-color'
 
 import { Flex, POSITION_ABSOLUTE } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
+import type { ColorResult } from '@uiw/react-color'
 import type { RefObject } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { Ingredient } from '@opentrons/step-generation'
@@ -37,7 +37,7 @@ export function LiquidColorPicker({
           <Sketch
             presetColors={DEFAULT_LIQUID_COLORS}
             color={color}
-            onChange={color => {
+            onChange={(color: ColorResult) => {
               setValue('displayColor', color.hex)
               field.onChange(color.hex)
             }}
