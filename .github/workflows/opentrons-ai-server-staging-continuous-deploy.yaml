@@ -9,6 +9,12 @@ on:
       - 'opentrons-ai-server/**'
       - '.github/workflows/opentrons-ai-server-staging-continuous-deploy.yaml'
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'edge'
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
@@ -28,6 +34,8 @@ jobs:
     steps:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v6'
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
 
       - name: Setup UV
         uses: astral-sh/setup-uv@v7
