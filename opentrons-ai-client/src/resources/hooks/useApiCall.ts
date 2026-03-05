@@ -53,14 +53,14 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
         } else {
           setError({
             message: axiosError.message,
-            error_type: 'network_error',
+            errorType: 'network_error',
           })
         }
       } else {
         setError({
           message:
             err instanceof Error ? err.message : 'An unexpected error occurred',
-          error_type: 'unknown',
+          errorType: 'unknown',
         })
       }
     } finally {

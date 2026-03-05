@@ -7,6 +7,7 @@ class InternalServerError(BaseModel):
 
     message: str = "Internal server error"
     exception_message: str = ""
+    error_type: str = "InternalServerError"
 
     def __init__(self, *, exception_message: str = "", exception_object: Exception | None = None, **kwargs: object) -> None:
         if exception_object is not None:

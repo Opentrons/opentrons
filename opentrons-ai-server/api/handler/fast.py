@@ -218,10 +218,8 @@ def _anthropic_error_to_json_response(exc: anthropic.APIError) -> JSONResponse:
     else:
         http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    return JSONResponse(
-        status_code=http_status,
-        content={"message": message, "error_type": error_type},
-    )
+    body = ErrorResponse(message=message, error_type=error_type)
+    return JSONResponse(body.model_dump(by_alias=True), status_code=http_status)
 
 
 def _validate_request(data: Any, field_name: str) -> None:
@@ -229,7 +227,8 @@ def _validate_request(data: Any, field_name: str) -> None:
     value = getattr(data, field_name, None)
     if not value:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message=f"{field_name} is empty").model_dump()
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=EmptyRequestError(message=f"{field_name} is empty").model_dump(by_alias=True),
         )
 
 
@@ -461,7 +460,7 @@ async def create_chat_completion(
     except Exception as e:
         logger.exception("Error processing chat completion")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -532,7 +531,7 @@ async def create_chat_completion_multipart(
     except Exception as e:
         logger.exception("Error processing multipart chat completion")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -635,7 +634,7 @@ async def create_protocol(
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER and response is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(),
+                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(by_alias=True),
             )
 
         return _format_response(response, protocol_format, bool(body.fake))
@@ -705,7 +704,7 @@ async def update_protocol(
     except Exception as e:
         logger.exception("Error processing protocol update")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -775,7 +774,7 @@ async def feedback(
     except Exception as e:
         logger.exception("Error processing feedback")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 

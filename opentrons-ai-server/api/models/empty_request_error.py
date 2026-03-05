@@ -7,3 +7,4 @@ class EmptyRequestError(BaseModel):
 
     error: str = "Empty request"
     message: str
+    error_type: str = "BadRequestError"

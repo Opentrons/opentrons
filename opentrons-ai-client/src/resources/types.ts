@@ -150,7 +150,8 @@ export interface PromptData {
 
 export type FeatureFlags = Flags
 
+/** Matches API error payload (camelCase). */
 export interface ApiErrorResponse {
   message: string
-  error_type: string
+  errorType: string
 }
