@@ -11,7 +11,7 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  PARTIAL,
+  PARTIAL_COLUMN,
   ROW,
 } from '@opentrons/shared-data'
 
@@ -128,7 +128,7 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
     nozzleConfiguration
   )
   const allNozzles = Object.keys(nozzleMap)
-  const isPartial = nozzleConfiguration === PARTIAL
+  const isPartial = nozzleConfiguration === PARTIAL_COLUMN
   const nozzles = availableNozzlesOptions.map(nozzle => nozzle.value)
   const wellOrdering = Object.values(orderedColumns).map(
     column => column.orderedNozzles

@@ -12,7 +12,7 @@ import {
   G1_NOZZLE,
   H1_NOZZLE,
   H12_NOZZLE,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -90,7 +90,7 @@ export const getAvailableNozzleConfigurations = (
     })
     nozzleConfigurationOptions.push({
       name: t('partial_nozzles'),
-      value: PARTIAL,
+      value: PARTIAL_COLUMN,
     })
   }
   return nozzleConfigurationOptions
@@ -98,7 +98,7 @@ export const getAvailableNozzleConfigurations = (
 
 export const getAvailablePrimaryNozzles = (
   channels: number,
-  nozzleConfiguration: string
+  nozzleConfiguration: NozzleConfigurationStyle
 ): DropdownOption[] => {
   const allowedNozzlesMapping: Record<
     number,
@@ -113,7 +113,7 @@ export const getAvailablePrimaryNozzles = (
     8: {
       SINGLE: [A1_NOZZLE, H1_NOZZLE],
       ALL: [A1_NOZZLE],
-      PARTIAL: [
+      PARTIAL_COLUMN: [
         B1_NOZZLE,
         C1_NOZZLE,
         D1_NOZZLE,
@@ -144,7 +144,7 @@ export const getNozzleText = (
     (primary: PrimaryNozzleConfigurationStyle) => string | null
   > = {
     ALL: () => 'All',
-    PARTIAL: () =>
+    PARTIAL_COLUMN: () =>
       `${PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]} nozzles`,
 
     SINGLE: primary => `${primary} nozzle`,
@@ -187,7 +187,7 @@ export const getEntireWellSelection = (
       return wellOrdering[columnIndex]
     case ROW:
       return wellOrdering.map(column => column[rowIndex])
-    case PARTIAL: {
+    case PARTIAL_COLUMN: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
@@ -255,7 +255,7 @@ export function getWellGroupLength(
     case ROW:
     case COLUMN:
       return totalSelected
-    case PARTIAL:
+    case PARTIAL_COLUMN:
       if (ordering.length === 1) {
         return totalSelected
       }

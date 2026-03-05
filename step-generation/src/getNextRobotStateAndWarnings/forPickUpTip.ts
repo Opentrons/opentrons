@@ -4,7 +4,7 @@ import {
   ALL,
   COLUMN,
   getIsTiprack,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -79,7 +79,7 @@ export function forPickUpTip(
   // remove tips from tiprack
   if (nozzleConfiguration === SINGLE) {
     tipState.tipracks[labwareId][wellName] = EMPTY
-  } else if (nozzleConfiguration === PARTIAL && primaryNozzle) {
+  } else if (nozzleConfiguration === PARTIAL_COLUMN && primaryNozzle) {
     const partialTips = getTipsForPartial(tiprackDef.ordering, wellName)
     if (partialTips == null) {
       throw new Error(

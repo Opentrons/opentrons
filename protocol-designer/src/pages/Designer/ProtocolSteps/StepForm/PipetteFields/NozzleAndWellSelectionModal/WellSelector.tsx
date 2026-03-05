@@ -15,7 +15,7 @@ import {
 import {
   getDeckDefFromRobotType,
   getPositionFromSlotId,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -67,7 +67,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const primaryNozzle = propsForFields.primaryNozzle
     .value as PrimaryNozzleConfigurationStyle
   const pipetteId = propsForFields.pipette.value as string
-  const isPartialNozzle = nozzleConfiguration === PARTIAL
+  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
 
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)

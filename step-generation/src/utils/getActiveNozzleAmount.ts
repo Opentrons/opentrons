@@ -1,7 +1,7 @@
 import {
   ALL,
   COLUMN,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -38,7 +38,7 @@ export const getActiveNozzleAmount = (
       return 1
     case ALL:
       return pipetteChannels
-    case PARTIAL:
+    case PARTIAL_COLUMN:
       return PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
     default:
       return pipetteChannels

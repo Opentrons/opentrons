@@ -22,7 +22,7 @@ import {
   ALL,
   COLUMN,
   getPositionFromSlotId,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -200,7 +200,7 @@ export function SelectTips(
       } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, [wellName]])
       }
-    } else if (nozzles === PARTIAL) {
+    } else if (nozzles === PARTIAL_COLUMN) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)

@@ -13,7 +13,7 @@ import {
   getRobotDefFromRobotType,
   H1_NOZZLE,
   OT2_ROBOT_TYPE,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -476,7 +476,7 @@ export const getIsSafePickupWithinTiprack = (args: {
         isComplete: tipState[wellName] !== EMPTY,
       }
     }
-    if (nozzleConfiguration === PARTIAL) {
+    if (nozzleConfiguration === PARTIAL_COLUMN) {
       const targetWellIndex = tipColumnOrdered.indexOf(wellName)
       const targetWellLength =
         PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
@@ -640,7 +640,7 @@ export const getTargetTipsFromWellSets = (args: {
     if (
       nozzles === COLUMN ||
       (channels === 8 && nozzles === ALL) ||
-      (channels === 8 && nozzles === PARTIAL)
+      (channels === 8 && nozzles === PARTIAL_COLUMN)
     ) {
       const shouldReverse = getTipRowName(primaryNozzle) === 'H'
       return shouldReverse ? wellSet[wellSet.length - 1] : wellSet[0]

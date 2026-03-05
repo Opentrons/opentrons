@@ -5,7 +5,7 @@ import {
   ALL,
   COLUMN,
   F1_NOZZLE,
-  PARTIAL,
+  PARTIAL_COLUMN,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -102,7 +102,7 @@ describe('getActiveNozzleAmount', () => {
   })
   it('should return 3 for a 8ch with PARTIAL tip pick up using nozzle F1', () => {
     const args = {
-      nozzles: PARTIAL,
+      nozzles: PARTIAL_COLUMN,
       pipetteSpec: MOCK_P8_SPECS,
       primaryNozzle: F1_NOZZLE,
     }

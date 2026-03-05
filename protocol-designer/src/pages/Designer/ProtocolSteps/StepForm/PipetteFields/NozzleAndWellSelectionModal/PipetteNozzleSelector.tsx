@@ -12,7 +12,7 @@ import {
   A1_NOZZLE,
   ALL,
   G1_NOZZLE,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
 
@@ -74,7 +74,7 @@ export function PipetteNozzleSelector(
     column => column.orderedNozzles
   )
 
-  const isPartialNozzle = nozzleConfiguration === PARTIAL
+  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
 
   const [selectedNozzle, setSelectedNozzle] = useState<string[]>([])
 
@@ -132,7 +132,7 @@ export function PipetteNozzleSelector(
               onChange={() => {
                 propsForFields.nozzles.updateValue(value)
                 propsForFields.primaryNozzle.updateValue(
-                  value === PARTIAL ? G1_NOZZLE : A1_NOZZLE
+                  value === PARTIAL_COLUMN ? G1_NOZZLE : A1_NOZZLE
                 )
                 setSelectedNozzle([])
               }}

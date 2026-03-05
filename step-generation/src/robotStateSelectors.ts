@@ -15,7 +15,7 @@ import {
   H1_NOZZLE,
   H12_NOZZLE,
   orderWells,
-  PARTIAL,
+  PARTIAL_COLUMN,
   ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
@@ -131,7 +131,7 @@ export function _getNextTip(args: {
       return firstClean(orderedWellsB2T)
     }
 
-    if (nozzles === PARTIAL) {
+    if (nozzles === PARTIAL_COLUMN) {
       const first = firstClean(orderedWellsT2B)
       if (!first) return null
       const idx = orderedWellsT2B.indexOf(first)

@@ -6,7 +6,7 @@ import {
   ALL,
   COLUMN,
   getWellNamePerMultiTip,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -51,7 +51,7 @@ function _wellsForPipette(
     if (nozzles === ROW) {
       channels = 12
     }
-    if (nozzles === PARTIAL && primaryNozzle) {
+    if (nozzles === PARTIAL_COLUMN && primaryNozzle) {
       channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
     }
 
@@ -148,7 +148,7 @@ function _getSelectedWellsForStep(
           channels = 1
         } else if (stepArgs.nozzles === ROW) {
           channels = 12
-        } else if (stepArgs.nozzles === PARTIAL) {
+        } else if (stepArgs.nozzles === PARTIAL_COLUMN) {
           const partialNozzle = stepArgs.primaryNozzle as PartialPrimaryNozzles
           channels = PARTIAL_NOZZLE_MAP[partialNozzle]
         }

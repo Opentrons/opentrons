@@ -306,7 +306,7 @@ export const SINGLE = 'SINGLE' as const
 export const ROW = 'ROW' as const
 export const QUADRANT = 'QUADRANT' as const
 export const ALL = 'ALL' as const
-export const PARTIAL = 'PARTIAL' as const
+export const PARTIAL_COLUMN = 'PARTIAL_COLUMN' as const
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -314,7 +314,7 @@ export type NozzleConfigurationStyle =
   | typeof ROW
   | typeof QUADRANT
   | typeof ALL
-  | typeof PARTIAL
+  | typeof PARTIAL_COLUMN
 export const A1_NOZZLE = 'A1' as const
 export const A12_NOZZLE = 'A12' as const
 export const H1_NOZZLE = 'H1' as const

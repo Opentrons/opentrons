@@ -3,7 +3,7 @@ import last from 'lodash/last'
 import {
   ALL,
   COLUMN,
-  PARTIAL,
+  PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
@@ -243,7 +243,7 @@ export const substepTimelineMultiChannel = (
             numChannels = 1
           } else if (nozzles === ROW) {
             numChannels = 12
-          } else if (nozzles === PARTIAL && primaryNozzle) {
+          } else if (nozzles === PARTIAL_COLUMN && primaryNozzle) {
             numChannels =
               PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
           } else {
