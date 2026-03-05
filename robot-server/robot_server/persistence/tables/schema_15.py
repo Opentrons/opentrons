@@ -308,9 +308,8 @@ command_annotation_table = sqlalchemy.Table(
         nullable=False,
     ),
     sqlalchemy.Column(
-        "parent",
+        "parent_id",
         sqlalchemy.String,
-        sqlalchemy.ForeignKey("command_annotation.annotation_id"),
         nullable=True,
     ),
     # Stores a JSON string

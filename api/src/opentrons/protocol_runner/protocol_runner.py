@@ -42,6 +42,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CommandPreconditions,
     CustomCommandAnnotationLegacy,
     LegacyCommandAnnotation,
@@ -63,7 +64,7 @@ class RunResult(NamedTuple):
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
     command_annotations: List[
-        LegacyCommandAnnotation
+        CommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
 
@@ -104,7 +105,7 @@ class AbstractRunner(ABC):
         return []
 
     @property
-    def command_annotations(self) -> List[LegacyCommandAnnotation]:
+    def command_annotations(self) -> List[CommandAnnotation]:
         """Command annotations defined by protocol, if any. Currently only for json protocols."""
         return []
 
@@ -338,10 +339,10 @@ class JsonRunner(AbstractRunner):
 
         hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
-        self._command_annotations: List[LegacyCommandAnnotation] = []
+        self._command_annotations: List[CommandAnnotation] = []
 
     @property
-    def command_annotations(self) -> List[LegacyCommandAnnotation]:
+    def command_annotations(self) -> List[CommandAnnotation]:
         """Command annotations defined by protocol, if any."""
         return self._command_annotations
 
