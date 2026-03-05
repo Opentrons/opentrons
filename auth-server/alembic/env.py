@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
-from auth_server.persistence import orm_models as _orm_models  # noqa: F401
+from auth_server.persistence.tables import User as UserModel    # noqa: F401
 from auth_server.persistence.database import Base
 from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
@@ -33,6 +33,8 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 settings = get_settings()
+print(f"settings: {settings}")
+print(isinstance(settings.persistence_directory, Path))
 if isinstance(settings.persistence_directory, Path):
     db_path = settings.persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE
 else:
