@@ -47,9 +47,9 @@ class Settings(BaseSettings):
     google_sheet_id: str = "harcoded_default_from_settings"
     google_sheet_worksheet: str = "Sheet1"
 
-    # Request timeout for streaming and long-running handlers (seconds).
-    # Production proxies (CloudFront, ALB) must be configured to allow at least this duration.
-    request_timeout_seconds: str = "300"
+    # Request timeout for non-streaming handlers (seconds). Keep below CloudFront/ALB (e.g. 180s)
+    # so the API returns a clear 504 and message instead of the proxy timeout.
+    request_timeout_seconds: str = "178"
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments

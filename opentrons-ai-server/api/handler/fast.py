@@ -74,8 +74,6 @@ ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: List[str] = ["content-type"]
 ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 
 # Add CORS middleware. Parse comma-separated origins.
-# When allow_credentials=True, wildcard "*" is invalid per CORS spec; use explicit origins only.
-# If allowed_origins is empty after parsing, default to localhost dev origins (same as Settings).
 _cors_origins: List[str] = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
 if not _cors_origins:
     raise ValueError("allowed_origins setting is empty")
@@ -100,17 +98,14 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
         except asyncio.TimeoutError:
             body = TimeoutErrorResponse(
                 detail="The request took too long to complete and was cancelled.",
-                message=(
-                    "Your request timed out. The operation took longer than the allowed time. "
-                    "Please try again with a smaller or simpler request, or try again later."
-                ),
+                message=("Your request exceeded 3 minutes. Please simplify your request and try again."),
                 timeout_seconds=self.timeout_s,
             )
             return JSONResponse(body.model_dump(by_alias=True), status_code=504)
 
 
 # Request timeout in seconds. Set via settings.request_timeout_seconds.
-# Production: ensure CloudFront and ALB timeouts are at least this value.
+# Kept below CloudFront/ALB (e.g. 180s) so we return a clear 504 and message.
 app.add_middleware(TimeoutMiddleware, timeout_s=int(settings.request_timeout_seconds))
 
 
