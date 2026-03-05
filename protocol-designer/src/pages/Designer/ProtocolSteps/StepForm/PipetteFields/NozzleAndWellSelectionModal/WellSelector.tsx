@@ -142,15 +142,26 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const flatSelectedWells = useMemo(() => selectedWells.flat(), [selectedWells])
 
-  const allWellsWithStatus = getAllWellsSafetyStatus({
-    allWells,
-    robotState,
-    invariantContext,
-    pipetteId,
-    labwareId,
-    primaryNozzle,
-    nozzleConfiguration,
-  })
+  const allWellsWithStatus = useMemo(
+    () =>
+      getAllWellsSafetyStatus({
+        allWells,
+        robotState,
+        invariantContext,
+        pipetteId,
+        labwareId,
+        primaryNozzle,
+        nozzleConfiguration,
+      }),
+    [
+      primaryNozzle,
+      nozzleConfiguration,
+      pipetteId,
+      labwareId,
+      robotState,
+      invariantContext,
+    ]
+  )
   const allWellsWithState = allWells
     .flat()
     .reduce<Record<string, WellType>>((acc, wellName) => {

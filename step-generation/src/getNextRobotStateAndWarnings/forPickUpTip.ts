@@ -46,11 +46,13 @@ export function forPickUpTip(
   const getTiprackRowForWell = (
     ordering: string[][],
     targetWell: string
-  ): string[] | undefined => {
+  ): string[] | null => {
     const columnIndex = ordering.findIndex(column =>
       column.includes(targetWell)
     )
-    if (columnIndex === -1) return undefined
+    if (columnIndex === -1) {
+      return null
+    }
     const rowIndex = ordering[columnIndex].indexOf(targetWell)
     return ordering.map(column => column[rowIndex])
   }
@@ -58,11 +60,13 @@ export function forPickUpTip(
   const getTipsForPartial = (
     ordering: string[][],
     targetWell: string
-  ): string[] | undefined => {
+  ): string[] => {
     const numberOfTips =
       PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-    const columnIndex = ordering.findIndex(column => column.includes(wellName))
-    const rowIndex = ordering[columnIndex].indexOf(wellName)
+    const columnIndex = ordering.findIndex(column =>
+      column.includes(targetWell)
+    )
+    const rowIndex = ordering[columnIndex].indexOf(targetWell)
     const column = ordering[columnIndex]
 
     const remainingWells = column.length - rowIndex
@@ -82,8 +86,8 @@ export function forPickUpTip(
   } else if (nozzleConfiguration === PARTIAL_COLUMN && primaryNozzle) {
     const partialTips = getTipsForPartial(tiprackDef.ordering, wellName)
     if (partialTips == null) {
-      throw new Error(
-        'Invalid priamry well for tip pick up for partial config: ' + wellName
+      console.error(
+        `Invalid primary well for tip pick up for partial config: ${wellName}`
       )
     } else {
       partialTips.forEach(function (wellName) {
@@ -93,19 +97,18 @@ export function forPickUpTip(
   } else if (nozzleConfiguration === COLUMN) {
     const allWells = getTiprackColumnForWell(tiprackDef.ordering, wellName)
     if (allWells == null) {
-      // TODO Ian 2018-04-30 return {errors}, don't throw
-      throw new Error('Invalid primary well for tip pickup: ' + wellName)
+      console.error(`Invalid primary well for tip pickup: ${wellName}`)
     }
 
-    allWells.forEach(function (wellName) {
+    allWells?.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = EMPTY
     })
   } else if (nozzleConfiguration === ROW) {
     const wellsInRow = getTiprackRowForWell(tiprackDef.ordering, wellName)
     if (wellsInRow == null) {
-      throw new Error('Invalid priamry well for tip pickup: ' + wellName)
+      console.error('Invalid primary well for tip pickup: ' + wellName)
     }
-    wellsInRow.forEach(function (wellName) {
+    wellsInRow?.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = EMPTY
     })
   } else if (nozzleConfiguration === ALL) {
@@ -120,10 +123,9 @@ export function forPickUpTip(
     } else {
       const allWells = getTiprackColumnForWell(tiprackDef.ordering, wellName)
       if (allWells == null) {
-        // TODO Ian 2018-04-30 return {errors}, don't throw
-        throw new Error('Invalid primary well for tip pickup: ' + wellName)
+        console.error(`Invalid primary well for tip pickup: ${wellName}`)
       }
-      allWells.forEach(function (wellName) {
+      allWells?.forEach(function (wellName) {
         tipState.tipracks[labwareId][wellName] = EMPTY
       })
     }
@@ -142,10 +144,9 @@ export function forPickUpTip(
     } else {
       const allWells = getTiprackColumnForWell(tiprackDef.ordering, wellName)
       if (allWells == null) {
-        // TODO Ian 2018-04-30 return {errors}, don't throw
-        throw new Error('Invalid primary well for tip pickup: ' + wellName)
+        console.error(`Invalid primary well for tip pickup: ${wellName}`)
       }
-      allWells.forEach(function (wellName) {
+      allWells?.forEach(function (wellName) {
         tipState.tipracks[labwareId][wellName] = EMPTY
       })
     }

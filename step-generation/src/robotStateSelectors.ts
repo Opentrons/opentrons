@@ -113,74 +113,73 @@ export function _getNextTip(args: {
 
   const firstFullGroupReversed = (groups: string[][]): string[] | null =>
     [...groups].reverse().find(group => group.every(hasCleanTip)) ?? null
+  const is8ch1Nozzle = pipetteChannels === 8 && nozzles === SINGLE
+  const is8ch1NozzleFront = is8ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
+  const is8ch1NozzleBack = is8ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
 
-  if (
-    pipetteChannels === 1 ||
-    (pipetteChannels === 8 &&
-      nozzles === SINGLE &&
-      confirmedPrimaryNozzle === H1_NOZZLE) ||
-    (nozzles === SINGLE &&
-      pipetteChannels === 96 &&
-      confirmedPrimaryNozzle === H12_NOZZLE)
-  ) {
+  const is96ch1Nozzle = pipetteChannels === 96 && nozzles === SINGLE
+  const is96ch1NozzleFrontRight =
+    is96ch1Nozzle && confirmedPrimaryNozzle === H12_NOZZLE
+  const is96ch1NozzleBackRight =
+    is96ch1Nozzle && confirmedPrimaryNozzle === A12_NOZZLE
+  const is96ch1NozzleFrontLeft =
+    is96ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
+  const is96ch1NozzleBackLeft =
+    is96ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
+
+  if (pipetteChannels === 1 || is8ch1NozzleFront || is96ch1NozzleFrontRight) {
     return firstClean(orderedWellsT2B)
   }
-
-  if (pipetteChannels === 8) {
-    if (nozzles === SINGLE && confirmedPrimaryNozzle === A1_NOZZLE) {
-      return firstClean(orderedWellsB2T)
+  if (is8ch1NozzleBack) {
+    return firstClean(orderedWellsB2T)
+  }
+  if (nozzles === PARTIAL_COLUMN) {
+    const first = firstClean(orderedWellsT2B)
+    if (!first) {
+      return null
     }
-
-    if (nozzles === PARTIAL_COLUMN) {
-      const first = firstClean(orderedWellsT2B)
-      if (!first) return null
-      const idx = orderedWellsT2B.indexOf(first)
-      return orderedWellsT2B[idx] ?? null
-    }
-
-    if (nozzles === ALL) {
-      const column = firstFullGroup(tiprackDef.ordering)
-      return column?.[0] ?? null
-    }
+    const idx = orderedWellsT2B.indexOf(first)
+    return orderedWellsT2B[idx] ?? null
   }
 
-  if (pipetteChannels === 96) {
-    if (nozzles === SINGLE) {
-      if (confirmedPrimaryNozzle === A1_NOZZLE) {
-        return firstCleanReversed(orderedWellsT2B)
-      }
-      if (confirmedPrimaryNozzle === A12_NOZZLE) {
-        return firstClean(orderedWellsB2T)
-      }
-      if (confirmedPrimaryNozzle === H1_NOZZLE) {
-        return firstCleanReversed(orderedWellsB2T)
-      }
-    }
+  if (nozzles === ALL && pipetteChannels === 8) {
+    const column = firstFullGroup(tiprackDef.ordering)
+    return column?.[0] ?? null
+  }
 
-    if (nozzles === COLUMN) {
-      const columns = tiprackDef.ordering
-      const column =
-        confirmedPrimaryNozzle === A1_NOZZLE
-          ? firstFullGroupReversed(columns)
-          : firstFullGroup(columns)
-      return column?.[0] ?? null
-    }
+  if (is96ch1NozzleBackLeft) {
+    return firstCleanReversed(orderedWellsT2B)
+  }
+  if (is96ch1NozzleBackRight) {
+    return firstClean(orderedWellsB2T)
+  }
+  if (is96ch1NozzleFrontLeft) {
+    return firstCleanReversed(orderedWellsB2T)
+  }
 
-    if (nozzles === ROW) {
-      const columns = tiprackDef.ordering
-      const rows = columns[0].map((_, i) => columns.map(col => col[i]))
+  if (nozzles === COLUMN) {
+    const columns = tiprackDef.ordering
+    const column =
+      confirmedPrimaryNozzle === A1_NOZZLE
+        ? firstFullGroupReversed(columns)
+        : firstFullGroup(columns)
+    return column?.[0] ?? null
+  }
 
-      const row =
-        confirmedPrimaryNozzle === A1_NOZZLE
-          ? firstFullGroupReversed(rows)
-          : firstFullGroup(rows)
+  if (nozzles === ROW) {
+    const columns = tiprackDef.ordering
+    const rows = columns[0].map((_, i) => columns.map(col => col[i]))
 
-      return row?.[0] ?? null
-    }
+    const row =
+      confirmedPrimaryNozzle === A1_NOZZLE
+        ? firstFullGroupReversed(rows)
+        : firstFullGroup(rows)
 
-    if (nozzles === ALL) {
-      return orderedWellsT2B.every(hasCleanTip) ? orderedWellsT2B[0] : null
-    }
+    return row?.[0] ?? null
+  }
+
+  if (nozzles === ALL && pipetteChannels === 96) {
+    return orderedWellsT2B.every(hasCleanTip) ? orderedWellsT2B[0] : null
   }
 
   console.assert(false, `Unhandled _getNextTip case for pipette ${pipetteId}`)

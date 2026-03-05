@@ -444,7 +444,7 @@ export function generateQuickTransferArgs(
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles,
+    nozzles,
     channels: pipetteEntity.spec.channels,
   })
   const commonFields: SharedTransferLikeArgs = {

@@ -210,8 +210,8 @@ export function SelectTips(
         const allWellsinColumn = getAllWellsInColumn(wellName, labwareDef)
         const lengthOfColumn = allWellsinColumn.length
         const allWellsInPartialColumn = allWellsinColumn.slice(
-          lengthOfColumn - totalTipSelection,
-          lengthOfColumn
+          0,
+          lengthOfColumn - totalTipSelection
         )
         setSelectedTips(prevTips => [...prevTips, allWellsInPartialColumn])
       }

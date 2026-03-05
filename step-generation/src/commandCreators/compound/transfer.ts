@@ -489,7 +489,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })

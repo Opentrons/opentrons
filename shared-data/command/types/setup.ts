@@ -299,7 +299,7 @@ export const PARTIAL_NOZZLE_MAP: Record<
   D1: 5,
   C1: 6,
   B1: 7,
-}
+} as const
 
 export const COLUMN = 'COLUMN' as const
 export const SINGLE = 'SINGLE' as const

@@ -420,7 +420,7 @@ export const mix: CommandCreator<MixArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })

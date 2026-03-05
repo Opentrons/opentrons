@@ -25,7 +25,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { AccessibilityStatus, InaccessibleReason } from '../types'
 
-export const wellsToCheck = (
+export const getWellsToCheck = (
   nozzles: NozzleConfigurationStyle,
   wellOrdering: string[][]
 ): string[] => {
@@ -96,7 +96,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
           return acc
         }
         const pipetteChannels = pipetteSpecs.channels
-        const wellNamesToCheck = wellsToCheck(nozzles, def.ordering)
+        const wellNamesToCheck = getWellsToCheck(nozzles, def.ordering)
         return {
           ...acc,
           [id]: wellNamesToCheck.reduce((acc, wellName) => {
