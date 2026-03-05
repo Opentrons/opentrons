@@ -103,35 +103,42 @@ export function useRouteUpdateActions(
         resolve()
       })
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
   // If the door is permitted on the current step, but the robot is about to move, we need to manually redirect users
   // to the door modal unless the step is specifically a gripper jaw/stacker latch release step.
-  const checkDoorStatus = useCallback((): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (
-        isDoorOpen &&
-        !GRIPPER_MOVE_STEPS.includes(currentStep) &&
-        !STACKER_LATCH_STEPS.includes(currentStep)
-      ) {
-        stashedMapRef.current = { route: currentRoute, step: currentStep }
+  const checkDoorStatus = useCallback(
+    (): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        if (
+          isDoorOpen &&
+          !GRIPPER_MOVE_STEPS.includes(currentStep) &&
+          !STACKER_LATCH_STEPS.includes(currentStep)
+        ) {
+          stashedMapRef.current = { route: currentRoute, step: currentStep }
 
-        setRecoveryMap({
-          route: ROBOT_DOOR_OPEN.ROUTE,
-          step: ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN,
-        })
+          setRecoveryMap({
+            route: ROBOT_DOOR_OPEN.ROUTE,
+            step: ROBOT_DOOR_OPEN.STEPS.DOOR_OPEN,
+          })
 
-        reject(
-          new Error(
-            'Cannot perform a command while the door is open. Routing to door open modal.'
+          reject(
+            new Error(
+              'Cannot perform a command while the door is open. Routing to door open modal.'
+            )
           )
-        )
-      } else {
-        resolve()
-      }
-    })
-  }, [currentRoute, currentStep, isDoorOpen])
+        } else {
+          resolve()
+        }
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRoute, currentStep, isDoorOpen]
+  )
 
   const setRobotInMotion = useCallback(
     (inMotion: boolean, robotMovingRoute?: RobotMovingRoute): Promise<void> => {
@@ -162,6 +169,8 @@ export function useRouteUpdateActions(
         resolve()
       })
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentRoute, currentStep]
   )
 

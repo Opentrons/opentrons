@@ -4,11 +4,36 @@
 }
 
 .error_container {
+  display: flex;
+  align-items: center;
   padding: var(--spacing-12) var(--spacing-16);
   border: 1px solid var(--red-30);
   border-radius: var(--border-radius-4);
   margin-bottom: var(--spacing-8);
   background-color: var(--red-20);
+  gap: var(--spacing-8);
+}
+
+.error_icon {
+  flex-shrink: 0;
+  color: var(--red-50);
+}
+
+.error_text_wrapper {
+  min-width: 0;
+  flex: 1;
+}
+
+.error_dismiss {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8) var(--spacing-16);
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
 }
 
 .textarea {
@@ -40,7 +65,9 @@
   border-radius: var(--border-radius-12);
   background-color: var(--white);
   box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .main_input_container:focus-within {

@@ -74,55 +74,65 @@ export function useNotifyDataReady<TData, TError = Error>({
     staleTime !== Infinity &&
     !forcePollingFF
 
-  useEffect(() => {
-    if (shouldUseNotifications) {
-      // Always fetch on initial mount to keep latency as low as possible.
-      setRefetch('once')
-      appShellListener({
-        hostname,
-        notifyTopic: topic,
-        callback: onDataEvent,
-      })
-      dispatch(notifySubscribeAction(hostname, topic))
-      seenHostname.current = hostname
-    }
-
-    return () => {
-      if (seenHostname.current != null) {
+  useEffect(
+    () => {
+      if (shouldUseNotifications) {
+        // Always fetch on initial mount to keep latency as low as possible.
+        setRefetch('once')
         appShellListener({
-          hostname: seenHostname.current,
+          hostname,
           notifyTopic: topic,
           callback: onDataEvent,
-          isDismounting: true,
         })
+        dispatch(notifySubscribeAction(hostname, topic))
+        seenHostname.current = hostname
       }
-    }
-  }, [topic, hostname, shouldUseNotifications])
 
-  const onDataEvent = useCallback((data: NotifyResponseData): void => {
-    if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
-      setHasEncounteredNotificationsError(true)
-      if (data === 'ECONNREFUSED') {
-        doTrackEvent({
-          name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
-          properties: {},
+      return () => {
+        if (seenHostname.current != null) {
+          appShellListener({
+            hostname: seenHostname.current,
+            notifyTopic: topic,
+            callback: onDataEvent,
+            isDismounting: true,
+          })
+        }
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [topic, hostname, shouldUseNotifications]
+  )
+
+  const onDataEvent = useCallback(
+    (data: NotifyResponseData): void => {
+      if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
+        setHasEncounteredNotificationsError(true)
+        if (data === 'ECONNREFUSED') {
+          doTrackEvent({
+            name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+            properties: {},
+          })
+        }
+      } else if ('refetch' in data || 'unsubscribe' in data) {
+        setRefetch(currentRefetch => {
+          // A refetch is already in progress, mark that we need to do another
+          // one after the current refetch resolves.
+          if (currentRefetch === 'once') {
+            setPendingRefetch(true)
+            return currentRefetch
+          }
+          // No refetch is in progress, start one immediately.
+          else {
+            return 'once'
+          }
         })
       }
-    } else if ('refetch' in data || 'unsubscribe' in data) {
-      setRefetch(currentRefetch => {
-        // A refetch is already in progress, mark that we need to do another
-        // one after the current refetch resolves.
-        if (currentRefetch === 'once') {
-          setPendingRefetch(true)
-          return currentRefetch
-        }
-        // No refetch is in progress, start one immediately.
-        else {
-          return 'once'
-        }
-      })
-    }
-  }, [])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
@@ -134,6 +144,8 @@ export function useNotifyDataReady<TData, TError = Error>({
       }
       options.onSettled?.(data, error)
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refetch, pendingRefetch, options.onSettled]
   )
 

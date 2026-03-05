@@ -1,3 +1,4 @@
+import { LABWARE } from '../types'
 import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
@@ -32,7 +33,7 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
     case SELECTED:
       return <SelectedWell size={size} textInsideTip={text} wellMap={wellMap} />
     case NO:
-      return <EmptyWell size={size} wellMap={wellMap} />
+      return <EmptyWell size={size} wellMap={wellMap} parentType={LABWARE} />
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:

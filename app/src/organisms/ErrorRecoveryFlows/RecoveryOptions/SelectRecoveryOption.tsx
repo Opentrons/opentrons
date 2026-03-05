@@ -85,7 +85,7 @@ export function SelectRecoveryOptionHome({
           isSticky: true,
         }}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex css={CONTENT_STYLE}>
           <StyledText
             oddStyle="level4HeaderSemiBold"
             desktopStyle="headingSmallBold"
@@ -120,6 +120,11 @@ const CONTENT_WRAPPER_OVERRIDE_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: ${SPACING.spacing12};
   }
+`
+
+const CONTENT_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing16};
 `
 
 interface RecoveryOptionsProps {
@@ -175,9 +180,14 @@ const RECOVERY_OPTION_CONTAINER_STYLE = css`
 export function useCurrentTipStatus(
   determineTipStatus: () => Promise<PipetteWithTip[]>
 ): void {
-  useEffect(() => {
-    void determineTipStatus()
-  }, [])
+  useEffect(
+    () => {
+      void determineTipStatus()
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 }
 
 export function getRecoveryOptions(
@@ -219,6 +229,10 @@ export function getRecoveryOptions(
       return STACKER_SHUTTLE_OCCUPIED_OPTIONS
     case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
       return [RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE]
+    case ERROR_KINDS.VACUUM_CARBOY_FULL:
+      return VACUUM_CARBOY_FULL_OPTIONS
+    case ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED:
+      return VACUUM_PRESSURE_NOT_REACHED_OPTIONS
   }
 }
 
@@ -312,5 +326,16 @@ export const GRIPPER_ERROR_OPTIONS: RecoveryRoute[] = [
 
 export const GENERAL_ERROR_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.RETRY_STEP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const VACUUM_CARBOY_FULL_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.VACUUM_CARBOY_FULL_RETRY.ROUTE,
+  RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const VACUUM_PRESSURE_NOT_REACHED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]

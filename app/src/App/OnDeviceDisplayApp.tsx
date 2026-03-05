@@ -249,13 +249,18 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
-  useEffect(() => {
-    element?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto',
-    })
-  }, [location.pathname])
+  useEffect(
+    () => {
+      element?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto',
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname]
+  )
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings

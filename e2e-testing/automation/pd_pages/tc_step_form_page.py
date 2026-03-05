@@ -499,3 +499,4 @@ def _add_thermocycler_profile_step(
 
     tc_page.save_step()
     print("✅ Thermocycler profile step saved")
+    page.get_by_text("Confirm").click()

@@ -1,23 +1,41 @@
+import { COLORS } from '../../../../helix-design-system'
+import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
 
 import type { LabwareWellMap } from '@opentrons/shared-data'
+import type { ParentType } from '../types'
 
 interface EmptyWellProps {
   wellMap: LabwareWellMap
+  parentType: ParentType
   size?: string
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap } = props
+  const { size, wellMap, parentType } = props
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
+  const isLabware = parentType === LABWARE
+  const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
   const circularDimension = 20
-  const viewBox =
-    size || isCircular
-      ? `0 0 ${circularDimension} ${circularDimension}`
-      : `0 0 ${width} ${height}`
-
+  const viewBoxWidth = isCircular ? circularDimension : width
+  const viewBoxHeight = isCircular ? circularDimension : height
+  const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
+  const lineStrokeWidth = isCircular ? 2 : 1
+  const lineProps = isLabware
+    ? {
+        x1: 0,
+        y1: 0,
+        x2: viewBoxWidth,
+        y2: viewBoxHeight,
+      }
+    : {
+        x1: viewBoxWidth,
+        y1: 0,
+        x2: 0,
+        y2: viewBoxHeight,
+      }
   return (
     <svg
       width={size ?? width}
@@ -37,14 +55,7 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
         {isCircular ? (
           <circle cx="10" cy="10" r="9.5" fill="white" />
         ) : (
-          <rect
-            x="0.5"
-            y="0.5"
-            width={width}
-            height={height}
-            rx="2"
-            fill="white"
-          />
+          <rect x="0" y="0" width={width} height={height} fill="white" />
         )}
       </mask>
 
@@ -55,29 +66,25 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             cy="10"
             r="9"
             fill="#CBCCCC"
-            stroke="#737578"
-            strokeWidth="2"
+            stroke={outlineColor}
+            strokeWidth="3"
           />
         ) : (
           <rect
-            x="1"
-            y="1"
+            x="0"
+            y="0"
             width={width}
             height={height}
-            rx="2"
             fill="#CBCCCC"
-            stroke="#737578"
+            stroke={outlineColor}
             strokeWidth="2"
           />
         )}
 
         <line
-          x1={isCircular ? 24.7071 : width + 4.7071}
-          y1={isCircular ? -4.29289 : -4.29289}
-          x2={isCircular ? -3.29289 : -3.29289}
-          y2={isCircular ? 23.7071 : height + 3.7071}
-          stroke="#737578"
-          strokeWidth="2"
+          {...lineProps}
+          stroke={outlineColor}
+          strokeWidth={lineStrokeWidth}
         />
       </g>
     </svg>

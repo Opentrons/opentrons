@@ -87,7 +87,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
             ),
         ],
         authorization_checker: Annotated[
-            AuthorizationChecker, fastapi.Depends(_get_authorization_checker)
+            AuthorizationChecker, fastapi.Depends(get_authorization_checker)
         ],
     ) -> None:
         authorization_result = await authorization_checker.check(
@@ -158,12 +158,16 @@ async def build_authorization_checker(
             yield AuthServerAuthorizationChecker(client)
 
 
-def _get_authorization_checker(
+def get_authorization_checker(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> AuthorizationChecker:
-    """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`."""
+    """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`.
+
+    Endpoints should not normally need to use this directly. Use `require_scopes()`,
+    which is higher-level, instead. This is exposed for testing.
+    """
     authorization_checker = _authorization_checker_accessor.get_from(app_state)
     assert authorization_checker is not None, (
-        "Forgot to initialize notification client as part of server startup?"
+        "Forgot to initialize authorization checker as part of server startup?"
     )
     return authorization_checker

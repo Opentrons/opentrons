@@ -24,6 +24,8 @@ import {
   STALL_OR_COLLISION_OPTIONS,
   TIP_DROP_FAILED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
+  VACUUM_CARBOY_FULL_OPTIONS,
+  VACUUM_PRESSURE_NOT_REACHED_OPTIONS,
 } from '../SelectRecoveryOption'
 
 import type { Mock } from 'vitest'
@@ -579,5 +581,21 @@ describe('getRecoveryOptions', () => {
       'flexStacker/retrieve'
     )
     expect(stackerStalledOptions).toBe(STACKER_STALLED_RETRIEVE_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.VACUUM_CARBOY_FULL}`, () => {
+    const vacuumCarboyFullOptions = getRecoveryOptions(
+      ERROR_KINDS.VACUUM_CARBOY_FULL
+    )
+    expect(vacuumCarboyFullOptions).toBe(VACUUM_CARBOY_FULL_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED}`, () => {
+    const vacuumPressureNotReachedOptions = getRecoveryOptions(
+      ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED
+    )
+    expect(vacuumPressureNotReachedOptions).toBe(
+      VACUUM_PRESSURE_NOT_REACHED_OPTIONS
+    )
   })
 })

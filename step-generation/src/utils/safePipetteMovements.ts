@@ -1,5 +1,4 @@
 import {
-  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -11,7 +10,6 @@ import {
   getPositionFromSlotId,
   getRobotDefFromRobotType,
   OT2_ROBOT_TYPE,
-  PARTIAL,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -378,13 +376,11 @@ export const getIsSafePipetteMovement = (args: {
 
   const { channels } = pipetteEntity.spec
   const confirmedPrimaryNozzle =
-    nozzleConfiguration === PARTIAL
-      ? A1_NOZZLE
-      : (primaryNozzle ??
-        getDefaultPrimaryNozzle({
-          nozzles: nozzleConfiguration,
-          channels,
-        }))
+    primaryNozzle ??
+    getDefaultPrimaryNozzle({
+      nozzles: nozzleConfiguration,
+      channels,
+    })
 
   const tipOverlapOnNozzle =
     tiprackEntity != null

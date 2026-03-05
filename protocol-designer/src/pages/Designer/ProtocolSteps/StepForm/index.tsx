@@ -70,7 +70,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     deleteLabwares,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
+  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(() =>
     getDirtyFields(isNewStep, formData)
   )
   const savedStepForms = useSelector(getSavedStepForms)

@@ -69,15 +69,20 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
 
-  useEffect(() => {
-    if (
-      additionalEquipment[String(dropdownItem)] == null &&
-      labwareEntities[String(dropdownItem)] == null &&
-      !isTipDropLocationReturnTip
-    ) {
-      updateValue(null)
-    }
-  }, [dropdownItem])
+  useEffect(
+    () => {
+      if (
+        additionalEquipment[String(dropdownItem)] == null &&
+        labwareEntities[String(dropdownItem)] == null &&
+        !isTipDropLocationReturnTip
+      ) {
+        updateValue(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dropdownItem]
+  )
 
   return (
     <DropdownStepFormField
