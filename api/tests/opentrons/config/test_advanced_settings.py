@@ -272,3 +272,15 @@ def test_per_robot_true_defaults(mock_read_settings_file_empty: MagicMock) -> No
             )
             is True
         )
+        assert (
+            advanced_settings.get_setting_with_env_overload(
+                "allowWifiRoaming", RobotTypeEnum.OT2
+            )
+            is True
+        )
+        assert (
+            advanced_settings.get_setting_with_env_overload(
+                "allowWifiRoaming", RobotTypeEnum.FLEX
+            )
+            is False
+        )

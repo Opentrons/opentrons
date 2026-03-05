@@ -97,3 +97,7 @@ def hardware_subprocess_enabled() -> bool:
     return advs.get_setting_with_env_overload(
         "enableHardwareSubprocess", RobotTypeEnum.FLEX
     )
+
+
+def allow_wifi_roaming(robot_type: RobotTypeEnum) -> bool:
+    return advs.get_setting_with_env_overload("allowWifiRoaming", robot_type)

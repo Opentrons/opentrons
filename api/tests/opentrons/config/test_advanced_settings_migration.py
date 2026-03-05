@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 39
+    return 40
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -34,6 +34,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": False,
         "enableHardwareSubprocess": False,
+        "allowWifiRoaming": None,
     }
 
 
@@ -603,4 +604,5 @@ def test_ensures_config() -> None:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
+        "allowWifiRoaming": None,
     }

@@ -244,6 +244,13 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="allowWifiRoaming",
+        title="Allow the robot to automatically try to connect to better Wi-Fi Access Points",
+        description="In a Wi-Fi network with multiple access points providing a network, sometimes environmental conditions make one access point get better signal than another. With this setting enabled, the robot will automatically try to connect to the best access point; with it disabled, the robot will stay on the access point that was best when you configured the Wi-Fi connection. Since the roaming process can fail, and robots do not typically move, it's better to keep roaming turned off, but if your wireless network configuration changes you may need to manually reconnect.",
+        robot_type=[RobotTypeEnum.FLEX, RobotTypeEnum.OT2],
+        default_true_on_robot_types=[RobotTypeEnum.OT2],
+    ),
 ]
 
 
@@ -777,6 +784,16 @@ def _migrate38to39(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate39to40(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 40 of the feature flags file.
+
+    - Adds the allowWifiRoaming=false default
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["allowWifiRoaming"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -817,6 +834,7 @@ _MIGRATIONS = [
     _migrate36to37,
     _migrate37to38,
     _migrate38to39,
+    _migrate39to40,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
