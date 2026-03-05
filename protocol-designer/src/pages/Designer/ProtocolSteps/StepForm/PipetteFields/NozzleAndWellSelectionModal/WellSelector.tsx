@@ -154,6 +154,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         nozzleConfiguration,
       }),
     [
+      allWells,
       primaryNozzle,
       nozzleConfiguration,
       pipetteId,
