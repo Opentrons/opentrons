@@ -77,6 +77,7 @@ import {
   PauseTools,
   TemperatureTools,
   ThermocyclerTools,
+  VacuumTools,
 } from './StepTools'
 import {
   capitalizeFirstLetter,
@@ -115,6 +116,7 @@ const STEP_FORM_MAP: StepFormMap = {
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
   flexStacker: FlexStackerTools,
+  vacuum: VacuumTools,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
