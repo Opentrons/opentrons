@@ -147,13 +147,13 @@ EXPECTED_STATEMENTS_LATEST = [
         annotation_id VARCHAR NOT NULL,
         name VARCHAR NOT NULL,
         description VARCHAR,
-        source VARCHAR(6) NOT NULL,
-        parent VARCHAR,
+        source VARCHAR(13) NOT NULL,
+        parent_id VARCHAR,
         params VARCHAR,
         PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, parent_id) REFERENCES command_annotation (run_id, annotation_id) ON DELETE CASCADE,
         FOREIGN KEY(run_id) REFERENCES run (id),
-        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system')),
-        FOREIGN KEY(parent) REFERENCES command_annotation (annotation_id)
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('userCommand', 'systemCommand'))
     )
     """,
     """
@@ -172,12 +172,6 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
     """
     CREATE UNIQUE INDEX ix_c2a_run_id_command_id_annotation_id ON command_to_annotation (run_id, command_id, annotation_id)
-    """,
-    """
-    CREATE UNIQUE INDEX ix_c2a_run_id_annotation_id ON command_to_annotation (run_id, annotation_id)
-    """,
-    """
-    CREATE UNIQUE INDEX ix_c2a_run_id_command_id ON command_to_annotation (run_id, command_id)
     """,
     """
     CREATE TABLE data_files (

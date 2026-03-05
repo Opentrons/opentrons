@@ -337,7 +337,7 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
-        command_annotations = self.run_orchestrator.get_all_legacy_command_annotations()
+        command_annotations = self.run_orchestrator.get_all_command_annotations()
         preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
