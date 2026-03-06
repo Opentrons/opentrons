@@ -10,6 +10,7 @@ from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
 )
+from auth_server.persistence import orm_models as _orm_models  # noqa: F401
 from auth_server.server_settings import get_settings
 
 # this is the Alembic Config object, which provides
@@ -84,6 +85,7 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+            render_as_batch=True,
         )
 
         with context.begin_transaction():
