@@ -38,7 +38,7 @@ export function LiquidColorPicker({
             presetColors={DEFAULT_LIQUID_COLORS}
             color={color}
             onChange={(color: ColorResult) => {
-              setValue('displayColor', color.hex)
+              setValue('displayColor', color.hexa)
               field.onChange(color.hex)
             }}
           />
