@@ -4,6 +4,8 @@ from typing import Any, NamedTuple
 
 from opentrons import config
 
+NM_UUID_RE = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
 
 class EAPType(NamedTuple):
     name: str

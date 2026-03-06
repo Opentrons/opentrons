@@ -16,18 +16,118 @@ import logging
 import os
 import re
 from asyncio import subprocess as as_subprocess
+from contextlib import AbstractAsyncContextManager
 from shlex import quote
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Self,
+    Tuple,
+    Type,
+    cast,
+)
 
 from .network_constants import (
     CONNECTION_TYPES,
     EAP_TYPES,
     NETWORK_IFACES,
+    NM_UUID_RE,
     SECURITY_TYPES,
 )
 from opentrons import config
 
 log = logging.getLogger(__name__)
+
+
+class BackedUpModify(AbstractAsyncContextManager[str]):
+    """Use as a context manager to back up a connection for modification.
+
+    On enter, the CM will clone the connection specified in init,
+    and yield the name of the clone. On a clean exit, the CM will try and up the clone;
+    if it succeeds, the CM will remove the original and rename the clone to
+    the original's name. If the modified clone fails to come up, the clone
+    will be removed and the original will come up. On an exit via exception, we'll
+    just remove the clone.
+
+    After exiting, the result is available from result() as a (bool, str) pair
+    in the same style as the rest of the methods here.
+    """
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+        self._result: tuple[bool, str] | None = None
+        self._clone_name: str | None
+
+    def result(self) -> tuple[bool, str]:
+        """Once the CM has exited, the result of trying to bring up the modified connection."""
+        if self._result is None:
+            raise RuntimeError("Results not yet available")
+        return self._result
+
+    async def __aenter__(self: Self) -> str:
+        """Enter the CM, cloning the connection. Yields the name of the clone."""
+        clone_no = 1
+        while await connection_exists(f"{self._name}-{clone_no}") is not None:
+            clone_no += 1
+        res, err, code = await _call(
+            ["connection", "clone", self._name, f"{self._name}-{clone_no}"]
+        )
+        # clones aren't expected to fail, and usually only do so if the name was wrong
+        if code != 0:
+            raise RuntimeError(f"Failed to clone {self._name}: {res}, {err}")
+        # connection clone has a lovely human readable result we have to regex
+        self._clone_name = _parse_clone_result(res)
+        return self._clone_name
+
+    async def __aexit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: Any,
+    ) -> None:
+        if self._clone_name is None:
+            log.error("No known clone name in exit, clone must have failed")
+            return
+        if exc_type:
+            log.error(
+                f"Exception caught while trying to modify cloned connection: {exc_type.__name__}({exc_value})"
+            )
+            await _call(["connection", "delete", "id", self._clone_name])
+        else:
+            log.info(
+                f"Attempting to bring up cloned connection name {self._clone_name}"
+            )
+            res, err, code = await _call(["connection", "up", "id", self._clone_name])
+            if err or code != 0 or "successfully activated" not in res:
+                log.error(f"Failed to bring up modified connection: {res} {err}")
+                await remove(name=self._clone_name)
+                self._result = (False, res)
+            else:
+                log.info("Brought up new connection successfully!")
+                await remove(name=self._name)
+                await _call(
+                    [
+                        "connection",
+                        "modify",
+                        "id",
+                        self._clone_name,
+                        "id",
+                        self._clone_name,
+                    ]
+                )
+                self._result = (True, res)
+
+
+def _parse_clone_result(res: str) -> str:
+    matches = re.match(
+        rf"^.+\({NM_UUID_RE}\) cloned as (.+) \(({NM_UUID_RE})\)\.$", res.strip()
+    )
+    if not matches:
+        raise RuntimeError(f"Unparsable result from connection clone: {res}")
+    return matches.group(1)
 
 
 def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
@@ -60,8 +160,8 @@ async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]
 
     fields = ["ssid", "signal", "active", "security"]
     cmd = ["--terse", "--fields", ",".join(fields), "device", "wifi", "list"]
-    out, err = await _call(cmd)
-    if err:
+    out, err, code = await _call(cmd)
+    if err or code != 0:
         raise RuntimeError(err)
     output = _dict_from_terse_tabular(
         fields,
@@ -78,7 +178,7 @@ async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]
 
 async def is_connected() -> str:
     """Return nmcli's connection measure: none/portal/limited/full/unknown"""
-    res, _ = await _call(["networking", "connectivity", "check"])
+    res, _, _1 = await _call(["networking", "connectivity", "check"])
     return res
 
 
@@ -95,8 +195,8 @@ async def connections(
     If for_type is not None, it should be a str containing an element of
     CONNECTION_TYPES, and results will be limited to that connection type.
     """
-    fields = ["name", "type", "active"]
-    res, _ = await _call(["-t", "-f", ",".join(fields), "connection", "show"])
+    fields = ["name", "type", "active", "uuid"]
+    res, _, _1 = await _call(["-t", "-f", ",".join(fields), "connection", "show"])
     found = _dict_from_terse_tabular(
         fields,
         res,
@@ -123,7 +223,7 @@ async def connection_exists(ssid: str) -> Optional[str]:
     """
     nmcli_conns = await connections()
     for wifi in [c["name"] for c in nmcli_conns if c["type"] == "wireless"]:
-        res, _ = await _call(
+        res, _, _1 = await _call(
             [
                 "-t",
                 "-f",
@@ -269,10 +369,10 @@ async def configure(
         # TODO(seth, 8/29/2018): We may need to do connection modifies
         # here for EAP configuration if e.g. we’re passing a keyfile in a
         # different http request
-        _1, _2 = await _call(["connection", "delete", already])
+        _ = await _call(["connection", "delete", already])
 
     configure_cmd = _build_con_add_cmd(ssid, securityType, psk, hidden, eapConfig)
-    res, err = await _call(configure_cmd)
+    res, err, _1 = await _call(configure_cmd)
 
     # nmcli connection add returns a string that looks like
     # "Connection ’connection-name’ (connection-uuid) successfully added."
@@ -285,12 +385,12 @@ async def configure(
     name = uuid_matches.group(1)
     uuid = uuid_matches.group(2)
     for _ in range(upRetries):
-        res, err = await _call(["connection", "up", "uuid", uuid])
+        res, err, _code = await _call(["connection", "up", "uuid", uuid])
         if "Connection successfully activated" in res:
             # If we successfully added the connection, remove other wifi
             # connections so they don’t accumulate over time
 
-            _3, _4 = await _trim_old_connections(name, CONNECTION_TYPES.WIRELESS)
+            _2 = await _trim_old_connections(name, CONNECTION_TYPES.WIRELESS)
             return True, res
     else:
         return False, err.split("\r")[-1]
@@ -310,7 +410,7 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     Returns (True, msg) if the network was disconnected from successfully,
             (False, msg) otherwise
     """
-    res, err = await _call(["connection", "down", ssid])
+    res, err, _ = await _call(["connection", "down", ssid])
     if "successfully deactivated" in res:
         rem_ok, rem_res = await remove(ssid)
         if rem_ok:
@@ -335,7 +435,7 @@ async def remove(
     if None is not ssid:
         name = await connection_exists(ssid)
     if None is not name:
-        res, err = await _call(["connection", "delete", name])
+        res, err, _ = await _call(["connection", "delete", name])
         if "successfully deleted" in res:
             return True, res
         else:
@@ -387,7 +487,7 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     # ‘dev show <dev-name>’ default to a multiline representation, and even if
     # explicitly ask for it to be tabular, it’s not quite the same as the other
     # commands. So we have to special-case the parsing.
-    res, err = await _call(
+    res, err, _ = await _call(
         [
             "--mode",
             "multiline",
@@ -426,7 +526,7 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     return info
 
 
-async def _call(cmd: List[str], suppress_err: bool = False) -> Tuple[str, str]:
+async def _call(cmd: List[str], suppress_err: bool = False) -> Tuple[str, str, int]:
     """
     Runs the command in a subprocess and returns the captured stdout output.
     :param cmd: a list of arguments to nmcli. Should not include nmcli itself.
@@ -448,7 +548,13 @@ async def _call(cmd: List[str], suppress_err: bool = False) -> Tuple[str, str]:
     log.debug("{}: stdout={}".format(" ".join(sanitized), out_str))
     if err_str and not suppress_err:
         log.warning("{}: stderr={}".format(" ".join(sanitized), err_str))
-    return out_str, err_str
+    # this should never happen and represents an invocation bug
+    if proc.returncode is None:
+        log.error("nmcli invocation has not yet exited!")
+        returncode = 1
+    else:
+        returncode = proc.returncode
+    return out_str, err_str, returncode
 
 
 def sanitize_args(cmd: List[str]) -> List[str]:
