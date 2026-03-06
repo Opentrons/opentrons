@@ -174,7 +174,7 @@ export type StepType =
   | 'temperature'
   | 'thermocycler'
   | 'flexStacker'
-
+  | 'vacuum'
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
   camera: 'camera',
@@ -189,6 +189,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   pause: 'pause-circle',
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
+  vacuum: 'ot-vacuum',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -537,6 +538,12 @@ export interface HydratedFlexStackerFormData extends AnnotationFields {
   moduleId: string
 }
 
+export interface HydratedVacuumFormData extends AnnotationFields {
+  stepType: 'vacuum'
+  id: string
+  moduleId: string
+}
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
@@ -657,3 +664,4 @@ export type HydratedFormData =
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
   | HydratedFlexStackerFormData
+  | HydratedVacuumFormData

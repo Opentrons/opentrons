@@ -245,4 +245,11 @@ describe('getDefaultsForStepType', () => {
       })
     })
   })
+  describe('vacuum step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('vacuum')).toEqual({
+        moduleId: null,
+      })
+    })
+  })
 })
