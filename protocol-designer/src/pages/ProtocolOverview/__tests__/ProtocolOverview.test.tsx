@@ -43,10 +43,6 @@ vi.mock('../InstrumentsInfo')
 vi.mock('../StepsInfo')
 vi.mock('../StartingDeck')
 vi.mock('../PeripheralsInfo')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const mockNavigate = vi.fn()
 

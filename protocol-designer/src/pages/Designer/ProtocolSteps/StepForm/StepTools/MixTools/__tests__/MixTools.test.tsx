@@ -34,10 +34,6 @@ vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
 vi.mock('react-plotly.js', () => ({
   default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
 }))
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'

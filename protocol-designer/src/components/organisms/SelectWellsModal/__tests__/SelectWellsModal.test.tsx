@@ -25,10 +25,6 @@ vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('/protocol-designer/top-selectors/well-contents')
 vi.mock('/protocol-designer/components/organisms/Labware/SelectableLabware')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof SelectWellsModal>) => {
   return renderWithProviders(<SelectWellsModal {...props} />, {

@@ -10,10 +10,6 @@ import { Privacy } from '..'
 import type { ComponentProps } from 'react'
 
 vi.mock('/protocol-designer/analytics')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof Privacy>) => {
   return renderWithProviders(<Privacy {...props} />, {

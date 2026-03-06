@@ -50,10 +50,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getAllDefinitions: vi.fn(),
   }
 })
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof SelectedItems>) => {
   return renderWithProviders(<SelectedItems {...props} />)[0]

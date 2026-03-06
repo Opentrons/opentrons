@@ -6,11 +6,6 @@ import { i18n } from '/protocol-designer/assets/localization'
 
 import { MagnetModuleChangeContent } from '..'
 
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
-
 const render = () => {
   return renderWithProviders(<MagnetModuleChangeContent />, {
     i18nInstance: i18n,
