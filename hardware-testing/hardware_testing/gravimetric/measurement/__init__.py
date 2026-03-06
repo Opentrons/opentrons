@@ -17,7 +17,9 @@ class SupportedLiquid(Enum):
 
     WATER = "water"
     ETHANOL = "ethanol"
+    ETHANOL_80 = "ethanol_80"
     GLYCEROL = "glycerol"
+    GLYCEROL_50 = "glycerol_50"
     HEXANE = "hexane"
 
     @classmethod
