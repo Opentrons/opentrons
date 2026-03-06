@@ -88,12 +88,17 @@ export function useLPCFlows({
     ? compatibleFlexAnalysis
     : mostRecentAnalysis
 
-  const labwareDefs = useMemo(() => {
-    const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
-      compatibleRobotAnalysis?.commands ?? []
-    )
-    return labwareDefsFromCommands
-  }, [compatibleRobotAnalysis?.commands.length])
+  const labwareDefs = useMemo(
+    () => {
+      const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
+        compatibleRobotAnalysis?.commands ?? []
+      )
+      return labwareDefsFromCommands
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [compatibleRobotAnalysis?.commands.length]
+  )
 
   const {
     labwareInfo,
@@ -133,24 +138,29 @@ export function useLPCFlows({
     useDeleteMaintenanceRunMutation()
 
   // After the maintenance run is created, add labware defs to the maintenance run.
-  useEffect(() => {
-    if (maintenanceRunId != null) {
-      void Promise.all(
-        labwareDefs.map(def => {
-          return createLabwareDefinition({
-            maintenanceRunId,
-            labwareDef: def,
+  useEffect(
+    () => {
+      if (maintenanceRunId != null) {
+        void Promise.all(
+          labwareDefs.map(def => {
+            return createLabwareDefinition({
+              maintenanceRunId,
+              labwareDef: def,
+            })
           })
-        })
-      )
-        .then(() => {
-          setHasCreatedLPCRun(true)
-        })
-        .finally(() => {
-          setIsLaunching(false)
-        })
-    }
-  }, [maintenanceRunId])
+        )
+          .then(() => {
+            setHasCreatedLPCRun(true)
+          })
+          .finally(() => {
+            setIsLaunching(false)
+          })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [maintenanceRunId]
+  )
 
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.

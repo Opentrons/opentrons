@@ -169,11 +169,16 @@ export function ProtocolSteps({
     }
   }
 
-  useEffect(() => {
-    if (selectedStepId != null) {
-      handleScrollToTop()
-    }
-  }, [selectedStepId])
+  useEffect(
+    () => {
+      if (selectedStepId != null) {
+        handleScrollToTop()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedStepId]
+  )
 
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
@@ -185,39 +190,49 @@ export function ProtocolSteps({
   const zoomedInOnOffDeck =
     zoomedInSlot != null && labware[zoomedInSlot] != null
   //  zoom in already if you are exiting from adding liquids
-  useEffect(() => {
-    if (zoomedInSlot != null && !zoomedInOnOffDeck) {
-      const zoomInSlotPosition = getPositionFromSlotId(
-        zoomedInSlot ?? '',
-        deckDef
-      )
-      if (zoomInSlotPosition != null) {
-        const zoomedInViewBox = zoomInOnCoordinate({
-          x: zoomInSlotPosition[0],
-          y: zoomInSlotPosition[1],
+  useEffect(
+    () => {
+      if (zoomedInSlot != null && !zoomedInOnOffDeck) {
+        const zoomInSlotPosition = getPositionFromSlotId(
+          zoomedInSlot ?? '',
+          deckDef
+        )
+        if (zoomInSlotPosition != null) {
+          const zoomedInViewBox = zoomInOnCoordinate({
+            x: zoomInSlotPosition[0],
+            y: zoomInSlotPosition[1],
 
-          deckDef,
-        })
-        setViewBox(zoomedInViewBox)
+            deckDef,
+          })
+          setViewBox(zoomedInViewBox)
+        }
+      } else if (
+        zoomedInOnOffDeck &&
+        selectedTerminalItemId! === START_TERMINAL_ITEM_ID
+      ) {
+        setDeckView(rightString)
       }
-    } else if (
-      zoomedInOnOffDeck &&
-      selectedTerminalItemId! === START_TERMINAL_ITEM_ID
-    ) {
-      setDeckView(rightString)
-    }
-  }, [zoomedInSlot, labware, zoomedInOnOffDeck])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [zoomedInSlot, labware, zoomedInOnOffDeck]
+  )
 
   //  zoom out if you select on any step other than starting deck state in the timeline toolbox
-  useEffect(() => {
-    if (
-      zoomedInSlot != null &&
-      selectedTerminalItemId !== START_TERMINAL_ITEM_ID
-    ) {
-      dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-      setViewBox(initialViewBox)
-    }
-  }, [zoomedInSlot, selectedTerminalItemId])
+  useEffect(
+    () => {
+      if (
+        zoomedInSlot != null &&
+        selectedTerminalItemId !== START_TERMINAL_ITEM_ID
+      ) {
+        dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+        setViewBox(initialViewBox)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [zoomedInSlot, selectedTerminalItemId]
+  )
 
   return (
     <>

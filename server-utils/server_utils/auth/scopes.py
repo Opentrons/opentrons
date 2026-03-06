@@ -24,6 +24,11 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
+    ROBOT_SETTINGS_WRITE = (
+        "robot_settings.write",
+        "Edit general robot settings."
+    )
+
     RUNS_WRITE = (
         "runs.write",
         "Create and control protocol runs.",

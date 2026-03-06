@@ -16,7 +16,6 @@ from server_utils.auth.resource_server.fastapi_dependencies import (
 from auth_server.authorization_checker import build_authorization_checker
 from auth_server.oauth2.backend import build as build_oauth2_backend
 from auth_server.oauth2.fastapi_dependencies import (
-    install_oath2_sql_engine,
     install_oauth2_backend,
 )
 from auth_server.oauth2.router import router as oauth2_router
@@ -40,8 +39,8 @@ from auth_server.users.user_data_manager import UserDataManager
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
-def _get_persistence_directory(settings: AuthServerSettings) -> Optional[Path]:
-    """Extract the persistence directory from settings."""
+def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Path]:
+    """Return the root persistence directory."""
     if settings.persistence_directory == "automatically_make_temporary":
         return None
     return settings.persistence_directory
@@ -53,7 +52,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     install_settings_store(app.state, settings_store)
 
     settings = get_settings()
-    persistence_directory_root = _get_persistence_directory(settings)
+    persistence_directory_root = _get_persistence_directory_root(settings)
     prepared_root = await prepare_root(persistence_directory_root)
     set_persistence_directory(app.state, prepared_root)
 
@@ -64,15 +63,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         set_sql_engine(app.state, engine)
 
         user_store = UserStore(sql_engine=engine)
+        oauth2_backend = build_oauth2_backend(user_store)
+        install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(user_store=user_store)
         user_service.seed_initial_users()
-        install_oath2_sql_engine(app.state, engine)
 
         settings_store = SettingsStore()
         install_settings_store(app.state, settings_store)
-
-        oauth2_backend = build_oauth2_backend(user_store)
-        install_oauth2_backend(app.state, oauth2_backend)
 
         authorization_checker = build_authorization_checker(
             settings_store, oauth2_backend

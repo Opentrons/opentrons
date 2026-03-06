@@ -11,7 +11,7 @@ import pydantic
 
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
-from auth_server.persistence.tables import User
+from auth_server.users.models import UserResponse
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import password_hash
 
@@ -105,8 +105,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Is the client allowed to access the requested scopes?"""
-        assert isinstance(request.user, User)
-        user: User = request.user
+        assert isinstance(request.user, UserResponse)
+        user: UserResponse = request.user
 
         try:
             for scope in scopes:
@@ -120,8 +120,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             return False
 
         requested_scopes = set(scopes)
-        allowed_scopes = {scope.api_name for scope in user.scopes}
-        return requested_scopes.issubset(allowed_scopes)
+        return requested_scopes.issubset(user.scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -129,9 +128,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self, client_id: str, request: oauthlib.common.Request
     ) -> list[str]:
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
-        assert isinstance(request.user, User)
-        user: User = request.user
-        return sorted(scope.api_name for scope in user.scopes)
+        assert isinstance(request.user, UserResponse)
+        user: UserResponse = request.user
+        return sorted(user.scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -167,10 +166,13 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         user = self.__user_store.get(username)
-        if user is not None and password_hash.verify(
-            password, str(user.hashed_password)
+        # todo(tz, 2026-02-27): remove this check when we upgrade to sqlalchemy 2.0.
+        if (
+            user is not None
+            and user.hashed_password is not None
+            and password_hash.verify(password, user.hashed_password)
         ):
-            request.user = user  # type: ignore[attr-defined]
+            request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
             return True
         return False
 
@@ -211,7 +213,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         expires_in = token["expires_in"]
 
         user = request.user
-        assert isinstance(user, User)
+        assert isinstance(user, UserResponse)
 
         client_id = request.client_id
         assert isinstance(client_id, str)
@@ -222,7 +224,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self.__token_store.save(
             _TokenIssuance(
                 client_id=client_id,
-                username=user.username,
+                username=user.userName,
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
@@ -247,8 +249,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if issuance is not None:
             user = self.__user_store.get(issuance.username)
+            if user is None:
+                return False
             # Set `.user` per the oauthlib docs.
-            request.user = user  # type: ignore[attr-defined]
+            request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
             return True
         else:
             return False

@@ -84,36 +84,41 @@ export function RecoveryDoorOpenSpecial({
       .then(() => proceedToRouteAndStep(route, step))
   }
 
-  useEffect(() => {
-    if (!doorStatusUtils.isDoorOpen) {
-      switch (selectedRecoveryOption) {
-        case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
-          handleHomeExceptPlungersAndRoute(
-            RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
-            RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
-          )
-          break
-        case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
-          handleHomeExceptPlungersAndRoute(
-            RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
-            RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
-          )
-          break
-        case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
-          handleHomeAllAndRoute(
-            RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
-            RECOVERY_MAP.HOME_AND_RETRY.STEPS.CONFIRM_RETRY
-          )
-          break
-        default: {
-          console.error(
-            `Unhandled special-cased door open on route ${selectedRecoveryOption}.`
-          )
-          void proceedToRouteAndStep(RECOVERY_MAP.OPTION_SELECTION.ROUTE)
+  useEffect(
+    () => {
+      if (!doorStatusUtils.isDoorOpen) {
+        switch (selectedRecoveryOption) {
+          case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
+            handleHomeExceptPlungersAndRoute(
+              RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+              RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
+            )
+            break
+          case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+            handleHomeExceptPlungersAndRoute(
+              RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+              RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE
+            )
+            break
+          case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
+            handleHomeAllAndRoute(
+              RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
+              RECOVERY_MAP.HOME_AND_RETRY.STEPS.CONFIRM_RETRY
+            )
+            break
+          default: {
+            console.error(
+              `Unhandled special-cased door open on route ${selectedRecoveryOption}.`
+            )
+            void proceedToRouteAndStep(RECOVERY_MAP.OPTION_SELECTION.ROUTE)
+          }
         }
       }
-    }
-  }, [doorStatusUtils.isDoorOpen])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [doorStatusUtils.isDoorOpen]
+  )
 
   return (
     <RecoverySingleColumnContentWrapper>

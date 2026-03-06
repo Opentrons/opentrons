@@ -53,7 +53,6 @@ async def post_users(
             password=user_create.password.get_secret_value(),
             full_name=user_create.fullName,
             account_type=user_create.accountType,
-            scopes=[Scope.USERS_WRITE],
         )
     except UserAlreadyExistsError:
         raise fastapi.HTTPException(
@@ -67,7 +66,7 @@ async def post_users(
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
-        content=SimpleBody(data=UserResponse.from_orm_user(new_user)),
+        content=SimpleBody(data=new_user),
     )
 
 
@@ -100,7 +99,7 @@ async def get_user(
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(data=UserResponse.from_orm_user(user)),
+        content=SimpleBody(data=user),
     )
 
 
@@ -179,5 +178,5 @@ async def update_user(
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(data=UserResponse.from_orm_user(updated_user)),
+        content=SimpleBody(data=updated_user),
     )

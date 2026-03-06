@@ -877,7 +877,7 @@
         },
         "lidOffsets": {
           "$ref": "#/definitions/pickUpAndDropOffsets",
-          "description": "Additional offsets for gripping this labware, if this labware is a lid. Beware this property's placement: instead of affecting the labware stacked atop this labware, like the rest of the `gripperOffsets` properties, it affects this labware."
+          "description": "An adjustment for when this labware is a lid moving into or out of a Thermocycler. This is a workaround for suspected software bugs in how Thermocycler positions are calculated. This might be ignored once the underlying bugs are fixed. Beware this property's placement: instead of affecting the labware stacked atop this labware, like the rest of the `gripperOffsets` properties, it affects this labware. For historical reasons, `dropOffset` is ignored, and `pickUpOffset` is applied to both the pickup and drop; `dropOffset` should be set to match `pickUpOffset` to avoid confusion."
         },
         "lidDisposalOffsets": {
           "$ref": "#/definitions/pickUpAndDropOffsets",

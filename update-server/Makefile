@@ -4,7 +4,6 @@ include ../scripts/python-uv.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
@@ -37,9 +36,12 @@ lock:
 	$(UV) lock
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate --log-level debug --port $(port)
+	$(python) -m otupdate.buildroot --log-level debug --port $(port)
+
+.PHONY: dev-flex
+dev-flex:
+	$(python) -m otupdate.openembedded --log-level debug --port $(port)
 
 .PHONY: clean
 clean:

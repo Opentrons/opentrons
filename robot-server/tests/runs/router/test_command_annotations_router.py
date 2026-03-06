@@ -16,7 +16,9 @@ from robot_server.runs.router.command_annotations_router import (
     get_command_annotation,
     get_command_annotations_list,
 )
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_data_manager import (
+    RunDataManager,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import (
     CommandAnnotationNotFoundError as CommandAnnotationNotFoundInRunStoreError,

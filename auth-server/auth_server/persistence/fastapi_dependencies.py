@@ -11,11 +11,10 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-
-from .persistence_directory import PersistenceResetter
+from server_utils.persistence.persistence_directory import PersistenceResetter
 
 _sql_engine_accessor = AppStateAccessor[SQLEngine]("sql_engine")
-_persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
+_persistence_directory_root_accessor = AppStateAccessor[Path]("persistence_directory")
 
 
 def set_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None:
@@ -42,14 +41,14 @@ def set_persistence_directory(app_state: AppState, directory: Path) -> None:
 
     This should be called once at server startup.
     """
-    _persistence_directory_accessor.set_on(app_state, directory)
+    _persistence_directory_root_accessor.set_on(app_state, directory)
 
 
-async def get_persistence_directory(
+async def get_persistence_directory_root(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the root persistence directory."""
-    directory = _persistence_directory_accessor.get_from(app_state)
+    directory = _persistence_directory_root_accessor.get_from(app_state)
     assert directory is not None, (
         "Forgot to initialize persistence directory as part of server startup?"
     )
@@ -57,7 +56,7 @@ async def get_persistence_directory(
 
 
 async def get_persistence_resetter(
-    directory_to_reset: Annotated[Path, Depends(get_persistence_directory)],
+    directory_to_reset: Annotated[Path, Depends(get_persistence_directory_root)],
 ) -> PersistenceResetter:
     """Get a ``PersistenceResetter`` to reset the auth-server's stored data."""
     return PersistenceResetter(directory_to_reset)

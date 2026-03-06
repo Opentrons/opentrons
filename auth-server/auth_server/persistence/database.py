@@ -14,16 +14,11 @@ from server_utils import sql_utils
 Base = declarative_base()
 
 
-def create_sql_engine(
+@contextmanager
+def sql_engine_ctx(
     db_path: Path,
-) -> sqlalchemy.engine.Engine:
-    """Create a SQLAlchemy engine.
-
-    Prefer ``sql_engine_ctx`` so the engine is disposed automatically.
-
-    Args:
-        db_path: Path to a SQLite file.
-    """
+) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    """Context-managed engine that disposes itself on exit."""
     engine = sqlalchemy.create_engine(
         sql_utils.get_connection_url(db_path),
         future=True,
@@ -31,19 +26,6 @@ def create_sql_engine(
     try:
         sql_utils.enable_foreign_key_constraints(engine)
         sql_utils.fix_transactions(engine)
-    except Exception:
-        engine.dispose()
-        raise
-    return engine
-
-
-@contextmanager
-def sql_engine_ctx(
-    db_path: Path,
-) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    """Context-managed engine that disposes itself on exit."""
-    engine = create_sql_engine(db_path)
-    try:
         yield engine
     finally:
         engine.dispose()
@@ -51,4 +33,7 @@ def sql_engine_ctx(
 
 def create_schema(engine: sqlalchemy.engine.Engine) -> None:
     """Create all ORM-mapped tables that don't yet exist."""
+    # we need to import the User model to ensure it is created in the database
+    from auth_server.persistence.orm_models import User  # noqa: F401
+
     Base.metadata.create_all(engine)

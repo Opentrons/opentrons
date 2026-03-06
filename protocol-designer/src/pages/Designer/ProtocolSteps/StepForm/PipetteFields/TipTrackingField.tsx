@@ -159,9 +159,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           {t('step_edit_form.field.tip_tracking.label')}
         </StyledText>
         <Flex className={styles.radio_buttons_container}>
-          {tipTrackingOptions.map(({ title, description, value }, i) => (
+          {tipTrackingOptions.map(({ title, description, value }) => (
             <RadioButton
-              key={i}
+              key={value}
               buttonLabel={title}
               buttonSubLabel={{
                 label: description,

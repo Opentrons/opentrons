@@ -24,6 +24,7 @@ class CommandAnnotation(BaseModel):
     """Optional annotations for protocol engine commands."""
 
     id: str = Field(..., description="A unique identifier for the command annotation.")
+    # TODO (spp, 2026-02-25): make this a string enum or string literal
     source: str = Field(..., description="The type of annotation (for machine parsing)")
     name: str = Field(..., description="The name of the annotation")
     description: Optional[str] = Field(
@@ -36,7 +37,7 @@ class CommandAnnotation(BaseModel):
             description="Key value pairs of the parameters passed to the annotation.",
         )
     )
-    parent: Optional[str] = Field(
+    parentId: Optional[str] = Field(
         None, description="The ID of the parent annotation if this is a sub-annotation."
     )
 

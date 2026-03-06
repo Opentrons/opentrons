@@ -1,5 +1,6 @@
 ---
 title: "Plate Reader: Safety Information"
+description: "Safe use, environmental conditions, and compliance for the plate reader."
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.

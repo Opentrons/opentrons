@@ -1,5 +1,6 @@
 ---
 title: "Temperature Module: OT-2 Attachment Steps"
+description: "Mount the module on the OT-2 deck and connect USB and power."
 hide: toc
 ---
 

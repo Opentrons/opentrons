@@ -3,9 +3,8 @@
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from server_utils.auth.scopes import Scope
-
-from auth_server.persistence.tables import AccountType, User
+from auth_server.persistence.orm_models import User
+from auth_server.users.models import AccountType
 
 
 class UserStore:
@@ -47,7 +46,6 @@ class UserStore:
         hashed_password: str,
         full_name: str,
         account_type: str,
-        scopes: list[Scope],
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
@@ -55,7 +53,6 @@ class UserStore:
             hashed_password=hashed_password,
             full_name=full_name,
             account_type=AccountType(account_type),
-            scopes=scopes,
         )
         with self._session() as session:
             session.add(new_user)

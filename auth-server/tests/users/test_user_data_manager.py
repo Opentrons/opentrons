@@ -3,7 +3,8 @@ from decoy import Decoy, matchers
 
 from server_utils.auth.scopes import Scope
 
-from auth_server.persistence.tables import AccountType, User
+from auth_server.persistence.orm_models import User
+from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
@@ -38,7 +39,6 @@ def _make_orm_user(
         hashed_password=hashed_password,
         full_name=full_name,
         account_type=account_type,
-        scopes=scopes if scopes is not None else [],
     )
 
 
@@ -71,7 +71,6 @@ def test_create_user_success(
             hashed_password=matchers.IsA(str),
             full_name="New User",
             account_type=AccountType.USER,
-            scopes=[Scope.RUNS_WRITE],
         )
     ).then_return(expected)
 
@@ -80,44 +79,30 @@ def test_create_user_success(
         password="validpass123",
         full_name="New User",
         account_type=AccountType.USER,
-        scopes=[Scope.RUNS_WRITE],
     )
-    assert result.username == "new_user"
-    assert result.account_type == AccountType.USER
+    assert result.userName == "new_user"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_create_user_hashes_password(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
     decoy.when(mock_store.get("hash_check")).then_return(None)
-    decoy.when(
-        mock_store.add(
-            username="hash_check",
-            hashed_password=matchers.IsA(str),
-            full_name="X",
-            account_type=AccountType.USER,
-            scopes=[],
-        )
-    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
 
-    manager.create_user(
+    decoy.when(
+        mock_store.add("hash_check", matchers.IsA(str), "X", AccountType.USER)
+    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
+    result = manager.create_user(
         username="hash_check",
         password="plaintextpw",
         full_name="X",
         account_type=AccountType.USER,
-        scopes=[],
     )
-
-    decoy.verify(
-        mock_store.add(
-            username="hash_check",
-            hashed_password="plaintextpw",
-            full_name="X",
-            account_type=AccountType.USER,
-            scopes=[],
-        ),
-        times=0,
-    )
+    assert result.userName == "hash_check"
+    assert result.fullName == "X"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_create_user_duplicate_raises(
@@ -132,7 +117,6 @@ def test_create_user_duplicate_raises(
             password="validpass123",
             full_name="Second",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -143,7 +127,6 @@ def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
             password="validpass123",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -154,7 +137,6 @@ def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
             password="",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -165,7 +147,6 @@ def test_create_user_short_password_raises(manager: UserDataManager) -> None:
             password="1234567",
             full_name="X",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -176,7 +157,6 @@ def test_create_user_empty_full_name_raises(manager: UserDataManager) -> None:
             password="validpass123",
             full_name="",
             account_type=AccountType.USER,
-            scopes=[],
         )
 
 
@@ -189,8 +169,9 @@ def test_get_user_returns_existing(
     expected = _make_orm_user(username="admin", account_type=AccountType.ADMIN)
     decoy.when(mock_store.get("admin")).then_return(expected)
     result = manager.get_user("admin")
-    assert result.username == "admin"
-    assert result.account_type == AccountType.ADMIN
+    assert result.userName == "admin"
+    assert result.accountType == AccountType.ADMIN
+    assert result.scopes == [scope.api_name for scope in Scope]
 
 
 def test_get_user_not_found_raises(
@@ -243,50 +224,33 @@ def test_update_user_username(
     ).then_return(expected)
 
     result = manager.update_user("old_name", new_username="new_name")
-    assert result.username == "new_name"
-    assert result.full_name == "Name Test"
+    assert result.userName == "new_name"
+    assert result.fullName == "Name Test"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_update_user_password_is_hashed(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
+    """Test that the password is hashed when updating a user."""
+
     decoy.when(
-        mock_store.update(
-            "pw_user",
-            new_username=None,
-            hashed_password=matchers.IsA(str),
-            full_name=None,
-            account_type=None,
-        )
-    ).then_return(_make_orm_user(username="pw_user"))
-
-    manager.update_user("pw_user", password="newpassword2")
-
-    decoy.verify(
-        mock_store.update(
-            "pw_user",
-            new_username=None,
-            hashed_password="newpassword2",
-            full_name=None,
-            account_type=None,
-        ),
-        times=0,
-    )
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None)
+    ).then_return(_make_orm_user(username="pw_user", full_name="X"))
+    result = manager.update_user("pw_user", password="newpassword2")
+    assert result.userName == "pw_user"
+    assert result.fullName == "X"
+    assert result.accountType == AccountType.USER
+    assert result.scopes == [Scope.RUNS_WRITE.api_name]
 
 
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(
-        mock_store.update(
-            "ghost",
-            new_username=None,
-            hashed_password=None,
-            full_name="Nope",
-            account_type=None,
-        )
-    ).then_raise(ValueError("User 'ghost' not found"))
-
+    decoy.when(mock_store.update("ghost", None, None, "Nope", None)).then_raise(
+        ValueError("User 'ghost' not found")
+    )
     with pytest.raises(UserNotFoundError):
         manager.update_user("ghost", full_name="Nope")
 

@@ -12,7 +12,8 @@
     "deselect_multiple": "Unselect wells"
   },
   "inaccessible": {
-    "collision": "Selection will cause a collision"
+    "collision": "Selection will cause a collision",
+    "partial_tip": "Blocked by existing selection"
   },
   "all_pickups_selected": "All wells selected"
 }
