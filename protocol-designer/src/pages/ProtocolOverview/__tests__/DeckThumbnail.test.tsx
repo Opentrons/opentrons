@@ -31,6 +31,10 @@ vi.mock('@opentrons/components', async importOriginal => {
     DeckFromLayers: () => <div>mock DeckFromLayers</div>,
   }
 })
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof DeckThumbnail>) => {
   return renderWithProviders(<DeckThumbnail {...props} />)[0]

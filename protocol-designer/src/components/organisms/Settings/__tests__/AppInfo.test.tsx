@@ -9,6 +9,11 @@ import { AppInfo } from '..'
 
 import type { ComponentProps } from 'react'
 
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
+
 const render = (props: ComponentProps<typeof AppInfo>) => {
   return renderWithProviders(<AppInfo {...props} />, {
     i18nInstance: i18n,

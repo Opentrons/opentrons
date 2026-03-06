@@ -21,6 +21,11 @@ vi.mock('/protocol-designer/tutorial/actions')
 vi.mock('/protocol-designer/tutorial/selectors')
 vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/analytics/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
