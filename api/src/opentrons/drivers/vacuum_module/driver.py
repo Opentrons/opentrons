@@ -313,10 +313,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         return self.parse_get_pump_state(resp)
 
     # turns off motor, then releases, takes a timeout for buffer between turn off and vent
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
 
-        command = GCODE.SET_VENT_STATE.build_command().add_int("V", int(state))
+        command = GCODE.SET_VENT_STATE.build_command().add_int("V", state.value)
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")

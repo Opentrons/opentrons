@@ -31,12 +31,12 @@ async def test_get_device_info(
         "M114 R:0",
     ]
     response = await subject.get_device_info()
-    assert response == types.VacuumModuleInfo(
-        fw="0.0.1",
-        hw=types.HardwareRevision.NFF,
-        sn="VMA120230605001",
-        rr=0,
-    )
+    assert response == {
+        "serial": "VMA120230605001",
+        "version": "0.0.1",
+        "model": types.HardwareRevision.NFF.value,
+        "reset_reason": "0",
+    }
 
     device_info = types.GCODE.GET_DEVICE_INFO.build_command()
     reset_reason = types.GCODE.GET_RESET_REASON.build_command()
@@ -181,7 +181,7 @@ async def test_get_vacuum_state(
 ) -> None:
     """It should send a get pressure command"""
     connection.send_command.return_value = (
-        "M121 T:400.0 C:988.0 A:989.3 B:988.6 H:992.5 E:1 V:1"
+        "M121 T:400.0 C:988.0 A:989.3 B:988.6 H:992.5 E:1 V:0"
     )
 
     pressure_state = await subject.get_vacuum_state()
@@ -196,7 +196,7 @@ async def test_get_vacuum_state(
 
     # test idle
     connection.send_command.return_value = (
-        "M121 T:0.0 C:0.0 A:989.3 B:988.6 H:992.5 E:0 V:0"
+        "M121 T:0.0 C:0.0 A:989.3 B:988.6 H:992.5 E:0 V:1"
     )
 
     pressure_state = await subject.get_vacuum_state()
@@ -277,6 +277,20 @@ async def test_get_pump_state(
     connection.reset_mock()
 
     assert pump_state == types.PumpState(0, 0, 0, 0, False, True)
+
+
+async def test_set_vent_state(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should send a set vent command"""
+    connection.send_command.return_value = "M124"
+
+    await subject.set_vent_state(types.VentState.CLOSED)
+
+    set_vent = types.GCODE.SET_VENT_STATE.build_command().add_int("V", 0)
+
+    connection.send_command.assert_any_call(set_vent)
+    connection.reset_mock()
 
 
 async def test_set_pressure_control_tunings(

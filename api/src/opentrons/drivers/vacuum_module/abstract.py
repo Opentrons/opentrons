@@ -1,14 +1,6 @@
 from typing import Optional, Protocol
 
-from .types import (
-    LEDColor,
-    LEDPattern,
-    PressureControlTunings,
-    PressureState,
-    PumpState,
-    VacuumModuleInfo,
-    WasteConfigParameters,
-)
+from .types import LEDColor, LEDPattern, PressureState, PumpState, VentState
 
 
 class AbstractVacuumModuleDriver(Protocol):
@@ -82,7 +74,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Get the pump state."""
         ...
 
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
         ...
 
