@@ -148,6 +148,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "black_96_well_microtiter_plate_lid": 2,
         "corning_96_wellplate_360ul_lid": 2,
         "corning_falcon_384_wellplate_130ul_flat_lid": 2,
+        "ibidi_96_square_well_plate_300ul_lid": 2,
     },
 }
 
