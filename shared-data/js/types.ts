@@ -1,5 +1,9 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
 import type {
+  PartialNozzles8Channel,
+  RowChannels,
+} from '../command/types/setup'
+import type {
   CommandAnnotationV1,
   CommandAnnotationV2,
 } from '../commandAnnotation/types'
@@ -644,6 +648,11 @@ export interface SlotTransforms {
 export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
+
+export type ActiveNozzleNumber =
+  | PipetteChannels
+  | PartialNozzles8Channel
+  | RowChannels
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 

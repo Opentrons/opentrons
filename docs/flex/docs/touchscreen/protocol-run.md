@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Run"
+description: "Start, pause, cancel, and monitor protocol execution on the touchscreen."
 ---
 
 Once everything is set up, begin your run by tapping the play button :material-play-circle: on the "Prepare to run" screen. Flex will begin the protocol and you'll see the Running screen.

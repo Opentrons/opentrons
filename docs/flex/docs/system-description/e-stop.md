@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Emergency Stop Pendant"
+description: "Emergency Stop Pendant operation and when to use it."
 ---
 
 The *Emergency Stop Pendant (E-stop)* is a dedicated hardware button for quickly stopping robot motion. Opentrons Flex requires a functional, disengaged E-stop to be attached at all times. When you press the stop button, Flex cancels any running protocol or setup workflow as quickly as possible and prevents most robot motion.

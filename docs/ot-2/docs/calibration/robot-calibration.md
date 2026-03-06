@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Robot Calibration"
+description: "Deck, tip length, and pipette offset calibration steps and when to run them."
 ---
 
 Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left–right, front–back, up–down). To move accurately, the robot needs a precise map of its own hardware relative to a good reference point: the deck. The robot calibration process creates this map.

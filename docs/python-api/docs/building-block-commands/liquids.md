@@ -329,7 +329,7 @@ pipette.blow_out(pipette.trash_container)
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
 
-*Changed in version 2.28:* Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
+*Changed in version 2.29:* Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
 
 ## Touch tip { #touch-tip-building-block }
 
@@ -340,7 +340,7 @@ pipette.touch_tip()
 ```
 
 !!! note
-    Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.28, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
+    Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.29, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
 
 ### Touch location
 

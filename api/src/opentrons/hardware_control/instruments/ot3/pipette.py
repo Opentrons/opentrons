@@ -489,9 +489,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager.update_nozzle_configuration(
             back_left_nozzle, front_right_nozzle, starting_nozzle
         )
-        self._versioned_tip_overlap_dictionary = (
-            self.get_nominal_tip_overlap_dictionary_by_configuration()
-        )
 
     def reset_nozzle_configuration(self) -> None:
         """

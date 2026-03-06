@@ -8,7 +8,7 @@ import {
   F1_NOZZLE,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
-  PARTIAL,
+  PARTIAL_COLUMN,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -72,7 +72,7 @@ describe('getEntireWellSelection', () => {
   })
 
   it('returns the correct number of wells when the pipette configuration is PARTIAL', () => {
-    const nozzleConfiguration = PARTIAL
+    const nozzleConfiguration = PARTIAL_COLUMN
     const partialPrimaryNozzle = F1_NOZZLE
     expect(
       getEntireWellSelection(
@@ -132,7 +132,7 @@ describe('getAvailableNozzleConfigurations', () => {
       },
       {
         name: 'partial_nozzles',
-        value: PARTIAL,
+        value: PARTIAL_COLUMN,
       },
     ]
     expect(
@@ -221,7 +221,7 @@ describe('getAvailableNozzleConfigurations', () => {
   })
   it('returns length of well group when the nozzle configuration is PARTIAL', () => {
     const totalSelected = 3
-    const nozzleConfiguration = PARTIAL
+    const nozzleConfiguration = PARTIAL_COLUMN
     const mockTiprack = {
       stack: ['tiprack2', '3'],
       id: 'tiprack2',

@@ -239,7 +239,9 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -248,7 +250,9 @@ lint-js-prettier:
 
 .PHONY: lint-json
 lint-json:
-	yarn eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:

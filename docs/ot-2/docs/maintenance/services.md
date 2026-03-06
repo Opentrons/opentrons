@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Services"
+description: "Opentrons Care and Care Plus service plans, repairs, and preventive maintenance."
 ---
 
 Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, both of which include benefits for onboarding, maintenance, and repair. These services are available in the continental United States; Opentrons Care is also available internationally. Both services include:

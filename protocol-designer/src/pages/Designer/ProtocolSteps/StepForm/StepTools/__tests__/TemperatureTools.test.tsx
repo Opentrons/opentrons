@@ -46,6 +46,7 @@ vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
     getTemperatureModuleIds: vi.fn(),
   }
 })
+
 const render = (props: ComponentProps<typeof TemperatureTools>) => {
   return renderWithProviders(<TemperatureTools {...props} />, {
     i18nInstance: i18n,

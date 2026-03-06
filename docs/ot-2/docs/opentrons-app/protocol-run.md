@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Running Protocols"
+description: "Start setup, preview, and run a protocol on the OT-2."
 ---
 
 After creating and uploading a protocol, it's time to run it on your OT-2. Follow these instructions to get started.

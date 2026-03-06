@@ -3625,7 +3625,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 47.61,
+        "tipLength": 47.4,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",
@@ -3713,7 +3713,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.28.",
+      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.29.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3722,7 +3722,7 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.28.",
+          "detail": "Cannot return tip to a tip rack while the pipette is configured for partial tip before API version 2.29.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "UnexpectedProtocolError",
