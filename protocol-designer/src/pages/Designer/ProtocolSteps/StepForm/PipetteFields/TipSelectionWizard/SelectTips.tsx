@@ -35,6 +35,7 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,

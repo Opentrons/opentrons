@@ -18,8 +18,6 @@ import {
   SINGLE,
 } from '@opentrons/shared-data'
 
-import { PARTIAL_NOZZLE_MAP } from './constants'
-
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
@@ -189,7 +187,7 @@ export const getEntireWellSelection = (
       return wellOrdering[columnIndex]
     case ROW:
       return wellOrdering.map(column => column[rowIndex])
-    case PARTIAL: {
+    case PARTIAL_COLUMN: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
@@ -257,7 +255,7 @@ export function getWellGroupLength(
     case ROW:
     case COLUMN:
       return totalSelected
-    case PARTIAL:
+    case PARTIAL_COLUMN:
       if (ordering.length === 1) {
         return totalSelected
       }

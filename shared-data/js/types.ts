@@ -1,5 +1,9 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
 import type {
+  PartialNozzles8Channel,
+  RowChannels,
+} from '../command/types/setup'
+import type {
   CommandAnnotationV1,
   CommandAnnotationV2,
 } from '../commandAnnotation/types'

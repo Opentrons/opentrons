@@ -221,7 +221,7 @@ describe('getAvailableNozzleConfigurations', () => {
   })
   it('returns length of well group when the nozzle configuration is PARTIAL', () => {
     const totalSelected = 3
-    const nozzleConfiguration = PARTIAL
+    const nozzleConfiguration = PARTIAL_COLUMN
     const mockTiprack = {
       stack: ['tiprack2', '3'],
       id: 'tiprack2',

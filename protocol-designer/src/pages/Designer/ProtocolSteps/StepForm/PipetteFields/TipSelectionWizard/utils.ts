@@ -120,6 +120,15 @@ export const getColumnFromWellName = (wellName: string): string => {
   return ''
 }
 
+export const getRowFromWellName = (wellName: string): string => {
+  const rowLetter = wellName.match(/^[A-Za-z]+/)?.[0]
+  if (rowLetter) {
+    return rowLetter
+  }
+  console.error('No row found for well name', wellName)
+  return ''
+}
+
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
   labwareEntities: LabwareEntities,
