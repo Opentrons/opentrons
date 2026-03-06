@@ -85,6 +85,7 @@ const validateCommandAnnotations8 = (
         resolve(commandAnnotationSchema1)
         break
       default:
+        // eslint-disable-next-line prefer-promise-reject-errors
         reject([
           {
             keyword: 'Invalid command annotation schema requested',
