@@ -14,6 +14,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -65,6 +66,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles, channels })
   const tiprackDefinition = Object.values(labwareEntities).find(
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
@@ -125,9 +129,6 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       value: MANUAL,
     },
   ]
-
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
 
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({

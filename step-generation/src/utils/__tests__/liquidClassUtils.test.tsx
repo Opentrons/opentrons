@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   A1_NOZZLE,
+  ALL,
   FIXED_TRASH_ID,
   fixtureTiprack300ul,
   getLabwareDefURI,
@@ -92,7 +93,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractYOffset: -2,
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
-          nozzles: null,
+          nozzles: ALL,
           stepNumber: 1,
           tipTracking: AUTOMATIC,
           tipsSelected: [],
@@ -256,7 +257,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractYOffset: -2,
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
-          nozzles: null,
+          nozzles: ALL,
           stepNumber: 1,
           tipTracking: AUTOMATIC,
           tipsSelected: [],

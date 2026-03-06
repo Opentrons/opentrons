@@ -354,7 +354,7 @@ interface CommonArgs {
 export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
   primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
 
   sourceLabware: string
@@ -496,7 +496,7 @@ export type MixArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   labware: string
   pipette: string
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number

@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { ALL } from '@opentrons/shared-data'
+
 import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -17,7 +19,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
-        nozzles: null,
+        nozzles: ALL,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
@@ -135,7 +137,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_checkbox: false,
         pipette: null,
         nozzles: null,
-        primaryNozzle: null,
+        primaryNozzle: 'A1',
         volume: undefined,
         times: null,
         wells: [],
