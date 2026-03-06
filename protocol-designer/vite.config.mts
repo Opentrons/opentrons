@@ -194,6 +194,14 @@ export default defineConfig(async (): Promise<UserConfig> => {
       // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
+        '@icons/material/CheckIcon': path.resolve(
+          __dirname,
+          './src/icon-stub.tsx'
+        ),
+        '@icons/material/UnfoldMoreHorizontalIcon': path.resolve(
+          __dirname,
+          './src/icon-stub.tsx'
+        ),
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
         // consuming project vs. the config from the source project).
