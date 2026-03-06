@@ -16,6 +16,11 @@ import { TimelineEditHardware } from '../TimelineEditHardware'
 vi.mock('/protocol-designer/components/organisms/FlexHardware')
 vi.mock('/protocol-designer/components/organisms/Ot2Modules')
 vi.mock('/protocol-designer/file-data/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
+
 const render = () => {
   return renderWithProviders(<TimelineEditHardware />, {
     i18nInstance: i18n,

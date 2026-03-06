@@ -56,6 +56,10 @@ vi.mock('@opentrons/components', async importOriginal => {
     DeckFromLayers: vi.fn(),
   }
 })
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = () => {
   return renderWithProviders(<Ot2Modules />, {

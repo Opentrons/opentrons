@@ -27,6 +27,10 @@ vi.mock('../../../top-selectors/labware-locations')
 vi.mock('react-plotly.js', () => ({
   default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
 }))
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

@@ -46,6 +46,10 @@ vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/ui/steps')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof AddStepButton>) => {
   return renderWithProviders(<AddStepButton {...props} />, {

@@ -24,6 +24,10 @@ vi.mock('/protocol-designer/ui/steps/actions/actions')
 vi.mock('/protocol-designer/ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof ConnectedStepContainer>) => {
   return renderWithProviders(<ConnectedStepContainer {...props} />, {

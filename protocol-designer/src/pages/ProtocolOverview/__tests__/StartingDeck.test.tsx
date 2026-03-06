@@ -15,6 +15,10 @@ vi.mock('../DeckThumbnail')
 vi.mock('../OffDeckThumbnail')
 vi.mock('../../../components/organisms')
 vi.mock('../../../step-forms/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 vi.mock('../DeckThumbnail', () => ({
   DeckThumbnail: vi.fn(() => <div>mock DeckThumbnail</div>),

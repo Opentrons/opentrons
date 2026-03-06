@@ -12,6 +12,10 @@ import type { ComponentProps } from 'react'
 
 vi.mock('../HardwareStep')
 vi.mock('/protocol-designer/components/molecules')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof Configurations>) => {
   return renderWithProviders(<Configurations {...props} />, {

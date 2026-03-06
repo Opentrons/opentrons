@@ -18,6 +18,10 @@ vi.mock('../../../navigation/actions')
 vi.mock('../../../components/organisms/AnnouncementModal/announcements')
 vi.mock('../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../analytics/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const mockMakeSnackbar = vi.fn()
 const mockEatToast = vi.fn()
