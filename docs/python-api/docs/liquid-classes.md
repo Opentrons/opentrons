@@ -1,6 +1,5 @@
 ---
-title: "Python API: Liquid Classes"
-description: "How to use Opentrons-verified and custom liquid clases to increase pipetting accuracy on Flex."
+title: 'Python API: Liquid Classes'
 ---
 
 Accounting for properties of liquids in your protocol can increase pipetting accuracy on the Flex. For example, a slower flow rate can improve pipetting for a viscous liquid, and an air gap can prevent a volatile liquid from dripping onto the deck.
