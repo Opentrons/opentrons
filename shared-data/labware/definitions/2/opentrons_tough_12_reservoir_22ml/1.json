@@ -190,7 +190,11 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor96GridSubwells"
+    ],
     "loadName": "opentrons_tough_12_reservoir_22ml"
   },
   "namespace": "opentrons",
