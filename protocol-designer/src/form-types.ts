@@ -586,20 +586,6 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   stepType: 'vacuum'
   id: string
   moduleId: string
-  endingHoldVentCheckbox: boolean
-  modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
-  orderedProfileIds: string[]
-  powerPercent: number | null
-  pressureMbar: number | null
-  profileItemsById: Record<string, ProfileItem>
-  programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
-  pumpDurationCheckbox: boolean | null
-  pumpDurationTime: string | null
-  stateType:
-    | typeof VACUUM_STATE_PUMP
-    | typeof VACUUM_VENT_SET_OPEN
-    | typeof VACUUM_VENT_SET_CLOSED
-    | null
 }
 
 // fields used in TipPositionInput

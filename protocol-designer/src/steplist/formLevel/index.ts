@@ -297,14 +297,7 @@ const stepFormHelperMap: {
     getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
   },
   vacuum: {
-    getErrors: composeErrors(
-      vacuumProgramRequired,
-      vacuumStateRequired,
-      vacuumModeRequired,
-      gaugePressureRequired,
-      vacuumDurationRequired,
-      vacuumProfileRequired
-    ),
+    getErrors: composeErrors(),
   },
 }
 

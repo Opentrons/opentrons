@@ -265,16 +265,6 @@ export function getDefaultsForStepType(
     case 'vacuum':
       return {
         moduleId: null,
-        programType: null, // state | profile
-        stateType: null, // vent | pump
-        modeType: null, // pressure | power
-        pressureMbar: null,
-        powerPercent: null,
-        pumpDurationCheckbox: null,
-        pumpDurationTime: null,
-        endingHoldVentCheckbox: null,
-        orderedProfileIds: [],
-        profileItemsById: {},
       }
     default:
       return {}
