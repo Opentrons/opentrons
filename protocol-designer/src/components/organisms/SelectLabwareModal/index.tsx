@@ -423,6 +423,7 @@ export function SelectLabwareModal(
             rightElement={
               <Icon
                 name="close"
+                size="1.75rem"
                 onClick={() => {
                   setSearchTerm('')
                 }}
