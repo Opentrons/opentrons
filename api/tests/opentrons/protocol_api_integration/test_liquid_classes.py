@@ -117,7 +117,7 @@ def test_custom_liquid_class_w_multi_dispense_creation_and_property_fetching(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.28", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.29", "Flex")], indirect=True
 )
 def test_adding_blowout_position_to_liquid_classes(
     simulated_protocol_context: ProtocolContext,

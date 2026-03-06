@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 

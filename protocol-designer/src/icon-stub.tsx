@@ -1,6 +1,10 @@
+/* eslint-disable import/no-default-export */
 // This will be removed when replacing react-color
 // icon-stub.tsx
-import React from 'react'
+import type { JSX } from 'react'
 
-const IconStub = () => null
+export function IconStub(): JSX.Element | null {
+  return null
+}
+
 export default IconStub

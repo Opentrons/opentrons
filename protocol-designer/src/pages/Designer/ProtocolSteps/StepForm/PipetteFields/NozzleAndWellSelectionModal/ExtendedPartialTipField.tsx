@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { COLORS, ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
+import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { PARTIAL_NOZZLE_MAP, PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -44,8 +45,6 @@ export function ExtendedPartialTipField(
     getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
-  const partialNozzleCount =
-    PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -98,13 +97,9 @@ export function ExtendedPartialTipField(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
     stepType: string,
-    channels: number
+    channels: ActiveNozzleNumber
   ): string {
-    const nozzleText = getNozzleText(
-      primaryNozzle,
-      nozzleConfiguration,
-      partialNozzleCount
-    )
+    const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
     const isTransfer = stepType === 'transfer'
     const isColumn =
       (channels === 8 && nozzleConfiguration === ALL) ||

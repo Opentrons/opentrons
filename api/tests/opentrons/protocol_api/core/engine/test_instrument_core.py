@@ -2425,8 +2425,8 @@ def test_aspirate_liquid_class_using_volume_config_below_2_28(
     assert result == [LiquidAndAirGapPair(air_gap=222, liquid=111)]
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 28)))
-def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 29)))
+def test_aspirate_liquid_class_using_volume_config_2_29_and_above(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: InstrumentCore,
@@ -2558,8 +2558,8 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
     assert result == [LiquidAndAirGapPair(air_gap=222, liquid=111)]
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 28)))
-def test_aspirate_liquid_class_2_28_and_above_skips_configure_volume(
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 29)))
+def test_aspirate_liquid_class_2_29_and_above_skips_configure_volume(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: InstrumentCore,
