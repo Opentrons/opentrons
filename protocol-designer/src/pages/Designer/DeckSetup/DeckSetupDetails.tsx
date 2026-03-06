@@ -180,7 +180,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const createdTopLabwareForSlot = activeLabware[createdStackForSlot[0]]
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   useEffect(
     () => {
       if (

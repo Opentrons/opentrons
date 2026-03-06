@@ -118,12 +118,11 @@ export const LabwareControls = (
     [labwareOnDeck, swapBlocked]
   )
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // todo(mm, 2026-03-06): Is this ref+useEffect doing anything? Can we just use canDrop on its own?
   useEffect(() => {
     canDropRef.current = canDrop
   }, [canDrop])
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   useEffect(
     () => {
       if (draggedLabware != null) {
