@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 from __future__ import annotations
 
 import logging
@@ -7,9 +8,6 @@ from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
-from . import (
-    validation,
-)  # isort: skip  # Imported after other protocol_api imports to avoid circular import
 from .core.common import (
     AbsorbanceReaderCore,
     FlexStackerCore,
@@ -45,6 +43,9 @@ from opentrons.protocols.api_support.util import (
     requires_version,
 )
 
+from . import (
+    validation,
+)  # isort: skip  # noqa: I001  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -120,9 +121,9 @@ class ModuleContext(CommandPublisher):
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
 
-        assert labware.parent == self._core.geometry, (
-            "Labware is not configured with this module as its parent"
-        )
+        assert (
+            labware.parent == self._core.geometry
+        ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
 
