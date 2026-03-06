@@ -13,6 +13,10 @@ import type { UseProtocolExportHandlerProps } from '../useProtocolExportHandler'
 vi.mock('../../../components/organisms/BlockingHintModal/useBlockingHint')
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/file-data/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const mockOnConfirmExport = vi.fn()
 const mockModal = <div>mock Modal</div>

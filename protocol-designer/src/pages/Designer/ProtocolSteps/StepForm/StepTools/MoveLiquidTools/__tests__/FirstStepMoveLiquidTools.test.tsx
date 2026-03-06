@@ -34,6 +34,10 @@ import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/s
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../../PipetteFields')
 vi.mock('/protocol-designer/feature-flags/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const labwareId =
   '4d7e45e2-b962-45ca-8ace-8a5a683591d5:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2'

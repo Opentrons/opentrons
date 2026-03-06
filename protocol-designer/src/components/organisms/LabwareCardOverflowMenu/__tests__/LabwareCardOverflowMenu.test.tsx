@@ -36,6 +36,10 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof LabwareCardOverflowMenu>) => {
   return renderWithProviders(<LabwareCardOverflowMenu {...props} />, {

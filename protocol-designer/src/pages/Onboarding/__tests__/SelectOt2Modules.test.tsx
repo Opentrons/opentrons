@@ -16,6 +16,10 @@ import type { WizardFormState } from '/protocol-designer/components/organisms'
 import type { WizardTileProps } from '../types'
 
 vi.mock('/protocol-designer/feature-flags/selectors')
+// a temp fix to pass test
+vi.mock('react-color', () => ({
+  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
+}))
 
 const render = (props: ComponentProps<typeof SelectOt2Modules>) => {
   return renderWithProviders(<SelectOt2Modules {...props} />, {
