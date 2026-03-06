@@ -5,6 +5,7 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
+  getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
   getModuleDef,
@@ -12,7 +13,6 @@ import {
   getPositionFromSlotId,
   getRobotDefFromRobotType,
   H1_NOZZLE,
-  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
@@ -20,6 +20,7 @@ import {
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
@@ -28,6 +29,7 @@ import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 import type {
   AddressableArea,
   CoordinateTuple,
+  CutoutId,
   LabwareDefinition,
   ModuleModel,
   NozzleConfigurationStyle,
@@ -144,15 +146,11 @@ const getModuleHeightFromDeckDefinition = (
 const getWasteChuteHeightFromDeckDefinition = (
   robotType: RobotType
 ): number => {
-  if (robotType === FLEX_ROBOT_TYPE) {
-    const deckDef = getDeckDefFromRobotType(robotType)
-    const wasteChute = Object.values(deckDef.locations.addressableAreas).find(
-      addressableArea =>
-        addressableArea.id === NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-    )
-    return wasteChute?.offsetFromCutoutFixture[2] ?? 0
-  }
-  return 0
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const wasteChute = Object.values(deckDef.cutoutFixtures).find(cutoutFixture =>
+    WASTE_CHUTE_FIXTURES.includes(cutoutFixture.id)
+  )
+  return wasteChute?.height ?? 0 // returns 0 if no waste chute
 }
 
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
@@ -166,14 +164,17 @@ const getHighestZInSlot = (
   const { modules, labware } = robotState
   const { moduleEntities, labwareEntities, wasteChuteEntities } =
     invariantContext
-
   let totalHeight: number = 0
   const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
   const moduleInSlot = Object.keys(modules).find(
     moduleId => modules[moduleId].slot === slotId
   )
+  const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
+    wasteChute =>
+      getCutoutDisplayName(wasteChute.location as CutoutId) === slotId
+  )
   // if slot has waste chute
-  if (wasteChuteEntities && slotId === 'D3') {
+  if (wasteChuteInSlot) {
     totalHeight += getWasteChuteHeightFromDeckDefinition(robotType)
   }
   //  if slot has labware, includes labware, adapters, and module
