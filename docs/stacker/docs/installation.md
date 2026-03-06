@@ -1,5 +1,6 @@
 ---
 title: "Flex Stacker: Installation"
+description: "Unbox, replace side panel, attach to Flex, and connect power and data."
 ---
 
 Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](pre-installation.md).

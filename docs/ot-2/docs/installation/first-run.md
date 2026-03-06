@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: First Run"
+description: "Download the app, connect power and Ethernet, and power on the OT-2."
 ---
 
 The OT-2 is powered by an external power supply that converts AC wall current to the 36 VDC used by the robot's internal systems. You control the robot through the Opentrons App and a computer connected using the supplied Ethernet cable and dongle. This section guides you through downloading the Opentrons App, connecting your computer to the OT-2, and connecting the robot to the external power supply.

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Introduction"
+description: "Overview of the OT-2 robot, manual structure, and how to control it."
 ---
 
 Welcome to the instruction manual for the Opentrons OT-2 liquid handling robot. This manual will help you set up and work with the OT-2.

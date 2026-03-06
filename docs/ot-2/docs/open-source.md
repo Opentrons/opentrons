@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Open Source Software"
+description: "How to use Opentrons open-source code, GitHub releases, and contribute."
 ---
 
 Opentrons believes that open-source software and hardware make science better. That's why we make our code available on GitHub and welcome contributions from the open-source community.

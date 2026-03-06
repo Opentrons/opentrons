@@ -38,16 +38,6 @@ class CommandAnnotationNotFound(ErrorDetails):
     title: str = "Command annotation not found"
 
 
-class PreSerializedCommandAnnotationsNotAvailable(ErrorDetails):
-    """An error if one tries to fetch pre-serialized annotations before they are written to the database."""
-
-    id: Literal["PreSerializedCommandAnnotationsNotAvailable"] = (
-        "PreSerializedCommandAnnotationsNotAvailable"
-    )
-    title: str = "Pre-serialized command annotations not available"
-    detail: str = "Pre-serialized command annotations are only available once a run has finished running."
-
-
 @PydanticResponse.wrap_route(
     command_annotations_router.get,
     path="/runs/{runId}/commandAnnotations",

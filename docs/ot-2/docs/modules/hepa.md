@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: HEPA Module"
+description: "HEPA Module: positive-pressure clean air for the OT-2 enclosure (OT-2 only)."
 ---
 
 ![OT-2 HEPA Module](../images/ot2-hepa-hero.png)

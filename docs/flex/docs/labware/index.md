@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Labware"
+description: "How Flex uses labware in software and on the deck."
 ---
 
 This chapter covers how Opentrons Flex works with labware, both in software and on the robot deck itself.

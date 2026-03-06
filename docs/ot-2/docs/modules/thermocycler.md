@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Thermocycler"
+description: "On-deck thermocycler for PCR: block and lid temperatures, profiles, and software control."
 ---
 
 ![Thermocycler](../images/thermocycler.png)

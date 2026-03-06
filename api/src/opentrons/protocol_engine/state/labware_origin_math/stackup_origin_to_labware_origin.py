@@ -1288,7 +1288,7 @@ def _get_tc_lid_gripper_offsets(
         bottom_most_lw_location = stackup_lw_info_top_to_bottom[-1][1]
 
         # This is done as a workaround for some TC geometry inaccuracies.
-        # See PLAT-579 for context.
+        # See EXEC-1267 for context.
         if (
             isinstance(bottom_most_lw_location, ModuleLocation)
             and getattr(underlying_ancestor_definition, "model", None)

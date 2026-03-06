@@ -1,5 +1,6 @@
 ---
 title: "Python API: Pipettes"
+description: "Load pipettes and use them for transfers and other liquid handling."
 ---
 
 Opentrons pipettes are configurable devices used to move liquids throughout the working area during the execution of protocols. Flex and OT-2 each have their own pipettes, which are available for use in the Python API.
