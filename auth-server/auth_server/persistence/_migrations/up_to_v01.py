@@ -2,13 +2,10 @@
 
 from pathlib import Path
 
-from server_utils.persistence.folder_migrator import Migration
-
-from auth_server.persistence.database import create_schema, sql_engine_ctx
-from auth_server.persistence.file_and_directory_names import DB_FILE
-
 from alembic.config import Config
+
 from alembic import command
+from server_utils.persistence.folder_migrator import Migration
 
 from auth_server.persistence.file_and_directory_names import DB_FILE
 

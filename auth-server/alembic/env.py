@@ -1,8 +1,6 @@
 from logging.config import fileConfig
 from pathlib import Path
-from typing import Any, Literal, Union
 
-from alembic.autogenerate.api import AutogenContext
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
@@ -12,8 +10,6 @@ from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
 )
-from auth_server.persistence.tables import ScopeListType
-from auth_server.persistence.tables import User as UserModel  # noqa: F401
 from auth_server.server_settings import get_settings
 
 # this is the Alembic Config object, which provides
@@ -68,18 +64,7 @@ def run_migrations_offline() -> None:
     )
 
     with context.begin_transaction():
-        context.run_migrations()
-
-
-def _render_item(
-    type_: str, obj: Any, autogen_context: AutogenContext
-) -> Union[str, Literal[False]]:
-    if type_ == "type" and isinstance(obj, ScopeListType):
-        autogen_context.imports.add(
-            "from auth_server.persistence.tables import ScopeListType"
-        )
-        return "ScopeListType()"
-    return False  # fall back to default rendering
+        context.run_migrations()  # fall back to default rendering
 
 
 def run_migrations_online() -> None:
@@ -99,7 +84,6 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            render_item=_render_item,
         )
 
         with context.begin_transaction():
