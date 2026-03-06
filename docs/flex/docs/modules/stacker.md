@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Stacker"
+description: "Stacker Module on Flex: high-capacity labware storage and shuttle."
 ---
 
 ![Stacker module image](../images/stacker-module.png)

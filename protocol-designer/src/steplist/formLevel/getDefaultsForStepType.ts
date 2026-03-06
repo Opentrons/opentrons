@@ -257,6 +257,10 @@ export function getDefaultsForStepType(
         interventionMessage: null,
         moduleId: null,
       }
+    case 'vacuum':
+      return {
+        moduleId: null,
+      }
     default:
       return {}
   }

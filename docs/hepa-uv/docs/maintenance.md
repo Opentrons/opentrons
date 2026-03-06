@@ -1,5 +1,6 @@
 ---
 title: "HEPA/UV Module: Maintenance"
+description: "UV bulb and filter replacement; when to contact support for service."
 ---
 
 <style>

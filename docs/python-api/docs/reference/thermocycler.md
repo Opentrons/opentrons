@@ -1,5 +1,6 @@
 ---
 title: "Python API Reference: Thermocycler"
+description: "Thermocycler Module class reference for the Python Protocol API."
 ---
 
 ::: opentrons.protocol_api.ThermocyclerContext

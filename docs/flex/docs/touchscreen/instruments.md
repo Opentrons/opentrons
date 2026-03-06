@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Instrument Management"
+description: "View and manage pipettes and modules from the touchscreen."
 ---
 
 The Instruments screen is an interactive list of all instruments that you've connected to your Flex. The list is organized by mount: left pipette mount, right pipette mount, and extension mount.

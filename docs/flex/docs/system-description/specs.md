@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: System Specifications"
+description: "Dimensions, weight, deck slots, connectivity, and power specifications."
 ---
 
 ## General specifications
