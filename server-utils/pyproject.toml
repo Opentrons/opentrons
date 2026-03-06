@@ -10,6 +10,7 @@ classifiers = [
 description = "Common utilities for various Opentrons Python servers."
 
 dependencies = [
+    "aiohttp>=3.12.14,<4",
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",

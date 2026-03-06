@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'
 import { TipStatus } from './Tips'
+import { LABWARE } from './types'
 import { WellStatus } from './Wells'
 import { STYLE_BY_WELL_CONTENTS } from './Wells/StyledWells'
 import { Well } from './Wells/Well'
@@ -140,7 +141,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     >
                       {isTiprack ? (
                         <TipStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
                           type={statusByWellName[wellName] as TipType}
                           text={
                             selectedTipsByIndex != null &&
@@ -152,8 +153,9 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         />
                       ) : (
                         <WellStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
                           type={statusByWellName[wellName] as WellType}
+                          parentType={LABWARE}
                         />
                       )}
                     </svg>

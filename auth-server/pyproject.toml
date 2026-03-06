@@ -17,6 +17,7 @@ dependencies = [
     "uvicorn==0.27.0.post1",
     "sqlalchemy==1.4.51",
     "oauthlib>=3.3.1,<4",
+    "pwdlib[argon2,bcrypt]==0.3.0",
 ]
 
 [tool.uv.dependency-groups]
@@ -47,9 +48,9 @@ dev = [
     "pytest-xdist~=2.5.0",
     "requests==2.27.1",
     "types-requests==2.27.1",
-    "sqlalchemy2-stubs==0.0.2a21",
     "tavern>=3.0.2",
     "types-oauthlib==3.3.0.20250822",
+    "sqlalchemy2-stubs==0.0.2a21",
 ]
 
 [tool.ruff.lint]
@@ -129,8 +130,8 @@ packages = ["auth_server"]
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
-    "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
+    "error::sqlalchemy.exc.RemovedIn20Warning",
 ]
 
 [tool.mypy]

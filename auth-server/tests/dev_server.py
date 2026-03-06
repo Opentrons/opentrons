@@ -65,4 +65,3 @@ class DevServer:
     @property
     def base_url(self) -> str:
         return f"http://localhost:{self.port}"
-

@@ -277,3 +277,34 @@ async def test_get_pump_state(
     connection.reset_mock()
 
     assert pump_state == types.PumpState(0, 0, 0, 0, False, True)
+
+
+async def test_set_pressure_control_tunings(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should send a set pressure pid command"""
+    connection.send_command.return_value = "M125"
+
+    await subject.set_pressure_control_tunings(kp=1)
+
+    set_pressure_pid = (
+        types.GCODE.SET_PRESSURE_PID.build_command().add_float("P", 1).add_int("R", 0)
+    )
+
+    connection.send_command.assert_any_call(set_pressure_pid)
+    connection.reset_mock()
+
+
+async def test_get_pressure_control_tunings(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should send a get pressure pid command"""
+    connection.send_command.return_value = "M126 P:1.0 I:0.0 D:0.0 O:-2.0 V:20.0 H:43.0"
+
+    pressure_state = await subject.get_pressure_control_tunings()
+
+    get_pressure = types.GCODE.GET_PRESSURE_PID.build_command()
+    connection.send_command.assert_any_call(get_pressure)
+    connection.reset_mock()
+
+    assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43)

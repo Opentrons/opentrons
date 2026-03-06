@@ -97,15 +97,14 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
+  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null) {
+  if (wellName == null || labware.def.wells[wellName] == null) {
     return {
       x: 0,
       y: 0,
     }
   }
-  const labware = labwareState[selectedLabwareId ?? '']
-
   const well = labware.def.wells[wellName]
   return {
     x: well.x + xOffset,
@@ -113,8 +112,14 @@ export const getHoveredOffsetFromWell = (args: {
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(-2, -1)
+export const getColumnFromWellName = (wellName: string): string => {
+  const match = wellName.match(/^[A-Za-z]+(\d+)/)
+  if (match && match.length > 1) {
+    return match[1]
+  }
+  console.error('No column found for well name', wellName)
+  return ''
+}
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],

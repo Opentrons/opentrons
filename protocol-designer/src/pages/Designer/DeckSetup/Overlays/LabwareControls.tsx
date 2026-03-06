@@ -113,21 +113,32 @@ export const LabwareControls = (
         canDrop: monitor.canDrop(),
       }),
     }),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareOnDeck, swapBlocked]
   )
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     canDropRef.current = canDrop
   }, [canDrop])
 
-  useEffect(() => {
-    if (draggedLabware != null) {
-      setDraggedLabware(draggedLabware?.labwareOnDeck)
-    } else {
-      setHoveredLabware(null)
-      setDraggedLabware(null)
-    }
-  }, [draggedLabware])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    () => {
+      if (draggedLabware != null) {
+        setDraggedLabware(draggedLabware?.labwareOnDeck)
+      } else {
+        setHoveredLabware(null)
+        setDraggedLabware(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [draggedLabware]
+  )
 
   const isBeingDragged =
     draggedLabware?.labwareOnDeck?.stack != null &&

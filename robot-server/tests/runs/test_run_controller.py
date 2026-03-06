@@ -21,7 +21,6 @@ from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
     RunTimeParameter,
-    SecondOrderCommandAnnotationLegacy,
 )
 from opentrons.protocol_runner import RunResult
 
@@ -105,10 +104,12 @@ def run_time_parameters() -> List[RunTimeParameter]:
 def command_annotations() -> List[CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        SecondOrderCommandAnnotationLegacy(
-            commandKeys=["abc"],
-            params={"abc": "123"},
-            machineReadableName="hello world",
+        CommandAnnotation(
+            id="annotation-id",
+            source="userCommand",
+            name="My command annotation",
+            description="This is a command annotation",
+            params={},
         )
     ]
 
@@ -232,6 +233,7 @@ async def test_create_play_action_to_start(
             run_id=run_id,
             summary=engine_state_summary,
             commands=protocol_commands,
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         ),
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),

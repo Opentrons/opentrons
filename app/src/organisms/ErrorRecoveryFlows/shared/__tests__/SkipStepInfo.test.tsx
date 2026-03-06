@@ -115,6 +115,18 @@ describe('SkipStepInfo', () => {
     screen.getByText('Close the robot door before proceeding.')
   })
 
+  it(`renders correct title and body text for ${RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step')
+    screen.getByText(
+      'Take any necessary actions to prepare the robot to continue the run from the next step.'
+    )
+    screen.getByText('Close the robot door before proceeding.')
+  })
+
   it('renders error message for unexpected recovery option', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       'UNEXPECTED_ROUTE' as any

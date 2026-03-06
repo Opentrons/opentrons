@@ -9,6 +9,7 @@ import {
   multiplyMatrices,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { AlignToModuleChildSlot } from '../..'
@@ -30,6 +31,7 @@ import { MagneticModule } from './MagneticModule'
 import { PlateReader } from './PlateReader'
 import { Temperature } from './Temperature'
 import { Thermocycler } from './Thermocycler'
+import { Vacuum } from './Vacuum'
 
 import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
@@ -173,7 +175,8 @@ export const Module = (props: Props): JSX.Element => {
   const orientationTransform =
     orientation === 'left' ||
     moduleType === ABSORBANCE_READER_TYPE ||
-    moduleType === FLEX_STACKER_MODULE_TYPE
+    moduleType === FLEX_STACKER_MODULE_TYPE ||
+    moduleType === VACUUM_MODULE_TYPE
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
@@ -223,6 +226,8 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <PlateReader />
   } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
     moduleViz = <FlexStacker />
+  } else if (moduleType === VACUUM_MODULE_TYPE) {
+    moduleViz = <Vacuum />
   }
   return (
     <g

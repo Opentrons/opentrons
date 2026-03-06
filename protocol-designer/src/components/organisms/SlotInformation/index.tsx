@@ -40,13 +40,15 @@ interface SlotInformationProps {
   fixtures?: string[]
 }
 
+const EMPTY_ITEMS: string[] = []
+
 export const SlotInformation: FC<SlotInformationProps> = ({
   location,
   robotType,
-  liquids = [],
-  labwares = [],
-  modules = [],
-  fixtures = [],
+  liquids = EMPTY_ITEMS,
+  labwares = EMPTY_ITEMS,
+  modules = EMPTY_ITEMS,
+  fixtures = EMPTY_ITEMS,
 }) => {
   const { t } = useTranslation('shared')
   const isOffDeck = location === 'offDeck'
@@ -142,9 +144,9 @@ function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {reducedItems.length > 0 ? (
-        reducedItems.map((item, index) => (
+        reducedItems.map(item => (
           <StackInfo
-            key={`${title}_${index}`}
+            key={`${title}_${item.item}`}
             title={title}
             stackInformation={
               item.count > 1

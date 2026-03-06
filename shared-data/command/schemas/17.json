@@ -36,12 +36,12 @@
     "AirGapInPlaceCreate": {
       "description": "AirGapInPlace command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -122,12 +122,12 @@
     "AspirateCreate": {
       "description": "Create aspirate command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -157,12 +157,12 @@
     "AspirateInPlaceCreate": {
       "description": "AspirateInPlace command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -395,12 +395,12 @@
     "AspirateWhileTrackingCreate": {
       "description": "Create aspirateWhileTracking command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -491,12 +491,12 @@
     "BlowOutCreate": {
       "description": "Create blow-out command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -526,12 +526,12 @@
     "BlowOutInPlaceCreate": {
       "description": "BlowOutInPlace command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -677,12 +677,12 @@
     "CalibrateGripperCreate": {
       "description": "A request to create a `calibrateGripper` command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -734,12 +734,12 @@
     "CalibrateModuleCreate": {
       "description": "Create calibrate-module command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -791,12 +791,12 @@
     "CalibratePipetteCreate": {
       "description": "Create calibrate-pipette command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -838,12 +838,12 @@
     "CaptureImageCreate": {
       "description": "A request to execute an Absorbance Reader measurement.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -983,12 +983,12 @@
     "CloseGripperJawCreate": {
       "description": "CloseGripperJaw command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1030,12 +1030,12 @@
     "CloseLabwareLatchCreate": {
       "description": "A request to create a Heater-Shaker's close latch command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1104,12 +1104,12 @@
     "CommentCreate": {
       "description": "Comment command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1152,12 +1152,12 @@
     "ConfigureForVolumeCreate": {
       "description": "Configure for volume command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1211,12 +1211,12 @@
     "ConfigureNozzleLayoutCreate": {
       "description": "Configure nozzle layout creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1321,12 +1321,12 @@
     "CreateTimerCreate": {
       "description": "CreateTimer command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1382,12 +1382,12 @@
     "CustomCreate": {
       "description": "A request to create a custom command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1424,12 +1424,12 @@
     "DeactivateBlockCreate": {
       "description": "A request to create a Thermocycler's deactivate block command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1472,12 +1472,12 @@
     "DeactivateHeaterCreate": {
       "description": "A request to create a Heater-Shaker's deactivate heater command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1520,12 +1520,12 @@
     "DeactivateLidCreate": {
       "description": "A request to create a Thermocycler's deactivate lid command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1568,12 +1568,12 @@
     "DeactivateShakerCreate": {
       "description": "A request to create a Heater-Shaker's deactivate shaker command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1616,12 +1616,12 @@
     "DeactivateTemperatureCreate": {
       "description": "A request to deactivate a Temperature Module.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1769,12 +1769,12 @@
     "DisengageCreate": {
       "description": "A request to create a Magnetic Module disengage command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1817,12 +1817,12 @@
     "DispenseCreate": {
       "description": "Create dispense command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1852,12 +1852,12 @@
     "DispenseInPlaceCreate": {
       "description": "DispenseInPlace command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -1987,12 +1987,12 @@
     "DispenseWhileTrackingCreate": {
       "description": "Create dispenseWhileTracking command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2088,12 +2088,12 @@
     "DropTipCreate": {
       "description": "Drop tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2123,12 +2123,12 @@
     "DropTipInPlaceCreate": {
       "description": "Drop tip in place command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2238,12 +2238,12 @@
     "EmptyCreate": {
       "description": "A request to execute a Flex Stacker empty command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2310,12 +2310,12 @@
     "EngageCreate": {
       "description": "A request to create a Magnetic Module engage command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2363,12 +2363,12 @@
     "FillCreate": {
       "description": "A request to execute a Flex Stacker fill command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2451,12 +2451,12 @@
     "GetNextTipCreate": {
       "description": "Get next tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2512,12 +2512,12 @@
     "GetTipPresenceCreate": {
       "description": "GetTipPresence command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2560,12 +2560,12 @@
     "HomeCreate": {
       "description": "Data to create a Home command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2615,12 +2615,12 @@
     "IdentifyModuleCreate": {
       "description": "A request to execute an IdentifyModule command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2685,12 +2685,12 @@
     "InitializeCreate": {
       "description": "A request to execute an Absorbance Reader measurement.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2902,12 +2902,12 @@
     "LiquidProbeCreate": {
       "description": "The request model for a `liquidProbe` command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -2964,12 +2964,12 @@
     "LoadLabwareCreate": {
       "description": "Load labware command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3062,12 +3062,12 @@
     "LoadLidCreate": {
       "description": "Load lid command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3150,12 +3150,12 @@
     "LoadLidStackCreate": {
       "description": "Load lid stack command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3256,12 +3256,12 @@
     "LoadLiquidClassCreate": {
       "description": "Load Liquid Class command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3308,12 +3308,12 @@
     "LoadLiquidCreate": {
       "description": "Load liquid command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3377,12 +3377,12 @@
     "LoadModuleCreate": {
       "description": "The model for a creation request for a load module command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3433,12 +3433,12 @@
     "LoadPipetteCreate": {
       "description": "Load pipette command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3605,12 +3605,12 @@
     "MoveAxesRelativeCreate": {
       "description": "MoveAxesRelative command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3664,12 +3664,12 @@
     "MoveAxesToCreate": {
       "description": "MoveAxesTo command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3734,12 +3734,12 @@
     "MoveLabwareCreate": {
       "description": "A request to create a ``moveLabware`` command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3826,12 +3826,12 @@
     "MoveRelativeCreate": {
       "description": "Data to create a MoveRelative command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3883,12 +3883,12 @@
     "MoveToAddressableAreaCreate": {
       "description": "Move to addressable area command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -3918,12 +3918,12 @@
     "MoveToAddressableAreaForDropTipCreate": {
       "description": "Move to addressable area for drop tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4055,12 +4055,12 @@
     "MoveToCoordinatesCreate": {
       "description": "Move to coordinates command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4123,12 +4123,12 @@
     "MoveToCreate": {
       "description": "MoveTo command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4158,12 +4158,12 @@
     "MoveToMaintenancePositionCreate": {
       "description": "Calibration set up position command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4231,12 +4231,12 @@
     "MoveToWellCreate": {
       "description": "Move to well command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4504,12 +4504,12 @@
     "OpenGripperJawCreate": {
       "description": "openGripperJaw command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4545,12 +4545,12 @@
     "OpenLabwareLatchCreate": {
       "description": "A request to create a Heater-Shaker's open labware latch command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4593,12 +4593,12 @@
     "PickUpTipCreate": {
       "description": "Pick up tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4707,12 +4707,12 @@
     "PrepareToAspirateCreate": {
       "description": "Prepare for aspirate command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4755,12 +4755,12 @@
     "PressureDispenseCreate": {
       "description": "PressureDispense command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4918,12 +4918,12 @@
     "ReadAbsorbanceCreate": {
       "description": "A request to execute an Absorbance Reader measurement.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -4971,12 +4971,12 @@
     "ReloadLabwareCreate": {
       "description": "Reload labware command creation request.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5096,12 +5096,12 @@
     "RetractAxisCreate": {
       "description": "Data to create a Retract Axis command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5225,12 +5225,12 @@
     "RetrieveCreate": {
       "description": "A request to execute a Flex Stacker retrieve command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5313,12 +5313,12 @@
     "RunExtendedProfileCreate": {
       "description": "A request to execute a Thermocycler profile run.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5381,12 +5381,12 @@
     "RunProfileCreate": {
       "description": "A request to execute a Thermocycler profile run.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5465,12 +5465,12 @@
     "SavePositionCreate": {
       "description": "Save position command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5523,12 +5523,12 @@
     "SealPipetteToTipCreate": {
       "description": "Seal tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5597,12 +5597,12 @@
     "SetAndWaitForShakeSpeedCreate": {
       "description": "A request to create a Heater-Shaker's set and wait for shake speed command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5650,12 +5650,12 @@
     "SetRailLightsCreate": {
       "description": "setRailLights command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5698,12 +5698,12 @@
     "SetShakeSpeedCreate": {
       "description": "A request to create a Heater-Shaker's set shake speed command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5764,12 +5764,12 @@
     "SetStatusBarCreate": {
       "description": "setStatusBar command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5811,12 +5811,12 @@
     "SetStoredLabwareCreate": {
       "description": "A request to execute a Flex Stacker SetStoredLabware command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5918,12 +5918,12 @@
     "SetTargetBlockTemperatureCreate": {
       "description": "A request to create a Thermocycler's set block temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -5991,12 +5991,12 @@
     "SetTargetLidTemperatureCreate": {
       "description": "A request to create a Thermocycler's set lid temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6049,12 +6049,12 @@
     "SetTipStateCreate": {
       "description": "Set tip state command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6330,12 +6330,12 @@
     "StartRunExtendedProfileCreate": {
       "description": "A request to execute a Thermocycler profile run.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6417,12 +6417,12 @@
     "StoreCreate": {
       "description": "A request to execute a Flex Stacker store command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6554,12 +6554,12 @@
     "TouchTipCreate": {
       "description": "Touch tip command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6651,12 +6651,12 @@
     "TryLiquidProbeCreate": {
       "description": "The request model for a `tryLiquidProbe` command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6713,12 +6713,12 @@
     "UnsafeBlowOutInPlaceCreate": {
       "description": "UnsafeBlowOutInPlace command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6767,12 +6767,12 @@
     "UnsafeDropTipInPlaceCreate": {
       "description": "Drop tip in place command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6820,12 +6820,12 @@
     "UnsafeEngageAxesCreate": {
       "description": "UnsafeEngageAxes command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6871,12 +6871,12 @@
     "UnsafeFlexStackerCloseLatchCreate": {
       "description": "A request to execute a Flex Stacker UnsafeFlexStackerCloseLatch command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6919,12 +6919,12 @@
     "UnsafeFlexStackerManualRetrieveCreate": {
       "description": "A request to execute a Flex Stacker manual retrieve command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -6987,12 +6987,12 @@
     "UnsafeFlexStackerOpenLatchCreate": {
       "description": "A request to execute a Flex Stacker UnsafeFlexStackerOpenLatch command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7035,12 +7035,12 @@
     "UnsafeFlexStackerPrepareShuttleCreate": {
       "description": "A request to execute a Flex Stacker UnsafeFlexStackerPrepareShuttle command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7089,12 +7089,12 @@
     "UnsafePlaceLabwareCreate": {
       "description": "UnsafePlaceLabware command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7155,12 +7155,12 @@
     "UnsafeUngripLabwareCreate": {
       "description": "UnsafeEngageAxes command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7196,12 +7196,12 @@
     "UnsealPipetteFromTipCreate": {
       "description": "Unseal pipette command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7258,12 +7258,12 @@
     "UpdatePositionEstimatorsCreate": {
       "description": "UpdatePositionEstimators command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7329,12 +7329,12 @@
     "VerifyTipPresenceCreate": {
       "description": "VerifyTipPresence command creation request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7386,12 +7386,12 @@
     "WaitForBlockTemperatureCreate": {
       "description": "A request to create Thermocycler's wait for block temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7434,12 +7434,12 @@
     "WaitForDurationCreate": {
       "description": "Wait for duration command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7487,12 +7487,12 @@
     "WaitForLidTemperatureCreate": {
       "description": "A request to create Thermocycler's wait for lid temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7535,12 +7535,12 @@
     "WaitForResumeCreate": {
       "description": "Wait for resume command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7582,12 +7582,12 @@
     "WaitForTasksCreate": {
       "description": "WaitForTasks command request model.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7681,12 +7681,12 @@
     "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate": {
       "description": "A request to execute an Absorbance Reader close lid command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7729,12 +7729,12 @@
     "opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate": {
       "description": "A request to execute an Absorbance Reader open lid command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7777,12 +7777,12 @@
     "opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate": {
       "description": "A request to create a Heater-Shaker's set temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7835,12 +7835,12 @@
     "opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate": {
       "description": "A request to create a Heater-Shaker's wait for temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7888,12 +7888,12 @@
     "opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate": {
       "description": "A request to create a Temperature Module's set temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7946,12 +7946,12 @@
     "opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate": {
       "description": "A request to create a Temperature Module's wait for temperature command.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -7999,12 +7999,12 @@
     "opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate": {
       "description": "A request to close a Thermocycler's lid.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {
@@ -8047,12 +8047,12 @@
     "opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate": {
       "description": "A request to open a Thermocycler's lid.",
       "properties": {
-        "commandAnnotations": {
+        "commandAnnotationIds": {
           "description": "A list of command annotation IDs (if any) that apply to this command.",
           "items": {
             "type": "string"
           },
-          "title": "Commandannotations",
+          "title": "Commandannotationids",
           "type": "array"
         },
         "commandType": {

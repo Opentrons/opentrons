@@ -76,6 +76,49 @@ export function waitForRobotServerAndShowMainWindow(
     mainWindow.webContents.send('window-type', 'odd-main')
   })
 
+  // prevent fullscreen for safe
+  mainWindow.setFullScreen(false)
+
+  // prevent Electron shortcuts that Desktop app shows in menu
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    const key = input.key.toLowerCase()
+    const ctrlOrMeta = input.control || input.meta
+    const ctrlMeta = input.control && input.meta
+
+    // Open Chrome Devtools: Ctrl + Shift + i / ⌘+⌥+I
+    const isDevToolsByShift = ctrlOrMeta && input.shift && key === 'i'
+    const isDevToolsByAltMeta = input.meta && input.alt && key === 'i'
+    const isDevTools = isDevToolsByShift || isDevToolsByAltMeta
+
+    // Reload Ctrl + R / Ctrl + Shift + R
+    const isReload = ctrlOrMeta && key === 'r'
+
+    // Zoom In: add is for numpad
+    const isPlusKey = key === '+' || key === '=' || key === 'add'
+    const isZoomIn = ctrlOrMeta && isPlusKey
+
+    // Zoom Out: subtract is for numpad
+    const isMinusKey = key === '-' || key === '_' || key === 'subtract'
+    const isZoomOut = ctrlOrMeta && isMinusKey
+
+    // Actual Size Cmd + 0/ Ctrl + 0
+    // This might not be needed since this shortcut is used when zooming in/out
+    const isActualZoom = ctrlOrMeta && key === '0'
+
+    const isFullScreen = (ctrlMeta && key === 'f') || key === 'f11'
+
+    if (
+      isDevTools ||
+      isReload ||
+      isZoomIn ||
+      isZoomOut ||
+      isActualZoom ||
+      isFullScreen
+    ) {
+      event.preventDefault()
+    }
+  })
+
   _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd

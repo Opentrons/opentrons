@@ -1,3 +1,8 @@
+# Local development scratch directories (protocols, custom labware, CSV inputs)
+tmp-protocols/
+tmp-custom-labware/
+tmp-csv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

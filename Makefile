@@ -12,6 +12,7 @@ APP_SHELL_ODD_DIR := app-shell-odd
 AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+DOCS_DIR := docs
 G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_DIR := hardware
 LABWARE_LIBRARY_DIR := labware-library
@@ -26,7 +27,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If

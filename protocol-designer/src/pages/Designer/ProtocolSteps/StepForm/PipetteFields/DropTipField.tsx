@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { ALL, SINGLE } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -58,7 +59,9 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     name: t('form:step_edit_form.field.dropTip.option.return'),
     value: tiprackDefUri,
   }
-
+  const enableAdditionalPartialTip = useSelector(
+    getEnableAdditionalPartialTipSelection
+  )
   const isReturnTipValid =
     nozzles === ALL || nozzles == null || (channels === 1 && nozzles === SINGLE)
 
@@ -66,21 +69,30 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
 
-  useEffect(() => {
-    if (
-      additionalEquipment[String(dropdownItem)] == null &&
-      labwareEntities[String(dropdownItem)] == null &&
-      !isTipDropLocationReturnTip
-    ) {
-      updateValue(null)
-    }
-  }, [dropdownItem])
+  useEffect(
+    () => {
+      if (
+        additionalEquipment[String(dropdownItem)] == null &&
+        labwareEntities[String(dropdownItem)] == null &&
+        !isTipDropLocationReturnTip
+      ) {
+        updateValue(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dropdownItem]
+  )
 
   return (
     <DropdownStepFormField
       {...props}
       updateValue={updateValue}
-      options={isReturnTipValid ? [...options, returnOption] : options}
+      options={
+        isReturnTipValid || enableAdditionalPartialTip
+          ? [...options, returnOption]
+          : options
+      }
       value={dropdownItem ? String(dropdownItem) : null}
       title={i18n.format(
         t('step_edit_form.field.location.dropTip'),

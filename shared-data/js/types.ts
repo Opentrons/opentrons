@@ -1,5 +1,8 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -1074,7 +1077,7 @@ export interface CompletedProtocolAnalysis {
   errors: AnalysisError[]
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
-  commandAnnotations?: CommandAnnotation[]
+  commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
 }
 
