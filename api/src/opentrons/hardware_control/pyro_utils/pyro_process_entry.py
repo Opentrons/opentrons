@@ -40,6 +40,7 @@ def build_and_run_hwc_pyro() -> None:
     """Build an instance of the OT3API and provide it to the Pyro Daemon Factory as a resource"""
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
+    # todo(chb, 03-06-26): Logging should be configured for process entry given this will no longer be handled by the original HWC process creator
 
     log.info("Building OT-3 API Instance")
 
