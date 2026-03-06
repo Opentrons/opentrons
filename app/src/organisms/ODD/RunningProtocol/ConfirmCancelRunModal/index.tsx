@@ -26,7 +26,6 @@ interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
-  isQuickTransfer: boolean
   protocolId?: string | null
 }
 
@@ -34,7 +33,6 @@ export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
-  isQuickTransfer,
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
@@ -70,11 +68,7 @@ export function ConfirmCancelRunModal({
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {
         dismissCurrentRun(runId)
-        if (isQuickTransfer && protocolId != null) {
-          navigate(`/quick-transfer/${protocolId}`)
-        } else if (isQuickTransfer) {
-          navigate('/quick-transfer')
-        } else if (protocolId != null) {
+        if (protocolId != null) {
           navigate(`/protocols/${protocolId}`)
         } else {
           navigate('/protocols')
