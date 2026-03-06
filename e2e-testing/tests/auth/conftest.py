@@ -10,7 +10,7 @@ from collections.abc import Generator
 
 import pytest
 
-from automation.auth_client import (
+from automation.clients.auth import (
     ADMIN_PASSWORD,
     ADMIN_USERNAME,
     AuthClient,

@@ -129,6 +129,14 @@ test-auth:
 check-auth:
 	uv run python scripts/check_auth.py $(ROBOT_IP)
 
+# ── System-server E2E tests ──────────────────────────────────────────────────
+# Auto-starts a local system-server if one isn't already running.
+# Point SYSTEM_SERVER_URL at a remote server to skip local startup.
+
+.PHONY: test-system
+test-system:
+	uv run pytest -m systemE2E $(PYTEST_ARGS)
+
 .PHONY: test-compare
 test-compare:
 	@if [ "$(HEADLESS)" = "false" ]; then \

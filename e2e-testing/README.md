@@ -1,6 +1,6 @@
 # E2E Testing
 
-End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, and **Auth Server** using Playwright (PD/LL) and httpx (Auth Server) with pytest.
+End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, **Auth Server**, and **System Server** using Playwright (PD/LL) and httpx (Auth/System) with pytest.
 
 ## Prerequisites
 
@@ -75,6 +75,18 @@ The auth tests use **httpx** (not Playwright) to exercise the auth-server's OAut
 
 **Auto-start behavior:** When no `AUTH_SERVER_URL` is set and nothing is already listening on `:33950`, the test fixture automatically runs `make -C ../auth-server dev`, waits for it to become ready, and tears it down after the session. If the auth-server is already running, the fixture reuses it.
 
+### System Server
+
+```bash
+make test-system                                  # Auto-starts system-server if needed
+make test-system PYTEST_ARGS="-k test_name"       # Run one test
+SYSTEM_SERVER_URL=http://host:32950 make test-system  # Point at a remote server
+```
+
+The system tests use **httpx** to exercise the deprecated register/authorize/connected flow and related endpoints.
+
+**Auto-start behavior:** When no `SYSTEM_SERVER_URL` is set and nothing is already listening on `:32950`, the test fixture runs `make -C ../system-server dev` (with a temporary persistence directory), waits for the server, and tears it down after the session.
+
 ### Other Targets
 
 ```bash
@@ -121,19 +133,33 @@ uv run python scripts/check_auth.py      # run the script directly
 
 Checks connectivity to auth-server and robot-server, displays auth settings, attempts token exchange for both test users, and introspects the tokens. Useful for quickly verifying a robot's auth-server is alive and configured correctly.
 
+### check_robot_auth — Authenticated robot-server endpoints
+
+```bash
+uv run python scripts/check_robot_auth.py              # uses ROBOT_IP from .env or prompts
+uv run python scripts/check_robot_auth.py 10.0.0.42    # override with positional arg
+```
+
+Gets a token from the auth-server (admin user), then calls robot-server `GET /health` and `GET /runs` with that token. Uses the RobotClient and Pydantic response models; prints health fields and a runs table with Rich. Useful for verifying access control and authenticated robot-server calls.
+
 ## Directory Layout
 
 - `automation/` — Page objects, clients, and shared helpers
   - `base_page.py` — Shared `BasePage` class inherited by all page objects
-  - `auth_client.py` — httpx-based OAuth 2 client for auth-server E2E tests
+  - `clients/auth.py` — httpx-based OAuth 2 client for auth-server E2E tests
+  - `clients/system.py` — httpx-based client for system-server E2E tests
+  - `clients/update.py` — httpx-based client for update-server (health, name, update session)
+  - `clients/robot.py` — httpx-based client for robot-server GET endpoints (health, runs)
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
 - `scripts/` — Interactive CLI tools for probing live robots
   - `check_auth.py` — Auth-server connectivity and OAuth 2 flow check
+  - `check_robot_auth.py` — Get token and call authenticated robot-server GET /health, GET /runs
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
   - `auth/` — Auth Server tests (marked `@pytest.mark.authE2E`)
+  - `system/` — System Server tests (marked `@pytest.mark.systemE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
 - `eyes.py` — Applitools Eyes wrapper and pytest fixture
@@ -255,7 +281,7 @@ All tests automatically generate comprehensive reports and recordings:
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document test steps with comments and print statements so agents can maintain them
-8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E`, Auth tests `@pytest.mark.authE2E`
+8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E`, Auth tests `@pytest.mark.authE2E`, System tests `@pytest.mark.systemE2E`
 
 ## Visual Snapshots (Applitools Eyes)
 

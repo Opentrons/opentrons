@@ -22,7 +22,7 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.table import Table
 
-from automation.auth_client import (
+from automation.clients.auth import (
     ADMIN_PASSWORD,
     ADMIN_USERNAME,
     USER_PASSWORD,
