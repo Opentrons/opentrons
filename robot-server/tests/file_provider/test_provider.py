@@ -108,7 +108,22 @@ async def test_write_new_file(subject: FileProviderExecutor) -> None:
         run_metadata=run_metadata,
         command_metadata=cmd_metadata,
     )
-    await subject.write_file_cb(file_data)
+    file_info = await subject.write_file_cb(file_data)
+
+    #make sure it appends a csv to the filename if there's not one
+    assert file_info.path.endswith("file.csv")
+
+    cmd_metadata = UserDefinedCSVCmdFileNameMetadata(
+        filename="file.csv", command_id="123", prev_command_id="122", file_id=None
+    )
+    file_data = FileData.build(
+        data=bytes(b"1,2,3,4,5,"),
+        mime_type=MimeType.TEXT_CSV,
+        run_metadata=run_metadata,
+        command_metadata=cmd_metadata,
+    )
+    # make sure it didn't tack on a second .csv ending
+    assert file_info.path.endswith("file.csv")
 
 
 async def test_append(subject: FileProviderExecutor) -> None:
