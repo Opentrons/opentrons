@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, HTTPException, Path, Query, Response, Uploa
 from starlette import status
 from starlette.responses import JSONResponse
 
-from opentrons.system import nmcli, wifi
+from opentrons.system import network_constants, nmcli, wifi
 from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import LegacyErrorResponse
@@ -49,7 +49,7 @@ async def get_networking_status() -> NetworkingStatus:
         connectivity = await nmcli.is_connected()
 
         async def _permissive_get_iface(
-            i: nmcli.NETWORK_IFACES,
+            i: network_constants.NETWORK_IFACES,
         ) -> dict[str, dict[str, str | None]]:
             try:
                 return {i.value: await nmcli.iface_info(i)}
@@ -58,7 +58,7 @@ async def get_networking_status() -> NetworkingStatus:
                 return {}
 
         interfaces: dict[str, dict[str, str | None]] = {}
-        for interface in nmcli.NETWORK_IFACES:
+        for interface in network_constants.NETWORK_IFACES:
             this_iface = await _permissive_get_iface(interface)
             interfaces.update(this_iface)
         log.debug(f"Connectivity: {connectivity}")
@@ -123,7 +123,7 @@ async def post_wifi_configure(
         psk = configuration.psk.get_secret_value() if configuration.psk else None
         ok, message = await nmcli.configure(
             ssid=configuration.ssid,
-            securityType=nmcli.SECURITY_TYPES(configuration.securityType),
+            securityType=network_constants.SECURITY_TYPES(configuration.securityType),
             eapConfig=configuration.eapConfig,
             hidden=configuration.hidden is True,
             psk=psk,
@@ -252,7 +252,7 @@ async def get_eap_options() -> EapOptions:
                 for o in m.args()
             ],
         )
-        for m in nmcli.EAP_TYPES
+        for m in network_constants.EAP_TYPES
     ]
     result = EapOptions(options=options)
     return result

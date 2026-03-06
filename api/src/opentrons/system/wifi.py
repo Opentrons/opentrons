@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Generator, List, Optional, TypedDict
 
 from opentrons.config import CONFIG
-from opentrons.system import nmcli
+from opentrons.system import network_constants
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ EAP_CONFIG_SHAPE: EapConfigShape = {
                 for arg in method.args()
             ],
         }
-        for method in nmcli.EAP_TYPES
+        for method in network_constants.EAP_TYPES
     ]
 }
 
