@@ -6,7 +6,7 @@ import inspect
 from types import FunctionType, MethodType
 from typing import Any, Callable, Iterator, Optional, ParamSpec, TypeVar
 
-import Pyro5.api as pyro
+from Pyro5 import api as pyro
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -56,7 +56,9 @@ class _PSO:
 
 
 def PyroSynchronousObject(core_obj: Any) -> _PSO:
-    """A Pyro-ready class generator. It takes the base object (such as an OT3API); makes an object wrapper with a
+    """A Pyro-ready class generator.
+
+    It takes the base object (such as an OT3API); makes an object wrapper with a
     synchronous version of the base object's methods; and exposes the wrapper via pyro. Pyro requests to the wrapper
     synchronous methods are forwarded to the original bound async methods of that base object in the original event
     loop and thread, with the generated class attributes here acting as an alias referencing them.
@@ -111,7 +113,7 @@ def PyroSynchronousObject(core_obj: Any) -> _PSO:
     Server-side Example
     -------
     .. code-block::
-    >>> import Pyro5.api as pyro
+    >>> from Pyro5 import api as pyro
     >>> # ... This example assumes instances of OT3API and Thermocycler ...
     >>> pyro_ot3api = PyroSynchronousObject(ot3api)
     >>> pyro_thermocycler = PyroSynchronousObject(thermocycler_attached_module)
@@ -157,16 +159,22 @@ def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
                 yield (name, bound_method)
             elif isinstance(attr, property) and not name.startswith("_"):
                 # Bound property to the original instance and expose the bounded property
-                def bound(func):  # type: ignore
+                # Accepts the functional arguments (Callables) of a property to rebind
+                def _bound(
+                    func: Callable[[Any], Any]
+                    | Callable[[Any, Any], None]
+                    | Callable[[Any], None]
+                    | None,
+                ) -> Any | None:
                     if func is None:
                         return None
                     return lambda self, *a, **kw: func(core_obj, *a, **kw)
 
                 bound_property = property(
-                    fget=bound(attr.fget),  # type: ignore
-                    fset=bound(attr.fset),  # type: ignore
-                    fdel=bound(attr.fdel),  # type: ignore
+                    fget=_bound(attr.fget),
+                    fset=_bound(attr.fset),
+                    fdel=_bound(attr.fdel),
                     doc=attr.__doc__,
                 )
-                exposed = pyro.expose(bound_property)
+                exposed = pyro.expose(bound_property)  # type: ignore
                 yield (name, exposed)

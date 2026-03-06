@@ -4,18 +4,19 @@ import logging
 import socket
 from typing import Any, Callable
 
-import Pyro5.api as pyro
-import Pyro5.errors as errors
+from Pyro5 import api as pyro
+from Pyro5 import errors
 
 from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
 
 log = logging.getLogger(__name__)
 
-PYRO_TIMEOUT = 10
+PYRO_TIMEOUT = 100
 
 
 def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None:  # type: ignore
     """Function to create a Pyro Daemon request loop servicing a given resource.
+
     Registers the resource with the NameServer at the given PyroName.
     Runs the type registry provided before creating the Pyro Daemon request loop.
     """
@@ -27,7 +28,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
 
     # Handle Pyro registration and publication of our synchronized object
     pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
-    with pyro.Daemon() as daemon:
+    with pyro.Daemon() as daemon:  # type: ignore
         pyro_uri = daemon.register(pyro_object)
 
         # Find the currently running nameserver

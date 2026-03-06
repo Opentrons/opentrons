@@ -2,10 +2,10 @@
 
 import enum
 import inspect
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 import serpent
-from Pyro5.api import register_class_to_dict, register_dict_to_class
+from Pyro5 import api as pyro
 
 import opentrons.config.types
 import opentrons.hardware_control.types
@@ -53,18 +53,22 @@ def _estop_overall_status_dict_to_class(  # type: ignore
     classname, d
 ) -> opentrons.hardware_control.types.EstopOverallStatus:
     return opentrons.hardware_control.types.EstopOverallStatus(
-        state=d["state"],
-        left_physical_state=d["left_physical_state"],
-        right_physical_state=d["right_physical_state"],
+        state=opentrons.hardware_control.types.EstopState(d["state"]),
+        left_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
+            d["left_physical_state"]
+        ),
+        right_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
+            d["right_physical_state"]
+        ),
     )
 
 
 def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.EstopOverallStatus",
-        "state": obj.state,
-        "left_physical_state": obj.left_physical_state,
-        "right_physical_state": obj.right_physical_state,
+        "state": obj.state.value,
+        "left_physical_state": obj.left_physical_state.value,
+        "right_physical_state": obj.right_physical_state.value,
     }
 
 
@@ -73,17 +77,30 @@ def _update_status_dict_to_class(  # type: ignore
     classname, d
 ) -> opentrons.hardware_control.types.UpdateStatus:
     return opentrons.hardware_control.types.UpdateStatus(
-        subsystem=d["subsystem"], state=d["state"], progress=d["progress"]
+        subsystem=opentrons.hardware_control.types.SubSystem(d["subsystem"]),
+        state=opentrons.hardware_control.types.UpdateState(d["state"]),
+        progress=d["progress"],
     )
 
 
 def _update_status_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.UpdateStatus",
-        "subsystem": obj.subsystem,
-        "state": obj.state,
+        "subsystem": obj.subsystem.value,
+        "state": obj.state.value,
         "progress": obj.progress,
     }
+
+
+def register_type_to_serpent(
+    class_type: Any,
+    dict_to_class: Callable[[str, Any], Any],
+    class_to_dict: Callable[[Any], dict[Any, Any]],
+) -> None:
+    """Adapter function to call the serpent registries for individual types."""
+    class_path = ".".join((class_type.__module__, class_type.__qualname__))
+    pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
+    pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
 
 
 # Handy function to map all registries for the Hardware controller
@@ -96,29 +113,27 @@ def register_hardware_types() -> None:
     )
     # Serpent matches by first isinstance() in registry order, so unregister enums first so that
     # types like "Mount" don't automatically become strings/ints, then register the enums after.
-    serpent.unregister_class(enum.Enum)
+    serpent.unregister_class(enum.Enum)  # type: ignore
 
     for enum_type in opentrons_types:
-        classpath = ".".join((enum_type.__module__, enum_type.__qualname__))
-        register_dict_to_class(classpath, _generic_enum_dict_to_class)
-        register_class_to_dict(enum_type, _generic_enum_class_to_dict)
+        register_type_to_serpent(
+            class_type=enum_type,
+            dict_to_class=_generic_enum_dict_to_class,
+            class_to_dict=_generic_enum_class_to_dict,
+        )
 
-    serpent.register_class(enum.Enum, _serpent_enum_serializer)
+    serpent.register_class(enum.Enum, _serpent_enum_serializer)  # type: ignore
 
     # E-Stop Overall registration
-    register_dict_to_class(
-        "opentrons.hardware_control.types.EstopOverallStatus",
-        _estop_overall_status_dict_to_class,
-    )
-    register_class_to_dict(
-        opentrons.hardware_control.types.EstopOverallStatus,
-        _estop_overall_status_class_to_dict,
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.types.EstopOverallStatus,
+        dict_to_class=_estop_overall_status_dict_to_class,
+        class_to_dict=_estop_overall_status_class_to_dict,
     )
 
     # UpdateStatus registration
-    register_dict_to_class(
-        "opentrons.hardware_control.types.UpdateStatus", _update_status_dict_to_class
-    )
-    register_class_to_dict(
-        opentrons.hardware_control.types.UpdateStatus, _update_status_class_to_dict
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.types.UpdateStatus,
+        dict_to_class=_update_status_dict_to_class,
+        class_to_dict=_update_status_class_to_dict,
     )

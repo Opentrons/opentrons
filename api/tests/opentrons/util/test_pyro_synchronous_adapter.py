@@ -1,4 +1,4 @@
-"""Test for the Pyro Synchronous Adapter"""
+"""Test for the Pyro Synchronous Adapter."""
 
 import asyncio
 import inspect
@@ -23,6 +23,7 @@ from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
 
 @pytest.fixture
 def managed_obj(ot3_hardware: ThreadManager[OT3API]) -> OT3API:
+    """OT3API fixture for tests."""
     managed = ot3_hardware.managed_obj
     assert managed
     return managed
@@ -70,7 +71,7 @@ def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     def _nameserver_loop() -> None:
         # start_ns returns (nameserver, daemon, uri)
-        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
         name_server_ready.set()
         # Run until the test process exits; thread is marked daemon=True.
         ns_daemon.requestLoop()
@@ -89,7 +90,7 @@ def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
     # Client-side requests below
     register_hardware_types()
     uri = pyro.resolve("PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)
+    ot3_proxy = pyro.Proxy(uri)  # type: ignore
 
     # Access property, method and async method, assert expected response between client and server
     door_state = ot3_proxy.door_state
@@ -102,4 +103,4 @@ def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
     assert tip_status is hw_types.TipStateType.ABSENT
 
     # Clean up client resources.
-    ot3_proxy._pyroRelease()
+    ot3_proxy._pyroRelease()  # type: ignore
