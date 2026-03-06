@@ -90,8 +90,8 @@ class LEDPattern(Enum):
 class VentState(Enum):
     """The State of the vent."""
 
-    OPENED = 0
-    CLOSED = 1
+    CLOSED = 0
+    OPENED = 1
 
 
 @dataclass

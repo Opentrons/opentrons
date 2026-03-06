@@ -115,6 +115,6 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         """Get the pump state."""
         return PumpState(0, 0, 0, 0, False, False)
 
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
-        self.vent_state = VentState(open)
+        self.vent_state = state
