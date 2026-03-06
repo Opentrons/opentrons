@@ -129,8 +129,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(
     () => {
       setSelectedWells(getSelectedWells())
