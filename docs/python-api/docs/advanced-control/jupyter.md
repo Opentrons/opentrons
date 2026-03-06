@@ -1,5 +1,6 @@
 ---
 title: "Python API: Jupyter Notebook"
+description: "Use Jupyter to develop and run protocols interactively on the robot."
 ---
 
 Sometimes it’s more convenient to control your robot outside of the app. For example, you might want to have variables in your code that change based on user input or the contents of a CSV file. Or you might want to only execute part of your protocol at a time, especially when developing or debugging a new protocol.

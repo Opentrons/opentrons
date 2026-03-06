@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Software Downgrade"
+description: "Roll back Flex robot software for troubleshooting or compliance."
 ---
 
 Downgrading Flex software should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes. The instructions in this section take you through the robot software downgrade process.

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Instrument Installation and Calibration"
+description: "Attach pipettes and calibrate using the touchscreen or Opentrons App."
 ---
 
 After initial robot setup, the next step is to attach instruments to the robot and calibrate them.

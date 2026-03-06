@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Starting Deck"
+description: "Edit deck hardware, labware, and liquids for the start of the protocol."
 ---
 
 Click **Edit protocol** to add and edit hardware, labware, and liquids on the protocol starting deck. 

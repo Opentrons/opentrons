@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: App Installation and Management"
+description: "Download, install, and update the Opentrons App."
 ---
 
 Start here for step-by-step instructions for downloading, installing, and maintaining the Opentrons App on a computer.
