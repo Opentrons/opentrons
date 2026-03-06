@@ -82,18 +82,6 @@
         "z": -6
       }
     },
-    "lidOffsets": {
-      "pickUpOffset": {
-        "x": 0.5,
-        "y": 0,
-        "z": -5
-      },
-      "dropOffset": {
-        "x": 0.5,
-        "y": 0,
-        "z": -1
-      }
-    },
     "lidDisposalOffsets": {
       "pickUpOffset": {
         "x": 0,
