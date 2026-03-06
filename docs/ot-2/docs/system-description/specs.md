@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: System Specifications"
+description: "Dimensions, weight, deck slots, connectivity, and power specifications of the OT-2."
 ---
 
 <table>

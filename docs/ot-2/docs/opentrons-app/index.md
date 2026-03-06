@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Opentrons App"
+description: "Download and use the Opentrons App to run protocols and control the OT-2."
 ---
 
 You operate an OT-2 through the [Opentrons App](https://opentrons.com/ot-app). This chapter describes how to download and use the app to perform fundamental tasks like uploading protocol files, running and managing protocols, controlling hardware, and other features.
