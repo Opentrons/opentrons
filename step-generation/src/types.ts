@@ -418,10 +418,10 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
 
   /** additional blowout params if the position needs to be more refined */
-  blowoutOffsetFromTopMm?: number | undefined
-  blowoutXPosition?: number | undefined
-  blowoutYPosition?: number | undefined
-  blowoutPositionReference?: string | undefined
+  blowoutOffsetFromTopMm: number | null
+  blowoutXPosition: number | null
+  blowoutYPosition: number | null
+  blowoutPositionReference: string | null
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
