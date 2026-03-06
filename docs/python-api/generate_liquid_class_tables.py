@@ -112,16 +112,40 @@ def delay_cell(delay_obj: dict) -> str:
     return "\u2014"
 
 
+def blowout_cell(blowout_obj: dict) -> str:
+    """Format blowout: em dash if disabled, else 'Into trash/destination at X µL/sec'."""
+    if not blowout_obj["enable"]:
+        return "\u2014"
+    loc = blowout_obj["params"]["location"]
+    rate = blowout_obj["params"]["flowRate"]
+    location_label = "trash" if loc == "trash" else "destination"
+    return f"Into {location_label} at {n(rate)} \u00b5L/sec"
+
+
 def flow_rate_cell(entries: list):
     """Format flow-rate-by-volume entries.
 
-    Each entry is an interpolation point and is shown individually (no range
-    merging).  Returns a *str* for a single entry or a *list[str]* for
-    multiple entries (the list signals to the renderer to use <ul>/<li>).
+    Consecutive entries with the same rate are merged into ranges (e.g.
+    "1–9.9 µL: 22 µL/sec").  Returns a *str* for a single resulting group
+    or a *list[str]* for multiple groups (the list signals <ul>/<li>).
     """
     if len(entries) == 1:
         return f"{n(entries[0][1])} \u00b5L/sec"
-    return [f"{n(v)} \u00b5L: {n(r)} \u00b5L/sec" for v, r in entries]
+    ranges = _merge_ranges(entries)
+    if len(ranges) == 1:
+        start, end, rate = ranges[0]
+        if start == end:
+            return f"{n(rate)} \u00b5L/sec"
+        return f"{n(start)}\u2013{n(end)} \u00b5L: {n(rate)} \u00b5L/sec"
+    items = []
+    for start, end, rate in ranges:
+        if start == end:
+            items.append(f"{n(start)} \u00b5L: {n(rate)} \u00b5L/sec")
+        else:
+            items.append(
+                f"{n(start)}\u2013{n(end)} \u00b5L: {n(rate)} \u00b5L/sec"
+            )
+    return items
 
 
 def _merge_ranges(entries: list) -> list:
@@ -245,6 +269,10 @@ def dispense_rows(tips: list) -> list:
         [delay_cell(d["retract"]["delay"]) for d in disps],
     ))
     rows.append((
+        "Blowout",
+        [blowout_cell(d["retract"]["blowout"]) for d in disps],
+    ))
+    rows.append((
         "Push out by volume",
         [by_volume_cell(d["pushOutByVolume"]) for d in disps],
     ))
@@ -295,6 +323,10 @@ def multi_dispense_rows(tips: list) -> list:
     rows.append((
         "Delay after retracting",
         [delay_cell(m["retract"]["delay"]) for m in mds],
+    ))
+    rows.append((
+        "Blowout",
+        [blowout_cell(m["retract"]["blowout"]) for m in mds],
     ))
     rows.append((
         "Air gap by volume",
@@ -426,15 +458,12 @@ def main():
         definitions_dir = DEFINITIONS_BASE / source_name
         data = get_latest_definition(definitions_dir)
         content = generate_tables(data)
-        output_path = OUTPUT_DIR / output_name
+        output_path = (OUTPUT_DIR / output_name).resolve()
 
         # Only write when content has changed, so that mkdocs serve
         # doesn't detect a file-system change and enter a rebuild loop.
-        if output_path.exists() and output_path.read_text(encoding="utf-8") == content:
-            print(f"Unchanged {output_path.relative_to(SCRIPT_DIR)}")
-        else:
+        if not output_path.exists() or output_path.read_text(encoding="utf-8") != content:
             output_path.write_text(content, encoding="utf-8")
-            print(f"Wrote {output_path.relative_to(SCRIPT_DIR)}")
 
 
 # ---------------------------------------------------------------------------
