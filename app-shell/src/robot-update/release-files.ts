@@ -164,11 +164,9 @@ export function cleanupReleaseFiles(
 ): Promise<unknown> {
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
-      return (
-        files
-          .filter(f => f.isDirectory() && f.name !== currentRelease)
-          .map(f => path.join(downloadsDir, f.name))
-      )
+      return files
+        .filter(f => f.isDirectory() && f.name !== currentRelease)
+        .map(f => path.join(downloadsDir, f.name))
     })
     .then(removals => Promise.all(removals.map(f => remove(f))))
 }
