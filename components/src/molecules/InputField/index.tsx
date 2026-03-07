@@ -1,6 +1,8 @@
 import { forwardRef, useRef } from 'react'
 import styled, { css } from 'styled-components'
 
+import { StyledText } from '../../atoms/StyledText'
+import { Tooltip } from '../../atoms/Tooltip'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
@@ -13,8 +15,6 @@ import {
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
-import { Tooltip } from '../Tooltip'
 
 import type {
   ChangeEventHandler,
@@ -123,7 +123,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       (props.isIndeterminate ?? false) ? '-' : props.placeholder
 
     const INPUT_FIELD = css`
-      display: flex;
       background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
       border-radius: ${borderRadius != null
         ? borderRadius
@@ -204,7 +203,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={(props.disabled ?? false) ? 0.5 : ''}
+        opacity={props.disabled === true ? 0.5 : 1}
       >
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (
