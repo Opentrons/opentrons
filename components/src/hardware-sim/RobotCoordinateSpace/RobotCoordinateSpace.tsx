@@ -2,7 +2,7 @@ import { animated } from '@react-spring/web'
 
 import styles from './robotcoordinatespace.module.css'
 
-import type { ComponentType, ReactNode, SVGProps } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 interface RobotCoordinateSpaceProps {
   animated?: boolean
@@ -11,7 +11,7 @@ interface RobotCoordinateSpaceProps {
   viewBox?: string
 }
 
-const AnimatedSvg = animated.svg as ComponentType<SVGProps<SVGSVGElement>>
+const AnimatedSvg = animated.svg as ComponentType<any>
 
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps

@@ -200,7 +200,7 @@ describe('robot-api http client', () => {
   it('can POST a multipart body', () => {
     testApp.post(
       '/file',
-      multer({ storage: multer.memoryStorage() }).any(),
+      multer({ storage: multer.memoryStorage() }).any() as any,
       (req, res) => {
         const files = (req as any).files ?? []
 

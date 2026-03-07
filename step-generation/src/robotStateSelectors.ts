@@ -220,7 +220,7 @@ export function getNextTiprack(
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
       console.assert(
-        invariantContext.labwareEntities[labwareId]?.labwareDefURI,
+        invariantContext.labwareEntities[labwareId]?.labwareDefURI != null,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck =
@@ -340,7 +340,6 @@ export function getPipetteWithTipMaxVol(
     )
     return NaN
   }
-  // @ts-expect-error(SA, 2021-05-03): ts thinks these might be falsy even though we're doing an assert above
   return min([tiprackTipVol, pipetteMaxVol])
 }
 export function getModuleState(

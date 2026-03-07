@@ -30,6 +30,8 @@
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0",
+    "@types/react": "18.2.51",
+    "@types/react-dom": "18.2.0",
     "@typescript-eslint/typescript-estree": "8.52.0",
     "@typescript-eslint/scope-manager": "8.52.0",
     "@typescript-eslint/types": "8.52.0",
