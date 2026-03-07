@@ -4,7 +4,7 @@ from enum import Enum
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class LidPosition(Enum):
@@ -68,7 +68,7 @@ class HeaterShakerStepPage(BasePage):
 
     def pause_confirm(self) -> None:
         """Confirm the pause in the step editor."""
-        self.page.get_by_role("button", name="Add pause step").click()
+        self.page.get_by_role("button", name="Confirm").click()
 
     ## Composite step
 

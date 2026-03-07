@@ -7,7 +7,6 @@ In the protocol's analysis, the Python Protocol API should successfully load the
 labware.
 """
 
-
 # TODO(mm, 2023-01-11): Port this to a Tavern test once
 # https://github.com/taverntesting/tavern/issues/833 is resolved. We need to upload
 # multiple files into the `files` field of the `POST /protocols` endpoint.
@@ -77,6 +76,7 @@ def make_test_protocol(api_level: str, labware_load_name: str) -> bytes:
     ).encode("utf-8")
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "api_level",
     [

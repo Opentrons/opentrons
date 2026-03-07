@@ -11,6 +11,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
     PositionReference,
 )
+from opentrons_shared_data.liquid_classes.types import TipPositionDict
 
 from opentrons.protocol_api import Labware, TrashBin, WasteChute
 from opentrons.protocol_api._liquid import LiquidClass
@@ -59,6 +60,15 @@ def patch_mock_raise_if_location_inside_liquid(
     """Replace raise_if_location_inside_liquid() with a mock."""
     mock = decoy.mock(func=tx_utils.raise_if_location_inside_liquid)
     monkeypatch.setattr(tx_utils, "raise_if_location_inside_liquid", mock)
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_get_blowout_location_for_trash(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace get_blowout_location_for_trash() with a mock."""
+    mock = decoy.mock(func=tx_utils.get_blowout_location_for_trash)
+    monkeypatch.setattr(tx_utils, "get_blowout_location_for_trash", mock)
 
 
 """ Test aspirate properties:
@@ -1317,7 +1327,7 @@ def test_retract_after_dispense_with_blowout_in_destination(
         mock_instrument_core.delay(10),
         mock_instrument_core.blow_out(
             location=Location(Point(12, 24, 36), labware=None),
-            well_core=None,
+            well_core=dest_well,
             in_place=True,
             flow_rate=100,
         ),
@@ -1447,7 +1457,7 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
         mock_instrument_core.delay(0.2),
         mock_instrument_core.blow_out(
             location=trash_location,
-            well_core=None,
+            well_core=trash_well_core,
             in_place=False,
             flow_rate=100,
         ),
@@ -1853,6 +1863,250 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
             ]
             or []
         ),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "blowout_location",
+        "blowout_position",
+        "blowout_position_reference_point",
+        "expected_blowout_point",
+    ],
+    argvalues=[
+        (
+            "trash",
+            {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
+            Point(1, 2, 3),  # Well-top point
+            Point(2, 4, 6),
+        ),
+        (
+            "destination",
+            {
+                "position_reference": "well-center",
+                "offset": {"x": 10, "y": 20, "z": 30},
+            },
+            Point(1, 1, 1),  # Well-center point
+            Point(11, 21, 31),
+        ),
+        (
+            "source",
+            {
+                "position_reference": "well-bottom",
+                "offset": {"x": 100, "y": 200, "z": 300},
+            },
+            Point(0, 0, 0),  # Well-bottom point
+            Point(100, 200, 300),
+        ),
+    ],
+)
+def test_retract_after_dispense_with_blowout_position_set(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+    blowout_location: str,
+    blowout_position: TipPositionDict,
+    blowout_position_reference_point: Point,
+    expected_blowout_point: Point,
+) -> None:
+    """It should use the blowout position for destination blowout."""
+    source_well_core = decoy.mock(cls=WellCore)
+    source_well = decoy.mock(cls=Well)
+    source_location = Location(Point(1, 2, 3), labware=source_well)
+
+    trash_well_core = decoy.mock(cls=WellCore)
+    trash_well = decoy.mock(cls=Well)
+    trash_location = Location(Point(4, 5, 6), labware=trash_well)
+
+    dest_well_core = decoy.mock(cls=WellCore)
+    dest_well = decoy.mock(cls=Well)
+
+    blowout_well_core = {
+        "trash": trash_well_core,
+        "destination": dest_well_core,
+        "source": source_well_core,
+    }[blowout_location]
+    blowout_well = {
+        "trash": trash_well,
+        "destination": dest_well,
+        "source": source_well,
+    }[blowout_location]
+
+    well_top_point = Point(1, 2, 3)
+    sample_transfer_props.dispense.retract.blowout.location = blowout_location
+    sample_transfer_props.dispense.retract.blowout.blowout_position = blowout_position
+    # Disable touch tip so we don't have to mock out touch tip related functions
+    sample_transfer_props.dispense.retract.touch_tip.enabled = False
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 1, 1), labware=dest_well),
+        target_well=dest_well_core,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(trash_well._core).then_return(trash_well_core)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(dest_well_core.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well_core.get_top(0)).then_return(well_top_point)
+
+    for well_core in [trash_well_core, source_well_core, dest_well_core]:
+        decoy.when(well_core.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+            Point(10, 20, 29)
+        )
+    decoy.when(trash_well_core.get_top(0)).then_return(blowout_position_reference_point)
+    decoy.when(dest_well_core.get_center()).then_return(
+        blowout_position_reference_point
+    )
+    decoy.when(source_well_core.get_bottom(0)).then_return(
+        blowout_position_reference_point
+    )
+
+    subject.retract_after_dispensing(
+        trash_location=trash_location,
+        source_location=source_location,
+        source_well=source_well_core,
+        add_final_air_gap=False,
+    )
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=Location(expected_blowout_point, labware=blowout_well),
+            well_core=blowout_well_core,
+            in_place=False,
+            flow_rate=100,
+        )
+    )
+
+
+def test_retract_after_dispense_with_blowout_position_for_trashbin(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """It should use the blowout position for destination blowout."""
+    trash_location = decoy.mock(cls=TrashBin)
+    expected_blowout_trash_location = decoy.mock(
+        cls=WasteChute
+    )  # Use waste chute just to make the expected result object distinct
+
+    source_well_core = decoy.mock(cls=WellCore)
+    source_location = Location(Point(1, 2, 3), labware=decoy.mock(cls=Well))
+    dest_well_core = decoy.mock(cls=WellCore)
+    dest_location = Location(Point(1, 1, 1), labware=decoy.mock(cls=Well))
+
+    well_top_point = Point(1, 2, 3)
+    sample_transfer_props.dispense.retract.blowout.location = "trash"
+    sample_transfer_props.dispense.retract.blowout.blowout_position = {
+        "position_reference": "well-center",
+        "offset": {"x": 10, "y": 20, "z": 30},
+    }
+    # Disable touch tip so we don't have to mock out touch tip related functions
+    sample_transfer_props.dispense.retract.touch_tip.enabled = False
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=dest_location,
+        target_well=dest_well_core,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(dest_well_core.get_top(0)).then_return(well_top_point)
+
+    for well_core in [source_well_core, dest_well_core]:
+        decoy.when(well_core.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+            Point(10, 20, 29)
+        )
+
+    decoy.when(
+        trash_location.top(x=0, y=0, z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    ).then_return(trash_location)
+    decoy.when(trash_location.offset).then_return(DisposalOffset(x=10, y=20, z=30))
+    decoy.when(
+        tx_utils.get_blowout_location_for_trash(
+            trash_location,
+            sample_transfer_props.dispense.retract.blowout.blowout_position,  # type: ignore[arg-type]
+        )
+    ).then_return(expected_blowout_trash_location)
+
+    subject.retract_after_dispensing(
+        trash_location=trash_location,
+        source_location=source_location,
+        source_well=source_well_core,
+        add_final_air_gap=False,
+    )
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=expected_blowout_trash_location,
+            well_core=None,
+            in_place=False,
+            flow_rate=100,
+        )
+    )
+
+
+def test_retract_after_dispense_with_blowout_in_trash_destination(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """It should blowout at the specified position in a trash destination."""
+    dest_location = decoy.mock(cls=WasteChute)
+    expected_blowout_dest_location = decoy.mock(
+        cls=TrashBin
+    )  # Use trash bin just to make the expected result object distinct
+
+    source_well_core = decoy.mock(cls=WellCore)
+    source_location = Location(Point(1, 2, 3), labware=decoy.mock(cls=Well))
+
+    trash_well_core = decoy.mock(cls=WellCore)
+    trash_location = Location(Point(4, 5, 6), labware=decoy.mock(cls=Well))
+
+    sample_transfer_props.dispense.retract.blowout.location = "destination"
+    sample_transfer_props.dispense.retract.blowout.blowout_position = {
+        "position_reference": "well-center",
+        "offset": {"x": 10, "y": 20, "z": 30},
+    }
+    # Disable touch tip so we don't have to mock out touch tip related functions
+    sample_transfer_props.dispense.retract.touch_tip.enabled = False
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=dest_location,
+        target_well=None,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    for well_core in [source_well_core, trash_well_core]:
+        decoy.when(well_core.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+            Point(10, 20, 29)
+        )
+
+    decoy.when(
+        dest_location.top(x=0, y=0, z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    ).then_return(dest_location)
+    decoy.when(dest_location.offset).then_return(DisposalOffset(x=10, y=20, z=30))
+    decoy.when(
+        tx_utils.get_blowout_location_for_trash(
+            dest_location,
+            sample_transfer_props.dispense.retract.blowout.blowout_position,  # type: ignore[arg-type]
+        )
+    ).then_return(expected_blowout_dest_location)
+
+    subject.retract_after_dispensing(
+        trash_location=trash_location,
+        source_location=source_location,
+        source_well=source_well_core,
+        add_final_air_gap=False,
+    )
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=expected_blowout_dest_location,
+            well_core=None,
+            in_place=False,
+            flow_rate=100,
+        )
     )
 
 
@@ -2338,7 +2592,7 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
             and [
                 mock_instrument_core.blow_out(  # type: ignore[func-returns-value]
                     location=Location(Point(3, 5, 4), labware=None),
-                    well_core=None,
+                    well_core=dest_well,
                     in_place=True,
                     flow_rate=10,
                 )

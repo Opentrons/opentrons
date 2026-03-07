@@ -19,6 +19,7 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import {
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
@@ -36,7 +37,9 @@ import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { getMainPagePortalEl } from '../Portal'
 import { LiquidCardList } from './LiquidCardList'
+import { getDeckLabel } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 
 export interface WellContentsByNumber {
@@ -66,7 +69,7 @@ export const SlotDetailModal = (
   const allIngredientGroupFields = useSelector(
     selectors.allIngredientGroupFields
   )
-  const { labware } = activeDeckSetup
+  const { labware, modules } = activeDeckSetup
   const labwareOnDeck = labware[selectedLabware]
 
   const wellContents =
@@ -101,13 +104,17 @@ export const SlotDetailModal = (
 
   const isAdapter = getIsAdapterFromDef(labwareOnDeck.def)
   const slotName = getSlotInLocationStack(labwareOnDeck.stack)
+  const isHopper = Object.values(modules).some(
+    ({ slot, model }) => slot === slotName && model === FLEX_STACKER_MODULE_V1
+  )
+
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
       <RobotInfoLabel
-        deckLabel={slotName === 'offDeck' ? t('off_deck') : slotName}
+        deckLabel={getDeckLabel(slotName, isHopper, t as TFunction)}
       />
     </Flex>
   )
@@ -122,7 +129,6 @@ export const SlotDetailModal = (
       closeOnOutsideClick
       childrenPadding={0}
       width="47rem"
-      overflowY="hidden"
       headerTagElement={
         stackOfLabware.length > 1 ? (
           <Tag

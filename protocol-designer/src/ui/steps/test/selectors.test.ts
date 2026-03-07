@@ -621,6 +621,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         nozzles: {
           isIndeterminate: false,
           value: undefined,
@@ -814,6 +818,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         preWetTip: {
           isIndeterminate: true,
+        },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
         },
         pushOut_checkbox: {
           isIndeterminate: false,
@@ -1180,6 +1188,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         pushOut_checkbox: {
           isIndeterminate: false,
           value: undefined,
@@ -1294,6 +1306,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         liquidClassesSupported: { isIndeterminate: false },
         liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        primaryNozzle: {
           isIndeterminate: false,
           value: undefined,
         },

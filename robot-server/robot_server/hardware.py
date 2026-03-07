@@ -40,6 +40,7 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.util.helpers import utc_now
 from opentrons_shared_data import deck
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from server_utils import systemd_utils
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -506,16 +507,6 @@ def _postinit_done_handler(task: "asyncio.Task[None]") -> None:
         log.info("Postinit task complete")
 
 
-def _systemd_notify(systemd_available: bool) -> None:
-    if systemd_available:
-        try:
-            import systemd.daemon  # type: ignore
-
-            systemd.daemon.notify("READY=1")
-        except ImportError:
-            pass
-
-
 async def _wrap_postinit(postinit: Awaitable[None]) -> None:
     try:
         return await postinit
@@ -575,7 +566,7 @@ async def _initialize_hardware_api(
         # - systemd timeouts might need to be increased to allow for DB migration time
         # - There might be UI implications for loading states on the Flex's on-device display,
         #   because it polls for the server's systemd status.
-        _systemd_notify(systemd_available)
+        systemd_utils.notify_up()
 
         if should_use_ot3():
             postinit_task = asyncio.create_task(

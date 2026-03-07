@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
+import { HOPPER_STACKER_LOCATION } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -102,6 +103,7 @@ describe('AssignLiquidsModal', () => {
 
   it('loads the modal with selectable labware', () => {
     props.assignLiquidsModalData.labware.mockLabwareId.stack = [
+      HOPPER_STACKER_LOCATION,
       'mockLabwareId',
       'labware2',
     ]
@@ -112,5 +114,17 @@ describe('AssignLiquidsModal', () => {
     render(props)
 
     screen.getByText('mock LabwareStackToolbox')
+  })
+
+  it('does not load the labware toolbox if the labware is not on the hopper', () => {
+    props.assignLiquidsModalData.labware.mockLabwareId.stack = [
+      'mockLabwareId',
+      'labware2',
+    ]
+    render(props)
+
+    expect(
+      screen.queryByText('mock LabwareStackToolbox')
+    ).not.toBeInTheDocument()
   })
 })

@@ -228,10 +228,12 @@ export const RobotConfigurationDetails = (
             <Fragment key={`module_${index}`}>
               <Divider marginY={SPACING.spacing12} width="100%" />
               <RobotConfigurationDetailsItem
-                label={`${t('slot')} ${getModuleDeckLabel(
-                  getModuleType(module.params.model),
-                  module.params.location.slotName
-                )}`}
+                label={t('slot', {
+                  slotName: getModuleDeckLabel(
+                    getModuleType(module.params.model),
+                    module.params.location.slotName
+                  ),
+                })}
                 item={
                   <>
                     <ModuleIcon
@@ -264,11 +266,12 @@ export const RobotConfigurationDetails = (
           <Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={`${t('slot')} ${
-                AAName != null
-                  ? getAASlotDisplayName(AAName)
-                  : getCutoutDisplayName(fixture.cutoutId)
-              }`}
+              label={t('slot', {
+                slotName:
+                  AAName != null
+                    ? getAASlotDisplayName(AAName)
+                    : getCutoutDisplayName(fixture.cutoutId),
+              })}
               item={
                 <>
                   {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId) ? (

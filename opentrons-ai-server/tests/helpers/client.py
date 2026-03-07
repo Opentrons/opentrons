@@ -65,9 +65,11 @@ class Client:
     @timeit
     def get_chat_completion(self, message: str, fake: bool = True, fake_key: Optional[FakeKeys] = None, bad_auth: bool = False) -> Response:
         """Call the /chat/completion endpoint and return the response."""
-        request = ChatRequest(message=message, fake=fake, fake_key=fake_key, history=None, chat_options=None)
+        request = ChatRequest(
+            message=message, fake=fake, fake_key=fake_key, history=None, chat_options=None, pd_protocol_content=None, attachments=None
+        )
         headers = self.standard_headers if not bad_auth else self.invalid_auth_headers
-        return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump())
+        return self.httpx.post("/chat/completion", headers=headers, json=request.model_dump(mode="json"))
 
     def post_feedback(self, message: str, fake: bool = True, bad_auth: bool = False) -> Response:
         """Call the /chat/feedback endpoint and return the response."""
@@ -135,7 +137,7 @@ def main() -> None:
         print_response(response)
 
         console.print(Rule("Now interact", style="bold"))
-        real = Prompt.ask("Actually call OpenAI API?", choices=["y", "n"], default="n")
+        real = Prompt.ask("Actually call Anthropic API?", choices=["y", "n"], default="n")
         if real == "y":
             message = Prompt.ask("Enter a message")
             response = client.get_chat_completion(message, fake=False)

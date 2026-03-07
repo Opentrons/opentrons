@@ -6,9 +6,12 @@ import type { ProtocolFile } from '@opentrons/shared-data'
 import type { PDMetadata } from '/protocol-designer/file-types'
 import type { FormData } from '/protocol-designer/form-types'
 
+// Alias for clarity. No separate type for this, currently.
+type LegacyFormData = FormData
+
 describe('v8.9.0 migration', () => {
   it('should migrate Thermocycler profile steps and leave other steps alone', () => {
-    const initialDeckSetupStep: FormData = {
+    const initialDeckSetupStep: LegacyFormData = {
       labwareLocationUpdate: {},
       moduleLocationUpdate: {},
       pipetteLocationUpdate: {},
@@ -20,7 +23,7 @@ describe('v8.9.0 migration', () => {
       id: '__INITIAL_DECK_SETUP_STEP__',
     }
 
-    const originalProfileStep: FormData = {
+    const originalProfileStep: LegacyFormData = {
       id: 'profile-step-id',
       stepName: 'profile step name',
       stepDetails: 'profile step details',
@@ -67,7 +70,7 @@ describe('v8.9.0 migration', () => {
       lidOpenHold: true,
     }
 
-    const pauseStep: FormData = {
+    const pauseStep: LegacyFormData = {
       moduleId: '23347241-80bb-4a7e-9c91-5d9727a9e483:heaterShakerModuleType',
       pauseAction: 'untilTime',
       pauseMessage: '',
@@ -79,7 +82,7 @@ describe('v8.9.0 migration', () => {
       stepDetails: '',
     }
 
-    const setStateStep: FormData = {
+    const setStateStep: LegacyFormData = {
       id: 'set-state-step-id',
       stepName: 'set state step name',
       stepDetails: 'set state step details',
@@ -182,12 +185,6 @@ describe('v8.9.0 migration', () => {
       },
       profileTargetLidTemp: '40',
       profileVolume: '10',
-
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: false,
     }
 
     const newWaitForProfileCompleteStep: FormData = {
@@ -219,12 +216,6 @@ describe('v8.9.0 migration', () => {
       profileItemsById: {},
       profileTargetLidTemp: null,
       profileVolume: null,
-
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: false,
     }
 
     expect(resultSavedStepForms).toStrictEqual(

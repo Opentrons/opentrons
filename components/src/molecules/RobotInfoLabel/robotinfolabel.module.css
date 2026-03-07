@@ -10,6 +10,8 @@
   border-radius: var(--border-radius-8);
   background-color: inherit;
   overflow-wrap: break-word;
+  white-space: nowrap;
+
 }
 
 .robot_info_label_highlight {

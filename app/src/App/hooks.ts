@@ -82,65 +82,71 @@ export function useProtocolReceiptToast(): void {
     hasRefetched.current = false
   }
 
-  useEffect(() => {
-    const newProtocolIds = difference(protocolIds, protocolIdsRef.current)
-    if (!hasRefetched.current && newProtocolIds.length > 0) {
-      Promise.all(
-        newProtocolIds.map(protocolId => {
-          if (host != null) {
-            return (
-              getProtocol(host, protocolId).then(
-                data =>
-                  data.data.data.metadata.protocolName ??
-                  data.data.data.files[0].name
-              ) ?? ''
-            )
-          } else {
-            return Promise.reject(
-              new Error(
-                'no host provider info inside of useProtocolReceiptToast'
+  useEffect(
+    () => {
+      const newProtocolIds = difference(protocolIds, protocolIdsRef.current)
+      if (!hasRefetched.current && newProtocolIds.length > 0) {
+        Promise.all(
+          newProtocolIds.map(protocolId => {
+            if (host != null) {
+              return (
+                getProtocol(host, protocolId).then(
+                  data =>
+                    data.data.data.metadata.protocolName ??
+                    data.data.data.files[0].name
+                ) ?? ''
               )
-            )
-          }
-        })
-      )
-        .then(protocolNames => {
-          protocolNames.forEach(name => {
-            makeToast(
-              t('protocol_added', {
-                protocol_name: truncateString(name, 30),
-              }) as string,
-              'success',
-              {
-                buttonText: i18n.format(t('shared:close'), 'capitalize'),
-                disableTimeout: true,
-                displayType: 'odd',
-              }
-            )
+            } else {
+              return Promise.reject(
+                new Error(
+                  'no host provider info inside of useProtocolReceiptToast'
+                )
+              )
+            }
           })
-        })
-        .then(() => {
-          queryClient
-            .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) => {
-              console.error(`error invalidating protocols query: ${e.message}`)
+        )
+          .then(protocolNames => {
+            protocolNames.forEach(name => {
+              makeToast(
+                t('protocol_added', {
+                  protocol_name: truncateString(name, 30),
+                }) as string,
+                'success',
+                {
+                  buttonText: i18n.format(t('shared:close'), 'capitalize'),
+                  disableTimeout: true,
+                  displayType: 'odd',
+                }
+              )
             })
-        })
-        .then(() => {
-          createLiveCommand({
-            command: animationCommand,
-          }).catch((e: Error) => {
-            console.warn(`cannot run status bar animation: ${e.message}`)
           })
-        })
-        .catch((e: Error) => {
-          console.error(e)
-        })
-    }
-    protocolIdsRef.current = protocolIds
-    // dont want this hook to rerun when other deps change
+          .then(() => {
+            queryClient
+              .invalidateQueries([host, 'protocols'])
+              .catch((e: Error) => {
+                console.error(
+                  `error invalidating protocols query: ${e.message}`
+                )
+              })
+          })
+          .then(() => {
+            createLiveCommand({
+              command: animationCommand,
+            }).catch((e: Error) => {
+              console.warn(`cannot run status bar animation: ${e.message}`)
+            })
+          })
+          .catch((e: Error) => {
+            console.error(e)
+          })
+      }
+      protocolIdsRef.current = protocolIds
+      // dont want this hook to rerun when other deps change
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [protocolIds])
+    [protocolIds]
+  )
 }
 
 const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
@@ -211,40 +217,52 @@ export function useModuleAttachedToast(
 
   const [firstRun, setFirstRun] = useState<boolean>(true)
 
-  useEffect(() => {
-    const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    if (
-      !runInProgress &&
-      ongoingSubsystemUpdate == null &&
-      newModuleSerials.length > 0
-    ) {
-      setToastID(
-        makeToast(t('module_added') as string, 'info', {
-          buttonText: i18n.format(t('shared:close'), 'capitalize'),
-          linkText: t('module_added_link'),
-          onLinkClick: () => {
-            launchModuleSetupCallback(true)
-          },
-          disableTimeout: true,
-          displayType: 'odd',
-        })
+  useEffect(
+    () => {
+      const newModuleSerials = difference(
+        moduleSerials,
+        moduleSerialsRef.current
       )
-    }
+      if (
+        !runInProgress &&
+        ongoingSubsystemUpdate == null &&
+        newModuleSerials.length > 0
+      ) {
+        setToastID(
+          makeToast(t('module_added') as string, 'info', {
+            buttonText: i18n.format(t('shared:close'), 'capitalize'),
+            linkText: t('module_added_link'),
+            onLinkClick: () => {
+              launchModuleSetupCallback(true)
+            },
+            disableTimeout: true,
+            displayType: 'odd',
+          })
+        )
+      }
 
-    moduleSerialsRef.current = moduleSerials
-    setFirstRun(false)
-    // dont want this hook to rerun when other deps change
+      moduleSerialsRef.current = moduleSerials
+      setFirstRun(false)
+      // dont want this hook to rerun when other deps change
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress, firstRun])
+    [moduleSerials, runInProgress, firstRun]
+  )
 
-  useEffect(() => {
-    // Close toast if there are no new modules to setup
-    if (toastID && currentlySetuppableModules.length === 0) {
-      launchModuleSetupCallback(false)
-      eatToast(toastID)
-      setToastID('')
-    }
-  }, [toastID, currentlySetuppableModules])
+  useEffect(
+    () => {
+      // Close toast if there are no new modules to setup
+      if (toastID && currentlySetuppableModules.length === 0) {
+        launchModuleSetupCallback(false)
+        eatToast(toastID)
+        setToastID('')
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toastID, currentlySetuppableModules]
+  )
 }
 
 export function useScrollRef(): {

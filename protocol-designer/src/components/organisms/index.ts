@@ -1,7 +1,6 @@
 export * from './Alerts'
 export * from './AnnouncementModal'
 export * from './AssignLiquidsModal'
-export * from './BonusStepModal'
 export * from './BlockingHintModal'
 export * from './ConfirmDeleteEntityInUseModal'
 export * from './ConfirmDeleteModal'

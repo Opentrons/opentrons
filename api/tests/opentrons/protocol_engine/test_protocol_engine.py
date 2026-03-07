@@ -29,6 +29,7 @@ from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     AddLiquidAction,
     AddModuleAction,
+    CreateUserCommandAnnotation,
     FinishAction,
     FinishErrorDetails,
     HardwareStoppedAction,
@@ -1424,6 +1425,34 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_create_user_command_annotation(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should create a user command annotation and return an annotation ID."""
+    result = subject.create_user_command_annotation(
+        annotation_name="My annotation",
+        annotation_id="abc123",
+        description="Hello world",
+        params={},
+    )
+
+    assert result == "abc123"
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id="abc123",
+                name="My annotation",
+                description="Hello world",
+                params={},
+            ),
+        ),
+        times=1,
     )
 
 

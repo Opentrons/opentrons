@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -17,6 +18,7 @@ import type {
   ModuleModel,
   ModuleType,
   OT2AddressableAreaName,
+  StackerStoredLabwareDefinitionURIs,
 } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
@@ -27,6 +29,7 @@ import type {
   ModuleState,
   TemperatureModuleState,
   ThermocyclerModuleState,
+  VacuumModuleState,
 } from './types'
 
 // Temperature statuses
@@ -79,6 +82,12 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
+  setStoredLabwareCount: 1,
+  fillCount: 1,
+}
+
+export const VACUUM_MODULE_INITIAL_STATE: VacuumModuleState = {
+  type: VACUUM_MODULE_TYPE,
 }
 
 export const MODULE_INITIAL_STATE_BY_TYPE: {
@@ -91,6 +100,7 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
   [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_MODULE_INITIAL_STATE,
+  [VACUUM_MODULE_TYPE]: VACUUM_MODULE_INITIAL_STATE,
 } as const
 
 MODULE_INITIAL_STATE_BY_TYPE satisfies {
@@ -136,6 +146,9 @@ export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup
 > = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
+export const BOTTOM_UP_STORED_LABWARE_URI_KEYS: Array<
+  keyof StackerStoredLabwareDefinitionURIs
+> = ['adapterLabwareURI', 'primaryLabwareURI', 'lidLabwareURI']
 
 export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   DeckSlotId,
@@ -146,3 +159,5 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   C4: 'hopperC4',
   D4: 'hopperD4',
 }
+
+export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'

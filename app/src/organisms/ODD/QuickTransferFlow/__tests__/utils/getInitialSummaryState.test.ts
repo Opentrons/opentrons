@@ -169,14 +169,6 @@ describe('getInitialSummaryState', () => {
         path: 'single',
         liquidClassValuesInitialized: false,
         changeTip: 'always',
-        disposalVolumeDispenseSettings: {
-          volume: 1,
-          flowRate: 75,
-          blowoutLocation: {
-            cutoutFixtureId: 'trashBinAdapter',
-            cutoutId: 'cutoutA3',
-          },
-        },
       } as any,
       deckConfig: [
         {

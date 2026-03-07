@@ -62,6 +62,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
 
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
@@ -86,6 +87,7 @@ interface DeckSetupContainerProps {
   setViewBox: Dispatch<SetStateAction<string>>
   viewBox: string
   initialViewBox: string
+  currentStep: FormData | null
 }
 export function DeckSetupContainer(
   props: DeckSetupContainerProps
@@ -98,6 +100,7 @@ export function DeckSetupContainer(
     initialViewBox,
     viewBox,
     setViewBox,
+    currentStep,
   } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
@@ -286,6 +289,7 @@ export function DeckSetupContainer(
                             slotClipColor={darkFill}
                             showExpansion={cutoutId === 'cutoutA1'}
                             fixtureBaseColor={lightFill}
+                            showSlotClips={false}
                           />
                         ) : null
                       })}
@@ -301,6 +305,7 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
+                              showSlotClips={false}
                             />
                           )
                         }
@@ -316,6 +321,7 @@ export function DeckSetupContainer(
                                   deckDefinition={deckDef}
                                   slotClipColor={COLORS.transparent}
                                   fixtureBaseColor={lightFill}
+                                  showSlotClips={false}
                                 />
                                 <FlexTrash
                                   robotType={robotType}
@@ -358,6 +364,7 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
+                              showSlotClips={false}
                             />
                           )
                         }
@@ -371,6 +378,7 @@ export function DeckSetupContainer(
                     setHover={setHoverSlot}
                     addEquipment={addEquipment}
                     activeDeckSetup={activeDeckSetup}
+                    currentStep={currentStep}
                     stagingAreaCutoutIds={stagingAreaFixtures.map(
                       areas => areas.location as CutoutId
                     )}

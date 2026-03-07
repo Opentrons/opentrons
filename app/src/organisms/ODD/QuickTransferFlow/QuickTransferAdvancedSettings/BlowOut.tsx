@@ -41,7 +41,11 @@ import { getMaxUiFlowRate, getPipetteName } from '../utils'
 import { getExtractTiprackTypeFromURI } from '../utils/getExtractTiprackTypeFromURI'
 
 import type { Dispatch } from 'react'
-import type { DeckConfiguration, SupportedTip } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  DeckConfiguration,
+  SupportedTip,
+} from '@opentrons/shared-data'
 import type {
   BlowOutLocation,
   FlowRateKind,
@@ -59,7 +63,8 @@ interface BlowOutProps {
 
 export const useBlowOutLocationOptions = (
   deckConfig: DeckConfiguration,
-  transferType: TransferType
+  transferType: TransferType,
+  dropTipLocation: CutoutConfig | string
 ): Array<{ location: BlowOutLocation; description: string }> => {
   const { t } = useTranslation('quick_transfer')
 
@@ -68,7 +73,6 @@ export const useBlowOutLocationOptions = (
       WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
       TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
   )
-
   // add trash bin in A3 if no trash or waste chute configured
   if (trashLocations.length === 0) {
     trashLocations.push({
@@ -76,6 +80,12 @@ export const useBlowOutLocationOptions = (
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     })
   }
+  // if the user picked a trash fixture for tip drop, then filter the list of
+  // trashLocations to only allow them to blow out to the same trash fixture:
+  if (typeof dropTipLocation === 'object') {
+    trashLocations.splice(0, trashLocations.length, dropTipLocation)
+  }
+
   const blowOutLocationItems: Array<{
     location: BlowOutLocation
     description: string
@@ -143,7 +153,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   ]
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
-    state.transferType
+    state.transferType,
+    state.dropTipLocation
   )
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()

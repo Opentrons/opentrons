@@ -69,8 +69,6 @@ export const forThermocyclerSetTargetLidTemperature = (
   moduleState.lidTargetTemp = celsius
 }
 
-// todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
-// Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitBlockTemperature = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -79,8 +77,6 @@ export const forThermocyclerAwaitBlockTemperature = (
   // nothing to be done
 }
 
-// todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
-// Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitLidTemperature = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,

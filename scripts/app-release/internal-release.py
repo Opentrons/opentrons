@@ -146,30 +146,51 @@ def get_remote_tags(clone_url: str, tag_pattern: str) -> List[str]:
         return []
 
 
+def extract_internal_numeric_version(tag: str) -> int:
+    """Extract numeric version from internal@vN tag."""
+    m = re.match(r"^internal@v(\d+)$", tag)
+    return int(m.group(1)) if m else -1
+
+
 def get_last_tag_from_list(tags: List[str], tag_type: str, internal_version: str) -> Optional[str]:
     """Get the most recent tag from a list for the given internal version."""
     if not tags:
         return None
     
-    # Sort tags by version
+    # For internal_numeric (ot3-firmware), sort by numeric version
+    if tag_type == "internal_numeric":
+        numeric_tags = [(t, extract_internal_numeric_version(t)) for t in tags]
+        numeric_tags = [(t, n) for t, n in numeric_tags if n >= 0]
+        if not numeric_tags:
+            return None
+        numeric_tags.sort(key=lambda x: x[1], reverse=True)
+        return numeric_tags[0][0]
+    
+    # Sort tags by version for alpha tags
     tags_sorted = sorted(tags, key=lambda t: t, reverse=True)
     
-    # For internal_numeric (ot3-firmware), just return the latest
-    if tag_type == "internal_numeric":
-        return tags_sorted[0] if tags_sorted else None
+    # For alpha tags, filter to matching version and sort by alpha number
+    if tag_type == "internal_alpha":
+        prefix = f"internal@{internal_version}-alpha."
+    elif tag_type == "ot3_alpha":
+        prefix = f"ot3@{internal_version}-alpha."
+    else:
+        return None
     
-    # For alpha tags, find the latest tag matching this specific version
-    for tag in tags_sorted:
-        if tag_type == "internal_alpha":
-            # internal@2.8.0-alpha.X
-            if tag.startswith(f"internal@{internal_version}-alpha."):
-                return tag
-        elif tag_type == "ot3_alpha":
-            # ot3@2.8.0-alpha.X
-            if tag.startswith(f"ot3@{internal_version}-alpha."):
-                return tag
+    matching_tags = [t for t in tags if t.startswith(prefix)]
+    if not matching_tags:
+        return None
     
-    return None
+    def alpha_key(tag: str) -> int:
+        # Extract the number after "alpha."
+        suffix = tag[len(prefix):]
+        try:
+            return int(suffix)
+        except ValueError:
+            return -1
+    
+    matching_sorted = sorted(matching_tags, key=alpha_key, reverse=True)
+    return matching_sorted[0] if matching_sorted else None
 
 
 def get_last_tag_for_version(repo_path: Path, tag_pattern: str, tag_type: str, internal_version: str) -> Optional[str]:

@@ -75,10 +75,12 @@ def get_sample_pipette_dict(
     return pipette_dict
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
-def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+def ot3_hardware_api(
+    decoy: Decoy, request: pytest.FixtureRequest
+) -> HardwareControlAPI:
     """Get a mocked out OT3API."""
+    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 

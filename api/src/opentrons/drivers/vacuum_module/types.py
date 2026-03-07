@@ -18,6 +18,8 @@ class GCODE(StrEnum):
     SET_PUMP_STATE = "M122"
     GET_PUMP_STATE = "M123"
     SET_VENT_STATE = "M124"
+    SET_PRESSURE_PID = "M125"
+    GET_PRESSURE_PID = "M126"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -103,6 +105,18 @@ class PressureState:
     pressure_atm: float
     vacuum_enabled: bool
     vent_state: VentState
+
+
+@dataclass
+class PressureControlTunings:
+    """Get the pressure control tuning values."""
+
+    kp: float
+    ki: float
+    kd: float
+    overshoot_error: float
+    k_velocity: float
+    k_holding: float
 
 
 @dataclass

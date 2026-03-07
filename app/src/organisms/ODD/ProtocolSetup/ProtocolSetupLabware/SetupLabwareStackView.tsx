@@ -118,14 +118,10 @@ export function SetupLabwareStackView({
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_FLEX_START}
           alignItems={ALIGN_CENTER}
+          gap={SPACING.spacing12}
         >
           <ODDBackButton onClick={onClickBack} />
-          <StyledText
-            oddStyle="level2HeaderBold"
-            marginRight={SPACING.spacing16}
-          >
-            {t('labware_in')}
-          </StyledText>
+          <StyledText oddStyle="level2HeaderBold">{t('labware_in')}</StyledText>
           <RobotInfoLabel
             deckLabel={
               slotName === 'offDeck'

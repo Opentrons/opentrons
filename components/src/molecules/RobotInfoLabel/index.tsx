@@ -5,13 +5,14 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
 
+import type { HelixStyles } from '../../atoms/StyledText'
 import type { IconName } from '../../icons'
 
 export interface RobotInfoLabelProps {
   deckLabel?: string
   iconName?: IconName
   highlight?: boolean
-  size?: 'large' | 'default'
+  size?: 'large' | 'default' | 'extraLarge'
   height?: string | number
   width?: string | number
   svgSize?: string | number
@@ -38,6 +39,16 @@ export function RobotInfoLabel({
       [styles.has_deck_label]: deckLabel != null,
     }
   )
+  const getTextSize = (size: string): HelixStyles => {
+    switch (size) {
+      case 'large':
+        return 'headingSmallBold'
+      case 'extraLarge':
+        return 'headingLargeBold'
+      default:
+        return 'captionBold'
+    }
+  }
 
   return (
     <div
@@ -59,7 +70,7 @@ export function RobotInfoLabel({
         />
       ) : (
         <PlaceholderStyledText
-          desktopStyle={size === 'large' ? 'headingSmallBold' : 'captionBold'}
+          desktopStyle={getTextSize(size)}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >

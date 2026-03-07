@@ -5,6 +5,12 @@
     line-height: var(--line-height-24);
   }
 
+  .heading_large_bold {
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-32);
+  }
+
   .caption_bold {
     font-size: 0.75rem;
     font-weight: var(--font-weight-bold);

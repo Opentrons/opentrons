@@ -2,6 +2,7 @@ import intersection from 'lodash/intersection'
 import uuidv1 from 'uuid/v4'
 
 import {
+  ALL,
   getAllDefinitions,
   getLabwareDefURI,
   orderWells,
@@ -11,20 +12,17 @@ import {
 } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
 
-import {
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../constants'
+import { DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP } from '../constants'
 
 import type {
   CutoutConfig,
   DeckConfiguration,
   LabwareDefinition,
-  NozzleConfigurationStyle,
   PipetteName,
 } from '@opentrons/shared-data'
 import type {
@@ -34,6 +32,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
   RobotState,
+  SharedTransferLikeArgs,
   TransferArgs,
   TrashBinEntities,
   WasteChuteEntities,
@@ -437,18 +436,20 @@ export function generateQuickTransferArgs(
         : undefined
   }
 
-  let nozzles = null
-  if (pipetteEntity.spec.channels === 96) {
-    nozzles = 'ALL' as NozzleConfigurationStyle
-  }
+  const nozzles = ALL
   const touchTipAfterDispenseOffsetMmFromTop =
     quickTransferState.touchTipDispense ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const touchTipAfterAspirateOffsetMmFromTop =
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
-  const commonFields = {
-    stepId: 1,
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles,
+    channels: pipetteEntity.spec.channels,
+  })
+  const commonFields: SharedTransferLikeArgs = {
+    stepNumber: 1,
+    primaryNozzle: primaryNozzle,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id!,
@@ -463,7 +464,6 @@ export function generateQuickTransferArgs(
       quickTransferState.path === 'multiDispense'
         ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
         : (quickTransferState.blowOutDispense?.flowRate ?? 0),
-    blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
     aspirateDelay:

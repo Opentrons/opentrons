@@ -40,7 +40,6 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolsLanding')
 vi.mock('/app/pages/Desktop/Devices/ProtocolRunDetails')
 vi.mock('/app/pages/Desktop/Devices/RobotSettings')
 vi.mock('/app/organisms/Desktop/Alerts/AlertsModal')
-vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
@@ -57,9 +56,6 @@ const render = (path = '/') => {
 
 describe('DesktopApp', () => {
   beforeEach(() => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     vi.mocked(CalibrationDashboard).mockReturnValue(
       <div>Mock CalibrationDashboard</div>
     )
@@ -137,7 +133,7 @@ describe('DesktopApp', () => {
 
   it('renders a ProtocolsTimeline component from /visualization', () => {
     render(
-      `/devices/otie/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/mockDecodedTimestamp/6b94f0a9-e91e-4202-b25f-ab13beab4bca/visualization`
+      `/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/mockDecodedTimestamp/6b94f0a9-e91e-4202-b25f-ab13beab4bca/visualization`
     )
     screen.getByText('Mock Visualization')
   })

@@ -76,7 +76,6 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
         '**/lib/**',
-        'labware-library/cypress/**/*',
         ...configDefaults.exclude,
       ],
       provider: 'v8',

@@ -6,6 +6,7 @@ on:
       - edge
     paths:
       - 'opentrons-ai-client/**'
+      - '.github/workflows/opentrons-ai-client-staging-continuous-deploy.yaml'
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +17,7 @@ env:
   CI: true
 
 jobs:
-  js-unit-test:
+  build-and-deploy:
     runs-on: 'ubuntu-24.04'
     permissions:
       id-token: write
@@ -24,34 +25,8 @@ jobs:
     name: 'OpentronsAI client edge continuous deployment to staging'
     timeout-minutes: 10
     steps:
-      - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.21.1'
-      - name: 'install udev'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+      - uses: 'actions/checkout@v6'
+      - uses: ./.github/actions/js/setup
       - name: 'build'
         env:
           # inject dev id since this is for staging
@@ -59,7 +34,7 @@ jobs:
         run: |
           make -C opentrons-ai-client build-staging
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
           aws-region: ${{ secrets.STAGING_AI_REGION }}

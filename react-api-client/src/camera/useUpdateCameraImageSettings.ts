@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from 'react-query'
 
 import { createCameraImageSettings } from '@opentrons/api-client'
-import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { useHost } from '../api'
 
@@ -36,7 +35,6 @@ export function useCreateCameraImageSettings(
     CameraImageSettings
   > = {}
 ): UseCreateCameraImageSettingsMutationResult {
-  const cameraId = OT_SYSTEM_CAMERA
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -45,11 +43,11 @@ export function useCreateCameraImageSettings(
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >(
-    [host, 'camera', 'cameraSettings', cameraId],
+    [host, 'camera', 'cameraSettings'],
     (data: CameraImageSettings) =>
-      createCameraImageSettings(host!, data, cameraId).then(response => {
+      createCameraImageSettings(host!, data).then(response => {
         queryClient
-          .invalidateQueries([host, 'camera', 'cameraSettings', cameraId])
+          .invalidateQueries([host, 'camera', 'cameraSettings'])
           .catch(e => {
             throw e
           })

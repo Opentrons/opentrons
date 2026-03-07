@@ -45,7 +45,6 @@ describe('getLabwareOverlapOffset()', () => {
 
   it('should return the labware overlap offset for a given module model', () => {
     const result = getLabwareOverlapOffset(
-      FLEX_STACKER_MODULE_V1,
       mockLabwareDefinition,
       'labware-name'
     )
@@ -53,18 +52,11 @@ describe('getLabwareOverlapOffset()', () => {
   })
 
   it('should console an error if the module model is invalid', () => {
-    const mockConsoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {})
     const result = getLabwareOverlapOffset(
-      MAGNETIC_MODULE_V1,
       mockLabwareDefinition,
       'labware-name'
     )
     expect(result).toStrictEqual({ x: 0, y: 0, z: 0 })
-    expect(mockConsoleError).toHaveBeenCalledWith(
-      'Invalid module model for labware overlap offset: magneticModuleV1'
-    )
   })
 })
 

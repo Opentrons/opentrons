@@ -23,7 +23,6 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.modules import (
     build as build_module,
 )
-from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 from opentrons.hardware_control.modules.types import (
     AbsorbanceReaderModel,

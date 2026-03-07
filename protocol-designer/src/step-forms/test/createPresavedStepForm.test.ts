@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
   fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -228,6 +229,7 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      primaryNozzle: null,
       pushOut_checkbox: null,
       pushOut_volume: null,
       conditioning_checkbox: false,
@@ -266,6 +268,7 @@ describe('createPresavedStepForm', () => {
         dropTip_location: 'mockTrash',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
+        primaryNozzle: A1_NOZZLE,
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
@@ -448,11 +451,6 @@ describe('createPresavedStepForm', () => {
               profileTargetLidTemp: null,
               orderedProfileItems: [],
               profileItemsById: {},
-              blockIsActiveHold: false,
-              blockTargetTempHold: null,
-              lidIsActiveHold: false,
-              lidTargetTempHold: null,
-              lidOpenHold: null,
             },
           }
           args.orderedStepIds = ['prevStepId']
@@ -460,16 +458,11 @@ describe('createPresavedStepForm', () => {
 
         expect(createPresavedStepForm(args)).toEqual({
           blockIsActive: !timelineHasErrors,
-          blockIsActiveHold: false,
           blockTargetTemp: timelineHasErrors ? null : 42,
-          blockTargetTempHold: null,
           id: stepId,
           lidIsActive: !timelineHasErrors,
-          lidIsActiveHold: false,
           lidOpen: !timelineHasErrors,
-          lidOpenHold: null,
           lidTargetTemp: timelineHasErrors ? null : 43,
-          lidTargetTempHold: null,
           moduleId: 'someThermocyclerModuleId',
           orderedProfileItems: [],
           profileItemsById: {},

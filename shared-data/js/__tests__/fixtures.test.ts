@@ -13,11 +13,14 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
   getAAComboFixtureDisplayName,
+  getAddedMissingThermocyclerFixtures,
   getCutoutConfigReplacmentForModule,
   getFixtureDisplayName,
   getFlexStackerD3Compatibility,
@@ -30,7 +33,7 @@ import {
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
-import type { CutoutConfig, DeckConfiguration } from '..'
+import type { CutoutConfig, CutoutConfigMap, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -539,5 +542,80 @@ describe('getFlexStackerD3Compatibility', () => {
       },
     ])
     expect(result).toBeNull()
+  })
+})
+
+describe('getAddedMissingThermocyclerFixtures', () => {
+  it('should return values unchanged when no thermocycler fixture is present', () => {
+    const values = [
+      {
+        cutoutId: 'cutoutD1',
+        cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+        addressableAreaId: 'temperatureModuleV2D1',
+      },
+    ] as CutoutConfigMap[]
+    const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
+    expect(result).toEqual(values)
+  })
+
+  it('should add rear fixture when only front fixture is provided', () => {
+    const values = [
+      {
+        cutoutId: 'cutoutB1',
+        cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+        addressableAreaId: 'B1',
+      },
+    ] as CutoutConfigMap[]
+    const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
+    expect(result).toHaveLength(2)
+    expect(result).toContainEqual({
+      cutoutId: 'cutoutB1',
+      cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+      addressableAreaId: 'B1',
+    })
+    expect(result).toContainEqual({
+      cutoutId: 'cutoutA1',
+      cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+      addressableAreaId: 'A1',
+    })
+  })
+
+  it('should add front fixture when only rear fixture is provided', () => {
+    const values = [
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+        addressableAreaId: 'A1',
+      },
+    ] as CutoutConfigMap[]
+    const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
+    expect(result).toHaveLength(2)
+    expect(result).toContainEqual({
+      cutoutId: 'cutoutA1',
+      cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+      addressableAreaId: 'A1',
+    })
+    expect(result).toContainEqual({
+      cutoutId: 'cutoutB1',
+      cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+      addressableAreaId: 'thermocyclerModuleV2',
+    })
+  })
+
+  it('should return values unchanged when both thermocycler fixtures are present', () => {
+    const values = [
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+        addressableAreaId: 'A1',
+      },
+      {
+        cutoutId: 'cutoutB1',
+        cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+        addressableAreaId: 'B1',
+      },
+    ] as CutoutConfigMap[]
+    const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
+    expect(result).toHaveLength(2)
   })
 })

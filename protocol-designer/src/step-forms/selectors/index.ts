@@ -56,7 +56,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
-import type { BonusStepModalType } from '/protocol-designer/components/organisms'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
@@ -443,16 +442,9 @@ export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
   )
 
 export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
-  createSelector(
-    getOrderedSavedForms,
-    featureFlagSelectors.getEnableConcurrentModuleActions,
-    (orderedSavedForms, enableConcurrentModuleActions) => {
-      return convertStepArrayToHierarchy(
-        orderedSavedForms,
-        enableConcurrentModuleActions
-      )
-    }
-  )
+  createSelector(getOrderedSavedForms, orderedSavedForms => {
+    return convertStepArrayToHierarchy(orderedSavedForms)
+  })
 
 /**
  * A mapping from step IDs to the step's user-visible index in the timeline.
@@ -754,13 +746,7 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  featureFlagSelectors.getEnableConcurrentModuleActions,
-  (
-    stepForms,
-    contextualState,
-    allLabwareDefs,
-    enableConcurrentModuleActions
-  ) => {
+  (stepForms, contextualState, allLabwareDefs) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -774,8 +760,7 @@ export const getArgsAndErrorsByStepId: Selector<
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState,
-                enableConcurrentModuleActions
+                contextualState
               ),
             }
           : {
@@ -786,53 +771,6 @@ export const getArgsAndErrorsByStepId: Selector<
       },
       {}
     )
-  }
-)
-
-export const getBonusStepModalType = createSelector(
-  getUnsavedForm,
-  getCurrentFormIsPresaved,
-  featureFlagSelectors.getEnableConcurrentModuleActions,
-  (
-    unsavedForm,
-    currentFormIsPresaved,
-    enableConcurrentModuleActions
-  ): BonusStepModalType | null => {
-    // NOTE: This logic to decide whether a bonus step is warranted should be kept in
-    // sync with saveStepForm().
-
-    const isTempModSetTempForm =
-      unsavedForm?.stepType === 'temperature' &&
-      unsavedForm?.targetTemperature != null
-    const isHSSetTempForm =
-      unsavedForm?.stepType === 'heaterShaker' &&
-      unsavedForm?.targetHeaterShakerTemperature != null &&
-      unsavedForm?.heaterShakerSetTimer !== true
-    const isTCProfileForm =
-      unsavedForm?.stepType === 'thermocycler' &&
-      unsavedForm?.thermocyclerFormType === 'thermocyclerProfile'
-
-    const isFirstTimeSavingThisForm = currentFormIsPresaved
-
-    // todo(mm, 2025-11-24): These should also be conditional on "Don't show again"
-    // not having been clicked before. https://opentrons.atlassian.net/browse/EXEC-1925
-    if (isTempModSetTempForm && isFirstTimeSavingThisForm) {
-      return enableConcurrentModuleActions
-        ? 'explainWaitForTemperatureModuleTemp'
-        : 'optionallyWaitForTemp'
-    } else if (isHSSetTempForm && isFirstTimeSavingThisForm) {
-      return enableConcurrentModuleActions
-        ? 'explainWaitForHeaterShakerTemp'
-        : 'optionallyWaitForTemp'
-    } else if (
-      enableConcurrentModuleActions &&
-      isTCProfileForm &&
-      isFirstTimeSavingThisForm
-    ) {
-      return 'explainWaitForThermocyclerProfile'
-    } else {
-      return null
-    }
   }
 )
 

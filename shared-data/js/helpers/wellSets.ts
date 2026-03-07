@@ -17,6 +17,7 @@ import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleLayoutConfig,
   PipetteV2Specs,
@@ -54,7 +55,7 @@ export interface NozzleLayoutDetails {
 export interface WellSetForMultiChannelParams {
   labwareDef: LabwareDefinition
   wellName: string
-  channels: 8 | 96
+  channels: ActiveNozzleNumber
   pipetteNozzleDetails?: NozzleLayoutDetails
 }
 
@@ -153,7 +154,6 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
     if (channels === 8) {
       const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
-
       switch (nozzleConfig) {
         case null:
         case 'full':
@@ -179,6 +179,16 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
           console.error('Unhandled nozzleConfig case.')
           return null
       }
+    } else if (channels === 12) {
+      return getActiveRowFromWell(labwareDef.ordering)
+    } else if (channels > 1 && channels < 8) {
+      const flatListOfWells = labwareDef.ordering.flat()
+      const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
+      const partialWellIndex = allWellSetsFor8Channel.flat().indexOf(wellName)
+      return flatListOfWells.slice(
+        partialWellIndex,
+        partialWellIndex + channels
+      )
     } else {
       switch (nozzleConfig) {
         case null:

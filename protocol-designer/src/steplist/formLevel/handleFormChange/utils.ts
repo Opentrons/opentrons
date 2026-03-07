@@ -71,6 +71,7 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
+    'primaryNozzle',
     'labware',
     'wells',
     'volume',
@@ -87,6 +88,7 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
+    'primaryNozzle',
     'aspirate_labware',
     'aspirate_wells',
     'dispense_labware',
@@ -1528,6 +1530,7 @@ export const updateFieldsForLiquidClass = (args: {
     liquidHandlingAction,
     robotType,
   })
+
   Object.entries(fieldUpdates).forEach(([field, value]) => {
     if (field in propsForFields) {
       propsForFields[field].updateValue(value)

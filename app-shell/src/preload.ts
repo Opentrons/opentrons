@@ -48,4 +48,9 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, listener)
     },
   },
+  secondaryWindow: {
+    closeSelf: () => {
+      ipcRenderer.send('secondary-window: close-self')
+    },
+  },
 })

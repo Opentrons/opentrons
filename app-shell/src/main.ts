@@ -56,7 +56,6 @@ log.debug('App config', {
 initializeSentry(getStore().analytics.optedIn)
 
 if (config.devtools) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   electronDebug({ isEnabled: true, showDevTools: true })
 }
 
@@ -183,6 +182,13 @@ function startUp(): void {
   })
 
   initializeMenu()
+
+  ipcMain.on('secondary-window:close-self', event => {
+    const senderWindow = BrowserWindow.fromWebContents(event.sender)
+    if (senderWindow != null && !senderWindow.isDestroyed()) {
+      senderWindow.close()
+    }
+  })
 
   ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })

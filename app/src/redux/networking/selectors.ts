@@ -5,7 +5,6 @@ import { createSelector } from 'reselect'
 
 import { INTERFACE_ETHERNET, INTERFACE_WIFI } from './constants'
 
-import type { Dictionary } from 'lodash'
 import type { State } from '../types'
 import type * as Types from './types'
 
@@ -23,7 +22,7 @@ export const getNetworkInterfaces: (
   (state: State, robotName: string) => state.networking[robotName]?.interfaces,
   interfaces => {
     const simpleIfaces = map(
-      interfaces as Dictionary<Types.InterfaceStatus>,
+      interfaces as Record<string, Types.InterfaceStatus>,
       (iface: Types.InterfaceStatus): Types.SimpleInterfaceStatus => {
         const { ipAddress: ipWithMask, macAddress, type } = iface
         let ipAddress: string | null = null

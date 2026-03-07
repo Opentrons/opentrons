@@ -22,6 +22,10 @@ const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
 
 const isCI = process.env.CI === 'true'
 
+const sentryReleaseEnv = !!process.env.SENTRY_RELEASE
+  ? process.env.SENTRY_RELEASE
+  : undefined
+
 const hasSentryCreds =
   !!process.env.SENTRY_AUTH_TOKEN &&
   !!process.env.SENTRY_ORG &&
@@ -31,8 +35,12 @@ const hasSentryCreds =
 // When enabled locally, the plugin will upload sourcemaps under the `local-dev`
 // release name. The runtime SDK is configured to report the same release so local
 // events can resolve uploaded sourcemaps.
-// CI should use getsentry/action-release for releases/sourcemaps.
-const enableSentryLocalPlugin = !isCI && hasSentryCreds
+// In CI, sourcemap upload is disabled by default and must be explicitly opted in.
+const enableSentryLocalSourcemapUpload = !isCI && hasSentryCreds
+const enableSentryCiSourcemapUpload =
+  isCI && hasSentryCreds && process.env.OT_PD_SENTRY_PLUGIN_UPLOAD === 'true'
+const enableSentrySourcemapUpload =
+  enableSentryLocalSourcemapUpload || enableSentryCiSourcemapUpload
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {
@@ -62,6 +70,25 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
+    worker: {
+      // Vite builds web workers in a separate bundle context with its own plugin pipeline.
+      // Add a Sentry plugin instance here so worker chunks get debug IDs injected.
+      // The main Sentry plugin instance (below) will then upload all debug-ID-enabled
+      // chunks (including workers) in a single upload.
+      //
+      // IMPORTANT: Prevent this worker plugin from uploading on its own by overriding
+      // auth/org/project with empty strings (so it does not fall back to process.env).
+      plugins: () => [
+        sentryVitePlugin({
+          silent: true,
+          telemetry: false,
+          authToken: '',
+          org: '',
+          project: '',
+          release: { inject: false },
+        }),
+      ],
+    },
     plugins: [
       react({
         include: '**/*.tsx',
@@ -81,26 +108,32 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
 
-      ...(enableSentryLocalPlugin
-        ? [
-            sentryVitePlugin({
+      // Always enable the Sentry Vite plugin so React component names are annotated
+      // (better breadcrumbs, component stack traces, etc).
+      // Only upload sourcemaps locally when explicitly opted in via SENTRY_* env vars.
+      // CI can optionally upload sourcemaps via this plugin when explicitly opted in.
+      // (Default CI behavior is still no upload.)
+      sentryVitePlugin({
+        telemetry: false,
+        reactComponentAnnotation: { enabled: true },
+        release: {
+          name: enableSentryLocalSourcemapUpload
+            ? 'local-dev'
+            : (sentryReleaseEnv ?? OT_PD_VERSION),
+          inject: false,
+        },
+        ...(enableSentrySourcemapUpload
+          ? {
               org: process.env.SENTRY_ORG,
               project: process.env.SENTRY_PROJECT,
               authToken: process.env.SENTRY_AUTH_TOKEN,
-              telemetry: false,
-              reactComponentAnnotation: { enabled: true },
-
-              // Local opt-in behavior:
-              // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
-              // - Use the `local-dev` release name
-              // CI continues to upload via getsentry/action-release.
-              release: {
-                name: 'local-dev',
-                inject: false,
+              sourcemaps: {
+                assets: ['./dist/**'],
+                ignore: ['./node_modules/**'],
               },
-            }),
-          ]
-        : []),
+            }
+          : {}),
+      }),
 
       {
         name: 'build-info-generator',
@@ -146,7 +179,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
       _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
       _OT_PD_SENTRY_RELEASE_: JSON.stringify(
-        enableSentryLocalPlugin ? 'local-dev' : OT_PD_VERSION
+        enableSentryLocalSourcemapUpload
+          ? 'local-dev'
+          : (sentryReleaseEnv ?? OT_PD_VERSION)
       ),
       _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
       _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),

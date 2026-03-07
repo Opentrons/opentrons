@@ -4,6 +4,7 @@ import type {
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -118,19 +119,14 @@ export type StepFieldName = string
 
 /* MODULE FIELDS */
 // | 'blockIsActive'
-// | 'blockIsActiveHold'
-// | 'blockTargetTempHold'
 // | 'engageHeight'
 // | 'heaterShakerSetTimer'
 // | 'heaterShakerTimerMinutes'
 // | 'heaterShakerTimerSeconds'
 // | 'latchOpen'
 // | 'lidIsActive'
-// | 'lidIsActiveHold'
 // | 'lidOpen'
-// | 'lidOpenHold'
 // | 'lidTargetTemp'
-// | 'lidTargetTempHold'
 // | 'magnetAction'
 // | 'moduleId'
 // | 'orderedProfileItems'
@@ -178,7 +174,7 @@ export type StepType =
   | 'temperature'
   | 'thermocycler'
   | 'flexStacker'
-
+  | 'vacuum'
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
   camera: 'camera',
@@ -193,6 +189,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   pause: 'pause-circle',
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
+  vacuum: 'ot-vacuum',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -310,10 +307,12 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   disposalVolume_checkbox: boolean
   dropTip_location: string
   liquidClassesSupported: boolean
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
   path: PathOption
   // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+
   tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
@@ -420,7 +419,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_touchTip_checkbox: boolean
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
   tipRack: TipRackWithDef
@@ -434,6 +433,8 @@ export interface HydratedMixFormData extends AnnotationFields {
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dropTip_wellNames?: string[] | null
+  // TODO: mix_mmFromBottom is now the position above the mix_position_reference, not the bottom.
+  // Renaming it will probably require a migration.
   mix_mmFromBottom?: number | null
   mix_touchTip_mmFromTop?: number | null
   mix_x_position?: number | null
@@ -441,6 +442,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_position_reference: PositionReference
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   pushOut_volume: number | null
   pushOut_checkbox: boolean
   times?: number | null
@@ -498,18 +500,6 @@ export interface HydratedThermocyclerFormData extends AnnotationFields {
   profileItemsById: Record<string, ProfileItem>
   profileTargetLidTemp: string | null
   profileVolume: string | null
-
-  // https://opentrons.atlassian.net/browse/EXEC-2141
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  blockIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  blockTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidOpenHold: boolean
 }
 
 export type AbsorbanceReaderFormType =
@@ -545,6 +535,12 @@ export interface HydratedFlexStackerFormData extends AnnotationFields {
   fillLabwareIds: string[]
   flexStackerFormType: FlexStackerFormType | null
   interventionMessage: string | null
+  moduleId: string
+}
+
+export interface HydratedVacuumFormData extends AnnotationFields {
+  stepType: 'vacuum'
+  id: string
   moduleId: string
 }
 
@@ -668,3 +664,4 @@ export type HydratedFormData =
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
   | HydratedFlexStackerFormData
+  | HydratedVacuumFormData

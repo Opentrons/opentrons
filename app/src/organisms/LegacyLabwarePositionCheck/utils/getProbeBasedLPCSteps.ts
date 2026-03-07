@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash'
+import isEqual from 'lodash/isEqual'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'

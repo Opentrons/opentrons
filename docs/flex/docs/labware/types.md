@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Labware Types"
+description: "Reservoirs, well plates, tube racks, and other labware types for Flex."
 ---
 
 This section covers the different types of labware included in the Opentrons Labware Library for use with Flex. 

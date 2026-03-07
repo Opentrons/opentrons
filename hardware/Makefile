@@ -65,6 +65,10 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: teardown
 teardown:
 	$(SHX) rm -rf .venv

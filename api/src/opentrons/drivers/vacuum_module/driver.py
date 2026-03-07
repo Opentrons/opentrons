@@ -9,6 +9,7 @@ from .types import (
     HardwareRevision,
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
     PressureState,
     PumpState,
     VacuumModuleInfo,
@@ -76,6 +77,23 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("H")),
             bool(int(match.group("E"))),
             VentState(int(match.group("V"))),
+        )
+
+    @classmethod
+    def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
+        """Parse the get pressure pid."""
+        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+)"
+        _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for get pressure pid: {response}")
+        return PressureControlTunings(
+            float(match.group("P")),
+            float(match.group("I")),
+            float(match.group("D")),
+            float(match.group("O")),
+            float(match.group("V")),
+            float(match.group("H")),
         )
 
     @classmethod
@@ -280,3 +298,41 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")
+
+    async def set_pressure_control_tunings(
+        self,
+        kp: Optional[float] = None,
+        ki: Optional[float] = None,
+        kd: Optional[float] = None,
+        overshoot: Optional[float] = None,
+        k_velocity: Optional[float] = None,
+        k_holding: Optional[float] = None,
+        reset: bool = False,
+    ) -> None:
+        """Sets the PID tuning parameters for the pressure control."""
+
+        command = GCODE.SET_PRESSURE_PID.build_command()
+        if kp is not None:
+            command.add_float("P", kp, GCODE_ROUNDING_PRECISION)
+        if ki is not None:
+            command.add_float("I", ki, GCODE_ROUNDING_PRECISION)
+        if kd is not None:
+            command.add_float("D", kd, GCODE_ROUNDING_PRECISION)
+        if overshoot is not None:
+            command.add_float("O", overshoot, GCODE_ROUNDING_PRECISION)
+        if k_velocity is not None:
+            command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
+        if k_holding is not None:
+            command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
+        command.add_int("R", int(reset))
+
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_PRESSURE_PID}$", resp):
+            raise ValueError(f"Incorrect Response for set pressure pid: {resp}")
+
+    async def get_pressure_control_tunings(self) -> PressureControlTunings:
+        """Get the pressure control pid tunings."""
+        resp = await self._connection.send_command(
+            GCODE.GET_PRESSURE_PID.build_command()
+        )
+        return self.parse_get_pressure_pid(resp)

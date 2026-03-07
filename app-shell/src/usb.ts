@@ -205,7 +205,6 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
       }
     })
     .catch(e =>
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       usbLog.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
     )
 }

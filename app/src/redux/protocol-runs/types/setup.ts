@@ -1,3 +1,5 @@
+import type { CameraImageSettings } from '@opentrons/api-client'
+import type { CameraId } from '@opentrons/shared-data'
 import type {
   CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
@@ -13,11 +15,15 @@ export type ModuleSetupStepKey = typeof MODULE_SETUP_STEP_KEY
 export type LPCStepKey = typeof LPC_STEP_KEY
 export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
 export type CameraSetupStepKey = typeof CAMERA_SETUP_STEP_KEY
+
 export interface CameraState {
   enabled: boolean
   liveStreamEnabled: boolean
   recoveryEnabled: boolean
 }
+
+export type CameraImageSettingsById = Record<CameraId, CameraImageSettings>
+
 export type StepKey =
   | RobotCalibrationStepKey
   | ModuleSetupStepKey
@@ -34,6 +40,7 @@ export interface CameraStepState extends BaseStepState {
   cameraEnabled: boolean
   liveStreamEnabled: boolean
   recoveryEnabled: boolean
+  cameraImageSettings: CameraImageSettingsById
 }
 
 export interface RunSetupStatusPartial {
@@ -101,6 +108,14 @@ export interface UpdateAllCameraSettings {
   }
 }
 
+export interface UpdateCameraSpecificImageSettings {
+  type: typeof CAMERA_SETUP_STEP_KEY
+  payload: {
+    runId: string
+    cameraId: string
+    cameraImageSettings: CameraImageSettings
+  }
+}
 export type RunSetupStepsAction =
   | UpdateRunSetupStepsCompleteAction
   | UpdateRunSetupStepsRequiredAction
@@ -108,3 +123,4 @@ export type RunSetupStepsAction =
   | UpdateAllCameraSettings
   | UpdateLivestreamEnabled
   | UpdateCameraErrorRecoveryEnablement
+  | UpdateCameraSpecificImageSettings

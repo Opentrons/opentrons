@@ -23,6 +23,7 @@ const labwareId2 = 'labwareId2'
 const labwareId3 = 'labwareId3'
 const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
+const lidId1 = 'lidId1'
 vi.mock('../../../robotStateSelectors')
 
 describe('flexStackerFillItems', () => {
@@ -92,6 +93,9 @@ describe('flexStackerFillItems', () => {
       [labwareId5]: {
         stack: [labwareId5, 'offDeck'],
       },
+      [lidId1]: {
+        stack: [lidId1, 'offDeck'],
+      },
     }
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
@@ -112,6 +116,57 @@ describe('flexStackerFillItems', () => {
         adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
+    })
+  })
+  it('creates flex stacker fill command with 1 tiprack with a lid', () => {
+    invariantContext.labwareEntities = {
+      [labwareId]: {
+        id: labwareId,
+        def: fixture96Plate as LabwareDefinition2,
+        labwareDefURI: 'mockURI',
+        pythonName: 'mock_labware_1',
+      },
+      [lidId1]: {
+        id: lidId1,
+        def: { ...fixture96Plate, allowedRoles: ['lid'] } as LabwareDefinition2,
+        labwareDefURI: 'mockURI',
+        pythonName: 'mock_lid_1',
+      },
+    }
+    robotState.labware = {
+      [labwareId]: {
+        stack: [labwareId, 'offDeck'],
+      },
+      [lidId1]: {
+        stack: [lidId1, 'offDeck'],
+      },
+    }
+    const result = flexStackerFillItems(
+      {
+        moduleId,
+        commandCreatorFnName: 'flexStackerFillItems',
+        interventionMessage: null,
+        fillLabwareUri: 'mockURI',
+        fillLabwareIds: [labwareId, lidId1],
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'flexStacker/fillItems',
+          key: expect.any(String),
+          params: {
+            moduleId,
+            labware: [labwareId, lidId1],
+          },
+        },
+      ],
+      python: `
+mock_flex_stacker_1.fill_items(
+    labware=[mock_labware_1],
+)`.trimStart(),
     })
   })
   it('creates flex stacker fill command with 1 labware', () => {

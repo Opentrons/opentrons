@@ -2,6 +2,7 @@
 from typing import Dict, Any, List, Set
 import argparse
 import os
+from pathlib import Path
 import json
 import sys
 import traceback
@@ -17,7 +18,7 @@ def instrument_helper(
     google_sheet_name: str,
     inst_sheet_serials: Set[str],
     inst_sheet_modify_dates: Set[str],
-    storage_directory: str,
+    storage_directory: Path,
 ) -> List[Any]:
     """Helper for parsing instrument calibration data."""
     # Populate Instruments
@@ -57,7 +58,7 @@ def module_helper(
     google_sheet_name: str,
     module_sheet_serials: Set[str],
     module_modify_dates: Set[str],
-    storage_directory: str,
+    storage_directory: Path,
 ) -> List[Any]:
     """Helper for parsing module calibration data."""
     # Populate Modules
@@ -109,7 +110,7 @@ def deck_helper(
     calibration_log: Dict[Any, Any],
     google_sheet_name: str,
     deck_sheet_hashes: Set[str],
-    storage_directory: str,
+    storage_directory: Path,
 ) -> List[Any]:
     """Helper for parsing deck calibration data."""
     deck_upload_rows: List[Any] = []
@@ -190,7 +191,7 @@ def send_batch_update(
 
 def upload_calibration_offsets(
     calibration_data: List[Dict[str, Any]],
-    storage_directory: str,
+    storage_directory: Path,
     google_sheet_instruments: google_sheets_tool.google_sheet,
     google_sheet_modules: google_sheets_tool.google_sheet,
     google_sheet_deck: google_sheets_tool.google_sheet,
@@ -262,7 +263,7 @@ def upload_calibration_offsets(
 
 
 def run(
-    storage_directory: str, folder_name: str, google_sheet_name_param: str, email: str
+    storage_directory: Path, folder_name: str, google_sheet_name_param: str, email: str
 ) -> None:
     """Main control function."""
     # Connect to google drive.
@@ -323,7 +324,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "storage_directory",
         metavar="STORAGE_DIRECTORY",
-        type=str,
+        type=Path,
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )

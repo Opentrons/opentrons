@@ -38,8 +38,10 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
@@ -335,7 +337,7 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
-        command_annotations = self.run_orchestrator.get_command_annotations()
+        command_annotations = self.run_orchestrator.get_all_command_annotations()
         preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
@@ -450,6 +452,24 @@ class RunOrchestratorStore:
         """Get a run's command by ID."""
         return self.run_orchestrator.get_command(command_id=command_id)
 
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations in the run."""
+        return self.run_orchestrator.get_total_command_annotations_count()
+
+    def get_command_annotations_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of run commands."""
+        return self.run_orchestrator.get_command_annotations_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the specified command annotation."""
+        return self.run_orchestrator.get_command_annotation(annotation_id)
+
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""
         return self.run_orchestrator.get_run_status()
@@ -457,6 +477,28 @@ class RunOrchestratorStore:
     def get_is_run_terminal(self) -> bool:
         """Get whether run is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
+
+    def get_camera_capture_image_settings(
+        self, camera_id: str
+    ) -> CameraCaptureImageSettings:
+        """Get camera capture image settings to state."""
+        settings = self.run_orchestrator.get_camera_capture_image_settings()
+
+        # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
+        # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
+        if camera_id != settings["camera_id"]:
+            _log.info(
+                f"Stored camera ID does not match provided ID, returning stored data for camera ID {settings['camera_id']}."
+            )
+        return CameraCaptureImageSettings(
+            cameraId=settings["camera_id"],
+            resolution=settings["resolution"],
+            zoom=settings["zoom"],
+            pan=settings["pan"],
+            contrast=settings["contrast"],
+            brightness=settings["brightness"],
+            saturation=settings["saturation"],
+        )
 
     def run_was_started(self) -> bool:
         """Get whether the run has started."""

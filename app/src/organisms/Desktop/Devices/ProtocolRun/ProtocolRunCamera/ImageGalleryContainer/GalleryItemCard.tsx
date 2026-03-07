@@ -16,6 +16,7 @@ import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
+import { GalleryItemErrorModal } from './GalleryItemErrorModal'
 
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
@@ -26,7 +27,7 @@ export interface GalleryItemCardProps extends UseImageGalleryDataProps {
 }
 
 export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
-  const { item, protocolAnalysis, robotName } = props
+  const { item, protocolAnalysis, robotName, runId } = props
   const {
     currentCommand,
     currentCommandString,
@@ -91,21 +92,17 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     if (isLoading) {
       return
     }
-    const img = new Image()
-    const imagePathUrl = img.src
-    img.onload = () => {
-      if (robotName) {
-        dispatch(
-          cameraPhotoOpenAction({
-            robotName: robotName,
-            photoUrl: imagePathUrl,
-            windowTitle: t('branded:image_capture_window_title', {
-              step: stepCommandText,
-              timestamp,
-            }),
-          })
-        )
-      }
+    if (robotName && imagePath != null) {
+      dispatch(
+        cameraPhotoOpenAction({
+          robotName: robotName,
+          photoUrl: imagePath,
+          windowTitle: t('branded:image_capture_window_title', {
+            step: stepCommandText,
+            timestamp,
+          }),
+        })
+      )
     }
   }
   const [showErrorModal, setShowErrorModal] = useState(false)
@@ -119,22 +116,32 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     actions.push({ label: t('view_error_details'), onClick: toggleErrorModal })
   }
   return (
-    <MediaContainerContent
-      mediaContent={
-        <img
-          className={styles.gallery_img}
-          src={imagePath ?? undefined}
-          alt="camera-photo"
+    <>
+      {state() === 'error' && showErrorModal && currentCommand != null && (
+        <GalleryItemErrorModal
+          erroredCommand={currentCommand}
+          runId={runId}
+          toggleModal={toggleErrorModal}
+          robotName={robotName}
         />
-      }
-      centerPrimaryText={stepCommandText}
-      centerSecondaryText={previousCommandString}
-      rightPrimaryText={timestamp}
-      state={state()}
-      overflowMenu={true}
-      overflowMenuActions={actions}
-      hoverText={t('view_image')}
-      mediaContentOnClick={onClick}
-    />
+      )}
+      <MediaContainerContent
+        mediaContent={
+          <img
+            className={styles.gallery_img}
+            src={imagePath ?? undefined}
+            alt="camera-photo"
+          />
+        }
+        centerPrimaryText={stepCommandText}
+        centerSecondaryText={previousCommandString}
+        rightPrimaryText={timestamp}
+        state={state()}
+        overflowMenu={true}
+        overflowMenuActions={actions}
+        hoverText={t('view_image')}
+        mediaContentOnClick={onClick}
+      />
+    </>
   )
 }

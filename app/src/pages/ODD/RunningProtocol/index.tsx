@@ -110,7 +110,6 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
@@ -161,6 +160,8 @@ export function RunningProtocol(): JSX.Element {
       robotSideAnalysis != null
         ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
   )
 
@@ -219,7 +220,6 @@ export function RunningProtocol(): JSX.Element {
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}
-            isQuickTransfer={isQuickTransfer}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
           />

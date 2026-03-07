@@ -128,6 +128,11 @@ export function ProtocolRunHeader(
           protocolRunControls={protocolRunControls}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           isClosingCurrentRun={isClosingCurrentRun}
+          numberOfAtomicCommands={
+            protocolData?.status === 'completed'
+              ? protocolData.commands.length
+              : 0
+          }
           {...props}
         />
         <RunProgressMeter {...props} />

@@ -29,6 +29,10 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: clean
 clean:
 	$(clean_cmd)

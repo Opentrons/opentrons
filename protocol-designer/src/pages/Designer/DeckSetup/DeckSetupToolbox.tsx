@@ -29,6 +29,8 @@ import {
   getIsSlotAHopper,
 } from '@opentrons/step-generation'
 
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
+
 import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
@@ -136,7 +138,17 @@ export function DeckSetupToolbox(
     (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
     (createdStackForSlot.length === 0 && deckSetup.labware[slot] != null)
   const handleClear = (): void => {
-    if (slot !== 'offDeck' && offDeckLabware == null) {
+    if (isHopperSlot) {
+      const labwareIdsToDelete = (labwareInHopper ?? []).reduce<string[]>(
+        (acc, group) => {
+          return [...acc, ...Object.values(group).filter(id => id != null)]
+        },
+        []
+      )
+      labwareIdsToDelete.forEach(labwareId => {
+        dispatch(deleteContainer({ labwareId: labwareId }))
+      })
+    } else if (slot !== 'offDeck' && offDeckLabware == null) {
       if (createdAdapterForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
@@ -249,11 +261,8 @@ export function DeckSetupToolbox(
       handleClear()
     }
   }
-
   const displaySlot = getIsSlotAHopper(slot)
-    ? t('shared:stacker', {
-        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
-      })
+    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
     : slot
   return (
     <>

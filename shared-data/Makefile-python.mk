@@ -62,6 +62,10 @@ setup-py:
 	@$(uv_sync_dev)
 	@$(UV) pip list
 
+.PHONY: lock-py
+lock-py:
+	@$(UV) lock
+
 .PHONY: teardown
 teardown: teardown-py
 

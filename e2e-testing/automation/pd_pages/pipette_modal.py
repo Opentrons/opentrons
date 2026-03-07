@@ -2,7 +2,7 @@
 
 from playwright.sync_api import Page, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class PipetteModal(BasePage):
@@ -28,6 +28,18 @@ class PipetteModal(BasePage):
             volume: e.g., "1000 µL", "300 µL"
         """
         self.page.get_by_text(channels).click()
+        self.page.get_by_text(volume).click()
+
+    def ot2_select_pipette_type(self, channels: str, gen: str, volume: str) -> None:
+        """Select pipette for OT-2 by channels and volume.
+
+        Args:
+            channels: e.g., "1-Channel", "8-Channel"
+            gen: e.g., "GEN1", "GEN2"
+            volume: e.g., "1000 µL", "300 µL"
+        """
+        self.page.get_by_text(channels).click()
+        self.page.get_by_text(gen).click()
         self.page.get_by_text(volume).click()
 
     def select_tip_racks(self, tip_racks: list[str]) -> None:

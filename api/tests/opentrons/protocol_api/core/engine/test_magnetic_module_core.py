@@ -36,7 +36,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> MagDeckHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture
@@ -92,7 +94,8 @@ def test_engage_from_base(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.magnetic_module.EngageParams(moduleId="1234", height=7.0)
+            cmd.magnetic_module.EngageParams(moduleId="1234", height=7.0),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -116,7 +119,8 @@ def test_engage_to_labware(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.magnetic_module.EngageParams(moduleId="1234", height=6.0)
+            cmd.magnetic_module.EngageParams(moduleId="1234", height=6.0),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -164,7 +168,8 @@ def test_disengage(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.magnetic_module.DisengageParams(moduleId="1234")
+            cmd.magnetic_module.DisengageParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )

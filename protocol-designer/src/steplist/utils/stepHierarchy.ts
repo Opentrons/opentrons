@@ -48,32 +48,15 @@ export interface ThermocyclerProfileGroup {
 
 /**
  * Given a flat array of steps, return the equivalent hierarchy.
- *
- * If enableConcurrentModuleActions is false, this is a no-op.
  */
-export function convertStepArrayToHierarchy(
-  steps: FormData[],
-  enableConcurrentModuleActions: boolean
-): StepHierarchy {
-  if (enableConcurrentModuleActions) {
-    return {
-      topLevelItems: [
-        ..._convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
-      ],
-    }
-  } else {
-    return {
-      topLevelItems: steps.map(step => ({
-        type: 'standaloneStep',
-        stepId: step.id,
-      })),
-    }
+export function convertStepArrayToHierarchy(steps: FormData[]): StepHierarchy {
+  return {
+    topLevelItems: [..._convertStepArrayToHierarchy(steps)],
   }
 }
 
 function* _convertStepArrayToHierarchy(
-  steps: FormData[],
-  enableConcurrentModuleActions: boolean
+  steps: FormData[]
 ): Generator<StandaloneStep | ThermocyclerProfileGroup> {
   let currentGroup: {
     thermocyclerProfileStepId: StepIdType
@@ -179,7 +162,7 @@ type MoveStepResult =
   | { isMoveAllowed: false }
 
 /**
- * Recursively search the tree for a given step ID. It can either point to a
+ * Recursively search the tree for a given step ID. The step ID can either point to a
  * standalone step, or to the root of a group.
  *
  * The match's location in the tree is returned: either the top-level `StepHierarchy`,
@@ -188,7 +171,7 @@ type MoveStepResult =
  *
  * Returns `null` if there's no match.
  */
-function findStep(
+export function findStep(
   stepHierarchy: StepHierarchy,
   stepIdToFind: StepIdType
 ): null | {

@@ -5,7 +5,6 @@ import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../thermocyclerDeactivateLid'
 import { thermocyclerOpenLid } from '../thermocyclerOpenLid'
-import { thermocyclerRunExtendedProfile } from '../thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetBlockTemperature } from '../thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../thermocyclerSetTargetLidTemperature'
 import { thermocyclerStartRunExtendedProfile } from '../thermocyclerStartRunExtendedProfile'
@@ -89,15 +88,6 @@ describe('thermocycler atomic commands', () => {
       expectedType: 'thermocycler/openLid',
       params: {
         moduleId: module,
-      },
-    },
-    {
-      commandCreator: thermocyclerRunExtendedProfile,
-      expectedType: 'thermocycler/runExtendedProfile',
-      params: {
-        moduleId: module,
-        profileElements,
-        blockMaxVolumeUl: volume,
       },
     },
     {

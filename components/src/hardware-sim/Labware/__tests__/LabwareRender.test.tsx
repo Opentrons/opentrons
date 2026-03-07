@@ -10,7 +10,8 @@ import {
   StrokedWellsComponent as StrokedWells,
   WellLabelsComponent as WellLabels,
 } from '../labwareInternals'
-import { LabwareRender, WELL_LABEL_OPTIONS } from '../LabwareRender'
+import { WELL_LABEL_OPTIONS } from '../labwareInternals/Wells'
+import { LabwareRender } from '../LabwareRender'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'

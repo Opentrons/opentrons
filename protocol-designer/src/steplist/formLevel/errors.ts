@@ -44,6 +44,7 @@ import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -190,18 +191,6 @@ const LID_TEMPERATURE_REQUIRED: FormError = {
 const BLOCK_TEMPERATURE_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
-  location: ['field'],
-  page: 1,
-}
-const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
-  location: ['field'],
-  page: 1,
-}
-const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
   location: ['field'],
   page: 1,
 }
@@ -455,6 +444,12 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   page: 2,
   tab: 'dispense',
 }
+const QUANTITY_OUT_OF_RANGE: FormError = {
+  title: 'Value falls outside of expected range',
+  dependentFields: ['fillLabwareIds'],
+  showOnReopen: true,
+  location: ['field'],
+}
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
   dependentFields: ['aspirate_touchTip_mmFromEdge'],
@@ -568,16 +563,6 @@ const PROFILE_TARGET_LID_TEMP_RANGE: FormError = {
 const PROFILE_VOLUME_RANGE: FormError = {
   title: `Enter a value between ${MIN_TC_PROFILE_VOLUME} and ${MAX_TC_PROFILE_VOLUME}`,
   dependentFields: ['profileVolume'],
-  location: ['field'],
-}
-const BLOCK_TARGET_TEMP_HOLD_RANGE: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['blockTargetTempHold'],
-  location: ['field'],
-}
-const LID_TARGET_TEMP_HOLD_RANGE: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['lidTargetTempHold'],
   location: ['field'],
 }
 const ASPIRATE_SUBMERGE_SPEED_REQUIRED: FormError = {
@@ -813,6 +798,7 @@ export const moduleIdRequired = (
     | HydratedMagnetFormData
     | HydratedTemperatureFormData
     | HydratedHeaterShakerFormData
+    | HydratedFlexStackerFormData
 ): FormError | null => {
   const { moduleId } = fields
   if (moduleId == null) return MODULE_ID_REQUIRED
@@ -890,48 +876,12 @@ export const profileVolumeRange = (
     ? PROFILE_VOLUME_RANGE
     : null
 }
-export const blockTargetTempHoldRange = (
-  fields: HydratedThermocyclerFormData
-): FormError | null => {
-  const { blockTargetTempHold } = fields
-  return blockTargetTempHold != null &&
-    (parseInt(blockTargetTempHold) < MIN_TC_BLOCK_TEMP ||
-      parseInt(blockTargetTempHold) > MAX_TC_BLOCK_TEMP)
-    ? BLOCK_TARGET_TEMP_HOLD_RANGE
-    : null
-}
-export const lidTargetTempHoldRange = (
-  fields: HydratedThermocyclerFormData
-): FormError | null => {
-  const { lidTargetTempHold } = fields
-  return lidTargetTempHold != null &&
-    (parseInt(lidTargetTempHold) < MIN_TC_LID_TEMP ||
-      parseInt(lidTargetTempHold) > MAX_TC_LID_TEMP)
-    ? LID_TARGET_TEMP_HOLD_RANGE
-    : null
-}
 export const lidTemperatureRequired = (
   fields: HydratedThermocyclerFormData
 ): FormError | null => {
   const { lidIsActive, lidTargetTemp } = fields
   return lidIsActive === true && !lidTargetTemp
     ? LID_TEMPERATURE_REQUIRED
-    : null
-}
-export const blockTemperatureHoldRequired = (
-  fields: HydratedThermocyclerFormData
-): FormError | null => {
-  const { blockIsActiveHold, blockTargetTempHold } = fields
-  return blockIsActiveHold === true && !blockTargetTempHold
-    ? BLOCK_TEMPERATURE_HOLD_REQUIRED
-    : null
-}
-export const lidTemperatureHoldRequired = (
-  fields: HydratedThermocyclerFormData
-): FormError | null => {
-  const { lidIsActiveHold, lidTargetTempHold } = fields
-  return lidIsActiveHold === true && !lidTargetTempHold
-    ? LID_TEMPERATURE_HOLD_REQUIRED
     : null
 }
 export const shakeSpeedRequired = (
@@ -952,6 +902,15 @@ export const shakeTimeRequired = (
     error = SHAKER_TIME_FORMAT
   }
   return error
+}
+export const fillQuantityOutOfRange = (
+  fields: HydratedFlexStackerFormData
+): FormError | null => {
+  const { fillLabwareIds, flexStackerFormType } = fields
+  return (fillLabwareIds === null || fillLabwareIds.length === 0) &&
+    flexStackerFormType === 'fill'
+    ? QUANTITY_OUT_OF_RANGE
+    : null
 }
 
 export const temperatureRequired = (

@@ -41,6 +41,9 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
   const dispatch = useDispatch()
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const selectedLabwareIds = useSelector(
+    labwareIngredSelectors.getSelectedLabwareIds
+  )
   const labwareEntities = useSelector(getLabwareEntities)
   const selectedLabwareDef =
     labwareId != null ? labwareEntities[labwareId] : null
@@ -88,7 +91,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
     if (labwareId != null) {
       dispatch(
         removeWellsContents({
-          labwareId,
+          labwareId: selectedLabwareIds ?? labwareId,
           wells,
         })
       )
@@ -192,7 +195,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <Divider borderColor={COLORS.grey40} />
             {info.liquidIndex != null
               ? fullWellsByLiquid[info.liquidIndex]
-                  .sort((a, b) =>
+                  ?.sort((a, b) =>
                     orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
                   )
                   .map((wellName, wellliquidIndex) => {

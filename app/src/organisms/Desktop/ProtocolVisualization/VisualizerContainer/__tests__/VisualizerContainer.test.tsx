@@ -52,6 +52,7 @@ const mockAnalysis = {
   modules: [],
   labware: [],
   pipettes: [],
+  liquids: [],
   result: 'ok',
   robotType: 'OT-3 Standard',
   runTimeParameters: [],
@@ -78,7 +79,8 @@ describe('VisualizerContainer', () => {
 
   beforeEach(() => {
     props = {
-      analysis: mockAnalysis,
+      analysisOutput: mockAnalysis,
+      runId: null,
       groupedCommands: [],
       protocolKey: mockProtocolKey,
       srcFileNames: mockSrcFileNames,

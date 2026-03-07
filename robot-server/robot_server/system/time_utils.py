@@ -3,7 +3,7 @@
 import asyncio
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Tuple, Union, cast
+from typing import Dict, Tuple, Union
 
 from opentrons.config import IS_ROBOT
 from opentrons.util.helpers import utc_now

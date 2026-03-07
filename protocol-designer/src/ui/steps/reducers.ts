@@ -76,7 +76,7 @@ const selectedItem: Reducer<SelectedItemState, any> = handleActions(
     ADD_STEP: (state: SelectedItemState, action: AddStepAction) =>
       terminalItemIdHelper(PRESAVED_STEP_ID),
     SAVE_STEP_FORM: (state: SelectedItemState, action: SaveStepFormAction) => {
-      return stepIdHelper(action.payload.id)
+      return stepIdHelper(action.payload.form.id)
     },
     SELECT_STEP: (state: SelectedItemState, action: SelectStepAction) =>
       stepIdHelper(action.payload),

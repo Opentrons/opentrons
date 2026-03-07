@@ -1,6 +1,6 @@
 """Module identification and response data mapping."""
 
-from typing import Annotated, List, Optional, Type, cast
+from typing import Annotated, Optional, Type, cast
 
 from fastapi import Depends
 from opentrons_hardware.hardware_control.types import PCBARevision

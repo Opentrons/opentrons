@@ -14,6 +14,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLiquidAction,
     AddModuleAction,
+    CreateUserCommandAnnotation,
     DoorChangeAction,
     FailCommandAction,
     FinishAction,
@@ -63,6 +64,7 @@ __all__ = [
     "SetPipetteMovementSpeedAction",
     "StartTaskAction",
     "FinishTaskAction",
+    "CreateUserCommandAnnotation",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

@@ -18,7 +18,14 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.system import camera
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..dependencies import get_run_orchestrator_store
 from ..run_models import Run
@@ -31,15 +38,11 @@ from robot_server.data_files.models import FileNotFound
 from robot_server.errors.error_responses import ErrorBody, LegacyErrorResponse
 from robot_server.hardware import get_robot_type
 from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.service.json_api import (
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-)
 from robot_server.service.legacy.models.settings import (
     CameraCaptureImageSettings,
     CameraEnable,
 )
+from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
 
 log = logging.getLogger(__name__)
 camera_router = LightRouter()
@@ -61,6 +64,7 @@ camera_router = LightRouter()
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_camera_settings(
     request_body: RequestModel[CameraEnable],
@@ -145,6 +149,7 @@ async def add_camera_settings(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def add_camera_capture_image_settings(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -186,6 +191,50 @@ async def add_camera_capture_image_settings(
     )
 
 
+@camera_router.get(
+    path="/runs/{runId}/cameraSettings/{cameraId}",
+    summary="Query run specific camera capture image settings.",
+    description=(
+        "Query run specific camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's data will be the camera capture image settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the run specific camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        run_orchestrator_store: Engine storage interface.
+        run: Run response data by ID from URL; ensures 404 if run not found.
+        robot_type: Used to validate robot type for live stream service.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = run_orchestrator_store.get_camera_capture_image_settings(
+        camera_id=cameraId
+    )
+
+    # todo(chb, 2025-01-14): For now we only support one camera, the default camera. The engine only stores one cameras settings at a time.
+    #  If we intend to support multiple cameras in the future we'll need to store and return a dictionary of many camera settings sets.
+    if cameraId != DEFAULT_CAMERA_ID:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(
+                f"No stored camera image settings for Camera ID: {cameraId}, current settings are for {DEFAULT_CAMERA_ID}."
+            ),
+        )
+
+    return result
+
+
 @camera_router.post(
     path="/runs/{runId}/camera/capturePreviewImage",
     summary="Capture a preview image based on provided settings and the run specific camera enablement.",
@@ -197,6 +246,7 @@ async def add_camera_capture_image_settings(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],

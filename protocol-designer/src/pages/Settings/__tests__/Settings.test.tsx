@@ -21,6 +21,7 @@ vi.mock('/protocol-designer/tutorial/actions')
 vi.mock('/protocol-designer/tutorial/selectors')
 vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/analytics/selectors')
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>

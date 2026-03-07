@@ -50,6 +50,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
 import type {
+  ActiveNozzleNumber,
   AddressableAreaName,
   BlowoutParams,
   CutoutFixtureId,
@@ -59,9 +60,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLidParams,
   LoadLidStackRunTimeCommand,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { HopperLocationMapKey } from '../constants'
@@ -338,7 +341,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8 | 96,
+  channels: ActiveNozzleNumber,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -598,6 +601,8 @@ interface DispenseLocationHelperArgs {
   xOffset: number
   yOffset: number
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -614,6 +619,8 @@ export const dispenseLocationHelper: CommandCreator<
     xOffset,
     yOffset,
     tipRack,
+    primaryNozzle,
+    nozzles,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -646,6 +653,8 @@ export const dispenseLocationHelper: CommandCreator<
           },
         },
         tipRack,
+        primaryNozzle,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -676,6 +685,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (
@@ -872,12 +882,20 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack: string[] | null,
+  isStacker: boolean = false
+): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return `STACKER ${slot.slice(-2, -1)}`
+    } else {
+      return slot
+    }
   }
 }
 
@@ -1429,10 +1447,17 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
-  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
-  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
-  return loadedLabware == null || loadedLabware === labwareURIToBeStored
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
+  const storedLabwareURIs = Object.values(
+    stackerState?.storedLabwareDetails ?? {}
+  ).reduce<string[]>((acc, val) => {
+    return val != null ? [...acc, val] : acc
+  }, [])
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
+  return storedLabwareURIs.some(uri => labwareEntity?.labwareDefURI === uri)
 }
 
 export const getIsSpaceInHopper = (

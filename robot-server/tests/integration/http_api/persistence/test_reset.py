@@ -69,6 +69,7 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
             )
 
 
+@pytest.mark.slow
 async def test_upload_protocols_and_reset_persistence_dir() -> None:
     """Test resetting runs history.
 
@@ -119,6 +120,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
             server.stop()
 
 
+@pytest.mark.slow
 async def test_reset_is_available_even_with_corrupt_persistence_directory() -> None:
     """Test resetting runs history when the persistence directory is corrupted."""
     port = "15555"

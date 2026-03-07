@@ -1,7 +1,5 @@
 """ Tools to bridge the Makefiles and the python build environment
 (or provide utilities) for python subprojects
-
-NOTE: This file must be python2.7 compatible
 """
 
 import argparse
@@ -34,6 +32,7 @@ package_entries = {
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
     'performance-metrics': PackageEntry('performance_metrics'),
+    'auth-server': PackageEntry('auth_server')
 }
 
 project_entries = {

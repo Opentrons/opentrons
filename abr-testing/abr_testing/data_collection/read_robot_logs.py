@@ -647,7 +647,7 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
 
 
 def create_abr_data_sheet(
-    storage_directory: str, file_name: str, headers: List[str]
+    storage_directory: Path, file_name: str, headers: List[str]
 ) -> str:
     """Creates csv file to log ABR data."""
     file_name_csv = file_name + ".csv"
@@ -737,7 +737,7 @@ def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
 
 def write_to_local_and_google_sheet(
     runs_and_robots: Dict[Any, Dict[str, Any]],
-    storage_directory: str,
+    storage_directory: Path,
     file_name: str,
     google_sheet: Any,
     header: List[str],
@@ -761,7 +761,7 @@ def write_to_local_and_google_sheet(
 
 
 def read_abr_data_sheet(
-    storage_directory: str, file_name_csv: str, google_sheet: Any
+    storage_directory: Path, file_name_csv: str, google_sheet: Any
 ) -> Set[str]:
     """Reads current run sheet to determine what new run data should be added."""
     print(file_name_csv)
@@ -783,7 +783,7 @@ def read_abr_data_sheet(
     return runs_in_sheet
 
 
-def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
+def get_run_ids_from_storage(storage_directory: Path) -> Set[str]:
     """Read all files in storage directory, extracts run id, adds to set."""
     os.makedirs(storage_directory, exist_ok=True)
     list_of_files = os.listdir(storage_directory)
@@ -805,7 +805,7 @@ def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
 
 
 def save_run_log_to_json(
-    ip: str, results: Dict[str, Any], storage_directory: str
+    ip: str, results: Dict[str, Any], storage_directory: Path
 ) -> str:
     """Save run log to local json file."""
     data_file_name = ip + "_" + results["run_id"] + ".json"
@@ -842,7 +842,7 @@ def write_to_sheets(
 
 
 def get_calibration_offsets(
-    ip: str, storage_directory: str
+    ip: str, storage_directory: Path
 ) -> Tuple[str, Dict[str, Any]]:
     """Connect to robot via ip and get calibration data."""
     calibration = dict()
@@ -894,7 +894,7 @@ def get_calibration_offsets(
     return saved_file_path, calibration
 
 
-def get_logs(storage_directory: str, ip: str) -> str:
+def get_logs(storage_directory: Path, ip: str) -> str:
     """Get Robot logs and return a zip file path containing them."""
     log_types: List[Dict[str, Any]] = [
         {"log type": "api.log", "records": 10000},
@@ -961,7 +961,7 @@ def get_logs(storage_directory: str, ip: str) -> str:
 
 
 def fetch_weston_log(
-    ip: str, storage_directory: str, collected_files: list, robot_name: str
+    ip: str, storage_directory: Path, collected_files: list, robot_name: str
 ) -> list[str]:
     """Get weston log using scp or local copy, saved with robot name."""
     local_log_path = Path("/var/log/weston.log")

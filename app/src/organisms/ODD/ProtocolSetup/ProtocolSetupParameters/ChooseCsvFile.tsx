@@ -49,6 +49,8 @@ export function ChooseCsvFile({
 }: ChooseCsvFileProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const csvFilesOnUSB = useSelector(getShellUpdateDataFiles) ?? []
   const csvFilesOnRobot = (useAllCsvFilesQuery(protocolId).data?.data ??
     []) as CsvFileData[]

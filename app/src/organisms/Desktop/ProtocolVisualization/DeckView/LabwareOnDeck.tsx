@@ -1,6 +1,7 @@
 import { COLORS, LabwareRender } from '@opentrons/components'
 import {
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
@@ -35,7 +36,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     setHoveredSlot,
   } = props
   const { tipState, pipettes: pipetteState, liquidState, labware } = robotState
-  const slot = getSlotInLocationStack(labware[labwareId].stack)
+  const slot = labware[labwareId].stack.includes(HOPPER_STACKER_LOCATION)
+    ? `hopper${getSlotInLocationStack(labware[labwareId].stack)}`
+    : getSlotInLocationStack(labware[labwareId].stack)
   const pipetteTemporalProperties = Object.entries(pipetteState).find(
     ([_, pipette]) => pipette.entityId === labwareId
   )
@@ -43,12 +46,11 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
-  const wellGroup: WellGroup | null =
-    activeWellName != null
-      ? {
-          [activeWellName]: null,
-        }
-      : null
+
+  const wellName = activeWellName ?? 'A1'
+
+  const wellGroup: WellGroup =
+    labwareDef.wells[wellName] != null ? { [wellName]: null } : {}
 
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
     liquidState,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from playwright.sync_api import Locator, Page, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class CreateProtocolWizard(BasePage):
@@ -72,3 +72,8 @@ class CreateProtocolWizard(BasePage):
         """Click the wizard Confirm button."""
 
         self.click_button("Confirm")
+
+    def name_protocol(self, protocol_name: str) -> None:
+        """Fill in the protocol name input box."""
+
+        self.page.locator('input[name="fields.name"]').fill(protocol_name)

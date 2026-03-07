@@ -82,13 +82,6 @@ export const DesktopApp = (): JSX.Element => {
       name: 'Visualization',
       path: '/protocols/:protocolKey/visualization',
     },
-    // for protocol visualization path from protocol setup page and back to protocol setup page
-    // protocolKey is for visualization page and runId is for back to protocol setup page
-    {
-      Component: ProtocolVisualization,
-      name: 'Visualization',
-      path: '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
-    },
     {
       Component: Labware,
       name: 'labware',
@@ -107,14 +100,19 @@ export const DesktopApp = (): JSX.Element => {
       path: '/devices/:robotName',
     },
     {
+      Component: CalibrationDashboard,
+      name: 'Calibration Dashboard',
+      path: '/devices/:robotName/robot-settings/calibration/dashboard',
+    },
+    {
       Component: RobotSettings,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
-      Component: CalibrationDashboard,
-      name: 'Calibration Dashboard',
-      path: '/devices/:robotName/robot-settings/calibration/dashboard',
+      Component: ProtocolVisualization,
+      name: 'Visualization',
+      path: '/devices/:robotName/protocol-runs/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: ProtocolRunDetails,

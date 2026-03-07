@@ -27,7 +27,7 @@ interface ListButtonProps extends StyleProps {
   disabled?: boolean
   /** ListButton onClick event */
   onClick?: () => void
-  /** optional data-testid value for Cypress testing */
+  /** optional data-testid value for testing */
   testId?: string
 }
 

@@ -18,7 +18,6 @@ import {
   ConcurrentGroupChild,
 } from '/protocol-designer/components/molecules'
 import { DND_TYPES } from '/protocol-designer/constants'
-import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import {
   getOrderedSavedForms,
   getSavedStepHierarchy,
@@ -126,9 +125,6 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
-  const enableConcurrentModuleActions = useSelector(
-    getEnableConcurrentModuleActions
-  )
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -143,16 +139,13 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const getStepsAfterMovingHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
-        {
-          moveType: 'insertBeforeDestinationStep',
-          movedStepId: idOfStepBeingMoved,
-          destinationStepId: stepId,
-        }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertBeforeDestinationStep',
+        movedStepId: idOfStepBeingMoved,
+        destinationStepId: stepId,
+      })
     },
-    [steps, stepId, enableConcurrentModuleActions]
+    [steps, stepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -307,23 +300,17 @@ function ThermocyclerProfileEndCheckpoint(props: {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
-  const enableConcurrentModuleActions = useSelector(
-    getEnableConcurrentModuleActions
-  )
   const { t } = useTranslation()
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
-        {
-          moveType: 'insertAsLastStepOfGroup',
-          movedStepId: idOfStepBeingMoved,
-          destinationGroupRootStepId: thermocyclerProfileStepId,
-        }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: idOfStepBeingMoved,
+        destinationGroupRootStepId: thermocyclerProfileStepId,
+      })
     },
-    [steps, thermocyclerProfileStepId, enableConcurrentModuleActions]
+    [steps, thermocyclerProfileStepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(

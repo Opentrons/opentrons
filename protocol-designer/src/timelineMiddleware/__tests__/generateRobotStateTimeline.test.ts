@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
+  ALL,
   fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
@@ -31,6 +33,7 @@ describe('generateRobotStateTimeline', () => {
         errors: false,
         stepArgs: {
           stepNumber: 1,
+          primaryNozzle: A1_NOZZLE,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -87,7 +90,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
-          nozzles: null,
+          nozzles: ALL,
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           aspirateXOffset: 0,
           aspirateYOffset: 0,
@@ -107,6 +110,7 @@ describe('generateRobotStateTimeline', () => {
       b: {
         errors: false,
         stepArgs: {
+          primaryNozzle: A1_NOZZLE,
           stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
@@ -138,7 +142,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
-          nozzles: null,
+          nozzles: ALL,
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
           aspirateXOffset: 0,
           aspirateYOffset: 0,
@@ -185,6 +189,7 @@ describe('generateRobotStateTimeline', () => {
         errors: false,
         stepArgs: {
           dropTipLocation: FIXED_TRASH_ID,
+          primaryNozzle: A1_NOZZLE,
           commandCreatorFnName: 'mix',
           name: 'Mix',
           description: 'description would be here 2018-03-01',
@@ -200,17 +205,16 @@ describe('generateRobotStateTimeline', () => {
           aspirateFlowRateUlSec: 3.78,
           dispenseFlowRateUlSec: 3.78,
           blowoutFlowRateUlSec: 3.78,
-          offsetFromBottomMm: 0.5,
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
-          nozzles: null,
+          nozzles: ALL,
           tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+          positionReference: POSITION_REFERENCE_BOTTOM,
           xOffset: 0,
           yOffset: 0,
+          zOffset: 0.5,
           finalPushOut: 0,
-          zOffset: 0,
-          positionReference: POSITION_REFERENCE_BOTTOM,
           tipTracking: AUTOMATIC,
           tipsSelected: [],
           tiprackSelected: null,
@@ -263,6 +267,7 @@ describe('generateRobotStateTimeline', () => {
           "dropTipInPlace",
         ],
         [
+          "configureNozzleLayout",
           "pickUpTip",
           "moveToWell",
           "prepareToAspirate",
@@ -310,6 +315,7 @@ mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
+mock_pipette_p300_multi.configure_nozzle_layout(...)
 mock_pipette_p300_multi.transfer_with_liquid_class(...)
 mock_pipette_p300_multi.drop_tip()
 `.trim(),
@@ -360,6 +366,7 @@ mock_pipette.transfer_with_liquid_class(...)
 `.trim(),
       // Step b:
       `
+mock_pipette_p300_multi.configure_nozzle_layout(...)
 mock_pipette_p300_multi.transfer_with_liquid_class(...)
 mock_pipette_p300_multi.drop_tip()
 `.trim(),

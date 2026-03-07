@@ -32,9 +32,9 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
 1. select the python version `pyenv local 3.12.6`.
    1. This will create a `.python-version` file in this directory.
 1. select the node version with `nvs` or `nvm` currently 22.11\*.
-1. Install pipenv and python dependencies using `make setup`.
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and python dependencies using `make setup`.
 1. Install docker if you plan to run and build the docker container locally.
-1. `make teardown` will remove the virtual environment but requires pipenv to be installed.
+1. `make teardown` will remove the virtual environment.
 
 ### Run locally
 
@@ -69,7 +69,7 @@ Now you are in the docker container and can inspect the environment and such.
 
 #### Direct API Interaction and Authentication
 
-> There is only 1 endpoint with the potential to call the OpenAI API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The OpenAI API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the OpenAI API.
+> There is only 1 endpoint with the potential to call the Anthropic API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The Anthropic API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the Anthropic API.
 
 To access the `/api/chat/completion` API endpoint, you will need to provide an Authorization header in your API calls.
 `"Authorization": "Bearer YOUR_TOKEN"`
@@ -100,10 +100,9 @@ The live-test target will run tests against any environment. The default is loca
 
 ## Dev process
 
-1. run the server locally `make run-local`
+1. run the server locally `make local-run`
 1. do development
-1. `make fixup` formats, lints, and runs mypy
-1. `make pre-commit` does what CI will do
+1. `make prep` formats, lints, runs mypy, and runs unit tests (matches CI expectations)
 1. `make build` to make sure that the docker container builds
 1. `make run` to make sure the docker container runs
 1. test locally `make live-test` (ENV=local is the default in the Makefile)
@@ -114,16 +113,16 @@ The live-test target will run tests against any environment. The default is loca
 
 ## Install a dev dependency
 
-`python -m pipenv install pytest==8.2.0 --dev`
+`uv add --dev pytest==8.2.0`
 
 ## Install a production dependency
 
-`python -m pipenv install openai==1.25.1`
+`uv add openai==1.25.1`
 
 ## Upgrade a dependency
 
-1. alter the `Pipfile` to the new pinned version
-1. run `make setup` to update the `Pipfile.lock`
+1. update the version in `pyproject.toml` (or use `uv add <package>==<version>`)
+1. run `uv lock` to update `uv.lock`
 
 ## Google Sheets Integration
 

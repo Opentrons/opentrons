@@ -10,6 +10,9 @@ export const flexStackerRetrieve: CommandCreator<
 > = (args, invariantContext, robotState) => {
   const { moduleId } = args
   const { moduleEntities } = invariantContext
+  if (moduleId == null || moduleEntities[moduleId] == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
   const modulePythonName = moduleEntities[moduleId].pythonName
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const isLabwareInHopper =

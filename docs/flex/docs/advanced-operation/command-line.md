@@ -1,10 +1,11 @@
 ---
 title: "Opentrons Flex: Command Line Operation Over SSH"
+description: "Connect via SSH and use command-line tools to manage Flex."
 ---
 
 Opentrons Flex gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
 
-- Run protocols directly via the [Python API and command line](https://docs.opentrons.com/v2/advanced_control/command_line.html#command-line).
+- Run protocols directly via the [Python API and command line](../../python-api/advanced-control/command-line.md).
 - Perform advanced tasks like customizing the robot's Python environment.
 - Execute protocols that reference external files on disk (apart from custom labware definition files).
 

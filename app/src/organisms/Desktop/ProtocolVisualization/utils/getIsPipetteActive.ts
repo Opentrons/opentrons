@@ -10,10 +10,10 @@ export const getIsPipetteActive = (
     Object.entries(pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === side
     )?.[0] ?? null
+
   return (
     'pipetteId' in currentCommand.params &&
     currentCommand.params.pipetteId === pipetteId &&
-    pipetteId != null &&
-    pipettes[pipetteId].entityId != null
+    pipetteId != null
   )
 }

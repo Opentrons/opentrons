@@ -40,7 +40,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
-from opentrons_shared_data.robot.types import RobotType
 
 from . import modules
 from .backends.errors import SubsystemUpdating

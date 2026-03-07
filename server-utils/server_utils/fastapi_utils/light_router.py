@@ -198,11 +198,17 @@ def _merge_kwargs(
     # child, in order to leave the defaulting up to FastAPI.
     if "tags" in remaining_from_parent or "tags" in remaining_from_child:
         merge_result["tags"] = [
-            *(remaining_from_parent.get("tags") or []),
-            *(remaining_from_child.get("tags") or []),
+            *(remaining_from_parent.pop("tags", None) or []),
+            *(remaining_from_child.pop("tags", None) or []),
         ]
-        remaining_from_parent.pop("tags", None)
-        remaining_from_child.pop("tags", None)
+    if (
+        "dependencies" in remaining_from_parent
+        or "dependencies" in remaining_from_child
+    ):
+        merge_result["dependencies"] = [
+            *(remaining_from_parent.pop("dependencies", None) or []),
+            *(remaining_from_child.pop("dependencies", None) or []),
+        ]
 
     # For any argument whose values we don't know how to merge, we can just pass it
     # along opaquely, as long as the parent and child aren't both trying to set it.

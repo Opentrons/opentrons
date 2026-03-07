@@ -22,6 +22,12 @@
   gap: var(--spacing-12);
 }
 
+.refill_settings_input_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
 .selected_labware_container {
   display: flex;
   flex-direction: column;

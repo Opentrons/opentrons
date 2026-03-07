@@ -40,24 +40,29 @@ export function useRobotAnalyticsData(
   }, [dispatch, robotName])
 
   // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-  return useMemo(() => {
-    if (robot != null) {
-      return settings.reduce<RobotAnalyticsData>(
-        (result, setting) => ({
-          ...result,
-          [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
-        }),
-        // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-        {
-          robotApiServerVersion: getRobotApiVersion(robot) ?? '',
-          robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
-          robotLeftPipette: pipettes.left?.model ?? '',
-          robotRightPipette: pipettes.right?.model ?? '',
-          robotSerialNumber: serialNumber ?? '',
-        }
-      )
-    }
+  return useMemo(
+    () => {
+      if (robot != null) {
+        return settings.reduce<RobotAnalyticsData>(
+          (result, setting) => ({
+            ...result,
+            [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
+          }),
+          // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
+          {
+            robotApiServerVersion: getRobotApiVersion(robot) ?? '',
+            robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
+            robotLeftPipette: pipettes.left?.model ?? '',
+            robotRightPipette: pipettes.right?.model ?? '',
+            robotSerialNumber: serialNumber ?? '',
+          }
+        )
+      }
 
-    return null
-  }, [pipettes, robot, settings])
+      return null
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pipettes, robot, settings]
+  )
 }

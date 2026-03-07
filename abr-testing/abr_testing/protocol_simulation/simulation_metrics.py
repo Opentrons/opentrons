@@ -20,7 +20,7 @@ def build_parser() -> Any:
     parser.add_argument(
         "storage_directory",
         metavar="STORAGE_DIRECTORY",
-        type=str,
+        type=Path,
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )
@@ -353,7 +353,7 @@ def parse_results_volume(
 def main(
     protocol_file_path: Path,
     save: bool,
-    storage_directory: str = os.curdir,
+    storage_directory: Path = Path(os.curdir),
     google_sheet_name: str = "",
     parameters: str = "",
     extra_files: List[Path] = [],
@@ -363,7 +363,7 @@ def main(
     # Simulation run date
     file_date = datetime.now()
     file_date_formatted = file_date.strftime("%Y-%m-%d_%H-%M-%S")
-    error_output = f"{storage_directory}\\test_debug"
+    error_output = storage_directory / "test_debug"
     protocol_name = protocol_file_path.stem
     protocol_files = [protocol_file_path]
     if extra_files != []:

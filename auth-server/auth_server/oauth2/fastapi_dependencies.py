@@ -1,0 +1,32 @@
+from typing import Annotated
+
+from fastapi import Depends
+
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
+
+from .backend import Backend
+
+_app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
+
+
+def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
+    """Store the server's singleton OAuth 2 backend in server state for later retrieval.
+
+    This should be called once at server startup.
+    """
+    _app_state_accessor.set_on(app_state, backend)
+
+
+def get_oauth2_backend(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> Backend:
+    """Return the server's singleton OAuth 2 backend."""
+    backend = _app_state_accessor.get_from(app_state)
+    assert backend is not None, (
+        "Forgot to initialize OAuth 2 backend at server startup?"
+    )
+    return backend

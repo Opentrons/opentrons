@@ -31,7 +31,7 @@ export function DeckInfoLabelTextTag({
   colThreeTag,
 }: DeckInfoLabelTextTagProps): JSX.Element {
   return (
-    <Flex css={CONTAINER_STYLE}>
+    <Flex display={DISPLAY_GRID} css={CONTAINER_STYLE}>
       <Flex css={LABEL_CONTAINER_STYLE}>
         {colOneDeckInfoLabels
           .slice(0, MAX_SUPPORTED_LABELS)
@@ -53,7 +53,6 @@ const CONTAINER_STYLE = css`
   border-radius: ${BORDERS.borderRadius12};
   padding: ${SPACING.spacing12};
   width: 100%;
-  display: ${DISPLAY_GRID};
   grid-template-columns: 120px 1fr ${FLEX_MAX_CONTENT};
   gap: ${SPACING.spacing40};
   align-items: ${ALIGN_CENTER};

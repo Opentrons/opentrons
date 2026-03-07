@@ -14,13 +14,14 @@ export const flexStackerStore: CommandCreator<
   FlexStackerStoreCreateCommand['params']
 > = (args, invariantContext, robotState) => {
   const { moduleId } = args
-  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
+  const { labwareEntities, moduleEntities } = invariantContext
+  if (moduleId == null || moduleEntities[moduleId] == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
+  const pythonName = moduleEntities[moduleId].pythonName
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const labwareId = flexStackerState?.labwareOnShuttle?.primaryLabwareId ?? null
-  const isSpace = getIsSpaceInHopper(
-    flexStackerState,
-    invariantContext.labwareEntities
-  )
+  const isSpace = getIsSpaceInHopper(flexStackerState, labwareEntities)
   if (flexStackerState !== null && !getLabwareIdOnShuttle(flexStackerState)) {
     return {
       errors: [errorCreators.flexStackerShuttleEmpty()],

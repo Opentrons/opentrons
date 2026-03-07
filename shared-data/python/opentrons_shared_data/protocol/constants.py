@@ -1,34 +1,4 @@
 from enum import Enum
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .types import (
-        AirGapCommandId,
-        AspirateCommandId,
-        BlowoutCommandId,
-        DelayCommandId,
-        DispenseCommandId,
-        DropTipCommandId,
-        MagneticModuleDisengageCommandId,
-        MagneticModuleEngageCommandId,
-        MoveToSlotCommandId,
-        MoveToWellCommandId,
-        PickUpTipCommandId,
-        TemperatureModuleAwaitCommandId,
-        TemperatureModuleDeactivateCommandId,
-        TemperatureModuleSetTargetCommandId,
-        ThermocyclerAwaitBlockTemperatureCommandId,
-        ThermocyclerAwaitLidTemperatureCommandId,
-        ThermocyclerAwaitProfileCommandId,
-        ThermocyclerCloseLidCommandId,
-        ThermocyclerDeactivateBlockCommandId,
-        ThermocyclerDeactivateLidCommandId,
-        ThermocyclerOpenLidCommandId,
-        ThermocyclerRunProfileCommandId,
-        ThermocyclerSetTargetBlockCommandId,
-        ThermocyclerSetTargetLidCommandId,
-        TouchTipCommandId,
-    )
 
 
 class JsonPipetteCommand(Enum):

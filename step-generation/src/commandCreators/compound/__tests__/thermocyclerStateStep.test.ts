@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../../../fixtures'
@@ -11,6 +12,7 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
+  ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../../../types'
 import type { Diff } from '../../../utils/thermocyclerStateDiff'
@@ -366,4 +368,40 @@ mock_thermocycler.set_lid_temperature(20)`.trimStart(),
       })
     }
   )
+
+  it('should return an error if the thermocycler is busy running a profile', () => {
+    const { robotState, invariantContext } = getStateAndContextTempTCModules({
+      temperatureModuleId,
+      thermocyclerId,
+    })
+
+    robotState.modules[thermocyclerId].moduleState = {
+      ...(robotState.modules[thermocyclerId]
+        .moduleState as ThermocyclerModuleState),
+      currentBlockActivity: {
+        type: 'profile',
+        profileElements: [],
+        taskId: null,
+      },
+    }
+
+    const args: ThermocyclerStateStepArgs = {
+      moduleId: thermocyclerId,
+      commandCreatorFnName: 'thermocyclerState',
+      blockTargetTemp: null,
+      lidTargetTemp: null,
+      lidOpen: false,
+    }
+
+    const resultErrors = getErrorResult(
+      thermocyclerStateStep(args, invariantContext, robotState)
+    ).errors
+
+    expect(resultErrors).toStrictEqual([
+      {
+        type: 'THERMOCYCLER_BUSY_WITH_PROFILE',
+        message: expect.any(String),
+      },
+    ] satisfies typeof resultErrors)
+  })
 })

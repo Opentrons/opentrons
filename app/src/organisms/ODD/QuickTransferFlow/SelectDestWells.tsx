@@ -21,6 +21,7 @@ import { WellSelection } from '/app/organisms/WellSelection'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
 
+import { ACTIONS } from './constants'
 import {
   CIRCULAR_WELL_96_PLATE_DEFINITION_URI,
   RECTANGULAR_WELL_96_PLATE_DEFINITION_URI,
@@ -103,7 +104,7 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
       sourceWellCount === 1
     ) {
       dispatch({
-        type: 'SET_DEST_WELLS',
+        type: ACTIONS.SET_DEST_WELLS,
         wells: Object.keys(selectedWells),
       })
       const duration = new Date().getTime() - analyticsStartTime.getTime()

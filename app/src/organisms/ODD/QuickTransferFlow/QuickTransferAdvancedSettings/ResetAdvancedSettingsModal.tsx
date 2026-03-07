@@ -14,6 +14,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import { ACTIONS } from '../constants'
 import { retrieveLiquidClassValues } from '../utils'
 
 import type { Dispatch } from 'react'
@@ -60,7 +61,7 @@ export function ResetAdvancedSettingsModal({
       liquidHandlingAction
     )
     dispatch({
-      type: 'SET_LIQUID_CLASS_VALUES',
+      type: ACTIONS.SET_LIQUID_CLASS_VALUES,
       liquidClassValues: {
         ...liquidClassValues,
       },

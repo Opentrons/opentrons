@@ -88,7 +88,8 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
 
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
-    state.transferType
+    state.transferType,
+    state.dropTipLocation
   )
 
   const handleClickBackOrExit = (): void => {

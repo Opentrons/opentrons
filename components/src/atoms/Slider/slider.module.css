@@ -1,51 +1,46 @@
-.slider_setting_container {
+.slider_container {
   display: flex;
+  width: 100%;
   flex-direction: column;
-  gap: var(--spacing-16);
-}
-
-.slider_setting_text_container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
-.slider_value_container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-8);
 }
 
-.slider_basic {
+.slider_text_container_label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.slider_text_container_no_label {
+  justify-content: flex-end;
+}
+
+.slider {
   width: 100%;
-  height: 4px;
-  border-radius: var(--border-radius-2);
+  height: 32px;
+  border-radius: 4px;
   appearance: none;
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--slider-progress, 50%),
-      var(--grey-30) var(--slider-progress, 50%),
-      var(--grey-30) 100%
-    );
-  cursor: pointer;
-  outline: none;
-}
-
-.slider_basic::-webkit-slider-thumb {
-  width: 1rem;
-  height: 1rem;
-  border: none;
-  border-radius: 50%;
-  appearance: none;
-  background: var(--blue-50);
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--value-percent),
+    var(--blue-20) var(--value-percent),
+    var(--blue-20) 100%
+  );
   cursor: pointer;
 }
 
-/* Necessary to ensure dynamic percentages don't resize the slider. */
-.slider_percentage {
-  min-width: 2rem;
-  text-align: right;
+.slider::-webkit-slider-runnable-track {
+  height: 0;
+  background: transparent;
+}
+
+.slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 32px;
+  border: 4px solid var(--blue-50);
+  border-radius: 4px;
+  margin-top: -16px; /* Center thumb on the 0-height track */
+  appearance: none;
+  background: var(--blue-30);
 }

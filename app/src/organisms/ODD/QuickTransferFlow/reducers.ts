@@ -1,4 +1,4 @@
-import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
+import { ACTIONS, CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
 import type {
   QuickTransferSummaryAction,
@@ -13,20 +13,20 @@ export function quickTransferWizardReducer(
   action: QuickTransferWizardAction
 ): QuickTransferWizardState {
   switch (action.type) {
-    case 'SELECT_PIPETTE': {
+    case ACTIONS.SELECT_PIPETTE: {
       return {
         pipette: action.pipette,
         mount: action.mount,
       }
     }
-    case 'SELECT_TIP_RACK': {
+    case ACTIONS.SELECT_TIP_RACK: {
       return {
         pipette: state.pipette,
         mount: state.mount,
         tipRack: action.tipRack,
       }
     }
-    case 'SET_SOURCE_LABWARE': {
+    case ACTIONS.SET_SOURCE_LABWARE: {
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -34,7 +34,7 @@ export function quickTransferWizardReducer(
         source: action.labware,
       }
     }
-    case 'SET_SOURCE_WELLS': {
+    case ACTIONS.SET_SOURCE_WELLS: {
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -43,7 +43,7 @@ export function quickTransferWizardReducer(
         sourceWells: action.wells,
       }
     }
-    case 'SET_DEST_LABWARE': {
+    case ACTIONS.SET_DEST_LABWARE: {
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -53,7 +53,7 @@ export function quickTransferWizardReducer(
         destination: action.labware,
       }
     }
-    case 'SET_DEST_WELLS': {
+    case ACTIONS.SET_DEST_WELLS: {
       let transferType: TransferType = TRANSFER
       if (
         state.sourceWells != null &&
@@ -77,7 +77,7 @@ export function quickTransferWizardReducer(
         transferType,
       }
     }
-    case 'SET_VOLUME': {
+    case ACTIONS.SET_VOLUME: {
       return {
         pipette: state.pipette,
         mount: state.mount,
@@ -90,26 +90,26 @@ export function quickTransferWizardReducer(
         volume: action.volume,
       }
     }
-    case 'SET_PIPETTE_PATH': {
+    case ACTIONS.SET_PIPETTE_PATH: {
       return {
         ...state,
         path: action.path,
       }
     }
 
-    case 'SET_CHANGE_TIP': {
+    case ACTIONS.SET_CHANGE_TIP: {
       return {
         ...state,
         changeTip: action.changeTip,
       }
     }
-    case 'SET_DROP_TIP_LOCATION': {
+    case ACTIONS.SET_DROP_TIP_LOCATION: {
       return {
         ...state,
         dropTipLocation: action.location,
       }
     }
-    case 'SET_LIQUID_CLASS': {
+    case ACTIONS.SET_LIQUID_CLASS: {
       return {
         ...state,
         liquidClassName: action.liquidClassName,
@@ -123,153 +123,153 @@ export function quickTransferSummaryReducer(
   action: QuickTransferSummaryAction
 ): QuickTransferSummaryState {
   switch (action.type) {
-    case 'SET_ASPIRATE_FLOW_RATE': {
+    case ACTIONS.SET_ASPIRATE_FLOW_RATE: {
       return {
         ...state,
         aspirateFlowRate: action.rate,
       }
     }
-    case 'SET_DISPENSE_FLOW_RATE': {
+    case ACTIONS.SET_DISPENSE_FLOW_RATE: {
       return {
         ...state,
         dispenseFlowRate: action.rate,
       }
     }
-    case 'SET_PIPETTE_PATH': {
+    case ACTIONS.SET_PIPETTE_PATH: {
       return {
         ...state,
         path: action.path,
       }
     }
-    case 'SET_ASPIRATE_TIP_POSITION': {
+    case ACTIONS.SET_ASPIRATE_TIP_POSITION: {
       return {
         ...state,
         tipPositionAspirate: action.position,
       }
     }
-    case 'SET_PRE_WET_TIP': {
+    case ACTIONS.SET_PRE_WET_TIP: {
       return {
         ...state,
         preWetTip: action.preWetTip,
       }
     }
-    case 'SET_MIX_ON_ASPIRATE': {
+    case ACTIONS.SET_MIX_ON_ASPIRATE: {
       return {
         ...state,
         mixOnAspirate: action.mixSettings,
       }
     }
-    case 'SET_DELAY_ASPIRATE': {
+    case ACTIONS.SET_DELAY_ASPIRATE: {
       return {
         ...state,
         delayAspirate: action.delaySettings,
       }
     }
-    case 'SET_SUBMERGE_ASPIRATE': {
+    case ACTIONS.SET_SUBMERGE_ASPIRATE: {
       return {
         ...state,
         submergeAspirate: action.submergeSettings,
       }
     }
-    case 'SET_RETRACT_ASPIRATE': {
+    case ACTIONS.SET_RETRACT_ASPIRATE: {
       return {
         ...state,
         retractAspirate: action.retractSettings,
       }
     }
-    case 'SET_TOUCH_TIP_ASPIRATE': {
+    case ACTIONS.SET_TOUCH_TIP_ASPIRATE: {
       return {
         ...state,
         touchTipAspirate: action.position,
         touchTipAspirateSpeed: action.touchTipAspirateSpeed,
       }
     }
-    case 'SET_AIR_GAP_ASPIRATE': {
+    case ACTIONS.SET_AIR_GAP_ASPIRATE: {
       return {
         ...state,
         airGapAspirate: action.volume,
       }
     }
-    case 'SET_DISPENSE_TIP_POSITION': {
+    case ACTIONS.SET_DISPENSE_TIP_POSITION: {
       return {
         ...state,
         tipPositionDispense: action.position,
       }
     }
-    case 'SET_MIX_ON_DISPENSE': {
+    case ACTIONS.SET_MIX_ON_DISPENSE: {
       return {
         ...state,
         mixOnDispense: action.mixSettings,
       }
     }
-    case 'SET_DELAY_DISPENSE': {
+    case ACTIONS.SET_DELAY_DISPENSE: {
       return {
         ...state,
         delayDispense: action.delaySettings,
       }
     }
-    case 'SET_SUBMERGE_DISPENSE': {
+    case ACTIONS.SET_SUBMERGE_DISPENSE: {
       return {
         ...state,
         submergeDispense: action.submergeSettings,
       }
     }
-    case 'SET_RETRACT_DISPENSE': {
+    case ACTIONS.SET_RETRACT_DISPENSE: {
       return {
         ...state,
         retractDispense: action.retractSettings,
       }
     }
-    case 'SET_TOUCH_TIP_DISPENSE': {
+    case ACTIONS.SET_TOUCH_TIP_DISPENSE: {
       return {
         ...state,
         touchTipDispense: action.position,
         touchTipDispenseSpeed: action.touchTipDispenseSpeed,
       }
     }
-    case 'SET_BLOW_OUT': {
+    case ACTIONS.SET_BLOW_OUT: {
       return {
         ...state,
         blowOutDispense: action.blowOutSettings,
       }
     }
-    case 'SET_AIR_GAP_DISPENSE': {
+    case ACTIONS.SET_AIR_GAP_DISPENSE: {
       return {
         ...state,
         airGapDispense: action.volume,
       }
     }
-    case 'SET_CHANGE_TIP': {
+    case ACTIONS.SET_CHANGE_TIP: {
       return {
         ...state,
         changeTip: action.changeTip,
       }
     }
-    case 'SET_DROP_TIP_LOCATION': {
+    case ACTIONS.SET_DROP_TIP_LOCATION: {
       return {
         ...state,
         dropTipLocation: action.location,
       }
     }
-    case 'SET_PUSH_OUT': {
+    case ACTIONS.SET_PUSH_OUT: {
       return {
         ...state,
         pushOutDispense: action.pushOutSettings,
       }
     }
-    case 'SET_CONDITION_ASPIRATE': {
+    case ACTIONS.SET_CONDITION_ASPIRATE: {
       return {
         ...state,
         conditionAspirate: action.conditionAspirate,
       }
     }
-    case 'SET_DISPOSAL_VOLUME_DISPENSE': {
+    case ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE: {
       return {
         ...state,
         disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
       }
     }
-    case 'SET_LIQUID_CLASS_VALUES': {
+    case ACTIONS.SET_LIQUID_CLASS_VALUES: {
       return {
         ...state,
         ...action.liquidClassValues,

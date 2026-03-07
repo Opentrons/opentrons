@@ -268,14 +268,6 @@ class ThreadManager(Generic[WrappedObj]):
         self._cached_modules: weakref.WeakKeyDictionary[
             AbstractModule, CallBridger[AbstractModule]
         ] = weakref.WeakKeyDictionary()
-        # TODO: remove this if we switch to python 3.8
-        # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
-        # On windows, the event loop and system interface is different and
-        # this won't work.
-        try:
-            asyncio.get_child_watcher()
-        except NotImplementedError:
-            pass
         blocking = not getattr(builder, "nonblocking", False)
         target = object.__getattribute__(self, "_build_and_start_loop")
         thread = threading.Thread(

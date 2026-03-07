@@ -1146,7 +1146,9 @@ def test_drop_tip_to_trash(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+@pytest.mark.parametrize(
+    "api_version", [APIVersion(2, 15), APIVersion(2, 18), APIVersion(2, 29)]
+)
 def test_drop_tip_to_randomized_trash_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1173,7 +1175,7 @@ def test_drop_tip_to_randomized_trash_location(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 29), False)],
 )
 def test_drop_tip_in_trash_bin(
     decoy: Decoy,
@@ -1198,7 +1200,7 @@ def test_drop_tip_in_trash_bin(
 
 @pytest.mark.parametrize(
     ["api_version", "alternate_drop"],
-    [(APIVersion(2, 17), True), (APIVersion(2, 18), False)],
+    [(APIVersion(2, 17), True), (APIVersion(2, 18), False), (APIVersion(2, 29), False)],
 )
 def test_drop_tip_in_waste_chute(
     decoy: Decoy,
@@ -1216,6 +1218,36 @@ def test_drop_tip_in_waste_chute(
             waste_chute,
             home_after=None,
             alternate_tip_drop=alternate_drop,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 29)])
+def test_drop_tip_alternate_position_explicitly(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should alternate the drop position when alternate_drop_location is specified."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=True)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=True,
+        ),
+        times=1,
+    )
+
+    subject.drop_tip(location=trash_bin, alternate_drop_location=False)
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=False,
         ),
         times=1,
     )
@@ -1709,7 +1741,7 @@ def test_touch_tip_raises_if_trash_last_location(
         subject.touch_tip()
 
 
-@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 28), False))
+@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 29), False))
 def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1736,14 +1768,14 @@ def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
     )
 
 
-@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 29)))
 def test_touch_tip_raises_if_labware_is_untouchable(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.28 & above."""
+    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.29 & above."""
     mock_well = decoy.mock(cls=Well)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
     decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])

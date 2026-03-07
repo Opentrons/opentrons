@@ -303,5 +303,17 @@ class AbstractProtocol(
         "Capture an image using a camera."
 
     @abstractmethod
+    def start_step_grouping(
+        self,
+        annotation_name: str,
+        annotation_description: Optional[str],
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+
+    @abstractmethod
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
+
+    @abstractmethod
     def load_robot(self) -> AbstractRobot:
         """Load a Robot Core context into a protocol"""

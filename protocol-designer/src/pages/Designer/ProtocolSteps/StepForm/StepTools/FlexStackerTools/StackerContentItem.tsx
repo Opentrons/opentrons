@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { ListItem, StyledText, Tag } from '@opentrons/components'
+import { COLORS, ListItem, StyledText, Tag } from '@opentrons/components'
 
 import styles from './flexstackertools.module.css'
 
@@ -20,8 +20,8 @@ export function StackerContentItem(
       <StyledText desktopStyle="bodyDefaultRegular">
         {primaryLabwareName}
       </StyledText>
-      {hasLid != null ? (
-        <StyledText desktopStyle="bodyDefaultRegular">
+      {hasLid ? (
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t(
             `step_edit_form.flex_stacker.with_lid.${isTiprack ? 'tiprack' : 'standard'}`
           )}

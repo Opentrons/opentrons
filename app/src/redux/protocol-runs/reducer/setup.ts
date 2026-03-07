@@ -11,6 +11,9 @@ const CAMERA_INITIAL_SETUP_STATE = {
   cameraEnabled: false,
   liveStreamEnabled: false,
   recoveryEnabled: false,
+  cameraImageSettings: {
+    ot_system_camera: {},
+  },
 }
 
 export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
@@ -54,12 +57,26 @@ export function setupReducer(
 
     case Constants.CAMERA_SETUP_STEP_KEY: {
       const { runId, ...rest } = action.payload
-      return {
-        ...state,
-        [Constants.CAMERA_SETUP_STEP_KEY]: {
-          ...state[Constants.CAMERA_SETUP_STEP_KEY],
-          ...rest,
-        },
+
+      if ('cameraId' in rest && 'cameraImageSettings' in rest) {
+        return {
+          ...state,
+          [Constants.CAMERA_SETUP_STEP_KEY]: {
+            ...state[Constants.CAMERA_SETUP_STEP_KEY],
+            cameraImageSettings: {
+              ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
+              [rest.cameraId]: rest.cameraImageSettings,
+            },
+          },
+        }
+      } else {
+        return {
+          ...state,
+          [Constants.CAMERA_SETUP_STEP_KEY]: {
+            ...state[Constants.CAMERA_SETUP_STEP_KEY],
+            ...rest,
+          },
+        }
       }
     }
 

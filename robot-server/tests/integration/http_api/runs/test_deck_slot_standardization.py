@@ -13,6 +13,7 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
         yield robot_client
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     (
         "base_url",

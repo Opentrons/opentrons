@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Modules"
+description: "Flex-compatible modules: Heater-Shaker, HEPA/UV, Temperature Module, Thermocycler, and more."
 ---
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
@@ -9,7 +10,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 !!! tip
     - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [Modules category](../../modules/index.md) of the Opentrons Documentation website.
 
-    - For details on integrating modules into your protocols, see the [Protocol Designer section](../protocols/designer.md) of the Protocol Development chapter or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
+    - For details on integrating modules into your protocols, see the [Protocol Designer section](../protocols/designer.md) of the Protocol Development chapter or the [Hardware Modules section](../../python-api/modules/index.md) of our Python API documentation.
 
 
 ## Supported modules

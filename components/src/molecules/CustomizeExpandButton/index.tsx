@@ -101,6 +101,7 @@ export function CustomizeExpandButtonComponent(
               backgroundColor={COLORS.blue10}
               padding={SPACING.spacing16}
               borderRadius={BORDERS.borderRadius4}
+              gridGap={SPACING.spacing8}
             >
               {isLid &&
               !isNestedDefALid &&

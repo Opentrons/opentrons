@@ -11,9 +11,7 @@ import {
   aspirateTouchTipMmFromEdgeRequired,
   aspirateTouchTipSpeedRequired,
   aspirateWellsRequired,
-  blockTargetTempHoldRange,
   blockTargetTempRange,
-  blockTemperatureHoldRequired,
   blockTemperatureRequired,
   blowoutFlowRateRequired,
   blowoutLocationRequired,
@@ -35,13 +33,12 @@ import {
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
+  fillQuantityOutOfRange,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
   labwareToMoveRequired,
-  lidTargetTempHoldRange,
   lidTargetTempRange,
-  lidTemperatureHoldRequired,
   lidTemperatureRequired,
   magnetActionRequired,
   magneticModuleIdRequired,
@@ -107,6 +104,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  HydratedVacuumFormData,
   StepType,
 } from '../../form-types'
 import type { FormError } from './errors'
@@ -139,6 +137,7 @@ interface StepFormDataMap {
   comment: HydratedCommentFormData
   camera: HydratedCameraFormData
   flexStacker: HydratedFlexStackerFormData
+  vacuum: HydratedVacuumFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -276,10 +275,6 @@ const stepFormHelperMap: {
       lidTemperatureRequired,
       profileVolumeRequired,
       profileTargetLidTempRequired,
-      blockTemperatureHoldRequired,
-      lidTemperatureHoldRequired,
-      lidTargetTempHoldRange,
-      blockTargetTempHoldRange,
       profileVolumeRange,
       profileTargetLidTempRange,
       lidTargetTempRange,
@@ -293,6 +288,9 @@ const stepFormHelperMap: {
     getErrors: composeErrors(),
   },
   flexStacker: {
+    getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
+  },
+  vacuum: {
     getErrors: composeErrors(),
   },
 }
@@ -388,6 +386,12 @@ export const getFormErrors = (
     case 'flexStacker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedFlexStackerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'vacuum':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedVacuumFormData,
         moduleEntities,
         labwareEntities
       )

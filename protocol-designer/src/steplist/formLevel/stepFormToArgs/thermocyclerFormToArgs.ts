@@ -40,8 +40,7 @@ const _convertToProfileElements = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  castFormData: GetCastFormData<HydratedThermocyclerFormData>,
-  enableConcurrentModuleActions: boolean
+  castFormData: GetCastFormData<HydratedThermocyclerFormData>
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs => {
   const { thermocyclerFormType, stepDetails } = castFormData
 
@@ -74,20 +73,6 @@ export const thermocyclerFormToArgs = (
         profileItemsById: castFormData.profileItemsById,
       })
 
-      const holdStepArgs = {
-        blockTargetTempHold:
-          castFormData.blockIsActiveHold &&
-          castFormData.blockTargetTempHold !== null
-            ? Number(castFormData.blockTargetTempHold)
-            : null,
-        lidOpenHold: castFormData.lidOpenHold,
-        lidTargetTempHold:
-          castFormData.lidIsActiveHold &&
-          castFormData.lidTargetTempHold !== null
-            ? Number(castFormData.lidTargetTempHold)
-            : null,
-      }
-
       const args = {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
 
@@ -106,17 +91,6 @@ export const thermocyclerFormToArgs = (
         profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
         profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,
-
-        ...(enableConcurrentModuleActions
-          ? {
-              concurrent: true as const,
-              // holdStepArgs is omitted here because step-generation and the backend
-              // don't support that functionality when concurrent is true.
-            }
-          : {
-              concurrent: false as const,
-              ...holdStepArgs,
-            }),
       }
 
       return args

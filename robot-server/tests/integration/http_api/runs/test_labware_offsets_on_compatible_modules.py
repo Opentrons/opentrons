@@ -54,6 +54,7 @@ async def robot_client(
         yield robot_client
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("use_protocol_engine_backend", [False, True])
 @pytest.mark.parametrize(
     (

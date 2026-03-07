@@ -17,8 +17,8 @@ from typing import Dict, List
 import sqlalchemy
 
 from opentrons_shared_data.data_files import MimeType
+from server_utils.persistence.folder_migrator import Migration
 
-from .._folder_migrator import Migration
 from ..database import sql_engine_ctx
 from ._util import add_column, copy_contents
 from robot_server.persistence.file_and_directory_names import DB_FILE
@@ -82,7 +82,7 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
     for table_row in old_boolean_settings:
         connection.execute(
             sqlalchemy.insert(schema_13.boolean_setting_table).values(
-                key=table_row.key, value=table_row.value
+                key=table_row.key.value, value=table_row.value
             )
         )
     new_rows = [

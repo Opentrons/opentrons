@@ -38,7 +38,6 @@
     "absorbanceReader": "absorbance plate reader",
     "camera": "camera",
     "comment": "comment",
-    "ending_hold": "ending hold",
     "flexStacker": "flex stacker",
     "heaterShaker": "heater-shaker",
     "magnet": "magnet",
@@ -49,7 +48,8 @@
     "profile": "Program a Thermocycler profile",
     "profile_steps": "profile steps",
     "temperature": "temperature",
-    "thermocycler": "thermocycler"
+    "thermocycler": "thermocycler",
+    "vacuum": "vacuum"
   },
   "temperature": "Temperature (°C)",
   "time": "Time",

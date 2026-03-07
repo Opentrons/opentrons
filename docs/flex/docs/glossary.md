@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Glossary"
+description: "Definitions of terms used in the Flex manual and Opentrons products."
 ---
 
 This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for *pipette* describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
@@ -200,7 +201,7 @@ The working end of a pipette. Flex pipettes pick up disposable tips by pressing 
 
 ##### Opentrons App
 
-Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](opentrons-app.md).
+Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](./opentrons-app/index.md).
 
 ##### Paddle
 
@@ -244,7 +245,7 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 ##### Python Protocol API
 
-A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
+A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the [Opentrons Python Protocol API documentation](../python-api/index.md).
 
 ##### Removable deck slot
 

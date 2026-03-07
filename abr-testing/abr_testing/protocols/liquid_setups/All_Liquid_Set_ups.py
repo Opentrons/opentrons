@@ -315,7 +315,7 @@ def run(protocol: ProtocolContext) -> None:
             dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"]],
             trash=False,
             blow_out=False,
-            blowout_destination="destination well",
+            blowout_location="destination well",
         )
         pipette.reset_tipracks()
         # partial tip for pcr_reagents_plate
@@ -403,7 +403,7 @@ def run(protocol: ProtocolContext) -> None:
             source=6 * [src_reservoir["A1"]],
             dest=reservoir.wells()[:6],
             blow_out=False,
-            Trash=True,
+            trash=True,
             blowout_location="destination well",
         )
         # FILL FIRST 5 COLUMNS

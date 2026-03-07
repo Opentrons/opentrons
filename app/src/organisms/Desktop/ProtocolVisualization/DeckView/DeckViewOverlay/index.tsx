@@ -13,12 +13,17 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getAddressableAreaFromSlotId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   getFlexHoverDimensions,
   getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  HOPPER_FAKE_LOCATIONS,
+} from '@opentrons/step-generation'
 
 import styles from './deckviewoverlay.module.css'
 
@@ -29,7 +34,11 @@ import type {
   DeckSlotId,
   RobotType,
 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import type {
+  HopperLocationMapKey,
+  InvariantContext,
+  RobotState,
+} from '@opentrons/step-generation'
 
 interface SlotOverlayProps {
   slotId: DeckSlotId
@@ -61,36 +70,60 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     invariantContext
   const { modules } = robotState
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
-
-  const hasTCOnSlot = Object.entries(modules).find(
-    ([id, module]) =>
-      module.slot === slotId &&
-      moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
-  )
+  const slotMapped = HOPPER_FAKE_LOCATIONS.includes(slotId)
+    ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
+    : slotId
+  const hasTCOnSlot = Object.entries(modules).some(([id, module]) => {
+    const entity = moduleEntities[id]
+    return (
+      module.slot === slotMapped && entity?.type === THERMOCYCLER_MODULE_TYPE
+    )
+  })
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
   const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
     stagingArea => stagingArea.location as string
   )
   const isWasteChuteOnSlot =
-    Object.values(wasteChuteEntities).length > 0 && slotId === 'D3'
+    Object.values(wasteChuteEntities).length > 0 && slotMapped === 'D3'
 
   const cutoutId =
     getCutoutIdForAddressableArea(
-      slotId as AddressableAreaName,
+      slotMapped as AddressableAreaName,
       deckDef.cutoutFixtures
     ) ?? 'cutoutD1'
 
-  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId))) {
+  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotMapped))) {
     return null
   }
   const hoverOpacity = hover != null && hover === slotId ? 0.9 : 0
 
   if (robotType === FLEX_ROBOT_TYPE) {
+    const thermocyclerModuleEntry = Object.entries(modules).find(
+      ([id, module]) =>
+        module.slot === slotMapped &&
+        moduleEntities[id]?.type === THERMOCYCLER_MODULE_TYPE
+    )
+    const thermocyclerModuleModel =
+      thermocyclerModuleEntry != null
+        ? moduleEntities[thermocyclerModuleEntry[0]]?.model
+        : null
+    const slotOffsetFromCutout = getAddressableAreaFromSlotId(
+      slotMapped,
+      deckDef
+    )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    const moduleOffsetFromCutout = deckDef.locations.addressableAreas.find(
+      area => area.id === thermocyclerModuleModel
+    )?.offsetFromCutoutFixture ?? [0, 0, 0]
+    const thermocyclerOffsetFromSlot = [
+      moduleOffsetFromCutout[0] - slotOffsetFromCutout[0],
+      moduleOffsetFromCutout[1] - slotOffsetFromCutout[1],
+      moduleOffsetFromCutout[2] - slotOffsetFromCutout[2],
+    ]
     const { width, x, y, height } = getFlexHoverDimensions(
       stagingAreaLocations,
       cutoutId,
-      slotId,
-      hasTCOnSlot != null,
+      slotMapped,
+      hasTCOnSlot,
       slotPosition
     )
 
@@ -112,8 +145,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
           key={`${robotType.toLowerCase()}_slotOverlay`}
           width={width}
           height={height}
-          x={x}
-          y={y}
+          x={hasTCOnSlot === true ? x + thermocyclerOffsetFromSlot[0] : x}
+          y={hasTCOnSlot === true ? y + thermocyclerOffsetFromSlot[1] : y}
           flexProps={{ flex: '1' }}
           foreignObjectProps={{
             opacity: hoverOpacity,
@@ -165,7 +198,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     )
   } else {
     const { width, x, y, height } = getOT2HoverDimensions(
-      hasTCOnSlot != null,
+      hasTCOnSlot,
       slotPosition
     )
 

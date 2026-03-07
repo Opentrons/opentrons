@@ -53,7 +53,7 @@ export const QuickTransferFlow = (): JSX.Element => {
         step: currentStep,
       },
     })
-    navigate('/quick-transfer')
+    navigate('/protocols')
   }, true)
 
   const exitButtonProps: ComponentProps<typeof SmallButton> = {

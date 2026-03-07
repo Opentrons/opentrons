@@ -18,6 +18,9 @@ const CAMERA_STEP = {
   cameraEnabled: false,
   liveStreamEnabled: false,
   recoveryEnabled: false,
+  cameraImageSettings: {
+    ot_system_camera: {},
+  },
 }
 
 describe('protocol runs reducer', () => {

@@ -230,6 +230,31 @@ settings = [
         ),
         robot_type=[RobotTypeEnum.FLEX],
     ),
+    SettingDefinition(
+        _id="enableProtocolSubprocess",
+        title="Enable running Protocols as a seperate process",
+        description="Protocol execution will run in a seperate process and utilize Pyro to communicate with the robot-server process.",
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="enableHardwareSubprocess",
+        title="Enable running Hardware Controller as a seperate process",
+        description="The Hardware Controller will run in a seperate process hosted by a systemd service and utilize Pyro to communicate with the robot-server and protocol processes.",
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="allowStepGrouping",
+        title="Allow creation of step groups via command annotations.",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to allow using in-development"
+            " command annotations and step groups."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
 ]
 
 
@@ -742,12 +767,34 @@ def _migrate36to37(previous: SettingsMap) -> SettingsMap:
 
 
 def _migrate37to38(previous: SettingsMap) -> SettingsMap:
-    """Migrate to version 36 of the feature flags file.
+    """Migrate to version 38 of the feature flags file.
 
     -  Adds the disableFlexStackerLabwareDetection config element.
     """
     newmap = {k: v for k, v in previous.items()}
     newmap["disableFlexStackerLabwareDetection"] = None
+    return newmap
+
+
+def _migrate38to39(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 39 of the feature flags file.
+
+    -  Adds the enableProtocolSubprocess and enableHardwareSubprocess config elements.
+    -  Ensure both elements begin as false.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolSubprocess"] = False
+    newmap["enableHardwareSubprocess"] = False
+    return newmap
+
+
+def _migrate39to40(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 40 of the feature flags file.
+
+    - Adds the allowStepGrouping config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["allowStepGrouping"] = None
     return newmap
 
 
@@ -790,6 +837,8 @@ _MIGRATIONS = [
     _migrate35to36,
     _migrate36to37,
     _migrate37to38,
+    _migrate38to39,
+    _migrate39to40,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
