@@ -33,10 +33,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../../PipetteFields')
 vi.mock('/protocol-designer/feature-flags/selectors')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'

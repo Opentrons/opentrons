@@ -55,10 +55,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPositionFromSlotId: vi.fn(),
   }
 })
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = () => {
   return renderWithProviders(
