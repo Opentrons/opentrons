@@ -29,7 +29,15 @@
     "node": ">=22.22.0"
   },
   "resolutions": {
-    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
+    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0",
+    "@typescript-eslint/typescript-estree": "8.52.0",
+    "@typescript-eslint/scope-manager": "8.52.0",
+    "@typescript-eslint/types": "8.52.0",
+    "@typescript-eslint/visitor-keys": "8.52.0",
+    "@typescript-eslint/utils": "8.52.0",
+    "@typescript-eslint/type-utils": "8.52.0",
+    "@typescript-eslint/eslint-plugin": "8.52.0",
+    "@typescript-eslint/parser": "8.52.0"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.582.0",
@@ -61,8 +69,8 @@
     "@types/react-redux": "7.1.32",
     "@types/redux-mock-store": "1.5.0",
     "@types/semver": "^7.3.6",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
-    "@typescript-eslint/parser": "^6.20.0",
+    "@typescript-eslint/eslint-plugin": "8.52.0",
+    "@typescript-eslint/parser": "8.52.0",
     "@vitejs/plugin-react": "4.2.0",
     "@vitest/coverage-v8": "2.1.8",
     "ajv": "6.12.3",
@@ -81,7 +89,7 @@
     "download": "8.0.0",
     "electron": "39.1.2",
     "electron-builder": "26.0.15",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^43.0.1",
