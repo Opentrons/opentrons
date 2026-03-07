@@ -10,10 +10,6 @@ import { FeatureFlag } from '..'
 import type { ComponentProps } from 'react'
 
 vi.mock('/protocol-designer/feature-flags')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof FeatureFlag>) => {
   return renderWithProviders(<FeatureFlag {...props} />, {

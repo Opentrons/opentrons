@@ -22,10 +22,6 @@ vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/ui/labware/selectors')
 vi.mock('/protocol-designer/ui/modules/selectors')
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof FlexStackerTools>) => {
   return renderWithProviders(<FlexStackerTools {...props} />, {

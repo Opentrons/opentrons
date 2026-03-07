@@ -27,10 +27,6 @@ vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
     getMagneticLabwareOptions: vi.fn(),
   }
 })
-// a temp fix to pass test
-vi.mock('react-color', () => ({
-  SketchPicker: () => <div data-testid="mock-sketch-picker" />,
-}))
 
 const render = (props: ComponentProps<typeof MagnetTools>) => {
   return renderWithProviders(<MagnetTools {...props} />, {
