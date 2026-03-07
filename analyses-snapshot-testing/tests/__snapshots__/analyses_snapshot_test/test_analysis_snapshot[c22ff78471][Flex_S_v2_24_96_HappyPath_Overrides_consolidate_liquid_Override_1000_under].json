@@ -66082,6 +66082,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -66218,6 +66219,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -66354,6 +66356,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -69314,6 +69317,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -69450,6 +69454,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -69586,6 +69591,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -72560,6 +72566,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -72696,6 +72703,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
@@ -72832,6 +72840,7 @@
             "loadName": "nest_1_reservoir_290ml",
             "quirks": [
               "centerMultichannelOnWells",
+              "offsetPipetteFor12GridSubwells",
               "touchTipDisabled"
             ]
           },
