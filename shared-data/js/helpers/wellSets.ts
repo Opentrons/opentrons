@@ -14,8 +14,10 @@
 import uniq from 'lodash/uniq'
 
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
+import { SINGLE } from '../../command/types'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
+import type { NozzleConfigurationStyle } from '../../command/types'
 import type {
   ActiveNozzleNumber,
   LabwareDefinition,
@@ -79,6 +81,7 @@ export interface WellSetHelpers {
 
   canPipetteUseLabware: (
     pipetteSpec: PipetteV2Specs,
+    nozzleConfiguration: NozzleConfigurationStyle,
     labwareDef?: LabwareDefinition,
     trashName?: string
   ) => boolean
@@ -227,10 +230,13 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const canPipetteUseLabware = (
     pipetteSpec: PipetteV2Specs,
+    nozzleConfiguration: NozzleConfigurationStyle,
     labwareDef?: LabwareDefinition,
     trashName?: string
   ): boolean => {
-    if (pipetteSpec.channels === 1 || trashName != null) {
+    const has1ActiveNozzle =
+      pipetteSpec.channels === 1 || nozzleConfiguration === SINGLE
+    if (has1ActiveNozzle || trashName != null) {
       // assume all labware can be used by single-channel
       return true
     }
