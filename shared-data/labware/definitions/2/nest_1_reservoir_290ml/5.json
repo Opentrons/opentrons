@@ -20,11 +20,11 @@
     "A1": {
       "depth": 39.55,
       "shape": "rectangular",
-      "xDimension": 106.8,
-      "yDimension": 71.2,
+      "xDimension": 107.76,
+      "yDimension": 71.1,
       "totalLiquidVolume": 290000,
       "x": 63.88,
-      "y": 42.74,
+      "y": 42.73,
       "z": 4.85,
       "geometryDefinitionId": "cuboidalWell"
     }
@@ -41,11 +41,11 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled", "offsetPipetteFor12GridSubwells"],
     "loadName": "nest_1_reservoir_290ml"
   },
   "namespace": "opentrons",
-  "version": 3,
+  "version": 5,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
