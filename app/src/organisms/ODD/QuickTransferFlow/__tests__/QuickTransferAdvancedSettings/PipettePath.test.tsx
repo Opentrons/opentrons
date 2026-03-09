@@ -172,7 +172,7 @@ describe('PipettePath', () => {
 
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Disposal volume (µL)',
+        label: 'Disposal volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -203,7 +203,7 @@ describe('PipettePath', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Disposal volume (µL)',
+        label: 'Disposal volume (µL)',
         error: 'Value must be between 1 to 160',
         readOnly: true,
         type: 'number',

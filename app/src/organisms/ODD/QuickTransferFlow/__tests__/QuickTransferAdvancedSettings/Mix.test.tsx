@@ -102,7 +102,7 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -132,7 +132,7 @@ describe('Mix', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: 'Value must be between 1 to 200',
         readOnly: true,
         type: 'number',
@@ -158,7 +158,7 @@ describe('Mix', () => {
     fireEvent.click(zeroButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: 'Value must be between 1 to 999',
         readOnly: true,
         type: 'number',
@@ -204,7 +204,7 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -215,7 +215,7 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: null,
         readOnly: true,
         type: 'number',
@@ -242,7 +242,7 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -253,7 +253,7 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: null,
         readOnly: true,
         type: 'number',

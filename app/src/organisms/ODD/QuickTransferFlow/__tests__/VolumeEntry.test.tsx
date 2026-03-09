@@ -74,7 +74,7 @@ describe('VolumeEntry', () => {
     screen.getByText('Set transfer volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Volume per well (µL)',
+        label: 'Volume per well (µL)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -97,7 +97,7 @@ describe('VolumeEntry', () => {
     screen.getByText('Set dispense volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Dispense volume per well (µL)',
+        label: 'Dispense volume per well (µL)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -120,7 +120,7 @@ describe('VolumeEntry', () => {
     screen.getByText('Set aspirate volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate volume per well (µL)',
+        label: 'Aspirate volume per well (µL)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -161,7 +161,7 @@ describe('VolumeEntry', () => {
     expect(continueBtn).toBeDisabled()
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate volume per well (µL)',
+        label: 'Aspirate volume per well (µL)',
         error: 'Value must be between 5 to 50',
         readOnly: true,
         type: 'text',

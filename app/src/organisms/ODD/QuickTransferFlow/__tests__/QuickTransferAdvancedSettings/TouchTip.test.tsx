@@ -114,7 +114,7 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Touch tip position from top of well (mm)',
+        label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -151,7 +151,7 @@ describe('TouchTip', () => {
     fireEvent.click(secondNumButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Touch tip position from top of well (mm)',
+        label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -25 to 0',
         readOnly: true,
         type: 'text',
@@ -180,7 +180,7 @@ describe('TouchTip', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Touch tip position from top of well (mm)',
+        label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -100 to 0',
         readOnly: true,
         type: 'text',
@@ -225,7 +225,7 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Touch tip position from top of well (mm)',
+        label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -252,7 +252,7 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Touch tip position from top of well (mm)',
+        label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',

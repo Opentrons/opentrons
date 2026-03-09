@@ -6,7 +6,7 @@ import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, DIRECTION_ROW } from '../../styles'
 import { TYPOGRAPHY } from '../../ui-style-constants'
-import styles from './TouchInputField.module.css'
+import styles from './touchinputfield.module.css'
 
 import type {
   ChangeEventHandler,

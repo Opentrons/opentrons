@@ -94,7 +94,7 @@ describe('FlowRate', () => {
     screen.getByTestId('ChildNavigation_Primary_Button')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate flow rate (µL/s)',
+        label: 'Aspirate flow rate (µL/s)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -116,7 +116,7 @@ describe('FlowRate', () => {
     screen.getByText('Dispense flow rate')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Dispense flow rate (µL/s)',
+        label: 'Dispense flow rate (µL/s)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -133,7 +133,7 @@ describe('FlowRate', () => {
     fireEvent.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate flow rate (µL/s)',
+        label: 'Aspirate flow rate (µL/s)',
         error: 'Value must be between 1 to 92',
         readOnly: true,
         type: 'number',

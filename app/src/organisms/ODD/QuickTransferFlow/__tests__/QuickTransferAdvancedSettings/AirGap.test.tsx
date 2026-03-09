@@ -96,7 +96,7 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -127,7 +127,7 @@ describe('AirGap', () => {
     fireEvent.click(screen.getByText('0'))
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: 'Value must be between 0 to 195',
         readOnly: true,
         type: 'number',
@@ -156,7 +156,7 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -183,7 +183,7 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -208,7 +208,7 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -245,7 +245,7 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -270,7 +270,7 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Air gap volume (µL)',
+        label: 'Air gap volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',

@@ -102,7 +102,7 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        label: 'Delay duration (seconds)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -132,7 +132,7 @@ describe('Delay', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        label: 'Delay duration (seconds)',
         error: 'Value must be between 0.1 to 9999999999',
         readOnly: true,
         type: 'number',
@@ -177,7 +177,7 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        label: 'Delay duration (seconds)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -203,7 +203,7 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        label: 'Delay duration (seconds)',
         error: null,
         readOnly: true,
         type: 'number',

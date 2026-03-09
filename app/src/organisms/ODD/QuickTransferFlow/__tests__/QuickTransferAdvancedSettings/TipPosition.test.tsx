@@ -91,7 +91,7 @@ describe('TipPosition', () => {
     screen.getByTestId('ChildNavigation_Primary_Button')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -113,7 +113,7 @@ describe('TipPosition', () => {
     screen.getByText('Dispense tip position')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -130,7 +130,7 @@ describe('TipPosition', () => {
     fireEvent.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 52',
         readOnly: true,
         type: 'text',
@@ -153,7 +153,7 @@ describe('TipPosition', () => {
     fireEvent.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 202',
         readOnly: true,
         type: 'text',
