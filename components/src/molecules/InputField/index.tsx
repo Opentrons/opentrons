@@ -109,8 +109,11 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       padding,
       disabled,
       error,
+      units,
       leftElement,
       rightElement,
+      isIndeterminate = false,
+      onClick,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
@@ -119,10 +122,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const generatedId = useId()
     const inputId = props.id ?? generatedId
 
-    const hasError = props.error != null
-    const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
-    const placeHolder =
-      (props.isIndeterminate ?? false) ? '-' : props.placeholder
+    const hasError = error != null
+    const value = (isIndeterminate ?? false) ? '' : (props.value ?? '')
+    const placeHolder = (isIndeterminate ?? false) ? '-' : props.placeholder
 
     const INPUT_FIELD = css`
       background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
@@ -191,7 +193,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     `
 
     const UNITS_STYLE = css`
-      color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
+      color: ${disabled ? COLORS.grey40 : COLORS.grey50};
       font: ${TYPOGRAPHY.bodyTextRegular};
       text-align: ${TYPOGRAPHY.textAlignRight};
       white-space: ${NO_WRAP};
@@ -204,8 +206,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         lineHeight={1}
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={props.disabled === true ? 0.5 : 1}
+        color={error != null ? COLOR_WARNING_DARK : COLORS.black90}
+        opacity={disabled === true ? 0.5 : 1}
       >
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (
@@ -234,7 +236,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           <Flex
             width="100%"
             flexDirection={DIRECTION_COLUMN}
-            onClick={props.disabled === true ? undefined : props.onClick}
+            onClick={disabled === true ? undefined : onClick}
           >
             <Flex
               tabIndex={tabIndex}
@@ -260,9 +262,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                 disabled={disabled}
                 ref={mergedRef}
               />
-              {props.units != null ? (
-                <Flex css={UNITS_STYLE}>{props.units}</Flex>
-              ) : null}
+              {units != null ? <Flex css={UNITS_STYLE}>{units}</Flex> : null}
               {rightElement != null ? (
                 <Flex
                   alignSelf={TEXT_ALIGN_RIGHT}
