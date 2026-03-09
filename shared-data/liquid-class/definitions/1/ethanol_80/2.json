@@ -1197,7 +1197,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 35.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.375],
