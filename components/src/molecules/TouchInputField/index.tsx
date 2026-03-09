@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useId, useRef } from 'react'
+import { forwardRef, useId, useRef } from 'react'
 import clsx from 'clsx'
 
 import { StyledText } from '../../atoms/StyledText'
@@ -9,6 +9,7 @@ import styles from './touchinputfield.module.css'
 
 import type {
   ChangeEventHandler,
+  CSSProperties,
   FocusEvent,
   MouseEvent,
   ReactNode,
@@ -73,24 +74,24 @@ export const TouchInputField = forwardRef<
   TouchInputFieldProps
 >((props, ref): JSX.Element => {
   const {
-    textAlign = TYPOGRAPHY.textAlignLeft,
-    size = 'small',
+    disabled,
+    units,
+    error,
     label,
     caption,
-    error,
-    units,
+    onClick,
     tabIndex = 0,
+    isIndeterminate = false,
+    textAlign = TYPOGRAPHY.textAlignLeft,
+    size = 'small',
     hasBackgroundError = false,
     borderRadius,
     padding,
-    disabled,
-    isIndeterminate = false,
-    onClick,
+    type,
     ...inputProps
   } = props
 
   const internalRef = useRef<HTMLInputElement>(null)
-  const inputFieldRef = useRef<HTMLDivElement>(null)
   const mergedRef = setRefs(ref, internalRef)
   const generatedId = useId()
   const inputId = props.id ?? generatedId
@@ -99,22 +100,10 @@ export const TouchInputField = forwardRef<
   const value = isIndeterminate ? '' : (props.value ?? '')
   const placeHolder = isIndeterminate ? '-' : props.placeholder
 
-  useEffect(() => {
-    if (inputFieldRef.current == null) return
-    if (borderRadius != null) {
-      inputFieldRef.current.style.setProperty(
-        '--touch-input-border-radius',
-        borderRadius
-      )
-    } else {
-      inputFieldRef.current.style.removeProperty('--touch-input-border-radius')
-    }
-    if (padding != null) {
-      inputFieldRef.current.style.setProperty('--touch-input-padding', padding)
-    } else {
-      inputFieldRef.current.style.removeProperty('--touch-input-padding')
-    }
-  }, [borderRadius, padding])
+  const inputFieldStyles = {
+    '--touch-input-border-radius': borderRadius ?? 'var(--border-radius-4)',
+    '--touch-input-padding': padding ?? 'var(--spacing-16) var(--spacing-24)',
+  } as CSSProperties
 
   return (
     <div
@@ -147,8 +136,8 @@ export const TouchInputField = forwardRef<
           onClick={disabled === true ? undefined : onClick}
         >
           <div
-            ref={inputFieldRef}
             tabIndex={tabIndex}
+            style={inputFieldStyles}
             className={clsx(
               styles.input_field,
               size === 'small'
@@ -170,7 +159,7 @@ export const TouchInputField = forwardRef<
               className={clsx(
                 styles.input,
                 size === 'small' ? styles.input_small : styles.input_medium,
-                props.type === 'password' ? styles.password_input : null,
+                type === 'password' ? styles.password_input : null,
                 textAlign === TYPOGRAPHY.textAlignCenter
                   ? styles.align_center
                   : styles.align_left
@@ -180,7 +169,7 @@ export const TouchInputField = forwardRef<
               onWheel={event => {
                 event.currentTarget.blur()
               }}
-              type={props.type}
+              type={type}
               disabled={disabled}
               ref={mergedRef}
             />
@@ -221,3 +210,6 @@ export const TouchInputField = forwardRef<
     </div>
   )
 })
+
+// for debugging
+TouchInputField.displayName = 'TouchInputField'

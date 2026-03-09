@@ -115,6 +115,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       isIndeterminate = false,
       onClick,
       caption,
+      type,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
@@ -259,7 +260,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                 onWheel={event => {
                   event.currentTarget.blur()
                 }} // prevent value change with scrolling
-                type={props.type}
+                type={type}
                 disabled={disabled}
                 ref={mergedRef}
               />
