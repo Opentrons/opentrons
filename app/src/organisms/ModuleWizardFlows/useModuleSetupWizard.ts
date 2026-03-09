@@ -12,6 +12,7 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { ACTIONS } from './constants'
 import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
@@ -77,6 +78,7 @@ export function useModuleSetupWizard(
   })
   const { currentStepIndex, currentStep, totalStepCount, attachedModule } =
     state
+  const { setOddRunIds } = useMaintenanceRunTakeover()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette =
     attachedPipettes.left?.data.calibratedOffset?.last_modified != null
@@ -96,13 +98,17 @@ export function useModuleSetupWizard(
     useChainMaintenanceCommands()
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
-      onSuccess: (response: {
-        data: { id: SetStateAction<string | null> }
-      }) => {
-        setMaintenanceRunId(response.data.id)
+    useCreateTargetedMaintenanceRunMutation(
+      {
+        onSuccess: (response: {
+          data: { id: SetStateAction<string | null> }
+        }) => {
+          setMaintenanceRunId(response.data.id)
+        },
       },
-    })
+      undefined,
+      { setOddRunIds }
+    )
 
   useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,

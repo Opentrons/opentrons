@@ -30,6 +30,7 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { AttachProbe } from './AttachProbe'
 import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -135,6 +136,7 @@ export const PipetteWizardFlows = (
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
+  const { setOddRunIds } = useMaintenanceRunTakeover()
   const [errorMessage, setShowErrorMessage] = useState<null | string>(null)
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -187,7 +189,8 @@ export const PipetteWizardFlows = (
           setShowErrorMessage(error.message)
         },
       },
-      host
+      host,
+      { setOddRunIds }
     )
 
   // this will close the modal in case the run was deleted by the terminate

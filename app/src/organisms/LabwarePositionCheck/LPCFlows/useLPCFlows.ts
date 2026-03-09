@@ -8,6 +8,7 @@ import {
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
+import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
@@ -129,9 +130,10 @@ export function useLPCFlows({
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
+  const { setOddRunIds } = useMaintenanceRunTakeover()
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation()
+    useCreateTargetedMaintenanceRunMutation({}, undefined, { setOddRunIds })
   const { createLabwareDefinition } =
     useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun, isLoading: isClosing } =

@@ -7,8 +7,6 @@ import {
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-// TODO: refactor this so helper code doesn't spawn UI
-import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { getIsOnDevice } from '/app/redux/config'
 
 import {
@@ -125,17 +123,26 @@ type CreateTargetedMaintenanceRunMutation =
     createTargetedMaintenanceRun: CreateMaintenanceRunType
   }
 
+interface MaintenanceRunIds {
+  currentRunId: string | null
+  oddRunId: string | null
+}
+interface UseCreateTargetedMaintenanceRunMutationMeta {
+  setOddRunIds?: (state: MaintenanceRunIds) => void
+}
+
 // A wrapper around useCreateMaintenanceRunMutation that ensures the ODD TakeoverModal renders, if applicable.
 export function useCreateTargetedMaintenanceRunMutation(
   options: UseCreateMaintenanceRunMutationOptions = {},
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  meta: UseCreateTargetedMaintenanceRunMutationMeta = {}
 ): CreateTargetedMaintenanceRunMutation {
   const createMaintenanceRunMutation = useCreateMaintenanceRunMutation(
     options,
     hostOverride
   )
   const isOnDevice = useSelector(getIsOnDevice)
-  const { setOddRunIds } = useMaintenanceRunTakeover()
+  const { setOddRunIds } = meta
 
   return {
     ...createMaintenanceRunMutation,
@@ -143,7 +150,7 @@ export function useCreateTargetedMaintenanceRunMutation(
       createMaintenanceRunMutation
         .createMaintenanceRun(variables, ...options)
         .then(res => {
-          if (isOnDevice)
+          if (isOnDevice && setOddRunIds != null)
             setOddRunIds({ currentRunId: res.data.id, oddRunId: res.data.id })
           return Promise.resolve(res)
         })

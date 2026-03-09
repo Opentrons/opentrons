@@ -29,6 +29,7 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { BeforeBeginning } from './BeforeBeginning'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -73,6 +74,7 @@ export function GripperWizardFlows(
     string | null
   >(null)
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
+  const { setOddRunIds } = useMaintenanceRunTakeover()
 
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -82,14 +84,18 @@ export function GripperWizardFlows(
   ] = useState<boolean>(false)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
-      onSuccess: response => {
-        setCreatedMaintenanceRunId(response.data.id)
+    useCreateTargetedMaintenanceRunMutation(
+      {
+        onSuccess: response => {
+          setCreatedMaintenanceRunId(response.data.id)
+        },
+        onError: error => {
+          setErrorMessage(error.message)
+        },
       },
-      onError: error => {
-        setErrorMessage(error.message)
-      },
-    })
+      undefined,
+      { setOddRunIds }
+    )
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,

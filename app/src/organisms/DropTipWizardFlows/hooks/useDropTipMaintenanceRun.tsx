@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -77,27 +78,32 @@ function useCreateDropTipMaintenanceRun({
   setErrorDetails,
   setCreatedMaintenanceRunId,
 }: UseCreateDropTipMaintenanceRunParams): void {
+  const { setOddRunIds } = useMaintenanceRunTakeover()
   const { chainRunCommands } = useChainMaintenanceCommands()
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation({
-      onSuccess: response => {
-        // The type assertions here are safe, since we only use this command after asserting these
-        const loadPipetteCommand = buildLoadPipetteCommand(
-          instrumentModelName!,
-          mount!
-        )
+    useCreateTargetedMaintenanceRunMutation(
+      {
+        onSuccess: response => {
+          // The type assertions here are safe, since we only use this command after asserting these
+          const loadPipetteCommand = buildLoadPipetteCommand(
+            instrumentModelName!,
+            mount!
+          )
 
-        chainRunCommands(response.data.id, [loadPipetteCommand], false)
-          .then(() => {
-            setCreatedMaintenanceRunId(response.data.id)
-          })
-          .catch((error: Error) => error)
+          chainRunCommands(response.data.id, [loadPipetteCommand], false)
+            .then(() => {
+              setCreatedMaintenanceRunId(response.data.id)
+            })
+            .catch((error: Error) => error)
+        },
+        onError: (error: Error) => {
+          setErrorDetails({ message: error.message })
+        },
       },
-      onError: (error: Error) => {
-        setErrorDetails({ message: error.message })
-      },
-    })
+      undefined,
+      { setOddRunIds }
+    )
 
   useEffect(
     () => {
