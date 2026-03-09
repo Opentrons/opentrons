@@ -118,8 +118,7 @@ def blowout_cell(blowout_obj: dict) -> str:
         return "\u2014"
     loc = blowout_obj["params"]["location"]
     rate = blowout_obj["params"]["flowRate"]
-    location_label = "trash" if loc == "trash" else "destination"
-    return f"Into {location_label} at {n(rate)} \u00b5L/sec"
+    return f"Into {loc} at {n(rate)} \u00b5L/sec"
 
 
 def flow_rate_cell(entries: list):
