@@ -18,6 +18,7 @@ auth_server.db # SQLite database (schema managed by Alembic)
 ## How It Works
 
 On server startup:
+
 1. `prepare_root()` creates or resets the persistence directory
 2. `MigrationOrchestrator` ensures the version subdirectory exists
 3. `alembic upgrade head` runs any pending schema migrations
@@ -31,12 +32,12 @@ On first boot, this creates the database from scratch. On subsequent boots, only
 1. Modify the ORM model in `orm_models.py`
 2. Autogenerate the migration:
    `OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \`
-     `uv run alembic revision --autogenerate -m "describe the change"`
+   `uv run alembic revision --autogenerate -m "describe the change"`
 3. Review the generated file in `alembic/versions/` and adjust as needed
 4. Test:
-       `rm -rf /tmp/auth-server-alembic && mkdir -p /tmp/auth-server-alembic/1`
+   `rm -rf /tmp/auth-server-alembic && mkdir -p /tmp/auth-server-alembic/1`
    `OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \`
-     `uv run alembic upgrade head`
+   `uv run alembic upgrade head`
 
 ### When to bump the folder version
 
@@ -53,10 +54,8 @@ uv run alembic downgrade -1       # roll back one step
 uv run alembic downgrade base     # roll back everything
 ```
 
-
 # SQLite Notes
 
-- Use `render_as_batch=True` (configured in env.py) for constraint and    column modifications
+- Use `render_as_batch=True` (configured in env.py) for constraint and column modifications
 - Column renames are not auto-detected — replace the generated add+drop with batch_alter_table
 - Failed migrations can leave the database in a partial state — reset the temp database and re-run migrations
-   
