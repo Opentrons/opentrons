@@ -43,7 +43,7 @@ let protocolsDirectoryPath: string | null = null
 function getProtocolsDirectoryPath(): string {
   if (protocolsDirectoryPath == null) {
     protocolsDirectoryPath = getIgnoreOT2App()
-      ? FileSystem.FLEX_PROTOCOLS_DIRECTORY_PATH
+      ? FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH
       : FileSystem.PROTOCOLS_DIRECTORY_PATH
   }
 
@@ -130,45 +130,43 @@ export function preParityMigrateProtocolsFrom(
   }
 }
 
-// If ignoreOT2App is enabled and flex-protocols does not exist,
-// copy only Flex protocols from protocols to flex-protocols.
-async function migrateFlexProtocolsToFlexDirectory(): Promise<void> {
-  if (!getIgnoreOT2App()) {
-    return
-  }
+// If ignoreOT2App is enabled and the not-OT-2 directory does not exist,
+// copy protocols from protocols to protocols-10.0-plus. Exclude only
+// protocols that explicitly are OT-2 protocols.
+async function migrateProtocolsToNotOt2Directory(): Promise<void> {
+  if (!getIgnoreOT2App()) return
 
   try {
-    const destStat = await fse.stat(FileSystem.FLEX_PROTOCOLS_DIRECTORY_PATH)
-    if (destStat.isDirectory()) {
-      return
-    }
+    const destStat = await fse.stat(FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH)
+    if (destStat.isDirectory()) return
   } catch {
-    // flex-protocols doesn't exist, proceed with migration
+    // the "not-OT-2 directory" doesn't exist, proceed with migration
   }
 
   try {
-    await ensureDir(FileSystem.FLEX_PROTOCOLS_DIRECTORY_PATH)
+    await ensureDir(FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH)
     const protocolDirPaths = await FileSystem.readDirectoriesWithinDirectory(
       FileSystem.PROTOCOLS_DIRECTORY_PATH
     )
 
     for (const dirPath of protocolDirPaths) {
-      const isFlex = await FileSystem.isFlexProtocol(dirPath)
-      if (isFlex) {
+      const shouldMigrate =
+        await FileSystem.shouldMigrateToNotOt2Directory(dirPath)
+      if (shouldMigrate) {
         const protocolKey = path.parse(dirPath).base
         const destPath = path.join(
-          FileSystem.FLEX_PROTOCOLS_DIRECTORY_PATH,
+          FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH,
           protocolKey
         )
         await fse.copy(dirPath, destPath, { overwrite: false })
       }
     }
     console.log(
-      `Flex protocol migration to ${FileSystem.FLEX_PROTOCOLS_DIRECTORY_NAME} complete.`
+      `Protocol migration to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME} complete.`
     )
   } catch (e) {
     console.log(
-      `Error migrating Flex protocols to ${FileSystem.FLEX_PROTOCOLS_DIRECTORY_NAME}: ${e}`
+      `Error migrating protocols to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME}: ${e}`
     )
   }
 }
@@ -224,7 +222,7 @@ export const fetchProtocols = (
 ): Promise<void> => {
   return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
     .then(() => migrateProtocolsFromTempDirectory())
-    .then(() => migrateFlexProtocolsToFlexDirectory())
+    .then(() => migrateProtocolsToNotOt2Directory())
     .then(() => {
       const protocolsDir = getProtocolsDirectoryPath()
       return FileSystem.readDirectoriesWithinDirectory(protocolsDir)

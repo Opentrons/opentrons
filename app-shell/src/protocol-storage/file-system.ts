@@ -1,9 +1,9 @@
 import path from 'path'
 import { app, shell } from 'electron'
 import fs from 'fs-extra'
-import { v4 as uuidv4 } from 'uuid'
+import uuid from 'uuid/v4'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { analyzeProtocolSource } from '../protocol-analysis'
 
@@ -35,15 +35,19 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
   PROTOCOLS_DIRECTORY_NAME
 )
-export const FLEX_PROTOCOLS_DIRECTORY_NAME = 'flex-protocols'
-export const FLEX_PROTOCOLS_DIRECTORY_PATH = path.join(
+
+export const NOT_OT2_PROTOCOLS_DIRECTORY_NAME = 'protocols-10.0-plus'
+export const NOT_OT2_PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
-  FLEX_PROTOCOLS_DIRECTORY_NAME
+  NOT_OT2_PROTOCOLS_DIRECTORY_NAME
 )
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
 export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
 
-export async function isFlexProtocol(
+// Returns true if the protocol should be migrated to the not-OT-2 directory.
+// Migrate by default; exclude only when analysis explicitly says OT-2 Standard.
+// Covers protocols with no analysis, failed analysis, etc.
+export async function shouldMigrateToNotOt2Directory(
   protocolDirPath: string
 ): Promise<boolean> {
   try {
@@ -53,7 +57,7 @@ export async function isFlexProtocol(
     )
     const stat = await fs.stat(analysisDirPath)
     if (!stat.isDirectory()) {
-      return false
+      return true
     }
 
     const analysisFiles = await readFilesWithinDirectory(analysisDirPath)
@@ -61,7 +65,7 @@ export async function isFlexProtocol(
       p => path.extname(p).toLowerCase() === '.json'
     )
     if (jsonFiles.length === 0) {
-      return false
+      return true
     }
 
     const withTimestamps = jsonFiles
@@ -71,13 +75,14 @@ export async function isFlexProtocol(
     const mostRecentPath = withTimestamps[0]?.path
 
     if (mostRecentPath == null) {
-      return false
+      return true
     }
 
     const analysis = await fs.readJson(mostRecentPath)
-    return analysis?.robotType === FLEX_ROBOT_TYPE
+
+    return analysis?.robotType !== OT2_ROBOT_TYPE
   } catch {
-    return false
+    return true
   }
 }
 
@@ -97,18 +102,12 @@ export function readDirectoriesWithinDirectory(dir: string): Promise<string[]> {
   })
 }
 
-const VALID_PROTOCOL_FILE_EXTENSIONS = ['.py', '.json']
 export function readFilesWithinDirectory(dir: string): Promise<string[]> {
   const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
 
-  const isValidProtocolFile = (e: Dirent): boolean => {
-    const extension = path.extname(e.name).toLowerCase()
-    return e.isFile() && VALID_PROTOCOL_FILE_EXTENSIONS.includes(extension)
-  }
-
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
     const protocolDirPaths = entries
-      .filter(isValidProtocolFile)
+      .filter(e => e.isFile())
       .map(getAbsolutePath)
 
     return protocolDirPaths
@@ -159,7 +158,7 @@ export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
 ): Promise<string> {
-  const protocolKey = uuidv4()
+  const protocolKey = uuid()
   const protocolDirPath = path.join(protocolsDirPath, protocolKey as string)
 
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
@@ -210,14 +209,7 @@ export function analyzeProtocolByKey(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
-  return readFilesWithinDirectory(srcDirPath).then(dirsContainingProtocol => {
-    if (dirsContainingProtocol.length === 0) {
-      throw new Error(
-        `No valid protocol files (.py, .json) found in directory: ${srcDirPath}`
-      )
-    }
-    return analyzeProtocolSource(dirsContainingProtocol[0], destFilePath)
-  })
+  return analyzeProtocolSource(srcDirPath, destFilePath)
 }
 
 export function viewProtocolSourceFolder(
