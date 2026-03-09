@@ -76,12 +76,16 @@ export const TouchInputField = forwardRef<
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
     label,
+    caption,
+    error,
+    units,
     tabIndex = 0,
     hasBackgroundError = false,
     borderRadius,
     padding,
     disabled,
     isIndeterminate = false,
+    onClick,
     ...inputProps
   } = props
 
@@ -91,7 +95,7 @@ export const TouchInputField = forwardRef<
   const generatedId = useId()
   const inputId = props.id ?? generatedId
 
-  const hasError = props.error != null
+  const hasError = error != null
   const value = isIndeterminate ? '' : (props.value ?? '')
   const placeHolder = isIndeterminate ? '-' : props.placeholder
 
@@ -140,7 +144,7 @@ export const TouchInputField = forwardRef<
           className={clsx(styles.outer, {
             [styles.outer_error]: hasError,
           })}
-          onClick={props.disabled === true ? undefined : props.onClick}
+          onClick={disabled === true ? undefined : onClick}
         >
           <div
             ref={inputFieldRef}
@@ -180,7 +184,7 @@ export const TouchInputField = forwardRef<
               disabled={disabled}
               ref={mergedRef}
             />
-            {props.units != null ? (
+            {units != null ? (
               <div
                 className={clsx(
                   styles.units,
@@ -192,25 +196,25 @@ export const TouchInputField = forwardRef<
                   }
                 )}
               >
-                {props.units}
+                {units}
               </div>
             ) : null}
           </div>
         </div>
 
-        {props.caption != null ? (
+        {caption != null ? (
           <StyledText
             oddStyle="bodyTextRegular"
             className={styles.caption}
             color={hasError ? COLORS.red50 : COLORS.grey60}
           >
-            {props.caption}
+            {caption}
           </StyledText>
         ) : null}
 
         {hasError ? (
           <StyledText oddStyle="bodyTextRegular" className={styles.error_text}>
-            {props.error}
+            {error}
           </StyledText>
         ) : null}
       </div>

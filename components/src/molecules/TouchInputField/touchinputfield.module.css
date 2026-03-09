@@ -1,11 +1,11 @@
 .container {
-  width: 100%;
   display: flex;
+  width: 100%;
   align-items: center;
-  line-height: 1;
+  color: var(--black-90);
   font-size: var(--font-size-28);
   font-weight: var(--font-weight-regular);
-  color: var(--black-90);
+  line-height: 1;
 }
 
 .container_error {
@@ -18,20 +18,20 @@
 
 .inner {
   display: flex;
-  flex-direction: column;
   width: 100%;
+  flex-direction: column;
 }
 
 .label_row {
   display: flex;
   flex-direction: row;
-  column-gap: var(--spacing-8);
   align-items: center;
+  column-gap: var(--spacing-8);
 }
 
 .outer {
-  width: 100%;
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: var(--spacing-8);
 }
@@ -46,11 +46,11 @@
 
 .input_field {
   display: flex;
-  align-items: center;
   width: 100%;
-  border-radius: var(--touch-input-border-radius, var(--border-radius-4));
+  align-items: center;
   padding: var(--touch-input-padding, var(--spacing-16) var(--spacing-24));
   border: 2px solid var(--grey-50);
+  border-radius: var(--touch-input-border-radius, var(--border-radius-4));
   background-color: var(--white);
 }
 
