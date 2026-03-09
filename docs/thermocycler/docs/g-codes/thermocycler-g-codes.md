@@ -44,7 +44,7 @@ The Thermocycler accepts the G-code commands listed below.
           <li><code>V</code>: liquid volume (optional)</li>
           <li><code>R</code>: ramp rate (optional)</li>
         </ul>
-        <strong>Example:</strong> <code>M104 S95 R25</code> sets the block temperature to 95°C using a ramp rate of 25°C/s<br>
+        <strong>Example:</strong> <code>M104 S95 R25</code> sets the block temperature to 95 °C using a ramp rate of 25 °C/s<br>
         <strong>Response:</strong> <code>M104 OK</code> (acknowledge only or error)
       </td>
     </tr>
@@ -58,7 +58,7 @@ The Thermocycler accepts the G-code commands listed below.
           <li><code>T</code>: target temperature °C</li>
           <li><code>C</code>: current temperature °C</li>
         </ul>
-        <strong>Response:</strong> <code>M105 T:none C:82.3 OK</code> indicates there is no target temperature and the current temperature is 82.3°C
+        <strong>Response:</strong> <code>M105 T:none C:82.3 OK</code> indicates there is no target temperature and the current temperature is 82.3 °C
       </td>
     </tr>
     <tr>
@@ -124,8 +124,8 @@ The Thermocycler accepts the G-code commands listed below.
       <td><code>M140</code></td>
       <td>
         <strong>Command:</strong> set lid temperature in °C<br>
-        <strong>Arguments:</strong> <code>S</code> sets the lid temperature in °C. This parameter is optional. If not defined, the default temperature target is 105°C.<br>
-        <strong>Example:</strong> <code>M140 S100</code> sets the lid temperature to 100°C<br>
+        <strong>Arguments:</strong> <code>S</code> sets the lid temperature in °C. This parameter is optional. If not defined, the default temperature target is 105 °C.<br>
+        <strong>Example:</strong> <code>M140 S100</code> sets the lid temperature to 100 °C<br>
         <strong>Response:</strong> <code>OK</code> (acknowledge only or error)
       </td>
     </tr>
@@ -139,7 +139,7 @@ The Thermocycler accepts the G-code commands listed below.
           <li><code>T</code>: the target temperature in °C</li>
           <li><code>C</code>: the current temperature in °C</li>
         </ul>
-        <strong>Response:</strong> <code>M141 T:none C:85.0</code> indicates there is no target temperature and the current temperature is 85°C
+        <strong>Response:</strong> <code>M141 T:none C:85.0</code> indicates there is no target temperature and the current temperature is 85 °C
       </td>
     </tr>
     <tr>
@@ -163,7 +163,7 @@ The Thermocycler accepts the G-code commands listed below.
       <td>
         <strong>Command:</strong> set ramp rate in °C/s<br>
         <strong>Arguments:</strong> <code>S</code> sets the temperature ramp rate in °C/s. This parameter is optional. If not defined, the temperature ramp rate will be infinite (as fast as possible).<br>
-        <strong>Example:</strong> <code>M566 S25</code> sets the ramp rate to 25°C/s<br>
+        <strong>Example:</strong> <code>M566 S25</code> sets the ramp rate to 25 °C/s<br>
         <strong>Response:</strong> <code>OK</code> (acknowledge only or error)
       </td>
     </tr>
