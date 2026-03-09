@@ -93,7 +93,7 @@ export interface InputFieldProps {
 }
 
 /**
- * InputField is for the Destkop application and web applications
+ * InputField is for the Desktop application and web applications
  * Please do not use this for the touchscreen application
  */
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
@@ -250,7 +250,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               <StyledInput
                 {...inputProps}
                 id={inputId}
-                data-testid={inputId} // 
+                data-testid={inputId} //
                 value={value}
                 placeholder={placeHolder}
                 onWheel={event => {
