@@ -586,13 +586,13 @@ export const SecondStepsMoveLiquidTools = ({
                       <PositionField
                         formData={formData}
                         padding="0"
-                        prefix={'blowout'}
+                        prefix="blowout"
                         propsForFields={propsForFields}
-                        zField={`blowout_mmFromBottom`}
-                        xField={`blowout_x_position`}
-                        yField={`blowout_y_position`}
+                        zField="blowout_mmFromBottom"
+                        xField="blowout_x_position"
+                        yField="blowout_y_position"
                         labwareId={blowOutLabwareId}
-                        referenceField={'blowout_position_reference'}
+                        referenceField="blowout_position_reference"
                         isNested={true}
                       />
                     ) : null}
