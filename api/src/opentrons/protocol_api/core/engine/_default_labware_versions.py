@@ -151,9 +151,9 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "ibidi_96_square_well_plate_300ul_lid": 2,
         "agilent_1_reservoir_290ml": 5,
         "nest_1_reservoir_195ml": 5,
-        "nest_1_reservoir_290ml": 3,
+        "nest_1_reservoir_290ml": 5,
         "opentrons_tough_12_reservoir_22ml": 2,
-        "opentrons_tough_1_reservoir_300ml": 3,
+        "opentrons_tough_1_reservoir_300ml": 2,
         "usascientific_12_reservoir_22ml": 5,
     },
 }
