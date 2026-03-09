@@ -49,7 +49,7 @@
     ]
   },
   "namespace": "opentrons",
-  "version": 4,
+  "version": 5,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,

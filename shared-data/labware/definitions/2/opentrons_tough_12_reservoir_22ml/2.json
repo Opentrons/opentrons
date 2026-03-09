@@ -198,7 +198,7 @@
     "loadName": "opentrons_tough_12_reservoir_22ml"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,

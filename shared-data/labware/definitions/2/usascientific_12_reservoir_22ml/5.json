@@ -13,7 +13,7 @@
     ["A11"],
     ["A12"]
   ],
-  "schemaVersion": 2,
+  "schemaVersion": 5,
   "version": 4,
   "namespace": "opentrons",
   "metadata": {
