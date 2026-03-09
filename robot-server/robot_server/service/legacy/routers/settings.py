@@ -191,6 +191,7 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))]
 )
 async def post_log_level_local(
     log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
@@ -224,6 +225,7 @@ async def post_log_level_local(
     ),
     response_model=LegacyErrorResponse,
     deprecated=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))]
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     raise LegacyErrorResponse(
