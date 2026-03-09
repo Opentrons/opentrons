@@ -29,19 +29,27 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     # Handle Pyro registration and publication of our synchronized object
     pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
     with pyro.Daemon() as daemon:  # type: ignore
-        pyro_uri = daemon.register(pyro_object)
-
-        # Find the currently running nameserver
         try:
-            with pyro.locate_ns() as ns:
-                # Register our objects URI with the system nameserver
-                ns.register(pyroname, pyro_uri)
+            pyro_uri = daemon.register(pyro_object)
 
-            log.info(f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}")
+            # Find the currently running nameserver
+            try:
+                with pyro.locate_ns() as ns:
+                    # Register our objects URI with the system nameserver
+                    try:
+                        ns.register(pyroname, pyro_uri)
+                        log.info(
+                            f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}"
+                        )
 
-            # Maintain a request loop to handle requests on our resource instance from remote processes
-            daemon.requestLoop()
-        except (errors.NamingError, errors.CommunicationError, socket.timeout):
-            raise errors.CommunicationError(
-                f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
-            )
+                        # Maintain a request loop to handle requests on our resource instance from remote processes
+                        daemon.requestLoop()
+                    finally:
+                        ns.remove(name=pyroname)
+            except (errors.NamingError, errors.CommunicationError, socket.timeout):
+                raise errors.CommunicationError(
+                    f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
+                )
+        finally:
+            daemon.unregister(pyro_object)
+            daemon.close()
