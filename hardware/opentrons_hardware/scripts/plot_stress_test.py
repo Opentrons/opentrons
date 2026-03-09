@@ -1,7 +1,7 @@
 """Parse the output of network_test.py."""
 
-from typing import BinaryIO, Iterator, Tuple, Set
 import argparse
+from typing import BinaryIO, Iterator, Set, Tuple
 
 import matplotlib.pyplot as pp
 

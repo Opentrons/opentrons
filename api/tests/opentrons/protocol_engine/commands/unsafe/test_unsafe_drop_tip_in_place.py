@@ -1,27 +1,25 @@
 """Test unsafe drop tip in place commands."""
 
+import pytest
+from decoy import Decoy
+
+from opentrons.hardware_control import OT3HardwareControlAPI
+from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.unsafe.unsafe_drop_tip_in_place import (
+    UnsafeDropTipInPlaceImplementation,
+    UnsafeDropTipInPlaceParams,
+    UnsafeDropTipInPlaceResult,
+)
+from opentrons.protocol_engine.execution import TipHandler
+from opentrons.protocol_engine.state.motion import PipetteLocationData
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
     PipetteTipStateUpdate,
     PipetteUnknownFluidUpdate,
     StateUpdate,
 )
-import pytest
-from decoy import Decoy
-
 from opentrons.types import MountType
-from opentrons.protocol_engine.state.state import StateView
-
-from opentrons.protocol_engine.execution import TipHandler
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.unsafe.unsafe_drop_tip_in_place import (
-    UnsafeDropTipInPlaceParams,
-    UnsafeDropTipInPlaceResult,
-    UnsafeDropTipInPlaceImplementation,
-)
-from opentrons.protocol_engine.state.motion import PipetteLocationData
-from opentrons.hardware_control import OT3HardwareControlAPI
-from opentrons.hardware_control.types import Axis
 
 
 @pytest.fixture

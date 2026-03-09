@@ -12,13 +12,14 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Dict, Optional
-from enum import Enum
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers import utils
-from opentrons.drivers.types import Temperature
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import SerialConnection, UnhandledGcode
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver
+from opentrons.drivers.types import Temperature
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ DEFAULT_TEMP_DECK_TIMEOUT = 1
 DEFAULT_COMMAND_RETRIES = 3
 
 
-class GCODE(str, Enum):
+class GCODE(StrEnum):
     GET_TEMP = "M105"
     SET_TEMP = "M104"
     DEVICE_INFO = "M115"

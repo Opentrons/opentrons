@@ -8,7 +8,6 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData } from '../../ProtocolTimelineScrubber/types'
 import type {
   GetDirectTranslationCommandText,
   TCProfileCycleText,
@@ -20,7 +19,7 @@ export * from './utils'
 export interface UseCommandTextStringParams {
   command: RunTimeCommand | null
   allRunDefs: LabwareDefinition[]
-  commandTextData: CommandTextData | null
+  commandTextData: utils.CommandTextData | null
   robotType: RobotType
 }
 

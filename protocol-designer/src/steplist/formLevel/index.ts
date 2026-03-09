@@ -11,9 +11,7 @@ import {
   aspirateTouchTipMmFromEdgeRequired,
   aspirateTouchTipSpeedRequired,
   aspirateWellsRequired,
-  blockTargetTempHoldRange,
   blockTargetTempRange,
-  blockTemperatureHoldRequired,
   blockTemperatureRequired,
   blowoutFlowRateRequired,
   blowoutLocationRequired,
@@ -35,13 +33,12 @@ import {
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
+  fillQuantityOutOfRange,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
   labwareToMoveRequired,
-  lidTargetTempHoldRange,
   lidTargetTempRange,
-  lidTemperatureHoldRequired,
   lidTemperatureRequired,
   magnetActionRequired,
   magneticModuleIdRequired,
@@ -95,7 +92,9 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCameraFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -105,6 +104,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  HydratedVacuumFormData,
   StepType,
 } from '../../form-types'
 import type { FormError } from './errors'
@@ -135,6 +135,9 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
+  camera: HydratedCameraFormData
+  flexStacker: HydratedFlexStackerFormData
+  vacuum: HydratedVacuumFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -272,10 +275,6 @@ const stepFormHelperMap: {
       lidTemperatureRequired,
       profileVolumeRequired,
       profileTargetLidTempRequired,
-      blockTemperatureHoldRequired,
-      lidTemperatureHoldRequired,
-      lidTargetTempHoldRange,
-      blockTargetTempHoldRange,
       profileVolumeRange,
       profileTargetLidTempRange,
       lidTargetTempRange,
@@ -284,6 +283,15 @@ const stepFormHelperMap: {
   },
   comment: {
     getErrors: composeErrors(messageRequired),
+  },
+  camera: {
+    getErrors: composeErrors(),
+  },
+  flexStacker: {
+    getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
+  },
+  vacuum: {
+    getErrors: composeErrors(),
   },
 }
 
@@ -369,6 +377,27 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
+    case 'camera':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCameraFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'flexStacker':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedFlexStackerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'vacuum':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedVacuumFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    default:
+      stepType satisfies never // if TypeScript complains here, you missed a stepType above
+      throw new Error(`Unknown step type: ${stepType}`)
   }
 }
 

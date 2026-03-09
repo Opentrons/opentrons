@@ -45,7 +45,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
           }}
           closeButton={
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               marginRight={SPACING.spacing8}
             >
@@ -57,7 +57,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
             <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
               {t('multiple_modules')}
             </LegacyStyledText>
-            <LegacyStyledText as="p">{t('view_moam')}</LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">
+              {t('view_moam')}
+            </LegacyStyledText>
           </Flex>
         </Banner>
       </Box>
@@ -71,7 +73,10 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <Flex flexDirection={DIRECTION_ROW}>
                   <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-                    <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+                    <LegacyStyledText
+                      forwardedAs="p"
+                      marginBottom={SPACING.spacing16}
+                    >
                       {t('multiple_modules_explanation')}
                     </LegacyStyledText>
                     <Link
@@ -96,7 +101,7 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                       {t('example')}
                     </LegacyStyledText>
 
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       {t('multiple_modules_example')}
                     </LegacyStyledText>
                   </Flex>

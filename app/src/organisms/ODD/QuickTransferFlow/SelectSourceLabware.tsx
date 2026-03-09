@@ -15,6 +15,7 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ACTIONS } from './constants'
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
@@ -64,7 +65,7 @@ export function SelectSourceLabware(
     // the button will be disabled if this values is null
     if (selectedLabware != null) {
       dispatch({
-        type: 'SET_SOURCE_LABWARE',
+        type: ACTIONS.SET_SOURCE_LABWARE,
         labware: selectedLabware,
       })
       onNext()

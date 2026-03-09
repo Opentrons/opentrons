@@ -50,7 +50,7 @@ export function GantryHoming({
         >
           {t('gantry_homing')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('gantry_homing_description')}
         </LegacyStyledText>
       </Box>

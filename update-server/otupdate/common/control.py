@@ -3,16 +3,17 @@ otupdate.common.control: non-update-specific endpoints for otupdate
 
 This has endpoints like /restart that aren't specific to update tasks or machines.
 """
+
 import asyncio
 import logging
 import subprocess
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Coroutine, Mapping, Any
+from typing import Any, Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from .constants import RESTART_LOCK_NAME, DEVICE_BOOT_ID_NAME
+from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME
 from .name_management import get_name_synchronizer
 
 LOG = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ async def restart(request: web.Request) -> web.Response:
 
 
 def build_health_endpoint(
-    health_response: Mapping[str, Any]
+    health_response: Mapping[str, Any],
 ) -> Callable[[web.Request], Coroutine[None, None, web.Response]]:
     """Build a coroutine to serve /health that captures version info"""
 

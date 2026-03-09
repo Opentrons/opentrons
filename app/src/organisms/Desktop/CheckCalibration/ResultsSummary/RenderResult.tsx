@@ -26,7 +26,7 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
         {isBadCal ? t('recalibration_recommended') : t('good_calibration')}
       </LegacyStyledText>
       <Icon
-        name={isBadCal ? 'alert-circle' : 'check-circle'}
+        name={isBadCal ? 'ot-alert' : 'ot-check'}
         size={SIZE_1}
         color={isBadCal ? COLORS.yellow50 : COLORS.green50}
         marginRight={SPACING.spacing12}

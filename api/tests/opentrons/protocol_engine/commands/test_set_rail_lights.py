@@ -1,15 +1,15 @@
 """Test seRailLights command."""
-from decoy import Decoy
 
-from opentrons.protocol_engine.execution import (
-    RailLightsHandler,
-)
+from decoy import Decoy
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.set_rail_lights import (
+    SetRailLightsImplementation,
     SetRailLightsParams,
     SetRailLightsResult,
-    SetRailLightsImplementation,
+)
+from opentrons.protocol_engine.execution import (
+    RailLightsHandler,
 )
 
 

@@ -3,6 +3,7 @@
 # python-opentrons-system-server
 #
 ################################################################################
+OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 OT_PYTHON := python3
@@ -47,4 +48,3 @@ export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name
 $(eval $(call inner-python-package,$(ot_system_server_name),$(call UPPERCASE,$(ot_system_server_name)),$(call UPPERCASE,$(ot_system_server_name)),target))
-

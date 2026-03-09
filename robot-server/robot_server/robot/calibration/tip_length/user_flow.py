@@ -1,30 +1,29 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List, Optional, cast
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Set, cast
 
-from opentrons.types import Mount, Point, Location
-from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.hardware_control import CriticalPoint, HardwareControlAPI, Pipette
+from opentrons.protocol_api import labware
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons.protocol_api import labware
-from opentrons.protocol_api.core.legacy.deck import Deck
-
+from opentrons.types import Location, Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from robot_server.robot.calibration import util
-from robot_server.service.errors import RobotServerError
-
-from robot_server.service.session.models.command_definitions import CalibrationCommand
-from ..errors import CalibrationError
-from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
 from ..constants import (
-    TIP_RACK_LOOKUP_BY_MAX_VOL,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
 )
-from .constants import TipCalibrationState as State, TIP_RACK_SLOT
+from ..errors import CalibrationError
+from ..helper_classes import AttachedPipette, RequiredLabware, SupportedCommands
+from .constants import TIP_RACK_SLOT
+from .constants import TipCalibrationState as State
 from .state_machine import TipCalibrationStateMachine
+from robot_server.robot.calibration import util
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.models.command_definitions import CalibrationCommand
 
 MODULE_LOG = logging.getLogger(__name__)
 

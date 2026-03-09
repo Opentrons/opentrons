@@ -3,15 +3,14 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control.types import StatusBarState
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.set_status_bar import (
+    SetStatusBarImplementation,
     SetStatusBarParams,
     SetStatusBarResult,
-    SetStatusBarImplementation,
     StatusBarAnimation,
 )
-
-from opentrons.hardware_control.types import StatusBarState
 from opentrons.protocol_engine.execution.status_bar import StatusBarHandler
 
 

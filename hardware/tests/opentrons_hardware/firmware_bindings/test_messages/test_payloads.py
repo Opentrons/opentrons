@@ -1,8 +1,9 @@
 """Payloads tests."""
+
 import pytest
 
-from opentrons_hardware.firmware_bindings.messages import payloads, fields
 from opentrons_hardware.firmware_bindings import utils
+from opentrons_hardware.firmware_bindings.messages import fields, payloads
 
 
 @pytest.mark.parametrize(

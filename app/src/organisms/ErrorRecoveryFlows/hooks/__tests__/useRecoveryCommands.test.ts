@@ -227,6 +227,163 @@ describe('useRecoveryCommands', () => {
     }
   )
 
+  const LIQUID_TRACKING_COMMANDS = [
+    'aspirateWhileTracking',
+    'dispenseWhileTracking',
+  ] as const
+
+  it.each(LIQUID_TRACKING_COMMANDS)(
+    'Should liquid probe before retrying if failed command is $commandType',
+    async commandType => {
+      const { result } = renderHook(() => {
+        const failedCommand = {
+          ...mockFailedCommand,
+          commandType,
+          params: {
+            pipetteId: 'mock-pipette-id',
+            volume: 50,
+            flowRate: { x: 1, y: 1, z: 1 },
+            trackFromLocation: {
+              labwareId: 'labware-1',
+              wellName: 'A1',
+            },
+            trackToLocation: {
+              labwareId: 'labware-2',
+              wellName: 'B1',
+            },
+          },
+        }
+        return useRecoveryCommands({
+          runId: mockRunId,
+          failedCommand: {
+            byRunRecord: failedCommand,
+            byAnalysis: failedCommand,
+          },
+          unvalidatedFailedCommand: failedCommand,
+          failedLabwareUtils: mockFailedLabwareUtils,
+          routeUpdateActions: mockRouteUpdateActions,
+          recoveryToastUtils: {} as any,
+          analytics: {
+            reportActionSelectedResult: mockReportActionSelectedResult,
+            reportRecoveredRunResult: mockReportRecoveredRunResult,
+          } as any,
+          selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+        })
+      })
+
+      await act(async () => {
+        await result.current.retryFailedCommand()
+      })
+
+      expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+        [
+          {
+            commandType: 'liquidProbe',
+            intent: 'fixit',
+            params: {
+              pipetteId: 'mock-pipette-id',
+              volume: 50,
+              flowRate: { x: 1, y: 1, z: 1 },
+              trackFromLocation: {
+                labwareId: 'labware-1',
+                wellName: 'A1',
+              },
+              trackToLocation: {
+                labwareId: 'labware-2',
+                wellName: 'B1',
+              },
+              wellLocation: {
+                origin: 'top',
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: 2,
+                },
+              },
+            },
+          },
+          {
+            commandType,
+            params: {
+              pipetteId: 'mock-pipette-id',
+              volume: 50,
+              flowRate: { x: 1, y: 1, z: 1 },
+              trackFromLocation: {
+                labwareId: 'labware-1',
+                wellName: 'A1',
+              },
+              trackToLocation: {
+                labwareId: 'labware-2',
+                wellName: 'B1',
+              },
+            },
+          },
+        ],
+        false
+      )
+    }
+  )
+
+  it('Should not liquid probe before retrying if failed command is not a liquid tracking command', async () => {
+    const { result } = renderHook(() => {
+      const failedCommand = {
+        ...mockFailedCommand,
+        commandType: 'aspirate' as const,
+        params: {
+          pipetteId: 'mock-pipette-id',
+          volume: 50,
+          flowRate: { x: 1, y: 1, z: 1 },
+          labwareId: 'labware-1',
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'top',
+            offset: { x: 0, y: 0, z: 0 },
+          },
+        },
+      }
+      return useRecoveryCommands({
+        runId: mockRunId,
+        failedCommand: {
+          byRunRecord: failedCommand,
+          byAnalysis: failedCommand,
+        },
+        unvalidatedFailedCommand: failedCommand,
+        failedLabwareUtils: mockFailedLabwareUtils,
+        routeUpdateActions: mockRouteUpdateActions,
+        recoveryToastUtils: {} as any,
+        analytics: {
+          reportActionSelectedResult: mockReportActionSelectedResult,
+          reportRecoveredRunResult: mockReportRecoveredRunResult,
+        } as any,
+        selectedRecoveryOption: RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE,
+      })
+    })
+
+    await act(async () => {
+      await result.current.retryFailedCommand()
+    })
+
+    expect(mockChainRunCommands).toHaveBeenLastCalledWith(
+      [
+        {
+          commandType: 'aspirate',
+          params: {
+            pipetteId: 'mock-pipette-id',
+            volume: 50,
+            flowRate: { x: 1, y: 1, z: 1 },
+            labwareId: 'labware-1',
+            wellName: 'A1',
+            wellLocation: {
+              origin: 'top',
+              offset: { x: 0, y: 0, z: 0 },
+            },
+          },
+        },
+      ],
+      false
+    )
+  })
+
   it('should call resumeRun with runId and show success toast on success', async () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 

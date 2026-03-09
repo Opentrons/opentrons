@@ -3,35 +3,34 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine import (
-    LiquidHandlingWellLocation,
-    WellOrigin,
-    WellOffset,
-    DeckPoint,
-)
-from opentrons.types import Point
-from opentrons.protocol_engine.execution import (
-    PipettingHandler,
-    GantryMover,
-    MovementHandler,
-)
-
+from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     labware_definition_type_adapter,
 )
+
+from opentrons.protocol_engine import (
+    DeckPoint,
+    LiquidHandlingWellLocation,
+    WellOffset,
+    WellOrigin,
+)
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.pressure_dispense import (
+    PressureDispenseImplementation,
     PressureDispenseParams,
     PressureDispenseResult,
-    PressureDispenseImplementation,
+)
+from opentrons.protocol_engine.execution import (
+    GantryMover,
+    MovementHandler,
+    PipettingHandler,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import LabwareWellId
-
-from opentrons_shared_data.labware import load_definition
+from opentrons.types import Point
 
 
 @pytest.fixture

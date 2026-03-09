@@ -1,47 +1,48 @@
 """Test Flex Stacker empty command implementation."""
 
-import pytest
-from decoy import Decoy
 from typing import cast
 
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    BatchLabwareLocationUpdate,
-)
+import pytest
+from decoy import Decoy
 
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import RunControlHandler, EquipmentHandler
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.protocol_engine.commands.flex_stacker.empty import (
     EmptyImpl,
     EmptyParams,
     EmptyResult,
 )
+from opentrons.protocol_engine.errors import (
+    FlexStackerLabwarePoolNotYetDefinedError,
+    ModuleNotLoadedError,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler, RunControlHandler
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    BatchLabwareLocationUpdate,
+    FlexStackerStateUpdate,
+    StateUpdate,
+)
 from opentrons.protocol_engine.types import (
-    StackerFillEmptyStrategy,
-    DeckSlotLocation,
-    StackerStoredLabwareGroup,
-    NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
+    DeckSlotLocation,
     InStackerHopperLocation,
     LabwareUri,
+    NotOnDeckLocationSequenceComponent,
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
 )
-from opentrons.protocol_engine.errors import (
-    ModuleNotLoadedError,
-    FlexStackerLabwarePoolNotYetDefinedError,
-)
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 
 def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
+            primaryLabwareId=f"primary-id-{i + 1}",
             adapterLabwareId=None,
             lidLabwareId=None,
         )

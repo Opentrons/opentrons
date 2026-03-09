@@ -1,33 +1,31 @@
 """Test the utils module."""
 
-
 import json
 import os
 import secrets
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
+
 import mock
 import pytest
-from typing import cast
+
 from opentrons_hardware.firmware_bindings.constants import (
+    FirmwareTarget,
     NodeId,
     PipetteType,
-    FirmwareTarget,
     USBTarget,
 )
-from opentrons_hardware.hardware_control.types import PCBARevision
-
 from opentrons_hardware.firmware_update.utils import (
-    FirmwareUpdateType,
-    UpdateInfo,
-    load_firmware_manifest,
-    check_firmware_updates,
     _DEFAULT_PCBA_REVS,
     _DEFAULT_PCBA_REVS_PIPETTE,
-    _update_type_for_device,
+    FirmwareUpdateType,
+    UpdateInfo,
     _update_files_from_types,
+    _update_type_for_device,
+    check_firmware_updates,
+    load_firmware_manifest,
 )
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
-
+from opentrons_hardware.hardware_control.types import PCBARevision
 
 manifest_filename = "opentrons-manifest-test.json"
 
@@ -256,7 +254,7 @@ def test_load_firmware_manifest_invalid_json() -> None:
 
 
 def test_load_firmware_manifest_unknown_update_type(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test unknown update_type."""
     with open(manifest_filename, "w") as fp:
@@ -272,7 +270,7 @@ def test_load_firmware_manifest_unknown_update_type(
 
 
 def test_load_firmware_manifest_invalid_update_info(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test invalid update info."""
     with open(manifest_filename, "w") as fp:
@@ -302,7 +300,7 @@ def test_load_firmware_manifest_invalid_update_info(
 
 
 def test_load_firmware_manifest_binary_file_not_found(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test binary update file not found."""
     with open(manifest_filename, "w") as fp:
@@ -351,7 +349,7 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
 
 
 def test_check_firmware_updates_available_nodes_specified(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test that only specified devices are updated if given."""
     manifest = mock_manifest.copy()

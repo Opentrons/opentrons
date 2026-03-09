@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -14,21 +15,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  LINE_CLAMP_TEXT_STYLE,
-  LINK_BUTTON_STYLE,
-} from '../../components/atoms'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
-type MetadataInfo = Array<{
-  author?: string
-  description?: string | null
-  created?: string
-  modified?: string
-}>
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+
+interface MetadataItem {
+  title: string
+  value: string | null
+}
 
 interface ProtocolMetadataProps {
   setShowEditMetadataModal: (showEditMetadataModal: boolean) => void
-  metaDataInfo: MetadataInfo
+  metaDataInfo: MetadataItem[]
 }
 
 export function ProtocolMetadata({
@@ -59,35 +57,35 @@ export function ProtocolMetadata({
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {metaDataInfo.map(info => {
-          const [title, value] = Object.entries(info)[0]
-
-          return (
-            <ListItem type="default" key={`ProtocolOverview_${title}`}>
-              <ListItemDescriptor
-                type="large"
-                description={
-                  <Flex minWidth="13.75rem">
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t(`${title}`)}
-                    </StyledText>
-                  </Flex>
-                }
-                content={
+        {metaDataInfo.map(({ title, value }) => (
+          <ListItem type="default" key={`ProtocolOverview_${title}`}>
+            <ListItemDescriptor
+              type="large"
+              description={
+                <Flex minWidth="13.75rem">
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
-                    css={LINE_CLAMP_TEXT_STYLE(2)}
+                    color={COLORS.grey60}
                   >
-                    {value ?? t('na')}
+                    {t(`${title}`)}
                   </StyledText>
-                }
-              />
-            </ListItem>
-          )
-        })}
+                </Flex>
+              }
+              content={
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  className={clsx(
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_break_all
+                  )}
+                  style={{ WebkitLineClamp: 2 }}
+                >
+                  {value ?? t('na')}
+                </StyledText>
+              }
+            />
+          </ListItem>
+        ))}
         <ListItem type="default" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
             type="large"

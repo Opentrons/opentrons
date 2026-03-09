@@ -273,6 +273,7 @@ def _override_check_safe_for_pipette_movement(
     labware_id: str,
     well_name: str,
     well_location: object,
+    version: APIVersion,
 ) -> None:
     pass
 

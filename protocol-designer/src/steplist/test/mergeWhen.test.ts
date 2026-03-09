@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { mergeWhen } from '../utils'
+import { mergeWhen } from '../utils/mergeWhen'
 
 function concat(a: string, b: string): string {
   return a + b

@@ -1,8 +1,8 @@
 /* branded website navbar styles */
-@import '@opentrons/components/styles';
-@import '../../styles/breakpoints.module.css';
-@import '../../styles/shadows.module.css';
-@import '../../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../../styles/breakpoints.module.css');
+@import url('../../styles/shadows.module.css');
+@import url('../../styles/spacing.module.css');
 
 :root {
   --c-nav-gray: #707070;
@@ -11,7 +11,6 @@
   --spacing-submenu: 1.75rem;
   --spacing-link: 1.75rem;
   --spacing-mobile-heading: 4.5rem;
-
   --font-menu-title: {
     color: var(--c-nav-gray);
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
@@ -262,7 +261,7 @@ a.subdomain_link {
   flex: none;
   padding: 0 var(--spacing-5);
   color: var(--c-nav-gray);
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-1);
   font-weight: var(--fw-light);
   letter-spacing: 0.7px;

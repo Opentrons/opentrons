@@ -7,9 +7,8 @@ It's helpful to have these centralized in this one file so we can see all the to
 that we currently support.
 """
 
-from typing import NewType
 import re
-
+from typing import NewType
 
 TopicName = NewType("TopicName", str)
 """A string suitable for the server to use as an MQTT topic to publish on."""

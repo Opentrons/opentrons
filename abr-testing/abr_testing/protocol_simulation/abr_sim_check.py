@@ -99,7 +99,7 @@ if __name__ == "__main__":
     global exclude
     exclude = [
         "__init__.py",
-        "helpers.py",
+        "helpers",
     ]
     print("Simulating Protocols")
     file_dict, labware_defs = get_files()

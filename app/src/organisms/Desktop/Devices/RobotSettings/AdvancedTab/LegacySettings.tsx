@@ -48,17 +48,17 @@ export function LegacySettings({
     >
       <Box width="70%">
         <LegacyStyledText
-          as="h2"
+          forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
           id="AdvancedSettings_showLink"
         >
           {t('legacy_settings')}
         </LegacyStyledText>
-        <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
           {t('calibrate_deck_to_dots')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('calibrate_deck_description')}
         </LegacyStyledText>
       </Box>

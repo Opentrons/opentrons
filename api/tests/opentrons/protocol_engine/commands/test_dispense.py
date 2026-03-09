@@ -11,26 +11,25 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons.protocol_engine import (
-    LiquidHandlingWellLocation,
-    WellOrigin,
-    WellOffset,
     DeckPoint,
+    LiquidHandlingWellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.dispense import (
+    DispenseImplementation,
+    DispenseParams,
+    DispenseResult,
+)
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.types import Point
-
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
-from opentrons.protocol_engine.commands.dispense import (
-    DispenseParams,
-    DispenseResult,
-    DispenseImplementation,
-)
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 
 
 @pytest.fixture

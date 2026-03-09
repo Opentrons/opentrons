@@ -3,12 +3,11 @@ from typing import Dict
 
 from opentrons.drivers.smoothie_drivers.constants import AXES, GCODE_ROUNDING_PRECISION
 from opentrons.drivers.utils import (
+    ParseError,
     parse_key_values,
     parse_number,
     parse_optional_number,
-    ParseError,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +78,7 @@ def byte_array_to_ascii_string(byte_array: bytearray) -> str:
     """
     # remove trailing null characters
     try:
-        for c in [b"\x00", b"\xFF"]:
+        for c in [b"\x00", b"\xff"]:
             if c in byte_array:
                 byte_array = byte_array[: byte_array.index(c)]
         res = byte_array.decode()

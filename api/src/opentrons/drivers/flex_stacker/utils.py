@@ -9,9 +9,9 @@ def validate_histogram_frame(data: bytes, next_frame_id: int) -> bool:
         start_delimn == 0x81  # histogram start byte
     ), f"Invalid delimn, {hex(start_delimn)} != 0x81."
     frame_id = data[4]
-    assert (
-        next_frame_id == frame_id
-    ), f"Invalid frame id, expected {next_frame_id} got {frame_id}."
+    assert next_frame_id == frame_id, (
+        f"Invalid frame id, expected {next_frame_id} got {frame_id}."
+    )
     frame_len = data[5]
     assert (
         frame_len == 128  # len is always 128

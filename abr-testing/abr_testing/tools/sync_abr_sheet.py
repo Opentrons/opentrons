@@ -4,6 +4,7 @@ from abr_testing.automation import google_sheets_tool
 from abr_testing.automation import google_drive_tool
 import argparse
 import pandas as pd
+from pathlib import Path
 import csv
 import sys
 import os
@@ -177,7 +178,7 @@ def read_csv_as_dict(file_path: str) -> List[Dict[str, Any]]:
 
 
 def connect_and_download(
-    sheets: Dict[str, str], storage_directory: str
+    sheets: Dict[str, str], storage_directory: Path
 ) -> Tuple[List[str], str]:
     """Connect to google sheet and download."""
     try:
@@ -203,7 +204,7 @@ def connect_and_download(
 
 
 def run(
-    storage_directory: str, abr_data_sheet_url: str, abr_room_conditions_sheet: str
+    storage_directory: Path, abr_data_sheet_url: str, abr_room_conditions_sheet: str
 ) -> None:
     """Connect to storage and google sheets and update."""
     google_sheets_to_download = {
@@ -244,7 +245,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--storage-directory",
-        type=str,
+        type=Path,
         default="C:/Users/Rhyann Clarke/test_folder",
         help="Path to long term storage directory for run logs.",
     )

@@ -8,11 +8,11 @@ from opentrons.hardware_control.modules import AbsorbanceReader
 from opentrons.hardware_control.modules.types import (
     ModuleType,
 )
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import CannotPerformModuleAction
 from opentrons.protocol_engine.state.module_substates import AbsorbanceReaderSubState
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
@@ -38,7 +38,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncAbsorbanceReaderHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture
@@ -91,6 +93,7 @@ def test_initialize(
                 sampleWavelengths=[350],
                 referenceWavelength=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -107,6 +110,7 @@ def test_initialize(
                 sampleWavelengths=[350],
                 referenceWavelength=450,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -123,6 +127,7 @@ def test_initialize(
                 sampleWavelengths=[350, 400, 450],
                 referenceWavelength=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -173,6 +178,7 @@ def test_read(
                 moduleId="1234",
                 fileName=None,
             ),
+            command_annotations=[],
         ),
         times=1,
     )

@@ -68,8 +68,7 @@ export function useTerminalRunBannerContainer({
   }
 }
 
-interface TerminalRunBannerContainerProps
-  extends RunHeaderBannerContainerProps {
+interface TerminalRunBannerContainerProps extends RunHeaderBannerContainerProps {
   bannerType: TerminalBannerType
 }
 

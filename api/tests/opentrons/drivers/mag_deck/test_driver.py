@@ -1,13 +1,13 @@
-from mock import AsyncMock
 import pytest
+from mock import AsyncMock
 
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
-from opentrons.drivers.mag_deck.driver import (
-    MagDeckDriver,
-    MAG_DECK_COMMAND_TERMINATOR,
-    GCODE_ROUNDING_PRECISION,
-)
 from opentrons.drivers.command_builder import CommandBuilder
+from opentrons.drivers.mag_deck.driver import (
+    GCODE_ROUNDING_PRECISION,
+    MAG_DECK_COMMAND_TERMINATOR,
+    MagDeckDriver,
+)
 
 
 @pytest.fixture

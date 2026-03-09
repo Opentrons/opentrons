@@ -3,11 +3,12 @@ import logging
 import pathlib
 import time
 from typing import Callable, Dict, Tuple
-from opentrons.hardware_control.types import BoardRevision, DoorState
-from . import RevisionPinsError
-from .types import gpio_group, PinDir, GPIOPin
 
 import gpiod  # type: ignore[import-not-found]
+
+from . import RevisionPinsError
+from .types import GPIOPin, PinDir, gpio_group
+from opentrons.hardware_control.types import BoardRevision, DoorState
 
 """
 Raspberry Pi GPIO control module
@@ -98,7 +99,7 @@ class GPIOCharDev:
             return BoardRevision.OG
         except Exception:
             MODULE_LOG.exception(
-                "Unexpected error from reading central routing board " "revision bits"
+                "Unexpected error from reading central routing board revision bits"
             )
             return BoardRevision.UNKNOWN
 
@@ -200,7 +201,7 @@ class GPIOCharDev:
             return self.lines[input_pin.name].get_value()
         except KeyError:
             raise RuntimeError(
-                f"GPIO {input_pin.name} is not registered and cannot" "be read"
+                f"GPIO {input_pin.name} is not registered and cannotbe read"
             )
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:

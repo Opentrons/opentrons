@@ -1,11 +1,11 @@
 from typing import AsyncGenerator
 
 import pytest
+
+from .build_module import build_module
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import TempDeck
-
-from .build_module import build_module
 
 
 @pytest.fixture

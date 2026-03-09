@@ -8,7 +8,6 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -42,6 +41,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -133,11 +133,16 @@ export function RunSummary(): JSX.Element {
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  useEffect(() => {
-    if (isRunCurrent && typeof enteredER === 'boolean') {
-      reportRecoveredRunResult(runStatus, enteredER)
-    }
-  }, [isRunCurrent, enteredER])
+  useEffect(
+    () => {
+      if (isRunCurrent && typeof enteredER === 'boolean') {
+        reportRecoveredRunResult(runStatus, enteredER)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunCurrent, enteredER]
+  )
 
   const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
@@ -170,11 +175,7 @@ export function RunSummary(): JSX.Element {
     runId,
     { cursor: 0, pageLength: 100 },
     {
-      enabled:
-        runStatus != null &&
-        // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        isRunCurrent,
+      enabled: isTerminalRunStatus(runStatus) && isRunCurrent,
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
@@ -238,15 +239,20 @@ export function RunSummary(): JSX.Element {
     pageLength: 1,
   })
 
-  useEffect(() => {
-    // Only run tip checking if it wasn't *just* handled during Error Recovery.
-    if (
-      runSummaryNoFixit != null &&
-      !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
-    ) {
-      void determineTipStatus()
-    }
-  }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
+  useEffect(
+    () => {
+      // Only run tip checking if it wasn't *just* handled during Error Recovery.
+      if (
+        runSummaryNoFixit != null &&
+        !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
+      ) {
+        void determineTipStatus()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunCurrent, runSummaryNoFixit, isEREnabled]
+  )
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
@@ -612,4 +618,5 @@ const EqualWidthButton = styled(LargeButton)`
   flex: 1;
   min-width: 0;
   height: 17rem;
+  text-wrap: wrap;
 `

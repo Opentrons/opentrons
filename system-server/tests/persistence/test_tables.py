@@ -1,7 +1,9 @@
 """Tests for SQL registration table."""
 
-from typing import List, cast
+from typing import cast
+
 import sqlalchemy
+
 from system_server.persistence.tables import add_tables_to_db
 
 # The statements that we expect to emit when we create a fresh database.
@@ -61,7 +63,7 @@ def test_creating_tables_emits_expected_statements() -> None:
     Based on:
     https://docs.sqlalchemy.org/en/14/faq/metadata_schema.html#faq-ddl-as-string
     """
-    actual_statements: List[str] = []
+    actual_statements: list[str] = []
 
     def record_statement(
         sql: sqlalchemy.schema.DDLElement, *multiparams: object, **params: object

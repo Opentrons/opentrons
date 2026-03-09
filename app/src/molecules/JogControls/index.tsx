@@ -60,7 +60,12 @@ export function JogControls(props: JogControlsProps): JSX.Element {
   const controls = isOnDevice ? (
     <>
       <TouchStepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+        {...{
+          currentStepSize,
+          setCurrentStepSize,
+          stepSizes,
+          isOnDevice,
+        }}
       />
       <TouchDirectionControl
         planes={planes}
@@ -82,7 +87,12 @@ export function JogControls(props: JogControlsProps): JSX.Element {
         `}
       >
         <StepSizeControl
-          {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+          {...{
+            currentStepSize,
+            setCurrentStepSize,
+            stepSizes,
+            isOnDevice,
+          }}
         />
       </Flex>
       <Flex

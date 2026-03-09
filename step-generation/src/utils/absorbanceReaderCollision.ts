@@ -14,8 +14,8 @@ export const absorbanceReaderCollision = (
   const moduleState = moduleId != null ? modules[moduleId].moduleState : null
   const isAbsorbanceReaderLidClosed: boolean = Boolean(
     moduleState &&
-      moduleState.type === ABSORBANCE_READER_TYPE &&
-      moduleState.lidOpen !== true
+    moduleState.type === ABSORBANCE_READER_TYPE &&
+    moduleState.lidOpen !== true
   )
   return isAbsorbanceReaderLidClosed
 }

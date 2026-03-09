@@ -262,11 +262,11 @@ export function FactoryModeSlideout({
                 toggledOn={toggleValue}
                 onClick={handleToggleClick}
               />
-              <LegacyStyledText as="p" marginBottom={SPACING.spacing4}>
+              <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing4}>
                 {toggleValue ? t('on') : t('off')}
               </LegacyStyledText>
             </Flex>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {t('branded:oem_mode_description')}
             </LegacyStyledText>
           </Flex>
@@ -276,10 +276,10 @@ export function FactoryModeSlideout({
                 <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
                   {t('upload_custom_logo')}
                 </LegacyStyledText>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {t('upload_custom_logo_description')}
                 </LegacyStyledText>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {t('upload_custom_logo_dimensions')}
                 </LegacyStyledText>
               </Flex>
@@ -290,7 +290,7 @@ export function FactoryModeSlideout({
                     handleChooseFile(file)
                   }}
                   dragAndDropText={
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       <Trans
                         t={t}
                         i18nKey="shared:drag_and_drop"

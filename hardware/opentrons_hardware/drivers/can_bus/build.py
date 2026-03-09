@@ -1,11 +1,12 @@
 """Factory for building drivers and messengers."""
+
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from . import settings, CanMessenger
+from . import CanMessenger, settings
 from .abstract_driver import AbstractCanDriver
-from .socket_driver import SocketDriver
 from .driver import CanDriver
+from .socket_driver import SocketDriver
 
 
 async def build_driver(driver_settings: settings.DriverSettings) -> AbstractCanDriver:

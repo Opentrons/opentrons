@@ -11,6 +11,8 @@ import type {
   TemperatureModuleModel,
   THERMOCYCLER_MODULE_TYPE,
   ThermocyclerModuleModel,
+  VACUUM_MODULE_TYPE,
+  VacuumModuleModel,
 } from '@opentrons/shared-data'
 import type * as ApiTypes from './api-types'
 
@@ -58,6 +60,12 @@ export interface FlexStackerModule extends CommonModuleInfo {
   data: ApiTypes.FlexStackerData
   moduleOffset?: ApiTypes.ModuleOffset
 }
+export interface VacuumModule extends CommonModuleInfo {
+  moduleType: typeof VACUUM_MODULE_TYPE
+  moduleModel: VacuumModuleModel
+  data: ApiTypes.VacuumModuleData
+  moduleOffset?: ApiTypes.ModuleOffset
+}
 export type AttachedModule =
   | TemperatureModule
   | MagneticModule
@@ -65,6 +73,7 @@ export type AttachedModule =
   | HeaterShakerModule
   | AbsorbanceReaderModule
   | FlexStackerModule
+  | VacuumModule
 
 export interface ModulesMeta {
   cursor: number

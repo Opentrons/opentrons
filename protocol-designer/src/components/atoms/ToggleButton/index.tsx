@@ -53,7 +53,7 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
     <Btn
       disabled={disabled ?? false}
       role="switch"
-      aria-label={label}
+      aria-label={label ?? undefined}
       aria-checked={toggledOn}
       size={size ?? '2rem'}
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}

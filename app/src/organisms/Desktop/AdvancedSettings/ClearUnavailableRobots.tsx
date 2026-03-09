@@ -73,7 +73,7 @@ export function ClearUnavailableRobots(): JSX.Element {
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
             >
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {t('clearing_cannot_be_undone')}
               </LegacyStyledText>
               <Flex
@@ -118,7 +118,7 @@ export function ClearUnavailableRobots(): JSX.Element {
           >
             {t('clear_unavail_robots')}
           </LegacyStyledText>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('clear_robots_description')}
           </LegacyStyledText>
         </Box>

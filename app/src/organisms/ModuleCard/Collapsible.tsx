@@ -59,12 +59,12 @@ export function Collapsible({
         onClick={toggleExpanded}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="h5">{title}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="h5">{title}</LegacyStyledText>
         </Flex>
         <Icon
           size={SIZE_1}
           name={expanded ? collapse : expand}
-          aria-label={`expandedIcon` ?? 'plus'}
+          aria-label={expandedIcon != null ? 'expandedIcon' : 'plus'}
         />
       </Flex>
       <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>

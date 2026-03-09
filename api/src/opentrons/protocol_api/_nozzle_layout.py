@@ -1,5 +1,6 @@
-from typing_extensions import Final
 import enum
+
+from typing_extensions import Final
 
 
 class NozzleLayout(enum.Enum):

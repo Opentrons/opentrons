@@ -1,24 +1,26 @@
 """Simulating AbstractRunner factory."""
 
-from opentrons.hardware_control import API as OT2API, HardwareControlAPI
-from opentrons.protocols.api_support import deck_type
-from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+from opentrons_shared_data.robot.types import RobotType
+
+from ..protocol_engine.types import (
+    PostRunHardwareState,
+)
+from .protocol_runner import LiveRunner, create_protocol_runner
+from .python_protocol_wrappers import SimulatingContextCreator
+from .run_orchestrator import RunOrchestrator
+from opentrons.hardware_control import API as OT2API
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
+)
+from opentrons.protocol_engine import (
     DeckType,
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
-
-from opentrons_shared_data.robot.types import RobotType
-
-from .python_protocol_wrappers import SimulatingContextCreator
-from .run_orchestrator import RunOrchestrator
-from .protocol_runner import create_protocol_runner, LiveRunner
-from ..protocol_engine.types import (
-    PostRunHardwareState,
-)
+from opentrons.protocols.api_support import deck_type
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 
 
 class SimulatingRunOrchestrator(RunOrchestrator):

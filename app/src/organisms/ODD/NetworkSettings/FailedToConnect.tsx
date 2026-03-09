@@ -60,7 +60,7 @@ export function FailedToConnect({
             alignItems={ALIGN_CENTER}
           >
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginTop={SPACING.spacing40}
             >

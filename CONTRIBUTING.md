@@ -173,7 +173,6 @@ We use:
 - [pytest][] to test Python
 - [Vitest][vitest] to test JavaScript
   - To run tests in watch mode, you should also install [watchman][]
-- [Cypress.io][cypress] for end to end UI testing
 
 You can tests with:
 
@@ -184,9 +183,6 @@ make test
 # run tests per language
 make test-py
 make test-js
-
-# run cypress e2e tests
-make test-e2e
 ```
 
 You can pass some options to the JavaScript tests:
@@ -219,7 +215,6 @@ make check-js
 [pytest]: https://docs.pytest.org/en/latest/
 [vitest]: https://vitest.dev/
 [watchman]: https://facebook.github.io/watchman/
-[cypress]: https://www.cypress.io/
 
 ### Code quality
 

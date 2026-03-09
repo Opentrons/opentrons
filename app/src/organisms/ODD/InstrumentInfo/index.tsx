@@ -196,7 +196,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       {...props}
     >
       <LegacyStyledText
-        as="h4"
+        forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         fontSize={TYPOGRAPHY.fontSize28}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -204,7 +204,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
         {props.label}
       </LegacyStyledText>
       <LegacyStyledText
-        as="h4"
+        forwardedAs="h4"
         color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

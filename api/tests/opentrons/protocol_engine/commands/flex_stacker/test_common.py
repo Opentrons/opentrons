@@ -8,37 +8,37 @@ from decoy import Decoy
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.types import (
-    StackerStoredLabwareGroup,
-    OnLabwareLocationSequenceComponent,
-    LabwareLocationSequence,
-    OFF_DECK_LOCATION,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareUri,
-    InStackerHopperLocation,
-    LabwareLocation,
-    LoadedLabware,
-    OnLabwareOffsetLocationSequenceComponent,
-    LabwareOffset,
-)
+from opentrons.protocol_engine.commands.flex_stacker import common as subject
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
     LoadedLabwarePoolData,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.commands.flex_stacker import common as subject
-from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
     FlexStackerId,
+    FlexStackerSubState,
 )
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
     BatchLabwareLocationUpdate,
-    FlexStackerStateUpdate,
     BatchLoadedLabwareUpdate,
+    FlexStackerStateUpdate,
     LabwareLidUpdate,
+    StateUpdate,
+)
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareLocationSequence,
+    LabwareOffset,
+    LabwareUri,
+    LoadedLabware,
+    ModuleLocation,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    StackerStoredLabwareGroup,
 )
 
 
@@ -2050,7 +2050,15 @@ def test_build_ids_to_fill_builds_specified_components(
         return f"generated-{generated_id_counts}"
 
     decoy.when(model_utils.generate_id()).then_do(_new_id)
-    subject.build_ids_to_fill(has_adapter, has_lid, None, 1, 2, 0, model_utils,) == [
+    subject.build_ids_to_fill(
+        has_adapter,
+        has_lid,
+        None,
+        1,
+        2,
+        0,
+        model_utils,
+    ) == [
         StackerStoredLabwareGroup(
             primaryLabwareId="generated-1",
             adapterLabwareId="generated-2" if has_adapter else None,

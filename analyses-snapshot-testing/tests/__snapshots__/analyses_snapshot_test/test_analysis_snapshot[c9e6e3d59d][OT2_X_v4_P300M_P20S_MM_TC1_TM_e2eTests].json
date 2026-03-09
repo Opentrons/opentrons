@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34,6 +36,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -51,6 +54,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -73,6 +77,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -95,6 +100,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -117,6 +123,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -209,6 +216,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1368,6 +1376,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2527,6 +2536,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2626,6 +2636,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2879,6 +2890,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4045,6 +4057,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5219,6 +5232,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6378,6 +6392,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6411,6 +6426,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6430,7 +6446,7 @@
             "errorInfo": {
               "args": "('Cannot aspirate more than pipette max volume',)",
               "class": "AssertionError",
-              "traceback": "  File \"<PATH>\", line N, in publish_context\n    yield\n\n  File \"<PATH>\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"<PATH>\", line N, in aspirate\n    new_volume <= self._pipette_dict[\"working_volume\"]\n"
+              "traceback": "  File \"<PATH>\", line N, in publish_context\n    yield\n\n  File \"<PATH>\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"<PATH>\", line N, in aspirate\n    assert new_volume <= self._pipette_dict[\"working_volume\"], (\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"
             },
             "errorType": "PythonException",
             "id": "UUID",
@@ -6484,7 +6500,7 @@
           "errorInfo": {
             "args": "('Cannot aspirate more than pipette max volume',)",
             "class": "AssertionError",
-            "traceback": "  File \"<PATH>\", line N, in _run\n    await self._run_func()\n\n  File \"<PATH>\", line N, in _do_run\n    await func(*args, **kwargs)\n\n  File \"<PATH>\", line N, in run_func\n    await self._protocol_executor.execute(\n\n  File \"<PATH>\", line N, in execute\n    await to_thread.run_sync(\n\n  File \"<PATH>\", line N, in run_sync\n    return await get_async_backend().run_sync_in_worker_thread(\n\n  File \"<PATH>\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"<PATH>\", line N, in run\n    result = context.run(func, *args)\n\n  File \"<PATH>\", line N, in run_protocol\n    execute_json_v4.dispatch_json(\n\n  File \"<PATH>\", line N, in dispatch_json\n    pipette_command_map[command_type](  # type: ignore\n\n  File \"<PATH>\", line N, in _aspirate\n    pipette.aspirate(volume, location)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"<PATH>\", line N, in aspirate\n    new_volume <= self._pipette_dict[\"working_volume\"]\n"
+            "traceback": "  File \"<PATH>\", line N, in _run\n    await self._run_func()\n\n  File \"<PATH>\", line N, in _do_run\n    await func(*args, **kwargs)\n\n  File \"<PATH>\", line N, in run_func\n    await self._protocol_executor.execute(\n\n  File \"<PATH>\", line N, in execute\n    await to_thread.run_sync(\n\n  File \"<PATH>\", line N, in run_sync\n    return await get_async_backend().run_sync_in_worker_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in run_sync_in_worker_thread\n    return await future\n           ^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in run\n    result = context.run(func, *args)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in run_protocol\n    execute_json_v4.dispatch_json(\n\n  File \"<PATH>\", line N, in dispatch_json\n    pipette_command_map[command_type](  # type: ignore\n\n  File \"<PATH>\", line N, in _aspirate\n    pipette.aspirate(volume, location)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in aspirate\n    self._core.aspirate(\n\n  File \"<PATH>\", line N, in aspirate\n    assert new_volume <= self._pipette_dict[\"working_volume\"], (\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"
           },
           "errorType": "PythonException",
           "id": "UUID",

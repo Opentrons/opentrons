@@ -1,24 +1,23 @@
 """A script for sending and receiving data from sensors on the OT3."""
-import logging
-import asyncio
+
 import argparse
+import asyncio
+import logging
+from logging.config import dictConfig
+from typing import Callable
+
 from numpy import float64
 
-from typing import Callable
-from logging.config import dictConfig
-
+from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.motion import (
-    MoveGroupTipActionStep,
     MoveGroupSingleAxisStep,
+    MoveGroupTipActionStep,
     MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-
-from opentrons_hardware.drivers.can_bus.build import build_driver
-
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -34,9 +33,7 @@ def prompt_int_input(prompt_name: str) -> int:
     """Prompt to choose a member of the enum.
 
     Args:
-        output_func: Function to output text to user.
-        get_user_input: Function to get user input.
-        enum_type: an enum type
+        prompt_name: The string to print.
 
     Returns:
         The choice.

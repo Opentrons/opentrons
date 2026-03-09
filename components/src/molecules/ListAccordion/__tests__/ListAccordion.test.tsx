@@ -47,7 +47,7 @@ describe('ListAccordion', () => {
   it('renders with default alertKind and no icon', () => {
     render(props)
 
-    expect(screen.queryByTestId('alert-circle')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('ot-alert')).not.toBeInTheDocument()
   })
 
   it('renders with warning alertKind and shows alert icon', () => {
@@ -55,7 +55,7 @@ describe('ListAccordion', () => {
 
     render(props)
 
-    expect(screen.getByTestId('alert-circle')).toBeInTheDocument()
+    expect(screen.getByTestId('ot-alert')).toBeInTheDocument()
   })
 
   it('renders custom icon when provided and alertKind is default', () => {
@@ -74,7 +74,7 @@ describe('ListAccordion', () => {
 
     render(props)
 
-    expect(screen.getByTestId('alert-circle')).toBeInTheDocument()
+    expect(screen.getByTestId('ot-alert')).toBeInTheDocument()
     expect(screen.queryByTestId('icon-info')).not.toBeInTheDocument()
   })
 

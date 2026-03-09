@@ -27,8 +27,9 @@ export function getDisabledWellFillFromLabwareId(
             // apply 40% opacity to disabled wells if well not already filled
           } else if (wellFill[key] == null && labwareWellFill[key] == null) {
             wellFill[key] =
-              `${liquid?.displayColor}${COLORS.opacity40HexCode}` ??
-              COLORS.transparent
+              liquid?.displayColor != null
+                ? `${liquid.displayColor}${COLORS.opacity40HexCode}`
+                : COLORS.transparent
           }
         })
         labwareWellFill = { ...labwareWellFill, ...wellFill }

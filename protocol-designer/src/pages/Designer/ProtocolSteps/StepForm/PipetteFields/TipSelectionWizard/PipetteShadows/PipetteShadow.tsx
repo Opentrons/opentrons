@@ -1,21 +1,32 @@
-import { COLORS } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { getHoveredOffsetFromWell } from '../utils'
+import { COLORS } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE, SINGLE } from '@opentrons/shared-data'
+
+import styles from '../tipselectionwizard.module.css'
+import {
+  getHoveredOffsetFromWell,
+  getLabelOffsetByPlacement,
+  getPlacementByViewboxAndPipetteSpec,
+} from '../utils'
 import { EightChannelFlexShadow } from './EightChannelFlexShadow'
 import { EightChannelOT2Shadow } from './EightChannelOT2Shadow'
 import { NinetySixChannelFlexShadow } from './NinetySixChannelFlexShadow'
+import { PipetteLabel } from './PipetteLabel'
 import { SingleChannelOT2Shadow } from './SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from './SingleChannelShadow'
 
 import type { Channels } from '@opentrons/components'
 import type {
   CoordinateTuple,
+  NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
-import type { PipetteShadowProps } from '../types'
+import type { InaccessibleReason, PipetteShadowProps } from '../types'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
@@ -36,31 +47,76 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   },
 }
 
-// TODO: adjust once partial tip selection is enabled
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
   slotPosition: CoordinateTuple
   hoveredWell: string
-  selectedTiprackId: string
+  selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
-  primaryNozzle: string
+  inaccessibleReason: InaccessibleReason | null
+  isHoveredWellSelected: boolean
+  hasPickupsRemaining: boolean | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   robotType: RobotType
+  enclosingViewbox: string | null
+  nozzles: NozzleConfigurationStyle
+  rotate?: boolean
 }): JSX.Element {
   const {
     pipetteSpec,
     slotPosition,
     hoveredWell,
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     isAccessible,
+    inaccessibleReason,
+    isHoveredWellSelected,
+    hasPickupsRemaining,
     primaryNozzle,
     robotType,
+    enclosingViewbox,
+    nozzles,
+    rotate,
   } = props
   const [slotX, slotY] = slotPosition
+  const isTiprack = labwareState[selectedLabwareId].def.parameters.isTiprack
+  const translationFile = isTiprack ? 'tip_selection' : 'well_selection'
+  const { t } = useTranslation(translationFile)
+  const labelRef = useRef<HTMLDivElement>(null)
+  const [labelWidth, setLabelWidth] = useState(0)
+  const [labelHeight, setLabelHeight] = useState(0)
 
+  const isSingleTipPickup = nozzles === SINGLE
+
+  const labelText = (() => {
+    if (!hasPickupsRemaining && !isHoveredWellSelected && isTiprack) {
+      return t('all_pickups_selected')
+    }
+    if (!isAccessible && inaccessibleReason != null) {
+      return t(`inaccessible.${inaccessibleReason}`)
+    }
+    const pluralKey = isSingleTipPickup ? 'one' : 'multiple'
+    if (isAccessible) {
+      return isHoveredWellSelected
+        ? t(`accessible.deselect_${pluralKey}`)
+        : t(`accessible.select_${pluralKey}`)
+    }
+    console.error('No label text found')
+    return ''
+  })()
+
+  useEffect(() => {
+    if (labelRef.current) {
+      setLabelWidth(labelRef.current.offsetWidth)
+      setLabelHeight(labelRef.current.offsetHeight)
+    }
+  }, [hoveredWell, labelText])
+  if (isHoveredWellSelected && !isTiprack) {
+    return <></>
+  }
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     wellName: hoveredWell,
     pipetteSpec,
@@ -71,17 +127,58 @@ export function PipetteShadow(props: {
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const width = frontRightCorner[0] - backLeftCorner[0]
   const height = backLeftCorner[1] - frontRightCorner[1]
+
+  const isError =
+    !isAccessible ||
+    (!hasPickupsRemaining && !isHoveredWellSelected && isTiprack)
+
   const shadowProps = {
     x: slotX + xOffset,
     y: slotY + yOffset,
     width,
     height,
-    stroke: isAccessible ? COLORS.blue50 : COLORS.red50,
-    fill: isAccessible
-      ? `${COLORS.black90}${COLORS.opacity20HexCode}`
-      : `${COLORS.red50}${COLORS.opacity20HexCode}`,
+    ...(isError
+      ? {
+          fill: `${COLORS.red50}${COLORS.opacity20HexCode}`,
+          stroke: COLORS.red50,
+        }
+      : {
+          fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+          stroke: COLORS.blue50,
+        }),
+    rotate,
   }
 
+  const labelPlacement = getPlacementByViewboxAndPipetteSpec({
+    enclosingViewbox,
+    x: slotX + xOffset,
+    y: slotY + yOffset,
+    width,
+    height,
+    channels,
+  })
   const ShadowComponent = SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
-  return <ShadowComponent {...shadowProps} />
+  const isOt2EightChannel = robotType === OT2_ROBOT_TYPE && channels === 8
+  const { x: labelOffsetX, y: labelOffsetY } = getLabelOffsetByPlacement({
+    labelPlacement,
+    labelWidth,
+    labelHeight,
+    shadowWidth: width,
+    shadowHeight: height,
+    isOt2EightChannel,
+  })
+  return (
+    <g className={styles.shadow_overlay}>
+      <PipetteLabel
+        ref={labelRef}
+        text={labelText}
+        isZoomed
+        x={slotX + xOffset + labelOffsetX}
+        y={slotY + yOffset + labelOffsetY}
+        placement={labelPlacement}
+        isError={isError}
+      />
+      <ShadowComponent {...shadowProps} />
+    </g>
+  )
 }

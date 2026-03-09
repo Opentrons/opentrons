@@ -3,12 +3,11 @@
 from decoy import Decoy
 
 from opentrons.hardware_control import OT3HardwareControlAPI
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.robot.close_gripper_jaw import (
+    CloseGripperJawImplementation,
     CloseGripperJawParams,
     CloseGripperJawResult,
-    CloseGripperJawImplementation,
 )
 from opentrons.protocol_engine.state.state import StateView
 

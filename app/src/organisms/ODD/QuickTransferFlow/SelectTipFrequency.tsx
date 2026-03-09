@@ -10,6 +10,8 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ACTIONS } from './constants'
+
 import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -66,7 +68,7 @@ export function SelectTipFrequency({
 
   const handleClickNext = (): void => {
     dispatch({
-      type: 'SET_CHANGE_TIP',
+      type: ACTIONS.SET_CHANGE_TIP,
       changeTip: selectedChangeTipOption ?? 'once',
     })
     onNext()

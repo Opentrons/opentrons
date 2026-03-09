@@ -1,28 +1,30 @@
 """Common pipetting command base models."""
 
 from __future__ import annotations
-from typing import Literal, Tuple, TYPE_CHECKING, Optional
+
+from typing import TYPE_CHECKING, Literal, Optional, Tuple
+
 import numpy
-from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
+from typing_extensions import TypedDict
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
-from opentrons.protocol_engine.types import AspiratedFluid, FluidKind
 from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     StallOrCollisionDetectedError,
 )
-from .command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from opentrons.types import Point
 
+from .command import DefinedErrorData, SuccessData
 from .movement_common import StallOrCollisionError
+from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
+from opentrons.protocol_engine.state.update_types import StateUpdate
+from opentrons.protocol_engine.types import AspiratedFluid, FluidKind
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     from ..execution.pipetting import PipettingHandler
-    from ..resources import ModelUtils
     from ..notes import CommandNoteAdder
+    from ..resources import ModelUtils
 
 
 DEFAULT_CORRECTION_VOLUME = 0.0
@@ -252,9 +254,11 @@ async def aspirate_while_tracking(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
     movement_delay: Optional[float] = None,
-) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[
-    OverpressureError
-] | DefinedErrorData[StallOrCollisionError]:
+) -> (
+    SuccessData[BaseLiquidHandlingResult]
+    | DefinedErrorData[OverpressureError]
+    | DefinedErrorData[StallOrCollisionError]
+):
     """Execute an aspirate while tracking microoperation."""
     try:
         volume_aspirated = await pipetting.aspirate_while_tracking(
@@ -321,9 +325,11 @@ async def dispense_while_tracking(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
     movement_delay: Optional[float] = None,
-) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[
-    OverpressureError
-] | DefinedErrorData[StallOrCollisionError]:
+) -> (
+    SuccessData[BaseLiquidHandlingResult]
+    | DefinedErrorData[OverpressureError]
+    | DefinedErrorData[StallOrCollisionError]
+):
     """Execute an dispense while tracking microoperation."""
     # The current volume won't be none since it passed validation
     current_volume = (

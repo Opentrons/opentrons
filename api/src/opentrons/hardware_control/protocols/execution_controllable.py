@@ -1,4 +1,5 @@
 from typing_extensions import Protocol
+
 from ..types import PauseType
 
 

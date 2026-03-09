@@ -31,7 +31,7 @@ export function IncompatibleModuleODDModalBody({
   return (
     <OddModal header={incompatibleModuleHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
           <Trans t={t} i18nKey="remove_before_running_protocol" />
         </LegacyStyledText>
         <Flex
@@ -43,7 +43,7 @@ export function IncompatibleModuleODDModalBody({
           {modules.map(module => (
             <ListItem key={module.id} type="default">
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 key={module.id}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >

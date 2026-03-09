@@ -32,7 +32,7 @@ def enable_foreign_key_constraints(engine: sqlalchemy.engine.Engine) -> None:
     # Copied from:
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#foreign-key-support
 
-    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[misc]
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[untyped-decorator]
     def on_connect(
         # TODO(mm, 2023-08-29): Improve these type annotations when we have SQLAlchemy 2.0.
         dbapi_connection: Any,
@@ -60,7 +60,7 @@ def fix_transactions(engine: sqlalchemy.engine.Engine) -> None:
     # Copied from:
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#serializable-isolation-savepoints-transactional-ddl.
 
-    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[misc]
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[untyped-decorator]
     def on_connect(
         # TODO(mm, 2023-08-29): Improve these type annotations when we have SQLAlchemy 2.0.
         dbapi_connection: Any,
@@ -70,7 +70,7 @@ def fix_transactions(engine: sqlalchemy.engine.Engine) -> None:
         # also stops it from emitting COMMIT before any DDL.
         dbapi_connection.isolation_level = None
 
-    @sqlalchemy.event.listens_for(engine, "begin")  # type: ignore[misc]
+    @sqlalchemy.event.listens_for(engine, "begin")  # type: ignore[untyped-decorator]
     def on_begin(conn: sqlalchemy.engine.Connection) -> None:
         # emit our own BEGIN
         conn.exec_driver_sql("BEGIN")

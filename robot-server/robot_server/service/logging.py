@@ -1,6 +1,7 @@
 import logging
 from logging.config import dictConfig
 from typing import Any, Dict
+
 from opentrons.config import IS_ROBOT, robot_configs
 from opentrons.util.logging_config import log_queue
 

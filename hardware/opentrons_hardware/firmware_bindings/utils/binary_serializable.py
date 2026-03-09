@@ -1,13 +1,14 @@
 """BinarySerializable dataclass."""
 
 from __future__ import annotations
+
 import struct
-from dataclasses import dataclass, fields, astuple
-from typing import TypeVar, Generic, Type, Optional, Dict, Any, Sequence
+from dataclasses import astuple, dataclass, fields
+from typing import Any, Dict, Generic, Optional, Sequence, Type, TypeVar
 
 from opentrons_shared_data.errors.exceptions import (
-    InternalMessageFormatError,
     EnumeratedError,
+    InternalMessageFormatError,
     PythonException,
 )
 
@@ -217,13 +218,13 @@ class BinarySerializable:
             # we have to do message index special until we update to python 3.10 since we can't make it a kw_only arg
             # 3.10 has an updated dataclass field option that will make this go away, see payloads.py
             args = {
-                v.name: v.type.build(b[i])
+                v.name: v.type.build(b[i])  # type: ignore[union-attr]
                 for i, v in enumerate(fields(cls))
                 if not (v.name == "message_index")
             }
             message_index = next(
                 (
-                    v.type.build(b[i])
+                    v.type.build(b[i])  # type: ignore[union-attr]
                     for i, v in enumerate(fields(cls))
                     if v.name == "message_index"
                 ),
@@ -246,7 +247,7 @@ class BinarySerializable:
         dataclass_fields = fields(cls)
         try:
             format_string = (
-                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
+                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"  # type: ignore[union-attr]
             )
         except AttributeError as e:
             raise InvalidFieldException(

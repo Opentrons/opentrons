@@ -30,12 +30,7 @@ const updatePatchOnThermocyclerFormType = (
         'profileVolume',
         'profileTargetLidTemp',
         'orderedProfileItems',
-        'profileItemsById',
-        'blockIsActiveHold',
-        'blockTargetTempHold',
-        'lidIsActiveHold',
-        'lidTargetTempHold',
-        'lidOpenHold'
+        'profileItemsById'
       ),
     }
   }
@@ -49,8 +44,6 @@ const updatePatchOnBlockChange = (
 ): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
     return { ...patch, ...getDefaultFields('blockTargetTemp') }
-  } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
-    return { ...patch, ...getDefaultFields('blockTargetTempHold') }
   }
 
   return patch
@@ -62,8 +55,6 @@ const updatePatchOnLidChange = (
 ): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'lidIsActive')) {
     return { ...patch, ...getDefaultFields('lidTargetTemp') }
-  } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {
-    return { ...patch, ...getDefaultFields('lidTargetTempHold') }
   }
 
   return patch

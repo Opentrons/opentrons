@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Type, Literal, AsyncIterator
+from typing import AsyncIterator, Literal, Type
 
-from opentrons.drivers.command_builder import CommandBuilder
-
+from .async_serial import AsyncSerial
 from .errors import (
-    NoResponse,
     AlarmResponse,
-    ErrorResponse,
     BaseErrorCode,
     DefaultErrorCodes,
-    UnhandledGcode,
+    ErrorResponse,
     GCodeCacheFull,
+    NoResponse,
+    UnhandledGcode,
 )
-from .async_serial import AsyncSerial
+from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 
@@ -181,8 +180,9 @@ class SerialConnection:
 
         Raises: SerialException
         """
-        async with self._send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            self._send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data(data=data, retries=retries)
 
@@ -512,8 +512,9 @@ class AsyncResponseSerialConnection(SerialConnection):
         self, data: str, retries: int = 0, timeout: float | None = None, acks: int = 1
     ) -> list[str]:
         """Send data and return all responses."""
-        async with super().send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            super().send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data_multiack(
                 data=data, retries=retries or self._number_of_retries, acks=acks
@@ -534,8 +535,9 @@ class AsyncResponseSerialConnection(SerialConnection):
 
         Raises: SerialException
         """
-        async with super().send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            super().send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data(
                 data=data,

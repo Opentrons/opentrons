@@ -60,13 +60,16 @@ export function RobotSettingsPipetteOffsetCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {isFlex
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
       </LegacyStyledText>
       {isFlex ? (
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('pipette_calibrations_description')}
         </LegacyStyledText>
       ) : null}
@@ -82,7 +85,7 @@ export function RobotSettingsPipetteOffsetCalibration({
           }
         />
       ) : (
-        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_pipette_attached')}
         </LegacyStyledText>
       )}

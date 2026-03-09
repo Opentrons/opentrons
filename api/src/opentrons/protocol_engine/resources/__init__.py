@@ -3,17 +3,16 @@
 Classes in this module do not maintain state and can be instantiated
 as needed. Some classes may contain solely static methods.
 """
-from . import pipette_data_provider
-from . import labware_validation
-from .model_utils import ModelUtils
-from .deck_data_provider import DeckDataProvider, DeckFixedLabware
-from .labware_data_provider import LabwareDataProvider
-from .module_data_provider import ModuleDataProvider
-from .file_provider import FileProvider
-from .camera_provider import CameraProvider
-from .ot3_validation import ensure_ot3_hardware
-from .concurrency_provider import ConcurrencyProvider
 
+from . import labware_validation, pipette_data_provider
+from .camera_provider import CameraProvider
+from .concurrency_provider import ConcurrencyProvider
+from .deck_data_provider import DeckDataProvider, DeckFixedLabware
+from .file_provider import FileProvider
+from .labware_data_provider import LabwareDataProvider
+from .model_utils import ModelUtils
+from .module_data_provider import ModuleDataProvider
+from .ot3_validation import ensure_ot3_hardware
 
 __all__ = [
     "ModelUtils",

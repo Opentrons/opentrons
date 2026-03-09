@@ -1,4 +1,5 @@
 """Tests for the legacy Protocol API core implementation."""
+
 import inspect
 from typing import Any, Dict, cast
 
@@ -6,30 +7,22 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition2 as LabwareDefDict
-from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.module.types import ModuleDefinitionV3
-
-from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
-from opentrons.util.broker import Broker
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
-
-from opentrons.protocols import labware as mock_labware
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-
-from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.protocol_api.core.legacy.load_info import (
-    LoadInfo,
-    LabwareLoadInfo,
-    InstrumentLoadInfo,
-    ModuleLoadInfo,
+from opentrons.protocol_api.core.legacy import (
+    legacy_module_core as mock_legacy_module_core,
 )
+from opentrons.protocol_api.core.legacy import (
+    module_geometry as mock_module_geometry,
+)
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     ProvidedLabwareOffset,
@@ -42,11 +35,17 @@ from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCo
 from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
     LegacyProtocolCore,
 )
-
-from opentrons.protocol_api.core.legacy import (
-    legacy_module_core as mock_legacy_module_core,
-    module_geometry as mock_module_geometry,
+from opentrons.protocol_api.core.legacy.load_info import (
+    InstrumentLoadInfo,
+    LabwareLoadInfo,
+    LoadInfo,
+    ModuleLoadInfo,
 )
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
+from opentrons.protocols import labware as mock_labware
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import DeckSlotName, Location, Mount, Point, StagingSlotName
+from opentrons.util.broker import Broker
 
 
 @pytest.fixture(autouse=True)
@@ -82,8 +81,7 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 def mock_deck(decoy: Decoy) -> Deck:
     """Get a mock Deck."""
 
-    class _MockDeck(Dict[str, Any]):
-        ...
+    class _MockDeck(Dict[str, Any]): ...
 
     deck = _MockDeck()
     setattr(deck, "position_for", decoy.mock(name="Deck.position_for"))

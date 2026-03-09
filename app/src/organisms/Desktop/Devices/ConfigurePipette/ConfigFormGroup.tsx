@@ -81,7 +81,7 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
       paddingBottom={SPACING.spacing4}
     >
       <LegacyStyledText
-        as="label"
+        forwardedAs="label"
         id={props.labelFor}
         paddingBottom={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

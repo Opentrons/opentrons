@@ -63,18 +63,18 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
     >
       <Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
+          <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
             {t('prepare_the_space')}
           </LegacyStyledText>
           {isHealthCheck ? (
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {t('to_check', { mount: activePipette?.mount })}
             </LegacyStyledText>
           ) : null}
           <Flex marginLeft={SPACING.spacing32}>
             <ul>
               <li>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {t('place_full_tip_rack', {
                     tip_rack: isHealthCheck
                       ? activePipette?.tipRackDisplay
@@ -84,14 +84,14 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
               </li>
               {calBlock != null ? (
                 <li>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {t('place_cal_block')}
                   </LegacyStyledText>
                 </li>
               ) : null}
               {isHealthCheck ? (
                 <li>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {t('clear_other_slots')}
                   </LegacyStyledText>
                 </li>

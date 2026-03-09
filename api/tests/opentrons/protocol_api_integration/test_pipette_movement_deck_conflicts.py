@@ -2,7 +2,7 @@
 
 import pytest
 
-from opentrons.protocol_api import COLUMN, ALL, SINGLE, ROW, ProtocolContext
+from opentrons.protocol_api import ALL, COLUMN, ROW, SINGLE, ProtocolContext
 from opentrons.protocol_api.core.engine.pipette_movement_conflict import (
     PartialTipMovementNotAllowedError,
 )
@@ -141,7 +141,7 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration(
         15,
         res12["A6"],
         deepwell.columns()[6],
-        disposal_vol=0,
+        disposal_volume=0,
     )
 
 

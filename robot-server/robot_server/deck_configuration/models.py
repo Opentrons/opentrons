@@ -1,11 +1,10 @@
 """HTTP-facing JSON models for deck configuration."""
 
-
 from datetime import datetime
 from typing import List, Optional
-from typing_extensions import Literal
 
 import pydantic
+from typing_extensions import Literal
 
 from robot_server.errors.error_responses import ErrorDetails
 

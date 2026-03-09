@@ -2,9 +2,10 @@
 
 from typing import Any, Dict, Optional, Sequence
 
-from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError
+
+from opentrons.protocol_engine.errors import ProtocolEngineError
 
 
 class LabwareLocatingFeatureError(ProtocolEngineError):

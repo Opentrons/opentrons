@@ -1,4 +1,5 @@
 """Simple state change notification interface."""
+
 import asyncio
 
 

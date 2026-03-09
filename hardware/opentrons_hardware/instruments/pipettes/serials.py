@@ -1,11 +1,14 @@
 """Handle parsing and providing pipette information."""
+
 import re
-from typing import Dict, Tuple
 import struct
+from typing import Dict, Tuple
+
 from opentrons_shared_data.errors.exceptions import (
     InvalidInstrumentData,
     PythonException,
 )
+
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
@@ -36,7 +39,7 @@ NAME_LOOKUP: Dict[str, PipetteName] = {
 }
 
 SERIAL_FORMAT_MSG = (
-    f'Serial numbers must have the format PNNNVMMXXXXXX... where NNN is one of {", ".join(NAME_LOOKUP.keys())}, '
+    f"Serial numbers must have the format PNNNVMMXXXXXX... where NNN is one of {', '.join(NAME_LOOKUP.keys())}, "
     "MM is a two-digit model number, and the rest is some serial code."
 )
 

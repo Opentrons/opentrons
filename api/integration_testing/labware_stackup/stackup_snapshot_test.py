@@ -11,8 +11,8 @@ NOTE: The list of labware, modules, adapters and their versions are hardcoded an
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import stackup_test, snapshots, stackup_spec, create_stackups
-from .test_types import SuccessfulTest, CoordinateMismatch, ResultSummary
+from . import create_stackups, snapshots, stackup_spec, stackup_test
+from .test_types import CoordinateMismatch, ResultSummary, SuccessfulTest
 
 
 @dataclass(frozen=True)

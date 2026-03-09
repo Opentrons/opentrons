@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -96,6 +97,21 @@ export const getAbsorbanceReaderLabwareOptions: Selector<DropdownOption[]> =
         ABSORBANCE_READER_TYPE
       )
       return absorbanceReaderModuleOptions
+    }
+  )
+
+/** Returns dropdown option for labware placed on flex stacker module */
+export const getFlexStackerLabwareOptions: Selector<DropdownOption[]> =
+  createSelector(
+    getInitialDeckSetup,
+    getLabwareNicknamesById,
+    (initialDeckSetup, nicknamesById) => {
+      const flexStackerModuleOptions = getModuleLabwareOptions(
+        initialDeckSetup,
+        nicknamesById,
+        FLEX_STACKER_MODULE_TYPE
+      )
+      return flexStackerModuleOptions
     }
   )
 

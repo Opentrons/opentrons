@@ -1,16 +1,16 @@
 """Helper functions for the sensor scripts."""
+
+import csv
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
-from typing import Dict, Any, List
-import csv
-from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
-
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType, SensorId
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId, SensorType
 from opentrons_hardware.sensors import sensor_driver, sensor_types
+from opentrons_hardware.sensors.types import EnvironmentSensorDataType, SensorDataType
 
 hms = "%H:%M:%S"
 

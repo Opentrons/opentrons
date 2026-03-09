@@ -1,11 +1,12 @@
-from typing import List, Tuple
-import pytest
 import platform
+from typing import List, Tuple
+
+import pytest
 from decoy import Decoy
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 
 
@@ -43,6 +44,23 @@ def csv_file_mixed_quotes() -> bytes:
 def csv_file_different_delimiter() -> bytes:
     """A basic CSV file with a non-comma delimiter."""
     return b"x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
+
+
+@pytest.fixture()
+def csv_file_long() -> bytes:
+    """A long CSV file from a customer that caused the sniffer to fail when it only looked at the first 1024 bytes."""
+    return b"""
+Source Labware,Source Slot,Source Well,Source Height,Dest Labware,Dest Slot,Dest Well,Volume
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+""".strip()
 
 
 @pytest.fixture
@@ -100,6 +118,19 @@ def test_csv_parameter(
             subject.file
     assert subject.contents == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
     assert subject.parse_as_csv()[0] == ["x", "y", "z"]
+
+
+def test_csv_parameter_long_file(
+    decoy: Decoy, api_version: APIVersion, csv_file_long: bytes
+) -> None:
+    """It should detect the CSV dialect for files of unlimited length."""
+    # The previous implementation of parse_as_csv() passed only the first 1024 bytes of
+    # the CSV file to the dialect sniffer, chopping up a line an unfortunate position,
+    # causing the sniffer to fail with "Could not determine delimiter".
+    subject = CSVParameter(csv_file_long, api_version)
+    parsed_rows = subject.parse_as_csv()
+    assert len(parsed_rows) == 10
+    assert len(parsed_rows[0]) == 8
 
 
 @pytest.mark.parametrize(
@@ -188,9 +219,9 @@ def test_csv_parameter_trailing_empties(
     subject = CSVParameter(csv_file, api_version)
     parsed_csv = subject.parse_as_csv()
 
-    assert (
-        parsed_csv == expected_output
-    ), f"Expected {expected_output}, but got {parsed_csv}"
-    assert len(parsed_csv) == len(
-        expected_output
-    ), f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    assert parsed_csv == expected_output, (
+        f"Expected {expected_output}, but got {parsed_csv}"
+    )
+    assert len(parsed_csv) == len(expected_output), (
+        f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    )

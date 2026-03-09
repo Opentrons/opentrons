@@ -1,7 +1,7 @@
 """Tracks active connections to the server."""
-from datetime import datetime
-from typing import List
+
 from dataclasses import dataclass
+from datetime import datetime
 
 from system_server.jwt import Registrant
 
@@ -18,7 +18,7 @@ class AuthorizationTracker:
     """Class to track active authorizations on the server."""
 
     def __init__(self) -> None:
-        self._connections: List[_Authorization] = []
+        self._connections: list[_Authorization] = []
 
     def add_connection(self, registrant: Registrant, expiration: datetime) -> None:
         """Add a new connection, or refresh an existing one.
@@ -48,7 +48,7 @@ class AuthorizationTracker:
         self._update_active_connections()
         return len(self._connections)
 
-    def get_connected(self) -> List[Registrant]:
+    def get_connected(self) -> list[Registrant]:
         """Get a list of all of the current active connections."""
         self._update_active_connections()
         return [n.registrant for n in self._connections]

@@ -93,7 +93,7 @@ export function WizardRequiredEquipmentList(
       ) : (
         <>
           <LegacyStyledText
-            as="h3"
+            forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
@@ -109,7 +109,7 @@ export function WizardRequiredEquipmentList(
           {footer != null ? (
             <LegacyStyledText
               marginTop={SPACING.spacing8}
-              as="label"
+              forwardedAs="label"
               color={COLORS.grey60}
             >
               {footer}
@@ -165,9 +165,9 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_AROUND}
         >
-          <LegacyStyledText as="p">{displayName}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">{displayName}</LegacyStyledText>
           {subtitle != null ? (
-            <LegacyStyledText as="p" color={COLORS.grey50}>
+            <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
               {subtitle}
             </LegacyStyledText>
           ) : null}

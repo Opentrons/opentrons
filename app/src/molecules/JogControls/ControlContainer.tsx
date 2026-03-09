@@ -35,7 +35,7 @@ export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
   const { title, children } = props
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <LegacyStyledText as="h6" marginY={SPACING.spacing8}>
+      <LegacyStyledText forwardedAs="h6" marginY={SPACING.spacing8}>
         {title}
       </LegacyStyledText>
       <Flex css={CONTROL_CHILDREN_STYLES}>{children}</Flex>

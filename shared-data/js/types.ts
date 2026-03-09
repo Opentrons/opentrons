@@ -1,5 +1,12 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
+import type {
+  PartialNozzles8Channel,
+  RowChannels,
+} from '../command/types/setup'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -40,6 +47,8 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_TYPE,
 } from './constants'
 import type { PipetteName } from './pipettes'
 
@@ -49,6 +58,18 @@ export interface RobotDefinition {
   displayName: string
   robotType: RobotType
   models: string[]
+  extents: CoordinateTuple
+  paddingOffsets: {
+    rear: number
+    front: number
+    leftSide: number
+    rightSide: number
+  }
+  mountOffsets: {
+    left: CoordinateTuple
+    right: CoordinateTuple
+    gripper?: CoordinateTuple
+  }
 }
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -364,6 +385,7 @@ export type ModuleType =
   | typeof MAGNETIC_BLOCK_TYPE
   | typeof ABSORBANCE_READER_TYPE
   | typeof FLEX_STACKER_MODULE_TYPE
+  | typeof VACUUM_MODULE_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
@@ -386,6 +408,8 @@ export type AbsorbanceReaderModel = typeof ABSORBANCE_READER_V1
 
 export type FlexStackerModuleModel = typeof FLEX_STACKER_MODULE_V1
 
+export type VacuumModuleModel = typeof VACUUM_MODULE_MILLIPORE_V1
+
 export type ModuleModel =
   | MagneticModuleModel
   | TemperatureModuleModel
@@ -394,6 +418,7 @@ export type ModuleModel =
   | MagneticBlockModel
   | AbsorbanceReaderModel
   | FlexStackerModuleModel
+  | VacuumModuleModel
 
 export type GripperModel =
   | typeof GRIPPER_V1
@@ -458,8 +483,10 @@ export interface CutoutFixture {
   height: number
 }
 
-export interface FakeCutoutFixture
-  extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
+export interface FakeCutoutFixture extends Omit<
+  CutoutFixture,
+  'id' | 'providesAddressableAreas'
+> {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<
     CutoutId,
@@ -482,6 +509,7 @@ export type AreaType =
   | 'magneticBlock'
   | 'absorbanceReader'
   | 'flexStacker'
+  | 'vacuumModule'
 
 export interface AddressableArea {
   id: AddressableAreaName
@@ -495,8 +523,10 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-export interface FakeAddressableArea
-  extends Omit<AddressableArea, 'id' | 'areaType'> {
+export interface FakeAddressableArea extends Omit<
+  AddressableArea,
+  'id' | 'areaType'
+> {
   id: AddressableAreaNamesWithFakes
   areaType: AreaTypeWithFakes
 }
@@ -526,11 +556,10 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
-export interface DeckLocationsWithFakes
-  extends Omit<
-    DeckLocations,
-    'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
-  > {
+export interface DeckLocationsWithFakes extends Omit<
+  DeckLocations,
+  'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
+> {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -544,17 +573,16 @@ export interface DeckDefinition {
   cutoutFixtures: CutoutFixture[]
 }
 
-export interface DeckDefinitionWithFakes
-  extends Omit<
-    DeckDefinition,
-    | 'locations'
-    | 'cutoutFixtures'
-    | 'otId'
-    | 'cornerOffsetFromOrigin'
-    | 'dimensions'
-    | 'metadata'
-    | 'robot'
-  > {
+export interface DeckDefinitionWithFakes extends Omit<
+  DeckDefinition,
+  | 'locations'
+  | 'cutoutFixtures'
+  | 'otId'
+  | 'cornerOffsetFromOrigin'
+  | 'dimensions'
+  | 'metadata'
+  | 'robot'
+> {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }
@@ -569,6 +597,7 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -619,6 +648,11 @@ export interface SlotTransforms {
 export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
+
+export type ActiveNozzleNumber =
+  | PipetteChannels
+  | PartialNozzles8Channel
+  | RowChannels
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
@@ -828,9 +862,10 @@ export interface LoadedModule {
 }
 export interface Liquid {
   id: string
-  displayName: string
+  displayName: string | null
   description: string
   displayColor?: string
+  totalLiquids?: number
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
@@ -902,20 +937,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-export interface AspirateProperties
-  extends BaseLiquidHandlingProperties<RetractAspirate> {
+export interface AspirateProperties extends BaseLiquidHandlingProperties<RetractAspirate> {
   aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
-export interface SingleDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface SingleDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-export interface MultiDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface MultiDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
@@ -1039,6 +1071,7 @@ export type RunTimeParameter =
 export interface CommandPreconditions {
   isCameraUsed: boolean
 }
+export type CameraId = 'ot_system_camera'
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
@@ -1053,7 +1086,7 @@ export interface CompletedProtocolAnalysis {
   errors: AnalysisError[]
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
-  commandAnnotations?: CommandAnnotation[]
+  commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
 }
 

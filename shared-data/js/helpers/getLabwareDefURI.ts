@@ -3,7 +3,7 @@ import type { LabwareDefinition } from '../types'
 export const getLabwareDefURI = (def: LabwareDefinition): string =>
   constructLabwareDefURI(
     def.namespace,
-    def.parameters.loadName,
+    def.parameters?.loadName, // custom labware might be missing parameters?
     String(def.version)
   )
 

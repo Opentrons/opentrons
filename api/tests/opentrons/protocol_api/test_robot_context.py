@@ -1,25 +1,27 @@
 """Test the functionality of the `RobotContext`."""
+
+from typing import Optional, Union
+
 import pytest
 from decoy import Decoy
-from typing import Union, Optional
 
-from opentrons.types import (
-    DeckLocation,
-    Mount,
-    Point,
-    Location,
-    DeckSlotName,
-    AxisType,
-    StringAxisMap,
-    AxisMapType,
-)
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.common import ProtocolCore, RobotCore
-from opentrons.protocol_api import RobotContext, ModuleContext
-from opentrons.protocol_api.deck import Deck
 from opentrons_shared_data.pipette.types import PipetteNameType
 
+from opentrons.protocol_api import ModuleContext, RobotContext
 from opentrons.protocol_api._types import PipetteActionTypes, PlungerPositionTypes
+from opentrons.protocol_api.core.common import ProtocolCore, RobotCore
+from opentrons.protocol_api.deck import Deck
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckLocation,
+    DeckSlotName,
+    Location,
+    Mount,
+    Point,
+    StringAxisMap,
+)
 
 
 @pytest.fixture

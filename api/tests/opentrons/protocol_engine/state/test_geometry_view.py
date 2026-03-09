@@ -4,134 +4,79 @@ import inspect
 import json
 from datetime import datetime
 from math import isclose
-from typing import cast, List, Tuple, Optional, NamedTuple, Dict, Any
-from unittest.mock import sentinel
 from os import listdir, path
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, cast
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.state.update_types import (
-    LoadedLabwareUpdate,
-    StateUpdate,
-    AddressableAreaUsedUpdate,
-)
-
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.labware.types import LabwareUri, LocatingFeatures
-from opentrons_shared_data.module.types import ModuleOrientation
-from opentrons_shared_data.pipette import pipette_definition
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import (
-    Point,
-    DeckSlotName,
-    MountType,
-    StagingSlotName,
-    MeniscusTrackingTarget,
-)
-from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
-    LiquidClasses as VolumeModes,
-)
+from opentrons_shared_data.deck.types import CutoutFixture, DeckDefinitionV5
+from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons_shared_data.labware.labware_definition import (
+    AxisAlignedBoundingBox3D,
+    ConicalFrustum,
     CuboidalFrustum,
+    Extents,
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
-    Dimensions as LabwareDimensions,
-    Parameters2 as LabwareDefinition2Parameters,
-    SphericalSegment,
-    Vector3D as LabwareDefinitionVector3D,
-    ConicalFrustum,
-    labware_definition_type_adapter,
     LabwareDefinition3,
-    Extents,
-    AxisAlignedBoundingBox3D,
+    SphericalSegment,
     Vector3D,
+    labware_definition_type_adapter,
 )
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
-from opentrons_shared_data.labware import load_definition as load_labware_definition
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    SYSTEM_LOCATION,
-    OFF_DECK_LOCATION,
-    LabwareOffsetVector,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    LoadedLabware,
-    LoadedModule,
-    ModuleModel,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    WellOrigin,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
-    Dimensions,
-    DeckType,
-    CurrentWell,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    LoadedPipette,
-    TipGeometry,
-    ModuleDefinition,
-    ProbedHeightInfo,
-    ProbedVolumeInfo,
-    LoadedVolumeInfo,
-    WellLiquidInfo,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnModuleOffsetLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
-    OnModuleLocationSequenceComponent,
-    OnLabwareLocationSequenceComponent,
-    NotOnDeckLocationSequenceComponent,
-    OnCutoutFixtureLocationSequenceComponent,
-    LabwareLocation,
-    InStackerHopperLocation,
-    PotentialCutoutFixture,
-    AddressableArea,
-    AreaType,
-    AddressableOffsetVector,
-    WellLocationFunction,
-    GripperMoveType,
+from opentrons_shared_data.labware.labware_definition import (
+    Dimensions as LabwareDimensions,
 )
-from opentrons.protocol_engine.commands import Command
-from opentrons.protocol_engine.actions import (
-    SucceedCommandAction,
-    SetDeckConfigurationAction,
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters2 as LabwareDefinition2Parameters,
 )
-from opentrons.protocol_engine.state import _move_types
-from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.labware import (
-    LabwareView,
-    LabwareStore,
+from opentrons_shared_data.labware.labware_definition import (
+    Vector3D as LabwareDefinitionVector3D,
 )
-from opentrons.protocol_engine.state.wells import WellView, WellStore
-from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
-from opentrons.protocol_engine.state.pipettes import (
-    PipetteView,
-    PipetteStore,
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
-    PipetteBoundingBoxOffsets,
+from opentrons_shared_data.labware.types import LabwareUri, LocatingFeatures
+from opentrons_shared_data.module.types import ModuleOrientation
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses as VolumeModes,
 )
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaStore,
-    AddressableAreaState,
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+)
+from opentrons_shared_data.robot.types import (
+    RobotDefinition,
+    mountOffset,
+    paddingOffset,
 )
 
+from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
+from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
+from ..pipette_fixtures import get_default_nozzle_map
+from .command_fixtures import (
+    create_comment_command,
+)
+from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.actions import (
+    SetDeckConfigurationAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.commands import Command
+from opentrons.protocol_engine.state import _move_types, geometry
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D as EngineAABB,
 )
-from opentrons.protocol_engine.state import geometry
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaStore,
+    AddressableAreaView,
+)
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
@@ -143,25 +88,83 @@ from opentrons.protocol_engine.state.inner_well_math_utils import (
     find_volume_inner_well_geometry,
     find_volume_user_defined_volumes,
 )
+from opentrons.protocol_engine.state.labware import (
+    LabwareStore,
+    LabwareView,
+)
+from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
+from opentrons.protocol_engine.state.pipettes import (
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
+    PipetteStore,
+    PipetteView,
+    StaticPipetteConfig,
+)
+from opentrons.protocol_engine.state.update_types import (
+    AddressableAreaUsedUpdate,
+    LoadedLabwareUpdate,
+    StateUpdate,
+)
+from opentrons.protocol_engine.state.wells import WellStore, WellView
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
+    AddressableArea,
+    AddressableAreaLocation,
+    AddressableOffsetVector,
+    AreaType,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DeckType,
+    Dimensions,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    GripperMoveType,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareOffsetVector,
+    LiquidHandlingWellLocation,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    LoadedVolumeInfo,
+    ModuleDefinition,
+    ModuleLocation,
+    ModuleModel,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+    NotOnDeckLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    PotentialCutoutFixture,
+    ProbedHeightInfo,
+    ProbedVolumeInfo,
+    TipGeometry,
+    WellLiquidInfo,
+    WellLocation,
+    WellLocationFunction,
+    WellOffset,
+    WellOrigin,
+)
 from opentrons.protocol_engine.types.liquid_level_detection import (
-    SimulatedProbeResult,
     LiquidTrackingType,
+    SimulatedProbeResult,
 )
-from opentrons_shared_data.robot.types import (
-    RobotDefinition,
-    paddingOffset,
-    mountOffset,
+from opentrons.types import (
+    DeckSlotName,
+    MeniscusTrackingTarget,
+    MountType,
+    Point,
+    StagingSlotName,
 )
-
-
-from .command_fixtures import (
-    create_comment_command,
-)
-from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
-from ..pipette_fixtures import get_default_nozzle_map
-from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
-from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
-
 
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
     sections=[
@@ -2632,6 +2635,50 @@ def test_get_tip_drop_explicit_location(
     )
 
 
+def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should raise if version gate is False and the labware is tip rack, and not raise otherwise."""
+    decoy.when(mock_labware_view.get_definition("tip-rack-id")).then_return(
+        tip_rack_def
+    )
+
+    with pytest.raises(errors.UnexpectedProtocolError):
+        subject.get_checked_tip_drop_location(
+            pipette_id="pipette-id",
+            labware_id="tip-rack-id",
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=1, y=2, z=3),
+            ),
+            api_version_allows_partial_return_tip=False,
+        )
+
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        reservoir_def
+    )
+
+    location = subject.get_checked_tip_drop_location(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
+        api_version_allows_partial_return_tip=False,
+    )
+
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
+
+
 def test_get_ancestor_slot_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,
@@ -2805,7 +2852,7 @@ def test_ensure_location_not_occupied_raises(
     module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(
         mock_labware_view.raise_if_labware_in_location(module_location)
-    ).then_return(None)
+    ).then_return(True)
     decoy.when(
         mock_module_view.raise_if_module_in_location(module_location)
     ).then_raise(errors.LocationIsOccupiedError("Woops again!"))
@@ -3484,6 +3531,7 @@ def test_get_next_drop_tip_location(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

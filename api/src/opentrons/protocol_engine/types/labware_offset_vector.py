@@ -2,6 +2,7 @@
 
 This is a separate module to avoid circular imports.
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel

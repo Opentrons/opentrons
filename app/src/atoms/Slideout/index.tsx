@@ -36,6 +36,7 @@ export interface SlideoutProps {
   isExpanded?: boolean
   footer?: ReactNode
   multiSlideoutSpecs?: MultiSlideoutSpecs
+  childrenPadding?: string
 }
 
 const SHARED_STYLE = css`
@@ -124,6 +125,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
     children,
     footer,
     multiSlideoutSpecs,
+    childrenPadding = SPACING.spacing16,
   } = props
   const { t } = useTranslation('shared')
   const slideOutRef = useRef<HTMLDivElement>(null)
@@ -184,7 +186,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         >
           {multiSlideoutSpecs === undefined ? null : (
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
               paddingX={SPACING.spacing16}
@@ -204,7 +206,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               marginBottom={SPACING.spacing16}
             >
               <LegacyStyledText
-                as="h2"
+                forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
@@ -227,7 +229,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           )}
           <Divider marginY={0} color={COLORS.grey30} />
           <Box
-            padding={SPACING.spacing16}
+            padding={childrenPadding}
             flex="1 1 auto"
             overflowY="auto"
             data-testid={`Slideout_body_${

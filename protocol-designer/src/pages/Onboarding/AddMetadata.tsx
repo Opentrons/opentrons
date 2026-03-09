@@ -8,12 +8,12 @@ import {
   InputField,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
 
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import { ONBOARDING_FLOW_DURATION_EVENT } from '/protocol-designer/analytics/constants'
 import { HandleEnter } from '/protocol-designer/components/atoms'
-import { TextAreaField } from '/protocol-designer/components/molecules'
 
 import { WizardBody } from './WizardBody'
 

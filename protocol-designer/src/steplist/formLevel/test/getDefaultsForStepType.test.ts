@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { ALL } from '@opentrons/shared-data'
+
 import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -17,10 +19,11 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
-        nozzles: null,
+        nozzles: ALL,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
+        primaryNozzle: null,
         dropTip_wellNames: undefined,
         dropTip_location: null,
         pickUpTip_location: undefined,
@@ -134,6 +137,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_checkbox: false,
         pipette: null,
         nozzles: null,
+        primaryNozzle: 'A1',
         volume: undefined,
         times: null,
         wells: [],
@@ -171,6 +175,7 @@ describe('getDefaultsForStepType', () => {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -224,16 +229,29 @@ describe('getDefaultsForStepType', () => {
         profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
-        blockIsActiveHold: false,
-        blockTargetTempHold: null,
-        lidIsActiveHold: false,
-        lidTargetTempHold: null,
-        lidOpenHold: null,
       })
     })
     it('should default to an empty object', () => {
       // @ts-expect-error(sa, 2021-6-15): this case can never actually happen beacuse '' is not a StepType
       expect(getDefaultsForStepType('')).toEqual({})
+    })
+  })
+  describe('flex stacker step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('flexStacker')).toEqual({
+        fillLabwareUri: null,
+        fillLabwareIds: null,
+        flexStackerFormType: null,
+        interventionMessage: null,
+        moduleId: null,
+      })
+    })
+  })
+  describe('vacuum step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('vacuum')).toEqual({
+        moduleId: null,
+      })
     })
   })
 })

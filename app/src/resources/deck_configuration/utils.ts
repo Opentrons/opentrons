@@ -65,8 +65,7 @@ function isMatchedFixture(
   )
 }
 
-interface CutoutConfigAndCompatibilityWithPartial
-  extends CutoutConfigAndCompatibility {
+interface CutoutConfigAndCompatibilityWithPartial extends CutoutConfigAndCompatibility {
   partialRequiredCutoutFixtureId?: CutoutFixtureId
 }
 

@@ -22,12 +22,11 @@ import textwrap
 from opentrons.protocol_engine.types import DeckType
 from opentrons.protocols.api_support import deck_type
 
-
+from . import store
 from robot_server.persistence.file_and_directory_names import (
     DECK_CONFIGURATION_FILE,
     LATEST_VERSION_DIRECTORY,
 )
-from . import store
 
 
 def _main() -> None:

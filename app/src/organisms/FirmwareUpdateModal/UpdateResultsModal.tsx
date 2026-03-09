@@ -54,7 +54,7 @@ export function UpdateResultsModal(
       {!isSuccess ? (
         <OddModal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
+            <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
               {t('branded:firmware_update_download_logs')}
             </LegacyStyledText>
             <SmallButton
@@ -94,13 +94,16 @@ export function UpdateResultsModal(
                 marginBottom={SPACING.spacing16}
               />
               <LegacyStyledText
-                as="h4"
+                forwardedAs="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
               </LegacyStyledText>
-              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+              <LegacyStyledText
+                forwardedAs="p"
+                textAlign={TYPOGRAPHY.textAlignCenter}
+              >
                 <Trans
                   t={t}
                   i18nKey="ready_to_use"

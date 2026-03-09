@@ -1,17 +1,15 @@
 """Helpers for flagging unsafe movements to a Thermocycler Module."""
+
 from typing import Optional
 
+from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
+from ..state.state import StateStore
+from ..types import LabwareLocation, ModuleLocation
+from .equipment import EquipmentHandler
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
-
-
 from opentrons.protocol_engine.state.module_substates import ThermocyclerModuleId
-from ..types import ModuleLocation, LabwareLocation
-from ..state.state import StateStore
-from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
-
-from .equipment import EquipmentHandler
 
 
 class ThermocyclerMovementFlagger:
@@ -154,7 +152,7 @@ class ThermocyclerMovementFlagger:
         )
         if thermocycler is None:
             raise self._HardwareThermocyclerMissingError(
-                f"No Thermocycler found" f' with serial number "{thermocycler_serial}".'
+                f'No Thermocycler found with serial number "{thermocycler_serial}".'
             )
 
         lid_status = thermocycler.lid_status

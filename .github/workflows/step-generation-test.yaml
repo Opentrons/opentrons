@@ -12,6 +12,7 @@ on:
       - '.github/actions/js/setup/action.yml'
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
+      - 'vitest.config.*'
   push:
     paths:
       - 'step-generation/**'
@@ -21,6 +22,7 @@ on:
       - '.github/actions/js/setup/action.yml'
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
+      - 'vitest.config.*'
     branches:
       - '*'
 
@@ -42,7 +44,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/js/setup
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov

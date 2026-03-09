@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   DIRECTION_COLUMN,
@@ -13,8 +14,8 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { formatTime } from '/protocol-designer/pages/Designer/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import {
   getAdditionalEquipmentEntities,
@@ -25,6 +26,7 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
+import { FlexStackerSummary } from './FlexStackerSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
@@ -56,7 +58,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     return null
   }
   const { stepType } = currentStep
-  const { labware: labwareState, liquidState } = robotState
+  const {
+    labware: labwareState,
+    liquidState,
+    modules: moduleState,
+  } = robotState
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix': {
@@ -106,8 +112,6 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         blockTargetTemp,
         lidOpen,
         thermocyclerFormType,
-        lidOpenHold,
-        blockTargetTempHold,
         profileTargetLidTemp,
         profileVolume,
       } = currentStep
@@ -147,22 +151,14 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
                 'application:units.degrees'
               )}`}
             />
-            <StyledTrans
-              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.block"
-              tagText={`${blockTargetTempHold}${t(
-                'application:units.degrees'
-              )}`}
-            />
-            <StyledTrans
-              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
-              tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${
-                  lidOpenHold ? 'open' : 'closed'
-                }`
-              )}
-            />
           </div>
         )
+      break
+    }
+    case 'camera': {
+      stepSummaryContent = (
+        <StyledTrans i18nKey={'protocol_steps:camera.capture_image'} />
+      )
       break
     }
 
@@ -336,6 +332,15 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       )
       break
     }
+    case 'flexStacker': {
+      stepSummaryContent = (
+        <FlexStackerSummary
+          currentStep={currentStep}
+          moduleRobotState={moduleState}
+        />
+      )
+      break
+    }
 
     default:
       stepSummaryContent = null
@@ -358,7 +363,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              css={LINE_CLAMP_TEXT_STYLE(3)}
+              className={clsx(
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_break_all
+              )}
+              style={{ WebkitLineClamp: 3 }}
             >
               {stepDetails}
             </StyledText>

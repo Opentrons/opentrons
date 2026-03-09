@@ -6,7 +6,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
-import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 

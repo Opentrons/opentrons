@@ -1,9 +1,9 @@
 import asyncio
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from typing import Any, Iterator
 
 import pytest
 from mock import patch
-from typing import Any, Iterator
 
 from server_utils import util
 
@@ -21,7 +21,7 @@ def mock_utc_now(mock_start_time: datetime) -> Iterator[datetime]:
     1 day."""
 
     class _TimeIncrementer:
-        def __init__(self, t: datetime):
+        def __init__(self, t: datetime) -> None:
             self._time = t
 
         def __call__(self, *args: Any, **kwargs: Any) -> datetime:

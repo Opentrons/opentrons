@@ -84,7 +84,7 @@ export function CalibrationStatusCard({
             iconSize="0.313rem"
           />
         </Flex>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('calibration_status_description')}
         </LegacyStyledText>
         <Link

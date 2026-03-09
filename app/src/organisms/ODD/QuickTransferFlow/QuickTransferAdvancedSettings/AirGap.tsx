@@ -119,7 +119,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
       ? getAspirateAirGapVolumeRange(state.pipette, state.tipRack)
       : getDispenseAirGapVolumeRange(
           state.volume,
-          state?.disposalVolume ?? 0,
+          state?.disposalVolumeDispenseSettings?.volume ?? 0,
           state.path,
           state.pipette,
           state.tipRack

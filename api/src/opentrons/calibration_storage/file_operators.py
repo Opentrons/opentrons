@@ -1,10 +1,11 @@
-""" opentrons.calibration_storage.file_operators: functions that
+"""opentrons.calibration_storage.file_operators: functions that
 manipulate the file system.
 
 These methods should only be imported inside the calibration_storage
 module, except in the special case of v2 labware support in
 the v1 API.
 """
+
 import datetime
 import json
 import logging
@@ -13,8 +14,7 @@ from pathlib import Path
 
 import pydantic
 
-from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
-
+from .encoder_decoder import DateTimeDecoder, DateTimeEncoder
 
 _log = logging.getLogger(__name__)
 

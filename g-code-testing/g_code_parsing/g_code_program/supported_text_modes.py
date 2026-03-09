@@ -1,9 +1,9 @@
 import re
-
-from g_code_parsing.g_code import GCode
-from g_code_parsing.errors import InvalidTextModeError
-from typing import Callable, List
 from enum import Enum
+from typing import Callable, List
+
+from g_code_parsing.errors import InvalidTextModeError
+from g_code_parsing.g_code import GCode
 
 MULTIPLE_SPACE_REGEX = re.compile(" +")
 

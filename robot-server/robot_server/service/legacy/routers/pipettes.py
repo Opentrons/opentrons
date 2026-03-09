@@ -1,10 +1,11 @@
 import typing
-from fastapi import APIRouter, Query, Depends
 
+from fastapi import APIRouter, Depends, Query
+
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount

@@ -1,16 +1,16 @@
 import asyncio
+import threading
 import weakref
 from typing import NoReturn, Optional
-import threading
 
 import pytest
 
+from opentrons.hardware_control.api import API
 from opentrons.hardware_control.modules import ModuleAtPort, SimulatingModule
 from opentrons.hardware_control.thread_manager import (
-    ThreadManagerException,
     ThreadManager,
+    ThreadManagerException,
 )
-from opentrons.hardware_control.api import API
 
 
 async def _raise_exception() -> NoReturn:

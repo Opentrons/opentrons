@@ -1,6 +1,6 @@
 import typing
 
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AttachedPipette(BaseModel):
@@ -18,7 +18,7 @@ class AttachedPipette(BaseModel):
         "without the version string",
     )
     tip_length: typing.Optional[float] = Field(
-        ..., description="The default tip length for this pipette, if " "attached"
+        ..., description="The default tip length for this pipette, if attached"
     )
     mount_axis: str = Field(
         ..., description="The axis that moves this pipette up and down"

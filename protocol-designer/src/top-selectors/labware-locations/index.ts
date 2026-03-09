@@ -5,6 +5,7 @@ import {
   FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   isAddressableAreaStandardSlot,
@@ -44,7 +45,10 @@ import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
 
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
-import type { RobotState } from '@opentrons/step-generation'
+import type {
+  FlexStackerModuleState,
+  RobotState,
+} from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
@@ -233,10 +237,14 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
 
       const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
         (acc, [modId, modOnDeck]) => {
-          const moduleHasLabware = Object.entries(labware).some(
-            ([_, lwOnDeck]) =>
-              lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
-          )
+          const isModuleIsAStacker =
+            modOnDeck.moduleState.type === FLEX_STACKER_MODULE_TYPE
+          const moduleHasLabware = !isModuleIsAStacker
+            ? Object.entries(labware).some(
+                ([_, lwOnDeck]) =>
+                  lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
+              )
+            : (modOnDeck.moduleState as FlexStackerModuleState) == null
           const type = moduleEntities[modId].type
           const slot = modOnDeck.slot
           let tcLocations
@@ -249,7 +257,9 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
             : [
                 ...acc,
                 {
-                  name: getModuleDisplayName(moduleEntities[modId].model),
+                  name: isModuleIsAStacker
+                    ? slot
+                    : getModuleDisplayName(moduleEntities[modId].model),
                   value: modId,
                   deckLabel: tcLocations != null ? tcLocations : slot,
                 },

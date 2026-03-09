@@ -71,6 +71,7 @@ const render = () => {
       setViewBox={vi.fn()}
       viewBox="mockViewBox"
       initialViewBox="mockInitialViewBox"
+      currentStep={null}
     />
   )[0]
 }

@@ -1,7 +1,7 @@
 from typing_extensions import Protocol
-from .types import CalibrationType
 
 from ..util import DeckTransformState
+from .types import CalibrationType
 
 
 class Calibratable(Protocol[CalibrationType]):

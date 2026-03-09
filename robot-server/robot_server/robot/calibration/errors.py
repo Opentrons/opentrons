@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.service.errors import ErrorDef, ErrorCreateDef
+
+from robot_server.service.errors import ErrorCreateDef, ErrorDef
 
 
 class CalibrationError(ErrorDef):
@@ -51,6 +52,6 @@ class CalibrationError(ErrorDef):
     ERROR_DURING_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         title="Error During State Transition",
-        format_string="Event {action} failed to transition " "from {state}: {error}",
+        format_string="Event {action} failed to transition from {state}: {error}",
         error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )

@@ -7,14 +7,15 @@ import {
   ALIGN_CENTER,
   Banner,
   BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
-  NewPrimaryBtn,
-  NewSecondaryBtn,
+  PrimaryButton,
   ReleaseNotes,
+  SecondaryButton,
   SPACING,
   Tooltip,
   useHoverTooltip,
@@ -26,7 +27,6 @@ import {
   DOWNGRADE,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
-  OT2_BALENA,
   REINSTALL,
   robotUpdateChangelogSeen,
   UPGRADE,
@@ -93,53 +93,58 @@ export function UpdateRobotModal({
     disabledReason = t(updateFromFileDisabledReason)
   else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
 
-  useEffect(() => {
-    dispatch(robotUpdateChangelogSeen(robotName))
-  }, [robotName])
+  useEffect(
+    () => {
+      dispatch(robotUpdateChangelogSeen(robotName))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [robotName]
+  )
 
   let heading = ''
   if (updateType === UPGRADE || updateType === DOWNGRADE) {
-    if (systemType === OT2_BALENA) {
-      heading = t('robot_operating_update_available')
-    } else {
-      heading = `${robotName} ${t('update_available')}`
-    }
+    heading = t('robot_operating_update_available')
   } else if (updateType === REINSTALL) {
     heading = t('robot_up_to_date')
     releaseNotes = t('robot_up_to_date_description')
   }
 
   const robotUpdateFooter = (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      paddingX={SPACING.spacing24}
+      borderTop={BORDERS.lineBorder}
+      borderColor={COLORS.grey30}
+    >
       <ExternalLink
         href={`${RELEASE_NOTES_URL_BASE}${robotUpdateVersion}`}
         css={css`
           font-size: 0.875rem;
         `}
         id="SoftwareUpdateReleaseNotesLink"
-        marginLeft={SPACING.spacing32}
       >
         {t('release_notes')}
       </ExternalLink>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_AROUND}>
-        <NewSecondaryBtn
-          onClick={closeModal}
-          marginRight={SPACING.spacing8}
-          css={FOOTER_BUTTON_STYLE}
-        >
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_AROUND}
+        gap={SPACING.spacing8}
+      >
+        <SecondaryButton onClick={closeModal} css={FOOTER_BUTTON_STYLE}>
           {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
-        </NewSecondaryBtn>
-        <NewPrimaryBtn
+        </SecondaryButton>
+        <PrimaryButton
           onClick={() => {
             dispatchStartRobotUpdate(robotName)
           }}
-          marginRight={SPACING.spacing12}
           css={FOOTER_BUTTON_STYLE}
           disabled={updateDisabled}
           {...updateButtonProps}
         >
           {t('update_robot_now')}
-        </NewPrimaryBtn>
+        </PrimaryButton>
         {updateDisabled && (
           <Tooltip tooltipProps={updateButtonTooltipProps}>
             {disabledReason}

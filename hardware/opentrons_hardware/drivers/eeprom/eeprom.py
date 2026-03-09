@@ -1,22 +1,22 @@
 """Module to read/write to the eeprom on the Flex SOM."""
 
-import re
-import os
 import logging
+import os
+import re
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Set, Type, Tuple, Any
 from types import TracebackType
+from typing import Any, Optional, Set, Tuple, Type
 
 from ..gpio import OT3GPIO
 from .types import (
-    PropId,
-    Property,
     EEPROMData,
+    Property,
+    PropId,
 )
 from .utils import (
-    parse_data,
     generate_packet,
+    parse_data,
 )
 
 logger = logging.getLogger(__name__)

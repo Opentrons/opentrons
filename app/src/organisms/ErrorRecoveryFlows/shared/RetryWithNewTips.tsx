@@ -28,7 +28,7 @@ export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="robot_will_retry_with_new_tips"
         components={{
-          block: <LegacyStyledText as="p" />,
+          block: <LegacyStyledText forwardedAs="p" />,
         }}
       />
     )

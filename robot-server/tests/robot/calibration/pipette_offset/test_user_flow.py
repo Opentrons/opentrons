@@ -1,32 +1,37 @@
 import datetime
 import os
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
 import pytest
 from mock import MagicMock, call, patch
-from typing import List, Tuple, Dict, Any
+
 from opentrons import config
-from pathlib import Path
-from opentrons_shared_data.pipette import (
-    mutable_configurations,
-    pipette_load_name_conversions as pipette_load_name,
-)
-from opentrons.calibration_storage import helpers, types as CSTypes
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage import types as CSTypes
 from opentrons.calibration_storage.ot2 import models
-from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api import labware
-
+from opentrons.types import Mount, Point
 from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+)
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 
-from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command_definitions import CalibrationCommand
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetCalibrationState as POCState,
+)
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetWithTipLengthCalibrationState as POWTState,
+)
 from robot_server.robot.calibration.pipette_offset.user_flow import (
     PipetteOffsetCalibrationUserFlow,
 )
-from robot_server.robot.calibration.pipette_offset.constants import (
-    PipetteOffsetCalibrationState as POCState,
-    PipetteOffsetWithTipLengthCalibrationState as POWTState,
-)
-
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.models.command_definitions import CalibrationCommand
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
@@ -149,14 +154,17 @@ def mock_hw(hardware):
 @pytest.fixture
 def mock_user_flow(mock_hw):
     mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
-    with patch.object(
-        PipetteOffsetCalibrationUserFlow,
-        "_get_stored_tip_length_cal",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        PipetteOffsetCalibrationUserFlow,
-        "_get_stored_pipette_offset_cal",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_tip_length_cal",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_pipette_offset_cal",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         m = PipetteOffsetCalibrationUserFlow(hardware=mock_hw, mount=mount)
         yield m
@@ -165,14 +173,17 @@ def mock_user_flow(mock_hw):
 @pytest.fixture
 def mock_user_flow_fused(mock_hw):
     mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
-    with patch.object(
-        PipetteOffsetCalibrationUserFlow,
-        "_get_stored_tip_length_cal",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        PipetteOffsetCalibrationUserFlow,
-        "_get_stored_pipette_offset_cal",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_tip_length_cal",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_pipette_offset_cal",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         m = PipetteOffsetCalibrationUserFlow(
             hardware=mock_hw, mount=mount, recalibrate_tip_length=True
@@ -269,7 +280,7 @@ hw_commands_fused: List[Tuple[str, str, Dict[Any, Any], str]] = [
 
 
 @pytest.mark.parametrize(
-    "existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip," "hasblock,useblock",
+    "existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip,hasblock,useblock",
     [
         # If we otherwise have everything we need, follow the argument
         (
@@ -407,12 +418,17 @@ def test_create_params(
     hasblock,
     useblock,
 ):
-    with patch.object(
-        PipetteOffsetCalibrationUserFlow, "_get_stored_tip_length_cal", new=existing_tlc
-    ), patch.object(
-        PipetteOffsetCalibrationUserFlow,
-        "_get_stored_pipette_offset_cal",
-        new=existing_poc,
+    with (
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_tip_length_cal",
+            new=existing_tlc,
+        ),
+        patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            "_get_stored_pipette_offset_cal",
+            new=existing_poc,
+        ),
     ):
         m = PipetteOffsetCalibrationUserFlow(
             hardware=mock_hw,
@@ -589,7 +605,6 @@ async def test_save_tip_length(
 async def test_save_custom_tiprack_def(
     mock_user_flow_fused, custom_tiprack_def, clear_custom_tiprack_def_dir
 ):
-
     uf = mock_user_flow_fused
     uf._load_tip_rack(custom_tiprack_def, uf._get_stored_pipette_offset_cal())
     uf._sm.set_state(uf._sm.state.measuringTipOffset)

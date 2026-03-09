@@ -198,7 +198,6 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           })
         case 'robotUpdate:UPLOAD_FILE': {
           const { host, path, systemFile } = action.payload
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           return postFile(
             `http://${host.ip}:${host.port}${path}`,
             SYSTEM_FILENAME,
@@ -239,7 +238,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             } else if (webUpdate.files?.system != null) {
               return {
                 systemFile: webUpdate.files.system,
-                version: webUpdate.version as string, // version is string if files is not null
+                version: webUpdate.version!, // version is string if files is not null
                 isManualFile: false,
               }
             } else {

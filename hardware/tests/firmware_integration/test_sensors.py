@@ -1,13 +1,21 @@
 """Tests for eeprom."""
+
 import asyncio
+from typing import Tuple, Union
 
 import pytest
-from typing import Union, Tuple
+
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
-    SensorType,
     SensorThresholdMode,
+    SensorType,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
+    SensorThresholdModeField,
+    SensorTypeField,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
@@ -18,24 +26,17 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteToSensorRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    ReadFromSensorRequestPayload,
     BaselineSensorRequestPayload,
+    ReadFromSensorRequestPayload,
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorTypeField,
-    SensorIdField,
-    SensorThresholdModeField,
-)
 from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
     UInt8Field,
     UInt16Field,
     UInt32Field,
-    Int32Field,
 )
-
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.sensors.types import SensorDataType
 
 
@@ -158,7 +159,7 @@ async def test_baseline_poll_environment(
                 can_messenger_queue.read(), 1
             )
         except Exception as e:
-            pytest.fail(f"Did not get response #{response_idx+1}: {str(e)}")
+            pytest.fail(f"Did not get response #{response_idx + 1}: {str(e)}")
         assert isinstance(response, ReadFromSensorResponse)
         assert response.payload.sensor.value in (
             SensorType.humidity.value,

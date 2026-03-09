@@ -109,10 +109,9 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
         // since we're using a mutable array as a queue, guard against unsafe
         // array access before we start pushing
         if (pollQueue.length > 0) {
-          const head = pollQueue.shift() as HealthPollerTarget
+          const head = pollQueue.shift()!
           // take the head of the queue out and put it back in at the end
           pollQueue.push(head)
-          // eslint-disable-next-line no-void
           void pollAndNotify(head)
         }
       }

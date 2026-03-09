@@ -1,12 +1,13 @@
 import typing
 from datetime import datetime
-from enum import Enum
+
+from pydantic import BaseModel, Field
 
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.util import DeckTransformState
-from pydantic import BaseModel, Field
-from robot_server.service.shared_models import calibration as cal_model
+from opentrons_shared_data.util import StrEnum
 
+from robot_server.service.shared_models import calibration as cal_model
 
 # NOTE: this would be more accurately typed as
 # a typing.Tuple[float, float, float], but tuple is
@@ -16,16 +17,12 @@ Offset = typing.Sequence[float]
 # NOTE: this would be more accurately typed as
 # a 4x4 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
-AffineMatrix = typing.Sequence[
-    typing.Sequence[float],
-]
+AffineMatrix = typing.Sequence[typing.Sequence[float],]
 
 # NOTE: this would be more accurately typed as
 # a 3x3 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
-AttitudeMatrix = typing.Sequence[
-    typing.Sequence[float],
-]
+AttitudeMatrix = typing.Sequence[typing.Sequence[float],]
 
 
 class InstrumentOffset(BaseModel):
@@ -52,7 +49,7 @@ class InstrumentCalibrationStatus(BaseModel):
     left: InstrumentOffset
 
 
-class MatrixType(str, Enum):
+class MatrixType(StrEnum):
     """The deck calibration matrix type"""
 
     affine = "affine"

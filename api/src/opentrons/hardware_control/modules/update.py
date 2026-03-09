@@ -1,14 +1,14 @@
 import asyncio
 import logging
 import os
-from pathlib import Path
+from contextlib import asynccontextmanager
 from glob import glob
+from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Tuple, Union
 
 from .errors import UpdateError
 from .mod_abc import AbstractModule
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
-from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ async def find_bootloader_port() -> str:
                 log.info(f"Found bootloader at port {bootloader_ports[0]}")
                 return bootloader_ports[0]
             elif len(bootloader_ports) > 1:
-                raise OSError("Multiple new bootloader ports" "found on mode switch")
+                raise OSError("Multiple new bootloader portsfound on mode switch")
         await asyncio.sleep(2)
     raise Exception("No ot_module bootloaders found in /dev. Try again")
 
@@ -109,7 +109,7 @@ async def find_dfu_device(pid: str, expected_device_count: int) -> str:
             # Heater-Shaker has 2 unique endpoints, Thermocycler has 3
             return serial
         elif devices_found > expected_device_count:
-            raise OSError("Multiple new bootloader devices" "found on mode switch")
+            raise OSError("Multiple new bootloader devicesfound on mode switch")
 
     raise RuntimeError(
         "Could not update firmware via dfu. Possible issues- dfu-util"
@@ -181,9 +181,7 @@ async def upload_via_bossa(
     # NOTE: bossac cannot traverse symlinks to port,
     # so we resolve to real path
     resolved_symlink = os.path.realpath(port)
-    log.info(
-        f"device at symlinked port: {port} " f"resolved to path: {resolved_symlink}"
-    )
+    log.info(f"device at symlinked port: {port} resolved to path: {resolved_symlink}")
     bossa_args = [
         "bossac",
         f"-p{resolved_symlink}",

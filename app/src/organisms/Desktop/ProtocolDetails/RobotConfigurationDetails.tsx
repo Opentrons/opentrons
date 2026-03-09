@@ -50,6 +50,7 @@ import type {
   PipetteName,
   RobotType,
   SingleSlotCutoutFixtureId,
+  VISUAL_SLOTS,
 } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
@@ -96,8 +97,7 @@ export const RobotConfigurationDetails = (
 
   const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
-    getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
-    null
+    getPipetteNameSpecs(leftMountPipetteName!)?.displayName ?? null
   const leftMountItem =
     leftMountPipetteDisplayName != null ? (
       <InstrumentContainer displayName={leftMountPipetteDisplayName} />
@@ -106,8 +106,7 @@ export const RobotConfigurationDetails = (
     )
 
   const rightMountPipetteDisplayName =
-    getPipetteNameSpecs(rightMountPipetteName as PipetteName)?.displayName ??
-    null
+    getPipetteNameSpecs(rightMountPipetteName!)?.displayName ?? null
   const rightMountItem =
     rightMountPipetteDisplayName != null ? (
       <InstrumentContainer displayName={rightMountPipetteDisplayName} />
@@ -229,10 +228,12 @@ export const RobotConfigurationDetails = (
             <Fragment key={`module_${index}`}>
               <Divider marginY={SPACING.spacing12} width="100%" />
               <RobotConfigurationDetailsItem
-                label={`${t('slot')} ${getModuleDeckLabel(
-                  getModuleType(module.params.model),
-                  module.params.location.slotName
-                )}`}
+                label={t('slot', {
+                  slotName: getModuleDeckLabel(
+                    getModuleType(module.params.model),
+                    module.params.location.slotName
+                  ),
+                })}
                 item={
                   <>
                     <ModuleIcon
@@ -260,16 +261,17 @@ export const RobotConfigurationDetails = (
           fixture.cutoutFixtureId,
           fixture.requiredAddressableAreas[0]
         )
-        const AAName = getAAWithFakesFromVSId(visualSlotId)
+        const AAName = getAAWithFakesFromVSId(visualSlotId as VISUAL_SLOTS)
         return (
           <Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={`${t('slot')} ${
-                AAName != null
-                  ? getAASlotDisplayName(AAName)
-                  : getCutoutDisplayName(fixture.cutoutId)
-              }`}
+              label={t('slot', {
+                slotName:
+                  AAName != null
+                    ? getAASlotDisplayName(AAName)
+                    : getCutoutDisplayName(fixture.cutoutId),
+              })}
               item={
                 <>
                   {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId) ? (

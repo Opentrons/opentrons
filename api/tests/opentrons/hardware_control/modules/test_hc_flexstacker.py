@@ -1,51 +1,51 @@
 import asyncio
-import mock
 from contextlib import nullcontext as does_not_raise
-from typing import AsyncGenerator, ContextManager, Any
+from typing import Any, AsyncGenerator, ContextManager
 
+import mock
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
+)
 
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
+    HardwareRevision,
+    LEDColor,
+    LEDPattern,
     LimitSwitchStatus,
     PlatformStatus,
     StackerAxis,
-    LEDColor,
-    LEDPattern,
-    TOFSensorStatus,
-    TOFSensor,
-    TOFSensorState,
-    TOFSensorMode,
     StackerInfo,
-    HardwareRevision,
+    TOFSensor,
+    TOFSensorMode,
+    TOFSensorState,
+    TOFSensorStatus,
 )
-from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.flex_stacker import (
-    LATCH_CLEARANCE,
-    MAX_TRAVEL,
     HOME_OFFSET_MD,
     HOME_OFFSET_SM,
+    LATCH_CLEARANCE,
+    MAX_TRAVEL,
     PLATFORM_OFFSET,
     SIMULATING_POLL_PERIOD,
     STACKER_MOTION_CONFIG,
     FlexStackerReader,
 )
 from opentrons.hardware_control.modules.types import (
-    PlatformState,
-    ModuleErrorCallback,
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    PlatformState,
 )
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerShuttleLabwareError,
-    FlexStackerHopperLabwareError,
-    FlexStackerShuttleNotEmptyError,
-)
 
 
 @pytest.fixture
@@ -584,7 +584,6 @@ async def test_dispense_labware_error_handling(
             autospec=True,
         ) as labware_detected,
     ):
-
         with expected_raise:
             # Test valid labware height
             await subject.dispense_labware(

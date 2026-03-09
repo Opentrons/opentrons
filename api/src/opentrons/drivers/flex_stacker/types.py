@@ -1,12 +1,13 @@
-from enum import Enum
 from dataclasses import dataclass, fields
-from typing import List, Dict, Optional
+from enum import Enum
+from typing import Dict, List, Optional
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers.command_builder import CommandBuilder
 
 
-class GCODE(str, Enum):
-
+class GCODE(StrEnum):
     MOVE_TO = "G0"
     MOVE_TO_SWITCH = "G5"
     HOME_AXIS = "G28"
@@ -76,7 +77,7 @@ class StackerInfo:
         }
 
 
-class StackerAxis(str, Enum):
+class StackerAxis(StrEnum):
     """Stacker Axis."""
 
     X = "X"
@@ -84,7 +85,7 @@ class StackerAxis(str, Enum):
     L = "L"
 
 
-class TOFSensor(str, Enum):
+class TOFSensor(StrEnum):
     """Stacker TOF sensor."""
 
     X = "X"
@@ -102,7 +103,7 @@ class LEDColor(Enum):
 
     @classmethod
     def from_name(cls, name: str) -> "LEDColor":
-        match (name.lower()):
+        match name.lower():
             case "red":
                 return cls.RED
             case "green":
@@ -277,7 +278,7 @@ class StallGuardParams:
     threshold: int
 
 
-class MoveResult(str, Enum):
+class MoveResult(StrEnum):
     """The result of a move command."""
 
     NO_ERROR = "ok"

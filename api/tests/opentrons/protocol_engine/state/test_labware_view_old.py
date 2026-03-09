@@ -5,58 +5,58 @@ longer helpful. Try to add new tests to test_labware_state.py, where they can be
 tested together, treating LabwareState as a private implementation detail.
 """
 
-from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
+from datetime import datetime
+from typing import Any, ContextManager, Dict, List, Optional, Union, cast
 
 import pytest
 from numpy import isclose
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
-    Dimensions as LabwareDimensions,
     Extents,
-    labware_definition_type_adapter,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
     LabwareRole,
     Parameters2,
     Vector3D,
+    labware_definition_type_adapter,
 )
-
-from opentrons.types import DeckSlotName, MountType, Point
+from opentrons_shared_data.labware.labware_definition import (
+    Dimensions as LabwareDimensions,
+)
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D as EngineAABB,
+)
+from opentrons.protocol_engine.state._move_types import EdgePathType
+from opentrons.protocol_engine.state.labware import (
+    LabwareLoadParams,
+    LabwareState,
+    LabwareView,
+)
 from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
     DeckSlotLocation,
     Dimensions,
+    GripSpecs,
+    LabwareLocation,
     LabwareOffset,
     LabwareOffsetVector,
     LegacyLabwareOffsetLocation,
     LoadedLabware,
-    ModuleModel,
     ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    OFF_DECK_LOCATION,
+    ModuleModel,
     OnAddressableAreaOffsetLocationSequenceComponent,
+    OnLabwareLocation,
     OnModuleOffsetLocationSequenceComponent,
-    GripSpecs,
 )
-from opentrons.protocol_engine.state._move_types import EdgePathType
-from opentrons.protocol_engine.state.labware import (
-    LabwareState,
-    LabwareView,
-    LabwareLoadParams,
-)
-from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
-    AxisAlignedBoundingBox3D as EngineAABB,
-)
-
+from opentrons.types import DeckSlotName, MountType, Point
 
 plate = LoadedLabware(
     id="plate-id",
@@ -1724,6 +1724,123 @@ def test_labware_stacking_height_passes_or_raises(
                 stackLimit=stack_limit,
             ),
             bottom_labware_id="labware-id4",
+        )
+
+
+def test_tiprack_lid_stacking_height_passes_and_fails() -> None:
+    """It should pass if the tiprack lid is on an adapter tiprack into lid stack-up, and fail if you attempt to stack multiple tiprack lids."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="tiprack",
+                definitionUri="def-uri-2",
+                location=OnLabwareLocation(labwareId="adapter-id"),
+            ),
+            "adapter-id": LoadedLabware(
+                id="adapter-id",
+                loadName="tiprack_adapter",
+                definitionUri="def-uri-1",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "def-uri-1": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter],
+                parameters=Parameters2.model_construct(
+                    format="irregular",
+                    isTiprack=False,
+                    loadName="tiprack_adapter",
+                    isMagneticModuleCompatible=False,
+                ),
+                stackLimit=1,
+            ),
+            "def-uri-2": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware],
+                parameters=Parameters2.model_construct(
+                    format="irregular",
+                    isTiprack=False,
+                    loadName="tiprack",
+                    isMagneticModuleCompatible=False,
+                ),
+                stackLimit=1,
+            ),
+        },
+    )
+
+    result = subject.raise_if_labware_cannot_be_stacked(
+        top_labware_definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            allowedRoles=[LabwareRole.lid],
+            parameters=Parameters2.model_construct(
+                format="irregular",
+                isTiprack=False,
+                loadName="opentrons_flex_tiprack_lid",
+                isMagneticModuleCompatible=False,
+            ),
+            stackingOffsetWithLabware={"tiprack": Vector3D(x=0, y=0, z=0)},
+            stackLimit=1,
+        ),
+        bottom_labware_id="labware-id",
+    )
+    assert result
+
+
+def test_tiprack_lid_stacking_height_fails() -> None:
+    """It should fail if the tiprack lid is stacked on itself higher than its max stacking height."""
+    subject = get_labware_view(
+        labware_by_id={
+            "lid-id": LoadedLabware(
+                id="lid-id",
+                loadName="opentrons_flex_tiprack_lid",
+                definitionUri="def-uri-1",
+                location=OnLabwareLocation(labwareId="labware-id"),
+            ),
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="tiprack",
+                definitionUri="def-uri-2",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "def-uri-1": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.lid],
+                parameters=Parameters2.model_construct(
+                    format="irregular",
+                    isTiprack=False,
+                    loadName="opentrons_flex_tiprack_lid",
+                    isMagneticModuleCompatible=False,
+                ),
+                stackLimit=1,
+            ),
+            "def-uri-2": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware],
+                parameters=Parameters2.model_construct(
+                    format="irregular",
+                    isTiprack=False,
+                    loadName="tiprack",
+                    isMagneticModuleCompatible=False,
+                ),
+                stackLimit=1,
+            ),
+        },
+    )
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="Tip rack lid"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.lid],
+                parameters=Parameters2.model_construct(
+                    format="irregular",
+                    isTiprack=False,
+                    loadName="opentrons_flex_tiprack_lid",
+                    isMagneticModuleCompatible=False,
+                ),
+                stackingOffsetWithLabware={
+                    "opentrons_flex_tiprack_lid": Vector3D(x=0, y=0, z=0)
+                },
+                stackLimit=1,
+            ),
+            bottom_labware_id="lid-id",
         )
 
 

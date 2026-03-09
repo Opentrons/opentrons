@@ -1,19 +1,15 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
   COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_CENTER,
   LegacyStyledText,
-  SPACING,
   StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { CardButton } from '/app/molecules/CardButton'
+
+import styles from './networksetupmenu.module.css'
 
 import type { IconName } from '@opentrons/components'
 
@@ -44,52 +40,41 @@ export function NetworkSetupMenu(): JSX.Element {
   return (
     <>
       <StepMeter totalSteps={6} currentStep={1} />
-      <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing60}`}
-        flexDirection={DIRECTION_COLUMN}
-      >
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          marginBottom="3.09375rem"
-        >
+      <div className={styles.container}>
+        <div className={styles.title_row}>
           <LegacyStyledText
-            as="h2"
+            forwardedAs="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('choose_network_type')}
           </LegacyStyledText>
-        </Flex>
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacing40}
-        >
+        </div>
+        <div className={styles.description_row}>
           <LegacyStyledText
-            as="h4"
+            forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('branded:network_setup_menu_description')}
           </LegacyStyledText>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          columnGap={SPACING.spacing8}
-          height="17rem"
-        >
+        </div>
+        <div className={styles.card_button_row}>
           {NetworkSetupOptions.map(networkOption => (
-            <CardButton
+            <div
+              className={styles.card_button_wrapper}
               key={networkOption.title}
-              {...networkOption}
-              title={t(networkOption.title)}
-              description={t(networkOption.description)}
-            />
+            >
+              <CardButton
+                {...networkOption}
+                title={t(networkOption.title)}
+                description={t(networkOption.description)}
+              />
+            </div>
           ))}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
     </>
   )
 }

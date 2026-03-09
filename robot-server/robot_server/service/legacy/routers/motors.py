@@ -1,15 +1,14 @@
 from typing import Annotated
 
-from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
+from starlette import status
 
-from opentrons_shared_data.errors import ErrorCodes
-
-from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import Axis
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware

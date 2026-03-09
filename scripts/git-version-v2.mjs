@@ -2,8 +2,8 @@
 
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import git from 'simple-git'
 import semver from 'semver'
+import git from 'simple-git'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
@@ -20,7 +20,9 @@ function defaultTagPrefixes(project) {
 }
 
 function normalizeTagPrefixes(project, tagPrefixes) {
-  const prefixes = tagPrefixes?.length ? tagPrefixes : defaultTagPrefixes(project)
+  const prefixes = tagPrefixes?.length
+    ? tagPrefixes
+    : defaultTagPrefixes(project)
   const unique = [...new Set(prefixes.filter(Boolean))]
 
   if (unique.length === 0) {
@@ -40,10 +42,7 @@ function parseTagWithPrefixes(tag, prefixes) {
 }
 
 export function createGitVersionToolkit(options) {
-  const {
-    project,
-    tagPrefixes,
-  } = options ?? {}
+  const { project, tagPrefixes } = options ?? {}
 
   if (!project) {
     throw new Error('project is required')
@@ -86,7 +85,8 @@ export function createGitVersionToolkit(options) {
       }
 
       if (branch === 'HEAD') {
-        let ciBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+        let ciBranch =
+          process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 
         if (
           ciBranch === process.env.GITHUB_REF_NAME &&
@@ -262,9 +262,12 @@ export function createGitVersionToolkit(options) {
       environment: process.env.GITHUB_ENV || 'N/A',
       serverUrl,
       apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
-      graphqlUrl: process.env.GITHUB_GRAPHQL_URL || 'https://api.github.com/graphql',
+      graphqlUrl:
+        process.env.GITHUB_GRAPHQL_URL || 'https://api.github.com/graphql',
       runUrl:
-        runId && repository ? `${serverUrl}/${repository}/actions/runs/${runId}` : null,
+        runId && repository
+          ? `${serverUrl}/${repository}/actions/runs/${runId}`
+          : null,
       compareUrl:
         headRef && baseRef && repository
           ? `${serverUrl}/${repository}/compare/${baseRef}...${headRef}`
@@ -500,12 +503,15 @@ export function createGitVersionToolkit(options) {
             
             <div class="section">
                 <h2>🌿 Git Information</h2>
-                ${gitInfo.error ? `
+                ${
+                  gitInfo.error
+                    ? `
                     <div class="info-item">
                         <div class="info-label">Error</div>
                         <div class="info-value">${gitInfo.error}</div>
                     </div>
-                ` : `
+                `
+                    : `
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Branch</div>
@@ -538,55 +544,78 @@ export function createGitVersionToolkit(options) {
                         <div class="info-label">Commit Message</div>
                         <div class="commit-message">${gitInfo.commitMessage}</div>
                     </div>
-                `}
+                `
+                }
             </div>
             
-            ${isCI ? `
+            ${
+              isCI
+                ? `
             <div class="section">
                 <h2>🚀 GitHub Actions Information</h2>
                 
                 <h3 style="color: #764ba2; font-size: 1.1rem; margin-bottom: 1rem; margin-top: 1.5rem;">🔗 Quick Links</h3>
                 <div class="info-grid">
-                    ${githubInfo.runUrl ? `
+                    ${
+                      githubInfo.runUrl
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Workflow Run</div>
                         <div class="info-value">
                             <a href="${githubInfo.runUrl}" target="_blank">View Run #${githubInfo.runNumber}</a>
                         </div>
                     </div>
-                    ` : ''}
-                    ${githubInfo.prUrl ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      githubInfo.prUrl
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Pull Request</div>
                         <div class="info-value">
                             <a href="${githubInfo.prUrl}" target="_blank">View PR</a>
                         </div>
                     </div>
-                    ` : ''}
-                    ${githubInfo.compareUrl ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      githubInfo.compareUrl
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Compare Changes</div>
                         <div class="info-value">
                             <a href="${githubInfo.compareUrl}" target="_blank">${githubInfo.baseRef}...${githubInfo.headRef}</a>
                         </div>
                     </div>
-                    ` : ''}
-                    ${githubInfo.branchUrl ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      githubInfo.branchUrl
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Branch</div>
                         <div class="info-value">
                             <a href="${githubInfo.branchUrl}" target="_blank">${githubInfo.refName}</a>
                         </div>
                     </div>
-                    ` : ''}
-                    ${githubInfo.tagUrl ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      githubInfo.tagUrl
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Tag</div>
                         <div class="info-value">
                             <a href="${githubInfo.tagUrl}" target="_blank">${githubInfo.refName}</a>
                         </div>
                     </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                 </div>
                 
                 <h3 style="color: #764ba2; font-size: 1.1rem; margin-bottom: 1rem; margin-top: 1.5rem;">📊 Run Details</h3>
@@ -634,9 +663,11 @@ export function createGitVersionToolkit(options) {
                     <div class="info-item">
                         <div class="info-label">Actor</div>
                         <div class="info-value">
-                            ${githubInfo.actor !== 'N/A'
-                ? `<a href="${githubInfo.serverUrl}/${githubInfo.actor}" target="_blank">${githubInfo.actor}</a>`
-                : 'N/A'}
+                            ${
+                              githubInfo.actor !== 'N/A'
+                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.actor}" target="_blank">${githubInfo.actor}</a>`
+                                : 'N/A'
+                            }
                         </div>
                     </div>
                     <div class="info-item">
@@ -646,9 +677,11 @@ export function createGitVersionToolkit(options) {
                     <div class="info-item">
                         <div class="info-label">Triggering Actor</div>
                         <div class="info-value">
-                            ${githubInfo.triggeringActor !== 'N/A'
-                ? `<a href="${githubInfo.serverUrl}/${githubInfo.triggeringActor}" target="_blank">${githubInfo.triggeringActor}</a>`
-                : 'N/A'}
+                            ${
+                              githubInfo.triggeringActor !== 'N/A'
+                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.triggeringActor}" target="_blank">${githubInfo.triggeringActor}</a>`
+                                : 'N/A'
+                            }
                         </div>
                     </div>
                 </div>
@@ -671,19 +704,27 @@ export function createGitVersionToolkit(options) {
                         <div class="info-label">Ref Protected</div>
                         <div class="info-value">${githubInfo.refProtected}</div>
                     </div>
-                    ${githubInfo.headRef !== 'N/A' ? `
+                    ${
+                      githubInfo.headRef !== 'N/A'
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Head Ref (PR)</div>
                         <div class="info-value">${githubInfo.headRef}</div>
                     </div>
-                    ` : ''}
-                    ${githubInfo.baseRef !== 'N/A' ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      githubInfo.baseRef !== 'N/A'
+                        ? `
                     <div class="info-item">
                         <div class="info-label">Base Ref (PR)
                         </div>
                         <div class="info-value">${githubInfo.baseRef}</div>
                     </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                 </div>
                 
                 <h3 style="color: #764ba2; font-size: 1.1rem; margin-bottom: 1rem; margin-top: 1.5rem;">🏢 Repository Information</h3>
@@ -691,9 +732,11 @@ export function createGitVersionToolkit(options) {
                     <div class="info-item">
                         <div class="info-label">Repository</div>
                         <div class="info-value">
-                            ${githubInfo.repository !== 'N/A'
-                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repository}" target="_blank">${githubInfo.repository}</a>`
-                : 'N/A'}
+                            ${
+                              githubInfo.repository !== 'N/A'
+                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repository}" target="_blank">${githubInfo.repository}</a>`
+                                : 'N/A'
+                            }
                         </div>
                     </div>
                     <div class="info-item">
@@ -704,9 +747,11 @@ export function createGitVersionToolkit(options) {
                     <div class="info-item">
                         <div class="info-label">Repository Owner</div>
                         <div class="info-value">
-                            ${githubInfo.repositoryOwner !== 'N/A'
-                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repositoryOwner}" target="_blank">${githubInfo.repositoryOwner}</a>`
-                : 'N/A'}
+                            ${
+                              githubInfo.repositoryOwner !== 'N/A'
+                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repositoryOwner}" target="_blank">${githubInfo.repositoryOwner}</a>`
+                                : 'N/A'
+                            }
                         </div>
                     </div>
                     <div class="info-item">
@@ -716,7 +761,9 @@ export function createGitVersionToolkit(options) {
                 </div>
                 
             </div>
-            ` : ''}
+            `
+                : ''
+            }
         </div>
         
         <div class="footer">

@@ -1,9 +1,10 @@
-""" update-server implementation for openembedded systems """
+"""update-server implementation for openembedded systems"""
+
 import asyncio
 import logging
+from typing import Any, Mapping, Optional
 
 from aiohttp import web
-from typing import Optional, Mapping, Any
 
 from otupdate.common import (
     config,
@@ -13,14 +14,13 @@ from otupdate.common import (
     ssh_key_management,
     update,
 )
-
-from otupdate.openembedded.update_actions import (
-    RootFSInterface,
-    PartitionManager,
-    OT3UpdateActions,
-)
 from otupdate.common.file_actions import load_version_file
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
+from otupdate.openembedded.update_actions import (
+    OT3UpdateActions,
+    PartitionManager,
+    RootFSInterface,
+)
 
 OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 
@@ -94,16 +94,14 @@ async def get_app(
             [
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Openembedded version:         "
-                f'{version.get("openembedded_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                f"{version.get('openembedded_version', 'unknown')}",
+                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
                 "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
+                f"{version.get('opentrons_api_version', 'unknown')}",
+                f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",
                 "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
+                f"{version.get('update_server_version', 'unknown')}",
+                f"\t(from git sha      {version.get('update_server_sha', 'unknown')}",
             ]
         )
     )

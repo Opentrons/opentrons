@@ -1,7 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
+import {
+  useAddCameraImageSettingsToRunMutation,
+  useAddCameraSettingsToRunMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -28,9 +31,12 @@ const render = (props: ProtocolSetupCameraProps) => {
 describe('ProtocolSetupCamera', () => {
   let mockProps: ProtocolSetupCameraProps
   let mockConfirmCamera: Mock
+  let mockAddCameraImageSettings: Mock
 
   beforeEach(() => {
     mockConfirmCamera = vi.fn()
+    mockAddCameraImageSettings = vi.fn()
+
     mockProps = {
       runId: 'MOCK-RUN-ID',
       isCameraRequired: true,
@@ -53,7 +59,10 @@ describe('ProtocolSetupCamera', () => {
       liveStreamEnabled: true,
     })
     vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
-      addCameraSettingsToRun: mockConfirmCamera,
+      mutateAsync: mockConfirmCamera,
+    } as any)
+    vi.mocked(useAddCameraImageSettingsToRunMutation).mockReturnValue({
+      mutateAsync: mockAddCameraImageSettings,
     } as any)
   })
 
@@ -79,6 +88,7 @@ describe('ProtocolSetupCamera', () => {
     render(mockProps)
 
     const confirmButton = screen.getByText('Confirm preferences')
+    mockConfirmCamera.mockResolvedValue(undefined)
     fireEvent.click(confirmButton)
 
     expect(mockConfirmCamera).toHaveBeenCalledTimes(1)

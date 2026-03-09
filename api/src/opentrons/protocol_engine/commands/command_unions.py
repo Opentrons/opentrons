@@ -5,35 +5,333 @@ from typing import Annotated, Type, Union, get_type_hints
 
 from pydantic import Field, TypeAdapter
 
-from opentrons.util.get_union_elements import get_union_elements
-
-from .command import DefinedErrorData
-from .pipetting_common import (
-    OverpressureError,
-    LiquidNotFoundError,
-    TipPhysicallyAttachedError,
+from . import (
+    absorbance_reader,
+    calibration,
+    flex_stacker,
+    heater_shaker,
+    magnetic_module,
+    robot,
+    temperature_module,
+    thermocycler,
+    unsafe,
 )
-from .movement_common import StallOrCollisionError
+from .air_gap_in_place import (
+    AirGapInPlace,
+    AirGapInPlaceCommandType,
+    AirGapInPlaceCreate,
+    AirGapInPlaceParams,
+    AirGapInPlaceResult,
+)
+from .aspirate import (
+    Aspirate,
+    AspirateCommandType,
+    AspirateCreate,
+    AspirateParams,
+    AspirateResult,
+)
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceCommandType,
+    AspirateInPlaceCreate,
+    AspirateInPlaceParams,
+    AspirateInPlaceResult,
+)
+from .aspirate_while_tracking import (
+    AspirateWhileTracking,
+    AspirateWhileTrackingCommandType,
+    AspirateWhileTrackingCreate,
+    AspirateWhileTrackingParams,
+    AspirateWhileTrackingResult,
+)
+from .blow_out import (
+    BlowOut,
+    BlowOutCommandType,
+    BlowOutCreate,
+    BlowOutParams,
+    BlowOutResult,
+)
+from .blow_out_in_place import (
+    BlowOutInPlace,
+    BlowOutInPlaceCommandType,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceParams,
+    BlowOutInPlaceResult,
+)
+from .capture_image import (
+    CaptureImage,
+    CaptureImageCommandType,
+    CaptureImageCreate,
+    CaptureImageParams,
+    CaptureImageResult,
+)
+from .command import DefinedErrorData
+from .comment import (
+    Comment,
+    CommentCommandType,
+    CommentCreate,
+    CommentParams,
+    CommentResult,
+)
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeCommandType,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+)
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCommandType,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+)
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCommandType,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+)
+from .custom import (
+    Custom,
+    CustomCommandType,
+    CustomCreate,
+    CustomParams,
+    CustomResult,
+)
+from .dispense import (
+    Dispense,
+    DispenseCommandType,
+    DispenseCreate,
+    DispenseParams,
+    DispenseResult,
+)
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceCommandType,
+    DispenseInPlaceCreate,
+    DispenseInPlaceParams,
+    DispenseInPlaceResult,
+)
+from .dispense_while_tracking import (
+    DispenseWhileTracking,
+    DispenseWhileTrackingCommandType,
+    DispenseWhileTrackingCreate,
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingResult,
+)
+from .drop_tip import (
+    DropTip,
+    DropTipCommandType,
+    DropTipCreate,
+    DropTipParams,
+    DropTipResult,
+)
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceCommandType,
+    DropTipInPlaceCreate,
+    DropTipInPlaceParams,
+    DropTipInPlaceResult,
+)
 from .flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
-    FlexStackerShuttleOccupiedError,
     FlexStackerLabwareStoreError,
+    FlexStackerShuttleError,
+    FlexStackerShuttleOccupiedError,
+    FlexStackerStallOrCollisionError,
 )
-
-from . import absorbance_reader
-from . import flex_stacker
-from . import heater_shaker
-from . import magnetic_module
-from . import temperature_module
-from . import thermocycler
-
-from . import calibration
-from . import unsafe
-from . import robot
-
+from .get_next_tip import (
+    GetNextTip,
+    GetNextTipCommandType,
+    GetNextTipCreate,
+    GetNextTipParams,
+    GetNextTipResult,
+)
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCommandType,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+)
+from .home import (
+    Home,
+    HomeCommandType,
+    HomeCreate,
+    HomeParams,
+    HomeResult,
+)
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleCommandType,
+    IdentifyModuleCreate,
+    IdentifyModuleParams,
+    IdentifyModuleResult,
+)
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeCommandType,
+    LiquidProbeCreate,
+    LiquidProbeParams,
+    LiquidProbeResult,
+    TryLiquidProbe,
+    TryLiquidProbeCommandType,
+    TryLiquidProbeCreate,
+    TryLiquidProbeParams,
+    TryLiquidProbeResult,
+)
+from .load_labware import (
+    LoadLabware,
+    LoadLabwareCommandType,
+    LoadLabwareCreate,
+    LoadLabwareParams,
+    LoadLabwareResult,
+)
+from .load_lid import (
+    LoadLid,
+    LoadLidCommandType,
+    LoadLidCreate,
+    LoadLidParams,
+    LoadLidResult,
+)
+from .load_lid_stack import (
+    LoadLidStack,
+    LoadLidStackCommandType,
+    LoadLidStackCreate,
+    LoadLidStackParams,
+    LoadLidStackResult,
+)
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidCommandType,
+    LoadLiquidCreate,
+    LoadLiquidParams,
+    LoadLiquidResult,
+)
+from .load_liquid_class import (
+    LoadLiquidClass,
+    LoadLiquidClassCommandType,
+    LoadLiquidClassCreate,
+    LoadLiquidClassParams,
+    LoadLiquidClassResult,
+)
+from .load_module import (
+    LoadModule,
+    LoadModuleCommandType,
+    LoadModuleCreate,
+    LoadModuleParams,
+    LoadModuleResult,
+)
+from .load_pipette import (
+    LoadPipette,
+    LoadPipetteCommandType,
+    LoadPipetteCreate,
+    LoadPipetteParams,
+    LoadPipetteResult,
+)
+from .move_labware import (
+    GripperMovementError,
+    MoveLabware,
+    MoveLabwareCommandType,
+    MoveLabwareCreate,
+    MoveLabwareParams,
+    MoveLabwareResult,
+)
+from .move_relative import (
+    MoveRelative,
+    MoveRelativeCommandType,
+    MoveRelativeCreate,
+    MoveRelativeParams,
+    MoveRelativeResult,
+)
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaCommandType,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaResult,
+)
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipCommandType,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipResult,
+)
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesCommandType,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesResult,
+)
+from .move_to_well import (
+    MoveToWell,
+    MoveToWellCommandType,
+    MoveToWellCreate,
+    MoveToWellParams,
+    MoveToWellResult,
+)
+from .movement_common import StallOrCollisionError
+from .pick_up_tip import (
+    PickUpTip,
+    PickUpTipCommandType,
+    PickUpTipCreate,
+    PickUpTipParams,
+    PickUpTipResult,
+    TipPhysicallyMissingError,
+)
+from .pipetting_common import (
+    LiquidNotFoundError,
+    OverpressureError,
+    TipPhysicallyAttachedError,
+)
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCommandType,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+)
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseCommandType,
+    PressureDispenseCreate,
+    PressureDispenseParams,
+    PressureDispenseResult,
+)
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareCommandType,
+    ReloadLabwareCreate,
+    ReloadLabwareParams,
+    ReloadLabwareResult,
+)
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisCommandType,
+    RetractAxisCreate,
+    RetractAxisParams,
+    RetractAxisResult,
+)
+from .save_position import (
+    SavePosition,
+    SavePositionCommandType,
+    SavePositionCreate,
+    SavePositionParams,
+    SavePositionResult,
+)
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipCommandType,
+    SealPipetteToTipCreate,
+    SealPipetteToTipParams,
+    SealPipetteToTipResult,
+)
 from .set_rail_lights import (
     SetRailLights,
     SetRailLightsCommandType,
@@ -41,413 +339,63 @@ from .set_rail_lights import (
     SetRailLightsParams,
     SetRailLightsResult,
 )
-
-from .air_gap_in_place import (
-    AirGapInPlace,
-    AirGapInPlaceParams,
-    AirGapInPlaceCreate,
-    AirGapInPlaceResult,
-    AirGapInPlaceCommandType,
-)
-
-from .aspirate import (
-    Aspirate,
-    AspirateParams,
-    AspirateCreate,
-    AspirateResult,
-    AspirateCommandType,
-)
-
-from .aspirate_in_place import (
-    AspirateInPlace,
-    AspirateInPlaceParams,
-    AspirateInPlaceCreate,
-    AspirateInPlaceResult,
-    AspirateInPlaceCommandType,
-)
-
-from .aspirate_while_tracking import (
-    AspirateWhileTracking,
-    AspirateWhileTrackingParams,
-    AspirateWhileTrackingCreate,
-    AspirateWhileTrackingResult,
-    AspirateWhileTrackingCommandType,
-)
-
-from .comment import (
-    Comment,
-    CommentParams,
-    CommentCreate,
-    CommentResult,
-    CommentCommandType,
-)
-
-from .custom import (
-    Custom,
-    CustomParams,
-    CustomCreate,
-    CustomResult,
-    CustomCommandType,
-)
-
-from .dispense import (
-    Dispense,
-    DispenseParams,
-    DispenseCreate,
-    DispenseResult,
-    DispenseCommandType,
-)
-
-from .dispense_while_tracking import (
-    DispenseWhileTracking,
-    DispenseWhileTrackingParams,
-    DispenseWhileTrackingCreate,
-    DispenseWhileTrackingResult,
-    DispenseWhileTrackingCommandType,
-)
-
-from .dispense_in_place import (
-    DispenseInPlace,
-    DispenseInPlaceParams,
-    DispenseInPlaceCreate,
-    DispenseInPlaceResult,
-    DispenseInPlaceCommandType,
-)
-
-from .drop_tip import (
-    DropTip,
-    DropTipParams,
-    DropTipCreate,
-    DropTipResult,
-    DropTipCommandType,
-)
-
-from .drop_tip_in_place import (
-    DropTipInPlace,
-    DropTipInPlaceParams,
-    DropTipInPlaceCreate,
-    DropTipInPlaceResult,
-    DropTipInPlaceCommandType,
-)
-
-from .home import (
-    Home,
-    HomeParams,
-    HomeCreate,
-    HomeResult,
-    HomeCommandType,
-)
-
-from .load_labware import (
-    LoadLabware,
-    LoadLabwareParams,
-    LoadLabwareCreate,
-    LoadLabwareResult,
-    LoadLabwareCommandType,
-)
-
-from .reload_labware import (
-    ReloadLabware,
-    ReloadLabwareParams,
-    ReloadLabwareCreate,
-    ReloadLabwareResult,
-    ReloadLabwareCommandType,
-)
-
-from .load_liquid import (
-    LoadLiquid,
-    LoadLiquidParams,
-    LoadLiquidCreate,
-    LoadLiquidResult,
-    LoadLiquidCommandType,
-)
-
-from .load_liquid_class import (
-    LoadLiquidClass,
-    LoadLiquidClassParams,
-    LoadLiquidClassCreate,
-    LoadLiquidClassResult,
-    LoadLiquidClassCommandType,
-)
-
-from .load_module import (
-    LoadModule,
-    LoadModuleParams,
-    LoadModuleCreate,
-    LoadModuleResult,
-    LoadModuleCommandType,
-)
-
-from .load_pipette import (
-    LoadPipette,
-    LoadPipetteParams,
-    LoadPipetteCreate,
-    LoadPipetteResult,
-    LoadPipetteCommandType,
-)
-
-from .load_lid_stack import (
-    LoadLidStack,
-    LoadLidStackParams,
-    LoadLidStackCreate,
-    LoadLidStackResult,
-    LoadLidStackCommandType,
-)
-
-from .load_lid import (
-    LoadLid,
-    LoadLidParams,
-    LoadLidCreate,
-    LoadLidResult,
-    LoadLidCommandType,
-)
-
-from .move_labware import (
-    GripperMovementError,
-    MoveLabware,
-    MoveLabwareParams,
-    MoveLabwareCreate,
-    MoveLabwareResult,
-    MoveLabwareCommandType,
-)
-
-from .move_relative import (
-    MoveRelative,
-    MoveRelativeParams,
-    MoveRelativeCreate,
-    MoveRelativeResult,
-    MoveRelativeCommandType,
-)
-
-from .move_to_coordinates import (
-    MoveToCoordinates,
-    MoveToCoordinatesParams,
-    MoveToCoordinatesCreate,
-    MoveToCoordinatesResult,
-    MoveToCoordinatesCommandType,
-)
-
-from .move_to_well import (
-    MoveToWell,
-    MoveToWellParams,
-    MoveToWellCreate,
-    MoveToWellResult,
-    MoveToWellCommandType,
-)
-
-from .move_to_addressable_area import (
-    MoveToAddressableArea,
-    MoveToAddressableAreaParams,
-    MoveToAddressableAreaCreate,
-    MoveToAddressableAreaResult,
-    MoveToAddressableAreaCommandType,
-)
-
-from .move_to_addressable_area_for_drop_tip import (
-    MoveToAddressableAreaForDropTip,
-    MoveToAddressableAreaForDropTipParams,
-    MoveToAddressableAreaForDropTipCreate,
-    MoveToAddressableAreaForDropTipResult,
-    MoveToAddressableAreaForDropTipCommandType,
-)
-
-from .wait_for_resume import (
-    WaitForResume,
-    WaitForResumeParams,
-    WaitForResumeCreate,
-    WaitForResumeResult,
-    WaitForResumeCommandType,
-)
-
-from .wait_for_duration import (
-    WaitForDuration,
-    WaitForDurationParams,
-    WaitForDurationCreate,
-    WaitForDurationResult,
-    WaitForDurationCommandType,
-)
-
-from .create_timer import (
-    CreateTimer,
-    CreateTimerCreate,
-    CreateTimerParams,
-    CreateTimerResult,
-    CreateTimerCommandType,
-)
-
-from .wait_for_tasks import (
-    WaitForTasks,
-    WaitForTasksCreate,
-    WaitForTasksParams,
-    WaitForTasksResult,
-    WaitForTasksCommandType,
-)
-
-from .pick_up_tip import (
-    PickUpTip,
-    PickUpTipParams,
-    PickUpTipCreate,
-    PickUpTipResult,
-    PickUpTipCommandType,
-    TipPhysicallyMissingError,
-)
-
-from .touch_tip import (
-    TouchTip,
-    TouchTipParams,
-    TouchTipCreate,
-    TouchTipResult,
-    TouchTipCommandType,
-)
-
-from .save_position import (
-    SavePosition,
-    SavePositionParams,
-    SavePositionCreate,
-    SavePositionResult,
-    SavePositionCommandType,
-)
-
-from .blow_out import (
-    BlowOutParams,
-    BlowOut,
-    BlowOutCreate,
-    BlowOutCommandType,
-    BlowOutResult,
-)
-
-from .blow_out_in_place import (
-    BlowOutInPlaceParams,
-    BlowOutInPlace,
-    BlowOutInPlaceCreate,
-    BlowOutInPlaceCommandType,
-    BlowOutInPlaceResult,
-)
-
 from .set_status_bar import (
     SetStatusBar,
-    SetStatusBarParams,
-    SetStatusBarCreate,
-    SetStatusBarResult,
     SetStatusBarCommandType,
+    SetStatusBarCreate,
+    SetStatusBarParams,
+    SetStatusBarResult,
 )
-
-from .retract_axis import (
-    RetractAxis,
-    RetractAxisParams,
-    RetractAxisCreate,
-    RetractAxisResult,
-    RetractAxisCommandType,
-)
-
-from .configure_for_volume import (
-    ConfigureForVolume,
-    ConfigureForVolumeParams,
-    ConfigureForVolumeCreate,
-    ConfigureForVolumeResult,
-    ConfigureForVolumeCommandType,
-)
-
-from .prepare_to_aspirate import (
-    PrepareToAspirate,
-    PrepareToAspirateParams,
-    PrepareToAspirateCreate,
-    PrepareToAspirateResult,
-    PrepareToAspirateCommandType,
-)
-
-from .configure_nozzle_layout import (
-    ConfigureNozzleLayout,
-    ConfigureNozzleLayoutCreate,
-    ConfigureNozzleLayoutParams,
-    ConfigureNozzleLayoutResult,
-    ConfigureNozzleLayoutCommandType,
-)
-
-from .verify_tip_presence import (
-    VerifyTipPresence,
-    VerifyTipPresenceCreate,
-    VerifyTipPresenceParams,
-    VerifyTipPresenceResult,
-    VerifyTipPresenceCommandType,
-)
-
-from .get_tip_presence import (
-    GetTipPresence,
-    GetTipPresenceCreate,
-    GetTipPresenceParams,
-    GetTipPresenceResult,
-    GetTipPresenceCommandType,
-)
-
-from .get_next_tip import (
-    GetNextTip,
-    GetNextTipCreate,
-    GetNextTipParams,
-    GetNextTipResult,
-    GetNextTipCommandType,
-)
-
 from .set_tip_state import (
     SetTipState,
+    SetTipStateCommandType,
     SetTipStateCreate,
     SetTipStateParams,
     SetTipStateResult,
-    SetTipStateCommandType,
 )
-
-from .liquid_probe import (
-    LiquidProbe,
-    LiquidProbeParams,
-    LiquidProbeCreate,
-    LiquidProbeResult,
-    LiquidProbeCommandType,
-    TryLiquidProbe,
-    TryLiquidProbeParams,
-    TryLiquidProbeCreate,
-    TryLiquidProbeResult,
-    TryLiquidProbeCommandType,
+from .touch_tip import (
+    TouchTip,
+    TouchTipCommandType,
+    TouchTipCreate,
+    TouchTipParams,
+    TouchTipResult,
 )
-
-from .seal_pipette_to_tip import (
-    SealPipetteToTip,
-    SealPipetteToTipParams,
-    SealPipetteToTipCreate,
-    SealPipetteToTipResult,
-    SealPipetteToTipCommandType,
-)
-
-from .pressure_dispense import (
-    PressureDispense,
-    PressureDispenseParams,
-    PressureDispenseCreate,
-    PressureDispenseResult,
-    PressureDispenseCommandType,
-)
-
 from .unseal_pipette_from_tip import (
     UnsealPipetteFromTip,
-    UnsealPipetteFromTipParams,
-    UnsealPipetteFromTipCreate,
-    UnsealPipetteFromTipResult,
     UnsealPipetteFromTipCommandType,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipResult,
 )
-
-from .identify_module import (
-    IdentifyModule,
-    IdentifyModuleParams,
-    IdentifyModuleCreate,
-    IdentifyModuleResult,
-    IdentifyModuleCommandType,
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCommandType,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
 )
-
-from .capture_image import (
-    CaptureImage,
-    CaptureImageParams,
-    CaptureImageCreate,
-    CaptureImageResult,
-    CaptureImageCommandType,
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationCommandType,
+    WaitForDurationCreate,
+    WaitForDurationParams,
+    WaitForDurationResult,
 )
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeCommandType,
+    WaitForResumeCreate,
+    WaitForResumeParams,
+    WaitForResumeResult,
+)
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCommandType,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+)
+from opentrons.util.get_union_elements import get_union_elements
 
 Command = Annotated[
     Union[
@@ -1025,9 +973,9 @@ def _map_create_types_by_params_type(
 
     # This isn't an inherent requirement of opentrons.protocol_engine,
     # but this mapping is only useful to higher-level code if this holds true.
-    assert len(result) == len(
-        create_types
-    ), "Param models should map to create models 1:1."
+    assert len(result) == len(create_types), (
+        "Param models should map to create models 1:1."
+    )
 
     return result
 

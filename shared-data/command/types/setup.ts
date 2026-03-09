@@ -16,8 +16,7 @@ export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
   params: LoadPipetteParams
 }
 export interface LoadPipetteRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    Omit<LoadPipetteCreateCommand, 'params'> {
+  extends CommonCommandRunTimeInfo, Omit<LoadPipetteCreateCommand, 'params'> {
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
@@ -28,8 +27,7 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   params: LoadLabwareParams
 }
 export interface LoadLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLabwareCreateCommand {
   result?: LoadLabwareResult
 }
 export interface LoadLidCreateCommand extends CommonCommandCreateInfo {
@@ -37,8 +35,7 @@ export interface LoadLidCreateCommand extends CommonCommandCreateInfo {
   params: LoadLidParams
 }
 export interface LoadLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLidCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLidCreateCommand {
   result?: LoadLidResult
 }
 export interface LoadLidStackCreateCommand extends CommonCommandCreateInfo {
@@ -46,8 +43,7 @@ export interface LoadLidStackCreateCommand extends CommonCommandCreateInfo {
   params: LoadLidStackParams
 }
 export interface LoadLidStackRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLidStackCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLidStackCreateCommand {
   result?: LoadLidStackResult
 }
 export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
@@ -55,8 +51,7 @@ export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
   params: { labwareId: string }
 }
 export interface ReloadLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    ReloadLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, ReloadLabwareCreateCommand {
   result?: ReloadLabwareResult
 }
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
@@ -64,8 +59,7 @@ export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   params: MoveLabwareParams
 }
 export interface MoveLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MoveLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, MoveLabwareCreateCommand {
   result?: MoveLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
@@ -73,8 +67,7 @@ export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   params: LoadModuleParams
 }
 export interface LoadModuleRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    Omit<LoadModuleCreateCommand, 'params'> {
+  extends CommonCommandRunTimeInfo, Omit<LoadModuleCreateCommand, 'params'> {
   params: LoadModuleParams & {
     model: ModuleModel
   }
@@ -85,8 +78,7 @@ export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
   params: LoadLiquidParams
 }
 export interface LoadLiquidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLiquidCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
 
@@ -95,20 +87,17 @@ export interface LoadLiquidClassCreateCommand extends CommonCommandCreateInfo {
   params: LoadLiquidClassParams
 }
 export interface LoadLiquidClassRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLiquidClassCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLiquidClassCreateCommand {
   result?: LoadLiquidClassResult
 }
 
-export interface ConfigureNozzleLayoutCreateCommand
-  extends CommonCommandCreateInfo {
+export interface ConfigureNozzleLayoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'configureNozzleLayout'
   params: ConfigureNozzleLayoutParams
 }
 
 export interface ConfigureNozzleLayoutRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    ConfigureNozzleLayoutCreateCommand {
+  extends CommonCommandRunTimeInfo, ConfigureNozzleLayoutCreateCommand {
   result?: {}
 }
 
@@ -118,8 +107,7 @@ export interface SetTipStateCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface SetTipStateRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    SetTipStateCreateCommand {
+  extends CommonCommandRunTimeInfo, SetTipStateCreateCommand {
   result?: {}
 }
 
@@ -298,11 +286,27 @@ interface LoadLiquidClassResult {
   liquidClassId: string
 }
 
-export const COLUMN = 'COLUMN'
-export const SINGLE = 'SINGLE'
-export const ROW = 'ROW'
-export const QUADRANT = 'QUADRANT'
-export const ALL = 'ALL'
+export type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
+export type RowChannels = 12
+
+export const PARTIAL_NOZZLE_MAP: Record<
+  PartialPrimaryNozzles,
+  PartialNozzles8Channel
+> = {
+  G1: 2,
+  F1: 3,
+  E1: 4,
+  D1: 5,
+  C1: 6,
+  B1: 7,
+} as const
+
+export const COLUMN = 'COLUMN' as const
+export const SINGLE = 'SINGLE' as const
+export const ROW = 'ROW' as const
+export const QUADRANT = 'QUADRANT' as const
+export const ALL = 'ALL' as const
+export const PARTIAL_COLUMN = 'PARTIAL_COLUMN' as const
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -310,9 +314,36 @@ export type NozzleConfigurationStyle =
   | typeof ROW
   | typeof QUADRANT
   | typeof ALL
+  | typeof PARTIAL_COLUMN
+export const A1_NOZZLE = 'A1' as const
+export const A12_NOZZLE = 'A12' as const
+export const H1_NOZZLE = 'H1' as const
+export const H12_NOZZLE = 'H12' as const
 
-interface NozzleConfigurationParams {
-  primaryNozzle?: string
+export const G1_NOZZLE = 'G1' as const
+export const E1_NOZZLE = 'E1' as const
+export const F1_NOZZLE = 'F1' as const
+export const D1_NOZZLE = 'D1' as const
+export const C1_NOZZLE = 'C1' as const
+export const B1_NOZZLE = 'B1' as const
+
+export type PartialPrimaryNozzles =
+  | typeof B1_NOZZLE
+  | typeof C1_NOZZLE
+  | typeof D1_NOZZLE
+  | typeof E1_NOZZLE
+  | typeof F1_NOZZLE
+  | typeof G1_NOZZLE
+
+export type PrimaryNozzleConfigurationStyle =
+  | typeof A1_NOZZLE
+  | PartialPrimaryNozzles
+  | typeof A12_NOZZLE
+  | typeof H1_NOZZLE
+  | typeof H12_NOZZLE
+
+export interface NozzleConfigurationParams {
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
   style: NozzleConfigurationStyle
 }
 

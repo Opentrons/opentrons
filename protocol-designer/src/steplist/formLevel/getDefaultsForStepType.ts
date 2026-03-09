@@ -1,3 +1,4 @@
+import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import {
@@ -51,6 +52,7 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
+        primaryNozzle: A1_NOZZLE,
         pushOut_checkbox: null,
         pushOut_volume: null,
         times: null,
@@ -141,12 +143,13 @@ export function getDefaultsForStepType(
         dropTip_wellNames: undefined,
         liquidClassesSupported: true,
         liquidClass: 'none',
-        nozzles: null,
+        nozzles: ALL,
         path: 'single',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
         preWetTip: false,
+        primaryNozzle: null,
         pushOut_checkbox: null,
         pushOut_volume: null,
         tipRack: null,
@@ -156,6 +159,16 @@ export function getDefaultsForStepType(
         volume: null,
       }
 
+    case 'camera':
+      return {
+        home_before: false,
+        filename: null,
+        resolution: null,
+        zoom: null,
+        contrast: null,
+        brightness: null,
+        saturation: null,
+      }
     case 'comment':
       return {
         message: null,
@@ -181,6 +194,7 @@ export function getDefaultsForStepType(
         labwareLocationUpdate: {},
         moduleLocationUpdate: {},
         pipetteLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -214,15 +228,10 @@ export function getDefaultsForStepType(
     case 'thermocycler':
       return {
         blockIsActive: false,
-        blockIsActiveHold: false,
         blockTargetTemp: null,
-        blockTargetTempHold: null,
         lidIsActive: false,
-        lidIsActiveHold: false,
         lidOpen: false,
-        lidOpenHold: null,
         lidTargetTemp: null,
-        lidTargetTempHold: null,
         moduleId: null,
         orderedProfileItems: [],
         profileItemsById: {},
@@ -240,6 +249,18 @@ export function getDefaultsForStepType(
         referenceWavelength: null,
         referenceWavelengthActive: false,
         wavelengths: [Object.keys(ABSORBANCE_READER_COLOR_BY_WAVELENGTH)[0]], // default to first known wavelength
+      }
+    case 'flexStacker':
+      return {
+        fillLabwareUri: null,
+        fillLabwareIds: null,
+        flexStackerFormType: null,
+        interventionMessage: null,
+        moduleId: null,
+      }
+    case 'vacuum':
+      return {
+        moduleId: null,
       }
     default:
       return {}

@@ -1,21 +1,21 @@
 import asyncio
-from _pytest.fixtures import SubRequest
-import mock
-
-import pytest
-from decoy import Decoy
 from typing import (
     Any,
     Awaitable,
-    Dict,
     Callable,
     Coroutine,
+    Dict,
     Iterator,
-    Tuple,
     Optional,
+    Tuple,
     TypeAlias,
     Union,
 )
+
+import mock
+import pytest
+from _pytest.fixtures import SubRequest
+from decoy import Decoy
 
 try:
     import aionotify  # type: ignore[import-untyped]
@@ -23,14 +23,14 @@ except (OSError, ModuleNotFoundError):
     aionotify = None
 
 
-from opentrons.hardware_control.ot3api import OT3API
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.pipette.types import PipetteName
+
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import Axis, HardwareFeatureFlags, OT3Mount
 from opentrons.types import Mount
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-
 
 LEFT_PIPETTE_PREFIX = "p10_single"
 LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)
@@ -93,9 +93,7 @@ def mock_api_verify_tip_presence_ot3(request: SubRequest) -> Iterator[mock.Async
 def wrap_build_ot3_sim() -> Callable[[Any], Coroutine[Any, Any, OT3API]]:
     from opentrons.hardware_control.ot3api import OT3API
 
-    with mock.patch.object(
-        OT3API, "verify_tip_presence"
-    ) as mock_tip_presence:  # noqa: F841
+    with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:  # noqa: F841
         return OT3API.build_hardware_simulator
 
 
@@ -163,7 +161,7 @@ def get_plunger_speed(api: Any) -> Any:
 async def test_cache_instruments(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -183,7 +181,7 @@ async def test_cache_instruments(
 async def test_mismatch_fails(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -271,7 +269,7 @@ async def test_cache_instruments_hc(
 async def test_cache_instruments_sim(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -365,7 +363,7 @@ async def test_cache_instruments_sim(
 async def test_prep_aspirate(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -401,7 +399,7 @@ async def test_prep_aspirate(
 
 
 async def test_aspirate_new(
-    dummy_instruments: Tuple[DummyInstrumentConfig, int]
+    dummy_instruments: Tuple[DummyInstrumentConfig, int],
 ) -> None:
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments[0],
@@ -426,7 +424,6 @@ async def test_aspirate_new(
 async def test_aspirate_old(
     decoy: Decoy, dummy_instruments: Tuple[DummyInstrumentConfig, int]
 ) -> None:
-
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments[0],
         loop=asyncio.get_running_loop(),
@@ -529,7 +526,7 @@ async def test_configure_ot3(ot3_api_obj: Callable[..., Awaitable[Any]]) -> None
 
 
 async def test_dispense_ot2(
-    dummy_instruments: Tuple[DummyInstrumentConfig, int]
+    dummy_instruments: Tuple[DummyInstrumentConfig, int],
 ) -> None:
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
@@ -595,7 +592,7 @@ async def test_dispense_ot3(
 async def test_no_pipette(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -614,7 +611,7 @@ async def test_no_pipette(
 async def test_tip_pickup_moves(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     """Make sure that tip_pickup_moves does not add a tip to the instrument."""
     sim_builder = sim_and_instr[0]
@@ -711,7 +708,7 @@ def assert_move_called(mock_move: mock.Mock, speed: float, lock: Any = None) -> 
 async def test_aspirate_flow_rate(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -776,7 +773,7 @@ async def test_aspirate_flow_rate(
 async def test_dispense_flow_rate(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None
@@ -839,7 +836,7 @@ async def test_dispense_flow_rate(
 async def test_blowout_flow_rate(
     sim_and_instr: Tuple[
         Callable[..., Awaitable[Any]], Tuple[DummyInstrumentConfig, float]
-    ]
+    ],
 ) -> None:
     sim_builder = sim_and_instr[0]
     assert sim_and_instr[1] is not None

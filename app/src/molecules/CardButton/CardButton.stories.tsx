@@ -1,9 +1,6 @@
-import {
-  Flex,
-  ICON_DATA_BY_NAME,
-  SPACING,
-  VIEWPORT,
-} from '@opentrons/components'
+import { MemoryRouter } from 'react-router-dom'
+
+import { ICON_DATA_BY_NAME, SPACING, VIEWPORT } from '@opentrons/components'
 
 import { CardButton as CardButtonComponent } from './index'
 
@@ -23,9 +20,17 @@ const meta: Meta<typeof CardButtonComponent> = {
   },
   decorators: [
     Story => (
-      <Flex marginTop={SPACING.spacing16} width="15.375rem" height="17rem">
-        <Story />
-      </Flex>
+      <MemoryRouter>
+        <div
+          style={{
+            padding: SPACING.spacing16,
+            width: '15.375rem',
+            height: '17rem',
+          }}
+        >
+          <Story />
+        </div>
+      </MemoryRouter>
     ),
   ],
 }

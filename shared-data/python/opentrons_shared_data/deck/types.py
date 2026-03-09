@@ -5,11 +5,11 @@ This should only be imported if typing.TYPE_CHECKING is True
 """
 
 from typing import Any, Dict, List, NewType, Union
+
 from typing_extensions import Literal, TypedDict
 
-from ..module.types import ModuleType, ModuleOrientation
+from ..module.types import ModuleOrientation, ModuleType
 from opentrons_shared_data.labware.types import LocatingFeatures
-
 
 DeckSchemaVersion5 = Literal[5]
 DeckSchemaVersion4 = Literal[4]

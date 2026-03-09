@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { clsx } from 'clsx'
 import { css } from 'styled-components'
 
 import {
@@ -21,13 +22,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  LINE_CLAMP_TEXT_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '/protocol-designer/components/atoms'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/components/atoms'
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '/protocol-designer/constants'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -106,10 +105,14 @@ export function LiquidsOverflowMenu({
                 <LiquidIcon color={displayColor ?? ''} />
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  css={`
-                    ${LINE_CLAMP_TEXT_STYLE(3)}
-                    text-align: ${TYPOGRAPHY.textAlignLeft}
-                  `}
+                  className={clsx(
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_break_all
+                  )}
+                  style={{
+                    WebkitLineClamp: 3,
+                    textAlign: TYPOGRAPHY.textAlignLeft,
+                  }}
                 >
                   {displayName}
                 </StyledText>

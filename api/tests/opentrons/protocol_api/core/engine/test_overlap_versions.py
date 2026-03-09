@@ -1,10 +1,10 @@
 """Test the tip overlap selection logic in the API core."""
+
 import pytest
 
+from ... import versions_at_or_above, versions_below
 from opentrons.protocol_api.core.engine.overlap_versions import overlap_for_api_version
 from opentrons.protocols.api_support.types import APIVersion
-
-from ... import versions_below, versions_at_or_above
 
 
 @pytest.mark.parametrize(

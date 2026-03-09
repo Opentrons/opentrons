@@ -56,11 +56,14 @@ export function OpenDoorAlertModal(props: OpenDoorModalProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           width="100%"
         >
-          <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText
+            forwardedAs="h4"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+          >
             {doorHeader}
           </LegacyStyledText>
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             textAlign={TYPOGRAPHY.textAlignCenter}
             color={COLORS.grey60}
           >

@@ -30,7 +30,7 @@ export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
     <OddModal
       header={{
         title: t('run_quick_transfer_now'),
-        iconName: 'alert-circle',
+        iconName: 'ot-alert',
         iconColor: COLORS.yellow50,
       }}
     >

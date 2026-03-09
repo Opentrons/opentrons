@@ -1,17 +1,18 @@
-from typing import cast, Any, Type
+from typing import Any, Type, cast
+
 import mock
 import pytest
 
-import opentrons.protocol_api as papi
+from opentrons_shared_data.labware import load_definition as load_labware_definition
+from opentrons_shared_data.module.types import ModuleDefinitionV3
 
-from opentrons.types import Point, Location
+import opentrons.protocol_api as papi
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
-from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
@@ -20,11 +21,10 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
+from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons_shared_data.labware import load_definition as load_labware_definition
-from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons.types import Location, Point
 
 
 @pytest.fixture
@@ -354,7 +354,9 @@ def test_hs_flag_unsafe_move_raises(
     mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
-        mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
+        mod._core.flag_unsafe_move(  # type: ignore[attr-defined]
+            to_loc=labware.wells()[1].top(), is_multichannel=False
+        )
 
 
 def test_hs_flag_unsafe_move_skips_non_labware_locations(

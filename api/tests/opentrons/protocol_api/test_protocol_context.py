@@ -1,73 +1,76 @@
 """Tests for the ProtocolContext public interface."""
 
 import inspect
-from typing import cast, Dict
+from typing import Dict, cast
 from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
+
 from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
 )
-
-from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
+from tests.opentrons.protocol_api import (
+    versions_at_or_above,
+    versions_between,
+)
 
-from opentrons.protocol_api._liquid import LiquidClass
-from opentrons.types import Mount, DeckSlotName, StagingSlotName
-from opentrons.protocol_api import OFF_DECK
-from opentrons.legacy_broker import LegacyBroker
+from opentrons.config import feature_flags as ff
 from opentrons.hardware_control.modules.types import (
-    ModuleType,
-    TemperatureModuleModel,
     FlexStackerModuleModel,
     MagneticBlockModel,
+    ModuleType,
+    TemperatureModuleModel,
 )
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    OFF_DECK,
+    Deck,
+    InstrumentContext,
+    Labware,
+    Liquid,
+    MagneticBlockContext,
+    MagneticModuleContext,
+    ModuleContext,
+    ProtocolContext,
+    TemperatureModuleContext,
+)
+from opentrons.protocol_api import (
+    validation as mock_validation,
+)
+from opentrons.protocol_api._liquid import LiquidClass
+from opentrons.protocol_api.core.common import (
+    FlexStackerCore,
+    InstrumentCore,
+    LabwareCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.tasks import Task
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
 from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.deck_type import (
+    NoTrashDefinedError,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     RobotTypeError,
     UnsupportedAPIError,
 )
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    ProtocolContext,
-    InstrumentContext,
-    ModuleContext,
-    TemperatureModuleContext,
-    MagneticModuleContext,
-    MagneticBlockContext,
-    Labware,
-    Deck,
-    validation as mock_validation,
-    Liquid,
-)
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.common import (
-    InstrumentCore,
-    LabwareCore,
-    ProtocolCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    MagneticBlockCore,
-    FlexStackerCore,
-)
-from opentrons.protocol_api.tasks import Task
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.protocols.api_support.deck_type import (
-    NoTrashDefinedError,
-)
-from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from tests.opentrons.protocol_api import (
-    versions_at_or_above,
-    versions_between,
-)
+from opentrons.types import DeckSlotName, Mount, StagingSlotName
 
 
 @pytest.fixture(autouse=True)
@@ -2255,6 +2258,38 @@ def test_capture_image(
             saturation=52,
         )
     )
+
+
+def test_group_steps(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    mock_feature_flags: None,
+) -> None:
+    """It should create a command annotation during the lifetime of the context."""
+    decoy.when(ff.allow_step_grouping()).then_return(True)
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
+        "my-annotation-id"
+    )
+    with subject.group_steps("name", "desc"):
+        subject.comment("I'm being annotated!")
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
+
+
+def test_create_and_start_step_group(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    mock_feature_flags: None,
+) -> None:
+    """It should create a command annotation and return a step group object, which can close the annotation."""
+    decoy.when(ff.allow_step_grouping()).then_return(True)
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
+        "my-annotation-id"
+    )
+    step_group = subject.create_and_start_step_group("name", "desc")
+    step_group.end_group()
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 
 def test_bundled_data(

@@ -5,10 +5,7 @@ import { getRunDataFileMetadata } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type {
-  HostConfig,
-  RunDataFileMetadataResponse,
-} from '@opentrons/api-client'
+import type { RunDataFileMetadataResponse } from '@opentrons/api-client'
 
 export function useRunDataFileMetadata(
   runId: string,
@@ -22,10 +19,7 @@ export function useRunDataFileMetadata(
 
   const query = useQuery<RunDataFileMetadataResponse>(
     [host, 'dataFiles', runId, 'all'],
-    () =>
-      getRunDataFileMetadata(host as HostConfig, runId).then(
-        response => response.data
-      ),
+    () => getRunDataFileMetadata(host!, runId).then(response => response.data),
     allOptions
   )
   return query

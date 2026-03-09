@@ -15,17 +15,73 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, double as npdouble
+
+from numpy import array, dot
+from numpy import double as npdouble
 from numpy.typing import NDArray
 
+from .. import errors
+from ..actions import (
+    Action,
+    AddModuleAction,
+    SucceedCommandAction,
+)
+from ..commands import (
+    Command,
+    heater_shaker,
+    temperature_module,
+    thermocycler,
+)
+from ..errors import AreaNotInDeckConfigurationError, ModuleNotConnectedError
+from ..resources import DeckFixedLabware, deck_configuration_provider
+from ..types import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    HeaterShakerMovementRestrictors,
+    LoadedModule,
+    ModuleDefinition,
+    ModuleDimensions,
+    ModuleModel,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+    ModuleType,
+    StackerStoredLabwareGroup,
+)
+from ._abstract_store import HandlesActions, HasState
+from .addressable_areas import AddressableAreaView
+from .config import Config
+from .module_substates import (
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
+    FlexStackerId,
+    FlexStackerSubState,
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+    MagneticBlockId,
+    MagneticBlockSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
+from .update_types import (
+    AbsorbanceReaderStateUpdate,
+    FlexStackerStateUpdate,
+    LoadModuleUpdate,
+)
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
 from opentrons.hardware_control.modules.types import LiveData
 from opentrons.motion_planning.adjacent_slots_getters import (
+    get_adjacent_staging_slot,
     get_east_slot,
     get_west_slot,
-    get_adjacent_staging_slot,
 )
 from opentrons.protocol_engine.actions.get_state_update import get_state_updates
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
@@ -36,64 +92,6 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
     AbsorbanceReaderMeasureMode,
 )
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
-from .update_types import (
-    AbsorbanceReaderStateUpdate,
-    FlexStackerStateUpdate,
-    LoadModuleUpdate,
-)
-from ..errors import ModuleNotConnectedError, AreaNotInDeckConfigurationError
-from ..resources import deck_configuration_provider
-
-from ..types import (
-    LoadedModule,
-    ModuleModel,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    ModuleType,
-    ModuleDefinition,
-    DeckSlotLocation,
-    ModuleDimensions,
-    HeaterShakerLatchStatus,
-    HeaterShakerMovementRestrictors,
-    DeckType,
-    AddressableAreaLocation,
-    StackerStoredLabwareGroup,
-)
-
-from ..resources import DeckFixedLabware
-from .addressable_areas import AddressableAreaView
-from .. import errors
-from ..commands import (
-    Command,
-    heater_shaker,
-    temperature_module,
-    thermocycler,
-)
-from ..actions import (
-    Action,
-    SucceedCommandAction,
-    AddModuleAction,
-)
-from ._abstract_store import HasState, HandlesActions
-from .module_substates import (
-    MagneticModuleSubState,
-    HeaterShakerModuleSubState,
-    TemperatureModuleSubState,
-    ThermocyclerModuleSubState,
-    AbsorbanceReaderSubState,
-    FlexStackerSubState,
-    MagneticModuleId,
-    HeaterShakerModuleId,
-    TemperatureModuleId,
-    ThermocyclerModuleId,
-    AbsorbanceReaderId,
-    FlexStackerId,
-    MagneticBlockSubState,
-    MagneticBlockId,
-    ModuleSubStateType,
-)
-from .config import Config
-
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 
@@ -341,24 +339,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = HeaterShakerModuleSubState.from_live_data(
-                module_id=HeaterShakerModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                HeaterShakerModuleSubState.from_live_data(
+                    module_id=HeaterShakerModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_temperature_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = TemperatureModuleSubState.from_live_data(
-                module_id=TemperatureModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                TemperatureModuleSubState.from_live_data(
+                    module_id=TemperatureModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_thermocycler_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = ThermocyclerModuleSubState.from_live_data(
-                module_id=ThermocyclerModuleId(module_id), data=live_data
+            self._state.substate_by_module_id[module_id] = (
+                ThermocyclerModuleSubState.from_live_data(
+                    module_id=ThermocyclerModuleId(module_id), data=live_data
+                )
             )
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
@@ -417,9 +415,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
-            assert (
-                module_serial is not None
-            ), "Expected a module SN and got None instead."
+            assert module_serial is not None, (
+                "Expected a module SN and got None instead."
+            )
             self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
                 moduleOffsetVector=module_offset,
                 location=location,
@@ -439,9 +437,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         hs_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            hs_substate, HeaterShakerModuleSubState
-        ), f"{module_id} is not heater-shaker."
+        assert isinstance(hs_substate, HeaterShakerModuleSubState), (
+            f"{module_id} is not heater-shaker."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         prev_state: HeaterShakerModuleSubState = hs_substate
@@ -532,9 +530,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         thermocycler_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            thermocycler_substate, ThermocyclerModuleSubState
-        ), f"{module_id} is not a thermocycler module."
+        assert isinstance(thermocycler_substate, ThermocyclerModuleSubState), (
+            f"{module_id} is not a thermocycler module."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         block_temperature = thermocycler_substate.target_block_temperature
@@ -600,9 +598,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values:
         module_id = absorbance_reader_state_update.module_id
         absorbance_reader_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            absorbance_reader_substate, AbsorbanceReaderSubState
-        ), f"{module_id} is not an absorbance plate reader."
+        assert isinstance(absorbance_reader_substate, AbsorbanceReaderSubState), (
+            f"{module_id} is not an absorbance plate reader."
+        )
         is_lid_on = absorbance_reader_substate.is_lid_on
         measured = True
         configured = absorbance_reader_substate.configured
@@ -625,12 +623,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             measure_mode = AbsorbanceReaderMeasureMode(
                 absorbance_reader_state_update.initialize_absorbance_reader_update.measure_mode
             )
-            configured_wavelengths = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
-            )
-            reference_wavelength = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
-            )
+            configured_wavelengths = absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
+            reference_wavelength = absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
             data = None
         elif (
             absorbance_reader_state_update.absorbance_reader_data
@@ -654,13 +648,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         """Handle Flex Stacker state updates."""
         module_id = state_update.module_id
         prev_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            prev_substate, FlexStackerSubState
-        ), f"{module_id} is not a Flex Stacker."
+        assert isinstance(prev_substate, FlexStackerSubState), (
+            f"{module_id} is not a Flex Stacker."
+        )
 
-        self._state.substate_by_module_id[
-            module_id
-        ] = prev_substate.new_from_state_change(state_update)
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
 
 class ModuleView:
@@ -1326,8 +1320,11 @@ class ModuleView:
     def raise_if_module_in_location(
         self,
         location: DeckSlotLocation,
-    ) -> None:
-        """Raise if the given location has a module in it."""
+    ) -> bool:
+        """Raise if the given location has a module in it.
+
+        Return True if it does not raise.
+        """
         for module in self.get_all():
             if module.model in _COLUMN_4_MODULES and module.location == location:
                 raise errors.LocationIsOccupiedError(
@@ -1337,6 +1334,7 @@ class ModuleView:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
+        return True
 
     def is_column_4_module(self, model: ModuleModel) -> bool:
         """Determine whether or not a module is a Column 4 Module."""
@@ -1442,6 +1440,11 @@ class ModuleView:
             # loaded to column 3 but the addressable area is in column 4
             assert deck_slot.value[-1] == "3"
             return f"flexStackerModuleV1{deck_slot.value[0]}4"
+
+        elif model == ModuleModel.VACUUM_MODULE_V1:
+            # only allowed in column 3
+            assert deck_slot.value[-1] == "3"
+            return f"vacuumModuleMilliporeV1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."

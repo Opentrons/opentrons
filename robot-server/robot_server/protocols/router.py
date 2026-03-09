@@ -2,87 +2,85 @@
 
 import json
 import logging
-from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, List, Literal, Optional, Union, Tuple
-
-from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-)
-from opentrons_shared_data.robot import user_facing_robot_type
-from opentrons.util.performance_helpers import TrackingFunctions
+from textwrap import dedent
+from typing import Annotated, List, Literal, Optional, Tuple, Union
 
 from fastapi import (
     Depends,
     File,
+    Form,
     HTTPException,
     Query,
     UploadFile,
     status,
-    Form,
 )
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
-from server_utils.fastapi_utils.light_router import LightRouter
 
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    ProtocolFilesInvalidError,
-    FileReaderWriter,
-    FileHasher,
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
 )
+from opentrons.protocol_reader import (
+    FileHasher,
+    FileReaderWriter,
+    ProtocolFilesInvalidError,
+    ProtocolReader,
+)
+from opentrons.util.performance_helpers import TrackingFunctions
+from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
-
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.hardware import get_robot_type
-from robot_server.service.dependencies import get_unique_id, get_current_time
-from robot_server.service.json_api import (
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
     Body,
-    SimpleBody,
-    SimpleMultiBody,
-    SimpleEmptyBody,
     MultiBodyMeta,
     PydanticResponse,
     RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
 )
+
+from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
+from .analysis_models import (
+    AnalysisRequest,
+    AnalysisStatus,
+    AnalysisSummary,
+    ProtocolAnalysis,
+)
+from .analysis_store import AnalysisIsPendingError, AnalysisNotFoundError, AnalysisStore
+from .completed_analysis_store import UnreadableAnalysisError
+from .dependencies import (
+    get_analyses_manager,
+    get_analysis_store,
+    get_file_hasher,
+    get_file_reader_writer,
+    get_maximum_quick_transfer_protocols,
+    get_protocol_auto_deleter,
+    get_protocol_directory,
+    get_protocol_reader,
+    get_protocol_store,
+    get_quick_transfer_protocol_auto_deleter,
+)
+from .protocol_auto_deleter import ProtocolAutoDeleter
+from .protocol_models import Metadata, Protocol, ProtocolFile, ProtocolKind
+from .protocol_store import (
+    ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
+    ProtocolUsedByRunError,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
-
-from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
-
-from .protocol_auto_deleter import ProtocolAutoDeleter
-from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
-from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
-from .analysis_models import (
-    ProtocolAnalysis,
-    AnalysisRequest,
-    AnalysisSummary,
-    AnalysisStatus,
-)
-from .protocol_store import (
-    ProtocolStore,
-    ProtocolResource,
-    ProtocolNotFoundError,
-    ProtocolUsedByRunError,
-)
-from .dependencies import (
-    get_protocol_auto_deleter,
-    get_quick_transfer_protocol_auto_deleter,
-    get_protocol_reader,
-    get_protocol_store,
-    get_analysis_store,
-    get_analyses_manager,
-    get_protocol_directory,
-    get_file_reader_writer,
-    get_file_hasher,
-    get_maximum_quick_transfer_protocols,
-)
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.hardware import get_robot_type
+from robot_server.service.dependencies import get_current_time, get_unique_id
 
 log = logging.getLogger(__name__)
 
@@ -113,6 +111,13 @@ class ProtocolFilesInvalid(ErrorDetails):
 
     id: Literal["ProtocolFilesInvalid"] = "ProtocolFilesInvalid"
     title: str = "Protocol File(s) Invalid"
+
+
+class UnreadableProtocolAnalysis(ErrorDetails):
+    """An error returned when a protocol analysis is not readable."""
+
+    id: Literal["UnreadableProtocolAnalysis"] = "UnreadableProtocolAnalysis"
+    title: str = "Unreadable Protocol Analysis"
 
 
 class ProtocolRobotTypeMismatch(ErrorDetails):
@@ -816,7 +821,9 @@ async def get_protocol_analyses(
         raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
             status.HTTP_404_NOT_FOUND
         )
-
+    # TODO(spp, 2026-02-17): we currently don't handle an UnreadableAnalysisError
+    #  if one of the analyses in the list errors out. Decide whether to return an error response
+    #  or skip the analysis in the response
     analyses = await analysis_store.get_by_protocol(protocolId)
 
     return await PydanticResponse.create(
@@ -835,6 +842,9 @@ async def get_protocol_analyses(
         status.HTTP_200_OK: {"model": SimpleBody[ProtocolAnalysis]},
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorBody[Union[ProtocolNotFound, AnalysisNotFound]]
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorBody[UnreadableProtocolAnalysis]
         },
     },
 )
@@ -865,6 +875,13 @@ async def get_protocol_analysis_by_id(
         raise AnalysisNotFound(detail=str(error)).as_error(
             status.HTTP_404_NOT_FOUND
         ) from error
+    except UnreadableAnalysisError as error:
+        raise UnreadableProtocolAnalysis(
+            detail="Could not read saved analysis."
+            " It might have been generated by a different version of the protocol analyzer."
+            " Try re-analyzing the protocol."
+            f" Full error: {error}"
+        ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY) from error
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=analysis)

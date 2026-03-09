@@ -39,7 +39,7 @@ describe('InterventionModal', () => {
     props = {
       iconHeading: 'mock intervention icon heading',
       children: 'mock intervention children',
-      iconName: 'alert-circle',
+      iconName: 'ot-alert',
       type: 'intervention-required',
     }
     when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
@@ -72,17 +72,13 @@ describe('InterventionModal', () => {
   it('renders an icon if an icon is specified', () => {
     const { container } = render(props)
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
-    const icon = container.querySelector(
-      '[aria-roledescription="alert-circle"]'
-    )
+    const icon = container.querySelector('[aria-roledescription="ot-alert"]')
     expect(icon).not.toBeNull()
   })
   it('does not render an icon if no icon is specified', () => {
     const { container } = render({ ...props, iconName: undefined })
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
-    const icon = container.querySelector(
-      '[aria-roledescription="alert-circle"]'
-    )
+    const icon = container.querySelector('[aria-roledescription="ot-alert"]')
     expect(icon).toBeNull()
   })
 

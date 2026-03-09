@@ -4,10 +4,10 @@ import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, AsyncGenerator, Union
-from typing_extensions import Literal
+from typing import AsyncGenerator, Optional, Union
 
 from serial import Serial, serial_for_url  # type: ignore[import-untyped]
+from typing_extensions import Literal
 
 TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 

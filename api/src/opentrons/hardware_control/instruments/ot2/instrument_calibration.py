@@ -1,21 +1,22 @@
 import typing
-from typing_extensions import Literal
 from dataclasses import dataclass
 from datetime import datetime
-from opentrons.config.robot_configs import default_pipette_offset
 
-from opentrons.calibration_storage import ot2 as calibration_storage
-from opentrons.calibration_storage import types, helpers
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import OT3Mount
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
+from opentrons.calibration_storage import helpers, types
+from opentrons.calibration_storage import ot2 as calibration_storage
+from opentrons.config.robot_configs import default_pipette_offset
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.types import Mount, Point
+
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.pipette.types import LabwareUri
     from opentrons_shared_data.labware.types import (
         LabwareDefinition2 as TypeDictLabwareDef2,
     )
+    from opentrons_shared_data.pipette.types import LabwareUri
 
 # These type aliases aid typechecking in tests that work the same on this and
 # the hardware_control.instruments.ot3 variant
@@ -126,7 +127,7 @@ def load_tip_length_for_pipette(
             "TypeDictLabwareDef2",
             tiprack.model_dump(
                 exclude_none=True,
-                exclude_unset=True
+                exclude_unset=True,
                 # todo(mm, 2025-02-13): Do we need by_alias=True here?
             ),
         )

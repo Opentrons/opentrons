@@ -63,19 +63,24 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      if (!isActiveRun) {
-        dismissCurrentRun(runId)
-        if (protocolId != null) {
-          navigate(`/protocols/${protocolId}`)
-        } else {
-          navigate('/protocols')
+  useEffect(
+    () => {
+      if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
+        if (!isActiveRun) {
+          dismissCurrentRun(runId)
+          if (protocolId != null) {
+            navigate(`/protocols/${protocolId}`)
+          } else {
+            navigate('/protocols')
+          }
         }
       }
-    }
-  }, [runStatus])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runStatus]
+  )
 
   return isCanceling || isDismissing ? (
     <CancelingRunModal />
@@ -93,10 +98,10 @@ export function ConfirmCancelRunModal({
             isActiveRun ? styles.active_run : styles.inactive_run
           }`}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_alert_info_flex')}
           </LegacyStyledText>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_module_info')}
           </LegacyStyledText>
         </div>

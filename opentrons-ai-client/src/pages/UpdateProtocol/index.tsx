@@ -321,7 +321,7 @@ export function UpdateProtocol(): JSX.Element {
               <UploadInput
                 uploadButtonText={t('choose_file')}
                 dragAndDropText={
-                  <StyledText as="p">
+                  <StyledText forwardedAs="p">
                     <Trans
                       t={t}
                       i18nKey={t('drag_and_drop')}

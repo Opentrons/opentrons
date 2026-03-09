@@ -66,7 +66,7 @@ export function useCreateProtocolMutation(
       runTimeParameterFiles,
     }) =>
       createProtocol(
-        host as HostConfig,
+        host!,
         protocolFiles,
         protocolKey,
         protocolKind,

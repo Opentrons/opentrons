@@ -1,8 +1,8 @@
 """The versions of standard liquid classes that the Protocol API should load by default."""
 
 from typing import TypeAlias
-from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.api_support.types import APIVersion
 
 DefaultLiquidClassVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 
@@ -31,6 +31,11 @@ DEFAULT_LIQUID_CLASS_VERSIONS: DefaultLiquidClassVersions = {
         "ethanol_80": 2,
         "glycerol_50": 2,
         "water": 2,
+    },
+    APIVersion(2, 27): {
+        "ethanol_80": 2,
+        "glycerol_50": 2,
+        "water": 3,
     },
 }
 

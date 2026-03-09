@@ -1,8 +1,8 @@
 from opentrons.protocol_api.core.engine._default_labware_versions import (
     get_standard_labware_default_version,
 )
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.types import APIVersion
 
 

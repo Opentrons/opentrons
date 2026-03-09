@@ -7,7 +7,6 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
-  HostConfig,
   SearchLabwareOffsetsRequest,
   SearchLabwareOffsetsResponse,
 } from '@opentrons/api-client'
@@ -20,7 +19,7 @@ export function useSearchLabwareOffsets(
   const query = useQuery<SearchLabwareOffsetsResponse, AxiosError>(
     [host, 'searchLabwareOffsets', data],
     () =>
-      searchLabwareOffsets(host as HostConfig, data)
+      searchLabwareOffsets(host!, data)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

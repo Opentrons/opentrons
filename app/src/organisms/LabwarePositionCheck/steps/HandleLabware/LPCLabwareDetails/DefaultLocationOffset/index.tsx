@@ -28,7 +28,6 @@ import { ManageDefaultOffsetBtn } from './ManageDefaultOffsetBtn'
 
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { DefaultOffsetDetails } from '/app/redux/protocol-runs'
 
 export function DefaultLocationOffset(
   props: LPCWizardContentProps
@@ -38,7 +37,7 @@ export function DefaultLocationOffset(
   const dispatch = useDispatch()
   const defaultOffsetDetails = useSelector(
     selectSelectedLwDefaultOffsetDetails(runId)
-  ) as DefaultOffsetDetails
+  )!
   const mostRecentOffset = useSelector(
     selectMostRecentVectorOffsetForLwWithOffsetDetails(
       runId,

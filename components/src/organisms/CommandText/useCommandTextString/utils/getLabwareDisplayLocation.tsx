@@ -26,15 +26,19 @@ import type {
   LocationSlotOnlyParams,
 } from './getLabwareLocation'
 
-export interface DisplayLocationSlotOnlyParams
-  extends Omit<LocationSlotOnlyParams, 'location'> {
+export interface DisplayLocationSlotOnlyParams extends Omit<
+  LocationSlotOnlyParams,
+  'location'
+> {
   t: TFunction
   isOnDevice?: boolean
   includeSlotText?: boolean
   location?: LabwareLocation | LabwareLocationSequence | null
 }
-export interface DisplayLocationFullParams
-  extends Omit<LocationFullParams, 'location'> {
+export interface DisplayLocationFullParams extends Omit<
+  LocationFullParams,
+  'location'
+> {
   t: TFunction
   isOnDevice?: boolean
   includeSlotText?: boolean

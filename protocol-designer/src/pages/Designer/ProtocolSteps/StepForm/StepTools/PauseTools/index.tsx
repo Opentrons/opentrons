@@ -9,6 +9,7 @@ import {
   RadioButton,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -19,7 +20,6 @@ import {
 import {
   DropdownStepFormField,
   InputStepFormField,
-  TextAreaField,
 } from '/protocol-designer/components/molecules'
 import {
   PAUSE_UNTIL_RESUME,

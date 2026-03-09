@@ -3,6 +3,7 @@ test_name: GET Pipette Offset Calibration, No Calibrations
 marks:
   - usefixtures:
     - ot2_server_base_url
+    - clean_ot2_calibrations
 stages:
   - name: GET request returns an empty list
     request: &get_offsets

@@ -4,16 +4,15 @@ from typing import Any, Dict
 
 import pytest
 
-from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
-from opentrons.config.types import CurrentDict
-from opentrons.hardware_control.types import BoardRevision
-
 from .ot2_settings import (
     legacy_dummy_settings,
     migrated_dummy_settings,
     new_dummy_settings,
 )
 from .ot3_settings import ot3_dummy_settings
+from opentrons.config import CONFIG, defaults_ot2, defaults_ot3, robot_configs
+from opentrons.config.types import CurrentDict
+from opentrons.hardware_control.types import BoardRevision
 
 
 def test_load_corrupt_json(machine_variant_ffs: None) -> None:

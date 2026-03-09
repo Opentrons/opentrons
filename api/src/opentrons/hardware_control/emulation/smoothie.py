@@ -3,17 +3,17 @@
 The purpose is to provide a fake backend that responds to the GCODE sent by the
 Opentrons smoothie driver.
 """
+
 import logging
 import re
-from typing import Optional, Dict
+from typing import Dict, Optional
 
+from .abstract_emulator import AbstractEmulator
+from .settings import SmoothieSettings
 from opentrons import _find_smoothie_file
 from opentrons.drivers import utils
 from opentrons.drivers.smoothie_drivers.constants import GCODE, HOMED_POSITION
 from opentrons.hardware_control.emulation.parser import Command, Parser
-
-from .abstract_emulator import AbstractEmulator
-from .settings import SmoothieSettings
 
 logger = logging.getLogger(__name__)
 

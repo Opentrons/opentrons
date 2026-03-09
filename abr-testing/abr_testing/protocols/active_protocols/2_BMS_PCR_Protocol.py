@@ -6,7 +6,7 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
 )
 from opentrons.protocol_api import SINGLE, Well, ALL
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 from typing import List, Dict
 
 
@@ -14,22 +14,29 @@ metadata = {
     "protocolName": "PCR Protocol with TC Auto Sealing Lid",
     "author": "Rami Farawi <ndiehl@opentrons.com",
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    helpers.create_single_pipette_mount_parameter(parameters)
-    helpers.create_disposable_lid_parameter(parameters)
-    helpers.create_csv_parameter(parameters)
-    helpers.create_tc_lid_deck_riser_parameter(parameters)
-    helpers.create_deactivate_modules_parameter(parameters)
-    helpers.create_meniscus_z_parameter(parameters)
-    helpers.create_probe_liquid_height_parameter(parameters)
+    run_helpers.create_single_pipette_mount_parameter(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_disposable_lid_parameter(parameters)
+    run_helpers.create_csv_parameter(parameters)
+    run_helpers.create_tc_lid_deck_riser_parameter(parameters)
+    run_helpers.create_deactivate_modules_parameter(parameters)
+    run_helpers.create_meniscus_z_parameter(parameters)
+    run_helpers.create_probe_liquid_height_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
+
+    protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
+
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
     parsed_csv = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
@@ -37,9 +44,9 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "05")
+    run_helpers.comment_protocol_version(protocol, "06")
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     rxn_vol = 50
@@ -47,11 +54,11 @@ def run(protocol: ProtocolContext) -> None:
     # DECK SETUP AND LABWARE
 
     tc_mod: ThermocyclerContext = protocol.load_module(
-        helpers.tc_str
+        run_helpers.tc_str
     )  # type: ignore[assignment]
 
     temp_mod: TemperatureModuleContext = protocol.load_module(
-        helpers.temp_str, location="D3"
+        run_helpers.temp_str, location="D3"
     )  # type: ignore[assignment]
     reagent_rack = temp_mod.load_labware(
         "opentrons_24_aluminumblock_nest_1.5ml_snapcap", "Reagent Rack"
@@ -71,7 +78,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # Opentrons tough pcr auto sealing lids
     if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 3, "C3", deck_riser)
+        unused_lids = run_helpers.load_disposable_lids(protocol, 3, "C3", deck_riser)
     # LOAD PIPETTES
     p50 = protocol.load_instrument(
         "flex_8channel_50",
@@ -83,8 +90,11 @@ def run(protocol: ProtocolContext) -> None:
     protocol.load_trash_bin("A3")
     try:
         tc_mod.open_lid()
-        tc_mod.set_lid_temperature(105)
-        temp_mod.set_temperature(4)
+        tc_task = tc_mod.start_set_lid_temperature(105)
+        temp_mod_task = temp_mod.start_set_temperature(4)
+        protocol.wait_for_tasks(
+            [tc_task, temp_mod_task],
+        )
 
         # LOAD LIQUIDS
         water: Well = reagent_rack["B1"]
@@ -97,11 +107,11 @@ def run(protocol: ProtocolContext) -> None:
             "DNA": [{"well": dna_pic, "volume": 100.0}],
         }
         if probe_height_bool:
-            helpers.find_liquid_height_of_loaded_liquids(
+            run_helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, p50
             )
         else:
-            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+            run_helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         # adding water
         protocol.comment("\n\n----------ADDING WATER----------\n")
         p50.pick_up_tip()
@@ -120,10 +130,16 @@ def run(protocol: ProtocolContext) -> None:
                 break
 
             p50.configure_for_volume(water_vol)
-            p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
+            p50.prepare_to_aspirate()
+            p50.aspirate(
+                water_vol,
+                location=water.meniscus(z=meniscus_z, target="start"),
+                end_location=water.meniscus(z=meniscus_z, target="end"),
+            )
             p50.dispense(
                 water_vol,
-                dest_plate_1[dest_well].meniscus(z=2, target="end"),
+                location=dest_plate_1[dest_well].meniscus(z=2, target="start"),
+                end_location=dest_plate_1[dest_well].meniscus(z=2, target="end"),
                 rate=0.5,
             )
             p50.configure_for_volume(50)
@@ -157,9 +173,17 @@ def run(protocol: ProtocolContext) -> None:
                 break
             p50.configure_for_volume(mmx_vol)
             p50.aspirate(
-                mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
+                mmx_vol,
+                location=reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="start"),
+                end_location=reagent_rack[mmx_tube].meniscus(
+                    z=meniscus_z, target="end"
+                ),
             )
-            p50.dispense(mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end"))
+            p50.dispense(
+                mmx_vol,
+                location=dest_plate_1[dest_well].meniscus(z=2, target="start"),
+                end_location=dest_plate_1[dest_well].meniscus(z=2, target="end"),
+            )
             protocol.delay(seconds=2)
             p50.blow_out()
             p50.touch_tip()
@@ -185,13 +209,21 @@ def run(protocol: ProtocolContext) -> None:
             p50.configure_for_volume(dna_vol)
             p50.aspirate(
                 dna_vol,
-                source_plate_1[dest_and_source_well].meniscus(
+                location=source_plate_1[dest_and_source_well].meniscus(
+                    z=meniscus_z, target="start"
+                ),
+                end_location=source_plate_1[dest_and_source_well].meniscus(
                     z=meniscus_z, target="end"
                 ),
             )
             p50.dispense(
                 dna_vol,
-                dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
+                location=dest_plate_1[dest_and_source_well].meniscus(
+                    z=2, target="start"
+                ),
+                end_location=dest_plate_1[dest_and_source_well].meniscus(
+                    z=2, target="end"
+                ),
                 rate=0.5,
             )
 
@@ -207,11 +239,11 @@ def run(protocol: ProtocolContext) -> None:
 
         if real_mode:
             if disposable_lid:
-                helpers.use_disposable_lid_with_tc(
+                run_helpers.use_disposable_lid_with_tc(
                     protocol, unused_lids, dest_plate_1, tc_mod
                 )
                 tc_mod.close_lid()
-            helpers.perform_pcr(
+            run_helpers.perform_pcr(
                 protocol,
                 tc_mod,
                 initial_denature_time_sec=120,
@@ -222,8 +254,8 @@ def run(protocol: ProtocolContext) -> None:
                 final_extension_time_min=5,
             )
 
-            tc_mod.set_block_temperature(4)
-
+            block_task = tc_mod.start_set_block_temperature(4)
+            protocol.wait_for_tasks([block_task])
             tc_mod.open_lid()
             if disposable_lid:
                 protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
@@ -232,18 +264,21 @@ def run(protocol: ProtocolContext) -> None:
             mmx_pic.append(water)
         # Empty plates into liquid waste
         p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
-        helpers.clean_up_plates(
+        run_helpers.clean_up_plates(
             protocol, p50, [source_plate_1, dest_plate_1], liquid_waste
         )
         # Probe liquid waste
-        helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
+        run_helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
         if deactivate_modules_bool:
-            helpers.deactivate_modules(protocol)
+            run_helpers.deactivate_modules(protocol)
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            run_helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

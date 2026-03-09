@@ -6,8 +6,10 @@ import type {
 export interface Diff {
   lidOpen: boolean
   lidClosed: boolean
+
   setBlockTemperature: boolean
   deactivateBlockTemperature: boolean
+
   setLidTemperature: boolean
   deactivateLidTemperature: boolean
 }
@@ -50,20 +52,41 @@ const getLidClosedDiff = (
   return {}
 }
 
+const isBlockCurrentlyTargetingTemp = (
+  thermocyclerState: ThermocyclerModuleState,
+  temp: number | null
+): boolean => {
+  if (temp == null) {
+    // Is the block deactivated?
+    return thermocyclerState.currentBlockActivity.type === 'blockDeactivated'
+  } else {
+    // Is the block targeting the given temp?
+    return (
+      thermocyclerState.currentBlockActivity.type === 'blockTargetTemp' &&
+      thermocyclerState.currentBlockActivity.blockTargetTemp === temp
+    )
+  }
+}
+
 export const thermocyclerStateDiff = (
   prevThermocyclerState: ThermocyclerModuleState,
   args: ThermocyclerStateStepArgs
 ): Diff => {
   const lidOpenDiff = { ...getLidOpenDiff(prevThermocyclerState, args) }
   const lidClosedDiff = { ...getLidClosedDiff(prevThermocyclerState, args) }
-  const blockTempChanged =
-    prevThermocyclerState.blockTargetTemp !== args.blockTargetTemp
+
+  const blockTempChanged = !isBlockCurrentlyTargetingTemp(
+    prevThermocyclerState,
+    args.blockTargetTemp
+  )
   const blockTempDeactivated = blockTempChanged && args.blockTargetTemp === null
   const blockTempActivated = blockTempChanged && args.blockTargetTemp !== null
+
   const lidTempChanged =
     prevThermocyclerState.lidTargetTemp !== args.lidTargetTemp
   const lidTempDeactivated = lidTempChanged && args.lidTargetTemp === null
   const lidTempActivated = lidTempChanged && args.lidTargetTemp !== null
+
   return {
     ...getInitialDiff(),
     ...lidOpenDiff,

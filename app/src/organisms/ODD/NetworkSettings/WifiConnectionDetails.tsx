@@ -54,10 +54,14 @@ export function WifiConnectionDetails({
   const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
     useState<boolean>(false)
 
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
+  useEffect(
+    () => {
+      dispatch(fetchStatus(robotName))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    []
+  )
 
   return (
     <>
@@ -123,7 +127,10 @@ const DisplayConnectionStatus = ({
       justifyContent={JUSTIFY_CENTER}
     >
       <Icon size="3rem" name="ot-check" color={COLORS.green50} />
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {t('successfully_connected_to_network', { ssid })}
       </LegacyStyledText>
     </Flex>

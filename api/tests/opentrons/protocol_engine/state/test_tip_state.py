@@ -1,36 +1,38 @@
 """Tests for tip state store and selectors."""
 
-import pytest
-
 from typing import Optional
+
+import pytest
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Parameters2 as LabwareDefinition2Parameters,
 )
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
+from opentrons_shared_data.pipette.pipette_definition import (
+    AvailableSensorDefinition,
+    ValidNozzleMaps,
+)
+from opentrons_shared_data.pipette.types import PipetteNameType
 
+from ..pipette_fixtures import (
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    NINETY_SIX_ROWS,
+    get_default_nozzle_map,
+)
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
     OFF_DECK_LOCATION,
+    DeckSlotLocation,
     TipRackWellState,
 )
 from opentrons.types import DeckSlotName
-from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.pipette.pipette_definition import (
-    AvailableSensorDefinition,
-)
-from ..pipette_fixtures import (
-    NINETY_SIX_MAP,
-    NINETY_SIX_COLS,
-    NINETY_SIX_ROWS,
-    get_default_nozzle_map,
-)
 
 _tip_rack_parameters = LabwareDefinition2Parameters.model_construct(isTiprack=True)  # type: ignore[call-arg]
 

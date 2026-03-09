@@ -1,29 +1,29 @@
 """A script for monitoring CAN bus."""
-import asyncio
-import dataclasses
-from dataclasses import fields
-import logging
+
 import argparse
+import asyncio
 import atexit
+import dataclasses
+import logging
 import sys
+from dataclasses import fields
 from datetime import datetime
 from logging.config import dictConfig
 from typing import List, TextIO, cast
 
 from opentrons_hardware.drivers.can_bus import (
-    build,
     CanMessenger,
     WaitableCallback,
+    build,
 )
 from opentrons_hardware.firmware_bindings.constants import (
+    ErrorSeverity,
     MessageId,
     NodeId,
-    ErrorSeverity,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ErrorMessage,
 )
-
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 log = logging.getLogger(__name__)

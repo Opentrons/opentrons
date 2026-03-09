@@ -7,7 +7,6 @@ import {
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
   OT2_ROBOT_TYPE,
-  protocolSchemaV8,
 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
@@ -22,21 +21,17 @@ import {
   fileMetadata,
   ingredients,
   ingredLocations,
-  labwareDefsByURI,
   labwareEntities,
   labwareNicknamesById,
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import {
-  createFile,
-  createJSONFile,
-  getLabwareDefinitionsInUse,
-} from '../selectors'
+import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   LabwareEntities,
   PipetteEntities,
 } from '../../../../step-generation/src/types'
@@ -52,20 +47,6 @@ const ajv = new Ajv({
 // and add v8 command schema
 ajv.addSchema(labwareSchemaV2)
 ajv.addSchema(commandSchemaV8)
-
-const validateProtocol = ajv.compile(protocolSchemaV8)
-
-const expectResultToMatchSchema = (result: any): void => {
-  const valid = validateProtocol(result)
-  const validationErrors = validateProtocol.errors
-
-  if (validationErrors) {
-    console.log(JSON.stringify(validationErrors, null, 4))
-  }
-
-  expect(valid).toBe(true)
-  expect(validationErrors).toBe(null)
-}
 
 describe('createFile selector', () => {
   beforeEach(() => {
@@ -92,38 +73,19 @@ describe('createFile selector', () => {
     // to demonstrate what custom labware loading looks like.
   }
 
-  const entities = {
+  const entities: InvariantContext = {
     moduleEntities: v7Fixture.moduleEntities,
     labwareEntities: labwareEntitiesOpentrons,
     pipetteEntities,
     liquidEntities: ingredients,
+    wasteChuteEntities: {},
+    trashBinEntities: {},
+    gripperEntities: {},
+    stagingAreaEntities: {},
+    config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
-  it('should return a schema-valid JSON V8 protocol', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createJSONFile.resultFunc(
-      fileMetadata,
-      v7Fixture.initialRobotState,
-      v7Fixture.robotStateTimeline,
-      OT2_ROBOT_TYPE,
-      dismissedWarnings,
-      ingredLocations,
-      v7Fixture.savedStepForms,
-      v7Fixture.orderedStepIds,
-      labwareNicknamesById,
-      labwareDefsByURI,
-      {},
-      entities
-    )
-    expectResultToMatchSchema(result)
-
-    expect(vi.mocked(getLoadLiquidCommands)).toHaveBeenCalledWith(
-      ingredients,
-      ingredLocations
-    )
-  })
 
   it('should return a valid Python protocol file', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
@@ -285,7 +247,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: '8.7.0',
+        version: '8.8.0',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },

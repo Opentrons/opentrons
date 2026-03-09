@@ -5,41 +5,40 @@ longer helpful. Try to add new tests to test_labware_state.py, where they can be
 tested together, treating LabwareState as a private implementation detail.
 """
 
+from datetime import datetime
 from typing import Optional
-from opentrons.protocol_engine.state import update_types
+
 import pytest
 
-from datetime import datetime
-
-from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     Parameters2,
 )
-from opentrons.types import DeckSlotName
-
-from opentrons.protocol_engine.types import (
-    LabwareOffset,
-    LabwareOffsetCreateInternal,
-    LabwareOffsetVector,
-    LegacyLabwareOffsetLocation,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    DeckSlotLocation,
-    LoadedLabware,
-    OFF_DECK_LOCATION,
-)
-from opentrons.protocol_engine.actions import (
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    SucceedCommandAction,
-)
-from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import (
     create_comment_command,
 )
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_engine.actions import (
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.labware import LabwareState, LabwareStore
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    DeckSlotLocation,
+    LabwareOffset,
+    LabwareOffsetCreateInternal,
+    LabwareOffsetVector,
+    LegacyLabwareOffsetLocation,
+    LoadedLabware,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+)
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture

@@ -1,5 +1,6 @@
 import re
 from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -19,5 +20,5 @@ class GetRPMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         if match is not None:
             current_rpm = match.groupdict()["current_rpm"].strip()
             set_rpm = match.groupdict()["set_rpm"].strip()
-            message = f"Set RPM is {set_rpm}. " f"Current RPM is {current_rpm}"
+            message = f"Set RPM is {set_rpm}. Current RPM is {current_rpm}"
         return message

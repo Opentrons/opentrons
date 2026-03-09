@@ -1,6 +1,8 @@
 """Load pipette command request, result, and implementation models."""
+
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -9,18 +11,15 @@ from typing_extensions import Literal
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )
-from opentrons_shared_data.pipette.types import PipetteGenerationType
+from opentrons_shared_data.pipette.types import PipetteGenerationType, PipetteNameType
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
-
-from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons.types import MountType
-
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors import InvalidLoadPipetteSpecsError, InvalidSpecificationForRobotTypeError
 from ..errors.error_occurrence import ErrorOccurrence
-from ..errors import InvalidSpecificationForRobotTypeError, InvalidLoadPipetteSpecsError
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.protocol_engine.state.update_types import StateUpdate
+from opentrons.types import MountType
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
@@ -97,16 +96,12 @@ class LoadPipetteImplementation(
             self._state_view.config.robot_type
         )
         if (
-            (
-                robot_type == RobotTypeEnum.FLEX
-                and pipette_generation != PipetteGenerationType.FLEX
-            )
+            robot_type == RobotTypeEnum.FLEX
+            and pipette_generation != PipetteGenerationType.FLEX
         ) or (
-            (
-                robot_type == RobotTypeEnum.OT2
-                and pipette_generation
-                not in [PipetteGenerationType.GEN1, PipetteGenerationType.GEN2]
-            )
+            robot_type == RobotTypeEnum.OT2
+            and pipette_generation
+            not in [PipetteGenerationType.GEN1, PipetteGenerationType.GEN2]
         ):
             raise InvalidSpecificationForRobotTypeError(
                 f"Cannot load a {pipette_generation.value.capitalize()} pipette on "
@@ -138,9 +133,11 @@ class LoadPipetteImplementation(
             config=loaded_pipette.static_config,
         )
         state_update.set_fluid_unknown(pipette_id=loaded_pipette.pipette_id)
-        state_update.set_pipette_ready_to_aspirate(
-            pipette_id=loaded_pipette.pipette_id, ready_to_aspirate=False
-        ),
+        (
+            state_update.set_pipette_ready_to_aspirate(
+                pipette_id=loaded_pipette.pipette_id, ready_to_aspirate=False
+            ),
+        )
 
         return SuccessData(
             public=LoadPipetteResult(pipetteId=loaded_pipette.pipette_id),

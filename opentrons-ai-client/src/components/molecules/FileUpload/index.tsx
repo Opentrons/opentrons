@@ -58,14 +58,14 @@ export function FileUpload({
           padding={SPACING.spacing8}
           css={FILE_UPLOAD_STYLE}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {truncateString(file.name, 34, 19)}
           </LegacyStyledText>
           <Icon name="close" size="1.5rem" borderRadius="50%" />
         </Flex>
       </Btn>
       {fileError != null ? (
-        <LegacyStyledText as="label" color={COLORS.red50}>
+        <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
           {fileError}
         </LegacyStyledText>
       ) : null}

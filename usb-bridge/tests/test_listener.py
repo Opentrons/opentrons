@@ -1,13 +1,13 @@
 """Tests for the main file for ot3usb."""
 
-import pytest
-import mock
-
 import select
-import serial  # type: ignore[import-untyped]
 from queue import Queue
 
-from ot3usb import usb_config, tcp_conn, usb_monitor, listener
+import mock
+import pytest
+import serial  # type: ignore[import-untyped]
+
+from ot3usb import listener, tcp_conn, usb_config, usb_monitor
 from ot3usb.serial_thread import QUEUE_TYPE
 
 FAKE_HANDLE = "Handle Placeholder"

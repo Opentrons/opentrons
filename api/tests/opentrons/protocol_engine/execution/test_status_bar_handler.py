@@ -1,10 +1,11 @@
 """StatusBar handler."""
+
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution.status_bar import StatusBarHandler
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.types import StatusBarState
+from opentrons.protocol_engine.execution.status_bar import StatusBarHandler
 
 
 @pytest.fixture

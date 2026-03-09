@@ -1,17 +1,18 @@
 """A helper for controlling a `ProtocolEngine` without async/await."""
+
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, Final, overload
+
 from typing_extensions import Literal
 
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareUri
 
-
-from ..protocol_engine import ProtocolEngine
-from ..errors import ProtocolCommandFailedError
-from ..error_recovery_policy import ErrorRecoveryType
-from ..state.state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
+from ..error_recovery_policy import ErrorRecoveryType
+from ..errors import ProtocolCommandFailedError
+from ..protocol_engine import ProtocolEngine
+from ..state.state import StateView
 
 
 class RunStoppedBeforeCommandError(RuntimeError):
@@ -164,8 +165,7 @@ class ChildThreadTransport:
         method_name: Literal["add_labware_definition"],
         *,
         definition: LabwareDefinition,
-    ) -> LabwareUri:
-        ...
+    ) -> LabwareUri: ...
 
     @overload
     def call_method(
@@ -173,16 +173,14 @@ class ChildThreadTransport:
         method_name: Literal["reset_tips"],
         *,
         labware_id: str,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def call_method(
         self,
         method_name: str,
         **kwargs: Any,
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
     def call_method(self, method_name: str, **kwargs: Any) -> Any:
         """Execute a ProtocolEngine method, returning the result."""

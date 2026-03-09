@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Quick Transfer"
+description: "Run a simple liquid transfer from the touchscreen without a full protocol."
 ---
 
 Quick transfer is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
@@ -42,6 +43,8 @@ If everything is set up correctly, you'll move on to selecting pipettes and tips
 
 Creating a quick transfer involves selecting a pipette and appropriate tips. Quick transfer can use any 1-, 8-, or 96-channel pipette that's attached to the robot. When selecting a pipette tip, try to match the tip to a pipette of the same capacity or larger. For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
 
+Beginning with robot software version 8.6.0, you can apply Opentrons-verified liquid class settings in a quick transfer. Additionally, the release of robot software version 8.8.0 gives you the option to return tips to their original location, which can help you conserve them for future use. After choosing your pipette and tips, select the aqueous, viscous, or volatile liquid class to increase pipetting accuracy.
+
 ## Labware
 
 Quick transfer works with most of the labware in the [Opentrons Labware Library](https://labware.opentrons.com/). It omits labware from the source and destination menus when those items are incompatible with the selected pipette. For example, only the 1-channel pipette can aspirate or dispense from tube racks. If you select a multi-channel pipette, quick transfer won't let you choose a tube rack as a source or destination.
@@ -73,6 +76,8 @@ You'll set the amount of liquid to transfer (in µL) after specifying the source
 ## Advanced settings
 
 These are available after you name a quick transfer and before you save it. If some settings are familiar to you that's because they're the same as those offered in Protocol Designer. Advanced settings are optional; select any that you need or just save or run the transfer.
+
+If your quick transfer will apply liquid class settings, values for your chosen liquid class are shown for each advanced setting. You can still make changes before moving to the next step. 
 
 | Setting {style="width: 25%;"} | Description |
 |----------|-------------|

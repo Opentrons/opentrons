@@ -49,7 +49,6 @@ import {
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
   useRunTimestamps,
 } from '/app/resources/runs'
 
@@ -61,8 +60,8 @@ import type {
   RunningProtocolCommandListProps,
 } from '/app/organisms/ODD/RunningProtocol'
 
-const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
@@ -95,15 +94,19 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === lastRunCommand?.key
   )
-  const runStatus = useRunStatus(runId, {
+
+  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
-  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const runStatus = runRecord?.data.status ?? null
+
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -157,6 +160,8 @@ export function RunningProtocol(): JSX.Element {
       robotSideAnalysis != null
         ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
   )
 

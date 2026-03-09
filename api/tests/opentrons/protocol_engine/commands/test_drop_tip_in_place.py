@@ -1,25 +1,26 @@
 """Test drop tip in place commands."""
+
 from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.drop_tip_in_place import (
+    DropTipInPlaceImplementation,
+    DropTipInPlaceParams,
+    DropTipInPlaceResult,
+)
 from opentrons.protocol_engine.commands.pipetting_common import (
     TipPhysicallyAttachedError,
 )
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.drop_tip_in_place import (
-    DropTipInPlaceParams,
-    DropTipInPlaceResult,
-    DropTipInPlaceImplementation,
-)
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
-from opentrons.protocol_engine.execution import TipHandler, GantryMover
+from opentrons.protocol_engine.execution import GantryMover, TipHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state.update_types import (
     PipetteTipStateUpdate,
-    StateUpdate,
     PipetteUnknownFluidUpdate,
+    StateUpdate,
 )
 from opentrons.types import Point
 
@@ -93,7 +94,7 @@ async def test_tip_attached_error(
         Point(9, 8, 7)
     )
     decoy.when(
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False)
+        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False)  # type: ignore[func-returns-value]
     ).then_raise(TipAttachedError("Egads!"))
 
     decoy.when(mock_model_utils.generate_id()).then_return("error-id")

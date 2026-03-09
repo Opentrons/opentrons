@@ -1,23 +1,24 @@
 """Convert labware offset creation requests and stored elements between legacy and new."""
 
-from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
+
 from .errors import (
-    OffsetLocationInvalidError,
     FixtureDoesNotExistError,
-)
-from .types import (
-    LabwareOffsetCreate,
-    LegacyLabwareOffsetCreate,
-    LabwareOffsetCreateInternal,
-    LegacyLabwareOffsetLocation,
-    LabwareOffsetLocationSequence,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnModuleOffsetLocationSequenceComponent,
-    ModuleModel,
+    OffsetLocationInvalidError,
 )
 from .resources import deck_configuration_provider
+from .types import (
+    LabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
+    LabwareOffsetLocationSequence,
+    LegacyLabwareOffsetCreate,
+    LegacyLabwareOffsetLocation,
+    ModuleModel,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+)
 
 
 def standardize_labware_offset_create(
@@ -68,8 +69,7 @@ def legacy_offset_location_to_offset_location_sequence(
         if (
             # Check for v2 specifically because v1 is OT-2-only and OT-2s don't have
             # modules in their deck definitions; and v3 does not exist at the time of writing.
-            location.moduleModel
-            == ModuleModel.THERMOCYCLER_MODULE_V2
+            location.moduleModel == ModuleModel.THERMOCYCLER_MODULE_V2
         ):
             possible_cutout_fixture_id = "thermocyclerModuleV2Front"
         else:

@@ -1,18 +1,18 @@
 import os
-import pytest
 from typing import Iterator
-from opentrons_shared_data import get_shared_data_root
-from opentrons_shared_data.pipette.pipette_load_name_conversions import (
-    convert_pipette_model,
-)
-from opentrons_shared_data.pipette.load_data import load_definition
-from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
-from opentrons_shared_data.pipette.types import PipetteModel
+import pytest
+
+from opentrons_shared_data import get_shared_data_root
+from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.pipette_definition import (
     ulPerMMDefinition,
 )
-
+from opentrons_shared_data.pipette.pipette_load_name_conversions import (
+    convert_pipette_model,
+)
+from opentrons_shared_data.pipette.types import PipetteModel
+from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
 DEFAULT_MAX_SPEED_HIGH_THROUGHPUT_OT3_AXIS_KIND_P = 15
 DEFAULT_MAX_SPEED_LOW_THROUGHPUT_OT3_AXIS_KIND_P = 70
@@ -82,7 +82,6 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
 
     for liquid_name, liquid_properties in definition.liquid_properties.items():
         for tip_type, supported_tip in liquid_properties.supported_tips.items():
-
             """TODO: the following models do not pass the asserts since the uiMaxFlowRate was raised
             to match the default blowout and dispense flowRates. uiMaxFlowRate will be reevaluated
             in the future."""
@@ -90,13 +89,28 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
                 (
                     pipette_model_version_str
                     in {
+                        "p50_single_v3.3",
                         "p50_single_v3.4",
                         "p50_single_v3.5",
                         "p50_single_v3.6",
                         "p50_multi_v3.5",
                         "p50_multi_v3.4",
+                        "p50_multi_v3.3",
                     }
                     and liquid_properties.min_volume == 5.0
+                )
+                or (
+                    pipette_model_version_str
+                    in {
+                        "p50_single_v3.3",
+                        "p50_single_v3.4",
+                        "p50_single_v3.5",
+                        "p50_single_v3.6",
+                        "p50_multi_v3.5",
+                        "p50_multi_v3.4",
+                        "p50_multi_v3.3",
+                    }
+                    and liquid_properties.min_volume == 0.5
                 )
                 or (
                     pipette_model_version_str

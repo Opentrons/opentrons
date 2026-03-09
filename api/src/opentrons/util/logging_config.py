@@ -1,10 +1,10 @@
 import logging
+import sys
 from logging.config import dictConfig
 from logging.handlers import QueueListener, RotatingFileHandler
-import sys
 from queue import Queue
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
+from opentrons.config import ARCHITECTURE, CONFIG, SystemArchitecture
 
 if ARCHITECTURE is SystemArchitecture.YOCTO:
     from opentrons_hardware.sensors import SENSOR_LOG_NAME

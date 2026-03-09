@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Depends
 
-from robot_server.versioning import check_version_header, set_version_response_headers
-
 from . import (
-    networking,
-    control,
-    settings,
-    deck_calibration,
-    modules,
-    pipettes,
-    motors,
     camera,
+    control,
+    deck_calibration,
     logs,
+    modules,
+    motors,
+    networking,
+    pipettes,
+    settings,
 )
+from robot_server.versioning import check_version_header, set_version_response_headers
 
 legacy_routes = APIRouter()
 

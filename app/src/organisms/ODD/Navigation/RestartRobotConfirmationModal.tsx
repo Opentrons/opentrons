@@ -50,7 +50,7 @@ export function RestartRobotConfirmationModal({
             bold: <strong />,
             span: (
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 data-testid="restart_robot_confirmation_description"
               />
             ),

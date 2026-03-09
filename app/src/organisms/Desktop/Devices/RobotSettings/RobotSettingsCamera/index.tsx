@@ -5,7 +5,7 @@ import {
   SOURCE_ROBOT_SETTINGS,
   useCameraAnalytics,
 } from '/app/redux-resources/analytics'
-import { useFeatureFlag } from '/app/redux/config'
+import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
@@ -13,14 +13,13 @@ import { RobotSettingsCameraControls } from './RobotSettingsCameraControls'
 import { RobotSettingsCameraUsage } from './RobotSettingsCameraUsage'
 
 import type { JSX } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 
 export interface RobotSettingsCameraProps {
-  robotType: RobotType
+  robotName: string
   isRobotBusy: boolean
 }
 export function RobotSettingsCamera({
-  robotType,
+  robotName,
   isRobotBusy,
 }: RobotSettingsCameraProps): JSX.Element {
   const {
@@ -31,11 +30,12 @@ export function RobotSettingsCamera({
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
   } = useCameraUsageSettings()
+  const robotType = useRobotType(robotName)
+  const isFlex = useIsFlex(robotName)
   const { reportCameraEnablementSettings } = useCameraAnalytics({
     source: SOURCE_ROBOT_SETTINGS,
-    robotType: robotType,
+    robotType,
   })
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const handleToggleLiveStream = (): void => {
     toggleLiveVideoEnabled()
     reportCameraEnablementSettings({
@@ -59,6 +59,7 @@ export function RobotSettingsCamera({
         toggleCameraEnabled={toggleCameraEnabled}
         isCameraEnabled={isCameraEnabled}
         toggleDisabled={isRobotBusy}
+        isFlex={isFlex}
       />
       {isCameraEnabled && (
         <>
@@ -70,12 +71,10 @@ export function RobotSettingsCamera({
             toggleDisabled={isRobotBusy}
             robotType={robotType}
           />
-          {isCameraSettingsEnabled && (
-            <>
-              <Divider />
-              <RobotSettingsCameraControls />
-            </>
-          )}
+          <>
+            <Divider />
+            <RobotSettingsCameraControls disabled={isRobotBusy} />
+          </>
         </>
       )}
     </div>

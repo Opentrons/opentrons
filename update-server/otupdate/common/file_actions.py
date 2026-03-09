@@ -9,9 +9,9 @@ import json
 import logging
 import os
 import subprocess
-from typing import Callable, Sequence, Mapping, Optional, Tuple, List, Dict
 import tempfile
 import zipfile
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 LOG = logging.getLogger(__name__)
 

@@ -1,13 +1,15 @@
 ---
 title: "Opentrons Flex Instruction Manual"
+description: "Official instruction manual for the Opentrons Flex liquid handling robot."
 ---
 
 <style>
-.md-content__inner {
+div.cover {
   text-align: center;
 }
 </style>
 
+<div class="cover" markdown>
 ![Opentrons Flex](images/opentrons-flex-logo.svg "Opentrons Flex logo"){ width="75%" }
 
 # Instruction Manual
@@ -16,4 +18,5 @@ title: "Opentrons Flex Instruction Manual"
 
 **Opentrons Labworks Inc.**
 
-May 2025
+October 2025
+</div>

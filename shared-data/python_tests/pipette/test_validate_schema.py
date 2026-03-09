@@ -1,19 +1,19 @@
-import os
 import json
+import os
 from typing import Iterator
-from opentrons_shared_data import get_shared_data_root
 
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-)
+from opentrons_shared_data import get_shared_data_root
+from opentrons_shared_data.pipette import types
 from opentrons_shared_data.pipette.load_data import (
     load_definition,
     load_valid_nozzle_maps,
 )
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteConfigurations,
+)
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_pipette_model,
 )
-from opentrons_shared_data.pipette import types
 
 
 def iterate_models() -> Iterator[types.PipetteModel]:

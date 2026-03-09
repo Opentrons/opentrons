@@ -1,9 +1,9 @@
 """Request/response models for the `/labwareOffsets` endpoints."""
 
-from datetime import datetime
 import enum
+from datetime import datetime
 from textwrap import dedent
-from typing import Literal, Annotated, Final, TypeAlias, Sequence
+from typing import Annotated, Final, Literal, Sequence, TypeAlias
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -69,9 +69,9 @@ class StoredLabwareOffsetCreate(BaseModel):
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
 
-    locationSequence: Sequence[
-        StoredLabwareOffsetLocationSequenceComponents
-    ] | AnyLocation = Field(
+    locationSequence: (
+        Sequence[StoredLabwareOffsetLocationSequenceComponents] | AnyLocation
+    ) = Field(
         ...,
         description=(
             "Where the labware is located on the robot."
@@ -96,9 +96,9 @@ class StoredLabwareOffset(BaseModel):
     createdAt: datetime = Field(..., description="When this labware offset was added.")
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    locationSequence: Sequence[
-        ReturnedLabwareOffsetLocationSequenceComponents
-    ] | AnyLocation = Field(
+    locationSequence: (
+        Sequence[ReturnedLabwareOffsetLocationSequenceComponents] | AnyLocation
+    ) = Field(
         ...,
         description=(
             "Where the labware is located on the robot."

@@ -14,3 +14,4 @@ tests/helpers/*.env
 evaluation/
 api/storage/api_docs/scripts/
 ai-server/
+.venv/

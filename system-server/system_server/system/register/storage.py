@@ -1,17 +1,18 @@
 """Functionality to interface with the registration table."""
-import sqlalchemy
-from typing import Optional, Dict, Tuple
-from datetime import timedelta
-import logging
 
-from system_server.persistence import registration_table
-from system_server.jwt import Registrant, create_jwt, jwt_is_valid
+import logging
+from datetime import timedelta
+
+import sqlalchemy
+
 from system_server.constants import REGISTRATION_AUDIENCE, REGISTRATION_DURATION_DAYS
+from system_server.jwt import Registrant, create_jwt, jwt_is_valid
+from system_server.persistence import registration_table
 
 _log = logging.getLogger(__name__)
 
 
-def _create_registration_row(registrant: Registrant, token: str) -> Dict[str, object]:
+def _create_registration_row(registrant: Registrant, token: str) -> dict[str, object]:
     """Helper to serialize into a sql row."""
     return {
         "agent": registrant.agent,
@@ -23,7 +24,7 @@ def _create_registration_row(registrant: Registrant, token: str) -> Dict[str, ob
 
 def _get_registration_token(
     sql_connection: sqlalchemy.engine.Connection, registrant: Registrant
-) -> Optional[str]:
+) -> str | None:
     """Get the JWT for a registrant, if it exists.
 
     This function searches the database to check if a token exists for
@@ -94,7 +95,7 @@ def _add_registration_token(
 
 def get_or_create_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant, signing_key: str
-) -> Tuple[str, bool]:
+) -> tuple[str, bool]:
     """Get the token for a registrant, or create a new one if necessary.
 
     If a token is found in the database, this function performs validation on it. If
@@ -114,7 +115,7 @@ def get_or_create_registration_token(
         The JWT, and a boolean that is True if the JWT is newly created or False if
         it is a cached value.
     """
-    with sql_engine.connect() as conn:
+    with sql_engine.begin() as conn:
         token = _get_registration_token(conn, registrant)
         token_is_new = False
 

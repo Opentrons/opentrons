@@ -1,14 +1,16 @@
 """Common fixtures for integration tests."""
-from __future__ import annotations
-import pytest
-from typing import AsyncGenerator, Iterator, AsyncIterator, List, Dict
 
+from __future__ import annotations
+
+from typing import AsyncGenerator, AsyncIterator, Dict, Iterator, List
+
+import pytest
 from _pytest.fixtures import SubRequest
 
-from opentrons_hardware.drivers.can_bus.settings import DriverSettings
-from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.can_bus.settings import DriverSettings
 from opentrons_hardware.firmware_bindings import constants
 
 

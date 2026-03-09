@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import TYPE_CHECKING
+
+from opentrons_shared_data.util import StrEnum
+
 from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 if TYPE_CHECKING:
     from typing_extensions import Final
 
 
-class PipetteOffsetCalibrationState(str, Enum):
+class PipetteOffsetCalibrationState(StrEnum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"
@@ -20,7 +22,7 @@ class PipetteOffsetCalibrationState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-class PipetteOffsetWithTipLengthCalibrationState(str, Enum):
+class PipetteOffsetWithTipLengthCalibrationState(StrEnum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"

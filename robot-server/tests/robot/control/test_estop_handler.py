@@ -1,21 +1,27 @@
 """Test estop handler wrapper class."""
 
-from decoy import Decoy
+from typing import TYPE_CHECKING, List, Tuple
+
 import pytest
-from typing import List, Tuple, TYPE_CHECKING
+from decoy import Decoy
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
-from robot_server.robot.control.estop_handler import EstopHandler
-from robot_server.robot.control.models import (
-    EstopState,
-    EstopPhysicalStatus,
+from opentrons.hardware_control.types import (
+    EstopOverallStatus,
+)
+from opentrons.hardware_control.types import (
+    EstopPhysicalStatus as HwEstopPhysicalStatus,
 )
 from opentrons.hardware_control.types import (
     EstopState as HwEstopState,
-    EstopPhysicalStatus as HwEstopPhysicalStatus,
-    EstopOverallStatus,
+)
+
+from robot_server.robot.control.estop_handler import EstopHandler
+from robot_server.robot.control.models import (
+    EstopPhysicalStatus,
+    EstopState,
 )
 
 
@@ -41,7 +47,7 @@ def test_estop_state_transform(
         (HwEstopState.LOGICALLY_ENGAGED, EstopState.LOGICALLY_ENGAGED),
         (HwEstopState.DISENGAGED, EstopState.DISENGAGED),
     ]
-    for (input, output) in steps:
+    for input, output in steps:
         decoy.when(mock_hardware.estop_status).then_return(
             EstopOverallStatus(
                 state=input,
@@ -95,7 +101,7 @@ def test_estop_physical_state_transform(
         ),
     ]
 
-    for (input, left, right) in steps:
+    for input, left, right in steps:
         decoy.when(mock_hardware.estop_status).then_return(input)
         assert subject.get_left_physical_status() == left
         assert subject.get_right_physical_status() == right

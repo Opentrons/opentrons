@@ -1,64 +1,68 @@
 """Tests for the sensor drivers."""
-import pytest
-import mock
-from typing import Union, List
-from pytest_lazy_fixtures import lf as lazy_fixture
 
+from typing import List, Union
 from unittest.mock import patch
+
+import mock
+import pytest
 from mock.mock import AsyncMock
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from tests.conftest import MockCanMessageNotifier
 
-from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId, NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
-    UInt16Field,
-    UInt32Field,
-    Int32Field,
+from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    SensorOutputBinding,
+    SensorType,
 )
-
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorTypeField,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     BaselineSensorResponse,
-    ReadFromSensorRequest,
-    SetSensorThresholdRequest,
-    WriteToSensorRequest,
-    ReadFromSensorResponse,
-    SensorThresholdResponse,
     BindSensorOutputRequest,
     PeripheralStatusRequest,
     PeripheralStatusResponse,
+    ReadFromSensorRequest,
+    ReadFromSensorResponse,
+    SensorThresholdResponse,
+    SetSensorThresholdRequest,
+    WriteToSensorRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BaselineSensorRequestPayload,
-    ReadFromSensorRequestPayload,
-    WriteToSensorRequestPayload,
-    ReadFromSensorResponsePayload,
-    SensorThresholdResponsePayload,
+    BaselineSensorResponsePayload,
     BindSensorOutputRequestPayload,
     PeripheralStatusResponsePayload,
-    BaselineSensorResponsePayload,
+    ReadFromSensorRequestPayload,
+    ReadFromSensorResponsePayload,
+    SensorThresholdResponsePayload,
+    WriteToSensorRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorTypeField,
-    SensorIdField,
-    SensorOutputBindingField,
-)
-from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
-from opentrons_hardware.sensors.sensor_types import (
-    CapacitiveSensor,
-    PressureSensor,
-    EnvironmentSensor,
-    BaseSensorType,
-    ThresholdSensorType,
+from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
+    UInt8Field,
+    UInt16Field,
+    UInt32Field,
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
-from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
+from opentrons_hardware.sensors.sensor_types import (
+    BaseSensorType,
+    CapacitiveSensor,
+    EnvironmentSensor,
+    PressureSensor,
+    ThresholdSensorType,
+)
+from opentrons_hardware.sensors.types import EnvironmentSensorDataType, SensorDataType
 
 
 @pytest.fixture
@@ -629,12 +633,11 @@ async def test_debug_poll(
             "_multi_wait_for_response",
             new=AsyncMock(return_value=data_points),
         ):
-
             data = await sensor_driver.get_report(sensor_type, mock_messenger, timeout)
             if isinstance(data, EnvironmentSensorDataType):
-                expected_result: Union[
-                    EnvironmentSensorDataType, SensorDataType
-                ] = EnvironmentSensorDataType.build(data_points)
+                expected_result: Union[EnvironmentSensorDataType, SensorDataType] = (
+                    EnvironmentSensorDataType.build(data_points)
+                )
             else:
                 expected_result = data_points[0]
             assert data == expected_result

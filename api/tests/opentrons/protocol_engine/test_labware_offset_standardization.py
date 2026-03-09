@@ -1,25 +1,27 @@
 """Tests for `labware_offset_standardization`."""
 
 from functools import lru_cache
+
 import pytest
 
-from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck import load
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.types import RobotType
+
 from opentrons.protocol_engine import labware_offset_standardization as subject
 from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
+    LabwareOffsetLocationSequence,
+    LabwareOffsetVector,
     LegacyLabwareOffsetCreate,
     LegacyLabwareOffsetLocation,
+    ModuleModel,
+    OnAddressableAreaOffsetLocationSequenceComponent,
     OnLabwareOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    ModuleModel,
-    LabwareOffsetVector,
-    LabwareOffsetLocationSequence,
-    LabwareOffsetCreateInternal,
 )
+from opentrons.types import DeckSlotName
 
 
 @lru_cache

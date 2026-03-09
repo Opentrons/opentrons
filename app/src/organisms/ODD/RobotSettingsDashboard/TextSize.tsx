@@ -62,8 +62,8 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop="8.125rem">
         <LegacyStyledText
-          textSize="1.375rem"
-          lineHeight="1.75rem"
+          fontSize={TYPOGRAPHY.fontSize22}
+          lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}

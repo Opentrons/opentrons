@@ -1,11 +1,12 @@
 """Dependency functions for use with `fastapi.Depends()`."""
+
 from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends
 
-from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.disk_monitor.monitor import DiskMonitor
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.settings import RobotServerSettings, get_settings
 
 

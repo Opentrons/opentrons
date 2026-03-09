@@ -27,7 +27,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
   return (
     <Modal title={t('why_is_this_robot_unavailable')} onClose={props.onClose}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('connection_troubleshooting_intro')}
         </LegacyStyledText>
         <TroubleshootingSteps
@@ -45,7 +45,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           label={t('if_still_having_issues')}
           steps={[t('restart_the_robot'), t('restart_the_app')]}
         />
-        <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
+        <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing16}>
           {t('branded:contact_support_for_connection_help', {
             support_email: SUPPORT_EMAIL,
           })}
@@ -81,7 +81,10 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
   const { label, steps } = props
   return (
     <Box marginTop={SPACING.spacing16}>
-      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="p"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {label}:
       </LegacyStyledText>
       <ul>
@@ -92,7 +95,7 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
             `}
             key={step}
           >
-            <LegacyStyledText as="p">{step}</LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{step}</LegacyStyledText>
           </li>
         ))}
       </ul>

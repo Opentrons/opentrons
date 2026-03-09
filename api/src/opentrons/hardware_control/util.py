@@ -1,20 +1,22 @@
-""" Utility functions and classes for the hardware controller"""
+"""Utility functions and classes for the hardware controller"""
+
 import asyncio
 import logging
 from enum import Enum
-from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple, TypeVar, Union
 
-from .types import CriticalPoint, MotionChecks, Axis
-from .errors import OutOfBoundsMove
 from opentrons_shared_data.errors.exceptions import MissingConfigurationData
-from opentrons.types import Point
-from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    PressFitPickUpTipConfiguration,
     CamActionPickUpTipConfiguration,
+    PipetteConfigurations,
     PressAndCamConfigurationValues,
+    PressFitPickUpTipConfiguration,
 )
+from opentrons_shared_data.pipette.types import PipetteTipType
+
+from .errors import OutOfBoundsMove
+from .types import Axis, CriticalPoint, MotionChecks
+from opentrons.types import Point
 
 mod_log = logging.getLogger(__name__)
 
@@ -41,7 +43,6 @@ def plan_arc(
     dest_cp: Optional[CriticalPoint] = None,
     extra_waypoints: Optional[List[Tuple[float, float]]] = None,
 ) -> List[Tuple[Point, Optional[CriticalPoint]]]:
-
     assert z_height >= max(origin_point.z, dest_point.z)
     checked_wp = extra_waypoints or []
     return (

@@ -72,7 +72,7 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText as="p" paddingBottom={SPACING.spacing24}>
+            <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
             </LegacyStyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -102,7 +102,7 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >

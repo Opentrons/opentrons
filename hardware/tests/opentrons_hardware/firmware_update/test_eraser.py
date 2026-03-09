@@ -1,12 +1,15 @@
 """Tests for FirmwareUpdateEraser."""
+
 import pytest
 from mock import AsyncMock
 
+from tests.conftest import MockCanMessageNotifier
+
 from opentrons_hardware.firmware_bindings import (
-    NodeId,
-    ErrorCode,
     ArbitrationId,
     ArbitrationIdParts,
+    ErrorCode,
+    NodeId,
 )
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
@@ -16,7 +19,6 @@ from opentrons_hardware.firmware_bindings.messages import (
 from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
 from opentrons_hardware.firmware_update import FirmwareUpdateEraser
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
-from tests.conftest import MockCanMessageNotifier
 
 
 @pytest.fixture

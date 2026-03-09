@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 .alert {
   font-size: var(--fs-body-2);
@@ -98,6 +98,6 @@
   padding: 0.125rem;
 
   &:hover {
-    background-color: rgba(100, 100, 100, 0.1);
+    background-color: rgb(100 100 100 / 10%);
   }
 }

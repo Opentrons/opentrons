@@ -1,11 +1,11 @@
 """Unit tests for the `command_unions` module."""
 
-from opentrons.protocol_engine.commands import command_unions
 from opentrons.protocol_engine.commands import (
     AspirateCreate,
     AspirateParams,
     CustomCreate,
     CustomParams,
+    command_unions,
 )
 from opentrons.util.get_union_elements import get_union_elements
 

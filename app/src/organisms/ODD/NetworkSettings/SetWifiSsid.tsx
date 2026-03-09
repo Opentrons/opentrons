@@ -41,7 +41,7 @@ export function SetWifiSsid({
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >

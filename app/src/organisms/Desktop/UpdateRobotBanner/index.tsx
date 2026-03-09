@@ -44,7 +44,7 @@ export function UpdateRobotBanner(
       flexDirection={DIRECTION_COLUMN}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
-        <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
+        <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing4}>
           {t('branded:robot_software_update_required')}
         </LegacyStyledText>
         <Btn

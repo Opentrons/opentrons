@@ -4,7 +4,7 @@ require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
-from enum import Enum
+
 from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
@@ -12,7 +12,7 @@ from typing_extensions import Literal, TypedDict
 # TODO(mc, 2022-06-16): remove type alias when able
 # and when certain removal will not break any pickling
 from ..labware.types import LabwareUri as LabwareUri
-
+from ..util import StrEnum
 
 PipetteName = Literal[
     "p10_single",
@@ -37,7 +37,7 @@ PipetteName = Literal[
 ]
 
 
-class PipetteNameType(str, Enum):
+class PipetteNameType(StrEnum):
     """Pipette load name values."""
 
     value: PipetteName

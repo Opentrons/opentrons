@@ -1,8 +1,7 @@
 import { useRunCommandErrors } from '@opentrons/react-api-client'
 
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getHighestPriorityError } from '/app/transformations/runs'
-
-import { isTerminalRunStatus } from '../utils'
 
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'

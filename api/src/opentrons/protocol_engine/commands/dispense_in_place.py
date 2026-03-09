@@ -1,33 +1,34 @@
 """Dispense-in-place command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Union, Any
-from typing_extensions import Literal
+
+from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
-from .pipetting_common import (
-    PipetteIdMixin,
-    DispenseVolumeMixin,
-    FlowRateMixin,
-    BaseLiquidHandlingResult,
-    OverpressureError,
-    dispense_in_place,
-    DEFAULT_CORRECTION_VOLUME,
-)
+from ..state.update_types import CLEAR
+from ..types import CurrentWell
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
 )
-from ..state.update_types import CLEAR
-from ..types import CurrentWell
+from .pipetting_common import (
+    DEFAULT_CORRECTION_VOLUME,
+    BaseLiquidHandlingResult,
+    DispenseVolumeMixin,
+    FlowRateMixin,
+    OverpressureError,
+    PipetteIdMixin,
+    dispense_in_place,
+)
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
+    from ..execution import GantryMover, PipettingHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
 
@@ -165,9 +166,9 @@ class DispenseInPlace(
     params: DispenseInPlaceParams
     result: Optional[DispenseInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[DispenseInPlaceImplementation] = (
         DispenseInPlaceImplementation
-    ] = DispenseInPlaceImplementation
+    )
 
 
 class DispenseInPlaceCreate(BaseCommandCreate[DispenseInPlaceParams]):

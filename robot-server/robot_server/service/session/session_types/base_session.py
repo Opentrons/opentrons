@@ -3,15 +3,16 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
-from robot_server.service.session.models.common import IdentifierType, create_identifier
+from opentrons.util.helpers import utc_now
+
 from robot_server.service.session.command_execution import (
     CommandExecutor,
     create_command,
 )
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import session as models
 from robot_server.service.session.models import command as command_models
-from opentrons.util.helpers import utc_now
+from robot_server.service.session.models import session as models
+from robot_server.service.session.models.common import IdentifierType, create_identifier
 
 
 @dataclass(frozen=True)
@@ -93,6 +94,4 @@ class BaseSession(ABC):
         pass
 
     def __str__(self) -> str:
-        return (
-            f"Session(" f"session_type={self.session_type}," f"meta={self.meta}," f")"
-        )
+        return f"Session(session_type={self.session_type},meta={self.meta},)"

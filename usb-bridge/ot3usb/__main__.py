@@ -1,12 +1,12 @@
 """Entrypoint for the USB-TCP bridge application."""
+
 import asyncio
 import logging
 import time
 from typing import NoReturn
 
-from . import cli, usb_config, usb_monitor, tcp_conn, listener
-from .default_config import get_gadget_config, PHY_NAME
-
+from . import cli, listener, tcp_conn, usb_config, usb_monitor
+from .default_config import PHY_NAME, get_gadget_config
 from .serial_thread import create_worker_thread
 
 LOG = logging.getLogger(__name__)

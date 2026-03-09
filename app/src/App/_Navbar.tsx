@@ -117,6 +117,8 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedNavigate = useCallback(
     debounce((path: string) => {
       navigate(path)
@@ -145,9 +147,9 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           alt="opentrons logo"
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-          <NavbarLink key={name} to={navLinkTo as string}>
+          <NavbarLink key={name} to={navLinkTo!}>
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
             >
               {t(name)}
@@ -163,7 +165,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         <NavIconLink
           role="button"
           data-testid="Navbar_settingsLink"
-          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
             debouncedNavigate('/app-settings')
           }}

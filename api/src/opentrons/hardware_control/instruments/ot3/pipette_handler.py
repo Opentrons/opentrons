@@ -1,54 +1,54 @@
 """Shared code for managing pipette configuration and storage."""
-from dataclasses import dataclass
+
 import logging
+from dataclasses import dataclass
 from typing import (
+    Any,
     Dict,
+    List,
     Optional,
     Tuple,
-    Any,
-    cast,
-    List,
     TypeVar,
+    cast,
 )
-from typing_extensions import Final
+
 import numpy
-from opentrons_shared_data.pipette.types import UlPerMmAction
+from typing_extensions import Final
 
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    UnexpectedTipRemovalError,
+    CommandPreconditionViolated,
     UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
 )
 from opentrons_shared_data.pipette.pipette_definition import (
-    liquid_class_for_volume_between_default_and_defaultlowvolume,
-    PressFitPickUpTipConfiguration,
     CamActionPickUpTipConfiguration,
+    PressFitPickUpTipConfiguration,
+    liquid_class_for_volume_between_default_and_defaultlowvolume,
 )
+from opentrons_shared_data.pipette.types import UlPerMmAction
 
+from .instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
+    check_instrument_offset_reasonability,
+)
+from .pipette import Pipette
 from opentrons import types as top_types
+from opentrons.hardware_control.constants import (
+    DROP_TIP_RELEASE_DISTANCE,
+    SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    SHAKE_OFF_TIPS_SPEED,
+)
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import (
+    Axis,
     CriticalPoint,
     HardwareAction,
-    Axis,
     OT3Mount,
     TipScrapeType,
 )
-from opentrons.hardware_control.constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
-    DROP_TIP_RELEASE_DISTANCE,
-    SHAKE_OFF_TIPS_DROP_DISTANCE,
-)
-
-from opentrons.hardware_control.dev_types import PipetteDict
-from .pipette import Pipette
-from .instrument_calibration import (
-    PipetteOffsetSummary,
-    PipetteOffsetByPipetteMount,
-    check_instrument_offset_reasonability,
-)
-
 
 MOD_LOG = logging.getLogger(__name__)
 
@@ -279,12 +279,12 @@ class OT3PipetteHandler:
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
-            result[
-                "default_push_out_volume"
-            ] = instr.active_tip_settings.default_push_out_volume
-            result[
-                "pipette_bounding_box_offsets"
-            ] = instr.config.pipette_bounding_box_offsets
+            result["default_push_out_volume"] = (
+                instr.active_tip_settings.default_push_out_volume
+            )
+            result["pipette_bounding_box_offsets"] = (
+                instr.config.pipette_bounding_box_offsets
+            )
             result["lld_settings"] = instr.config.lld_settings
             result["plunger_positions"] = {
                 "top": instr.plunger_positions.top,
@@ -295,6 +295,7 @@ class OT3PipetteHandler:
             result["shaft_ul_per_mm"] = instr.config.shaft_ul_per_mm
             result["available_sensors"] = instr.config.available_sensors
             result["volume_mode"] = instr.liquid_class_name
+            result["available_volume_modes"] = instr.config.liquid_properties
         return cast(PipetteDict, result)
 
     @property
@@ -575,9 +576,9 @@ class OT3PipetteHandler:
         if asp_vol == 0:
             return None
 
-        assert instrument.ok_to_add_volume(
-            asp_vol
-        ), "Cannot aspirate more than pipette max volume"
+        assert instrument.ok_to_add_volume(asp_vol), (
+            "Cannot aspirate more than pipette max volume"
+        )
 
         dist = self.plunger_position(
             instr=instrument,

@@ -1,7 +1,7 @@
-from enum import Enum
+from opentrons_shared_data.util import StrEnum
 
 
-class ModuleType(str, Enum):
+class ModuleType(StrEnum):
     """Module type enumeration."""
 
     Magnetic = "magdeck"

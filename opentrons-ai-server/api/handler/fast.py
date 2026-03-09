@@ -4,12 +4,11 @@ import os
 import time
 from typing import Annotated, Any, Awaitable, Callable, Dict, List, Literal, Optional, Union, cast
 
+import anthropic
 import structlog
 from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
-from ddtrace import tracer
-from ddtrace.contrib.asgi.middleware import TraceMiddleware
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Query, Request, Response, Security, UploadFile, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -61,7 +60,7 @@ claude: AnthropicPredict = AnthropicPredict(settings)
 app = FastAPI(
     title="Opentrons AI API",
     description="An API for generating chat responses.",
-    version=os.getenv("DD_VERSION", "local"),
+    version=os.getenv("SERVICE_VERSION", "local"),
     openapi_url="/api/openapi.json",
 )
 
@@ -150,13 +149,6 @@ async def logging_middleware(request: Request, call_next) -> Response:  # type: 
 # by debugging `app.middleware_stack` and recursively drilling down the `app` property).
 app.add_middleware(CorrelationIdMiddleware)
 
-tracing_middleware = next((m for m in app.user_middleware if m.cls == TraceMiddleware), None)
-if tracing_middleware is not None:
-    app.user_middleware = [m for m in app.user_middleware if m.cls != TraceMiddleware]
-    structlog.stdlib.get_logger("api.datadog_patch").info("Patching Datadog tracing middleware to be the outermost middleware...")
-    app.user_middleware.insert(0, tracing_middleware)
-    app.middleware_stack = app.build_middleware_stack()
-
 
 # Models
 class Status(BaseModel):
@@ -178,6 +170,45 @@ class CorsHeadersResponse(BaseModel):
     Access_Control_Allow_Headers: List[str] | str = Field(alias="Access-Control-Allow-Headers")
     Access_Control_Expose_Headers: List[str] | str = Field(alias="Access-Control-Expose-Headers")
     Access_Control_Max_Age: str = Field(alias="Access-Control-Max-Age")
+
+
+def _extract_anthropic_error_message(exc: anthropic.APIError) -> str:
+    """Pull the human-readable message out of an Anthropic error."""
+    try:
+        body = getattr(exc, "body", None)
+        if isinstance(body, dict):
+            error_detail = body.get("error", {})
+            if isinstance(error_detail, dict) and "message" in error_detail:
+                return str(error_detail["message"])
+    except Exception:
+        pass
+    return str(exc)
+
+
+def _anthropic_error_to_json_response(exc: anthropic.APIError) -> JSONResponse:
+    """Convert any Anthropic SDK error into a safe, serializable JSONResponse."""
+    message = _extract_anthropic_error_message(exc)
+    error_type = type(exc).__name__
+
+    if isinstance(exc, anthropic.BadRequestError):
+        http_status = status.HTTP_400_BAD_REQUEST
+        if "too long" in message.lower() or "maximum" in message.lower():
+            error_type = "context_length_exceeded"
+    elif isinstance(exc, anthropic.RateLimitError):
+        http_status = status.HTTP_429_TOO_MANY_REQUESTS
+    elif isinstance(exc, anthropic.APITimeoutError):
+        http_status = status.HTTP_504_GATEWAY_TIMEOUT
+    elif isinstance(exc, anthropic.APIConnectionError):
+        http_status = status.HTTP_503_SERVICE_UNAVAILABLE
+    elif isinstance(exc, anthropic.APIStatusError):
+        http_status = status.HTTP_502_BAD_GATEWAY
+    else:
+        http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    return JSONResponse(
+        status_code=http_status,
+        content={"message": message, "error_type": error_type},
+    )
 
 
 def _validate_request(data: Any, field_name: str) -> None:
@@ -356,7 +387,6 @@ def _format_response(
     return ChatResponse(reply=response, fake=bool(is_fake), file_token_warning=file_token_warning)
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/completion",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -413,6 +443,8 @@ async def create_chat_completion(
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing chat completion")
         raise HTTPException(
@@ -420,7 +452,6 @@ async def create_chat_completion(
         ) from e
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/completion-multipart",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -485,6 +516,8 @@ async def create_chat_completion_multipart(
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing multipart chat completion")
         raise HTTPException(
@@ -542,7 +575,6 @@ def _determine_protocol_action(body: ChatRequest) -> str:
     return protocol_action
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/createProtocol",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -597,6 +629,8 @@ async def create_protocol(
 
         return _format_response(response, protocol_format, bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.error(
             f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
@@ -613,7 +647,6 @@ async def create_protocol(
         ) from e
 
 
-@tracer.wrap()
 @app.post(
     "/api/chat/updateProtocol",
     response_model=Union[ChatResponse, ErrorResponse],
@@ -655,6 +688,8 @@ async def update_protocol(
 
         return ChatResponse(reply=response, fake=bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing protocol update")
         raise HTTPException(
@@ -680,10 +715,9 @@ async def get_health(request: Request) -> Status:
         pass  # This is a health check from the load balancer
     else:
         logger.info(f"{request.method} {request.url.path}", extra={"requestMethod": request.method, "requestPath": request.url.path})
-    return Status(status="ok", version=settings.dd_version)
+    return Status(status="ok", version=settings.service_version)
 
 
-@tracer.wrap()
 @app.get("/api/timeout", response_model=TimeoutResponse)
 async def timeout_endpoint(request: Request, seconds: conint(ge=1, le=300) = Query(..., description="Number of seconds to wait")):  # type: ignore # noqa: B008
     """
@@ -759,6 +793,21 @@ async def handle_options(request: Request) -> JSONResponse:
         }
     )
     return JSONResponse(response.model_dump(by_alias=True))
+
+
+# Catch all Anthropic SDK errors at the app level so they are always serializable
+# and never reach FastAPI's default http_exception_handler as a raw Python object.
+# BadRequestError and RateLimitError are expected operational errors (warning);
+# everything else is unexpected (error + traceback).
+@app.exception_handler(anthropic.APIError)
+async def anthropic_error_handler(request: Request, exc: anthropic.APIError) -> JSONResponse:
+    message = _extract_anthropic_error_message(exc)
+    error_type = type(exc).__name__
+    if isinstance(exc, (anthropic.BadRequestError, anthropic.RateLimitError)):
+        logger.warning("Anthropic API error", extra={"error_type": error_type, "message": message})
+    else:
+        logger.error("Anthropic API error", extra={"error_type": error_type, "message": message}, exc_info=True)
+    return _anthropic_error_to_json_response(exc)
 
 
 # General exception handler for validation errors

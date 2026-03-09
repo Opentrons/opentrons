@@ -4,28 +4,30 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-API_DIR := api
 API_CLIENT_DIR := api-client
+API_DIR := api
 APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
+AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+DOCS_DIR := docs
 G_CODE_TESTING_DIR := g-code-testing
+HARDWARE_DIR := hardware
 LABWARE_LIBRARY_DIR := labware-library
+NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 PROTOCOL_DESIGNER_DIR := protocol-designer
-SHARED_DATA_DIR := shared-data
-UPDATE_SERVER_DIR := update-server
 REACT_API_CLIENT_DIR := react-api-client
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+SHARED_DATA_DIR := shared-data
 STEP_GENERATION_DIR := step-generation
 SYSTEM_SERVER_DIR := system-server
-HARDWARE_DIR := hardware
+UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
-NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR) $(SYSTEM_SERVER_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -39,7 +41,7 @@ cover ?= true
 updateSnapshot ?= false
 quiet ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
 ifeq ($(watch), true)
 	cover := false
@@ -53,19 +55,9 @@ usb_host=$(shell yarn -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-# Both the python and JS setup targets depend on a minimal python setup so they can create
-# virtual envs using pipenv.
-.PHONY: setup-py-toolchain
-setup-py-toolchain:
-	$(OT_PYTHON) -m pip install --upgrade pip
-	$(OT_PYTHON) -m pip install pipenv==2023.12.1
-# this needs to be installed AFTER pipenv or pipenv will update this to the bad version
-	$(OT_PYTHON) -m pip install virtualenv==20.30.0
-
-# front-end dependecies handled by yarn
+# front-end dependencies handled by yarn
 .PHONY: setup-js
 setup-js:
-setup-js: setup-py-toolchain
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
@@ -74,11 +66,14 @@ setup-js: setup-py-toolchain
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py
-setup-py: setup-py-toolchain
+setup-py:
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 %-py-setup:
 	$(MAKE) -C $* setup
+
+$(SHARED_DATA_DIR)-py-setup:
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
@@ -124,6 +119,18 @@ clean-py: $(PYTHON_CLEAN_TARGETS)
 # Specialize the %-py-clean pattern rule above to account for the Makefile duopoly in shared-data.
 $(SHARED_DATA_DIR)-py-clean:
 	$(MAKE) -C $(SHARED_DATA_DIR) clean-py
+
+PYTHON_LOCK_TARGETS := $(addsuffix -py-lock, $(PYTHON_DIRS))
+
+.PHONY: lock-py
+lock-py: $(PYTHON_LOCK_TARGETS)
+
+%-py-lock:
+	$(MAKE) -C $* lock
+
+# Specialize the %-py-lock pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-lock:
+	$(MAKE) -C $(SHARED_DATA_DIR) lock-py
 
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
@@ -173,6 +180,7 @@ push-ot3:
 	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
+	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -193,11 +201,6 @@ test: test-py test-js
 .PHONY: test-windows
 test-windows: test-js test-py-windows
 
-.PHONY: test-e2e
-test-e2e:
-	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
-
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
 WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
 
@@ -209,6 +212,9 @@ test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
 
 %-py-test:
 	$(MAKE) -C $* test
+
+$(SHARED_DATA_DIR)-py-test:
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-js
 test-js: test-js-internal
@@ -225,12 +231,17 @@ lint-py: $(PYTHON_LINT_TARGETS)
 %-py-lint:
 	$(MAKE) -C $* lint
 
+$(SHARED_DATA_DIR)-py-lint:
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+
 .PHONY: lint-js
 lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -239,7 +250,9 @@ lint-js-prettier:
 
 .PHONY: lint-json
 lint-json:
-	yarn eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
@@ -255,6 +268,9 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 %-py-format:
 	$(MAKE) -C $* format
+
+$(SHARED_DATA_DIR)-py-format:
+	$(MAKE) -C $(SHARED_DATA_DIR) format-py
 
 .PHONY: format-js
 format-js:

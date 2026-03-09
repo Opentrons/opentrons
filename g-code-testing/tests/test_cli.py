@@ -7,7 +7,6 @@ from typing import (
 )
 
 import pytest
-from opentrons import APIVersion
 
 from cli import (
     GCodeCLI,
@@ -22,17 +21,16 @@ from g_code_test_data.http.modules.magdeck import (
     MAGDECK_DEACTIVATE,
     MAGDECK_ENGAGE,
 )
-
 from g_code_test_data.http.modules.tempdeck import (
     TEMPDECK_DEACTIVATE,
     TEMPDECK_START_SET_TEMPERATURE,
 )
-
 from g_code_test_data.protocol.protocol_configurations import (
+    BASIC_SMOOTHIE,
     TWO_MODULES,
     TWO_SINGLE_CHANNEL,
-    BASIC_SMOOTHIE,
 )
+from opentrons import APIVersion
 
 
 @dataclass

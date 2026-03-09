@@ -28,7 +28,15 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   optimizeDeps: {
-    include: ['@opentrons/components', '@opentrons/shared-data', 'react', 'react-dom', 'react-query', 'react-redux', 'redux'],
+    include: [
+      '@opentrons/components',
+      '@opentrons/shared-data',
+      'react',
+      'react-dom',
+      'react-query',
+      'react-redux',
+      'redux',
+    ],
     exclude: ['@opentrons/labware-library'],
     entries: ['./src/main.tsx'],
     force: true,

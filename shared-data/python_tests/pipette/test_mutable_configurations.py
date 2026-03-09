@@ -2,18 +2,19 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Dict, Any, cast, Union, Generator
+from typing import Any, Dict, Generator, Union, cast
 
 import pytest
 
 from opentrons_shared_data.pipette import (
-    mutable_configurations,
-    types,
-    pipette_definition,
-    pipette_load_name_conversions as pip_conversions,
     load_data,
+    mutable_configurations,
+    pipette_definition,
+    types,
 )
-
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pip_conversions,
+)
 
 TEST_SERIAL_NUMBER = "P50MV1520200304"
 TestOverrideType = Dict[str, Union[float, int, bool]]

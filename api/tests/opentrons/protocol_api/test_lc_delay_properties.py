@@ -1,14 +1,15 @@
 """Tests for delay properties in the Opentrons protocol API."""
 
-from pydantic import ValidationError
-import pytest
 from typing import Any, Union
-from hypothesis import given, strategies as st, settings
 
-from opentrons.protocol_api._liquid_properties import _build_delay_properties
+import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
+from pydantic import ValidationError
+
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    DelayProperties,
     DelayParams,
+    DelayProperties,
 )
 
 from . import (
@@ -17,6 +18,7 @@ from . import (
     negative_non_zero_floats_and_ints,
     positive_or_zero_floats_or_ints,
 )
+from opentrons.protocol_api._liquid_properties import _build_delay_properties
 
 
 def test_delay_properties_enable_and_disable() -> None:

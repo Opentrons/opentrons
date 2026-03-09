@@ -157,4 +157,83 @@ describe('getLabwareInfoByLiquidId', () => {
       )
     ).toEqual(expected)
   })
+
+  it('consolidates multiple liquids for the same well on the same labware into a mixed liquid', () => {
+    const anotherMockLiquid = {
+      id: '846e0b7b-1e54-4f42-9ab1-964ebda45da5',
+      createdAt: '2022-09-07T19:47:42.781281+00:00',
+      commandType: 'loadLiquid',
+      key: '1870d1a2-8dcd-46f2-9e27-16578365913b',
+      status: 'succeeded',
+      params: {
+        liquidId: 'water',
+        labwareId: 'mockLabwareId1',
+        volumeByWell: {
+          A2: 20,
+          B2: 20,
+          C2: 20,
+          D2: 20,
+          E2: 20,
+          F2: 20,
+          G2: 20,
+          H2: 20,
+        },
+      },
+      result: {},
+      startedAt: '2022-09-07T19:47:42.785987+00:00',
+      completedAt: '2022-09-07T19:47:42.786087+00:00',
+    }
+    const expectedMixed = {
+      '0': [
+        {
+          labwareId: 'mockLabwareId1',
+          volumeByWell: {
+            A1: 33,
+            B1: 33,
+            C1: 33,
+            D1: 33,
+            E1: 33,
+            F1: 33,
+            G1: 33,
+            H1: 33,
+          },
+        },
+      ],
+      'mixed-1-water': [
+        {
+          labwareId: 'mockLabwareId1',
+          volumeByWell: {
+            A2: 40,
+            B2: 40,
+            C2: 40,
+            D2: 40,
+            E2: 40,
+            F2: 40,
+            G2: 40,
+            H2: 40,
+          },
+        },
+      ],
+      '1': [
+        {
+          labwareId: 'mockLabwareId2',
+          volumeByWell: {
+            A3: 33,
+            B3: 33,
+            C3: 33,
+            D3: 40,
+          },
+        },
+      ],
+    }
+
+    const mockCommandsWithMixedLiquid = [
+      ...mockLoadLiquidRunTimeCommands,
+      anotherMockLiquid,
+    ]
+
+    expect(
+      getLabwareInfoByLiquidId(mockCommandsWithMixedLiquid as RunTimeCommand[])
+    ).toEqual(expectedMixed)
+  })
 })

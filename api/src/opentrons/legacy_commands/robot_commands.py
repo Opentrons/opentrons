@@ -1,7 +1,8 @@
-from opentrons.types import Location, Mount, AxisMapType
-from .helpers import stringify_location
-from . import types as command_types
 from typing import Optional
+
+from . import types as command_types
+from .helpers import stringify_location
+from opentrons.types import AxisMapType, Location, Mount
 
 
 def move_to(

@@ -1,10 +1,10 @@
 """Logic to create stackup sets for testing."""
 
 import argparse
-from functools import partial
 from dataclasses import dataclass, field, fields
-from typing import Iterator, Callable, TypeVar, Literal
+from functools import partial
 from itertools import product
+from typing import Callable, Iterator, Literal, TypeVar
 
 from . import data, stackup_spec
 
@@ -164,7 +164,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """Add command line flags to drive the filters."""
     for this_field in fields(FilterSpecs):
         parser.add_argument(
-            f'--{this_field.name.replace("_", "-")}',
+            f"--{this_field.name.replace('_', '-')}",
             dest=this_field.name,
             nargs="*",
             action="store",

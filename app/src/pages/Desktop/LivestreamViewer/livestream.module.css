@@ -36,3 +36,16 @@
 .video_inactive {
   display: none;
 }
+
+.capture_image_button {
+  width: 100%;
+  height: 36px;
+  border-radius: var(--border-radius-8);
+}
+
+.capture_image_button_text {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+}

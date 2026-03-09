@@ -25,11 +25,6 @@ import {
 
 import type { TFunction } from 'i18next'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type {
-  LPCWizardState,
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
@@ -46,15 +41,12 @@ export function DesktopOffsetSuccess(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(props.runId)
   )
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[props.runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[props.runId]?.lpc!
   )
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(props.runId)
-  ) as SelectedLwOverview
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(props.runId))!
   const moduleModel =
     selectedLwInfo.offsetLocationDetails?.closestBeneathModuleModel
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
   const labwareDisplayName = useSelector(
     selectSelectedLwDisplayName(props.runId)
   )

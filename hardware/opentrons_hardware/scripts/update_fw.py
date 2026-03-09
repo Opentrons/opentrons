@@ -1,22 +1,23 @@
 """Firmware update script."""
+
 import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from typing_extensions import Final
 
-from opentrons_hardware.drivers.can_bus import build
-from opentrons_hardware.drivers.binary_usb import (
-    SerialUsbDriver,
-    BinaryMessenger,
-    build_rear_panel_messenger,
-    build_rear_panel_driver,
-)
-from opentrons_hardware.firmware_bindings import NodeId, USBTarget, FirmwareTarget
-from opentrons_hardware.firmware_update.run import RunUpdate
 from .can_args import add_can_args, build_settings
+from opentrons_hardware.drivers.binary_usb import (
+    BinaryMessenger,
+    SerialUsbDriver,
+    build_rear_panel_driver,
+    build_rear_panel_messenger,
+)
+from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.firmware_bindings import FirmwareTarget, NodeId, USBTarget
+from opentrons_hardware.firmware_update.run import RunUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ async def run(args: argparse.Namespace) -> None:
     erase = not args.no_erase
     usb_messenger: Optional[BinaryMessenger] = None
     try:
-        usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+        usb_driver: SerialUsbDriver = await build_rear_panel_driver()
         usb_messenger = build_rear_panel_messenger(usb_driver)
         usb_messenger.start()
     except IOError as e:

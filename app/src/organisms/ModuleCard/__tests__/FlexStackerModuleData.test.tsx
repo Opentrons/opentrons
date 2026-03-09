@@ -46,7 +46,7 @@ describe('FlexStackerModuleData', () => {
 
     const shuttleChip = screen.getByTestId('stacker_shuttle_label')
     expect(shuttleChip).toHaveTextContent('Extended')
-    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue30}`)
   })
 
   it('applies correct styles for door when opened', () => {
@@ -54,7 +54,7 @@ describe('FlexStackerModuleData', () => {
     render(props)
     const doorChip = screen.getByTestId('stacker_door_label')
     expect(doorChip).toHaveTextContent('Open')
-    expect(doorChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
+    expect(doorChip).toHaveStyle(`background-color: ${COLORS.blue30}`)
   })
 
   it('applies correct styles for shuttle when retracted', () => {
@@ -62,7 +62,7 @@ describe('FlexStackerModuleData', () => {
     render(props)
     const shuttleChip = screen.getByTestId('stacker_shuttle_label')
     expect(shuttleChip).toHaveTextContent('In stacker')
-    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue35}`)
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.blue30}`)
   })
 
   it('applies correct styles for shuttle when missing', () => {
@@ -70,6 +70,6 @@ describe('FlexStackerModuleData', () => {
     render(props)
     const shuttleChip = screen.getByTestId('stacker_shuttle_label')
     expect(shuttleChip).toHaveTextContent('Missing')
-    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.red35}`)
+    expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.red30}`)
   })
 })

@@ -18,7 +18,7 @@ const render = () => {
 
 describe('HintsModal', () => {
   beforeEach(() => {
-    vi.mocked(getHint).mockReturnValue('waste_chute_warning')
+    vi.mocked(getHint).mockReturnValue({ hintKey: 'waste_chute_warning' })
   })
   it('renders the text for waste chute warning and clicking button calls action', () => {
     render()
@@ -31,7 +31,9 @@ describe('HintsModal', () => {
     expect(vi.mocked(removeHint)).toHaveBeenCalled()
   })
   it('renders the text for tc lid passive cooling and clicking button calls action', () => {
-    vi.mocked(getHint).mockReturnValue('thermocycler_lid_passive_cooling')
+    vi.mocked(getHint).mockReturnValue({
+      hintKey: 'thermocycler_lid_passive_cooling',
+    })
     render()
     screen.getByText('Lid temperature')
     screen.getByText('The Thermocycler lid does not actively cool.')

@@ -1,34 +1,36 @@
 """Tests for hepa/uv settings."""
 
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from typing import List, Tuple, cast
+
 import pytest
 from mock import AsyncMock
-from typing import List, Tuple, cast
+
+from tests.conftest import CanLoopback
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
 )
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SetHepaFanStateRequestPayload,
     GetHepaFanStatePayloadResponse,
-    SetHepaUVStateRequestPayload,
     GetHepaUVStatePayloadResponse,
-)
-from opentrons_hardware.hardware_control.hepa_uv_settings import (
-    set_hepa_fan_state,
-    set_hepa_uv_state,
-    get_hepa_fan_state,
-    get_hepa_uv_state,
-    HepaFanState,
-    HepaUVState,
+    SetHepaFanStateRequestPayload,
+    SetHepaUVStateRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
 )
-from tests.conftest import CanLoopback
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    HepaFanState,
+    HepaUVState,
+    get_hepa_fan_state,
+    get_hepa_uv_state,
+    set_hepa_fan_state,
+    set_hepa_uv_state,
+)
 
 
 @pytest.fixture

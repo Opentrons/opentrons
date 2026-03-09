@@ -1,14 +1,15 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
-import pytest
+
 from pathlib import Path
 
-from opentrons.protocol_reader.file_reader_writer import (
-    FileReaderWriter,
-    FileReadError,
-    BufferedFile,
-)
+import pytest
 
 from ._input_file import InputFile
+from opentrons.protocol_reader.file_reader_writer import (
+    BufferedFile,
+    FileReadError,
+    FileReaderWriter,
+)
 
 
 async def test_read_with_abstract_input_file() -> None:

@@ -1,5 +1,6 @@
-from typing import Annotated, Callable, Optional
 from dataclasses import dataclass
+from typing import Annotated, Callable, Optional
+
 from fastapi import Depends
 
 from opentrons.protocol_engine.state.state_summary import StateSummary
@@ -9,9 +10,10 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+
+from .. import topics
 from ..notification_client import NotificationClient, get_notification_client
 from ..publisher_notifier import PublisherNotifier, get_pe_publisher_notifier
-from .. import topics
 
 
 @dataclass
@@ -92,9 +94,9 @@ class MaintenanceRunsPublisher:
                 self._engine_state_slice.state_summary_status = new_state_summary.status
 
 
-_maintenance_runs_publisher_accessor: AppStateAccessor[
-    MaintenanceRunsPublisher
-] = AppStateAccessor[MaintenanceRunsPublisher]("maintenance_runs_publisher")
+_maintenance_runs_publisher_accessor: AppStateAccessor[MaintenanceRunsPublisher] = (
+    AppStateAccessor[MaintenanceRunsPublisher]("maintenance_runs_publisher")
+)
 
 
 async def get_maintenance_runs_publisher(

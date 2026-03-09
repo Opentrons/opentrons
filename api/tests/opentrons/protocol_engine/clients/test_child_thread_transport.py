@@ -9,12 +9,12 @@ from typing import Any
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+from opentrons_shared_data.labware.types import LabwareUri
 
-from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint
-from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
+from opentrons.protocol_engine import DeckPoint, ProtocolEngine, commands
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
+from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolCommandFailedError
 
 
 @pytest.fixture

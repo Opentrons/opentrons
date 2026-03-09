@@ -63,7 +63,7 @@ export function AddCustomLabwareSlideout(
           }}
           uploadText={t('choose_file_to_upload')}
           dragAndDropText={
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="shared:drag_and_drop"

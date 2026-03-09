@@ -5,18 +5,15 @@ from __future__ import annotations
 from asyncio import get_running_loop, run_coroutine_threadsafe
 from typing import Callable, Optional
 
+from ..state.state import StateStore
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
     DoorState,
+    DoorStateNotification,
+    HardwareEvent,
     PauseType,
 )
-
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
-
-from ..state.state import StateStore
-
 
 _UnsubscribeCallback = Callable[[], None]
 

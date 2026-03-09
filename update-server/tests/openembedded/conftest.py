@@ -2,15 +2,16 @@ import collections
 import os
 from unittest import mock
 from unittest.mock import MagicMock
+
 import pytest
 from aiohttp.test_utils import TestClient
 
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 from otupdate.openembedded.update_actions import (
-    RootFSInterface,
-    PartitionManager,
     OT3UpdateActions,
+    PartitionManager,
+    RootFSInterface,
 )
 
 HERE = os.path.abspath(os.path.dirname(__file__))

@@ -8,7 +8,6 @@ import {
   useCameraAnalytics,
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
 import { CameraEnableSetting } from './CameraEnableSetting'
@@ -34,6 +33,7 @@ export interface CameraSettingsProps {
   not general settings context. */
   storageInfo: RobotStorageInfo | null
   isCameraRequired: boolean | null
+  runId: string | null
 }
 
 export function CameraSettings({
@@ -48,8 +48,8 @@ export function CameraSettings({
   toggleLiveStreamEnabled,
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
+  runId,
 }: CameraSettingsProps): JSX.Element {
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
@@ -92,7 +92,9 @@ export function CameraSettings({
     }
   }
   if (showControls) {
-    return <CameraControls toggleShowControls={toggleShowControls} />
+    return (
+      <CameraControls toggleShowControls={toggleShowControls} runId={runId} />
+    )
   } else {
     return (
       <div
@@ -126,11 +128,9 @@ export function CameraSettings({
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
                 robotName={robotName}
               />
-              {isCameraSettingsEnabled && (
-                <ControlPreferencesSettings
-                  toggleShowControls={toggleShowControls}
-                />
-              )}
+              <ControlPreferencesSettings
+                toggleShowControls={toggleShowControls}
+              />
             </>
           )}
         </div>

@@ -1,15 +1,14 @@
 """
 Entrypoint for the buildroot update server
 """
+
 import asyncio
 import logging
 from typing import NoReturn
 
 from . import get_app
-
-from otupdate.common import name_management, cli, systemd, constants
+from otupdate.common import cli, constants, name_management, systemd
 from otupdate.common.run_application import run_and_notify_up
-
 
 LOG = logging.getLogger(__name__)
 

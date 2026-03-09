@@ -21,7 +21,7 @@ export const CalibrationHealthCheckResults = ({
   const { t } = useTranslation('robot_calibration')
   return (
     <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <LegacyStyledText as="h1">
+      <LegacyStyledText forwardedAs="h1">
         {t('calibration_health_check_results')}
       </LegacyStyledText>
       <StatusLabel

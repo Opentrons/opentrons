@@ -111,7 +111,7 @@ export const IntroScreen = (props: {
         <Trans
           t={t}
           i18nKey="legacy_labware_position_check_description"
-          components={{ block: <LegacyStyledText as="p" /> }}
+          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
         />
       }
       rightElement={
@@ -178,7 +178,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         aria-label="show labware offsets"
       >
         <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
         </LegacyStyledText>
       </Btn>
@@ -193,7 +193,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               header={
                 <LegacyStyledText
-                  as="h4"
+                  forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {i18n.format(t('labware_offset_data'), 'capitalize')}

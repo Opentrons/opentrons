@@ -16,7 +16,6 @@ import {
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import {
-  ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
   getModuleDeckLabel,
@@ -33,12 +32,10 @@ import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import { getDoesModuleRequireCalibration } from './utils'
+
 import type { TFunction } from 'i18next'
-import type {
-  AttachedModule,
-  CommandData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -85,12 +82,7 @@ export const getModuleDisplayStatus = (
       return 'connected'
     }
 
-    // Absorbance reader module does not require calibration
-    if (
-      attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
-      attachedModule.moduleOffset?.last_modified == null
-    ) {
-      // check if instrument ready to perform module calibration
+    if (getDoesModuleRequireCalibration(attachedModule)) {
       return !calibrationStatus.complete
         ? 'calibrationBlocked'
         : 'needsCalibration'
@@ -126,7 +118,7 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 
@@ -246,7 +238,10 @@ export function ModuleTableItem({
         )
       case 'calibrationBlocked':
         return (
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {calibrationStatus?.reason === 'attach_pipette_failure_reason'
               ? t('calibration_required_attach_pipette_first')
               : t('calibration_required_calibrate_pipette_first')}
@@ -313,7 +308,10 @@ export function ModuleTableItem({
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {comboFixtureId != null
               ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}

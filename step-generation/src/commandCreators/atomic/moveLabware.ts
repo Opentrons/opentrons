@@ -14,7 +14,7 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
-import { COLUMN_4_SLOTS } from '../../constants'
+import { COLUMN_4_SLOTS, HOPPER_STACKER_LOCATION } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   formatPyStr,
@@ -95,6 +95,10 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     useGripper
   ) {
     errors.push(errorCreators.labwareOffDeck())
+  } else if (
+    prevRobotState.labware[labwareId].stack.includes(HOPPER_STACKER_LOCATION)
+  ) {
+    errors.push(errorCreators.labwareOnHopper())
   }
 
   const isAluminumBlock =
@@ -343,6 +347,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       prevRobotState.labware,
       parentSlotForSlotCompatibility
     )
+
     const slot = getSlotInLocationStack(largestStackInSlot)
     const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(
       labwareId,

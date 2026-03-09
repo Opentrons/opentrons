@@ -42,4 +42,4 @@ def get_file_size_limit(file_type: str) -> int:
 def format_file_size_error(filename: str, actual_size: int, file_type: str) -> str:
     """Format consistent file size error messages."""
     max_size = get_file_size_limit(file_type)
-    return f"File {filename} is too large ({actual_size/UNIT_MB:.1f}MB). " f"Maximum size for {file_type} files is {max_size/UNIT_MB}MB."
+    return f"File {filename} is too large ({actual_size / UNIT_MB:.1f}MB). Maximum size for {file_type} files is {max_size / UNIT_MB}MB."

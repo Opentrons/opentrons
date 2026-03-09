@@ -14,7 +14,22 @@ This project is specifically designed to test built packages in a real-world con
 
 ## Quick Start
 
-Clean environment, rebuild local packages, and start the dev server:
+### Requirements
+
+- node 22
+- pnpm 10.x installed in your node environment. For example via npm:
+
+```bash
+npm install -g pnpm@10.22.0
+```
+
+Or use corepack:
+
+```bash
+corepack enable
+```
+
+### Clean environment, rebuild local packages, and start the dev server:
 
 ```bash
 make teardown setup dev
@@ -35,17 +50,19 @@ Complete setup - installs dependencies, then builds and links packages locally.
 
 This command:
 
-1. Runs `pnpm install` to create `node_modules` and install dependencies
-2. Builds the `@opentrons/shared-data` package using `make pack`
-3. Moves the built `.tgz` to `pack/opentrons-shared-data-v0.0.0-dev.tgz`
+1. Builds the `@opentrons/shared-data` package using `make pack`
+2. Moves the built `.tgz` to `pack/opentrons-shared-data-v0.0.0-dev.tgz`
+3. Extracts it to `pack/opentrons-shared-data/`
 4. Builds the `@opentrons/components` package using `make pack`
 5. Moves the built `.tgz` to `pack/opentrons-components-v0.0.0-dev.tgz`
-6. Extracts both packages to `pack/` directory
-7. Links the packages using `pnpm link` (does NOT modify package.json or pnpm-lock.yaml)
+6. Extracts it to `pack/opentrons-components/`
+7. Runs `pnpm install --frozen-lockfile` to create `node_modules` and install dependencies (including symlinks to the extracted packages)
 
-#### `make install-local-packages`
+Note: Building packages happens BEFORE `pnpm install` because the `link:` entries in `package.json` reference the `pack/` directories, which must exist.
 
-Rebuild and link local packages only (requires `node_modules` to exist). Use this when you've made changes to the source packages and want to test them.
+#### `make build-local-packages`
+
+Build and extract local packages only (without running `pnpm install`). Use this when you've made changes to the source packages and want to rebuild them. After running this, run `pnpm install` to update the symlinks.
 
 ### Development Commands
 
@@ -69,7 +86,7 @@ Run Playwright tests with current snapshots. Note: You must run `make test-setup
 
 #### `make test-setup`
 
-Install Playwright browser dependencies (Chromium). Run this once before running tests for the first time.
+Install Playwright browser dependencies (Chromium). Run `make setup` first, then run this once before running tests for the first time.
 
 #### `make test-update-snapshots`
 
@@ -111,9 +128,9 @@ Remove only local packages (keeps node_modules). Useful when you want to refresh
 
 When you make changes to the source components or shared-data packages:
 
-1. Run `make clean-local-packages` to unlink old packages
-2. Run `make install-local-packages` to rebuild and relink
-3. Run `make dev` to see changes in the browser
+1. Run `make clean-local-packages` to remove old built packages
+2. Run `make build-local-packages` to rebuild and extract
+3. Run `pnpm install` to update symlinks (or just restart `make dev`)
 4. Run `make test` to verify visual tests still pass
 
 ### Updating Visual Snapshots
@@ -121,39 +138,50 @@ When you make changes to the source components or shared-data packages:
 When you make **intentional** style or layout changes to ProtocolDeck:
 
 1. Make your changes in the source `components` package
-2. Run `make clean-local-packages && make install-local-packages` to rebuild
-3. Run `make test-update-snapshots` to update the baseline screenshots
-4. Review the updated snapshots in `tests/__screenshots__/`
-5. Commit the updated snapshots if they look correct
+2. Run `make clean-local-packages build-local-packages` to rebuild
+3. Run `pnpm install` to update symlinks
+4. Run `make test-update-snapshots` to update the baseline screenshots
+5. Review the updated snapshots in `tests/__screenshots__/`
+6. Commit the updated snapshots if they look correct
 
 ## Package Linking Approach
 
-This project uses `pnpm link` with extracted package directories instead of `pnpm add` to avoid:
+This project uses `pnpm link` with extracted package directories to test built packages in a realistic consumption scenario.
 
-- Modifying package.json with file: dependencies
-- Causing unnecessary pnpm-lock.yaml relocks
-- Potential side effects on other dependencies during lock updates
+**How pnpm 10 handles linking:**
+
+- Adds `link:` protocol entries to `package.json` (e.g., `"@opentrons/components": "link:pack/opentrons-components"`)
+- Records links in `pnpm-lock.yaml` but does NOT lock to specific versions
+- The lockfile only changes when regular (non-linked) dependencies change, NOT when linked package contents change
+- Creates symlinks in `node_modules/@opentrons/` pointing to the extracted packages
+
+**Why this approach:**
+
+- Linked packages can be rebuilt and updated without causing lockfile churn
+- The `link:` protocol means pnpm always uses the current contents of `pack/opentrons-*/` directories
+- Regular dependencies remain stable and locked as expected
+- Simulates real-world package consumption while allowing rapid iteration
 
 The workflow:
 
-1. Install regular dependencies with `pnpm install` to create `node_modules`
-2. Build packages as `.tgz` files
-3. Extract `.tgz` files to `pack/opentrons-shared-data/` and `pack/opentrons-components/`
-4. Use `pnpm link` with absolute paths to symlink extracted packages into `node_modules/@opentrons/`
+1. Build packages as `.tgz` files using `make pack`
+2. Extract `.tgz` files to `pack/opentrons-shared-data/` and `pack/opentrons-components/`
+3. Use `pnpm link` (only needed the very first time to add the link in package.json) with absolute paths to add `link:` entries and symlink packages
+4. Install regular dependencies with `pnpm install` to create `node_modules`
 
-The `pack/` directory is gitignored, keeping the repository clean.
+The `pack/` directory is gitignored. The `link:` entries in `package.json` and `pnpm-lock.yaml` are committed to track the linking strategy.
 
 ## Project Structure
 
 ```text
 components-testing/
 ├── Makefile                    # Build and setup automation
-├── package.json               # Dependencies (local packages NOT listed here)
-├── pnpm-lock.yaml            # Lock file (unaffected by local package changes)
+├── package.json               # Dependencies (includes link: entries for local packages)
+├── pnpm-lock.yaml            # Lock file (tracks links but not versions)
 ├── playwright.config.ts      # Playwright test configuration
 ├── vite.config.mts           # Vite configuration
 ├── index.html                # HTML entry point
-├── pack/                     # Gitignored directory for .tgz packages
+├── pack/                     # Gitignored directory for .tgz packages and extracted dirs
 ├── src/
 │   ├── main.tsx             # Main application with ProtocolDeck test
 │   ├── styles.css           # Base styles
@@ -173,11 +201,11 @@ This project uses exact versions matching the monorepo's root package.json:
 - @types/react: 18.2.51
 - @types/react-dom: 18.2.0
 
-### Local Packages (Linked, Not in package.json)
+### Local Packages (Linked)
 
 The following packages are linked at build time via `pnpm link`:
 
-- `@opentrons/shared-data`: Extracted to `pack/opentrons-shared-data/`
-- `@opentrons/components`: Extracted to `pack/opentrons-components/`
+- `@opentrons/shared-data`: Extracted to `pack/opentrons-shared-data/`, linked with `link:` protocol
+- `@opentrons/components`: Extracted to `pack/opentrons-components/`, linked with `link:` protocol
 
-These are symlinked into `node_modules/@opentrons/` without appearing in `package.json`.
+These appear in `package.json` with the `link:` protocol (e.g., `"@opentrons/components": "link:pack/opentrons-components"`) and are symlinked into `node_modules/@opentrons/`. The links are tracked in `pnpm-lock.yaml` but versions are not locked, allowing the linked directories to be updated without relocking.

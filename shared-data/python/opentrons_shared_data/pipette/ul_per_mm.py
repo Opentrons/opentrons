@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteFunctionKeyType,

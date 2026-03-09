@@ -1,21 +1,21 @@
+import math
 from unittest.mock import MagicMock
 
-import math
 import pytest
 
 from opentrons.legacy_commands import types
 from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.duration.estimator import (
-    DurationEstimator,
     TEMP_MOD_HIGH_THRESH,
-    TEMP_MOD_RATE_HIGH_AND_ABOVE,
     TEMP_MOD_LOW_THRESH,
+    TEMP_MOD_RATE_HIGH_AND_ABOVE,
     TEMP_MOD_RATE_LOW_TO_HIGH,
     TEMP_MOD_RATE_ZERO_TO_LOW,
     THERMO_HIGH_THRESH,
     THERMO_LOW_THRESH,
+    DurationEstimator,
 )
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location, Point
 
 messageDataBefore: types.CommandMessageFields = {
@@ -50,7 +50,7 @@ def test_ignore_before(subject: DurationEstimator) -> None:
     message = types.DelayMessage(
         payload=types.DelayCommandPayload(minutes=1, seconds=1, text=""),
         name=types.DELAY,
-        **messageDataBefore
+        **messageDataBefore,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 0
@@ -68,7 +68,7 @@ def test_pick_up_tip(
             location=mock_location, instrument=mock_instrument, text=""
         ),
         name=types.PICK_UP_TIP,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 4.5
@@ -87,7 +87,7 @@ def test_drop_tip(
             location=mock_location, instrument=mock_instrument, text=""
         ),
         name=types.DROP_TIP,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 10.5
@@ -100,7 +100,7 @@ def test_blow_out(subject: DurationEstimator, mock_instrument: MagicMock) -> Non
             location=None, instrument=mock_instrument, text=""
         ),
         name=types.BLOW_OUT,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 0.5
@@ -111,7 +111,7 @@ def test_touch_tip(subject: DurationEstimator, mock_instrument: MagicMock) -> No
     message = types.TouchTipMessage(
         payload=types.TouchTipCommandPayload(instrument=mock_instrument, text=""),
         name=types.TOUCH_TIP,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 0.5
@@ -122,7 +122,7 @@ def test_delay(subject: DurationEstimator) -> None:
     message = types.DelayMessage(
         payload=types.DelayCommandPayload(minutes=1, seconds=1, text=""),
         name=types.DELAY,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 61
@@ -216,7 +216,7 @@ def test_thermocycler_set_lid_temp(subject: DurationEstimator) -> None:
     message = types.ThermocyclerSetLidTempMessage(
         payload=types.ThermocyclerSetLidTempCommandPayload(text=""),
         name=types.THERMOCYCLER_SET_LID_TEMP,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 60
@@ -227,7 +227,7 @@ def test_thermocycler_lid_close(subject: DurationEstimator) -> None:
     message = types.ThermocyclerCloseMessage(
         payload=types.ThermocyclerCloseCommandPayload(text=""),
         name=types.THERMOCYCLER_CLOSE,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 24
@@ -238,7 +238,7 @@ def test_thermocycler_lid_open(subject: DurationEstimator) -> None:
     message = types.ThermocyclerOpenMessage(
         payload=types.ThermocyclerOpenCommandPayload(text=""),
         name=types.THERMOCYCLER_OPEN,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 24
@@ -249,7 +249,7 @@ def test_thermocycler_deactivate_lid(subject: DurationEstimator) -> None:
     message = types.ThermocyclerDeactivateLidMessage(
         payload=types.ThermocyclerDeactivateLidCommandPayload(text=""),
         name=types.THERMOCYCLER_DEACTIVATE_LID,
-        **messageDataAfter
+        **messageDataAfter,
     )
     subject.on_message(message)
     assert subject.get_total_duration() == 23

@@ -1,47 +1,47 @@
 """Protocol engine state management."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+
 from typing_extensions import ParamSpec
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.robot.types import RobotDefinition
 
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
-from opentrons.util.change_notifier import ChangeNotifier
-
-from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from ._abstract_store import HasState, HandlesActions
-from .commands import CommandState, CommandStore, CommandView
+from ..resources import DeckFixedLabware
+from ..types import DeckConfigurationType
+from ._abstract_store import HandlesActions, HasState
 from .addressable_areas import (
     AddressableAreaState,
     AddressableAreaStore,
     AddressableAreaView,
 )
-from .labware import LabwareState, LabwareStore, LabwareView
-from .pipettes import PipetteState, PipetteStore, PipetteView
-from .modules import ModuleState, ModuleStore, ModuleView
-from .liquids import LiquidState, LiquidView, LiquidStore
-from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
-from .tips import TipState, TipView, TipStore
-from .wells import WellState, WellView, WellStore
-from .geometry import GeometryView
-from .motion import MotionView
-from .files import FileView, FileState, FileStore
+from .camera import CameraState, CameraStore, CameraView
+from .commands import CommandState, CommandStore, CommandView
 from .config import Config
-from .state_summary import StateSummary
-from ..types import DeckConfigurationType
-from .tasks import TaskState, TaskView, TaskStore
+from .files import FileState, FileStore, FileView
+from .geometry import GeometryView
+from .labware import LabwareState, LabwareStore, LabwareView
+from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
+from .liquids import LiquidState, LiquidStore, LiquidView
+from .modules import ModuleState, ModuleStore, ModuleView
+from .motion import MotionView
+from .pipettes import PipetteState, PipetteStore, PipetteView
 from .preconditions import (
     CommandPreconditionState,
     CommandPreconditionStore,
     CommandPreconditionView,
 )
-from .camera import CameraState, CameraView, CameraStore
-
+from .state_summary import StateSummary
+from .tasks import TaskState, TaskStore, TaskView
+from .tips import TipState, TipStore, TipView
+from .wells import WellState, WellStore, WellView
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
+from opentrons.util.change_notifier import ChangeNotifier
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")

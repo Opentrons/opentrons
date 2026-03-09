@@ -1,6 +1,5 @@
 """Unit tests for `robot_server.persistence.pydantic`."""
 
-
 from pydantic import BaseModel, Field, TypeAdapter
 
 from robot_server.persistence import pydantic as subject

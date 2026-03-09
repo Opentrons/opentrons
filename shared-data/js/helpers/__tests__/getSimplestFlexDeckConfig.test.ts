@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { getDeckDefFromRobotType } from '..'
+import { FLEX_ROBOT_TYPE } from '../..'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
+  getEmptyDeckConfiguration,
   getSimplestDeckConfigForProtocol,
 } from '../getSimplestFlexDeckConfig'
 
 import type { RunTimeCommand } from '../../../protocol'
-import type { CompletedProtocolAnalysis } from '../../types'
+import type { CompletedProtocolAnalysis, DeckConfiguration } from '../../types'
 
 const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
   RunTimeCommand,
@@ -19,13 +22,44 @@ const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
   status: 'succeeded',
 }
 
+export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
+  { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutC1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutD1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutA2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutB2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutC2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutD2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutA3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutB3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutC3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
+]
+
+describe('getEmptyDeckConfiguration', () => {
+  it.only('should be the same as FLEX_SIMPLEST_DECK_CONFIG', () => {
+    const result = getEmptyDeckConfiguration(
+      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+    )
+    const sortByCutoutId = (
+      a: { cutoutId: string },
+      b: { cutoutId: string }
+    ): number => a.cutoutId.localeCompare(b.cutoutId)
+
+    expect(result.sort(sortByCutoutId)).toEqual(
+      FLEX_SIMPLEST_DECK_CONFIG.sort(sortByCutoutId)
+    )
+  })
+})
+
 describe('getSimplestDeckConfigForProtocol', () => {
   it('returns simplest deck if no commands alter addressable areas', () => {
     expect(getSimplestDeckConfigForProtocol(null)).toEqual(
       FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
   })
-  it.only('returns staging area fixtures if commands address column 4 areas', () => {
+  it('returns staging area fixtures if commands address column 4 areas', () => {
     const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [
         {

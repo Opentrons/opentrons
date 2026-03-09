@@ -79,7 +79,7 @@ export function RobotSystemVersion({
           marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {t('branded:view_latest_release_notes_at', { url: GITHUB_URL })}
             </LegacyStyledText>
             <Flex
@@ -90,10 +90,12 @@ export function RobotSystemVersion({
               borderRadius={BORDERS.borderRadius8}
             >
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >{`${t('device_details:current_version')}`}</LegacyStyledText>
-              <LegacyStyledText as="p">{currentVersion}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="p">
+                {currentVersion}
+              </LegacyStyledText>
             </Flex>
           </Flex>
           <Flex>

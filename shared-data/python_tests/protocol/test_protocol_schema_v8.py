@@ -1,11 +1,11 @@
 import json
-import pytest
 from pathlib import Path
 
-from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.models import protocol_schema_v8
+import pytest
 
 from . import list_fixtures
+from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.protocol.models import protocol_schema_v8
 
 
 @pytest.mark.parametrize("defpath", list_fixtures(8))

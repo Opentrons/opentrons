@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Deck Configuration"
+description: "Configure deck layout, modules, and labware locations on the touchscreen."
 ---
 
 Deck configuration tells your Flex what fixtures are attached to the deck, in what locations. You need to inform the robot about installed fixtures because they're unpowered attachments. They do not contain electronic or mechanical components that communicate with the robot. Flex won't know what's attached and where it is until you configure deck fixtures via the touchscreen or Opentrons App.
@@ -29,8 +30,8 @@ To add deck fixtures via the touchscreen:
 Click the :octicons-x-circle-fill-16: on a fixture on the deck map to remove it from the deck configuration.
 
 <figure class="screenshot" markdown>
-![Deck configuration screen showing the deck map. Slots A1 through D1 and A3 through C3 are blue and have plus icons. Slot C3 is dark grey and is labeled "Staging area".](../images/deck-configuration-one-staging-slot.png "Deck configuration with staging slot in D3")
-<figcaption>A Flex configured with a staging area slot in D3, and no other fixtures.</figcaption>
+![Deck configuration screen showing the deck map with various modules attached.](../images/deck-config-multiple-slots.png)
+<figcaption>A Flex configured with staging area slots and modules.</figcaption>
 </figure>
 
 You can also configure the deck in the Opentrons App, on the robot details page for your Flex.

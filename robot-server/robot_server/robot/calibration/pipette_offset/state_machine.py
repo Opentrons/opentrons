@@ -1,13 +1,15 @@
 from typing import Dict, Type
 
-from robot_server.service.session.models.command_definitions import (
-    CommandDefinition,
-    CalibrationCommand,
-)
-from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
 from .constants import (
     PipetteOffsetCalibrationState as POCState,
+)
+from .constants import (
     PipetteOffsetWithTipLengthCalibrationState as POWTState,
+)
+from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
+from robot_server.service.session.models.command_definitions import (
+    CalibrationCommand,
+    CommandDefinition,
 )
 
 PipetteOffsetTransitions = Dict[POCState, Dict[CommandDefinition, POCState]]

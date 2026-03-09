@@ -1,4 +1,5 @@
 """Test exception handling."""
+
 from opentrons_shared_data.errors.exceptions import PythonException
 
 

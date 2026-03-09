@@ -1,11 +1,12 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import { useLPCLabwareInfo } from '..'
 import { getLPCLabwareInfoFrom } from '../getLPCLabwareInfoFrom'
@@ -17,6 +18,12 @@ vi.mock('../getLPCLabwareInfoFrom')
 vi.mock('../getLPCSearchParams')
 vi.mock('/app/resources/labware_offsets')
 vi.mock('/app/resources/runs')
+
+const runningRun = {
+  current: false,
+  id: 'test_id_running',
+  status: RUN_STATUS_RUNNING,
+}
 
 describe('useLPCLabwareInfo', () => {
   const RUN_ID = 'run-123'
@@ -35,12 +42,13 @@ describe('useLPCLabwareInfo', () => {
     vi.mocked(getLPCSearchParams).mockReturnValue(MOCK_SEARCH_PARAMS)
     vi.mocked(getLPCLabwareInfoFrom).mockReturnValue(MOCK_LABWARE_INFO)
 
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
     vi.mocked(useNotifySearchLabwareOffsets).mockReturnValue({
       data: { data: MOCK_STORED_OFFSETS },
     } as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { labwareOffsets: MOCK_LEGACY_OFFSETS } },
+      data: {
+        data: { labwareOffsets: MOCK_LEGACY_OFFSETS, status: RUN_STATUS_IDLE },
+      },
     } as any)
   })
 
@@ -60,7 +68,6 @@ describe('useLPCLabwareInfo', () => {
       legacyOffsets: MOCK_LEGACY_OFFSETS,
     })
 
-    expect(useRunStatus).toHaveBeenCalledWith(RUN_ID)
     expect(getUniqueValidLwLocationInfoByAnalysis).toHaveBeenCalledWith({
       labwareDefs: LABWARE_DEFS,
       protocolData: PROTOCOL_DATA,
@@ -119,14 +126,17 @@ describe('useLPCLabwareInfo', () => {
       legacyOffsets: MOCK_LEGACY_OFFSETS,
     })
 
-    expect(useRunStatus).toHaveBeenCalledWith(null)
     expect(useNotifyRunQuery).toHaveBeenCalledWith(null, {
       enabled: false,
     })
   })
 
   it('should not enable offset search if run status is not idle', () => {
-    vi.mocked(useRunStatus).mockReturnValue('running' as any)
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith('test_id_running')
+      .thenReturn({
+        data: { data: { status: runningRun } },
+      } as any)
 
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({

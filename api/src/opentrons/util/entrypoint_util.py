@@ -1,25 +1,25 @@
-""" opentrons.util.entrypoint_util: functions common to entrypoints
-"""
+"""opentrons.util.entrypoint_util: functions common to entrypoints"""
 
 import asyncio
 import contextlib
-from dataclasses import dataclass
 import json
 import logging
 import pathlib
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from typing import (
+    TYPE_CHECKING,
     Dict,
     Generator,
     List,
     Optional,
     Sequence,
     Union,
-    TYPE_CHECKING,
 )
 
+from opentrons.calibration_storage import helpers
 from opentrons.calibration_storage.deck_configuration import (
     deserialize_deck_configuration,
 )
@@ -29,13 +29,12 @@ from opentrons.config import (
     JUPYTER_NOTEBOOK_LABWARE_DIR,
     SystemArchitecture,
 )
-from opentrons.protocols import labware
-from opentrons.calibration_storage import helpers
 from opentrons.protocol_engine.errors.error_occurrence import (
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
 )
 from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocols import labware
 from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
 if TYPE_CHECKING:
@@ -54,7 +53,7 @@ class FoundLabware:
 
 
 def labware_from_paths(
-    paths: Sequence[Union[str, pathlib.Path]]
+    paths: Sequence[Union[str, pathlib.Path]],
 ) -> Dict[str, FoundLabware]:
     """Search paths for labware definitions.
 

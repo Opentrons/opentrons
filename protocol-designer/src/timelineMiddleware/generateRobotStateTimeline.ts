@@ -1,3 +1,4 @@
+import { getIsTiprack } from '@opentrons/shared-data'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
@@ -56,11 +57,22 @@ export const generateRobotStateTimeline = (
       // we know the current tip(s) aren't going to be reused, so we can drop them
       // immediately after the current step is done.
       const pipetteId = getPipetteIdFromCCArgs(args)
+
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
       //  assume that whenever we have a pipetteId we also have a dropTipLocation
       if (pipetteId != null && dropTipLocation != null) {
+        const prevNozzleConfiguration = 'nozzles' in args ? args.nozzles : null
+
+        // no eager tip dropping if this step returns tip
+        const dropTipLabware =
+          'dropTipLocation' in args
+            ? invariantContext.labwareEntities[args.dropTipLocation]
+            : null
+        const isReturnTip =
+          dropTipLabware != null ? getIsTiprack(dropTipLabware.def) : false
+
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
           .find(
@@ -69,7 +81,9 @@ export const generateRobotStateTimeline = (
         const willReuseTip =
           nextStepArgsForPipette != null &&
           'changeTip' in nextStepArgsForPipette &&
-          nextStepArgsForPipette.changeTip === 'never'
+          nextStepArgsForPipette.changeTip === 'never' &&
+          nextStepArgsForPipette.nozzles === prevNozzleConfiguration &&
+          !isReturnTip
 
         const isWasteChute =
           invariantContext.wasteChuteEntities[dropTipLocation] != null

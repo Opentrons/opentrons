@@ -81,7 +81,7 @@ export const HeaterShakerIsRunningModal = (
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
-        name="alert-circle"
+        name="ot-alert"
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
         color={COLORS.yellow50}

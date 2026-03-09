@@ -1,4 +1,5 @@
 import type {
+  CompletedProtocolAnalysis,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
@@ -17,3 +18,8 @@ export type LoadedPipettes = LoadedPipette[] | Record<string, LoadedPipette>
 export type LoadedLabwares = LoadedLabware[] | Record<string, LoadedLabware>
 
 export type LoadedModules = LoadedModule[] | Record<string, LoadedModule>
+
+export type CommandTextData = Pick<
+  CompletedProtocolAnalysis,
+  'pipettes' | 'labware' | 'modules' | 'liquids' | 'commands'
+>

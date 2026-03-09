@@ -1,15 +1,17 @@
 """CreateTimer command request, result, and implementation models."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Type
+
 from pydantic import BaseModel, Field
-from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from ..execution import TaskHandler, RunControlHandler
+    from ..execution import RunControlHandler, TaskHandler
 
 
 CreateTimerCommandType = Literal["createTimer"]

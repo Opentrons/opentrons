@@ -10,11 +10,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  ErrorResponse,
-  HostConfig,
-  RobotSettings,
-} from '@opentrons/api-client'
+import type { ErrorResponse, RobotSettings } from '@opentrons/api-client'
 
 export interface UpdateRobotSettingVariables {
   id: string
@@ -52,7 +48,7 @@ export function useUpdateRobotSettingMutation(
   >(
     [host, 'robot_settings'],
     ({ id, value }) =>
-      updateRobotSetting(host as HostConfig, id, value).then(response => {
+      updateRobotSetting(host!, id, value).then(response => {
         // TODO: investigate ODD top level behavior when invalidating this query
         // queryClient
         //   .invalidateQueries([host, 'robot_settings'])

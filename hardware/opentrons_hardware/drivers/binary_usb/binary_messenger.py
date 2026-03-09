@@ -1,11 +1,12 @@
 """Binary USB messenger class."""
-from __future__ import annotations
-import asyncio
-from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict, Type, TypeVar
-from traceback import format_exception
 
+from __future__ import annotations
+
+import asyncio
 import logging
+from inspect import Traceback
+from traceback import format_exception
+from typing import Callable, Dict, Optional, Tuple, Type, TypeVar
 
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -15,13 +16,10 @@ from opentrons_shared_data.errors.exceptions import (
 
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
-
-
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    BinaryMessageDefinition,
     AckFailed,
+    BinaryMessageDefinition,
 )
-
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
 log = logging.getLogger(__name__)
@@ -179,7 +177,7 @@ class BinaryMessenger:
                 await self._read_task()
             except (asyncio.CancelledError, StopAsyncIteration):
                 return
-            except (InternalUSBCommunicationError) as e:
+            except InternalUSBCommunicationError as e:
                 log.exception(f"Nonfatal error in USB read task: {e}")
                 continue
             except BaseException as e:

@@ -5,10 +5,11 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 
 import logging
 from typing import Optional
-from opentrons.drivers.mag_deck.driver import GCODE
-from opentrons.hardware_control.emulation.parser import Parser, Command
+
 from .abstract_emulator import AbstractEmulator
 from .settings import MagDeckSettings
+from opentrons.drivers.mag_deck.driver import GCODE
+from opentrons.hardware_control.emulation.parser import Command, Parser
 
 logger = logging.getLogger(__name__)
 

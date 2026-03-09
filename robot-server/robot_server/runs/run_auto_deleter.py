@@ -1,10 +1,10 @@
 """Auto-delete old resources to make room for new ones."""
+
 from logging import getLogger
 
-from robot_server.deletion_planner import RunDeletionPlanner
-from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from .run_store import RunStore
-
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
+from robot_server.deletion_planner import RunDeletionPlanner
 
 _log = getLogger(__name__)
 

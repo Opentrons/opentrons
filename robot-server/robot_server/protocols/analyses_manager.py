@@ -1,23 +1,23 @@
 """A collaborator for managing protocol analyses."""
+
 from typing import Optional
 
+from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
+)
 from opentrons.util import helpers as datetime_helper
 
-from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-)
-from opentrons.protocol_engine.errors import ErrorOccurrence
-
+import robot_server.errors.error_mappers as em
+from robot_server.protocols import protocol_analyzer
 from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     AnalysisSummary,
 )
 from robot_server.protocols.analysis_store import AnalysisStore
-from robot_server.protocols import protocol_analyzer
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
-import robot_server.errors.error_mappers as em
 
 
 class FailedToInitializeAnalyzer(Exception):

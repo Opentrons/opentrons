@@ -1,6 +1,7 @@
 import pytest
-from opentrons.types import DeckSlotName, Point, Location, MeniscusTrackingTarget
+
 from opentrons.protocol_api.labware import Labware
+from opentrons.types import DeckSlotName, Location, MeniscusTrackingTarget, Point
 
 
 def test_point_from_xyz_attrs() -> None:
