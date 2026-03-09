@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   capitalizeFirstLetterAfterNumber,
+  getConsolidatedStacks,
   getFillLabwareToDeleteData,
   getShiftSelectedSteps,
 } from '../utils'
@@ -98,7 +99,19 @@ describe('getShiftSelectedSteps', () => {
     ])
   })
 })
-
+describe('getConsolidatedStacks', () => {
+  it('should return an array of stacks with no duplicates', () => {
+    const labwareAtLastState = {
+      labware1: { stack: ['lid', 'labware1', 'slotC1'] },
+      labware2: { stack: ['labware1', 'slotC1'] },
+      labware3: { stack: ['labware3'] },
+    }
+    expect(getConsolidatedStacks(labwareAtLastState)).toStrictEqual([
+      ['lid', 'labware1', 'slotC1'],
+      ['labware3'],
+    ])
+  })
+})
 describe('getFillLabwareToDeleteData', () => {
   const mockModule = {
     id: 'moduleId1',
