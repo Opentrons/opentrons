@@ -5,7 +5,6 @@ import head from 'lodash/head'
 import { INFO_TOAST } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useNotifyImageFileQuery } from '/app/resources/dataFiles/useNotifyImageFileQuery'
 

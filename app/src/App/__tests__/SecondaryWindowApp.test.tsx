@@ -5,9 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '/app/LocalizationProvider'
-// eslint-disable-next-line opentrons/no-imports-across-applications
 import { CameraPhotoViewer } from '/app/pages/Desktop/CameraPhotoViewer'
-// eslint-disable-next-line opentrons/no-imports-across-applications
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { useRobot } from '/app/redux-resources/robots'
 

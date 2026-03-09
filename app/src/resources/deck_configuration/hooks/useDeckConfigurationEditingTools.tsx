@@ -9,7 +9,6 @@ import {
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
-/* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'

@@ -1,4 +1,3 @@
-/* eslint-disable opentrons/no-imports-across-applications */
 // client entry point and application manifest
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
