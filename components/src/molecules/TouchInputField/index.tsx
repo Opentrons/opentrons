@@ -4,8 +4,8 @@ import clsx from 'clsx'
 import { StyledText } from '../../atoms/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { TYPOGRAPHY } from '../../ui-style-constants'
+import { setRefs } from '../../utils'
 import styles from './touchinputfield.module.css'
-import { setRefs } from './utils/setRefs'
 
 import type {
   ChangeEventHandler,

@@ -15,7 +15,7 @@ import {
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { setRefs } from './utils/setRefs'
+import { setRefs } from '../../utils'
 
 import type {
   ChangeEventHandler,
