@@ -17,8 +17,6 @@ const EXPECTED_VALID_QUIRKS = [
   'stackingOnly',
   'noLabwarePositionCheck',
   'disableGeometryBasedGripCheck',
-  'offsetPipetteFor96GridSubwells',
-  'offsetPipetteFor12GridSubwells',
 ]
 
 describe('check quirks for all labware defs', () => {
