@@ -249,6 +249,14 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('vacuum')).toEqual({
         moduleId: null,
+        programType: null,
+        stateType: null,
+        modeType: null,
+        pressureMbar: null,
+        powerPercent: null,
+        pumpDurationCheckbox: null,
+        pumpDurationTime: null,
+        endingHoldVentCheckbox: null,
       })
     })
   })

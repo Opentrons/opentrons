@@ -131,7 +131,7 @@ export function DropdownStepFormField(
           flexDirection={DIRECTION_COLUMN}
           width="100%"
         >
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          <StyledText desktopStyle="bodyDefaultSemiBold" color={COLORS.black90}>
             {title}
           </StyledText>
           <ListItem type="default">

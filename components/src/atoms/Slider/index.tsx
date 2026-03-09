@@ -11,13 +11,22 @@ interface SliderProps {
   adjustValue: (value: number) => void
   /** Optional label for the slider */
   label?: string
+  /** Optional color for the unfilled (right) track. Defaults to blue-20. */
+  backgroundColor?: string
 }
 
 export function Slider({
   value,
   label,
   adjustValue,
+  backgroundColor,
 }: SliderProps): JSX.Element {
+  const style: React.CSSProperties & Record<string, string> = {
+    '--value-percent': `${value}%`,
+    ...(backgroundColor != null && {
+      '--slider-unfilled': backgroundColor,
+    }),
+  }
   return (
     <div className={styles.slider_container}>
       <div
@@ -43,9 +52,7 @@ export function Slider({
           adjustValue(Number(e.target.value))
         }}
         className={styles.slider}
-        // @ts-expect-error Expected. We want to use style here to avoid more complex
-        //  data-attribute CSS calculations.
-        style={{ '--value-percent': `${value}%` }}
+        style={style}
         aria-label={label}
       />
     </div>

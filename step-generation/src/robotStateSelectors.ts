@@ -13,6 +13,7 @@ import {
   orderWells,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
@@ -26,6 +27,7 @@ import type {
   ModuleTemporalProperties,
   RobotState,
   ThermocyclerModuleState,
+  VacuumModuleState,
 } from './types'
 
 export function sortLabwareBySlot(
@@ -295,6 +297,16 @@ export const flexStackerStateGetter = (
 ): FlexStackerModuleState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === FLEX_STACKER_MODULE_TYPE
+    ? hardwareModule
+    : null
+}
+
+export const vacuumModuleStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): VacuumModuleState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === VACUUM_MODULE_TYPE
     ? hardwareModule
     : null
 }

@@ -35,6 +35,10 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_VENT_CLOSED,
+  VACUUM_VENT_OPEN,
 } from './constants'
 
 // Copied from PD
@@ -169,9 +173,23 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
-// TODO (nd: 02/04/2026): configure this type for vacuum module
+interface VacuumModulePressureState {
+  modeType: typeof VACUUM_MODE_PRESSURE
+  currentPressure: number | null
+  targetPressure: number | null
+}
+
+interface VacuumModulePowerState {
+  modeType: typeof VACUUM_MODE_POWER
+  currentPower: number | null
+  targetPower: number | null
+}
+
+export type VentStatus = typeof VACUUM_VENT_OPEN | typeof VACUUM_VENT_CLOSED
 export interface VacuumModuleState {
   type: typeof VACUUM_MODULE_TYPE
+  vacuumState: VacuumModulePressureState | VacuumModulePowerState | null
+  ventStatus: VentStatus | null
 }
 
 export type ModuleState =
