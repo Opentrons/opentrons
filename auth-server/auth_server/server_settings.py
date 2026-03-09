@@ -22,8 +22,10 @@ class AuthServerSettings(BaseSettings):
     ``OT_AUTH_SERVER_``, e.g. ``OT_AUTH_SERVER_persistence_directory``.
     """
 
-    model_config = SettingsConfigDict(env_prefix="OT_AUTH_SERVER_")
-
+    model_config = SettingsConfigDict(
+        env_prefix="OT_AUTH_SERVER_",
+        env_file=Path(__file__).resolve().parent.parent / ".env",
+    )
     persistence_directory: typing.Union[
         typing_extensions.Literal["automatically_make_temporary"],
         Path,
