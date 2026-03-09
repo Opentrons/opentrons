@@ -10,6 +10,8 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { analyzeProtocolSource } from '../../protocol-analysis'
 import {
   addProtocolFile,
+  FLEX_PROTOCOLS_DIRECTORY_NAME,
+  isFlexProtocol,
   parseProtocolDirs,
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
@@ -52,6 +54,43 @@ describe('protocol storage directory utilities', () => {
       return expect(PROTOCOLS_DIRECTORY_PATH).toEqual(
         path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
       )
+    })
+
+    it('uses flex-protocols as FLEX_PROTOCOLS_DIRECTORY_NAME', () => {
+      expect(FLEX_PROTOCOLS_DIRECTORY_NAME).toBe('flex-protocols')
+    })
+  })
+
+  describe('isFlexProtocol', () => {
+    it('returns true when analysis has robotType OT-3 Standard', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.mkdir(path.join(protocolDir, 'analysis'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      await fs.writeJson(
+        path.join(protocolDir, 'analysis', '1234567890.json'),
+        { robotType: 'OT-3 Standard' }
+      )
+      expect(await isFlexProtocol(protocolDir)).toBe(true)
+    })
+
+    it('returns false when analysis has robotType OT-2 Standard', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.mkdir(path.join(protocolDir, 'analysis'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      await fs.writeJson(
+        path.join(protocolDir, 'analysis', '1234567890.json'),
+        { robotType: 'OT-2 Standard' }
+      )
+      expect(await isFlexProtocol(protocolDir)).toBe(false)
+    })
+
+    it('returns false when analysis directory is missing', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      expect(await isFlexProtocol(protocolDir)).toBe(false)
     })
   })
 

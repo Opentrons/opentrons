@@ -3,6 +3,8 @@ import { app, shell } from 'electron'
 import fs from 'fs-extra'
 import { v4 as uuidv4 } from 'uuid'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { analyzeProtocolSource } from '../protocol-analysis'
 
 import type { Dirent } from 'fs'
@@ -33,8 +35,51 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
   PROTOCOLS_DIRECTORY_NAME
 )
+export const FLEX_PROTOCOLS_DIRECTORY_NAME = 'flex-protocols'
+export const FLEX_PROTOCOLS_DIRECTORY_PATH = path.join(
+  app.getPath('userData'),
+  FLEX_PROTOCOLS_DIRECTORY_NAME
+)
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
 export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
+
+export async function isFlexProtocol(
+  protocolDirPath: string
+): Promise<boolean> {
+  try {
+    const analysisDirPath = path.join(
+      protocolDirPath,
+      PROTOCOL_ANALYSIS_DIRECTORY_NAME
+    )
+    const stat = await fs.stat(analysisDirPath)
+    if (!stat.isDirectory()) {
+      return false
+    }
+
+    const analysisFiles = await readFilesWithinDirectory(analysisDirPath)
+    const jsonFiles = analysisFiles.filter(
+      p => path.extname(p).toLowerCase() === '.json'
+    )
+    if (jsonFiles.length === 0) {
+      return false
+    }
+
+    const withTimestamps = jsonFiles
+      .map(p => ({ path: p, ts: Number(path.basename(p, path.extname(p))) }))
+      .filter(({ ts }) => Number.isFinite(ts))
+      .sort((a, b) => b.ts - a.ts)
+    const mostRecentPath = withTimestamps[0]?.path
+
+    if (mostRecentPath == null) {
+      return false
+    }
+
+    const analysis = await fs.readJson(mostRecentPath)
+    return analysis?.robotType === FLEX_ROBOT_TYPE
+  } catch {
+    return false
+  }
+}
 
 function makeAnalysisFilePath(analysisDirPath: string): string {
   return path.join(analysisDirPath, `${new Date().getTime()}.json`)
