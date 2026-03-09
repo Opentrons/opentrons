@@ -36,7 +36,7 @@ from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
