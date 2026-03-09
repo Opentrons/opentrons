@@ -327,6 +327,10 @@ export const moveLiquidFormToArgs = (
     blowoutFlowRateUlSec:
       castFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
+    blowoutOffsetFromTopMm: castFormData.blowout_mmFromBottom ?? null,
+    blowoutXPosition: castFormData.blowout_x_position ?? null,
+    blowoutYPosition: castFormData.blowout_y_position ?? null,
+    blowoutPositionReference: castFormData.blowout_position_reference ?? null,
     changeTip: castFormData.changeTip,
     preWetTip: Boolean(castFormData.preWetTip),
     aspirateDelay,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { truncateString } from '../utils'
+import { truncateString } from '../truncateString'
 
 describe('truncateString', () => {
   it('when an input string less than max length, return the original input', () => {

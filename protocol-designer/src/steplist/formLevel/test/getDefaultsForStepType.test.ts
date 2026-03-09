@@ -86,6 +86,10 @@ describe('getDefaultsForStepType', () => {
 
         blowout_checkbox: false,
         blowout_location: null,
+        blowout_mmFromBottom: null,
+        blowout_x_position: null,
+        blowout_y_position: null,
+        blowout_position_reference: 'well-top',
         blowout_flowRate: null,
         preWetTip: false,
         pushOut_checkbox: null,
