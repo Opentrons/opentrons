@@ -99,34 +99,37 @@ export interface InputFieldProps {
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   (props, ref): JSX.Element => {
     const {
-      textAlign = TYPOGRAPHY.textAlignLeft,
-      size = 'small',
+      disabled,
+      id,
+      placeholder: rawPlaceholder,
+      units,
+      value: rawValue,
+      error,
       title,
       tooltipText,
+      caption,
+      type,
+      onClick,
       tabIndex = 0,
+      isIndeterminate = false,
+      textAlign = TYPOGRAPHY.textAlignLeft,
+      size = 'small',
+      leftElement,
+      rightElement,
       hasBackgroundError = false,
       borderRadius,
       padding,
-      disabled,
-      error,
-      units,
-      leftElement,
-      rightElement,
-      isIndeterminate = false,
-      onClick,
-      caption,
-      type,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
     const internalRef = useRef<HTMLInputElement>(null)
     const mergedRef = setRefs(ref, internalRef)
     const generatedId = useId()
-    const inputId = props.id ?? generatedId
+    const inputId = id ?? generatedId
 
     const hasError = error != null
-    const value = (isIndeterminate ?? false) ? '' : (props.value ?? '')
-    const placeHolder = (isIndeterminate ?? false) ? '-' : props.placeholder
+    const value = (isIndeterminate ?? false) ? '' : (rawValue ?? '')
+    const placeHolder = (isIndeterminate ?? false) ? '-' : rawPlaceholder
 
     const INPUT_FIELD = css`
       background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
@@ -178,6 +181,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       &:disabled {
         border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
       }
+
       input[type='number']::-webkit-inner-spin-button,
       input[type='number']::-webkit-outer-spin-button {
         -webkit-appearance: none;
@@ -291,7 +295,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               desktopStyle="bodyDefaultRegular"
               css={ERROR_TEXT_STYLE}
             >
-              {props.error}
+              {error}
             </StyledText>
           ) : null}
         </Flex>
@@ -299,6 +303,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     )
   }
 )
+
+// for debugging
+InputField.displayName = 'InputField'
 
 const ERROR_TEXT_STYLE = css`
   color: ${COLORS.red50};
