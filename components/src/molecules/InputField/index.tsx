@@ -114,6 +114,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       rightElement,
       isIndeterminate = false,
       onClick,
+      caption,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
@@ -275,13 +276,13 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               ) : null}
             </Flex>
           </Flex>
-          {props.caption != null ? (
+          {caption != null ? (
             <StyledText
               desktopStyle="bodyDefaultRegular"
               css={FORM_BOTTOM_SPACE_STYLE}
               color={hasError ? COLORS.red50 : COLORS.grey60}
             >
-              {props.caption}
+              {caption}
             </StyledText>
           ) : null}
           {hasError ? (
