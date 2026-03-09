@@ -32,7 +32,11 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "usascientific_12_reservoir_22ml",
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor96GridSubwells"
+    ]
   },
   "wells": {
     "A1": {

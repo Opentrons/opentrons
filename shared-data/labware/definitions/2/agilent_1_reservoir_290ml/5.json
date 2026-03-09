@@ -1,53 +1,55 @@
 {
   "ordering": [["A1"]],
   "brand": {
-    "brand": "NEST",
-    "brandId": ["360103"],
-    "links": ["https://www.nest-biotech.com/reagent-reserviors/59178416.html"]
+    "brand": "Agilent",
+    "brandId": ["201252-100"],
+    "links": ["https://www.agilent.com/store/en_US/Prod-201252-100/201252-100"]
   },
   "metadata": {
-    "displayName": "NEST 1 Well Reservoir 195 mL",
+    "displayName": "Agilent 1 Well Reservoir 290 mL",
     "displayCategory": "reservoir",
     "displayVolumeUnits": "mL",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127.76,
-    "yDimension": 85.48,
-    "zDimension": 31.4
+    "yDimension": 85.47,
+    "zDimension": 44.04
   },
-  "gripForce": 15,
-  "gripHeightFromLabwareBottom": 16.8,
   "wells": {
     "A1": {
-      "depth": 26.85,
+      "depth": 39.23,
       "shape": "rectangular",
-      "xDimension": 106.8,
-      "yDimension": 71.2,
-      "totalLiquidVolume": 195000,
+      "xDimension": 107.5,
+      "yDimension": 71.25,
+      "totalLiquidVolume": 290000,
       "x": 63.88,
       "y": 42.74,
-      "z": 4.55,
+      "z": 4.81,
       "geometryDefinitionId": "cuboidalWell"
     }
   },
   "groups": [
     {
+      "wells": ["A1"],
       "metadata": {
         "wellBottomShape": "v"
-      },
-      "wells": ["A1"]
+      }
     }
   ],
   "parameters": {
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-    "loadName": "nest_1_reservoir_195ml"
+    "loadName": "agilent_1_reservoir_290ml",
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor96GridSubwells"
+    ]
   },
   "namespace": "opentrons",
-  "version": 3,
+  "version": 4,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -59,22 +61,21 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 71.3,
-          "topYDimension": 107.3,
-          "bottomXDimension": 70.6,
-          "bottomYDimension": 106.8,
-          "topHeight": 26.85,
+          "topXDimension": 107.5,
+          "topYDimension": 71.25,
+          "bottomXDimension": 106.785,
+          "bottomYDimension": 71.0,
+          "topHeight": 39.23,
           "bottomHeight": 2.0
         },
         {
           "shape": "cuboidal",
-          "topXDimension": 9,
-          "topYDimension": 9,
-          "bottomXDimension": 1.93,
-          "bottomYDimension": 1.93,
+          "topXDimension": 106.785,
+          "topYDimension": 8,
+          "bottomXDimension": 100.75,
+          "bottomYDimension": 1.66,
           "topHeight": 2,
           "bottomHeight": 0,
-          "xCount": 12,
           "yCount": 8
         }
       ]

@@ -44,7 +44,11 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_tough_1_reservoir_300ml",
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor96GridSubwells"
+    ]
   },
   "namespace": "opentrons",
   "version": 1,
