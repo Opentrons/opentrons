@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler Module: G-codes and Device IDs"
+title: "Thermocycler Module: G-Codes and Device IDs"
 ---
 
 This section provides an overview of Thermocycler G-codes, including the structure of a typical command and response. It also defines the vendor and device IDs used by every Thermocycler. See [Thermocycler Module G-codes](./thermocycler-g-codes.md) for a complete list of codes used by this device.
@@ -7,11 +7,11 @@ This section provides an overview of Thermocycler G-codes, including the structu
 !!!note
     You do not need to understand or use G-codes to operate a Thermocycler with your Flex or OT-2 robot. This section is a technical resource for developers building custom applications that work with Opentrons hardware.
 
-## Understanding G-codes
+## Understanding G-Codes
 
 G-codes are machine-readable instructions used to control hardware directly. While most users control modules using protocols developed with the Opentrons [Python API](../../python-api/index.md) or [Protocol Designer](../../protocol-designer/index.md), we also provide G-codes to third-party developers and integrators. These codes allow you to operate hardware independently of our software ecosystem, establishing direct serial control over Opentrons modules using your own custom software or APIs.
 
-## G-code command syntax
+## G-Code command syntax
 
 A typical G-code command string uses this syntax:
 
@@ -33,7 +33,7 @@ The following table defines these code elements.
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>ARGUMENT-KEY</code></span></td>
-      <td>This is an optional key-value pair that adds additional data to the G-code.</p><p>Typically, the key is a single letter followed by the value, which is usually an integer. For instance, a command like <code>G0</code> might take parameters for movement along an X, Y, and Z axis. X would be the <code>ARGUMENT-KEY</code>, and an <code>ARGUMENT-VALUE</code> of <code>10</code> would make the system move to <code>X=10</code>. The full g-code movement command would look like <code>G0 X10 \n</code>.</td>
+      <td>This is an optional key-value pair that adds additional data to the G-code.</p><p>Typically, the key is a single letter followed by the value, which is usually an integer. For instance, a command like <code>G0</code> might take parameters for movement along an X, Y, and Z axis. X would be the <code>ARGUMENT-KEY</code>, and an <code>ARGUMENT-VALUE</code> of <code>10</code> would make the system move to <code>X=10</code>. The full G-code movement command would look like <code>G0 X10 \n</code>.</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>TERMINATOR</code></span></td>
@@ -42,7 +42,7 @@ The following table defines these code elements.
   </tbody>
 </table>
 
-## G-code response syntax
+## G-Code response syntax
 
 Every G-code command sent to an Opentrons module returns a response from the module after execution. This response will be one of the following types defined below.
 
