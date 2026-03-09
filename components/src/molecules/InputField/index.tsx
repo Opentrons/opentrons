@@ -1,4 +1,4 @@
-import { forwardRef, useRef } from 'react'
+import { forwardRef, useId, useRef } from 'react'
 import styled, { css } from 'styled-components'
 
 import { StyledText } from '../../atoms/StyledText'
@@ -15,13 +15,13 @@ import {
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { setRefs } from './utils/setRefs'
 
 import type {
   ChangeEventHandler,
   FocusEvent,
   MouseEvent,
   ReactNode,
-  RefObject,
 } from 'react'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
@@ -107,7 +107,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       hasBackgroundError = false,
       borderRadius,
       padding,
-      id,
       disabled,
       error,
       leftElement,
@@ -116,7 +115,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
     const internalRef = useRef<HTMLInputElement>(null)
-    const inputRef = (ref ?? internalRef) as RefObject<HTMLInputElement>
+    const mergedRef = setRefs(ref, internalRef)
+    const generatedId = useId()
+    const inputId = props.id ?? generatedId
+
     const hasError = props.error != null
     const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
     const placeHolder =
@@ -212,7 +214,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <label htmlFor={id} css={TITLE_STYLE}>
+              <label htmlFor={inputId} css={TITLE_STYLE}>
                 {title}
               </label>
               {tooltipText != null ? (
@@ -239,7 +241,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               css={INPUT_FIELD}
               alignItems={ALIGN_CENTER}
               onClick={() => {
-                inputRef.current?.focus()
+                internalRef.current?.focus()
               }}
             >
               {leftElement != null ? (
@@ -247,7 +249,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               ) : null}
               <StyledInput
                 {...inputProps}
-                data-testid={props.id}
+                id={inputId}
+                data-testid={inputId} // 
                 value={value}
                 placeholder={placeHolder}
                 onWheel={event => {
@@ -255,7 +258,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                 }} // prevent value change with scrolling
                 type={props.type}
                 disabled={disabled}
-                ref={inputRef}
+                ref={mergedRef}
               />
               {props.units != null ? (
                 <Flex css={UNITS_STYLE}>{props.units}</Flex>

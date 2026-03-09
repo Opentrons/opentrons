@@ -1,23 +1,18 @@
-import { forwardRef, useRef } from 'react'
+import { forwardRef, useEffect, useId, useRef } from 'react'
 import clsx from 'clsx'
 
 import { StyledText } from '../../atoms/StyledText'
 import { COLORS } from '../../helix-design-system'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, DIRECTION_ROW } from '../../styles'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import styles from './touchinputfield.module.css'
+import { setRefs } from './utils/setRefs'
 
 import type {
   ChangeEventHandler,
-  CSSProperties,
   FocusEvent,
   MouseEvent,
   ReactNode,
-  RefObject,
 } from 'react'
-
-const COLOR_WARNING_DARK = '#9e5e00' // ToDo (kk:08/13/2024) replace this with COLORS
 
 export interface TouchInputFieldProps {
   /** field is disabled if value is true */
@@ -38,7 +33,7 @@ export interface TouchInputFieldProps {
   error?: string | null
   /** optional label */
   label?: string | null
-  /** optional caption. hidden when `error` is given */
+  /** optional caption */
   caption?: string | null
   /** mouse click handler */
   onClick?: (event: MouseEvent<HTMLElement>) => unknown
@@ -86,40 +81,49 @@ export const TouchInputField = forwardRef<
     borderRadius,
     padding,
     disabled,
+    isIndeterminate = false,
     ...inputProps
   } = props
 
   const internalRef = useRef<HTMLInputElement>(null)
-  const inputRef = (ref ?? internalRef) as RefObject<HTMLInputElement>
+  const inputFieldRef = useRef<HTMLDivElement>(null)
+  const mergedRef = setRefs(ref, internalRef)
+  const generatedId = useId()
+  const inputId = props.id ?? generatedId
 
   const hasError = props.error != null
-  const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
-  const placeHolder = (props.isIndeterminate ?? false) ? '-' : props.placeholder
+  const value = isIndeterminate ? '' : (props.value ?? '')
+  const placeHolder = isIndeterminate ? '-' : props.placeholder
 
-  const input_field_style: CSSProperties = {
-    borderRadius: borderRadius ?? 'var(--border-radius-4)',
-    padding: padding ?? 'var(--spacing-16) var(--spacing-24)',
-  }
+  useEffect(() => {
+    if (inputFieldRef.current == null) return
+    if (borderRadius != null) {
+      inputFieldRef.current.style.setProperty(
+        '--touch-input-border-radius',
+        borderRadius
+      )
+    } else {
+      inputFieldRef.current.style.removeProperty('--touch-input-border-radius')
+    }
+    if (padding != null) {
+      inputFieldRef.current.style.setProperty('--touch-input-padding', padding)
+    } else {
+      inputFieldRef.current.style.removeProperty('--touch-input-padding')
+    }
+  }, [borderRadius, padding])
 
   return (
-    <Flex
-      width="100%"
-      alignItems={ALIGN_CENTER}
-      lineHeight={1}
-      fontSize={TYPOGRAPHY.fontSizeP}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={hasError ? COLOR_WARNING_DARK : COLORS.black90}
-      opacity={disabled ? 0.5 : 1}
+    <div
+      className={clsx(styles.container, {
+        [styles.container_error]: hasError,
+        [styles.container_disabled]: disabled,
+      })}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+      <div className={styles.inner}>
         {label != null ? (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap="var(--spacing-8)"
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.label_row}>
             <label
-              htmlFor={props.id}
+              htmlFor={inputId}
               className={clsx(
                 styles.label,
                 textAlign === TYPOGRAPHY.textAlignCenter
@@ -129,20 +133,18 @@ export const TouchInputField = forwardRef<
             >
               {label}
             </label>
-          </Flex>
+          </div>
         ) : null}
 
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
+        <div
           className={clsx(styles.outer, {
             [styles.outer_error]: hasError,
           })}
           onClick={props.disabled === true ? undefined : props.onClick}
         >
-          <Flex
+          <div
+            ref={inputFieldRef}
             tabIndex={tabIndex}
-            alignItems={ALIGN_CENTER}
             className={clsx(
               styles.input_field,
               size === 'small'
@@ -153,15 +155,14 @@ export const TouchInputField = forwardRef<
                 [styles.background_error]: hasBackgroundError,
               }
             )}
-            style={input_field_style}
             onClick={() => {
-              inputRef.current?.focus()
+              internalRef.current?.focus()
             }}
           >
             <input
               {...inputProps}
-              id={props.id}
-              data-testid={props.id}
+              id={inputId}
+              data-testid={inputId} // ToDo remove or switch to testId
               className={clsx(
                 styles.input,
                 size === 'small' ? styles.input_small : styles.input_medium,
@@ -177,10 +178,10 @@ export const TouchInputField = forwardRef<
               }}
               type={props.type}
               disabled={disabled}
-              ref={inputRef}
+              ref={mergedRef}
             />
             {props.units != null ? (
-              <Flex
+              <div
                 className={clsx(
                   styles.units,
                   textAlign === TYPOGRAPHY.textAlignCenter
@@ -192,10 +193,10 @@ export const TouchInputField = forwardRef<
                 )}
               >
                 {props.units}
-              </Flex>
+              </div>
             ) : null}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
 
         {props.caption != null ? (
           <StyledText
@@ -212,7 +213,7 @@ export const TouchInputField = forwardRef<
             {props.error}
           </StyledText>
         ) : null}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 })
