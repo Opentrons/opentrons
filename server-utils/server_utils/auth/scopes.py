@@ -24,14 +24,14 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
+    ROBOT_CONTROL_WRITE = (
+        "robot_control.write",
+        "Run a protocol, or otherwise control the device in its capacity as a liquid-handling robot.",
+    )
+
     ROBOT_SETTINGS_WRITE = (
         "robot_settings.write",
         "Edit general robot settings."
-    )
-
-    RUNS_WRITE = (
-        "runs.write",
-        "Create and control protocol runs.",
     )
 
     USERS_READ = (
