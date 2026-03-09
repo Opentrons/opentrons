@@ -42,8 +42,13 @@ import {
 
 import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { Vector3D } from '@opentrons/shared-data'
+import type { LoadedPipette, Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import type {
+  LPCWizardState,
+  OffsetLocationDetails,
+  SelectedLwOverview,
+} from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
@@ -60,18 +65,21 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
 
   const isOnDevice = useSelector(getIsOnDevice)
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
+    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
   )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
-  )?.initialPosition!
+  )?.initialPosition as VectorOffset
   const mostRecentVector = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
-  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
-  const pipette = useSelector(selectActivePipette(runId))!
+  const selectedLwInfo = useSelector(
+    selectSelectedLwOverview(runId)
+  ) as SelectedLwOverview
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
 
   const [joggedPosition, setJoggedPosition] =
     useState<VectorOffset>(workingInitialOffset)
@@ -81,25 +89,20 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
     getVectorDifference(joggedPosition, workingInitialOffset)
   )
 
-  useEffect(
-    () => {
-      //  NOTE: this will perform a "null" jog when the jog controls mount so
-      //  if a user reaches the "confirm exit" modal (unmounting this component)
-      //  and clicks "go back" we are able so initialize the live offset to whatever
-      //  distance they had already jogged before clicking exit.
-      // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
-      let mounted = true
-      if (mounted) {
-        handleJog('x', 1, 0, setJoggedPosition)
-      }
-      return () => {
-        mounted = false
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    //  NOTE: this will perform a "null" jog when the jog controls mount so
+    //  if a user reaches the "confirm exit" modal (unmounting this component)
+    //  and clicks "go back" we are able so initialize the live offset to whatever
+    //  distance they had already jogged before clicking exit.
+    // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
+    let mounted = true
+    if (mounted) {
+      handleJog('x', 1, 0, setJoggedPosition)
+    }
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const slotOnlyDisplayLocation = getFlexSlotNameOnly(
     selectedLwInfo.offsetLocationDetails,
@@ -210,7 +213,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText forwardedAs="p" />,
+                  block: <LegacyStyledText as="p" />,
                   bold: <strong />,
                 }}
               />
@@ -301,7 +304,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <LegacyStyledText as="p" />,
                 bold: <strong />,
               }}
             />

@@ -59,10 +59,8 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText forwardedAs="h6">
-            {t('max_volume')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="h6">{t('max_volume')}</LegacyStyledText>
+          <LegacyStyledText as="p">
             {vol != null
               ? `${String(getDisplayVolume(vol, units, 2))} ${String(units)}`
               : t('various')}
@@ -75,12 +73,10 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginRight={SPACING.spacing16}
             >
-              <LegacyStyledText forwardedAs="h6">
+              <LegacyStyledText as="h6">
                 {t(wellLabel)} {t('shape')}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
-                {wellBottomValue}
-              </LegacyStyledText>
+              <LegacyStyledText as="p">{wellBottomValue}</LegacyStyledText>
             </Flex>
             <Icon
               height="1.25rem"

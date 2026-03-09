@@ -53,7 +53,7 @@ export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   return (
     <Banner type="error" width="100%">
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing2}>
-        <LegacyStyledText forwardedAs="p">{bannerText}</LegacyStyledText>
+        <LegacyStyledText as="p">{bannerText}</LegacyStyledText>
         <Btn onClick={handleClick}>
           <LegacyStyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
             {buttonText}

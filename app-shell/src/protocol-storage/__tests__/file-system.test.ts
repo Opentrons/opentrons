@@ -4,7 +4,7 @@ import path from 'path'
 import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import { v4 as uuidv4 } from 'uuid'
+import uuid from 'uuid/v4'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { analyzeProtocolSource } from '../../protocol-analysis'
@@ -18,10 +18,7 @@ import {
   removeProtocolByKey,
 } from '../file-system'
 
-// vi.mock('uuid')
-vi.mock('uuid', () => ({
-  v4: vi.fn(),
-}))
+vi.mock('uuid/v4')
 vi.mock('electron')
 vi.mock('electron-store')
 vi.mock('../../protocol-analysis')
@@ -179,7 +176,7 @@ describe('protocol storage directory utilities', () => {
   describe('addProtocolFile', () => {
     it('writes a protocol file to a new directory', () => {
       let count = 0
-      vi.mocked(uuidv4).mockImplementation(() => {
+      vi.mocked(uuid).mockImplementation(() => {
         const nextId = `${count}abc123`
         count = count + 1
         return nextId

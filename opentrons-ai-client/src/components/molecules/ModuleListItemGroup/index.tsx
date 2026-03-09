@@ -28,7 +28,7 @@ import { getOnlyLatestDefs } from '/ai-client/resources/utils'
 import { ModuleDiagram } from '../ModuleDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
-import type { LabwareDefinition, ModuleType } from '@opentrons/shared-data'
+import type { ModuleType } from '@opentrons/shared-data'
 import type { DisplayModule } from '/ai-client/components/organisms/ModulesAndFixturesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
@@ -73,11 +73,10 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
-  const allDefinitionsValues = useMemo((): LabwareDefinition[] => {
+  const allDefinitionsValues = useMemo(() => {
     const defs = getOnlyLatestDefs()
-    const defsRecord: Record<string, LabwareDefinition> = defs
 
-    return Object.values(defsRecord)
+    return Object.values(defs)
   }, [])
 
   const getDefDisplayName = (value: string): string => {

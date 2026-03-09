@@ -81,16 +81,10 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.borderRadius8}
     >
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}
       </LegacyStyledText>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {itemValue}
       </LegacyStyledText>
     </Flex>

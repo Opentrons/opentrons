@@ -176,45 +176,47 @@ export function RenameRobotSlideout({
         </PrimaryButton>
       }
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
         {isFlex ? null : (
           <Banner type="informing" marginBottom={SPACING.spacing16}>
             {t('rename_robot_prefer_usb_connection')}
           </Banner>
         )}
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
-          <Controller
-            control={control}
-            name="newRobotName"
-            render={({ field, fieldState }) => (
-              <InputField
-                data-testid="rename-robot_input"
-                id="newRobotName"
-                name="newRobotName"
-                type="text"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  field.onChange(e)
-                  trigger('newRobotName')
-                }}
-                value={field.value}
-                error={fieldState.error?.message && ' '}
-                onBlur={field.onBlur}
-                title={t('robot_name')}
-              />
-            )}
-          />
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
-            {t('characters_max')}
+        <Controller
+          control={control}
+          name="newRobotName"
+          render={({ field, fieldState }) => (
+            <InputField
+              data-testid="rename-robot_input"
+              id="newRobotName"
+              name="newRobotName"
+              type="text"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                field.onChange(e)
+                trigger('newRobotName')
+              }}
+              value={field.value}
+              error={fieldState.error?.message && ' '}
+              onBlur={field.onBlur}
+              title={t('robot_name')}
+            />
+          )}
+        />
+        <LegacyStyledText as="label" color={COLORS.grey50}>
+          {t('characters_max')}
+        </LegacyStyledText>
+        {errors.newRobotName != null ? (
+          <LegacyStyledText
+            as="label"
+            color={COLORS.red50}
+            marginTop={SPACING.spacing4}
+          >
+            {errors.newRobotName.message}
           </LegacyStyledText>
-          {errors.newRobotName != null ? (
-            <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
-              {errors.newRobotName.message}
-            </LegacyStyledText>
-          ) : null}
-        </Flex>
+        ) : null}
       </Flex>
     </Slideout>
   )

@@ -18,7 +18,7 @@ export function UnorderedList(props: UnorderedListProps): JSX.Element {
     <ul>
       {items.map((item, index) => (
         <ListItem key={index}>
-          <LegacyStyledText forwardedAs="p">{item}</LegacyStyledText>
+          <LegacyStyledText as="p">{item}</LegacyStyledText>
         </ListItem>
       ))}
     </ul>

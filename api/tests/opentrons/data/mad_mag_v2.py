@@ -1,5 +1,4 @@
 from typing import cast
-
 from opentrons import protocol_api, types
 
 metadata = {

@@ -31,7 +31,7 @@ export interface InlineNotificationProps extends StyleProps {
   /** optional handler to show close button/clear alert  */
   onCloseClick?: (() => void) | MouseEventHandler<HTMLButtonElement>
   linkText?: string
-  onLinkClick?: (() => void) | MouseEventHandler<HTMLAnchorElement>
+  onLinkClick?: (() => void) | MouseEventHandler<HTMLButtonElement>
 }
 
 const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
@@ -73,10 +73,8 @@ export function InlineNotification(
     onLinkClick,
   } = props
   // TODO (sb: 8/20/25) RSQ-189 Remove punctuation from this component and add to translation strings
-  // Temp fix (nd: 2/25/26): Avoid double-period for translations that already end in a period.
-  const doesMessageEndInPeriod = message?.trim().match(/\.$/) ?? false
-  const fullHeading = `${heading}${message && !doesMessageEndInPeriod ? '. ' : ''}`
-  const fullMessage = `${message}${doesMessageEndInPeriod ? '' : '.'}`
+  const fullHeading = `${heading}${message ? '. ' : ''}`
+  const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
   const iconProps = {
     ...inlineNotificationProps.icon,
@@ -120,7 +118,7 @@ export function InlineNotification(
                 />
               </>
             )}
-            {message != null && fullMessage}
+            {message != null && fullmessage}
           </StyledText>
         </Flex>
       </Flex>

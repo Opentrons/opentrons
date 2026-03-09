@@ -1,4 +1,4 @@
-@import url('@opentrons/components/styles');
+@import '@opentrons/components/styles';
 
 .disabled {
   color: var(--c-font-disabled);

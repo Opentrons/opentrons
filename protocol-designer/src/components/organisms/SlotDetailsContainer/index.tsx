@@ -1,15 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  FLEX_STACKER_MODULE_TYPE,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
-import {
-  FAKE_HOPPER_LOCATION_MAP,
-  getIsSlotAHopper,
-  getTopLocationInStack,
-} from '@opentrons/step-generation'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getTopLocationInStack } from '@opentrons/step-generation'
 
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -20,7 +13,6 @@ import { getFullStackFromLabwaresOnDeck } from '/protocol-designer/utils'
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 interface SlotDetailContainerProps {
@@ -40,39 +32,26 @@ export function SlotDetailsContainer(
   )
   const nickNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const liquidEntities = useSelector(getLiquidEntities)
+
   if (slot == null || (slot === 'offDeck' && offDeckLabwareId == null)) {
     return null
   }
-  const isSlotAHopper = getIsSlotAHopper(slot)
-  const adjustedSlotToFindModule = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
 
   const {
     modules: deckSetupModules,
     labware: deckSetupLabwares,
     additionalEquipmentOnDeck,
   } = deckSetup
-  const stackerModuleState = Object.values(deckSetupModules).find(
-    module =>
-      module.type === FLEX_STACKER_MODULE_TYPE &&
-      module.slot === adjustedSlotToFindModule
-  )?.moduleState
 
-  const labwareInHopper =
-    stackerModuleState != null && 'labwareInHopper' in stackerModuleState
-      ? stackerModuleState.labwareInHopper
-      : null
   const offDeckLabwareNickName =
     offDeckLabwareId != null ? nickNames[offDeckLabwareId] : null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
-    module => module.slot === adjustedSlotToFindModule
+    module => module.slot === slot
   )
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
-    slot,
-    isSlotAHopper
+    slot
   )
   const topLocationLabwareId =
     fullStackFromLabwares?.length > 0
@@ -116,16 +95,6 @@ export function SlotDetailsContainer(
   const labwares: string[] = []
   if (offDeckLabwareNickName != null) {
     labwares.push(offDeckLabwareNickName)
-  } else if (labwareInHopper != null && isSlotAHopper) {
-    const labwareIds: string[] = labwareInHopper.flatMap(
-      ({ primaryLabwareId, adapterLabwareId, lidLabwareId }) =>
-        [primaryLabwareId, adapterLabwareId, lidLabwareId].filter(
-          (id): id is string => id != null
-        )
-    )
-    labwareIds.forEach(id => {
-      labwares.push(deckSetupLabwares[id].def.metadata.displayName)
-    })
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {
       if (deckSetupLabwares[id] != null) {
@@ -133,6 +102,7 @@ export function SlotDetailsContainer(
       }
     })
   }
+
   return (
     <SlotInformation
       location={slot}

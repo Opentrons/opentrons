@@ -53,9 +53,9 @@ export function ListAccordion({
         <Flex css={HEADER_ICON_CHILD_STYLE}>
           {alertKind !== 'default' ? (
             <Icon
-              name="ot-alert"
+              name="alert-circle"
               css={ALERT_ICON_STYLE}
-              data-testid="ot-alert"
+              data-testid="alert-circle"
             />
           ) : (
             icon

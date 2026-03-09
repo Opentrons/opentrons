@@ -19,7 +19,6 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import {
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
@@ -37,9 +36,7 @@ import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { getMainPagePortalEl } from '../Portal'
 import { LiquidCardList } from './LiquidCardList'
-import { getDeckLabel } from './utils'
 
-import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 
 export interface WellContentsByNumber {
@@ -69,7 +66,7 @@ export const SlotDetailModal = (
   const allIngredientGroupFields = useSelector(
     selectors.allIngredientGroupFields
   )
-  const { labware, modules } = activeDeckSetup
+  const { labware } = activeDeckSetup
   const labwareOnDeck = labware[selectedLabware]
 
   const wellContents =
@@ -104,17 +101,13 @@ export const SlotDetailModal = (
 
   const isAdapter = getIsAdapterFromDef(labwareOnDeck.def)
   const slotName = getSlotInLocationStack(labwareOnDeck.stack)
-  const isHopper = Object.values(modules).some(
-    ({ slot, model }) => slot === slotName && model === FLEX_STACKER_MODULE_V1
-  )
-
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
       <RobotInfoLabel
-        deckLabel={getDeckLabel(slotName, isHopper, t as TFunction)}
+        deckLabel={slotName === 'offDeck' ? t('off_deck') : slotName}
       />
     </Flex>
   )
@@ -129,6 +122,7 @@ export const SlotDetailModal = (
       closeOnOutsideClick
       childrenPadding={0}
       width="47rem"
+      overflowY="hidden"
       headerTagElement={
         stackOfLabware.length > 1 ? (
           <Tag
@@ -143,15 +137,11 @@ export const SlotDetailModal = (
         padding={SPACING.spacing16}
         height="28rem"
       >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
-          height="28rem"
-        >
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           {stackOfLabware.length > 1 ? (
             <LabwareButtonBasket
               stackOfLabware={stackOfLabware}
-              selectedLabware={[selectedLabware]}
+              selectedLabware={selectedLabware}
               labware={labware}
               setSelectedLabware={(selectedLabwareId: string) => {
                 const wellContentsForNewlySelected =

@@ -1,12 +1,9 @@
 """opentrons.system.ffmpeg: Functions and data for interacting with FFMPEG."""
-
 import asyncio
 import logging
 from typing import Tuple
-
-from opentrons_shared_data.robot.types import RobotType
-
 from opentrons.protocol_engine.resources.camera_provider import CameraError
+from opentrons_shared_data.robot.types import RobotType
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +100,7 @@ async def ffmpeg_capture_image_bytes(
         return stdout
     else:
         log.error(
-            f"Failed to capture an image with camera, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to capture an image with camera, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
         return CameraError(
             message="Failed to return bytes from FFMPEG image capture.",

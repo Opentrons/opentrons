@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -12,9 +12,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useSentryReport } from '/app/App/hooks'
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import { appRestart, sendLog } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'
@@ -25,8 +26,16 @@ export function OnDeviceDisplayAppFallback({
   error,
 }: FallbackProps): JSX.Element {
   const { t } = useTranslation(['app_settings', 'branded'])
+  const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotSerialNumber =
+    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const handleRestartClick = (): void => {
+    trackEvent({
+      name: ANALYTICS_ODD_APP_ERROR,
+      properties: { errorMessage: error.message, robotSerialNumber },
+    })
     dispatch(appRestart(error.message as string))
   }
   const modalHeader: OddModalHeaderBaseProps = {
@@ -35,17 +44,10 @@ export function OnDeviceDisplayAppFallback({
     iconColor: COLORS.red50,
   }
 
-  useSentryReport(error)
-
   // immediately report to robot logs that something fatal happened
-  useEffect(
-    () => {
-      dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
+  }, [])
 
   return (
     <OddModal header={modalHeader}>
@@ -55,7 +57,7 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('branded:error_boundary_description')}
         </LegacyStyledText>
         <MediumButton

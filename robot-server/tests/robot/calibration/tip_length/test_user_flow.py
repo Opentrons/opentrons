@@ -1,27 +1,23 @@
 import os
-from pathlib import Path
-from typing import Any, Dict, List, Tuple
-
 import pytest
-from mock import ANY, call, patch
-
+from mock import ANY, patch, call
+from typing import List, Tuple, Dict, Any
 from opentrons import config
-from opentrons.calibration_storage import types as cal_types
-from opentrons.calibration_storage.ot2 import models
-from opentrons.hardware_control.instruments.ot2 import pipette
-from opentrons.protocol_api.labware import get_labware_definition
-from opentrons.types import Mount, Point
-from opentrons.util.helpers import utc_now
+from pathlib import Path
 from opentrons_shared_data.pipette import (
     mutable_configurations,
-)
-from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
+from opentrons.types import Mount, Point
+from opentrons.hardware_control.instruments.ot2 import pipette
+from opentrons.protocol_api.labware import get_labware_definition
+from opentrons.util.helpers import utc_now
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import models
 
-from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
+from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 

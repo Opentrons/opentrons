@@ -22,6 +22,8 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { EmptySection } from './EmptySection'
 
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
@@ -65,8 +67,8 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
     { enabled: protocolData != null }
   )
   const liquidsInOrder = parseLiquidsInLoadOrder(
-    mostRecentAnalysis!.liquids ?? [],
-    mostRecentAnalysis!.commands ?? []
+    (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
+    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
   )
   const { t, i18n } = useTranslation('protocol_details')
 
@@ -105,10 +107,10 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
                     </LegacyStyledText>
-                    <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+                    <LegacyStyledText as="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
                     </LegacyStyledText>
                   </Flex>

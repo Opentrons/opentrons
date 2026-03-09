@@ -1,65 +1,63 @@
 """Tests for the AnalysisStore interface."""
-
 import json
+
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, NamedTuple, Optional
 
 import pytest
 from decoy import Decoy
-from sqlalchemy.engine import Engine as SQLEngine
-
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-)
-from opentrons.protocol_engine import (
-    errors as pe_errors,
-)
-from opentrons.protocol_engine import (
-    types as pe_types,
-)
 from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    NumberParameter,
+    EnumParameter,
+    EnumChoice,
     BooleanParameter,
     CSVParameter,
-    EnumChoice,
-    EnumParameter,
     FileInfo,
-    NumberParameter,
-    RunTimeParameter,
+)
+
+from sqlalchemy.engine import Engine as SQLEngine
+
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.errors import ErrorCodes
+
+from opentrons.types import MountType, DeckSlotName
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    errors as pe_errors,
+    types as pe_types,
 )
 from opentrons.protocol_reader import (
-    JsonProtocolConfig,
     ProtocolSource,
+    JsonProtocolConfig,
 )
-from opentrons.types import DeckSlotName, MountType
-from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.pipette.types import PipetteNameType
 
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
-    CompletedAnalysis,
     PendingAnalysis,
+    CompletedAnalysis,
 )
 from robot_server.protocols.analysis_store import (
-    _CURRENT_ANALYZER_VERSION,
-    AnalysisIsPendingError,
-    AnalysisNotFoundError,
     AnalysisStore,
+    AnalysisNotFoundError,
+    AnalysisIsPendingError,
+    _CURRENT_ANALYZER_VERSION,
 )
 from robot_server.protocols.completed_analysis_store import (
-    CompletedAnalysisResource,
     CompletedAnalysisStore,
+    CompletedAnalysisResource,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
-    ProtocolResource,
     ProtocolStore,
+    ProtocolResource,
 )
 from robot_server.protocols.rtp_resources import (
-    CSVParameterResource,
     PrimitiveParameterResource,
+    CSVParameterResource,
 )
 
 
@@ -255,12 +253,7 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
-    command_annotation = pe_types.CommandAnnotation(
-        id="annotation-id",
-        source="userCommand",
-        name="My command annotation",
-        params={},
-    )
+    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
     )
@@ -332,12 +325,7 @@ async def test_update_adds_details_and_completes_analysis(
         "liquidClasses": [],
         "modules": [],
         "commandAnnotations": [
-            {
-                "source": "userCommand",
-                "id": "annotation-id",
-                "name": "My command annotation",
-                "params": {},
-            }
+            {"annotationType": "custom", "commandKeys": ["abc", "xyz"]}
         ],
     }
 

@@ -56,8 +56,6 @@ export function WelcomeModal({
     setShowWelcomeModal(false)
   }
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(startDiscoAnimation, [])
 
   return (
@@ -76,14 +74,14 @@ export function WelcomeModal({
             height="128px"
           />
           <LegacyStyledText
-            forwardedAs="h4"
+            as="h4"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_to_your_dashboard')}
           </LegacyStyledText>
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}

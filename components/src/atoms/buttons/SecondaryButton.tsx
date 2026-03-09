@@ -89,7 +89,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
     cursor: ${CURSOR_DEFAULT};
   }
 
-  ${styleProps as any}
+  ${styleProps}
 `
 
 SecondaryButton.defaultProps = {

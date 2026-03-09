@@ -1,9 +1,8 @@
 import typing
-
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import Location, Point
+from opentrons.types import Point, Location
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.types import LabwareDefinition2

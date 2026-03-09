@@ -1,24 +1,24 @@
 """Test move relative commands."""
-
 from datetime import datetime
 
-import pytest
 from decoy import Decoy, matchers
+import pytest
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.move_relative import (
-    MoveRelativeImplementation,
-    MoveRelativeParams,
-    MoveRelativeResult,
-)
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import DeckPoint, MovementAxis
+from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.types import Point
+
+from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.move_relative import (
+    MoveRelativeParams,
+    MoveRelativeResult,
+    MoveRelativeImplementation,
+)
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 
 @pytest.fixture

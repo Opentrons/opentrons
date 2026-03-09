@@ -5,6 +5,7 @@ import { createSelector } from 'reselect'
 
 import { INTERFACE_ETHERNET, INTERFACE_WIFI } from './constants'
 
+import type { Dictionary } from 'lodash'
 import type { State } from '../types'
 import type * as Types from './types'
 
@@ -22,7 +23,7 @@ export const getNetworkInterfaces: (
   (state: State, robotName: string) => state.networking[robotName]?.interfaces,
   interfaces => {
     const simpleIfaces = map(
-      interfaces as Record<string, Types.InterfaceStatus>,
+      interfaces as Dictionary<Types.InterfaceStatus>,
       (iface: Types.InterfaceStatus): Types.SimpleInterfaceStatus => {
         const { ipAddress: ipWithMask, macAddress, type } = iface
         let ipAddress: string | null = null
@@ -58,7 +59,7 @@ export const getWifiKeys: (state: State, robotName: string) => Types.WifiKey[] =
     (
       ids: string[] = [],
       keysById: Partial<{ [id: string]: Types.WifiKey }> = {}
-    ) => ids.map(id => keysById[id]!)
+    ) => ids.map(id => keysById[id] as Types.WifiKey)
   )
 
 // NOTE: not memoized because used in several rendered components

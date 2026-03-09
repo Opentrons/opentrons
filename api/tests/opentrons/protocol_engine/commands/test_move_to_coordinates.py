@@ -1,5 +1,4 @@
 """Test move-to-coordinates commands."""
-
 from datetime import datetime
 
 import pytest
@@ -7,18 +6,19 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.move_to_coordinates import (
-    MoveToCoordinatesImplementation,
-    MoveToCoordinatesParams,
-    MoveToCoordinatesResult,
-)
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import DeckPoint
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.types import Point
+
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.move_to_coordinates import (
+    MoveToCoordinatesParams,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesImplementation,
+)
 
 
 @pytest.fixture

@@ -1,10 +1,8 @@
 """Tests for pcan bit timing calculations."""
+import pytest
 
 from typing import Optional
-
-import pytest
 from opentrons_shared_data.errors.exceptions import CANBusConfigurationError
-
 from opentrons_hardware.drivers.can_bus import settings
 
 

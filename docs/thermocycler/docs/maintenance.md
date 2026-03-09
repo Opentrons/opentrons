@@ -1,6 +1,5 @@
 ---
 title: "Thermocycler Module: Maintenance and Cleaning"
-description: "Cleaning procedures and when to contact support."
 ---
 
 ## Maintenance

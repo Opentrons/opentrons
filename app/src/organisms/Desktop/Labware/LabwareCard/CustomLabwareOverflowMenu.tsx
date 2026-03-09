@@ -148,10 +148,10 @@ export function CustomLabwareOverflowMenu(
             onClose={handleCancelModal}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {t('def_moved_to_trash')}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
+              <LegacyStyledText as="p" paddingTop={SPACING.spacing8}>
                 {t('cannot-run-python-missing-labware')}
               </LegacyStyledText>
               <Flex

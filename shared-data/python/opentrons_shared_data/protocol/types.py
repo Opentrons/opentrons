@@ -2,14 +2,13 @@
 opentrons_shared_data.protocol.types: types for json protocols
 """
 
-from enum import Enum
 from typing import Any, Dict, List, Optional, Union
+from enum import Enum
 
-from typing_extensions import Literal, TypedDict
-
+from typing_extensions import TypedDict, Literal
+from ..pipette.types import PipetteName
 from ..labware.types import LabwareDefinition2
 from ..module.types import ModuleModel
-from ..pipette.types import PipetteName
 
 SlotSpan = Literal["span7_8_10_11"]
 

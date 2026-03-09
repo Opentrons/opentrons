@@ -1,8 +1,7 @@
 from typing import Sequence
 
 import pytest
-
-from opentrons.hardware_control.emulation.parser import Command, Parser
+from opentrons.hardware_control.emulation.parser import Parser, Command
 
 
 @pytest.fixture

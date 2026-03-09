@@ -1,6 +1,5 @@
 ---
 title: "Protocol Designer: Export"
-description: "Export protocol as Python and import into the Opentrons App to run."
 ---
 
 When you're finished creating and editing your protocol, click **Back to overview** in the upper left. Review the hardware, labware, liquids, and steps added to your protocol. Then, click **Export protocol** in the upper right. Your protocol will automatically download as a Python (.py) file. 

@@ -7,7 +7,6 @@ import argparse
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 from abr_testing.automation import google_sheets_tool
 import requests
-from pathlib import Path
 from typing import Any, Tuple
 import sys
 import json
@@ -15,7 +14,7 @@ from abr_testing.tools import plate_reader
 
 
 def get_protocol_step_as_int(
-    storage_directory: Path, robot: str
+    storage_directory: str, robot: str
 ) -> Tuple[int, float, str]:
     """Get user input as integer."""
     expected_liquid_moved = 0.0
@@ -107,7 +106,7 @@ def get_all_plate_readings(
 
 
 def get_most_recent_run_and_record(
-    ip: str, storage_directory: Path, labware: str, accuracy: float
+    ip: str, storage_directory: str, labware: str, accuracy: float
 ) -> None:
     """Write accuracy level to google sheet."""
     # Get most recent run
@@ -176,7 +175,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "storage_directory",
         metavar="STORAGE_DIRECTORY",
-        type=Path,
+        type=str,
         nargs=1,
         help="Path to long term storage directory for scale .csvs.",
     )

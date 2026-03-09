@@ -85,13 +85,7 @@ def test_get_options(client: Client) -> None:
     expected_headers = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": ["GET", "POST", "OPTIONS"],
-        "Access-Control-Allow-Headers": [
-            "content-type",
-            "authorization",
-            "origin",
-            "accept",
-            "x-enable-analytics",
-        ],
+        "Access-Control-Allow-Headers": ["content-type", "authorization", "origin", "accept"],
         "Access-Control-Expose-Headers": ["content-type"],
         "Access-Control-Max-Age": "600",
     }

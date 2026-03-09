@@ -20,8 +20,8 @@ export function useWifiQuery(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
-    [host!, 'networking', 'wifi'],
-    () => getWifiList(host!).then(response => response.data),
+    [host as HostConfig, 'networking', 'wifi'],
+    () => getWifiList(host as HostConfig).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

@@ -17,6 +17,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAuthorization } from '@opentrons/react-api-client'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
@@ -26,7 +27,13 @@ import {
   useIsRobotViewable,
   useRobot,
 } from '/app/redux-resources/robots'
-import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { getConfig } from '/app/redux/config'
+import {
+  CONNECTABLE,
+  getRobotAddressesByName,
+  getRobotModelByName,
+  OPENTRONS_USB,
+} from '/app/redux/discovery'
 import { useLights } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -35,7 +42,6 @@ import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
-import { useUSBRegistration } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -66,7 +72,22 @@ export function RobotOverview({
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
 
-  useUSBRegistration(robot)
+  const userId = useSelector(getConfig)?.userInfo?.userId ?? 'Opentrons-user'
+
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robot?.name ?? '')
+  )
+  const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
+
+  // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
+  useAuthorization({
+    subject: 'Opentrons',
+    agent:
+      // define the registration agent as usb if any usb hostname address exists
+      // may change when ODD no longer needs to rely on this
+      isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
+    agentId: userId,
+  })
 
   return robot != null ? (
     <>
@@ -91,9 +112,6 @@ export function RobotOverview({
                 height: '5.4375rem',
               }}
               id="RobotOverview_robotImage"
-              alt={
-                robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'
-              }
             />
           </Flex>
           <Box padding={SPACING.spacing8} width="100%">
@@ -119,7 +137,7 @@ export function RobotOverview({
                   paddingRight={SPACING.spacing16}
                 >
                   <LegacyStyledText
-                    forwardedAs="h6"
+                    as="h6"
                     color={COLORS.grey60}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
@@ -141,7 +159,7 @@ export function RobotOverview({
                       />
                     </Flex>
                     <LegacyStyledText
-                      forwardedAs="p"
+                      as="p"
                       color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                     >
                       {t('lights')}

@@ -188,7 +188,7 @@ export function StackingOffsets(): JSX.Element | null {
             {isStackableLabware && (
               <>
                 <LegacyStyledText
-                  forwardedAs="h3"
+                  as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Labware
@@ -211,7 +211,7 @@ export function StackingOffsets(): JSX.Element | null {
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
-                  forwardedAs="h3"
+                  as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Adapters
@@ -298,7 +298,7 @@ export function StackingOffsets(): JSX.Element | null {
                 gridGap={SPACING.spacing4}
               >
                 <LegacyStyledText
-                  forwardedAs="h3"
+                  as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Modules

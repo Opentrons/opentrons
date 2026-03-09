@@ -1,12 +1,22 @@
 """Blow-out command request, result, and implementation models."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type, Union
-
 from typing_extensions import Literal
 
-from ..state.update_types import StateUpdate
+
+from .pipetting_common import (
+    OverpressureError,
+    PipetteIdMixin,
+    FlowRateMixin,
+    blow_out_in_place,
+)
+from .movement_common import (
+    WellLocationMixin,
+    DestinationPositionResult,
+    move_to_well,
+    StallOrCollisionError,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -14,24 +24,15 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from .movement_common import (
-    DestinationPositionResult,
-    StallOrCollisionError,
-    WellLocationMixin,
-    move_to_well,
-)
-from .pipetting_common import (
-    FlowRateMixin,
-    OverpressureError,
-    PipetteIdMixin,
-    blow_out_in_place,
-)
+from ..state.update_types import StateUpdate
+
 from opentrons.hardware_control import HardwareControlAPI
+
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
-    from ..resources import ModelUtils
     from ..state.state import StateView
+    from ..resources import ModelUtils
 
 
 BlowOutCommandType = Literal["blowout"]

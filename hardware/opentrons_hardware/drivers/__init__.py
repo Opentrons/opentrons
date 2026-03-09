@@ -2,10 +2,10 @@
 
 from typing import Optional, Union
 
-from .binary_usb import BinaryMessenger
 from .can_bus import CanMessenger
-from .eeprom import EEPROMDriver
+from .binary_usb import BinaryMessenger
 from .gpio import OT3GPIO, RemoteOT3GPIO
+from .eeprom import EEPROMDriver
 
 
 class SystemDrivers:

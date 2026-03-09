@@ -12,7 +12,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
@@ -20,8 +19,6 @@ import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-
-import { useVacuumModuleControls } from './VacuumModule/hooks/useVacuumModuleControls'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -138,8 +135,6 @@ export function useModuleOverflowMenu(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { deactivateVacuum, openVent, closeVent } =
-    useVacuumModuleControls(module)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -336,10 +331,6 @@ export function useModuleOverflowMenu(
     })
   }
 
-  const isVentClosed =
-    module.moduleType === VACUUM_MODULE_TYPE &&
-    module.data.ventStatus === 'closed'
-
   const sendBlockTempCommand =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     module.data.targetTemperature != null
@@ -480,40 +471,6 @@ export function useModuleOverflowMenu(
         menuButtons: [aboutModuleBtn, setupBtn],
         onClick: homeShuttle,
       },
-    ],
-    vacuumModuleType: [
-      module.moduleType === VACUUM_MODULE_TYPE && module.data.status === 'idle'
-        ? {
-            setSetting: t('overflow_menu_set_vacuum'),
-            isSecondary: false,
-            isSettingDisabled: isDisabled,
-            menuButtons: [],
-            onClick: () => {
-              handleSlideoutClick(false)
-            },
-          }
-        : {
-            setSetting: t('overflow_menu_deactivate_vacuum'),
-            isSecondary: false,
-            isSettingDisabled: isDisabled,
-            menuButtons: [],
-            onClick: deactivateVacuum,
-          },
-      isVentClosed
-        ? {
-            setSetting: t('overflow_menu_open_vent'),
-            isSecondary: false,
-            isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn, setupBtn],
-            onClick: openVent,
-          }
-        : {
-            setSetting: t('overflow_menu_close_vent'),
-            isSecondary: false,
-            isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn, setupBtn],
-            onClick: closeVent,
-          },
     ],
   }
 

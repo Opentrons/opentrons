@@ -1,10 +1,8 @@
-import typing
+from unittest import mock
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple
-from unittest import mock
-
-import pytest
-
+import typing
+from opentrons.protocol_api.core.well import AbstractWellCore
 from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.protocol.types import (
     BlowoutParams,
@@ -17,39 +15,38 @@ from opentrons_shared_data.protocol.types import (
     StandardLiquidHandlingParams,
     TouchTipParams,
 )
-
+import pytest
+from opentrons.types import Location, Point, MountType
+from opentrons.protocols.parse import parse
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    InstrumentContext,
     ProtocolContext,
+    InstrumentContext,
     labware,
+    MAX_SUPPORTED_VERSION,
+)
+from opentrons.protocols.execution import execute
+from opentrons.protocols.execution.execute_json_v3 import (
+    _aspirate,
+    _dispense,
+    _delay,
+    _drop_tip,
+    _blowout,
+    dispatch_json,
+    _pick_up_tip,
+    _touch_tip,
+    _air_gap,
+    _move_to_slot,
+    load_labware_from_json_defs,
+    _get_well,
+    _set_flow_rate,
+    _get_location_with_offset,
+    load_pipettes_from_json,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
-from opentrons.protocol_api.core.well import AbstractWellCore
-from opentrons.protocols.execution import execute
-from opentrons.protocols.execution.execute_json_v3 import (
-    _air_gap,
-    _aspirate,
-    _blowout,
-    _delay,
-    _dispense,
-    _drop_tip,
-    _get_location_with_offset,
-    _get_well,
-    _move_to_slot,
-    _pick_up_tip,
-    _set_flow_rate,
-    _touch_tip,
-    dispatch_json,
-    load_labware_from_json_defs,
-    load_pipettes_from_json,
-)
-from opentrons.protocols.parse import parse
-from opentrons.types import Location, MountType, Point
 
 
 def test_load_pipettes_from_json() -> None:

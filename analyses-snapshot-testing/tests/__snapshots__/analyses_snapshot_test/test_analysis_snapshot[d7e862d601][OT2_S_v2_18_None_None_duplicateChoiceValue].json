@@ -5,7 +5,6 @@
   },
   "commands": [
     {
-      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +17,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

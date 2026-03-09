@@ -49,7 +49,7 @@ export function CollapsibleSection(
         }}
       >
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {title}

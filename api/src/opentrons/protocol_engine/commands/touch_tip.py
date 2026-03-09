@@ -1,41 +1,41 @@
 """Touch tip command request, result, and implementation models."""
 
 from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, Type, Any
 
-from typing import TYPE_CHECKING, Any, Optional, Type
-
+from typing_extensions import Literal
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal
+
+from opentrons.types import Point
 
 from ..errors import (
-    LabwareIsTipRackError,
     TouchTipDisabledError,
     TouchTipIncompatibleArgumentsError,
+    LabwareIsTipRackError,
 )
 from ..types import DeckPoint
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    StallOrCollisionError,
-    WellLocationMixin,
-    move_to_well,
+    DefinedErrorData,
 )
 from .pipetting_common import (
     PipetteIdMixin,
 )
-from opentrons.types import Point
+from .movement_common import (
+    WellLocationMixin,
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, MovementHandler
-    from ..resources.model_utils import ModelUtils
+    from ..execution import MovementHandler, GantryMover
     from ..state.state import StateView
+    from ..resources.model_utils import ModelUtils
 
 
 TouchTipCommandType = Literal["touchTip"]

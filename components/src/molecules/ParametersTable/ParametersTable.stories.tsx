@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as React from 'react-remove-scroll'
 
+import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { ParametersTable } from './index'
 
@@ -151,13 +152,13 @@ const runTimeParameters: RunTimeParameter[] = [
 ]
 
 const meta: Meta<typeof ParametersTable> = {
-  title: 'Helix/Molecules/ParametersTable',
+  title: 'Library/Molecules/ParametersTable',
   component: ParametersTable,
   decorators: [
     Story => (
-      <div style={{ padding: SPACING.spacing16 }}>
+      <Flex padding={SPACING.spacing16}>
         <Story />
-      </div>
+      </Flex>
     ),
   ],
 }
@@ -167,6 +168,6 @@ type Story = StoryObj<typeof ParametersTable>
 
 export const DefaultParameterTable: Story = {
   args: {
-    runTimeParameters,
+    runTimeParameters: runTimeParameters,
   },
 }

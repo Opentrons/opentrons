@@ -3,11 +3,10 @@ import contextlib
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
-
-from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-
-from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons.drivers.asyncio.communication.errors import SerialException
+
 
 log = logging.getLogger(__name__)
 

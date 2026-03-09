@@ -2,7 +2,6 @@
 import argparse
 import os
 import numpy as np
-from pathlib import Path
 from typing import Dict, Any, List
 
 
@@ -101,7 +100,7 @@ def read_byonoy_file_to_array(filename: str) -> Dict[str, Any]:
 
 
 def read_hellma_plate_files(
-    storage_directory: Path, hellma_plate_number: int
+    storage_directory: str, hellma_plate_number: int
 ) -> List[Any]:
     """Read hellma files for the following wavelengths."""
     wavelengths = [405, 450, 490, 650]

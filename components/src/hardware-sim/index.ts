@@ -1,4 +1,3 @@
-export * from './alignment'
 export * from './BaseDeck'
 export * from './BaseDeck/__fixtures__'
 export * from './Deck'

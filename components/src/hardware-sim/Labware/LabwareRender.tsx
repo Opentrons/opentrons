@@ -15,15 +15,19 @@ import {
 import type { CSSProperties, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
-import type { TipType, WellType } from './labwareInternals/types'
 import type {
   HighlightedWellLabels,
-  WELL_LABEL_OPTIONS,
-  WellFillByName,
+  TipType,
+  WellFill,
   WellGroup,
   WellMouseEvent,
-  WellStrokeByName,
-} from './labwareInternals/Wells'
+  WellStroke,
+} from './labwareInternals/types'
+
+export const WELL_LABEL_OPTIONS = {
+  SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
+  SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
+} as const
 
 export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 
@@ -89,9 +93,9 @@ export interface LabwareRenderProps {
   highlightedWellLabels?: HighlightedWellLabels
   selectedWells?: WellGroup | null
   /** CSS color to fill specified wells */
-  wellFill?: WellFillByName
+  wellFill?: WellFill
   /** CSS color to stroke specified wells */
-  wellStroke?: WellStrokeByName
+  wellStroke?: WellStroke
   /** CSS color to stroke the labware outline */
   labwareStroke?: CSSProperties['stroke']
   /** adds thicker blue border with blur to labware */
@@ -106,7 +110,7 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   showBorder?: boolean
   strokeColor?: string
-  statusByWellName?: Record<string, TipType | WellType>
+  tipStatusByWellName?: Record<string, TipType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
   fill?: CSSProperties['fill']
@@ -131,7 +135,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
     highlightedWellLabels,
     selectedWells,
     missingTips,
-    statusByWellName,
+    tipStatusByWellName,
     handleClickWell,
     selectedTipsByIndex,
     disabledWells,
@@ -200,7 +204,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         highlight={highlight}
         highlightShadow={highlightShadow}
         wellStroke={wellStroke}
-        statusByWellName={statusByWellName}
+        tipStatusByWellName={tipStatusByWellName}
         handleClickWell={handleClickWell}
         selectedTipsByIndex={selectedTipsByIndex}
         fill={fill}

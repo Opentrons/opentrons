@@ -16,7 +16,6 @@ import { getMainPagePortalEl } from '/protocol-designer/components/organisms/Por
 import styles from './tipselectionwizard.module.css'
 
 import type { ReactNode } from 'react'
-import type { TipSelectionBannerReason } from './types'
 
 interface TipSelectionModalProps {
   onClose: () => void
@@ -27,10 +26,9 @@ interface TipSelectionModalProps {
   totalSteps: number
   showBackButton?: boolean
   continueText?: string
-  showErrorBanner: boolean
+  showPickupsRequiredBanner: boolean
   numPickupsRemaining: number
   showReusingTipsBanner: boolean
-  errorReason: TipSelectionBannerReason | null
 }
 
 export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
@@ -43,17 +41,16 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     continueText,
     currentStepIndex,
     totalSteps,
-    showErrorBanner,
+    showPickupsRequiredBanner,
     numPickupsRemaining,
     showReusingTipsBanner,
-    errorReason,
   } = props
   const { t } = useTranslation('tip_selection')
 
   const header = (
     <WizardHeader
       title={t('select_tips_for_tracking')}
-      currentStep={currentStepIndex + 1}
+      currentStep={currentStepIndex}
       totalSteps={totalSteps}
       onExit={onClose}
     />
@@ -61,21 +58,17 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
 
   const footerElement = (
     <div className={styles.modal_footer}>
-      {errorReason != null && showErrorBanner && currentStepIndex === 1 ? (
+      {showPickupsRequiredBanner ? (
         <InlineNotification
           type="error"
-          message={t(
-            `error_banner.${errorReason}`,
-            errorReason === 'pickupsRequired'
-              ? { count: numPickupsRemaining }
-              : {}
-          )}
+          message={t('not_enough_tips_selected', {
+            count: numPickupsRemaining,
+          })}
           hug
         />
       ) : null}
-      {(errorReason == null || !showErrorBanner) &&
-      showReusingTipsBanner &&
-      currentStepIndex === 1 ? (
+      {/* pickups required error takes precedence over reusing tips warning */}
+      {showReusingTipsBanner && !showPickupsRequiredBanner ? (
         <InlineNotification
           type="alert"
           message={t('reusing_tips_banner')}

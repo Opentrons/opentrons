@@ -2,11 +2,11 @@ import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
-  DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloneRun,
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
+  useRunStatus,
 } from '/app/resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
@@ -39,7 +39,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!)
+  } = useRunActionMutations(runId as string)
 
   const {
     cloneRun,
@@ -66,11 +66,8 @@ export function useCurrentRunStatus(
   options?: UseQueryOptions<Run>
 ): RunStatus | null {
   const currentRunId = useCurrentRunId()
-  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
-    ...options,
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
-  return runRecord?.data.status ?? null
+
+  return useRunStatus(currentRunId, options)
 }
 
 export function useRunErrors(runId: string | null): RunData['errors'] {

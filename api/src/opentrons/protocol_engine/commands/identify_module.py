@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional
-
-from pydantic import BaseModel, Field
+from __future__ import annotations
+from typing import Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
+from pydantic import BaseModel, Field
+
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..types import ModuleModel
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..state.state import StateView

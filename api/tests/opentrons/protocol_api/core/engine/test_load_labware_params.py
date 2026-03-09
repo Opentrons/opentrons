@@ -1,15 +1,14 @@
 """Tests for Protocol API engine parameter validation."""
 
-from typing import List, Optional
-
 import pytest
-
-from tests.opentrons.protocol_api import versions_between
+from typing import List, Optional
 
 from opentrons.protocol_api.core.engine import load_labware_params as subject
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.types import APIVersion
+
+from tests.opentrons.protocol_api import versions_between
 
 
 @pytest.mark.parametrize(

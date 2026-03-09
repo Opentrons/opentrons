@@ -1,6 +1,5 @@
 ---
 title: "Flex Stacker: Post-installation Procedures"
-description: "Touchscreen setup, firmware, deck mapping, and attaching the shuttle."
 ---
 
 ## Touchscreen Instructions

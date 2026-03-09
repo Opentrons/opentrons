@@ -1,16 +1,13 @@
 """Protocol engine types involving instrument sensors."""
+from enum import Enum
 
-from opentrons_shared_data.util import StrEnum
-
-from opentrons.hardware_control.types import (
-    InstrumentProbeType,
-)
 from opentrons.hardware_control.types import (
     TipStateType as HwTipStateType,
+    InstrumentProbeType,
 )
 
 
-class InstrumentSensorId(StrEnum):
+class InstrumentSensorId(str, Enum):
     """Primary and secondary sensor ids."""
 
     PRIMARY = "primary"
@@ -26,7 +23,7 @@ class InstrumentSensorId(StrEnum):
         }[self]
 
 
-class TipPresenceStatus(StrEnum):
+class TipPresenceStatus(str, Enum):
     """Tip presence status reported by a pipette."""
 
     PRESENT = "present"

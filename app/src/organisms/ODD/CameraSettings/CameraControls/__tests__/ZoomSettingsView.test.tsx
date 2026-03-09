@@ -22,10 +22,9 @@ describe('ZoomSettingsView', () => {
 
   beforeEach(() => {
     mockProps = {
-      zoomValue: 1,
+      zoomValue: '1x',
       adjustZoom: vi.fn(),
       returnToHomeView: vi.fn(),
-      isLoading: false,
     }
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
   })

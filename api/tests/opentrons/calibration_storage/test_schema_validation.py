@@ -1,14 +1,13 @@
-import importlib
 import json
-from types import ModuleType
-from typing import Generator, no_type_check
-
 import pytest
+import importlib
+from types import ModuleType
+from typing import no_type_check, Generator
+
 from pydantic import ValidationError
 
-from opentrons.calibration_storage import encoder_decoder as ed
-from opentrons.calibration_storage import types as cal_types
 from opentrons.util.helpers import utc_now
+from opentrons.calibration_storage import encoder_decoder as ed, types as cal_types
 
 
 @no_type_check

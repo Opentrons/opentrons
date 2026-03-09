@@ -1,5 +1,6 @@
 """Tests for door_watcher."""
 
+
 from typing import cast
 
 import pytest
@@ -8,16 +9,17 @@ from decoy import Decoy, matchers
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.types import (
-    DoorState,
     DoorStateNotification,
+    DoorState,
     HardwareEventHandler,
     PauseType,
 )
+
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )
-from opentrons.protocol_engine.state.state import StateStore
 
 
 @pytest.fixture

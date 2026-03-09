@@ -2,27 +2,28 @@
 
 from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.types import (
-    CutoutFixture,
-    DeckDefinitionV5,
-)
 from opentrons_shared_data.module.types import ModuleOrientation
-
-from ..errors import (
-    AddressableAreaDoesNotExistError,
-    CutoutDoesNotExistError,
-    FixtureDoesNotExistError,
-    SlotDoesNotExistError,
+from opentrons_shared_data.deck.types import (
+    DeckDefinitionV5,
+    CutoutFixture,
 )
+
+from opentrons.types import DeckSlotName
+
 from ..types import (
     AddressableArea,
-    AddressableOffsetVector,
     AreaType,
+    PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
-    PotentialCutoutFixture,
+    AddressableOffsetVector,
 )
-from opentrons.types import DeckSlotName
+from ..errors import (
+    CutoutDoesNotExistError,
+    FixtureDoesNotExistError,
+    AddressableAreaDoesNotExistError,
+    SlotDoesNotExistError,
+)
 
 
 def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV5) -> DeckPoint:

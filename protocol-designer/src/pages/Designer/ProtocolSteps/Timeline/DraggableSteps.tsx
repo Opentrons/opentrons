@@ -18,22 +18,20 @@ import {
   ConcurrentGroupChild,
 } from '/protocol-designer/components/molecules'
 import { DND_TYPES } from '/protocol-designer/constants'
-import {
-  getOrderedSavedForms,
-  getSavedStepHierarchy,
-} from '/protocol-designer/step-forms/selectors'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { getOrderedSavedForms } from '/protocol-designer/step-forms/selectors'
 import * as steplistActions from '/protocol-designer/steplist/actions'
-import {
-  computeStepMove,
-  convertStepArrayToHierarchy,
-  convertStepHierarchyToArray,
-} from '/protocol-designer/steplist/utils/stepHierarchy'
 import {
   getMultiSelectItemIds,
   getSelectedStepId,
 } from '/protocol-designer/ui/steps/selectors'
 
 import { ConnectedStepInfo } from './ConnectedStepInfo'
+import {
+  computeStepMove,
+  convertStepArrayToHierarchy,
+  convertStepHierarchyToArray,
+} from './stepHierarchyUtils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
@@ -48,20 +46,37 @@ interface DraggableStepsProps {
  * terminal steps. The steps in here can be dragged and dropped to reorder them.
  */
 export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
   const { sidebarWidth } = props
   const [openedOverflowMenuId, setOpenedOverflowMenuId] = useState<
     string | null
   >(null)
 
-  const stepHierarchy = useSelector(getSavedStepHierarchy)
+  const orderedSavedForms = useSelector(getOrderedSavedForms)
+  const orderedStepIds = orderedSavedForms.map(form => form.id)
+
+  // todo(mm, 2025-10-27): nestedSteps and findStepIndex probably ought to be Redux selectors, for efficiency.
+  const nestedSteps = convertStepArrayToHierarchy(
+    orderedSavedForms,
+    enableConcurrentModuleActions
+  )
+  // todo(mm, 2025-10-27): This implementation of findStepIndex returns the wrong number for steps that
+  // come after Thermocycler profiles, because it counts the invisible pause step. We want the numbering to
+  // skip over invisible steps.
+  const findStepIndex = (stepId: StepIdType): number =>
+    orderedStepIds.findIndex(id => stepId === id)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {stepHierarchy.topLevelItems.map(nestedStepElement => {
+      {nestedSteps.topLevelItems.map(nestedStepElement => {
         if (nestedStepElement.type === 'standaloneStep') {
+          const index = findStepIndex(nestedStepElement.stepId)
           return (
             <DragDropStep
-              key={`${nestedStepElement.stepId}`}
+              key={`${nestedStepElement.stepId}_${index}`}
+              stepNumber={index + 1}
               stepId={nestedStepElement.stepId}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
@@ -81,6 +96,7 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
               concurrentStepIds={nestedStepElement.concurrentSteps.map(
                 step => step.stepId
               )}
+              findStepIndex={findStepIndex}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
               sidebarWidth={sidebarWidth}
@@ -100,6 +116,7 @@ interface DropType {
 
 interface ConnectedStepItemProps {
   stepId: StepIdType
+  stepNumber: number
   onStepContextMenu?: () => void
 }
 
@@ -117,6 +134,7 @@ interface DragDropStepProps extends ConnectedStepItemProps {
 function DragDropStep(props: DragDropStepProps): JSX.Element {
   const {
     stepId,
+    stepNumber,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -125,6 +143,9 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -139,13 +160,16 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const getStepsAfterMovingHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(convertStepArrayToHierarchy(steps), {
-        moveType: 'insertBeforeDestinationStep',
-        movedStepId: idOfStepBeingMoved,
-        destinationStepId: stepId,
-      })
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
+        {
+          moveType: 'insertBeforeDestinationStep',
+          movedStepId: idOfStepBeingMoved,
+          destinationStepId: stepId,
+        }
+      )
     },
-    [steps, stepId]
+    [steps, stepId, enableConcurrentModuleActions]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -189,6 +213,7 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
       <ConnectedStepInfo
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+        stepNumber={stepNumber}
         stepId={stepId}
         sidebarWidth={sidebarWidth}
       />
@@ -216,6 +241,8 @@ interface ThermocyclerProfileProps {
   thermocyclerProfileStepId: StepIdType
   concurrentStepIds: StepIdType[]
 
+  findStepIndex: (stepId: StepIdType) => number
+
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
 
@@ -232,6 +259,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
   const {
     thermocyclerProfileStepId,
     concurrentStepIds,
+    findStepIndex,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -250,6 +278,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
     <div>
       <DragDropStep
         stepId={thermocyclerProfileStepId}
+        stepNumber={findStepIndex(thermocyclerProfileStepId) + 1}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -273,6 +302,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
           <ConcurrentGroupChild key={concurrentStepId} type="step">
             <DragDropStep
               stepId={concurrentStepId}
+              stepNumber={findStepIndex(concurrentStepId) + 1}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
               sidebarWidth={sidebarWidth}
@@ -300,17 +330,23 @@ function ThermocyclerProfileEndCheckpoint(props: {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
   const { t } = useTranslation()
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(convertStepArrayToHierarchy(steps), {
-        moveType: 'insertAsLastStepOfGroup',
-        movedStepId: idOfStepBeingMoved,
-        destinationGroupRootStepId: thermocyclerProfileStepId,
-      })
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
+        {
+          moveType: 'insertAsLastStepOfGroup',
+          movedStepId: idOfStepBeingMoved,
+          destinationGroupRootStepId: thermocyclerProfileStepId,
+        }
+      )
     },
-    [steps, thermocyclerProfileStepId]
+    [steps, thermocyclerProfileStepId, enableConcurrentModuleActions]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(

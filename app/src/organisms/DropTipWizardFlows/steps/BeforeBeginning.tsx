@@ -52,7 +52,8 @@ export const BeforeBeginning = ({
 
   const buildTopText = (): string => {
     if (issuedCommandsType === 'fixit') {
-      return fixitCommandTypeUtils?.copyOverrides.beforeBeginningTopText!
+      return fixitCommandTypeUtils?.copyOverrides
+        .beforeBeginningTopText as string
     } else {
       return t('before_you_begin_do_you_want_to_blowout')
     }
@@ -70,7 +71,6 @@ export const BeforeBeginning = ({
           </StyledText>
           <MediumButton
             css={ODD_MEDIUM_BUTTON_STYLE}
-            justifyContent={JUSTIFY_FLEX_START}
             buttonType={flowType === 'blowout' ? 'primary' : 'secondary'}
             onClick={() => {
               setFlowType('blowout')
@@ -79,7 +79,6 @@ export const BeforeBeginning = ({
           />
           <MediumButton
             css={ODD_MEDIUM_BUTTON_STYLE}
-            justifyContent={JUSTIFY_FLEX_START}
             buttonType={flowType === 'drop_tips' ? 'primary' : 'secondary'}
             onClick={() => {
               setFlowType('drop_tips')
@@ -177,7 +176,7 @@ function DropTipOption({
       >
         <source src={videoSrc} />
       </AnimationVideo>
-      <LegacyStyledText forwardedAs="h3">{text}</LegacyStyledText>
+      <LegacyStyledText as="h3">{text}</LegacyStyledText>
     </Flex>
   )
 }
@@ -242,6 +241,7 @@ const CONTAINER_STYLE = css`
 
 const ODD_MEDIUM_BUTTON_STYLE = css`
   flex: 1;
+  justify-content: ${JUSTIFY_FLEX_START};
   padding-left: ${SPACING.spacing24};
   height: 5.25rem;
 `

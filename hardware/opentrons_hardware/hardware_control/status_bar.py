@@ -1,27 +1,26 @@
 """Interface to the status led bar."""
-
-import asyncio
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional, List
+import asyncio
 
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.binary_constants import (
-    LightAnimationType,
     LightTransitionType,
+    LightAnimationType,
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    Ack,
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
+    Ack,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt16Field,
+    UInt8Field,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     LightAnimationTypeField,
     LightTransitionTypeField,
-)
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
-    UInt16Field,
 )
 
 

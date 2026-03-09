@@ -2,45 +2,47 @@
 
 from datetime import datetime
 
-import pytest
-from decoy import Decoy, matchers
-
 from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     StallOrCollisionDetectedError,
 )
+from decoy import matchers, Decoy
+import pytest
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.state import update_types
+from opentrons.types import Point
 from opentrons.protocol_engine import (
-    DeckPoint,
     LiquidHandlingWellLocation,
-    WellOffset,
     WellOrigin,
+    WellOffset,
+    DeckPoint,
 )
+
 from opentrons.protocol_engine.commands.aspirate import (
-    AspirateImplementation,
     AspirateParams,
     AspirateResult,
+    AspirateImplementation,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+
+from opentrons.protocol_engine.state.state import StateView
+
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
-from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
-    AspiratedFluid,
     CurrentWell,
+    AspiratedFluid,
     FluidKind,
-    LabwareWellId,
     WellLocation,
+    LabwareWellId,
 )
-from opentrons.types import Point
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.notes import CommandNoteAdder
 
 
 @pytest.fixture
@@ -725,7 +727,7 @@ async def test_overpressure_during_preparation(
         ),
     ).then_return(prep_location)
 
-    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(  # type: ignore[func-returns-value]
+    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(
         PipetteOverpressureError()
     )
     decoy.when(model_utils.generate_id()).then_return(error_id)

@@ -1,10 +1,8 @@
 from copy import deepcopy
 from dataclasses import asdict
-from typing import Any, Dict, List, Optional, TypeVar, Union, cast
-
+from typing import Dict, Any, List, cast, Union, Optional, TypeVar
 from typing_extensions import Final
-
-from .types import AxisDict, CurrentDict, RobotConfig
+from .types import RobotConfig, CurrentDict, AxisDict
 
 ROBOT_CONFIG_VERSION: Final = 4
 PLUNGER_CURRENT_LOW = 0.05
@@ -158,7 +156,7 @@ def _build_dict_with_default(
     if not isinstance(from_conf, dict):
         return default
     else:
-        return from_conf
+        return cast(DictType, from_conf)
 
 
 def _build_hw_versioned_current_dict(

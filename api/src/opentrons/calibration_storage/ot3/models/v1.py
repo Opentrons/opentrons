@@ -1,15 +1,16 @@
 import typing
-from datetime import datetime
 
-from pydantic import BaseModel, Field, PlainSerializer, field_validator
 from typing_extensions import Literal
+from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.types import OT3Mount
+from pydantic import field_validator, BaseModel, Field, PlainSerializer
+from datetime import datetime
 
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from opentrons.calibration_storage import types
-from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import Point
+from opentrons.calibration_storage import types
+
 
 DatetimeType = typing.Annotated[
     datetime,

@@ -12,7 +12,6 @@ import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
-const mockSetTargetWidth = vi.fn()
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/ui/steps/selectors')
@@ -28,6 +27,7 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
+const mockSetTargetWidth = vi.fn()
 
 const render = (props: ComponentProps<typeof DraggableSidebar>) => {
   return renderWithProviders(<DraggableSidebar {...props} />, {

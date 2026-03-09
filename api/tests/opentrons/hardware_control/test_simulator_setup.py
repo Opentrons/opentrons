@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Type, Union
+from typing import Type, Union, TYPE_CHECKING
 
 import pytest
 
-from opentrons_shared_data.robot.types import RobotType
-
 from opentrons.config import robot_configs
-from opentrons.hardware_control import API, simulator_setup
-from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
-from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
+from opentrons.hardware_control import simulator_setup, API
 from opentrons.types import Mount
+from opentrons_shared_data.robot.types import RobotType
+from opentrons.hardware_control.types import OT3Mount
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

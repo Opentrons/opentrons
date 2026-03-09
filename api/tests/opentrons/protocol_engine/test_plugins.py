@@ -1,13 +1,11 @@
 """Tests for ProtocolEngine plugins."""
-
-from datetime import datetime
-
 import pytest
 from decoy import Decoy
+from datetime import datetime
 
-from opentrons.protocol_engine.actions import Action, ActionDispatcher, PlayAction
-from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
+from opentrons.protocol_engine.actions import ActionDispatcher, Action, PlayAction
 
 
 @pytest.fixture

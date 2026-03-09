@@ -1,28 +1,25 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import reduce from 'lodash/reduce'
+import { reduce } from 'lodash'
 
 import {
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getIsLid,
+  getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  SYSTEM_LOCATION,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
-  getIsSlotAHopper,
+  getNearestParentInStack,
   getSlotInLocationStack,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
-
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
@@ -45,7 +42,6 @@ import type {
 import type {
   AdditionalEquipmentName,
   DeckSlot,
-  HopperLocationMapKey,
   LabwareEntities,
   LabwareEntity,
   RobotState,
@@ -72,7 +68,6 @@ interface SlotInformation {
   createdStackForSlot: string[]
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
-  isSlotAHopper: boolean
   createdModuleForSlot?: ModuleOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
@@ -84,7 +79,6 @@ interface SlotInformationProps {
   deckSetup: AllTemporalPropertiesForTimelineFrame
   slot: DeckSlot
   deckDef?: DeckDefinition
-  pendingCreationStateForHopper?: boolean
 }
 
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
@@ -93,12 +87,7 @@ const FOURTH_COLUMN_CONVERSION = { A4: 'A3', B4: 'B3', C4: 'C3', D4: 'D3' }
 export const getSlotInformation = (
   props: SlotInformationProps
 ): SlotInformation => {
-  const {
-    slot,
-    deckSetup,
-    deckDef,
-    pendingCreationStateForHopper = false,
-  } = props
+  const { slot, deckSetup, deckDef } = props
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
@@ -109,31 +98,18 @@ export const getSlotInformation = (
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
-  const isSlotAHopper = getIsSlotAHopper(slot)
-  const adjustedSlot = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? getPositionFromSlotId(
-          adjustedSlot as string,
-          deckDef,
-          ...(isSlotAHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
-        )
+      ? (getPositionFromSlotId(slot, deckDef) ?? null)
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
-    module => module.slot === adjustedSlot
+    module => module.slot === slot
   )
-  // we need to pend the creation of new labware on the hopper to prevent
-  // a white screen where we are looking for labware that don't yet exist
-  // in the protocol.
-  const fullStackFromLabwares = pendingCreationStateForHopper
-    ? []
-    : getFullStackFromLabwaresOnDeck(
-        Object.values(deckSetupLabware),
-        slot,
-        isSlotAHopper
-      )
+
+  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
+    Object.values(deckSetupLabware),
+    slot
+  )
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
       id =>
@@ -219,7 +195,6 @@ export const getSlotInformation = (
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
-    isSlotAHopper,
     matchingLabwareFor4thColumn: matchingLabware,
     createdStackForSlot:
       slot === 'offDeck'
@@ -308,12 +283,9 @@ export const useLabwareDropdownOptions = (
   const { t } = useTranslation(['shared', 'protocol_steps'])
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const { labware: deckSetupLabware, modules } = activeDeckSetup
+  const { labware: deckSetupLabware } = activeDeckSetup
   const nicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
-  const stackerModuleIds = Object.values(modules).filter(
-    module => module.type === FLEX_STACKER_MODULE_TYPE
-  )
   const labwareOptions = reduce(
     labwareEntities,
     (
@@ -325,7 +297,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
-      const isInaccessible = deckSlot === SYSTEM_LOCATION
+
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -334,9 +306,6 @@ export const useLabwareDropdownOptions = (
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const topId = fullStackFromLabwares[0]
-      const isOnStacker = stackerModuleIds.some(stackerModule =>
-        fullStackFromLabwares.includes(stackerModule.slot)
-      )
       const isLabwareLidCombo =
         (fullStackFromLabwares[1] === labwareId &&
           labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
@@ -366,8 +335,6 @@ export const useLabwareDropdownOptions = (
 
       //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
-        isInaccessible ||
-        (type === 'labware' && isOnStacker) ||
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
@@ -402,7 +369,13 @@ export const getUnoccupiedStackOptions = (args: {
   labwareEntities: LabwareEntities
   t: any
 }): Option[] => {
-  const { robotState, deckSetupLabware, labwareIdFromDropdown, t } = args
+  const {
+    robotState,
+    deckSetupLabware,
+    labwareIdFromDropdown,
+    labwareEntities,
+    t,
+  } = args
   if (deckSetupLabware[labwareIdFromDropdown] == null) {
     return []
   }
@@ -411,6 +384,10 @@ export const getUnoccupiedStackOptions = (args: {
   const labwareCompatibleParentLabware = def.compatibleParentLabware
 
   const { labware: labwareState } = robotState
+
+  const isLabwareToMoveUsedLid =
+    labwareState[labwareIdFromDropdown]?.sterility ===
+    TOUCHED_PIPETTABLE_LABWARE
 
   return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
@@ -446,6 +423,18 @@ export const getUnoccupiedStackOptions = (args: {
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )
+
+      const nearestParentInStack = getNearestParentInStack(fullStack)
+      const isNearestParentPipettableLabware =
+        nearestParentInStack != null &&
+        labwareEntities[nearestParentInStack] != null &&
+        getIsPipettableLabware(labwareEntities[nearestParentInStack].def)
+
+      const isNewLabwarePipettable =
+        labwareOnDeckDef != null && getIsPipettableLabware(labwareOnDeckDef)
+      const isSafeLidMove =
+        !(isLabwareToMoveUsedLid && isNewLabwarePipettable) &&
+        !isNearestParentPipettableLabware
       const isInTrash =
         slot === 'gripperWasteChute' ||
         MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot as AddressableAreaName) ||
@@ -455,7 +444,8 @@ export const getUnoccupiedStackOptions = (args: {
         isTopOfStack &&
         isCompatible &&
         isNotCurrentLabwareStack &&
-        !isInTrash
+        !isInTrash &&
+        isSafeLidMove
       ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,

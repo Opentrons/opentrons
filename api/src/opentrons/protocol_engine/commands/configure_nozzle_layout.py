@@ -1,25 +1,22 @@
 """Configure nozzle layout command request, result, and implementation models."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional, Type, Union
-
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from pydantic import BaseModel
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
-from ..errors.error_occurrence import ErrorOccurrence
-from ..types import (
-    AllNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-)
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .pipetting_common import (
     PipetteIdMixin,
 )
-from opentrons.protocol_engine.state.update_types import StateUpdate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
+from ..types import (
+    AllNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+)
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, TipHandler
@@ -104,9 +101,9 @@ class ConfigureNozzleLayout(
     params: ConfigureNozzleLayoutParams
     result: Optional[ConfigureNozzleLayoutResult] = None
 
-    _ImplementationCls: Type[ConfigureNozzleLayoutImplementation] = (
+    _ImplementationCls: Type[
         ConfigureNozzleLayoutImplementation
-    )
+    ] = ConfigureNozzleLayoutImplementation
 
 
 class ConfigureNozzleLayoutCreate(BaseCommandCreate[ConfigureNozzleLayoutParams]):

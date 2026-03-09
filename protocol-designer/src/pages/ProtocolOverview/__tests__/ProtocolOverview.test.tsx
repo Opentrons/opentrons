@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getEnableCameraSupport } from '/protocol-designer/feature-flags/selectors'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
@@ -20,9 +22,9 @@ import {
 } from '../../../step-forms/selectors'
 import { getDismissedHints } from '../../../tutorial/selectors'
 import { ProtocolOverview } from '../index'
+import { InputDeviceInfo } from '../InputDeviceInfo'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
-import { PeripheralsInfo } from '../PeripheralsInfo'
 import { ProtocolMetadata } from '../ProtocolMetadata'
 import { StartingDeck } from '../StartingDeck'
 import { StepsInfo } from '../StepsInfo'
@@ -42,7 +44,7 @@ vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
 vi.mock('../StepsInfo')
 vi.mock('../StartingDeck')
-vi.mock('../PeripheralsInfo')
+vi.mock('../InputDeviceInfo')
 
 const mockNavigate = vi.fn()
 
@@ -85,6 +87,7 @@ describe('ProtocolOverview', () => {
       description: 'mockDescription',
       created: 123,
     })
+    vi.mocked(getEnableCameraSupport).mockReturnValue(true)
     vi.mocked(MaterialsListModal).mockReturnValue(
       <div>mock MaterialsListModal</div>
     )
@@ -96,7 +99,7 @@ describe('ProtocolOverview', () => {
     vi.mocked(ProtocolMetadata).mockReturnValue(
       <div>mock ProtocolMetadata</div>
     )
-    vi.mocked(PeripheralsInfo).mockReturnValue(<div>mock Peripherals</div>)
+    vi.mocked(InputDeviceInfo).mockReturnValue(<div>mock InputDevices</div>)
     vi.mocked(StartingDeck).mockReturnValue(<div>mock StartingDeck</div>)
   })
 
@@ -116,8 +119,8 @@ describe('ProtocolOverview', () => {
     //   liquids
     screen.getByText('mock LiquidDefinitions')
 
-    //   peripherals
-    screen.getByText('mock Peripherals')
+    //   input devices
+    screen.getByText('mock InputDevices')
 
     //  steps
     screen.getByText('mock StepsInfo')

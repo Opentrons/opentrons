@@ -3,24 +3,21 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAddedMissingThermocyclerFixtures,
-  getCutoutFixtureIdsForModuleModel,
+  FLEX_SIMPLEST_DECK_CONFIG,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
-  getEmptyDeckConfiguration,
-  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getDeckConfiguration } from '/protocol-designer/step-forms/selectors'
 
 import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
-import { mergeToComboFixtures } from './utils'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
-  AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
   CutoutId,
@@ -48,18 +45,10 @@ export function HardwareConfigurator(
   const dispatch = useDispatch()
   const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const emptyDeckConfiguration = getEmptyDeckConfiguration(deckDef)
-
-  const deckConfigWithAA =
-    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      emptyDeckConfiguration
-    )
-  const simpleDeckConfig: DeckConfiguration = emptyDeckConfiguration.filter(
+  const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
-        module =>
-          getCutoutIdFromAddressableArea(module.slot as string, deckDef) ===
-          cutoutId
+        module => module.cutoutId === cutoutId
       )
       //  since we are adding cutoutA1 in moduleConfig if
       //  there is a TC
@@ -73,25 +62,28 @@ export function HardwareConfigurator(
       return !hasModule && !hasFixture && !hasTCAndCutoutA1
     }
   )
-
-  const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
-    (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
-      const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
-      const cutoutId = getCutoutIdFromAddressableArea(module.slot, deckDef)!
-      const matchingDeckConfigEntry = deckConfigWithAA.find(
-        config =>
-          config.cutoutId === cutoutId &&
-          config.cutoutFixtureId === fixtureModule
-      )
-      const defaultModuleConfig: CutoutConfigMap = {
-        cutoutId,
-        cutoutFixtureId: fixtureModule,
-        addressableAreaId:
-          matchingDeckConfigEntry?.addressableAreaId ??
-          (module.slot as AddressableAreaNamesWithFakes),
+  const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
+    (module: FormModule | ModuleExtended): DeckConfiguration => {
+      const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+      const defaultModuleConfig: CutoutConfig = {
+        cutoutId: getCutoutIdFromAddressableArea(
+          module.slot,
+          deckDef
+        ) as CutoutId,
+        cutoutFixtureId: hasThermocycler
+          ? THERMOCYCLER_V2_FRONT_FIXTURE
+          : 'cutoutFixtureId' in module
+            ? (module.cutoutFixtureId ?? 'singleStandardSlot')
+            : 'singleStandardSlot',
       }
-      // getAddedMissingThermocyclerFixtures returns input array + any missing TC fixtures
-      return getAddedMissingThermocyclerFixtures([defaultModuleConfig], deckDef)
+      const thermocyclerA1Config: CutoutConfig = {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+      }
+      return [
+        defaultModuleConfig,
+        ...(hasThermocycler ? [thermocyclerA1Config] : []),
+      ]
     }
   )
   const additionalEquipmentConfig: DeckConfiguration = Object.values(
@@ -103,33 +95,18 @@ export function HardwareConfigurator(
     })
   )
 
-  // Merge modules and fixtures into combo fixtures where applicable
-  const {
-    comboFixtures,
-    remainingModuleConfig,
-    remainingAdditionalEquipmentConfig,
-  } = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
-
-  const updatedDeckConfig = [
-    ...simpleDeckConfig,
-    ...remainingModuleConfig,
-    ...remainingAdditionalEquipmentConfig,
-    ...comboFixtures,
-  ]
-
   //  initiate deck config
-  useEffect(
-    () => {
-      dispatch(
-        editDeckConfiguration({
-          deckConfig: updatedDeckConfig as DeckConfiguration,
-        })
-      )
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    dispatch(
+      editDeckConfiguration({
+        deckConfig: [
+          ...simpleDeckConfig,
+          ...moduleConfig,
+          ...additionalEquipmentConfig,
+        ],
+      })
+    )
+  }, [])
   return (
     <HardwareConfiguratorContainer
       modules={modules}

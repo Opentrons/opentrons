@@ -1,27 +1,26 @@
 """Move to coordinates command request, result, and implementation models."""
-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Type
-
 from pydantic import Field
+from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
+
 from ..types import DeckPoint
+from .pipetting_common import PipetteIdMixin
+from .movement_common import (
+    MovementMixin,
+    DestinationPositionResult,
+    move_to_coordinates,
+    StallOrCollisionError,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
+    DefinedErrorData,
 )
-from .movement_common import (
-    DestinationPositionResult,
-    MovementMixin,
-    StallOrCollisionError,
-    move_to_coordinates,
-)
-from .pipetting_common import PipetteIdMixin
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -94,9 +93,9 @@ class MoveToCoordinates(
     params: MoveToCoordinatesParams
     result: Optional[MoveToCoordinatesResult] = None
 
-    _ImplementationCls: Type[MoveToCoordinatesImplementation] = (
+    _ImplementationCls: Type[
         MoveToCoordinatesImplementation
-    )
+    ] = MoveToCoordinatesImplementation
 
 
 class MoveToCoordinatesCreate(BaseCommandCreate[MoveToCoordinatesParams]):

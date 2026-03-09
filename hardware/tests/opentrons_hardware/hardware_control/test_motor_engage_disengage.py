@@ -1,5 +1,4 @@
 """Tests for current settings."""
-
 import pytest
 from mock import AsyncMock
 
@@ -8,10 +7,10 @@ from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
 )
 from opentrons_hardware.hardware_control.motor_enable_disable import (
-    set_disable_motor,
-    set_disable_tip_motor,
     set_enable_motor,
+    set_disable_motor,
     set_enable_tip_motor,
+    set_disable_tip_motor,
 )
 
 

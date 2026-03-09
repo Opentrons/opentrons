@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -33,13 +33,16 @@ import { Dispense } from './Dispense'
 import { Overview } from './Overview'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { initializeSummaryState } from './utils'
+import {
+  createQuickTransferFile,
+  getInitialSummaryState,
+  retrieveLiquidClassValues,
+} from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
-import type { InitialSummaryStateProps } from './utils/getInitialSummaryState'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
@@ -57,6 +60,7 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
+  const enableExportJSON = useFeatureFlag('quickTransferExportJSON')
   const enableProtocolContentsLog = useFeatureFlag(
     'quickTransferProtocolContentsLog'
   )
@@ -66,10 +70,15 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
+  const initialSummaryState = getInitialSummaryState({
+    // @ts-expect-error TODO figure out how to make this type non-null as we know
+    // none of these values will be undefined
+    state: wizardFlowState,
+    deckConfig,
+  })
   const [state, dispatch] = useReducer(
     quickTransferSummaryReducer,
-    { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
-    initializeSummaryState
+    initialSummaryState
   )
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
@@ -86,6 +95,19 @@ export function SummaryAndSettings(
     host
   )
 
+  useEffect(() => {
+    if (!state.liquidClassValuesInitialized) {
+      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+      dispatch({
+        type: 'SET_LIQUID_CLASS_VALUES',
+        liquidClassValues: {
+          ...liquidClassValues,
+          liquidClassValuesInitialized: true,
+        },
+      })
+    }
+  })
+
   const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
@@ -100,12 +122,19 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = createQuickTransferPythonFile(
-      state,
-      deckConfig,
-      protocolName,
-      enableProtocolContentsLog
-    )
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -122,12 +151,19 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = createQuickTransferPythonFile(
-      state,
-      deckConfig,
-      undefined,
-      enableProtocolContentsLog
-    )
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],

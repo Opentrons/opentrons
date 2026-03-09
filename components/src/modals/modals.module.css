@@ -1,15 +1,21 @@
 /* common styling for modals */
-@import url('../index.module.css');
+@import '../index.module.css';
 
 .modal {
   position: fixed;
   z-index: 1;
 
   /* from legacy --absolute-fill */
+  top: 0;
 
   /* from legacy --absolute-fill */
+  right: 0;
 
   /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
 
   /* from legacy --absolute-fill */
   display: flex;
@@ -24,19 +30,22 @@
   /* from legacy --center-children */
   justify-content: center;
   padding: 4rem;
-
-  /* from legacy --absolute-fill */
-  inset: 0;
 }
 
 .modal_page {
   position: absolute;
 
   /* from legacy --absolute-fill */
+  top: 0;
 
   /* from legacy --absolute-fill */
+  right: 0;
 
   /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
 
   /* from legacy --absolute-fill */
 
@@ -51,27 +60,27 @@
 
   /* from legacy --flex-start */
   justify-content: flex-start;
-  padding: 4.5rem 3rem 1rem;
-
-  /* from legacy --absolute-fill */
-  inset: 0;
+  padding: 4.5rem 3rem 1rem 3rem;
 }
 
 .overlay {
   position: absolute;
 
   /* from legacy --absolute-fill */
+  top: 0;
+
+  /* from legacy --absolute-fill */
+  right: 0;
+
+  /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
 
   /* from legacy --absolute-fill */
 
-  /* from legacy --absolute-fill */
-
-  /* from legacy --absolute-fill */
-
-  background-color: rgb(0 0 0 / 90%);
-
-  /* from legacy --absolute-fill */
-  inset: 0;
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .title_bar {
@@ -210,7 +219,7 @@
 }
 
 .alert_modal_overlay {
-  background-color: rgb(115 115 115 / 90%);
+  background-color: rgba(115, 115, 115, 0.9);
 }
 
 .alert_modal_contents {

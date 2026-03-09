@@ -1,5 +1,4 @@
 """Tests for the analysis memory cache."""
-
 import pytest
 
 from robot_server.protocols.analysis_memcache import MemoryCache

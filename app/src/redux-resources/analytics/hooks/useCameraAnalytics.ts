@@ -92,16 +92,14 @@ export function useCameraAnalytics({
   }
 
   const reportImageCaptureUsage = (data: CaptureParams): void => {
-    if (data.amount > 0) {
-      doTrackEvent({
-        name: ANALYTICS_IMAGE_CAPTURE_KIND,
-        properties: {
-          robotType,
-          transactionId: data.transactionId,
-          amount: data.amount,
-        },
-      })
-    }
+    doTrackEvent({
+      name: ANALYTICS_IMAGE_CAPTURE_KIND,
+      properties: {
+        robotType,
+        transactionId: data.transactionId,
+        amount: data.amount,
+      },
+    })
   }
 
   const reportLiveFeedUsage = (data: LiveFeedParams): void => {

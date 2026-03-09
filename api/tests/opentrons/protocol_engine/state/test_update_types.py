@@ -1,5 +1,4 @@
 """Unit tests for the utilities in `update_types`."""
-
 from opentrons.protocol_engine import DeckSlotLocation, ModuleLocation
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import DeckSlotName

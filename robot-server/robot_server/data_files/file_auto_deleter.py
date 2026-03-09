@@ -1,5 +1,4 @@
 """Auto-delete old user data files to make room for new ones."""
-
 from logging import getLogger
 from typing import Set
 

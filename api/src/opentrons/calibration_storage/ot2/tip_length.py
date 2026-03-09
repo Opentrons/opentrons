@@ -1,19 +1,19 @@
 import json
-import logging
 import typing
+import logging
+from pydantic import ValidationError
 from dataclasses import asdict
 
-from pydantic import ValidationError
+from opentrons import config
 
+from .. import file_operators as io, helpers, types as local_types
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from .. import file_operators as io
-from .. import helpers
-from .. import types as local_types
-from .models import v1
-from opentrons import config
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
+
+
+from .models import v1
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.types import LabwareDefinition2

@@ -1,7 +1,6 @@
-from enum import StrEnum
-from string import Template
 from typing import Dict
-
+from string import Template
+from enum import Enum
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -11,7 +10,7 @@ class SetCurrentGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     # Using this list to output string in specific order
     EXPECTED_ARGS = ["X", "Y", "Z", "A", "B", "C"]
 
-    class ValDefinedMessage(StrEnum):
+    class ValDefinedMessage(str, Enum):
         Y = "Y-Axis Motor: $current"
         X = "X-Axis Motor: $current"
         Z = "Z-Axis Motor: $current"

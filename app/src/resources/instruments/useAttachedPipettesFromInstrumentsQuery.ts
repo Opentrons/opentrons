@@ -5,6 +5,7 @@ import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
+import type { PipetteModel } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
 
 export type AttachedPipettesFromInstrumentsQuery = {
@@ -22,9 +23,11 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
   const rightPipette = okPipettes.find(({ mount }) => mount === RIGHT) ?? null
 
   const leftDisplayName =
-    usePipetteModelSpecs(leftPipette?.instrumentModel!)?.displayName ?? ''
+    usePipetteModelSpecs(leftPipette?.instrumentModel as PipetteModel)
+      ?.displayName ?? ''
   const rightDisplayName =
-    usePipetteModelSpecs(rightPipette?.instrumentModel!)?.displayName ?? ''
+    usePipetteModelSpecs(rightPipette?.instrumentModel as PipetteModel)
+      ?.displayName ?? ''
 
   return {
     [LEFT]:

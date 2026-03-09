@@ -1,7 +1,6 @@
 """Useful types for testing."""
 
 from dataclasses import dataclass
-
 from .stackup_spec import StackupSpec
 
 

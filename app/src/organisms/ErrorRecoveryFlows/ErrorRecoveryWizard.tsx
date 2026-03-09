@@ -35,9 +35,6 @@ import {
   StackerStalledSkip,
   StackerStalledStoreRetry,
   StackerStalledStoreSkip,
-  VacuumCarboyFullRetry,
-  VacuumCarboyFullSkip,
-  VacuumPressureNotReachedRetry,
 } from './RecoveryOptions'
 import { ShuttleFullRetry } from './RecoveryOptions/ShuttleFullRetry'
 import { ShuttleFullSkip } from './RecoveryOptions/ShuttleFullSkip'
@@ -294,15 +291,6 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildStackerStalledStoreSkip = (): JSX.Element => {
     return <StackerStalledStoreSkip {...props} />
   }
-  const buildVacuumCarboyFullRetry = (): JSX.Element => {
-    return <VacuumCarboyFullRetry {...props} />
-  }
-  const buildVacuumCarboyFullSkip = (): JSX.Element => {
-    return <VacuumCarboyFullSkip {...props} />
-  }
-  const buildVacuumPressureNotReachedRetry = (): JSX.Element => {
-    return <VacuumPressureNotReachedRetry {...props} />
-  }
 
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
@@ -376,12 +364,6 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManuallyRouteToDoorOpen()
     case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
       return buildHomeAndRetry()
-    case RECOVERY_MAP.VACUUM_CARBOY_FULL_RETRY.ROUTE:
-      return buildVacuumCarboyFullRetry()
-    case RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE:
-      return buildVacuumCarboyFullSkip()
-    case RECOVERY_MAP.VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE:
-      return buildVacuumPressureNotReachedRetry()
     default:
       console.error('route: ' + props.recoveryMap.route + 'was not found')
       return buildSelectRecoveryOption()

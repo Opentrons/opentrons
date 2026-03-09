@@ -1,28 +1,25 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
-
-import asyncio
 import functools
-import inspect
-import logging
 import threading
+import logging
+import asyncio
+import inspect
 import weakref
 from typing import (
     Any,
-    AsyncGenerator,
     Awaitable,
     Callable,
-    Coroutine,
     Generic,
-    Mapping,
     Optional,
-    ParamSpec,
-    Sequence,
-    Type,
     TypeVar,
-    Union,
     cast,
+    Sequence,
+    Mapping,
+    AsyncGenerator,
+    Union,
+    Type,
+    ParamSpec,
 )
-
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 from .protocols import (
@@ -43,7 +40,7 @@ P = ParamSpec("P")
 
 async def call_coroutine_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    coro: Callable[P, Coroutine[Any, Any, WrappedReturn]],
+    coro: Callable[P, Awaitable[WrappedReturn]],
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> WrappedReturn:
@@ -61,6 +58,7 @@ async def execute_asyncgen_threadsafe(
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> AsyncGenerator[WrappedYield, None]:
+
     # This function should bridge an async generator function between two asyncio
     # loops running in different threads. There are several stages to this because
     # there are several stages to generator execution.
@@ -216,7 +214,7 @@ class ThreadManager(Generic[WrappedObj]):
 
     @staticmethod
     def nonblocking_builder(
-        builder: Callable[Builder, Awaitable[Built]],
+        builder: Callable[Builder, Awaitable[Built]]
     ) -> Callable[Builder, Awaitable[Built]]:
         """Wrap an instance of a builder function to make initializes that use it nonblocking.
 
@@ -268,6 +266,14 @@ class ThreadManager(Generic[WrappedObj]):
         self._cached_modules: weakref.WeakKeyDictionary[
             AbstractModule, CallBridger[AbstractModule]
         ] = weakref.WeakKeyDictionary()
+        # TODO: remove this if we switch to python 3.8
+        # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
+        # On windows, the event loop and system interface is different and
+        # this won't work.
+        try:
+            asyncio.get_child_watcher()
+        except NotImplementedError:
+            pass
         blocking = not getattr(builder, "nonblocking", False)
         target = object.__getattribute__(self, "_build_and_start_loop")
         thread = threading.Thread(

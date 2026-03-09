@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
-  DISPLAY_GRID,
   Flex,
   ListTable,
   RESPONSIVENESS,
@@ -22,13 +21,16 @@ import { OffsetTableHeaders } from './OffsetTableHeaders'
 
 import type { TFunction } from 'i18next'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import type { SelectedLwOverview } from '/app/redux/protocol-runs'
 
 export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps
 ): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
-  const { uri } = useSelector(selectSelectedLwOverview(props.runId))!
+  const { uri } = useSelector(
+    selectSelectedLwOverview(props.runId)
+  ) as SelectedLwOverview
   const sortedDetailsBySlot = useSelector(
     selectSortedLSOffsetDetailsWithCopy(
       props.runId,
@@ -45,7 +47,7 @@ export function LocationSpecificOffsetsContainer(
       >
         {t('applied_location_offsets')}
       </StyledText>
-      <Flex flexDirection={DIRECTION_COLUMN} display={DISPLAY_GRID}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
         <OffsetTableHeaders />
         <ListTable>
           {sortedDetailsBySlot.map(offset => {

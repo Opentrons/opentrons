@@ -34,13 +34,10 @@ export function RobotSettingsModuleCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('module_calibration')}
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">
+      <LegacyStyledText as="p">
         {t('module_calibration_description')}
       </LegacyStyledText>
       {attachedModules.length > 0 ? (
@@ -53,7 +50,7 @@ export function RobotSettingsModuleCalibration({
           isRobotBusy={isRobotBusy}
         />
       ) : (
-        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
           {t('no_modules_attached')}
         </LegacyStyledText>
       )}

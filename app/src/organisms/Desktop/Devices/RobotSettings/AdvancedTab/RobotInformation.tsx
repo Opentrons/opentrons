@@ -56,7 +56,7 @@ export function RobotInformation({
           <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('robot_serial_number')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {serialNumber != null
               ? serialNumber
               : t('robot_settings_advanced_unknown')}
@@ -66,7 +66,7 @@ export function RobotInformation({
           <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('firmware_version')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {firmwareVersion != null
               ? firmwareVersion
               : t('robot_settings_advanced_unknown')}
@@ -76,9 +76,7 @@ export function RobotInformation({
           <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
             {t('supported_protocol_api_versions')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
-            {formatApiVersionMinMax()}
-          </LegacyStyledText>
+          <LegacyStyledText as="p">{formatApiVersionMinMax()}</LegacyStyledText>
         </Flex>
       </Flex>
     </Box>

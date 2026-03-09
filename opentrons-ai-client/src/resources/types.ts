@@ -149,8 +149,3 @@ export interface PromptData {
 }
 
 export type FeatureFlags = Flags
-
-export interface ApiErrorResponse {
-  message: string
-  error_type: string
-}

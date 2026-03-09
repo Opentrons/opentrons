@@ -40,9 +40,6 @@ import {
   StackerStalledSkip,
   StackerStalledStoreRetry,
   StackerStalledStoreSkip,
-  VacuumCarboyFullRetry,
-  VacuumCarboyFullSkip,
-  VacuumPressureNotReachedRetry,
 } from '../RecoveryOptions'
 import {
   ErrorDetailsModal,
@@ -219,9 +216,6 @@ describe('ErrorRecoveryContent', () => {
     STACKER_STALLED_STORE_RETRY,
     STACKER_SHUTTLE_EMPTY_STORE_SKIP,
     STACKER_SHUTTLE_EMPTY_STORE_RETRY,
-    VACUUM_CARBOY_FULL_SKIP,
-    VACUUM_CARBOY_FULL_RETRY,
-    VACUUM_PRESSURE_NOT_REACHED_RETRY,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -295,15 +289,6 @@ describe('ErrorRecoveryContent', () => {
     )
     vi.mocked(StackerShuttleEmptyStoreRetry).mockReturnValue(
       <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_RETRY</div>
-    )
-    vi.mocked(VacuumCarboyFullRetry).mockReturnValue(
-      <div>MOCK_VACUUM_CARBOY_FULL_RETRY</div>
-    )
-    vi.mocked(VacuumCarboyFullSkip).mockReturnValue(
-      <div>MOCK_VACUUM_CARBOY_FULL_SKIP</div>
-    )
-    vi.mocked(VacuumPressureNotReachedRetry).mockReturnValue(
-      <div>MOCK_VACUUM_PRESSURE_NOT_REACHED_RETRY</div>
     )
   })
 
@@ -753,36 +738,5 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_HOME_AND_RETRY')
-  })
-
-  it(`returns appropriate view when the route is ${VACUUM_CARBOY_FULL_RETRY.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: VACUUM_CARBOY_FULL_RETRY.ROUTE,
-      },
-    }
-    renderRecoveryContent(props)
-  })
-
-  it(`returns appropriate view when the route is ${VACUUM_CARBOY_FULL_SKIP.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: VACUUM_CARBOY_FULL_SKIP.ROUTE,
-      },
-    }
-  })
-
-  it(`returns appropriate view when the route is ${VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE}`, () => {
-    props = {
-      ...props,
-      recoveryMap: {
-        ...props.recoveryMap,
-        route: VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE,
-      },
-    }
   })
 })

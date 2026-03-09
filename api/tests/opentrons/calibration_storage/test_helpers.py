@@ -1,5 +1,4 @@
 import json
-
 import pytest
 
 from opentrons.calibration_storage import helpers, types

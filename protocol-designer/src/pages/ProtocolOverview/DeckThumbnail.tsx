@@ -122,7 +122,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       backgroundColor={
         robotType === OT2_ROBOT_TYPE ? COLORS.white : COLORS.grey10
       }
-      paddingY={robotType === FLEX_ROBOT_TYPE ? SPACING.spacing24 : undefined}
+      paddingY={robotType === FLEX_ROBOT_TYPE && SPACING.spacing24}
       borderRadius={BORDERS.borderRadius8}
     >
       <RobotCoordinateSpaceWithRef
@@ -165,7 +165,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                       showExpansion={cutoutId === 'cutoutA1'}
                       fixtureBaseColor={lightFill}
                       slotClipColor={darkFill}
-                      showSlotClips={false}
                     />
                   ) : null
                 })}
@@ -176,7 +175,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     deckDefinition={deckDef}
                     fixtureBaseColor={lightFill}
                     slotClipColor={darkFill}
-                    showSlotClips={false}
                   />
                 ))}
                 {trash != null
@@ -188,7 +186,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                             deckDefinition={deckDef}
                             slotClipColor={COLORS.transparent}
                             fixtureBaseColor={lightFill}
-                            showSlotClips={false}
                           />
                           <FlexTrash
                             robotType={robotType}
@@ -215,7 +212,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     deckDefinition={deckDef}
                     fixtureBaseColor={lightFill}
                     slotClipColor={darkFill}
-                    showSlotClips={false}
                   />
                 ))}
               </>

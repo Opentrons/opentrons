@@ -15,6 +15,7 @@ vi.mock('../DeckThumbnail')
 vi.mock('../OffDeckThumbnail')
 vi.mock('../../../components/organisms')
 vi.mock('../../../step-forms/selectors')
+
 vi.mock('../DeckThumbnail', () => ({
   DeckThumbnail: vi.fn(() => <div>mock DeckThumbnail</div>),
 }))

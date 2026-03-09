@@ -1,6 +1,8 @@
 """Default deck configurations."""
 
+
 from . import models
+
 
 _for_flex = models.DeckConfigurationRequest.model_construct(
     cutoutFixtures=[

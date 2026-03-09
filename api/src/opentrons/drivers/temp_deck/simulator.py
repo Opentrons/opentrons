@@ -1,8 +1,8 @@
-from typing import Dict, Optional
+from typing import Optional, Dict
 
-from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver
-from opentrons.drivers.types import Temperature
 from opentrons.util.async_helpers import ensure_yield
+from opentrons.drivers.types import Temperature
+from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver
 
 TEMP_DECK_MODELS = {
     "temperatureModuleV1": "temp_deck_v1.1",

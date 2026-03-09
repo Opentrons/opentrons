@@ -1,33 +1,34 @@
 import asyncio
 import logging
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Mapping, List, Tuple
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader import (
-    AbsorbanceReaderDriver,
     AbstractAbsorbanceReaderDriver,
+    AbsorbanceReaderDriver,
     SimulatingDriver,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
-    ABSMeasurementConfig,
-    ABSMeasurementMode,
-    AbsorbanceReaderDeviceState,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
+    AbsorbanceReaderDeviceState,
+    ABSMeasurementMode,
+    ABSMeasurementConfig,
 )
+
 from opentrons.hardware_control.execution_manager import ExecutionManager
+from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.modules import mod_abc
-from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 from opentrons.hardware_control.modules.types import (
-    AbsorbanceReaderData,
-    AbsorbanceReaderStatus,
-    LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     ModuleType,
+    AbsorbanceReaderStatus,
+    LiveData,
+    AbsorbanceReaderData,
     UploadFunction,
 )
-from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 
 log = logging.getLogger(__name__)
 
@@ -347,9 +348,9 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     ) -> None:
         """Set the Absorbance Reader's measurement mode and active wavelength."""
         if mode == ABSMeasurementMode.SINGLE:
-            assert len(wavelengths) == 1, (
-                "Cannot initialize single read mode with more than 1 wavelength."
-            )
+            assert (
+                len(wavelengths) == 1
+            ), "Cannot initialize single read mode with more than 1 wavelength."
 
         await self._driver.initialize_measurement(wavelengths, mode)
         self._measurement_config = ABSMeasurementConfig(

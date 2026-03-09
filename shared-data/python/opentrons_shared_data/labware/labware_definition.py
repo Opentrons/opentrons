@@ -6,34 +6,33 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from functools import cached_property
-from math import asin, sqrt
+from math import sqrt, asin
 from typing import Final
-
 from numpy import pi, trapz
+from functools import cached_property
+
 from pydantic import (
-    BaseModel,
     ConfigDict,
+    BaseModel,
     Discriminator,
     Field,
-    StrictFloat,
     StrictInt,
+    StrictFloat,
     TypeAdapter,
 )
 from typing_extensions import Annotated, Literal
 
-from ..util import StrEnum
+from .types import LocatingFeatures
 from .constants import (
-    Circular,
     Conical,
     Cuboidal,
-    Rectangular,
     RoundedCuboid,
-    Spherical,
     SquaredCone,
+    Spherical,
     WellShape,
+    Circular,
+    Rectangular,
 )
-from .types import LocatingFeatures
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
@@ -94,7 +93,7 @@ class BrandData(BaseModel):
     links: list[str] | None = None
 
 
-class DisplayCategory(StrEnum):
+class DisplayCategory(str, Enum):
     tipRack = "tipRack"
     tubeRack = "tubeRack"
     reservoir = "reservoir"
@@ -107,7 +106,7 @@ class DisplayCategory(StrEnum):
     system = "system"
 
 
-class LabwareRole(StrEnum):
+class LabwareRole(str, Enum):
     labware = "labware"
     fixture = "fixture"
     adapter = "adapter"
@@ -588,9 +587,9 @@ class LabwareDefinition2(BaseModel):
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry | UserDefinedVolumes] | None = (
-        None
-    )
+    innerLabwareGeometry: dict[
+        str, InnerWellGeometry | UserDefinedVolumes
+    ] | None = None
 
 
 class LabwareDefinition3(BaseModel):

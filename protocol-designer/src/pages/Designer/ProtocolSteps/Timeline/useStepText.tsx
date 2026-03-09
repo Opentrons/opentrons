@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '/protocol-designer/constants'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 
 import { formatTime } from '../../utils'
 
@@ -15,6 +17,9 @@ export function useStepText(step: FormData): {
   subtext: string | null
 } {
   const { i18n, t } = useTranslation(['application', 'protocol_steps'])
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
 
   // add empty check to avoid causing undefined issue when calling titleCase
   const text =
@@ -23,7 +28,8 @@ export function useStepText(step: FormData): {
       : t(`stepType.${step.stepType}`)
 
   let subtext = null
-  if (step.stepType === 'pause') {
+  if (enableConcurrentModuleActions && step.stepType === 'pause') {
+    // todo(mm, 2025-09-10): Improve FormData typing to make this type-safe.
     if (step.pauseAction === PAUSE_UNTIL_RESUME) {
       subtext = t('protocol_steps:pause.untilResume')
     } else if (step.pauseAction === PAUSE_UNTIL_TEMP) {

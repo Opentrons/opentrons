@@ -15,7 +15,8 @@ export interface SetStatusBarCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface SetStatusBarRunTimeCommand
-  extends CommonCommandRunTimeInfo, SetStatusBarCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    SetStatusBarCreateCommand {
   result?: any
 }
 
@@ -29,7 +30,8 @@ export interface SetRailLightsCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface SetRailLightsRunTimeCommand
-  extends CommonCommandRunTimeInfo, SetRailLightsCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    SetRailLightsCreateCommand {
   result?: any
 }
 

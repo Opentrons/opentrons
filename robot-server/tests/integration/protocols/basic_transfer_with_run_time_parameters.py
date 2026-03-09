@@ -1,4 +1,4 @@
-from opentrons.protocol_api import ParameterContext, ProtocolContext
+from opentrons.protocol_api import ProtocolContext, ParameterContext
 
 metadata = {
     "apiLevel": "2.20",

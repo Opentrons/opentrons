@@ -1,9 +1,7 @@
 """Tests for runs publisher."""
-
+import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, Mock
-
-import pytest
 
 from opentrons.protocol_engine import CommandPointer, EngineStatus
 

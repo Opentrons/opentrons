@@ -3,38 +3,35 @@ from __future__ import annotations
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import Optional, Dict, List, Union
 
-from typing_extensions import Literal, TypedDict
+from typing_extensions import TypedDict, Literal
 
-from opentrons_shared_data.gripper import (
-    GripperDefinition,
-    GripperModel,
-)
-from opentrons_shared_data.pipette.pipette_definition import (
-    AvailableSensorDefinition,
-    PipetteBoundingBoxOffsetDefinition,
-    PipetteConfigurations,
-    PipetteLiquidPropertiesDefinition,
-    SupportedTipsDefinition,
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
 )
 from opentrons_shared_data.pipette.types import (
-    ChannelCount,
-    LiquidClasses,
     PipetteModel,
     PipetteName,
+    ChannelCount,
     PipetteTipType,
+    LiquidClasses,
+)
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteConfigurations,
+    SupportedTipsDefinition,
+    PipetteBoundingBoxOffsetDefinition,
+    AvailableSensorDefinition,
+)
+from opentrons_shared_data.gripper import (
+    GripperModel,
+    GripperDefinition,
 )
 
 from opentrons.drivers.types import MoveSplit
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Mount
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-        GripperCalibrationOffset,
-    )
+from opentrons.hardware_control.types import GripperJawState
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
 class InstrumentSpec(TypedDict):
@@ -109,9 +106,6 @@ class PipetteDict(InstrumentDict):
     shaft_ul_per_mm: float
     available_sensors: AvailableSensorDefinition
     volume_mode: LiquidClasses  # LiquidClasses refer to volume mode in this context
-    available_volume_modes: Dict[
-        LiquidClasses, PipetteLiquidPropertiesDefinition
-    ]  # Ditto
 
 
 class PipetteStateDict(TypedDict):

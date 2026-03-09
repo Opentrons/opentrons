@@ -1,20 +1,15 @@
 """A collection of motions that define a single move."""
-
+from typing import List, Dict, Iterable, Union, Optional
 from dataclasses import dataclass
-from enum import Enum, unique
-from logging import getLogger
-from typing import Dict, Iterable, List, Optional, Union
-
 import numpy as np
-
-from opentrons_hardware.firmware_bindings.constants import (
-    MoveStopCondition as MoveStopCondition,
-)
+from logging import getLogger
+from enum import Enum, unique
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteTipActionType,
-    SensorId,
+    MoveStopCondition as MoveStopCondition,
     SensorType,
+    SensorId,
 )
 
 LOG = getLogger(__name__)
@@ -148,15 +143,9 @@ def create_step(
     """Create a move from a block.
 
     Args:
-        distance: Diplacement vector.
-        velocity: Velocity vector.
-        acceleration: Acceleration vector.
-        duration: Time for the move
-        present_nodes: Nodes to expect to be present and generate moves for.
-        stop_condition: Any reason to stop the move.
-        sensor_type_pass: Sensor type.
-        sensor_id_pass: Sensor id.
-        sensor_binding_flags: Flags for the sensor.
+        origin: Start position.
+        target: Target position.
+        speed: the speed
 
     Returns:
         A Move

@@ -32,10 +32,7 @@ export function ErrorContent({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isSingleError
           ? t('error_info', {
               errorType: errors[0].errorType,
@@ -53,7 +50,7 @@ export function ErrorContent({
         {' '}
         {errors.map((error, index) => (
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             textAlign={TYPOGRAPHY.textAlignLeft}
             key={index}
           >

@@ -1,6 +1,5 @@
 ---
 title: "HEPA/UV Module: Unboxing and Installation"
-description: "Unbox, attach to Flex with clearance requirements, and connect power."
 ---
 
 Ask a lab partner for help with unboxing, lifting, and attaching the module. For tools, you will need scissors and the 2.5 mm hex screwdriver that comes in the Module User Kit.

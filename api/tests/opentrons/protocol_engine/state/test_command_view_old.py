@@ -5,46 +5,48 @@ Try to add new tests to test_command_state.py, where they can be tested together
 treating CommandState as a private implementation detail.
 """
 
-from contextlib import AbstractContextManager
-from contextlib import nullcontext as does_not_raise
+import pytest
+from contextlib import nullcontext as does_not_raise, AbstractContextManager
 from datetime import datetime
 from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
-import pytest
-
-from opentrons_shared_data.errors.codes import ErrorCodes
-
-from .command_fixtures import (
-    create_failed_command,
-    create_queued_command,
-    create_running_command,
-    create_succeeded_command,
-)
-from opentrons.protocol_engine import EngineStatus, errors
-from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
+    PlayAction,
     PauseAction,
     PauseSource,
-    PlayAction,
-    QueueCommandAction,
     StopAction,
+    QueueCommandAction,
 )
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolCommandFailedError
-from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
 from opentrons.protocol_engine.state.commands import (
-    CommandPointer,
-    CommandSlice,
-    CommandState,
-    CommandView,
-    QueueStatus,
-    RunResult,
     # todo(mm, 2024-10-24): Avoid testing internal implementation details like
     # _RecoveryTargetInfo. See note above about porting to test_command_state.py.
     _RecoveryTargetInfo,
+    CommandState,
+    CommandView,
+    CommandSlice,
+    CommandPointer,
+    RunResult,
+    QueueStatus,
 )
+
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
+
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
+
+from opentrons_shared_data.errors.codes import ErrorCodes
+
 from opentrons.protocol_engine.state.update_types import StateUpdate
+
+from .command_fixtures import (
+    create_queued_command,
+    create_running_command,
+    create_failed_command,
+    create_succeeded_command,
+)
 
 
 def _placeholder_error_recovery_policy(*args: object, **kwargs: object) -> Any:
@@ -121,7 +123,6 @@ def get_command_view(  # noqa: C901
         is_stopping_because_of_async_error=False,
         has_entered_error_recovery=has_entered_error_recovery,
         error_recovery_policy=_placeholder_error_recovery_policy,
-        command_annotations={},
     )
 
     return CommandView(state=state)

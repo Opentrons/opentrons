@@ -47,12 +47,12 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
           marginBottom={SPACING.spacing24}
         />
         {heading != null ? (
-          <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing8}>
+          <LegacyStyledText as="h1" marginBottom={SPACING.spacing8}>
             {heading}
           </LegacyStyledText>
         ) : null}
         {body != null ? (
-          <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
         ) : null}
       </Flex>
       <Flex

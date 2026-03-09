@@ -1,9 +1,7 @@
 """Tools for temporary protocol files."""
-
-import tempfile
 from pathlib import Path
+import tempfile
 from typing import IO
-
 from typing_extensions import Literal
 
 

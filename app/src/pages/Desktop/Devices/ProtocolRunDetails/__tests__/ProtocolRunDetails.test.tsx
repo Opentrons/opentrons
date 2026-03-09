@@ -14,6 +14,7 @@ import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/Pro
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useRobot } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useCurrentRunId,
@@ -38,6 +39,7 @@ vi.mock('/app/resources/runs')
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
+vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera')
 
@@ -120,6 +122,7 @@ describe('ProtocolRunDetails', () => {
       mockRobotSideAnalysis
     )
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: { createdAt: '123' } },
     } as any)

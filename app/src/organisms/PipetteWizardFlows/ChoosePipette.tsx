@@ -224,9 +224,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="h1">
-                {t('choose_pipette')}
-              </LegacyStyledText>
+              <LegacyStyledText as="h1">{t('choose_pipette')}</LegacyStyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -244,7 +242,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     alt={singleMount}
                   />
                   <LegacyStyledText
-                    forwardedAs="h3"
+                    as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
@@ -264,7 +262,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     alt={bothMounts}
                   />
                   <LegacyStyledText
-                    forwardedAs="h3"
+                    as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >

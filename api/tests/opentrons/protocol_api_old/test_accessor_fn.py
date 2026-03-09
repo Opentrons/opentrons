@@ -1,8 +1,7 @@
-from opentrons_shared_data.labware.types import LabwareDefinition2
-
+from opentrons.types import Point
 from opentrons.protocol_api import Labware
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.types import Point
+from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 def test_wells_accessor(

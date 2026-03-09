@@ -1,19 +1,17 @@
 """Command models to start heating a Temperature Module."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Optional, TYPE_CHECKING, Any
+from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal, Type
 
-from ...errors.error_occurrence import ErrorOccurrence
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
     from opentrons.protocol_engine.state.state import StateView
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
 SetTargetTemperatureCommandType = Literal["temperatureModule/setTargetTemperature"]
 

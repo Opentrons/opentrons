@@ -29,12 +29,6 @@ export const thermocyclerStateStep: CommandCreator<
     }
   }
 
-  if (thermocyclerState.currentBlockActivity.type === 'profile') {
-    return {
-      errors: [errorCreators.thermocyclerBusyWithProfile()],
-    }
-  }
-
   const {
     lidOpen,
     lidClosed,

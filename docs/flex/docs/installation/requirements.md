@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Installation Requirements"
-description: "Site requirements: placement, power, and environmental conditions for Flex."
 ---
 
 Before setting up Opentrons Flex, make sure that your installation site meets all of the requirements in this section. And follow all of the safety guidance here and throughout the installation instructions.

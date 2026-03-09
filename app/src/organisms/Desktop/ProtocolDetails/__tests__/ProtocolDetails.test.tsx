@@ -24,7 +24,7 @@ import {
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 
-import { ProtocolDetailsContents } from '..'
+import { ProtocolDetails } from '..'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
@@ -38,11 +38,11 @@ vi.mock('/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout')
 vi.mock('/app/organisms/Desktop/SendProtocolToFlexSlideout')
 
 const render = (
-  props: Partial<ComponentProps<typeof ProtocolDetailsContents>> = {}
+  props: Partial<ComponentProps<typeof ProtocolDetails>> = {}
 ) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolDetailsContents
+      <ProtocolDetails
         {...{ ...storedProtocolData, ...props, groupedCommands: null }}
       />
     </MemoryRouter>,
@@ -59,7 +59,7 @@ const createdAt = '2022-05-04T18:33:48.916159+00:00'
 const description = 'fake protocol description'
 
 const mockMostRecentAnalysis: ProtocolAnalysisOutput =
-  storedProtocolData.mostRecentAnalysis!
+  storedProtocolData.mostRecentAnalysis as ProtocolAnalysisOutput
 
 let mockTrackEvent: Mock
 
@@ -134,7 +134,9 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    screen.getByText('Deck View')
+    expect(
+      screen.getByRole('heading', { name: 'Deck View' })
+    ).toBeInTheDocument()
     screen.getByText('close ChooseRobotToRunProtocolSlideout')
   })
   it('opens choose robot to run protocol slideout when Start setup button is clicked', async () => {
@@ -184,6 +186,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
+    screen.getByRole('heading', { name: 'creation method' })
     screen.getByText('Protocol Designer 6.0')
   })
   it('renders the protocol creation method for py protocol made in PD', () => {
@@ -200,7 +203,25 @@ describe('ProtocolDetails', () => {
         },
       },
     })
+    screen.getByRole('heading', { name: 'creation method' })
     screen.getByText('Protocol Designer 8.0')
+  })
+  it('renders the last analyzed date', () => {
+    render({
+      mostRecentAnalysis: {
+        ...mockMostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...mockMostRecentAnalysis.metadata,
+        },
+        config: {
+          ...mockMostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
+    screen.getByRole('heading', { name: 'last analyzed' })
   })
   it('renders the protocol description', () => {
     render({
@@ -218,6 +239,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
+    screen.getByRole('heading', { name: 'description' })
     screen.getByText('fake protocol description')
   })
 })

@@ -87,7 +87,7 @@ export const getThermoUnconfiguredFixtures = (
     fixtureGroupKeys.map(cutout => ({
       cutoutId: cutout,
       addressableAreaId: THERMOCYCLER_MODULE_V2,
-      cutoutFixtureId: fixtureGroupMatch[cutout]!,
+      cutoutFixtureId: fixtureGroupMatch[cutout] as CutoutFixtureId,
       opentronsModuleSerialNumber: mod.serialNumber,
     }))
   )

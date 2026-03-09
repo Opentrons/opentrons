@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -46,8 +46,12 @@ CommandThermocyclerSetTargetBlock: types.ThermocyclerSetTargetBlockCommandId = (
 CommandThermocyclerSetTargetLid: types.ThermocyclerSetTargetLidCommandId = (
     "thermocycler/setTargetLidTemperature"
 )
-CommandThermocyclerAwaitLidTemperature: types.ThermocyclerAwaitLidTemperatureCommandId = "thermocycler/awaitLidTemperature"
-CommandThermocyclerAwaitBlockTemperature: types.ThermocyclerAwaitBlockTemperatureCommandId = "thermocycler/awaitBlockTemperature"
+CommandThermocyclerAwaitLidTemperature: types.ThermocyclerAwaitLidTemperatureCommandId = (
+    "thermocycler/awaitLidTemperature"
+)
+CommandThermocyclerAwaitBlockTemperature: types.ThermocyclerAwaitBlockTemperatureCommandId = (
+    "thermocycler/awaitBlockTemperature"
+)
 CommandThermocyclerDeactivateBlock: types.ThermocyclerDeactivateBlockCommandId = (
     "thermocycler/deactivateBlock"
 )

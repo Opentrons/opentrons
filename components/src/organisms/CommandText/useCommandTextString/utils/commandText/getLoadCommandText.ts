@@ -128,14 +128,11 @@ export const getLoadCommandText = ({
     }
     case 'loadLiquid': {
       const { liquidId, labwareId } = command.params
-      const displayName = getLiquidDisplayName(
-        commandTextData?.liquids ?? [],
-        liquidId,
-        t
-      )
-
       return t('load_liquids_info_protocol_setup', {
-        liquid: displayName,
+        liquid:
+          commandTextData != null
+            ? getLiquidDisplayName(commandTextData.liquids ?? [], liquidId)
+            : null,
         labware:
           commandTextData != null
             ? getLabwareName({

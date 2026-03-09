@@ -1,4 +1,4 @@
-from opentrons import containers, instruments
+from opentrons import instruments, containers
 
 metadata = {
     "protocolName": "Testosaur",

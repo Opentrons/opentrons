@@ -1,42 +1,39 @@
 """Test configure nozzle layout commands."""
-
-from collections import OrderedDict
-from typing import Dict, Union
-
-import pytest
-from decoy import Decoy
-
-from opentrons_shared_data.pipette.pipette_definition import (
-    ValidNozzleMaps,
-)
-
-from ..pipette_fixtures import (
-    NINETY_SIX_COLS,
-    NINETY_SIX_MAP,
-    NINETY_SIX_ROWS,
-)
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.configure_nozzle_layout import (
-    ConfigureNozzleLayoutImplementation,
-    ConfigureNozzleLayoutParams,
-    ConfigureNozzleLayoutResult,
-)
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    TipHandler,
-)
 from opentrons.protocol_engine.state.update_types import (
     PipetteNozzleMapUpdate,
     StateUpdate,
 )
+import pytest
+from decoy import Decoy
+from typing import Union, Dict
+from collections import OrderedDict
+
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    TipHandler,
+)
+from opentrons.types import Point
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.configure_nozzle_layout import (
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutImplementation,
+)
+
 from opentrons.protocol_engine.types import (
     AllNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
-from opentrons.types import Point
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
+from ..pipette_fixtures import (
+    NINETY_SIX_MAP,
+    NINETY_SIX_COLS,
+    NINETY_SIX_ROWS,
+)
 
 
 @pytest.mark.parametrize(

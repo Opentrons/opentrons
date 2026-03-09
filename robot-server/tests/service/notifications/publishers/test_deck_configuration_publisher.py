@@ -1,5 +1,4 @@
 """Tests for the deck configuration publisher."""
-
 import pytest
 from decoy import Decoy
 

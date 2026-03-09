@@ -4,12 +4,14 @@ See the `name_management` package docstring for background on the static hostnam
 and how it's distinct from other names on the machine.
 """
 
+
 import asyncio
 import logging
 import os
 import urllib.parse
 
 from .avahi import restart_daemon as restart_avahi_daemon
+
 
 _log = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ async def set_up_static_hostname() -> str:
     ret = proc.returncode
     if ret != 0:
         _log.error(
-            f"Error starting hostname: {ret} stdout: {stdout!r} stderr: {stderr!r}"
+            f"Error starting hostname: {ret} " f"stdout: {stdout!r} stderr: {stderr!r}"
         )
         raise RuntimeError("Couldn't run hostname")
 

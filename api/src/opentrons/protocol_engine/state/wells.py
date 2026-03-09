@@ -1,32 +1,34 @@
 """Basic well data state and store."""
 
 from dataclasses import dataclass
-from datetime import datetime
 from typing import (
     Dict,
-    Iterator,
     List,
+    Union,
+    Iterator,
     Optional,
     Tuple,
-    Union,
     overload,
 )
+from datetime import datetime
 
-from ..actions import Action
-from ..actions.get_state_update import get_state_updates
-from . import update_types
-from ._abstract_store import HandlesActions, HasState
 from opentrons.protocol_engine.types import (
-    LoadedVolumeInfo,
     ProbedHeightInfo,
     ProbedVolumeInfo,
+    LoadedVolumeInfo,
     WellInfoSummary,
     WellLiquidInfo,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import (
-    LiquidTrackingType,
     SimulatedProbeResult,
+    LiquidTrackingType,
 )
+
+from . import update_types
+from ._abstract_store import HasState, HandlesActions
+from ..actions import Action
+from ..actions.get_state_update import get_state_updates
+
 
 LabwareId = str
 WellName = str
@@ -254,11 +256,13 @@ class WellView:
 
 
 @overload
-def _volume_from_info(info: Optional[ProbedVolumeInfo]) -> Optional[float]: ...
+def _volume_from_info(info: Optional[ProbedVolumeInfo]) -> Optional[float]:
+    ...
 
 
 @overload
-def _volume_from_info(info: Optional[LoadedVolumeInfo]) -> Optional[float]: ...
+def _volume_from_info(info: Optional[LoadedVolumeInfo]) -> Optional[float]:
+    ...
 
 
 def _volume_from_info(

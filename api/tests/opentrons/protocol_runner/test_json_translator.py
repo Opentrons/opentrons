@@ -1,67 +1,55 @@
 """Tests for the JSON JsonTranslator interface."""
 
+import pytest
 from typing import Dict, List
 
-import pytest
-
 from opentrons_shared_data.labware.labware_definition import (
-    BrandData,
-    CircularWellDefinition2,
-    Dimensions,
-    DisplayCategory,
-    Group,
-    GroupMetadata,
     LabwareDefinition,
     LabwareDefinition2,
-    Metadata,
     Parameters2,
-)
-from opentrons_shared_data.labware.labware_definition import (
+    Metadata,
+    DisplayCategory,
+    BrandData,
     Vector3D as SD_Labware_Vector,
+    Dimensions,
+    Group,
+    GroupMetadata,
+    CircularWellDefinition2,
 )
-from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.protocol.models import (
-    Labware,
-    Liquid,
-    Location,
-    Module,
-    OffsetVector,
-    Pipette,
-    ProfileStep,
-    Robot,
     protocol_schema_v6,
     protocol_schema_v7,
     protocol_schema_v8,
-)
-from opentrons_shared_data.protocol.models import (
-    Metadata as SD_Metadata,
-)
-from opentrons_shared_data.protocol.models import (
+    Liquid,
+    Labware,
+    Location,
+    ProfileStep,
     WellLocation as SD_WellLocation,
+    OffsetVector,
+    Metadata as SD_Metadata,
+    Module,
+    Pipette,
+    Robot,
 )
-
-from opentrons.protocol_engine import (
-    DeckPoint,
-    DeckSlotLocation,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    LiquidHandlingWellLocation,
-    ModuleLocation,
-    ModuleModel,
-    PickUpTipWellLocation,
-    WellLocation,
-    WellOffset,
-    WellOrigin,
-)
-from opentrons.protocol_engine import (
-    Liquid as PE_Liquid,
-)
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons.types import DeckSlotName, MountType
+from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
+    DeckPoint,
+    DeckSlotLocation,
+    WellLocation,
+    LiquidHandlingWellLocation,
+    PickUpTipWellLocation,
+    DropTipWellLocation,
+    WellOrigin,
+    DropTipWellOrigin,
+    WellOffset,
+    ModuleModel,
+    ModuleLocation,
+    Liquid as PE_Liquid,
 )
 from opentrons.protocol_engine.types import HexColor
-from opentrons.protocol_runner.json_translator import JsonTranslator
-from opentrons.types import DeckSlotName, MountType
 
 VALID_TEST_PARAMS = [
     (
@@ -293,7 +281,6 @@ VALID_TEST_PARAMS = [
                     "origin": "bottom",
                     "offset": {"x": 0, "y": 0, "z": -1.23},
                 },
-                "commandAnnotations": [],
             },
         ),
         pe_commands.TouchTipCreate(
@@ -835,18 +822,15 @@ def test_load_command(
     test_v8_input: protocol_schema_v8.Command,
     expected_output: pe_commands.CommandCreate,
 ) -> None:
-    """Test translating v6/v7/v8 commands to protocol engine commands."""
+    """Test translating v6 commands to protocol engine commands."""
     v6_output = subject.translate_commands(
-        protocol=_make_v6_json_protocol(commands=[test_v6_input]),
-        command_keys_to_annotation_ids={},
+        _make_v6_json_protocol(commands=[test_v6_input])
     )
     v7_output = subject.translate_commands(
-        protocol=_make_v7_json_protocol(commands=[test_v7_input]),
-        command_keys_to_annotation_ids={},
+        _make_v7_json_protocol(commands=[test_v7_input])
     )
     v8_output = subject.translate_commands(
-        protocol=_make_v8_json_protocol(commands=[test_v8_input]),
-        command_keys_to_annotation_ids={},
+        _make_v8_json_protocol(commands=[test_v8_input])
     )
     assert v6_output == [expected_output]
     assert v7_output == [expected_output]
@@ -868,39 +852,3 @@ def test_load_liquid(
             displayColor=HexColor("#F00"),
         )
     ]
-
-
-def test_v8_command_annotations_get_added_to_engine_commands(
-    subject: JsonTranslator,
-) -> None:
-    """It should add the legacy command annotations to the engine commands during command translation."""
-    test_v8_command = protocol_schema_v8.Command.model_construct(
-        commandType="loadLabware",
-        params={
-            "labwareId": "labware-id-2",
-            "version": 1,
-            "namespace": "example",
-            "loadName": "foo_8_plate_33ul",
-            "location": {"moduleId": "temperatureModuleId"},
-            "displayName": "Trash",
-        },
-        key="load-labware-key",
-    )
-
-    expected_engine_command = pe_commands.LoadLabwareCreate(
-        params=pe_commands.LoadLabwareParams(
-            loadName="foo_8_plate_33ul",
-            displayName="Trash",
-            labwareId="labware-id-2",
-            location=ModuleLocation(moduleId="temperatureModuleId"),
-            version=1,
-            namespace="example",
-        ),
-        key="load-labware-key",
-        commandAnnotationIds=["ann1", "ann2"],
-    )
-    v8_output = subject.translate_commands(
-        protocol=_make_v8_json_protocol(commands=[test_v8_command]),
-        command_keys_to_annotation_ids={"load-labware-key": ["ann1", "ann2"]},
-    )
-    assert v8_output == [expected_engine_command]

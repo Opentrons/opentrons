@@ -1,13 +1,13 @@
 """SQLite database initialization and utilities."""
-
 from pathlib import Path
 
 import sqlalchemy
 
 from server_utils import sql_utils
 
-from .migrations import migrate
 from .tables import add_tables_to_db
+from .migrations import migrate
+
 
 # A reference to SQLite's built-in ROWID column.
 #

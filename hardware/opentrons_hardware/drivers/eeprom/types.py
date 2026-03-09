@@ -1,9 +1,10 @@
 """Type definitions used for the eeprom interface module."""
 
-from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
+
 
 # The version of the properties format
 FORMAT_VERSION = 1

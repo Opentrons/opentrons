@@ -95,7 +95,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
     <Trans
       t={t}
       i18nKey="carefully_move_labware"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <LegacyStyledText as="p" /> }}
     />
   )
   return (
@@ -120,7 +120,7 @@ export function HomeGantryBeforeRetry(
     <Trans
       t={t}
       i18nKey="take_necessary_actions_home"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <LegacyStyledText as="p" /> }}
     />
   )
   const secondaryBtnOnClick = (): Promise<void> =>

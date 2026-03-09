@@ -20,12 +20,9 @@ import {
   SPACING,
   StyledText,
   Tag,
-  WRAP,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
-  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
 } from '/app/redux/analytics'
@@ -40,17 +37,10 @@ import type {
   PythonConfig,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  GroupedCommands,
-  StoredProtocolData,
-} from '/app/redux/protocol-storage'
 import type { AnalysisStatus } from '/app/transformations/analysis'
+import type { ProtocolDetailsProps } from './UpdatedProtocolDetails'
 
 const MAX_DESCRIPTION_LENGTH = 220
-
-interface ProtocolDetailsProps extends StoredProtocolData {
-  groupedCommands: GroupedCommands | null
-}
 
 interface ProtocolDetailsHeaderProps {
   analysisStatus: AnalysisStatus
@@ -79,7 +69,7 @@ export function ProtocolDetailsHeader({
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const [isReadMore, setIsReadMore] = useState(true)
-  const numberOfAtomicCommands = mostRecentAnalysis?.commands.length ?? 0
+
   const protocolDescription = mostRecentAnalysis?.metadata.description ?? ''
   const slicedDescription = protocolDescription.slice(0, MAX_DESCRIPTION_LENGTH)
   const isDescriptionTruncated =
@@ -134,13 +124,6 @@ export function ProtocolDetailsHeader({
   }
 
   const handleClickTimeline = (): void => {
-    trackEvent({
-      name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: {
-        sourceLocation: 'protocol details header',
-        numberOfAtomicCommands,
-      },
-    })
     navigate(`/protocols/${protocolKey}/visualization`)
   }
 
@@ -173,26 +156,21 @@ export function ProtocolDetailsHeader({
           <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
             <Flex
               flexDirection={DIRECTION_ROW}
-              gap={SPACING.spacing24}
+              gap={SPACING.spacing4}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
               paddingRight={SPACING.spacing24}
             >
-              <StyledText
-                desktopStyle="headingSmallBold"
-                style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
-              >
+              <StyledText desktopStyle="headingSmallBold">
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
-                {robotType === OT2_ROBOT_TYPE ? null : (
-                  <SecondaryButton
-                    onClick={handleClickTimeline}
-                    cursor={CURSOR_POINTER}
-                  >
-                    {t('visualize')}
-                  </SecondaryButton>
-                )}
+                <SecondaryButton
+                  onClick={handleClickTimeline}
+                  cursor={CURSOR_POINTER}
+                >
+                  {t('visualize')}
+                </SecondaryButton>
                 <PrimaryButton
                   onClick={() => {
                     handleRunProtocolButtonClick()
@@ -229,11 +207,7 @@ export function ProtocolDetailsHeader({
               </StyledText>
             </Flex>
             {/* tag section */}
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gap={SPACING.spacing4}
-              flexWrap={WRAP}
-            >
+            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing4}>
               <Tag
                 text={`${i18n.format(t('date_added'), 'titleCase')}:  ${format(
                   new Date(modified),
@@ -249,7 +223,7 @@ export function ProtocolDetailsHeader({
                 type="default"
               />
               <Tag text={creationMethod} type="default" />
-              <Tag text={`Author: ${author}`} type="default" />
+              <Tag text={`Author:${author}`} type="default" />
             </Flex>
           </Flex>
         </Flex>

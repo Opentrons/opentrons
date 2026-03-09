@@ -1,22 +1,25 @@
+from contextlib import contextmanager
 import json
 import os
 import pathlib
 import tempfile
-from contextlib import contextmanager
 from datetime import datetime, timezone
+from mock import MagicMock
 from pathlib import Path
 from typing import Callable, Generator, Iterator, cast
+from typing_extensions import NoReturn
+from decoy import Decoy
+
+from sqlalchemy.engine import Engine as SQLEngine
 
 import pytest
-from _pytest.mark import deselect_by_mark
-from decoy import Decoy
 from fastapi import routing
-from mock import MagicMock
-from sqlalchemy.engine import Engine as SQLEngine
 from starlette.testclient import TestClient
-from typing_extensions import NoReturn
+
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from opentrons import config
+from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
     helpers,
     save_robot_deck_attitude,
@@ -27,36 +30,23 @@ from opentrons.calibration_storage import (
 # conditionally set up ot2/ot3 calibration structures instead of invariably
 # calling the OT2 functions.
 from opentrons.calibration_storage.ot2 import (
-    create_tip_length_data,
     save_pipette_calibration,
+    create_tip_length_data,
     save_tip_length_calibration,
 )
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.protocol_api import labware
-from opentrons.types import Mount, Point
-from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
-)
-from server_utils.auth.resource_server.fastapi_dependencies import (
-    get_authorization_checker,
-)
+from opentrons.types import Point, Mount
 
 from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
-from robot_server.health.router import ComponentVersions, get_versions
-from robot_server.persistence.database import sql_engine_ctx
-from robot_server.persistence.fastapi_dependencies import get_sql_engine
-from robot_server.persistence.tables import metadata
-from robot_server.runs.dependencies import get_run_data_manager
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.service.notifications.notification_client import (
-    NotificationClient,
-    get_notification_client,
-)
-from robot_server.service.session.manager import SessionManager
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
+from robot_server.service.session.manager import SessionManager
+from robot_server.persistence.database import sql_engine_ctx
+from robot_server.persistence.tables import metadata
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
+from robot_server.health.router import ComponentVersions, get_versions
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.dependencies import get_run_data_manager
 
 test_router = routing.APIRouter()
 
@@ -67,34 +57,6 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
-
-
-def pytest_collection_modifyitems(
-    session: pytest.Session, config: pytest.Config, items: list[pytest.Item]
-) -> None:
-    """Hook to implement not collecting integration tests if not needed.
-
-    https://docs.pytest.org/en/stable/reference/reference.html#pytest.hookspec.pytest_collection_modifyitems
-
-    The normal way to do this is to mark tests with a custom mark. But that's a lot of tests.
-    The next way to do this is to apply a mark dynamically in a fixture (which we do below) but that
-    happens after collection time, so we can only skip the tests rather than not collecting them.
-
-    By writing a collection hook, we can skip collecting the tests altogether. We can do this by
-    - At collection time, adding the mark to any test defined in a path under integration/
-    - Make sure that we rerun the logic that discards tests if they don't match some mark expression
-
-    Unfortunately that last part is a part of pytest internals, so we have to poke in there, but
-    it's only one place so maybe it's okay. It also may not be necessary (because maybe pytest forces
-    internal hooks to run after external hooks) but there's no formal guarantee that it isn't, so we do it.
-    """
-    for item in items:
-        # https://docs.pytest.org/en/stable/reference/reference.html#pytest.Item.location
-        itempath = item.location[0]
-        if os.path.join("tests", "integration") in itempath:
-            item.add_marker(pytest.mark.integration)
-    # https://github.com/pytest-dev/pytest/blob/main/src/_pytest/mark/__init__.py#L255
-    deselect_by_mark(items=items, config=config)
 
 
 @pytest.fixture()
@@ -217,40 +179,11 @@ def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_notification_client_with_mock(decoy: Decoy) -> Iterator[None]:
-    """Override app_state to include a mocked notification client."""
-    mock_notification_client = decoy.mock(cls=NotificationClient)
-
-    async def get_notification_client_override() -> NotificationClient:
-        return mock_notification_client
-
-    app.dependency_overrides[get_notification_client] = get_notification_client_override
-    yield
-    del app.dependency_overrides[get_notification_client]
-
-
-@pytest.fixture
-def _override_authorization_checker_with_always_allowed(decoy: Decoy) -> Iterator[None]:
-    authorization_checker = AlwaysAllowedAuthorizationChecker()
-
-    async def get_authorization_checker_override() -> AuthorizationChecker:
-        return authorization_checker
-
-    app.dependency_overrides[get_authorization_checker] = (
-        get_authorization_checker_override
-    )
-    yield
-    del app.dependency_overrides[get_authorization_checker]
-
-
-@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
-    _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -266,8 +199,6 @@ def api_client_camera_overrides(
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
-    _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

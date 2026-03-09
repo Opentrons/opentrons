@@ -45,7 +45,7 @@ export function DeviceReset({
         >
           {t('device_reset')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('device_reset_description')}
         </LegacyStyledText>
       </Box>

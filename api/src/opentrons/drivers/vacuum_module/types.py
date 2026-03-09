@@ -1,25 +1,17 @@
-from dataclasses import dataclass
 from enum import Enum
+from dataclasses import dataclass
 from typing import Dict
-
-from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers.command_builder import CommandBuilder
 
 
-class GCODE(StrEnum):
+class GCODE(str, Enum):
+
     GET_RESET_REASON = "M114"
     GET_DEVICE_INFO = "M115"
     SET_SERIAL_NUMBER = "M996"
     ENTER_BOOTLOADER = "dfu"
     SET_LED = "M200"
-    SET_PRESSURE_STATE = "M120"
-    GET_PRESSURE_STATE = "M121"
-    SET_PUMP_STATE = "M122"
-    GET_PUMP_STATE = "M123"
-    SET_VENT_STATE = "M124"
-    SET_PRESSURE_PID = "M125"
-    GET_PRESSURE_PID = "M126"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -62,7 +54,7 @@ class LEDColor(Enum):
 
     @classmethod
     def from_name(cls, name: str) -> "LEDColor":
-        match name.lower():
+        match (name.lower()):
             case "red":
                 return cls.RED
             case "green":
@@ -85,47 +77,3 @@ class LEDPattern(Enum):
     FLASH = 1
     PULSE = 2
     CONFIRM = 3
-
-
-class VentState(Enum):
-    """The State of the vent."""
-
-    OPENED = 0
-    CLOSED = 1
-
-
-@dataclass
-class PressureState:
-    """Get the pressure state."""
-
-    target_guage_pressure: float
-    current_guage_pressure: float
-    pressure_abs_a: float
-    pressure_abs_b: float
-    pressure_atm: float
-    vacuum_enabled: bool
-    vent_state: VentState
-
-
-@dataclass
-class PressureControlTunings:
-    """Get the pressure control tuning values."""
-
-    kp: float
-    ki: float
-    kd: float
-    overshoot_error: float
-    k_velocity: float
-    k_holding: float
-
-
-@dataclass
-class PumpState:
-    """Get the pump state."""
-
-    target_rpm: float
-    current_rpm: float
-    target_pwm: float
-    current_pwm: float
-    pump_running: bool
-    manual_control: bool

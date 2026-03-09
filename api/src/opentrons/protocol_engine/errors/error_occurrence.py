@@ -1,16 +1,13 @@
 """Models for concrete occurrences of specific errors."""
+from logging import getLogger
 
 from datetime import datetime
-from logging import getLogger
 from textwrap import dedent
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, Union
-
-from pydantic import BaseModel, ConfigDict, Field
-
+from typing import Any, Dict, Mapping, List, Type, Union, Optional, Sequence
+from pydantic import BaseModel, Field, ConfigDict
 from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons_shared_data.errors.exceptions import EnumeratedError
-
 from .exceptions import ProtocolEngineError
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 log = getLogger(__name__)
 

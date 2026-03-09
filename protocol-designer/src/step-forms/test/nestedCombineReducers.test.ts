@@ -49,6 +49,7 @@ describe('nestedCombineReducers', () => {
     })
   })
   it('should populate with initial undefined state (handled action)', () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const result = combinedReducer(undefined, {
       type: 'ADD_FRUIT',
       payload: 'durian',
@@ -65,6 +66,7 @@ describe('nestedCombineReducers', () => {
       fruits: ['banana'],
       warnings: {},
     }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const result = combinedReducer(prevState, {
       type: 'ADD_FRUIT',
       payload: 'durian',
@@ -127,6 +129,7 @@ describe('nestedCombineReducers', () => {
           warnings: {},
           badCountReducer: 0,
         },
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         {
           type: 'UNHANDLED_ACTION',
           payload: 'foo',

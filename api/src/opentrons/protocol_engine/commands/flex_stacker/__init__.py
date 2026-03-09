@@ -1,29 +1,33 @@
 """Command models for Flex Stacker commands."""
 
-from .empty import Empty, EmptyCommandType, EmptyCreate, EmptyParams, EmptyResult
-from .fill import Fill, FillCommandType, FillCreate, FillParams, FillResult
-from .retrieve import (
-    Retrieve,
-    RetrieveCommandType,
-    RetrieveCreate,
-    RetrieveParams,
-    RetrieveResult,
-)
-from .set_stored_labware import (
-    SetStoredLabware,
-    SetStoredLabwareCommandType,
-    SetStoredLabwareCreate,
-    SetStoredLabwareParams,
-    SetStoredLabwareResult,
-    StackerStoredLabwareDetails,
-)
 from .store import (
-    Store,
     StoreCommandType,
-    StoreCreate,
     StoreParams,
     StoreResult,
+    Store,
+    StoreCreate,
 )
+
+from .retrieve import (
+    RetrieveCommandType,
+    RetrieveParams,
+    RetrieveResult,
+    Retrieve,
+    RetrieveCreate,
+)
+
+from .set_stored_labware import (
+    SetStoredLabwareCommandType,
+    SetStoredLabwareParams,
+    SetStoredLabwareResult,
+    SetStoredLabware,
+    SetStoredLabwareCreate,
+    StackerStoredLabwareDetails,
+)
+
+from .fill import FillCommandType, FillParams, FillResult, Fill, FillCreate
+
+from .empty import EmptyCommandType, EmptyParams, EmptyResult, Empty, EmptyCreate
 
 __all__ = [
     # flexStacker/store

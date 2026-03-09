@@ -1,8 +1,7 @@
-from typing import List, Optional
+from typing import Optional, List
+from pydantic import ConfigDict, BaseModel, Field
 
-from pydantic import BaseModel, ConfigDict, Field
-
-from ..helper_classes import AttachedPipette, NextSteps, RequiredLabware
+from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 
 class PipetteOffsetCalibrationSessionStatus(BaseModel):

@@ -34,13 +34,13 @@ export function EnableStatusLight({
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             id="AdvancedSettings_Enable_Status_Light"
           >
             {t('enable_status_light')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('enable_status_light_description')}
           </LegacyStyledText>
         </Flex>

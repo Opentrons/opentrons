@@ -4,10 +4,7 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
-import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
-  useNotifyRunQuery,
-} from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
 import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
@@ -53,10 +50,7 @@ function useFlexLPCLabwareInfo({
   UseLPCLabwareInfoResult,
   'labwareInfo' | 'storedOffsets'
 > {
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
-  const runStatus = runRecord?.data.status ?? null
+  const runStatus = useRunStatus(runId ?? null)
 
   const lwLocationCombos = useMemo(
     () =>
@@ -65,15 +59,11 @@ function useFlexLPCLabwareInfo({
         protocolData,
         robotType,
       }),
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareDefs?.length, protocolData?.commands.length, robotType]
   )
 
   const searchLwOffsetsParams = useMemo(
     () => getLPCSearchParams(lwLocationCombos),
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [lwLocationCombos.length]
   )
 

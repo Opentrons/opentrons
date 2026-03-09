@@ -1,6 +1,5 @@
 ---
 title: "Heater-Shaker Module: OT-2 Installation Instructions"
-description: "Mount, anchor, and connect USB and power for the Heater-Shaker on OT-2."
 ---
 
 To install the Heater-Shaker on your OT-2:

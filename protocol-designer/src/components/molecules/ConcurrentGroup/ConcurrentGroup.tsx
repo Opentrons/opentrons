@@ -32,16 +32,9 @@ export function ConcurrentGroup(
       gridGap={SPACING.spacing4}
     >
       <OrnamentalLine active={active} />
-      <ul
-        style={{
-          flex: '1',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
+      <Box as="ul" flex="1">
         {children}
-      </ul>
+      </Box>
     </Flex>
   )
 }

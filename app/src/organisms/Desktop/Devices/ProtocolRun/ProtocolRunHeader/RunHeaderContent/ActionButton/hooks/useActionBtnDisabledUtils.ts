@@ -2,27 +2,19 @@ import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
+import { useIsDoorOpen } from '../../../hooks'
 import {
   isCancellableStatus,
   isDisabledStatus,
   isStartRunStatus,
-} from '/app/local-resources/runs/utils'
-import {
-  useCurrentRunId,
-  useModuleCalibrationStatus,
-  useRunCalibrationStatus,
-  useUnmatchedModulesForProtocol,
-} from '/app/resources/runs'
-
-import { useIsDoorOpen } from '../../../hooks'
+} from '../../../utils'
 import { useIsFixtureMismatch } from './useIsFixtureMismatch'
 
 import type { BaseActionButtonProps } from '..'
 import type { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
-  robotName: string
-  runId: string
+  isCurrentRun: boolean
   isValidRunAgain: boolean
   isSetupComplete: boolean
   isOtherRunCurrent: boolean
@@ -42,6 +34,7 @@ export function useActionBtnDisabledUtils(
   props: UseActionButtonDisabledUtilsProps
 ): UseActionButtonDisabledUtilsResult {
   const {
+    isCurrentRun,
     isSetupComplete,
     isOtherRunCurrent,
     isProtocolNotReady,
@@ -52,7 +45,6 @@ export function useActionBtnDisabledUtils(
     runId,
     isResetRunLoadingRef,
     isClosingCurrentRun,
-    isCameraReadyToRun,
   } = props
 
   const { isPlayRunActionLoading, isPauseRunActionLoading } =
@@ -60,23 +52,9 @@ export function useActionBtnDisabledUtils(
   const doorStatus = useIsDoorOpen(robotName)
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
-  const isCurrentRun = useCurrentRunId() === runId
-  const isCalibrationComplete = useRunCalibrationStatus(
-    robotName,
-    runId
-  ).complete
-  const isModuleCalibrationComplete = useModuleCalibrationStatus(
-    robotName,
-    runId
-  ).complete
-  const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isMissingModules = missingModuleIds.length > 0
   const isDisabled =
     (isCurrentRun && !isSetupComplete) ||
-    isMissingModules ||
-    isModuleCalibrationComplete ||
-    isCalibrationComplete ||
     isPlayRunActionLoading ||
     isPauseRunActionLoading ||
     isResetRunLoading ||
@@ -85,20 +63,16 @@ export function useActionBtnDisabledUtils(
     isProtocolNotReady ||
     isFixtureMismatch ||
     isDisabledStatus(runStatus) ||
-    !isCameraReadyToRun ||
     isRobotOnWrongVersionOfSoftware ||
     (doorStatus.isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
       isCancellableStatus(runStatus))
 
   const disabledReason = useDisabledReason({
-    isFixtureMismatch,
-    doorStatus,
-    isResetRunLoading,
-    isMissingModules,
-    isModuleCalibrationComplete,
-    isCalibrationComplete,
     ...props,
+    doorStatus,
+    isFixtureMismatch,
+    isResetRunLoading,
   })
 
   return isDisabled
@@ -111,14 +85,12 @@ type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isFixtureMismatch: boolean
   isResetRunLoading: boolean
   isClosingCurrentRun: boolean
-  isModuleCalibrationComplete: boolean
-  isMissingModules: boolean
-  isCalibrationComplete: boolean
-  isCameraReadyToRun: boolean
 }
 
 // The user-facing disabled explanation for why the ActionButton is disabled, if any.
 function useDisabledReason({
+  isCurrentRun,
+  isSetupComplete,
   isFixtureMismatch,
   isValidRunAgain,
   isOtherRunCurrent,
@@ -127,30 +99,22 @@ function useDisabledReason({
   runStatus,
   isResetRunLoading,
   isClosingCurrentRun,
-  isMissingModules,
-  isModuleCalibrationComplete,
-  isCalibrationComplete,
   isCameraReadyToRun,
 }: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  if (isRobotOnWrongVersionOfSoftware) {
-    return t('shared:a_software_update_is_available')
-  } else if (isClosingCurrentRun) {
-    return t('shared:robot_is_busy')
-  } else if (!isCameraReadyToRun) {
+
+  if (!isCameraReadyToRun) {
     return t('enable_camera')
-  } else if (isFixtureMismatch) {
-    return t('fixture_mismatch')
-  } else if (!isValidRunAgain) {
-    return t('run_again_disabled')
+  } else if (
+    isCurrentRun &&
+    (!isSetupComplete || isFixtureMismatch) &&
+    !isValidRunAgain
+  ) {
+    return t('setup_incomplete')
   } else if (isOtherRunCurrent && !isResetRunLoading) {
     return t('shared:robot_is_busy')
-  } else if (!isCalibrationComplete) {
-    return t('instrument_calibration_incomplete')
-  } else if (isMissingModules) {
-    return t('modules_missing')
-  } else if (!isModuleCalibrationComplete) {
-    return t('module_calibration_incomplete')
+  } else if (isRobotOnWrongVersionOfSoftware) {
+    return t('shared:a_software_update_is_available')
   } else if (
     doorStatus.isDoorOpen &&
     doorStatus.moduleDoorLocation !== null &&
@@ -159,6 +123,8 @@ function useDisabledReason({
     return t('close_stacker_door')
   } else if (doorStatus.isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
+  } else if (isClosingCurrentRun) {
+    return t('shared:robot_is_busy')
   } else {
     return null
   }

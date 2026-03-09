@@ -17,7 +17,8 @@ export interface WaitForResumeCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface WaitForResumeRunTimeCommand
-  extends CommonCommandRunTimeInfo, WaitForResumeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    WaitForResumeCreateCommand {
   result?: any
 }
 
@@ -31,7 +32,8 @@ export interface WaitForDurationCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface WaitForDurationRunTimeCommand
-  extends CommonCommandRunTimeInfo, WaitForDurationCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    WaitForDurationCreateCommand {
   result?: any
 }
 
@@ -46,7 +48,8 @@ export interface DeprecatedDelayCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface DeprecatedDelayRunTimeCommand
-  extends CommonCommandRunTimeInfo, DeprecatedDelayCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DeprecatedDelayCreateCommand {
   result?: {}
 }
 

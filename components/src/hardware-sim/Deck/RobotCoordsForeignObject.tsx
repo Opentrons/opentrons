@@ -3,7 +3,7 @@ import { ForeignObject } from '../../primitives'
 import styles from './deck.module.css'
 
 import type { HTMLAttributes, ReactNode } from 'react'
-import type { StyleProps } from '../../primitives/types'
+import type { StyleProps } from '../../primitives'
 
 export type FlexDirection = 'column' | 'row'
 

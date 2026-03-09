@@ -23,7 +23,7 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
     <OddModal
       header={{
         title: t('exit_quick_transfer'),
-        iconName: 'ot-alert',
+        iconName: 'alert-circle',
         iconColor: COLORS.yellow50,
       }}
     >

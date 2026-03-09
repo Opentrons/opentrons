@@ -1,17 +1,13 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
+import { FLEX_ROBOT_TYPE } from '../constants'
 import {
-  FLEX_ROBOT_TYPE,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-} from '../constants'
-import { getAddressableAreaFromSlotId } from '../fixtures'
-import { getMainFixtureIdForAA } from './deckConfiguration/getFixtureFrom'
+  getAddressableAreaFromSlotId,
+  getMainFixtureIdForAA,
+} from '../fixtures'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type {
-  AddressableArea,
   CompletedProtocolAnalysis,
   CutoutConfig,
   CutoutFixture,
@@ -28,7 +24,6 @@ export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
 
-// TODO: (tz, 2026-02-03) remove this and once FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC is using the getEmptyDeckConfiguration https://opentrons.atlassian.net/browse/AUTH-2736
 export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
   { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
@@ -49,26 +44,6 @@ export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[]
     ...config,
     requiredAddressableAreas: [],
   }))
-
-export const getEmptyDeckConfiguration = (
-  deckDef: DeckDefinition
-): DeckConfiguration => {
-  const singleSlotItems = deckDef.cutoutFixtures.filter(
-    fixture =>
-      fixture.id === SINGLE_LEFT_SLOT_FIXTURE ||
-      fixture.id === SINGLE_CENTER_SLOT_FIXTURE ||
-      fixture.id === SINGLE_RIGHT_SLOT_FIXTURE
-  )
-  // Map cutoutId to cutout fixture config
-  const emptyDeckConfiguration: DeckConfiguration = singleSlotItems.flatMap(
-    fixture =>
-      Object.keys(fixture.providesAddressableAreas).map(cutoutId => ({
-        cutoutId: cutoutId as CutoutId,
-        cutoutFixtureId: fixture.id as CutoutFixtureId,
-      }))
-  )
-  return emptyDeckConfiguration
-}
 
 export function getSimplestDeckConfigForProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
@@ -176,10 +151,7 @@ export function getCutoutIdForSlotName(
   slotName: string,
   deckDef: DeckDefinition
 ): CutoutId | null {
-  const addressableArea = getAddressableAreaFromSlotId(
-    slotName,
-    deckDef
-  ) as AddressableArea | null
+  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
   const cutoutIdForSlotName =
     addressableArea != null
       ? getCutoutIdForAddressableArea(

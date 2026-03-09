@@ -215,18 +215,13 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('hasThermocycler', value)
   }
 
-  useEffect(
-    () => {
-      if (selectedPipetteName != null) {
-        setValue(`pipettesByMount.${mount}.pipetteName`, selectedPipetteName)
-        openPipetteModal(false)
-        setSelectedPipetteName(null)
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedPipetteName]
-  )
+  useEffect(() => {
+    if (selectedPipetteName != null) {
+      setValue(`pipettesByMount.${mount}.pipetteName`, selectedPipetteName)
+      openPipetteModal(false)
+      setSelectedPipetteName(null)
+    }
+  }, [selectedPipetteName])
 
   return (
     <>
@@ -277,7 +272,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={() => {
                   setValue('fields.robotType', OT2_ROBOT_TYPE)
                   resetPipettes()
-                  setValue('hasGripper', false)
                   setValue('modules', {})
                   setValue('fixtures', ot2TrashFixture)
                 }}

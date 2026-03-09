@@ -1,0 +1,53 @@
+.layout_container {
+  display: flex;
+  overflow: hidden;
+  padding: var(--spacing-16);
+}
+
+.left_column {
+  position: relative;
+  display: flex;
+  min-width: 200px;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.center_column {
+  display: flex;
+  min-width: 200px;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.right_column {
+  position: relative;
+  display: flex;
+  min-width: 200px;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.resizer {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  transition: background-color 0.2s;
+}
+
+.resizer:hover {
+  background-color: var(--blue-50);
+}
+
+.resizer_right {
+  right: -4px;
+}
+
+.resizer_left {
+  left: -4px;
+}

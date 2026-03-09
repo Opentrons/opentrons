@@ -94,16 +94,16 @@ export function PipetteOffsetCalibrationItems({
             attachedPipettes?.[calibration.mount] != null && (
               <StyledTableRow key={index}>
                 <StyledTableCell>
-                  <LegacyStyledText forwardedAs="p">
+                  <LegacyStyledText as="p">
                     {calibration.modelName}
                   </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
+                  <LegacyStyledText as="p">
                     {calibration.serialNumber}
                   </LegacyStyledText>
                 </StyledTableCell>
                 <StyledTableCell>
                   <LegacyStyledText
-                    forwardedAs="p"
+                    as="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
                     {is96Attached ? t('both') : calibration.mount}
@@ -111,7 +111,7 @@ export function PipetteOffsetCalibrationItems({
                 </StyledTableCell>
                 {isFlex ? null : (
                   <StyledTableCell>
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {calibration.tiprack != null &&
                         getDisplayNameForTipRack(
                           calibration.tiprack,
@@ -125,12 +125,12 @@ export function PipetteOffsetCalibrationItems({
                     {calibration.lastCalibrated != null &&
                     !(calibration.markedBad ?? false) ? (
                       <>
-                        <LegacyStyledText forwardedAs="p">
+                        <LegacyStyledText as="p">
                           {formatLastCalibrated(calibration.lastCalibrated)}
                         </LegacyStyledText>
                       </>
                     ) : (
-                      <LegacyStyledText forwardedAs="p">
+                      <LegacyStyledText as="p">
                         {calibration.lastCalibrated != null &&
                         calibration.markedBad === true ? (
                           <>

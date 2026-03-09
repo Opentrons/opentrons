@@ -1,8 +1,6 @@
 """Test engine task core."""
-
-import pytest
 from decoy import Decoy, matchers
-
+import pytest
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 

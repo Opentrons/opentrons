@@ -22,33 +22,33 @@ export function LegacyOffsetVector(
   return (
     <Flex {...styleProps}>
       <LegacyStyledText
-        forwardedAs={as}
+        as={as}
         marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         X
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs={as} marginRight={SPACING.spacing8}>
+      <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
         {x.toFixed(1)}
       </LegacyStyledText>
       <LegacyStyledText
-        forwardedAs={as}
+        as={as}
         marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Y
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs={as} marginRight={SPACING.spacing8}>
+      <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
         {y.toFixed(1)}
       </LegacyStyledText>
       <LegacyStyledText
-        forwardedAs={as}
+        as={as}
         marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Z
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs={as} marginRight={SPACING.spacing8}>
+      <LegacyStyledText as={as} marginRight={SPACING.spacing8}>
         {z.toFixed(1)}
       </LegacyStyledText>
     </Flex>

@@ -1,10 +1,8 @@
 """Error types related to many robot interactions."""
 
 from typing_extensions import Literal
-
-from opentrons_shared_data.errors.codes import ErrorCodes
-
 from .error_responses import ErrorDetails
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 
 class InstrumentNotFound(ErrorDetails):

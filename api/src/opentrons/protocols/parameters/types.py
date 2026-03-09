@@ -1,6 +1,7 @@
-from typing import TypedDict, TypeVar, Union
+from typing import TypeVar, Union, TypedDict
 
 from .csv_parameter_interface import CSVParameter
+
 
 PrimitiveAllowedTypes = Union[str, int, float, bool]
 AllAllowedTypes = Union[str, int, float, bool, bytes, None]

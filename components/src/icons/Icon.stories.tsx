@@ -6,7 +6,7 @@ import { ICON_DATA_BY_NAME } from './icon-data'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof IconComponent> = {
-  title: 'Helix/Atoms/Icon',
+  title: 'Library/Atoms/Icon',
   component: IconComponent,
   argTypes: {
     // Disable all StyleProps

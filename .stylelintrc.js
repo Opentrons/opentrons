@@ -9,22 +9,6 @@ module.exports = {
     'docs/**',
     'components/lib/**',
     'components-testing/pack/**',
-    'shared-data/**',
-    'api-client/**',
-    'react-api-client/**',
-    'step-generation/**',
-    'scripts/**',
-    'hardware-testing/**',
-    'discovery-client/**',
-    'usb-bridge/**',
-    'app-shell/**',
-    'app-shell-odd/**',
-    '__mocks__/**',
-    'protocol-designer/fixtures/**',
-    'protocol-designer/benchmarks/**',
-    'components/src/__mocks__/**',
-    'app/scripts/**',
-    'e2e-testing/**',
   ],
 
   rules: {
@@ -35,23 +19,6 @@ module.exports = {
       true,
       {
         ignorePseudoClasses: ['export', 'import', 'global', 'local'],
-      },
-    ],
-
-    // number max precision
-    'number-max-precision': [
-      4,
-      {
-        ignoreProperties: [
-          'transition',
-          'width',
-          'height',
-          'max-height',
-          'max-width',
-          'min-width',
-          'min-height',
-          'flex',
-        ],
       },
     ],
 

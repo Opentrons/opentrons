@@ -13,6 +13,7 @@ import type {
 import type {
   ErrorRecoverySettingsRequest,
   ErrorRecoverySettingsResponse,
+  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateErrorRecoverySettingsMutationResult = UseMutationResult<
@@ -38,7 +39,7 @@ export function useUpdateErrorRecoverySettings(
   const mutation = useMutation(
     [host, 'errorRecovery', 'settings'],
     (settings: ErrorRecoverySettingsRequest) =>
-      updateErrorRecoverySettings(host!, settings)
+      updateErrorRecoverySettings(host as HostConfig, settings)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

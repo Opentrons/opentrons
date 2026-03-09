@@ -1,4 +1,4 @@
-import uniq from 'lodash/uniq'
+import { uniq } from 'lodash'
 import { css } from 'styled-components'
 
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
@@ -37,10 +37,11 @@ function safeCommandOfType(type: CommandType, index: number): RunTimeCommand {
   return commands[index]
 }
 
-interface WrapperProps extends Omit<
-  CategorizedStepContentProps,
-  'topCategoryCommand' | 'bottomCategoryCommands' | 'commandTextData'
-> {
+interface WrapperProps
+  extends Omit<
+    CategorizedStepContentProps,
+    'topCategoryCommand' | 'bottomCategoryCommands' | 'commandTextData'
+  > {
   topCategoryCommand: CommandType | 'none'
   bottomCategoryCommand1: CommandType | 'none'
   bottomCategoryCommand2: CommandType | 'none'

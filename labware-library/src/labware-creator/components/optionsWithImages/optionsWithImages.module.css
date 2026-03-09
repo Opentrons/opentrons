@@ -1,4 +1,4 @@
-@import url('@opentrons/components/styles');
+@import '@opentrons/components/styles';
 
 .radio_image_label {
   display: flex;

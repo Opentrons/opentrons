@@ -2,6 +2,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
+} from '@opentrons/api-client'
+import {
   AlertPrimaryButton,
   COLORS,
   Flex,
@@ -10,7 +15,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { isRecoveryStatus } from '/app/local-resources/runs/utils'
 import { TakeoverModal } from '/app/organisms/TakeoverModal/TakeoverModal'
 import { useUpdateClientDataRecovery } from '/app/resources/client_data'
 
@@ -39,7 +43,11 @@ export function RecoveryTakeover(props: {
 
   // TODO(jh, 07-29-24): This is likely sufficient for most edge cases, but this does not account for
   // all terminal commands as it should. Revisit this.
-  const isTerminateDisabled = !isRecoveryStatus(runStatus)
+  const isTerminateDisabled = !(
+    runStatus === RUN_STATUS_AWAITING_RECOVERY ||
+    runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR ||
+    runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED
+  )
 
   const buildRecoveryTakeoverProps = (
     intent: ClientDataRecovery['intent']
@@ -129,7 +137,11 @@ export function RecoveryTakeoverDesktop({
     >
       <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
         <Flex css={BANNER_TEXT_CONTENT_STYLE}>
-          <Icon name="ot-alert" color={COLORS.red50} size={SPACING.spacing40} />
+          <Icon
+            name="alert-circle"
+            color={COLORS.red50}
+            size={SPACING.spacing40}
+          />
           <StyledText desktopStyle="headingSmallBold">{title}</StyledText>
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('another_app_controlling_robot')}

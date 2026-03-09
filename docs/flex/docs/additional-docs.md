@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Additional Documentation"
-description: "Links to Knowledge Hub, Python API docs, and other Opentrons resources."
 ---
 
 Opentrons maintains additional online documentation for our hardware and software products. You may find these resources valuable as you use Opentrons Flex.
@@ -19,7 +18,7 @@ The [Opentrons Knowledge Hub](https://opentrons.com/resources/knowledge-hub/) ho
 
 ## Python Protocol API documentation
 
-The [documentation for the Opentrons Python Protocol API](../python-api/index.md) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](../python-api/tutorial.md) for users writing their first Python protocol.
+The [online documentation for the Opentrons Python Protocol API](https://docs.opentrons.com/v2/) describes how to write automated biology lab protocols for Opentrons robots and hardware modules. The documentation includes a [Tutorial](https://docs.opentrons.com/v2/tutorial.html) for users writing their first Python protocol.
 
 The Python API documentation covers writing Python code to:
 
@@ -35,7 +34,7 @@ The Python API documentation covers writing Python code to:
 
 - Move instruments to exact locations in the working area.
 
-There is also a [Python API reference](../python-api/reference/protocols.md) with information about all of the classes and methods that comprise the API.
+There is also a [Python API reference](https://docs.opentrons.com/v2/new_protocol_api.html) with information about all of the classes and methods that comprise the API.
 
 ## Opentrons HTTP API reference
 

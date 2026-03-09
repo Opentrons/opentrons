@@ -21,7 +21,7 @@ const publishConfig =
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
-  electronVersion: '39.1.2',
+  electronVersion: '33.2.1',
   npmRebuild: false,
   releaseInfo: {
     releaseNotesFile:
@@ -34,7 +34,6 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
-    '!**/.venv/**',
     {
       from: '../app/dist',
       to: './ui',

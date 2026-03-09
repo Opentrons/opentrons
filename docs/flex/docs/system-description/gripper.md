@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Gripper"
-description: "Gripper for moving labware and lids on the Flex deck."
 ---
 
 The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration](../installation/instruments.md).

@@ -1,11 +1,9 @@
 """Gripper configurations."""
 
-from typing import Any, Dict, List, NewType, Tuple
-
-from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated, Literal
-
-from ..util import StrEnum
+from typing import List, Dict, Tuple, Any, NewType
+from pydantic import ConfigDict, BaseModel, Field
+from enum import Enum
 
 
 def _snake_to_camel_case(snake: str) -> str:
@@ -20,7 +18,7 @@ GripperModelStr = NewType("GripperModelStr", str)
 
 # TODO (spp, 2023-01-31): figure out if we want to keep this a string enum or revert to
 #  a regular enum with custom stringification
-class GripperModel(StrEnum):
+class GripperModel(str, Enum):
     """Gripper models."""
 
     v1 = "gripperV1"

@@ -3,8 +3,8 @@ from typing import List, Optional, Tuple
 
 import pydantic
 
-from . import file_operators as io
 from .types import CutoutFixturePlacement
+from . import file_operators as io
 
 
 class _CutoutFixturePlacementModel(pydantic.BaseModel):

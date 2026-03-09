@@ -31,13 +31,13 @@ export function EnableErrorRecoveryMode({
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             id="AdvancedSettings_Error_Recovery_Mode"
           >
             {t('error_recovery_mode')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('error_recovery_mode_description')}
           </LegacyStyledText>
         </Flex>

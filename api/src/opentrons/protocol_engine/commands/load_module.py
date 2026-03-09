@@ -1,28 +1,28 @@
 """Implementation, request models, and response models for the load module command."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Optional, Type
-
+from typing import TYPE_CHECKING, Optional, Type, Any
+from typing_extensions import Literal
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal
 
+from opentrons.protocol_engine.state.update_types import StateUpdate
+
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..types import (
-    AddressableAreaLocation,
     DeckSlotLocation,
-    ModuleModel,
+    AddressableAreaLocation,
     ModuleType,
+    ModuleModel,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from opentrons.protocol_engine.resources import deck_configuration_provider
-from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.types import DeckSlotName
 
+from opentrons.protocol_engine.resources import deck_configuration_provider
+
+
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
     from ..state.state import StateView
+    from ..execution import EquipmentHandler
 
 
 LoadModuleCommandType = Literal["loadModule"]
@@ -67,7 +67,8 @@ class LoadModuleParams(BaseModel):
     moduleId: str | SkipJsonSchema[None] = Field(
         None,
         description=(
-            "An optional ID to assign to this module. If None, an ID will be generated."
+            "An optional ID to assign to this module."
+            " If None, an ID will be generated."
         ),
         json_schema_extra=_remove_default,
     )

@@ -1,21 +1,23 @@
 """The usb binary protocol over serial transport."""
-
 import asyncio
-import concurrent.futures
 import logging
+import concurrent.futures
 from functools import partial
-from typing import Optional, Tuple, Type
+from typing import Optional, Type, Tuple
 
 import serial  # type: ignore[import-untyped]
-from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
-from opentrons_hardware.firmware_bindings import utils
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
+from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
+
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
     get_binary_definition,
 )
+
+
+from opentrons_hardware.firmware_bindings import utils
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
 log = logging.getLogger(__name__)
 
@@ -107,8 +109,7 @@ class SerialUsbDriver:
             message_def = get_binary_definition(message_type)
             if message_def is not None:
                 message_length = int.from_bytes(
-                    utils.UInt16Field.build(header_data[2:4]).value,  # type: ignore[arg-type]
-                    "big",
+                    utils.UInt16Field.build(header_data[2:4]).value, "big"  # type: ignore[arg-type]
                 )
                 message_data = await self._loop.run_in_executor(
                     self._executor,

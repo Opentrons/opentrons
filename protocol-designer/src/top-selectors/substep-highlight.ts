@@ -1,16 +1,7 @@
 import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
 
-import {
-  A1_NOZZLE,
-  ALL,
-  COLUMN,
-  getWellNamePerMultiTip,
-  PARTIAL_COLUMN,
-  PARTIAL_NOZZLE_MAP,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { COLUMN, getWellNamePerMultiTip, SINGLE } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../file-data'
@@ -24,11 +15,8 @@ import { getWellSetForMultichannel } from '../utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
-  ActiveNozzleNumber,
   CreateCommand,
   NozzleConfigurationStyle,
-  PartialPrimaryNozzles,
-  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type { SubstepItemData } from '../steplist/types'
@@ -38,23 +26,15 @@ function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
   wells: string[],
-  nozzles: NozzleConfigurationStyle,
-  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle | null
 ): string[] {
   const pipChannels = pipetteEntity.spec.channels
   // `wells` is all the wells that pipette interacts with.
   if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
-    let channels: ActiveNozzleNumber = pipChannels
+    let channels = pipChannels
     if ((nozzles === COLUMN && pipChannels === 96) || pipChannels === 8) {
       channels = 8
     }
-    if (nozzles === ROW) {
-      channels = 12
-    }
-    if (nozzles === PARTIAL_COLUMN && primaryNozzle) {
-      channels = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-    }
-
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
         labwareEntity.def,
@@ -88,18 +68,10 @@ function _getSelectedWellsForStep(
   if (!pipetteEntity || !labwareEntity) {
     return []
   }
-  const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : ALL
-  const primaryNozzle =
-    'primaryNozzle' in stepArgs ? stepArgs.primaryNozzle : A1_NOZZLE
+  const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : null
 
   const getWells = (wells: string[]): string[] =>
-    _wellsForPipette(
-      pipetteEntity,
-      labwareEntity,
-      wells,
-      nozzles,
-      primaryNozzle
-    )
+    _wellsForPipette(pipetteEntity, labwareEntity, wells, nozzles)
 
   const wells = []
 
@@ -140,24 +112,19 @@ function _getSelectedWellsForStep(
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
-      let channels: ActiveNozzleNumber = pipetteSpec.channels
+      let channels = pipetteSpec.channels
       if ('nozzles' in stepArgs) {
         if (stepArgs.nozzles === COLUMN) {
           channels = 8
         } else if (stepArgs.nozzles === SINGLE) {
           channels = 1
-        } else if (stepArgs.nozzles === ROW) {
-          channels = 12
-        } else if (stepArgs.nozzles === PARTIAL_COLUMN) {
-          const partialNozzle = stepArgs.primaryNozzle as PartialPrimaryNozzles
-          channels = PARTIAL_NOZZLE_MAP[partialNozzle]
         }
       }
       const commandWellName = c.params.wellName
 
       if (channels === 1) {
         wells.push(commandWellName)
-      } else {
+      } else if (channels === 8 || channels === 96) {
         const wellSet =
           getWellSetForMultichannel({
             labwareDef: invariantContext.labwareEntities[labwareId].def,
@@ -165,6 +132,12 @@ function _getSelectedWellsForStep(
             channels,
           }) || []
         wells.push(...wellSet)
+      } else {
+        console.error(
+          `Unexpected number of channels: ${
+            channels || '?'
+          }. Could not get tip highlight state`
+        )
       }
     }
   })

@@ -17,8 +17,6 @@ import {
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import { ACTIONS } from './constants'
-
 import type { ComponentProps, Dispatch } from 'react'
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -69,7 +67,7 @@ export function SelectTipDropLocation({
 
   const handleClickNext = (): void => {
     dispatch({
-      type: ACTIONS.SET_DROP_TIP_LOCATION,
+      type: 'SET_DROP_TIP_LOCATION',
       location: selectedTipDropLocation ?? {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,

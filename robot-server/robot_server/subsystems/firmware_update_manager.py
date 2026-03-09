@@ -1,26 +1,26 @@
 """Class to monitor firmware update status."""
-
-import logging
 from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
 from datetime import datetime
+import logging
 from typing import (
-    TYPE_CHECKING,
-    Any,
-    Awaitable,
-    Callable,
     Dict,
-    List,
+    TYPE_CHECKING,
     Optional,
+    Any,
+    Callable,
+    Awaitable,
+    List,
 )
 
-from opentrons.hardware_control.errors import UpdateOngoingError
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
+from opentrons.hardware_control.errors import UpdateOngoingError
 
-from .models import SubSystem, UpdateState
 from robot_server.service.task_runner import TaskRunner
+from .models import SubSystem, UpdateState
+
 
 log = logging.getLogger(__name__)
 

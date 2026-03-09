@@ -9,6 +9,7 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   ClientDataResponse,
   DefaultClientData,
+  HostConfig,
 } from '@opentrons/api-client'
 
 export function useClientData<T = DefaultClientData>(
@@ -18,7 +19,8 @@ export function useClientData<T = DefaultClientData>(
   const host = useHost()
   const query = useQuery<ClientDataResponse<T>, AxiosError>(
     [host, 'client_data', key],
-    () => getClientData<T>(host!, key).then(response => response.data),
+    () =>
+      getClientData<T>(host as HostConfig, key).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

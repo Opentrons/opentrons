@@ -182,4 +182,6 @@ Versions follow [semver.inc][semver-inc]. QA is done on alpha builds, and only a
 
 ## Releasing Web Projects
 
-See [scripts/static-deploy/README.md](./scripts/static-deploy/README.md) for the release process of these projects.
+While our web projects also take their versions from appropriately-prefixed git tags, they will not be automatically deployed.
+
+See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.

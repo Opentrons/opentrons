@@ -59,14 +59,11 @@ export function UpdateSoftware({
         gridGap={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
         </LegacyStyledText>
         <LegacyStyledText
-          forwardedAs="h3"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey60}
         >

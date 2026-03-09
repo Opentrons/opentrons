@@ -111,7 +111,6 @@ export function LPCSetupFlexBtns({
         onClick={onApplyOffsets}
         id="LPC_setOffsetsConfirmed"
         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-        disabled={isApplyOffsetsBtnDisabled}
         {...confirmOffsetsTargetProps}
       >
         {t('apply_offsets')}

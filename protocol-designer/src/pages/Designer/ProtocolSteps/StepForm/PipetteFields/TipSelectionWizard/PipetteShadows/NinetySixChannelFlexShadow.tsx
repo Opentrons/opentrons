@@ -5,10 +5,7 @@ import type { PipetteShadowProps } from '../types'
 export function NinetySixChannelFlexShadow(
   props: PipetteShadowProps
 ): JSX.Element {
-  const { x, y, width, height, fill, stroke, rotate } = props
-  const transform = rotate
-    ? `rotate(180, ${x + width / 2}, ${y + height / 2})`
-    : ``
+  const { x, y, width, height, fill, stroke } = props
   return (
     <svg
       viewBox="0 0 499 341"
@@ -19,7 +16,7 @@ export function NinetySixChannelFlexShadow(
       height={height}
       fill={fill}
       className={styles.shadow_overlay}
-      transform={transform}
+      transform={`rotate(180, ${x + width / 2}, ${y + height / 2})`}
       stroke={stroke}
       strokeWidth="2.7881"
     >

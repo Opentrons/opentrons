@@ -69,7 +69,12 @@ const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  return labwareEntities[newLocation] != null
+  if (labwareEntities[newLocation] == null) {
+    return false
+  }
+  return (
+    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
+  )
 }
 
 const getIsAdditionalEquipmentLocation = (
@@ -375,6 +380,14 @@ const stepFieldHelperMap = {
   }),
   profileVolume: stepFieldHelpers({
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+  }),
+  blockTargetTempHold: stepFieldHelpers({
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  }),
+  lidTargetTempHold: stepFieldHelpers({
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
   }),
   mix_mmFromBottom: stepFieldHelpers({
     castValue: numberOrNull,

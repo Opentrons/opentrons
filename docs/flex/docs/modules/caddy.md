@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Module Caddy System"
-description: "Caddies for deck-mounting modules and below-deck cable routing on Flex."
 ---
 
 Compatible modules are designed to fit into caddies that occupy space below the deck. This system allows labware on top of modules to remain closer to the deck surface, and it also allows for below-deck cable routing so the deck stays tidy during your protocol runs.

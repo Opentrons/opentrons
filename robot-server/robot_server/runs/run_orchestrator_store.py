@@ -2,67 +2,67 @@
 
 import asyncio
 import logging
-from typing import Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Dict, List, Optional, Callable, Mapping, Sequence
+
+from opentrons.types import NozzleMapInterface
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.types import (
+    PostRunHardwareState,
+    RunTimeParameter,
+    CSVRuntimeParamPaths,
+)
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons_shared_data.errors.exceptions import ModuleNotPresent
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    AsynchronousModuleErrorNotification,
     EstopState,
-    EstopStateNotification,
     HardwareEvent,
+    EstopStateNotification,
     HardwareEventHandler,
+    AsynchronousModuleErrorNotification,
     ModuleDisconnectedNotification,
 )
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+from opentrons.protocol_runner import (
+    RunResult,
+    RunOrchestrator,
+)
+from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.protocol_engine import (
-    Command,
-    CommandCreate,
-    CommandErrorSlice,
-    CommandPointer,
-    CommandSlice,
     DeckType,
-    ErrorOccurrence,
-    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
+    CommandSlice,
+    CommandErrorSlice,
+    CommandPointer,
+    Command,
+    CommandCreate,
+    LabwareOffset,
+    Config as ProtocolEngineConfig,
     error_recovery_policy,
 )
-from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
-)
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine import ErrorOccurrence
+
+from robot_server.protocols.protocol_store import ProtocolResource
+from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
+    PrimitiveRunTimeParamValuesType,
+    EngineStatus,
+)
+from opentrons_shared_data.labware.types import LabwareUri
+from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
-from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
-from opentrons.protocol_engine.types import (
-    CommandAnnotation,
-    CSVRuntimeParamPaths,
-    DeckConfigurationType,
-    EngineStatus,
-    PostRunHardwareState,
-    PrimitiveRunTimeParamValuesType,
-    RunTimeParameter,
-)
-from opentrons.protocol_runner import (
-    RunOrchestrator,
-    RunResult,
-)
-from opentrons.protocol_runner.run_orchestrator import ParseMode
-from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.types import NozzleMapInterface
-from opentrons_shared_data.errors.exceptions import ModuleNotPresent
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
-
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
 _log = logging.getLogger(__name__)
 
@@ -249,10 +249,8 @@ class RunOrchestratorStore:
         Args:
             run_id: The run resource the run orchestrator is assigned to.
             labware_offsets: Labware offsets to create the run with.
-            initial_error_recovery_policy: How to recover from errors.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             file_provider: Wrapper to let the engine read/write data files.
-            camera_provider: Wrapper to let the engine use the camera.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
@@ -337,7 +335,7 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
-        command_annotations = self.run_orchestrator.get_all_command_annotations()
+        command_annotations = self.run_orchestrator.get_command_annotations()
         preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
@@ -452,24 +450,6 @@ class RunOrchestratorStore:
         """Get a run's command by ID."""
         return self.run_orchestrator.get_command(command_id=command_id)
 
-    def get_total_command_annotations_count(self) -> int:
-        """Get the total number of command annotations in the run."""
-        return self.run_orchestrator.get_total_command_annotations_count()
-
-    def get_command_annotations_slice(
-        self,
-        cursor: int,
-        length: int,
-    ) -> CommandAnnotationsSlice:
-        """Get a slice of run commands."""
-        return self.run_orchestrator.get_command_annotations_slice(
-            cursor=cursor, length=length
-        )
-
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
-        """Get the specified command annotation."""
-        return self.run_orchestrator.get_command_annotation(annotation_id)
-
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""
         return self.run_orchestrator.get_run_status()
@@ -477,28 +457,6 @@ class RunOrchestratorStore:
     def get_is_run_terminal(self) -> bool:
         """Get whether run is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
-
-    def get_camera_capture_image_settings(
-        self, camera_id: str
-    ) -> CameraCaptureImageSettings:
-        """Get camera capture image settings to state."""
-        settings = self.run_orchestrator.get_camera_capture_image_settings()
-
-        # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
-        # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
-        if camera_id != settings["camera_id"]:
-            _log.info(
-                f"Stored camera ID does not match provided ID, returning stored data for camera ID {settings['camera_id']}."
-            )
-        return CameraCaptureImageSettings(
-            cameraId=settings["camera_id"],
-            resolution=settings["resolution"],
-            zoom=settings["zoom"],
-            pan=settings["pan"],
-            contrast=settings["contrast"],
-            brightness=settings["brightness"],
-            saturation=settings["saturation"],
-        )
 
     def run_was_started(self) -> bool:
         """Get whether the run has started."""
@@ -525,20 +483,6 @@ class RunOrchestratorStore:
     ) -> CameraSettings:
         """Add new camera enablement settings to state."""
         return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
-
-    def add_camera_capture_image_settings(
-        self, capture_image_settings: CameraCaptureImageSettings
-    ) -> None:
-        """Add new camera capture image settings to state."""
-        self.run_orchestrator.add_camera_capture_image_settings(
-            camera_id=capture_image_settings.cameraId,
-            resolution=capture_image_settings.resolution,
-            zoom=capture_image_settings.zoom,
-            pan=capture_image_settings.pan,
-            contrast=capture_image_settings.contrast,
-            brightness=capture_image_settings.brightness,
-            saturation=capture_image_settings.saturation,
-        )
 
     async def add_command_and_wait_for_interval(
         self,

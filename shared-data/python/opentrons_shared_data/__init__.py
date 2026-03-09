@@ -6,8 +6,9 @@ the main opentrons package
 
 import os
 
-from ._version import version
 from .load import get_shared_data_root, load_shared_data
+
+from ._version import version
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 

@@ -4,36 +4,29 @@ import inspect
 from datetime import datetime
 from typing import cast
 
+from opentrons.protocol_engine.state.update_types import (
+    LoadPipetteUpdate,
+    LoadedLabwareUpdate,
+    LoadModuleUpdate,
+    PipetteConfigUpdate,
+    StateUpdate,
+)
 import pytest
-from decoy import Decoy, matchers
-
-from opentrons_shared_data.labware.types import LabwareDefinition2
-from opentrons_shared_data.module.types import ModuleDefinitionV3
-from opentrons_shared_data.pipette.types import PipetteNameType
+from decoy import matchers, Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.legacy_commands.types import CommandMessage, CommentMessage, PauseMessage
-from opentrons.protocol_api.core.legacy.load_info import (
-    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
-)
+from opentrons.legacy_commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_api.core.legacy.load_info import (
     LabwareLoadInfo as LegacyLabwareLoadInfo,
-)
-from opentrons.protocol_api.core.legacy.load_info import (
+    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_engine import (
-    ModuleDefinition,
     ModuleModel,
-)
-from opentrons.protocol_engine import (
-    actions as pe_actions,
-)
-from opentrons.protocol_engine import (
+    ModuleDefinition,
     commands as pe_commands,
-)
-from opentrons.protocol_engine import (
+    actions as pe_actions,
     types as pe_types,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
@@ -44,17 +37,13 @@ from opentrons.protocol_engine.resources import (
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
-from opentrons.protocol_engine.state.update_types import (
-    LoadedLabwareUpdate,
-    LoadModuleUpdate,
-    LoadPipetteUpdate,
-    PipetteConfigUpdate,
-    StateUpdate,
-)
 from opentrons.protocol_runner.legacy_command_mapper import (
-    LegacyCommandMapper,
     LegacyContextCommandError,
+    LegacyCommandMapper,
 )
+from opentrons_shared_data.labware.types import LabwareDefinition2
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import DeckSlotName, Mount, MountType
 
 

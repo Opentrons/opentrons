@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Module Calibration"
-description: "When and how to calibrate modules on Flex for accurate positioning."
 ---
 
 When you first install a module on Flex, you need to run automated positional calibration. This process is similar to positional calibration for instruments, and ensures that Flex moves to the exact correct locations for optimal protocol performance. During calibration, Flex will move to locations on a module calibration adapter, which looks similar to the calibration squares that are part of removable deck slots.

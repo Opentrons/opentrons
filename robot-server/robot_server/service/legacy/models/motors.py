@@ -1,12 +1,12 @@
-import typing
+from enum import Enum
 
-from pydantic import BaseModel, Field, field_validator
+import typing
+from pydantic import field_validator, BaseModel, Field
 
 from opentrons.hardware_control import types
-from opentrons_shared_data.util import StrEnum
 
 
-class MotorName(StrEnum):
+class MotorName(str, Enum):
     # opentrons.hardware_control.types.Axis as an int enum. We need this to
     # be a string enum of the keys in Axis. We will use _ignore_ and vars a la
     # https://docs.python.org/3/library/enum.html#timeperiod to
@@ -38,9 +38,9 @@ class EngagedMotors(BaseModel):
     z_r: EngagedMotor
     p_l: EngagedMotor
     p_r: EngagedMotor
-    q: typing.Optional[EngagedMotor] = (
-        None  # Optional since OT2 doesn't have these axes
-    )
+    q: typing.Optional[
+        EngagedMotor
+    ] = None  # Optional since OT2 doesn't have these axes
     g: typing.Optional[EngagedMotor] = None
 
 

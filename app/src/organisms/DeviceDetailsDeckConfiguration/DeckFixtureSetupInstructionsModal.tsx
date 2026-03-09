@@ -64,10 +64,10 @@ export function DeckFixtureSetupInstructionsModal({
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {t('deck_fixture_setup_modal_top_description')}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {t('branded:deck_fixture_setup_modal_bottom_description')}
               </LegacyStyledText>
             </Flex>
@@ -89,10 +89,10 @@ export function DeckFixtureSetupInstructionsModal({
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing16}
                 >
-                  <LegacyStyledText forwardedAs="p">
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_top_description')}
                   </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_bottom_description_desktop')}
                   </LegacyStyledText>
                 </Flex>

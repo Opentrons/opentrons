@@ -18,7 +18,7 @@ import type {
   TransferType,
 } from '../types'
 
-export interface InitialSummaryStateProps {
+interface InitialSummaryStateProps {
   state: {
     pipette: PipetteV2Specs
     mount: Mount
@@ -96,11 +96,11 @@ export function getInitialSummaryState(
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
+    disposalVolume: path === 'multiDispense' ? state.volume : undefined,
     blowOutDispense:
-      path !== 'multiDispense'
+      path === 'multiDispense'
         ? {
-            // blowout location should default to same fixture as dropTipLocation below
-            location: state.dropTipLocation ?? trashConfigCutout,
+            location: trashConfigCutout,
             flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
           }
         : undefined,

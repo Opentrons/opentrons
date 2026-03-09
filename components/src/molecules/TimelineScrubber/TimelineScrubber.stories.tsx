@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { action } from '@storybook/addon-actions'
 
-import { DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-
 import { TimelineScrubber as TimelineScrubberComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -37,13 +35,7 @@ function TimelineScrubber(args: any): JSX.Element {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: DIRECTION_COLUMN,
-        gap: SPACING.spacing16,
-      }}
-    >
+    <div>
       <h3>Timeline Scrubber</h3>
       <p>Drag the sliders to update the values</p>
       <TimelineScrubberComponent

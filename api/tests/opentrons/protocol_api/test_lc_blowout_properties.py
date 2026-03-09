@@ -1,16 +1,17 @@
 """Tests for liquid class blowout properties in the Opentrons protocol API."""
 
-from typing import Any
-
-import pytest
-from hypothesis import given, settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
+import pytest
+from typing import Any
+from hypothesis import given, strategies as st, settings
 
+from opentrons.protocol_api._liquid_properties import (
+    _build_blowout_properties,
+)
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    BlowoutLocation,
-    BlowoutParams,
     BlowoutProperties,
+    BlowoutParams,
+    BlowoutLocation,
 )
 
 from . import (
@@ -18,9 +19,6 @@ from . import (
     invalid_values,
     negative_or_zero_floats_and_ints,
     positive_non_zero_floats_and_ints,
-)
-from opentrons.protocol_api._liquid_properties import (
-    _build_blowout_properties,
 )
 
 
@@ -42,17 +40,11 @@ def test_blowout_properties_none_instantiation_combos() -> None:
     """Test that none values raise."""
     with pytest.raises(ValidationError):
         _build_blowout_properties(
-            BlowoutProperties(
-                enable=None,  # type: ignore
-                params=BlowoutParams(location=None, flowRate=None),  # type: ignore
-            )
+            BlowoutProperties(enable=None, params=BlowoutParams(location=None, flowRate=None))  # type: ignore
         )
     with pytest.raises(ValidationError):
         _build_blowout_properties(
-            BlowoutProperties(
-                enable=True,
-                params=BlowoutParams(location=None, flowRate=100),  # type: ignore
-            )
+            BlowoutProperties(enable=True, params=BlowoutParams(location=None, flowRate=100))  # type: ignore
         )
 
 

@@ -100,24 +100,19 @@ export const LocationConflictModal = (
 
   // skip past fix conflict screen if D3 can remain the same when you attach
   // a flex stacker module, ie mag block or waste chute only fixture
-  useEffect(
-    () => {
-      if (requiredModule != null && requiredModule === FLEX_STACKER_MODULE_V1) {
-        if (
-          deckConfigurationAtLocationFixtureId != null &&
-          (deckConfigurationAtLocationFixtureId === MAGNETIC_BLOCK_V1_FIXTURE ||
-            WASTE_CHUTE_ONLY_FIXTURES.includes(
-              deckConfigurationAtLocationFixtureId
-            ))
-        ) {
-          setShowModuleSelect(true)
-        }
+  useEffect(() => {
+    if (requiredModule != null && requiredModule === FLEX_STACKER_MODULE_V1) {
+      if (
+        deckConfigurationAtLocationFixtureId != null &&
+        (deckConfigurationAtLocationFixtureId === MAGNETIC_BLOCK_V1_FIXTURE ||
+          WASTE_CHUTE_ONLY_FIXTURES.includes(
+            deckConfigurationAtLocationFixtureId
+          ))
+      ) {
+        setShowModuleSelect(true)
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+    }
+  }, [])
 
   const isThermocyclerRequired =
     requiredModule === THERMOCYCLER_MODULE_V1 ||
@@ -328,13 +323,13 @@ export const LocationConflictModal = (
               cutout: displaySlotName,
             }}
             components={{
-              block: <LegacyStyledText forwardedAs="p" />,
+              block: <LegacyStyledText as="p" />,
               strong: <strong />,
             }}
           />
           <Flex flexDirection={DIRECTION_COLUMN}>
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
@@ -354,13 +349,13 @@ export const LocationConflictModal = (
                 borderRadius={BORDERS.borderRadius4}
               >
                 <LegacyStyledText
-                  forwardedAs="p"
+                  as="p"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('protocol_specifies')}
                 </LegacyStyledText>
 
-                <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
                   {protocolSpecifiesDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -373,13 +368,13 @@ export const LocationConflictModal = (
                 borderRadius={BORDERS.borderRadius4}
               >
                 <LegacyStyledText
-                  forwardedAs="p"
+                  as="p"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('currently_configured')}
                 </LegacyStyledText>
 
-                <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+                <LegacyStyledText as="p" color={COLORS.grey60}>
                   {currentFixtureDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -414,7 +409,7 @@ export const LocationConflictModal = (
           >
             <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
             <LegacyStyledText
-              forwardedAs="h3"
+              as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('deck_conflict')}
@@ -461,13 +456,10 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <LegacyStyledText
-                  forwardedAs="label"
-                  width={SPACING.spacing120}
-                >
+                <LegacyStyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
                 </LegacyStyledText>
-                <LegacyStyledText forwardedAs="label" flex="1">
+                <LegacyStyledText as="label" flex="1">
                   {protocolSpecifiesDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -479,13 +471,10 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <LegacyStyledText
-                  forwardedAs="label"
-                  width={SPACING.spacing120}
-                >
+                <LegacyStyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}
                 </LegacyStyledText>
-                <LegacyStyledText forwardedAs="label" flex="1">
+                <LegacyStyledText as="label" flex="1">
                   {currentFixtureDisplayName}
                 </LegacyStyledText>
               </Flex>

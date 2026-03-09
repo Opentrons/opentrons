@@ -1,12 +1,9 @@
 """Type definitions for liquid classes."""
-
 from typing import Sequence, Tuple, TypedDict
-
 from typing_extensions import NotRequired
-
 from .liquid_class_definition import (
-    BLOWOUT_LOCATION_VALUE_TYPE,
     POSITION_REFERENCE_VALUE_TYPE,
+    BLOWOUT_LOCATION_VALUE_TYPE,
 )
 
 
@@ -55,7 +52,6 @@ class BlowoutPropertiesDict(TypedDict):
     enabled: bool
     location: NotRequired[BLOWOUT_LOCATION_VALUE_TYPE]
     flow_rate: NotRequired[float]
-    blowout_position: NotRequired[TipPositionDict]
 
 
 class SubmergeDict(TypedDict):

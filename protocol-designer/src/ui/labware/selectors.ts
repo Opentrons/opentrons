@@ -61,7 +61,7 @@ export const getWasteChuteOption: Selector<DropdownOption | null> =
 export const getDisposalOptions = createSelector(
   stepFormSelectors.getAdditionalEquipment,
   getWasteChuteOption,
-  (additionalEquipment, wasteChuteOption): DropdownOption[] => {
+  (additionalEquipment, wasteChuteOption) => {
     const trashBins = reduce(
       additionalEquipment,
       (

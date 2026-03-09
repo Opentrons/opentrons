@@ -4,18 +4,7 @@ const fs = require('fs/promises')
 
 // Updates a releases historical manifest with a release's version.
 
-/**
- * Parses an argument list into positional arguments and flags
- * @param {string[]} argv - argument list
- * @returns {{flags: string[], args: string[]}} Lists of flags and strings
- */
-function parseArgs(argv) {
-  return {
-    flags: argv.filter(a => a.startsWith('-')),
-    args: argv.filter(a => !a.startsWith('-')),
-  }
-}
-
+const parseArgs = require('./deploy/lib/parseArgs')
 const USAGE =
   '\nUsage:\n node ./scripts/update-releases-json <releases-json-path> <project> <artifact-dir> <url-base>'
 

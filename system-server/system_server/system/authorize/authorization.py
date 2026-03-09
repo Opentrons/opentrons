@@ -1,11 +1,9 @@
 """This module keeps track of current authorization."""
-
-import logging
-import uuid
-from datetime import timedelta
-
-from system_server.constants import AUTHORIZATION_AUDIENCE
 from system_server.jwt import create_jwt, registrant_from_jwt
+from datetime import timedelta
+import uuid
+import logging
+from system_server.constants import AUTHORIZATION_AUDIENCE
 
 _log = logging.getLogger(__name__)
 

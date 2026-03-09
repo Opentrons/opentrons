@@ -70,7 +70,8 @@ export const selectInitialDatabaseOffsets = (
     loadedOffsets => loadedOffsets ?? []
   )
 
-export interface LocationSpecificOffsetDetailsWithCopy extends LocationSpecificOffsetDetails {
+export interface LocationSpecificOffsetDetailsWithCopy
+  extends LocationSpecificOffsetDetails {
   slotCopy: string
 }
 

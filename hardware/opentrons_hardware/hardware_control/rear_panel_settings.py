@@ -1,38 +1,36 @@
 """Utilities for updating the rear-panel settings."""
-
 import logging
 from dataclasses import dataclass
-from typing import Optional, cast
-
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    Ack,
-    AddLightActionRequest,
-    AuxIDRequest,
-    AuxIDResponse,
+    DoorSwitchStateRequest,
+    DoorSwitchStateInfo,
     AuxPresentDetectionChange,
     AuxPresentRequest,
-    BinaryMessageDefinition,
-    DoorSwitchStateInfo,
-    DoorSwitchStateRequest,
-    EngageSyncOut,
-    EstopButtonDetectionChange,
-    EstopButtonPresentRequest,
-    EstopStateChange,
-    EstopStateRequest,
+    AuxIDRequest,
+    AuxIDResponse,
+    SetDeckLightRequest,
     GetDeckLightRequest,
     GetDeckLightResponse,
-    ReadEEPromRequest,
-    ReadEEPromResponse,
+    EstopButtonPresentRequest,
+    EstopButtonDetectionChange,
+    Ack,
+    EngageSyncOut,
     ReleaseSyncOut,
-    SetDeckLightRequest,
     StartLightAction,
+    AddLightActionRequest,
+    BinaryMessageDefinition,
+    EstopStateRequest,
+    EstopStateChange,
     SyncStateRequest,
     SyncStateResponse,
     WriteEEPromRequest,
+    ReadEEPromRequest,
+    ReadEEPromResponse,
 )
+from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
+from typing import cast, Optional
 
 log = logging.getLogger(__name__)
 

@@ -158,7 +158,6 @@ describe('getSlotInformation', () => {
       createdStackForSlot: [mockLabOnDeck2.id],
       createdFixtureForSlots: [],
       slotPosition: null,
-      isSlotAHopper: false,
     })
   })
   it('renders only a labware for ot-2 on slot 2', () => {
@@ -170,7 +169,6 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [],
       slotPosition: null,
       createdStackForSlot: [],
-      isSlotAHopper: false,
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -187,24 +185,6 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdFixtureForSlots: [],
       createdStackForSlot: [],
-      isSlotAHopper: false,
-    })
-  })
-  it('renders the slot as a hopper', () => {
-    const mockDeckSetup: AllTemporalPropertiesForTimelineFrame = {
-      labware: {},
-      pipettes: {},
-      modules: {},
-      additionalEquipmentOnDeck: {},
-    }
-    expect(
-      getSlotInformation({ deckSetup: mockDeckSetup, slot: 'hopperA4' })
-    ).toEqual({
-      matchingLabwareFor4thColumn: null,
-      slotPosition: null,
-      createdFixtureForSlots: [],
-      createdStackForSlot: [],
-      isSlotAHopper: true,
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -216,7 +196,6 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [mockTrash],
       preSelectedFixture: 'trashBin',
       createdStackForSlot: [],
-      isSlotAHopper: false,
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -229,7 +208,6 @@ describe('getSlotInformation', () => {
       createdAdapterForSlot: mockLabOnDeck1Flex,
       createdStackForSlot: [mockLabOnDeck2Flex.id],
       createdFixtureForSlots: [],
-      isSlotAHopper: false,
     })
   })
   it('renders the waste chute and staging area for slot D3 for Flex', () => {
@@ -241,7 +219,6 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
       createdStackForSlot: [],
-      isSlotAHopper: false,
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -253,7 +230,6 @@ describe('getSlotInformation', () => {
       createdStackForSlot: [mockLabOnStagingArea.id],
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
-      isSlotAHopper: false,
     })
   })
 })

@@ -1,8 +1,7 @@
 from typing import Dict, Optional
-
-from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 from opentrons.util.async_helpers import ensure_yield
+from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
+from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
 
 class SimulatingDriver(AbstractHeaterShakerDriver):

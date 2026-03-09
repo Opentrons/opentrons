@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -20,10 +19,10 @@ import {
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
-import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 import { WellContents } from './WellContents'
@@ -41,9 +40,6 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
   const dispatch = useDispatch()
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const selectedLabwareIds = useSelector(
-    labwareIngredSelectors.getSelectedLabwareIds
-  )
   const labwareEntities = useSelector(getLabwareEntities)
   const selectedLabwareDef =
     labwareId != null ? labwareEntities[labwareId] : null
@@ -91,7 +87,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
     if (labwareId != null) {
       dispatch(
         removeWellsContents({
-          labwareId: selectedLabwareIds ?? labwareId,
+          labwareId,
           wells,
         })
       )
@@ -124,11 +120,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
           >
             <StyledText
               desktopStyle="bodyDefaultSemiBold"
-              className={clsx(
-                lineClampStyles.line_clamp,
-                lineClampStyles.word_break_all
-              )}
-              style={{ WebkitLineClamp: 3 }}
+              css={LINE_CLAMP_TEXT_STYLE(3)}
             >
               {name}
             </StyledText>
@@ -141,11 +133,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             ) : null}
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              className={clsx(
-                lineClampStyles.line_clamp,
-                lineClampStyles.word_break_all
-              )}
-              style={{ WebkitLineClamp: 3 }}
+              css={LINE_CLAMP_TEXT_STYLE(3)}
             >
               {info.liquidIndex != null
                 ? liquidsWithDescriptions[info.liquidIndex].description
@@ -195,7 +183,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <Divider borderColor={COLORS.grey40} />
             {info.liquidIndex != null
               ? fullWellsByLiquid[info.liquidIndex]
-                  ?.sort((a, b) =>
+                  .sort((a, b) =>
                     orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
                   )
                   .map((wellName, wellliquidIndex) => {

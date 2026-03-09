@@ -18,24 +18,24 @@ export function Body(props: BodyProps): JSX.Element | null {
         <Trans
           t={t}
           i18nKey="calibration_health_check_intro_body"
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       )
     case Sessions.SESSION_TYPE_DECK_CALIBRATION:
       return (
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('deck_calibration_intro_body')}
         </LegacyStyledText>
       )
     case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
       return (
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('pipette_offset_calibration_intro_body')}
         </LegacyStyledText>
       )
     case Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION:
       return (
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('tip_length_calibration_intro_body')}
         </LegacyStyledText>
       )

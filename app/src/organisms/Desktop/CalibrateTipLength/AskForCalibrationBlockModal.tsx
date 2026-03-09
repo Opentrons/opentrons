@@ -72,7 +72,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
       >
         <Flex gridGap={SPACING.spacing8}>
           <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t('do_you_have_a_cal_block')}
             </LegacyStyledText>
 
@@ -81,10 +81,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
               i18nKey="branded:calibration_block_description"
               components={{
                 block: (
-                  <LegacyStyledText
-                    forwardedAs="p"
-                    marginBottom={SPACING.spacing8}
-                  />
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
                 ),
                 supportLink: (
                   <Link
@@ -118,7 +115,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
               }}
               value={rememberPreference}
             />
-            <LegacyStyledText forwardedAs="p" marginLeft={SPACING.spacing8}>
+            <LegacyStyledText as="p" marginLeft={SPACING.spacing8}>
               {t('shared:remember_my_selection_and_do_not_ask_again')}
             </LegacyStyledText>
           </Flex>

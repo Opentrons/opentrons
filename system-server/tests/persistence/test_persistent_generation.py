@@ -1,15 +1,16 @@
 """tests that the database is generated on server startup."""
 
 import os
-from pathlib import Path
 
-from fastapi import FastAPI
 
 from system_server.persistence import (
-    get_persistent_uuid,
     get_sql_engine,
+    get_persistent_uuid,
 )
 from system_server.persistence.persistent_directory import create_persistent_directory
+
+from fastapi import FastAPI
+from pathlib import Path
 
 
 async def test_database_generation_on_init(tmpdir: Path) -> None:

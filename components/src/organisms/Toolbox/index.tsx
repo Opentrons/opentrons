@@ -27,8 +27,6 @@ export interface ToolboxProps extends StyleProps {
   closeButton?: JSX.Element
   titlePadding?: string
   childrenPadding?: string
-  /** Optional test id for the scrollable children container. */
-  childrenContainerTestId?: string
   subHeader?: JSX.Element | null
   secondaryHeaderButton?: JSX.Element
 }
@@ -47,7 +45,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
     confirmButton,
     titlePadding = SPACING.spacing16,
     childrenPadding = SPACING.spacing16,
-    childrenContainerTestId,
     subHeader,
     secondaryHeaderButton,
     position = POSITION_RELATIVE,
@@ -120,7 +117,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           padding={childrenPadding}
           flex="1 1 auto"
           overflowY="auto"
-          data-testid={childrenContainerTestId}
           ref={slideOutRef}
           onScroll={handleScroll}
         >

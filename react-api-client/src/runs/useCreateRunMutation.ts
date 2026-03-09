@@ -36,7 +36,7 @@ export function useCreateRunMutation(
   const mutation = useMutation<Run, AxiosError, CreateRunData>(
     [host, 'runs'],
     createRunData =>
-      createRun(host!, createRunData)
+      createRun(host as HostConfig, createRunData)
         .then(response => response.data)
         .catch(e => {
           throw e

@@ -1,11 +1,9 @@
 """Protocol Engine types to do with liquid level detection."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, List, Optional
-
+from typing import Optional, List, Any
 from pydantic import BaseModel, model_serializer, model_validator
 
 

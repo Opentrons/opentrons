@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Advanced Operations"
-description: "SSH, Jupyter, command-line tools, and log files for advanced users."
 ---
 
 This chapter describes selected features and techniques you might use only under unusual circumstances or for non-standard interactions, such as diagnostics or specialized control that requires knowledge of terminal commands.

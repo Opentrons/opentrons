@@ -27,14 +27,14 @@ export function useAllRunsQuery(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  let queryKey = [host!, 'runs', 'details']
+  let queryKey = [host as HostConfig, 'runs', 'details']
   if (params?.pageLength != null) {
     queryKey = [...queryKey, String(params.pageLength)]
   }
   const query = useQuery(
     queryKey,
     () =>
-      getRuns(host!, params)
+      getRuns(host as HostConfig, params)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

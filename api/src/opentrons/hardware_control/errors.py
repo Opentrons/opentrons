@@ -1,8 +1,7 @@
-from typing import Any, Dict, Optional
-
+from typing import Optional, Dict, Any
 from opentrons_shared_data.errors.exceptions import (
-    InvalidInstrumentData,
     MotionPlanningFailureError,
+    InvalidInstrumentData,
     RobotInUseError,
 )
 

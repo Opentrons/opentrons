@@ -1,5 +1,4 @@
 from typing import List
-
 from typing_extensions import Protocol
 
 from ..modules import AbstractModule, ModuleModel

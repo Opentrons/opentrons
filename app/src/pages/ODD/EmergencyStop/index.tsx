@@ -47,10 +47,7 @@ export function EmergencyStop(): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText
-            forwardedAs="h2"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('install_e_stop')}
           </LegacyStyledText>
         </Flex>
@@ -77,7 +74,7 @@ export function EmergencyStop(): JSX.Element {
                   data-testid="EmergencyStop_connected_icon"
                 />
                 <LegacyStyledText
-                  forwardedAs="h3"
+                  as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('e_stop_connected')}
@@ -87,7 +84,7 @@ export function EmergencyStop(): JSX.Element {
               <>
                 <img src={estopImg} height="116px" alt="E-stop button" />
                 <LegacyStyledText
-                  forwardedAs="h3"
+                  as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}

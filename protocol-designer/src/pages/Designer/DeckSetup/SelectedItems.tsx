@@ -29,10 +29,9 @@ interface SelectedItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
   slotPosition: CoordinateTuple | null
-  isSlotAHopper: boolean
 }
 export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
-  const { deckDef, robotType, slotPosition, isSlotAHopper } = props
+  const { deckDef, robotType, slotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
@@ -55,6 +54,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       )
     }
   )
+
   const matchingSelectedLidOnDeck = Object.values(labware).find(
     ({ stack, labwareDefURI }) => {
       const matchingSlot = getSlotInLocationStack(stack)
@@ -126,34 +126,28 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           quite right, most obviously for the Thermocycler on a Flex. We aren't
           passing a targetSlotId and targetDeckId down to <Module>, which means
           it isn't applying slot-specific adjustments.
-
-          note: we need to special-case labware on the hopper since it is the 2nd slot
-          available for labware on the stacker. so we don't want to re-render the stacker
-          in the hopper slot
           */}
-          {isSlotAHopper ? null : (
-            <Module
-              key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              def={getModuleDef(selectedModuleModel)}
-              orientation={orientation}
-              targetDeckId={null}
-              targetSlotId={null}
-              childrenPositioningMode={
-                getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
-                  ? 'passThrough'
-                  : 'offsetToSlot'
-              }
-            >
-              <SelectedModuleLabwareRender
-                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-                adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
-                lidOnDeck={matchingSelectedLidOnDeck}
-              />
-            </Module>
-          )}
+          <Module
+            key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            def={getModuleDef(selectedModuleModel)}
+            orientation={orientation}
+            targetDeckId={null}
+            targetSlotId={null}
+            childrenPositioningMode={
+              getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+                ? 'passThrough'
+                : 'offsetToSlot'
+            }
+          >
+            <SelectedModuleLabwareRender
+              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+              adapterDef={selectedAdapterDef}
+              moduleModel={selectedModuleModel}
+              lidOnDeck={matchingSelectedLidOnDeck}
+            />
+          </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
               isLast={selectedAdapterDefURI == null}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import type { WellBottomShape } from '@opentrons/shared-data'
 import type { LabwareType, WellShape } from '../../fields'
 

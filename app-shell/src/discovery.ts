@@ -66,6 +66,7 @@ export function initializeDiscovery(): void {
   const state = getDiscoveryState()
   let initialRobots: DiscoveryClientRobot[] = []
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!state.config.disableCache) {
     const legacyCachedServices: LegacyService[] | undefined = state.store.get(
       'services',

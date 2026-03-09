@@ -1,29 +1,28 @@
 """Load lid command request, result, and implementation models."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional, Type
-
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareCannotBeStackedError, LabwareIsNotAllowedInLocationError
-from ..errors.error_occurrence import ErrorOccurrence
 from ..resources import labware_validation
-from ..state.update_types import StateUpdate
 from ..types import (
     LoadableLabwareLocation,
     OnLabwareLocation,
     OnLabwareLocationSequenceComponent,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+
 from .labware_handling_common import LabwareHandlingResultMixin
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
     from ..state.state import StateView
+    from ..execution import EquipmentHandler
 
 
 LoadLidCommandType = Literal["loadLid"]

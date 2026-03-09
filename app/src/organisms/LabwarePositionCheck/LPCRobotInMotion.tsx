@@ -43,7 +43,7 @@ export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
         <Icon name="ot-spinner" css={SPINNER_STYLE} spin />
         {header != null ? <LoadingText>{header}</LoadingText> : null}
         {body != null ? (
-          <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
+          <LegacyStyledText as="p">{body}</LegacyStyledText>
         ) : null}
       </Flex>
     </LPCContentContainer>

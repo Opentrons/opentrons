@@ -133,9 +133,7 @@ describe('reduxActionToAnalyticsEvent', () => {
     const action = {
       type: 'SAVE_STEP_FORM',
       payload: {
-        form: {
-          id: 'stepId' /* .. other fields don't matter, will be read from getArgsAndErrors */,
-        },
+        id: 'stepId' /* .. other fields don't matter, will be read from getArgsAndErrors */,
       },
     }
     const result = reduxActionToAnalyticsEvent(fooState, action)

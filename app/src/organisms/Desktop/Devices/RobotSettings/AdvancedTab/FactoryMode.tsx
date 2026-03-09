@@ -35,10 +35,7 @@ export function FactoryMode({
       marginTop={SPACING.spacing24}
     >
       <Box width="70%">
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('factory_mode')}
         </LegacyStyledText>
       </Box>

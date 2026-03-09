@@ -2,20 +2,11 @@
 
 module.exports = {
   appId: 'com.opentrons.odd',
-  electronVersion: '39.1.2',
+  electronVersion: '33.2.1',
   npmRebuild: false,
-  electronLanguages: ['en-US', 'zh-CN'],
   files: [
-    'lib/*',
-    'node_modules/**/*',
-    'package.json',
+    '**/*',
     '!Makefile',
-    '!**/.venv/**',
-    '!**/*.py',
-    '!**/py.typed',
-    '!**/shared-data/**/*.json',
-    '!**/shared-data/**/*.jpg',
-    '!**/shared-data/**/*.png',
     {
       from: '../app/dist',
       to: './ui',

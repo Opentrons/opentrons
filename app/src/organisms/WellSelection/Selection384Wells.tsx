@@ -191,10 +191,7 @@ function SelectBy({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
       </LegacyStyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -256,27 +253,20 @@ function StartingWell({
     channels === 8 ? ['A1', 'B1'] : ['A1', 'A2', 'B1', 'B2']
 
   // on mount, select A1 well group for 96-channel
-  useEffect(
-    () => {
-      // deselect all wells on mount; clears well selection when navigating back within quick transfer flow
-      // otherwise, selected wells and lastSelectedIndex pointer will be out of sync
-      deselectWells(wells)
-      if (channels === 96) {
-        selectWells({ A1: null })
-      }
-      setStartingWellState({ A1: true, A2: false, B1: false, B2: false })
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  useEffect(() => {
+    // deselect all wells on mount; clears well selection when navigating back within quick transfer flow
+    // otherwise, selected wells and lastSelectedIndex pointer will be out of sync
+    deselectWells(wells)
+    if (channels === 96) {
+      selectWells({ A1: null })
+    }
+    setStartingWellState({ A1: true, A2: false, B1: false, B2: false })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  }, [])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
       </LegacyStyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -322,10 +312,7 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
   const addOrRemoveButtons =
     channels !== 96 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {i18n.format(
             t(channels === 8 ? 'add_or_remove_columns' : 'add_or_remove'),
             'capitalize'

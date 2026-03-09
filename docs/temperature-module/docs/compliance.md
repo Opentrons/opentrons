@@ -1,6 +1,5 @@
 ---
 title: "Temperature Module: Safety and Compliance"
-description: "Power requirements, environmental conditions, and regulatory compliance."
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.

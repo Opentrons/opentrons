@@ -352,7 +352,7 @@ export const getRobotStateWithTipStandard = (
   })
   robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = {
     hasTip: true,
-    tiprackURI: 'tiprack1Id',
+    tiprackURI: 'tiprackId',
   }
   return robotStateWithTip
 }
@@ -368,7 +368,7 @@ export const getRobotStatePickedUpTipStandard = (
   })
   robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = {
     hasTip: true,
-    tiprackURI: 'tiprack1Id',
+    tiprackURI: 'tiprackId',
   }
   robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = EMPTY
   return robotStatePickedUpOneTip
@@ -433,10 +433,9 @@ export const getStateAndContextTempTCModules = ({
       slot: 'span7_8_10_11',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        currentBlockActivity: { type: 'blockDeactivated' },
+        blockTargetTemp: null,
         lidTargetTemp: null,
         lidOpen: null,
-        numProfilesStarted: 0,
       },
     },
   }

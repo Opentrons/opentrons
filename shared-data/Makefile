@@ -67,10 +67,6 @@ lint-js-prettier:
 setup-py:
 	$(MAKE) -f Makefile-python.mk setup-py
 
-.PHONY: lock-py
-lock-py:
-	$(MAKE) -f Makefile-python.mk lock-py
-
 .PHONY: dist-py
 dist-py:
 	$(MAKE) -f Makefile-python.mk sdist wheel

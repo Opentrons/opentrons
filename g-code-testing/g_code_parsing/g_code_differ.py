@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from typing import Tuple
-
 from diff_match_patch import diff_match_patch as dmp  # type: ignore
-
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
@@ -27,11 +25,19 @@ class GCodeDiffer:
     }
 
     INSERTION_STYLE = (
-        '<ins style="background:#e6ffe6;font-size:large;font-weight:bold;">%s</ins>'
+        '<ins style="'
+        "background:#e6ffe6;"
+        "font-size:large;"
+        "font-weight:bold;"
+        '">%s</ins>'
     )
 
     DELETION_STYLE = (
-        '<del style="background:#ffe6e6;font-size:large;font-weight:bold;">%s</del>'
+        '<del style="'
+        "background:#ffe6e6;"
+        "font-size:large;"
+        "font-weight:bold;"
+        '">%s</del>'
     )
 
     @classmethod
@@ -66,7 +72,7 @@ class GCodeDiffer:
             )
 
         html = []
-        for op, data in diffs:
+        for (op, data) in diffs:
             text = process_text(data)
             if op == self.INSERTION_VALUE:
                 html.append(self.INSERTION_STYLE % text)

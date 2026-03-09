@@ -24,7 +24,7 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing2}
       width="max-content"
     >
-      <LegacyStyledText forwardedAs="p" id={id}>
+      <LegacyStyledText as="p" id={id}>
         {displayName}
       </LegacyStyledText>
     </Flex>

@@ -1,20 +1,21 @@
 from typing import Awaitable, Optional
 
-from ..configuration import SessionConfiguration
-from ..models.session import DeckCalibrationResponseAttributes, SessionType
-from .base_session import BaseSession, SessionMetaData
-from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
 from robot_server.robot.calibration.deck.user_flow import DeckCalibrationUserFlow
+from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
+from robot_server.service.session.errors import (
+    SessionCreationException,
+    CommandExecutionException,
+)
 from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
-    CommandExecutor,
     CompletedCommand,
+    CommandExecutor,
 )
-from robot_server.service.session.errors import (
-    CommandExecutionException,
-    SessionCreationException,
-)
+
+from .base_session import BaseSession, SessionMetaData
+from ..configuration import SessionConfiguration
+from ..models.session import SessionType, DeckCalibrationResponseAttributes
 
 
 class DeckCalibrationCommandExecutor(CallableExecutor):
@@ -60,9 +61,9 @@ class DeckCalibrationSession(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler: Optional[Awaitable[None]] = (
-                configuration.hardware.set_lights(rails=False)
-            )
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

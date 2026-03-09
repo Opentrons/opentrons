@@ -36,8 +36,6 @@ interface CustomizeExpandButtonProps extends StyleProps {
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
-  //  used for the hopper stack limit so far
-  customStackLimit?: number
   stackingProps?: StackingProps
   disabled?: boolean
   isSelected?: boolean
@@ -58,13 +56,10 @@ export function CustomizeExpandButtonComponent(
     stackingProps,
     allowInputField,
     isNestedDefALid,
-    customStackLimit,
   } = props
   const isLid =
     stackingProps != null &&
     stackingProps.definition.allowedRoles?.includes('lid')
-
-  const limit = customStackLimit ?? stackingProps?.definition.stackLimit
 
   return (
     <Flex
@@ -101,11 +96,8 @@ export function CustomizeExpandButtonComponent(
               backgroundColor={COLORS.blue10}
               padding={SPACING.spacing16}
               borderRadius={BORDERS.borderRadius4}
-              gridGap={SPACING.spacing8}
             >
-              {isLid &&
-              !isNestedDefALid &&
-              stackingProps.onCheckboxChange != null ? (
+              {isLid && !isNestedDefALid ? (
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()
@@ -117,7 +109,9 @@ export function CustomizeExpandButtonComponent(
                   padding={`0 0 0 ${SPACING.spacing8}`}
                 />
               ) : null}
-              {limit != null && limit > 1 && allowInputField ? (
+              {stackingProps.definition.stackLimit != null &&
+              stackingProps.definition.stackLimit > 1 &&
+              allowInputField ? (
                 <InputField
                   id="CustomizeExpandButton_inputField"
                   title={stackingProps.inputTitle}
@@ -128,7 +122,8 @@ export function CustomizeExpandButtonComponent(
                   type="number"
                   error={
                     !stackingProps.inputFieldValue ||
-                    stackingProps.inputFieldValue > limit
+                    stackingProps.inputFieldValue >
+                      stackingProps.definition.stackLimit
                       ? stackingProps.errorMessage
                       : null
                   }

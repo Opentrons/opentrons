@@ -7,9 +7,8 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-
-from .. import topics
 from ..notification_client import NotificationClient, get_notification_client
+from .. import topics
 
 
 class DeckConfigurationPublisher:
@@ -26,9 +25,9 @@ class DeckConfigurationPublisher:
         self._client.publish_advise_refetch(topic=topics.DECK_CONFIGURATION)
 
 
-_deck_configuration_publisher_accessor: AppStateAccessor[DeckConfigurationPublisher] = (
-    AppStateAccessor[DeckConfigurationPublisher]("deck_configuration_publisher")
-)
+_deck_configuration_publisher_accessor: AppStateAccessor[
+    DeckConfigurationPublisher
+] = AppStateAccessor[DeckConfigurationPublisher]("deck_configuration_publisher")
 
 
 async def get_deck_configuration_publisher(

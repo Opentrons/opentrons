@@ -1,38 +1,37 @@
 """Tests for the ProtocolReader interface."""
-
 from __future__ import annotations
-
-from pathlib import Path
-from typing import Optional
 
 import pytest
 from decoy import Decoy, matchers
+from pathlib import Path
+from typing import Optional
+
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parse import PythonParseMode
 
 from opentrons.protocol_reader import (
-    FileHasher,
-    ProtocolFileRole,
     ProtocolReader,
     ProtocolSource,
     ProtocolSourceFile,
+    ProtocolFileRole,
     PythonProtocolConfig,
-)
-from opentrons.protocol_reader.file_format_validator import FileFormatValidator
-from opentrons.protocol_reader.file_identifier import (
-    FileIdentifier,
-    IdentifiedData,
-    IdentifiedLabwareDefinition,
-    IdentifiedPythonMain,
+    FileHasher,
 )
 from opentrons.protocol_reader.file_reader_writer import (
-    BufferedFile,
     FileReaderWriter,
+    BufferedFile,
 )
 from opentrons.protocol_reader.role_analyzer import (
-    RoleAnalysis,
     RoleAnalyzer,
+    RoleAnalysis,
 )
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocol_reader.file_identifier import (
+    FileIdentifier,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
+    IdentifiedData,
+)
+from opentrons.protocol_reader.file_format_validator import FileFormatValidator
 
 
 @pytest.fixture

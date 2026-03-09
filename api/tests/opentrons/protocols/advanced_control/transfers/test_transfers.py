@@ -1,18 +1,17 @@
-"""Test the Transfer class and its functions"""
-
+""" Test the Transfer class and its functions """
+import pytest
 from typing import TypedDict
 
-import pytest
-
-import opentrons.protocol_api as papi
+from opentrons.types import Mount, TransferTipPolicy
+from opentrons.protocols.advanced_control.transfers import transfer as tx
+from opentrons.protocols.advanced_control.common import MixStrategy
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocols.advanced_control.common import MixStrategy
-from opentrons.protocols.advanced_control.transfers import transfer as tx
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import Mount, TransferTipPolicy
+
+import opentrons.protocol_api as papi
 
 # TODO (lc 12-8-2022) We need to re-write these transfer tests so that
 # they are agnostic to the underlying hardware.

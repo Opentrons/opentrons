@@ -1,7 +1,6 @@
 """Package for the module status server."""
-
-from .client import ModuleStatusClient
 from .server import ModuleStatusServer
+from .client import ModuleStatusClient
 
 __all__ = [
     "ModuleStatusServer",

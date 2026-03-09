@@ -1,12 +1,10 @@
-from enum import StrEnum
-from typing import Dict, Type
-
 import pytest
-
 from g_code_parsing.g_code import reverse_enum
+from typing import Dict, Type
+from enum import Enum
 
 
-class InputEnum(StrEnum):
+class InputEnum(str, Enum):
     HOME = "G28.2"
     MOVE = "G0"
     DWELL = "G4"

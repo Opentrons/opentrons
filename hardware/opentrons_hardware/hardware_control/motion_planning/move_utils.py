@@ -1,18 +1,16 @@
 """Utils for motion planning."""
-
-import logging
-from typing import TYPE_CHECKING, Iterator, List, Set, Tuple, cast
-
 import numpy as np
+import logging
+from typing import Iterator, List, Tuple, Set, TYPE_CHECKING, cast
 
 from opentrons_hardware.hardware_control.motion_planning.types import (
-    AxisConstraints,
-    AxisKey,
     Block,
     Coordinates,
-    CoordinateValue,
     Move,
     MoveTarget,
+    AxisConstraints,
+    CoordinateValue,
+    AxisKey,
     SystemConstraints,
     ZeroLengthMoveError,
     vectorize,

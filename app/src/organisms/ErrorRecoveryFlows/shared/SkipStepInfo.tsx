@@ -25,7 +25,6 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     STACKER_STALLED_STORE_SKIP,
     SHUTTLE_FULL_SKIP,
     STACKER_SHUTTLE_EMPTY_STORE_SKIP,
-    VACUUM_CARBOY_FULL_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
@@ -87,7 +86,6 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case STACKER_STALLED_STORE_SKIP.ROUTE:
       case SHUTTLE_FULL_SKIP.ROUTE:
       case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
-      case VACUUM_CARBOY_FULL_SKIP.ROUTE:
         return t('skip_to_next_step')
       default:
         console.error(
@@ -111,7 +109,6 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case STACKER_STALLED_STORE_SKIP.ROUTE:
       case SHUTTLE_FULL_SKIP.ROUTE:
       case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
-      case VACUUM_CARBOY_FULL_SKIP.ROUTE:
         return 'robot_not_attempt_to_move_lw'
       default:
         console.error(
@@ -126,7 +123,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText forwardedAs="p" />,
+          block: <LegacyStyledText as="p" />,
         }}
       />
     )

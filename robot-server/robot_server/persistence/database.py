@@ -1,5 +1,4 @@
 """SQLite database initialization and utilities."""
-
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
@@ -7,6 +6,7 @@ from typing import Generator
 import sqlalchemy
 
 from server_utils import sql_utils
+
 
 # A reference to SQLite's built-in ROWID column.
 #

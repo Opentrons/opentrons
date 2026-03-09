@@ -1,4 +1,4 @@
-from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 
 
 class SessionException(RobotServerError):

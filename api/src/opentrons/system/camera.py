@@ -1,26 +1,20 @@
 import asyncio
-import logging
 import os
-from functools import lru_cache
 from pathlib import Path
+import logging
+from functools import lru_cache
+from enum import Enum
 from typing import Dict, Optional
-
-from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
+from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons.config import IS_ROBOT
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
-from opentrons_shared_data.util import StrEnum
-
-from opentrons.config import (
-    ARCHITECTURE,
-    IS_ROBOT,
-    SystemArchitecture,
-    get_opentrons_path,
-)
 from opentrons.protocol_engine.resources.camera_provider import (
-    CameraError,
     CameraProvider,
-    CameraSettings,
     ImageParameters,
+    CameraError,
+    CameraSettings,
 )
 from opentrons.system import ffmpeg
 
@@ -28,9 +22,6 @@ log = logging.getLogger(__name__)
 
 # Default System Cameras
 DEFAULT_SYSTEM_CAMERA = "/dev/ot_system_camera"
-
-# Default Preview Image Filename
-PREVIEW_IMAGE = "preview_image.jpeg"
 
 # Stream Globals
 DEFAULT_CONF_FILE = (
@@ -63,7 +54,7 @@ SATURATION_MAX = 2.0
 SATURATION_DEFAULT = 1.0
 
 
-class StreamConfigurationKeys(StrEnum):
+class StreamConfigurationKeys(str, Enum):
     """The Configuration Key Types."""
 
     BOOT_ID = "BOOT_ID"
@@ -198,7 +189,7 @@ async def stop_live_stream(robot_type: RobotType) -> None:
         log.info("Stopped the opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to stop opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 
@@ -219,7 +210,7 @@ async def restart_live_stream(robot_type: RobotType) -> None:
         log.info("Restarted opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to restart opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 

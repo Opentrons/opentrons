@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Tuple, Type
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
+
 from opentrons.motion_planning import (
     DEFAULT_GENERAL_ARC_Z_MARGIN,
     DEFAULT_IN_LABWARE_ARC_Z_MARGIN,
@@ -13,9 +14,11 @@ from opentrons.motion_planning import (
     MoveType,
     get_waypoints,
 )
+
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-from opentrons.protocols.api_support.labware_like import LabwareLike
+
 
 MODULE_LOG = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 """Utilities for tavern testing."""
-
 from tavern import response as Response  # type: ignore
 
 

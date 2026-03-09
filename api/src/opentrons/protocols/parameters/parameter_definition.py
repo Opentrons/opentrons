@@ -1,24 +1,23 @@
 """Parameter definition and associated validators."""
+from abc import abstractmethod, ABC
+from typing import Generic, Optional, List, Set, Union
 
-from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, Set, Union
-
-from opentrons.protocol_engine.types import (
-    BooleanParameter,
-    EnumChoice,
-    EnumParameter,
-    NumberParameter,
-    RunTimeParameter,
+from opentrons.protocols.parameters.types import (
+    ParamType,
+    ParameterChoice,
+    PrimitiveAllowedTypes,
+)
+from opentrons.protocols.parameters.exceptions import (
+    ParameterValueError,
+    ParameterDefinitionError,
 )
 from opentrons.protocols.parameters import validation
-from opentrons.protocols.parameters.exceptions import (
-    ParameterDefinitionError,
-    ParameterValueError,
-)
-from opentrons.protocols.parameters.types import (
-    ParameterChoice,
-    ParamType,
-    PrimitiveAllowedTypes,
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    NumberParameter,
+    BooleanParameter,
+    EnumParameter,
+    EnumChoice,
 )
 from opentrons.util.get_union_elements import get_union_elements
 
@@ -26,18 +25,22 @@ from opentrons.util.get_union_elements import get_union_elements
 class AbstractParameterDefinition(ABC, Generic[ParamType]):
     @property
     @abstractmethod
-    def variable_name(self) -> str: ...
+    def variable_name(self) -> str:
+        ...
 
     @property
     @abstractmethod
-    def value(self) -> ParamType: ...
+    def value(self) -> ParamType:
+        ...
 
     @value.setter
     @abstractmethod
-    def value(self, new_value: ParamType) -> None: ...
+    def value(self, new_value: ParamType) -> None:
+        ...
 
     @abstractmethod
-    def as_protocol_engine_type(self) -> RunTimeParameter: ...
+    def as_protocol_engine_type(self) -> RunTimeParameter:
+        ...
 
 
 class ParameterDefinition(AbstractParameterDefinition[PrimitiveAllowedTypes]):

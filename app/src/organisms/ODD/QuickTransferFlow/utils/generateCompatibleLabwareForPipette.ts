@@ -1,8 +1,4 @@
-import {
-  ALL,
-  getLabwareDefURI,
-  makeWellSetHelpers,
-} from '@opentrons/shared-data'
+import { getLabwareDefURI, makeWellSetHelpers } from '@opentrons/shared-data'
 
 import { getAllLatestDefs } from '/app/local-resources/labware'
 
@@ -35,7 +31,7 @@ export function generateCompatibleLabwareForPipette(
       } else if (pipetteSpecs.channels === 1) {
         return [...acc, getLabwareDefURI(definition)]
       } else {
-        const isCompatible = canPipetteUseLabware(pipetteSpecs, ALL, definition)
+        const isCompatible = canPipetteUseLabware(pipetteSpecs, definition)
         return isCompatible ? [...acc, getLabwareDefURI(definition)] : acc
       }
     },

@@ -1,3 +1,4 @@
+/* eslint-disable storybook/prefer-pascal-case */
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { HELIX_STYLES, ODD_STYLES, StyledText } from './index'

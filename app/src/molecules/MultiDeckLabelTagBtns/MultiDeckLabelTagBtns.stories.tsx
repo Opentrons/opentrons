@@ -82,7 +82,7 @@ const Template: Story<MultiDeckLabelTagBtnsStoryProps> = args => {
     <Tag
       text={colTwoTagText}
       type="default"
-      iconName="ot-alert"
+      iconName="alert-circle"
       iconPosition="left"
       shrinkToContent={true}
     />

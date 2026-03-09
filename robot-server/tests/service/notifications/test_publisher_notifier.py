@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock, MagicMock
 
 from opentrons.util.change_notifier import ChangeNotifier
 

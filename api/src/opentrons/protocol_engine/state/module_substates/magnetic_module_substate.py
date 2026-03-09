@@ -3,17 +3,13 @@
 from dataclasses import dataclass
 from typing import NewType
 
-from opentrons.hardware_control.modules.magdeck import (
-    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
-)
-from opentrons.hardware_control.modules.magdeck import (
-    OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
-)
+from opentrons.protocol_engine.types import MagneticModuleModel, ModuleModel
+from opentrons.protocol_engine.errors import EngageHeightOutOfRangeError
 from opentrons.hardware_control.modules.magdeck import (
     engage_height_is_in_range,
+    OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
 )
-from opentrons.protocol_engine.errors import EngageHeightOutOfRangeError
-from opentrons.protocol_engine.types import MagneticModuleModel, ModuleModel
 
 MagneticModuleId = NewType("MagneticModuleId", str)
 

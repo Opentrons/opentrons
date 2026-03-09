@@ -84,8 +84,8 @@ function useCreateDropTipMaintenanceRun({
       onSuccess: response => {
         // The type assertions here are safe, since we only use this command after asserting these
         const loadPipetteCommand = buildLoadPipetteCommand(
-          instrumentModelName!,
-          mount!
+          instrumentModelName as string,
+          mount as PipetteData['mount']
         )
 
         chainRunCommands(response.data.id, [loadPipetteCommand], false)
@@ -99,28 +99,23 @@ function useCreateDropTipMaintenanceRun({
       },
     })
 
-  useEffect(
-    () => {
-      if (
-        issuedCommandsType === 'setup' &&
-        mount != null &&
-        instrumentModelName != null
-      ) {
-        createTargetedMaintenanceRun({}).catch((e: Error) => {
-          setErrorDetails({
-            message: `Error creating maintenance run: ${e.message}`,
-          })
+  useEffect(() => {
+    if (
+      issuedCommandsType === 'setup' &&
+      mount != null &&
+      instrumentModelName != null
+    ) {
+      createTargetedMaintenanceRun({}).catch((e: Error) => {
+        setErrorDetails({
+          message: `Error creating maintenance run: ${e.message}`,
         })
-      } else {
-        console.warn(
-          'Could not create maintenance run due to missing pipette data.'
-        )
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mount, instrumentModelName]
-  )
+      })
+    } else {
+      console.warn(
+        'Could not create maintenance run due to missing pipette data.'
+      )
+    }
+  }, [mount, instrumentModelName])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {
@@ -144,26 +139,21 @@ function useMonitorMaintenanceRunForDeletion({
   ] = useState<boolean>(false)
   const [closedOnce, setClosedOnce] = useState<boolean>(false)
 
-  useEffect(
-    () => {
-      if (isMaintenanceRunType && !closedOnce) {
-        if (
-          createdMaintenanceRunId !== null &&
-          activeMaintenanceRunId === createdMaintenanceRunId
-        ) {
-          setMonitorMaintenanceRunForDeletion(true)
-        }
-        if (
-          activeMaintenanceRunId !== createdMaintenanceRunId &&
-          monitorMaintenanceRunForDeletion
-        ) {
-          closeFlow()
-          setClosedOnce(true)
-        }
+  useEffect(() => {
+    if (isMaintenanceRunType && !closedOnce) {
+      if (
+        createdMaintenanceRunId !== null &&
+        activeMaintenanceRunId === createdMaintenanceRunId
+      ) {
+        setMonitorMaintenanceRunForDeletion(true)
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId]
-  )
+      if (
+        activeMaintenanceRunId !== createdMaintenanceRunId &&
+        monitorMaintenanceRunForDeletion
+      ) {
+        closeFlow()
+        setClosedOnce(true)
+      }
+    }
+  }, [isMaintenanceRunType, createdMaintenanceRunId, activeMaintenanceRunId])
 }

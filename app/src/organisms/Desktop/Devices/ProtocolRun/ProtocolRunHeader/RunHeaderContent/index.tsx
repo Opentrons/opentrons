@@ -16,7 +16,6 @@ export type RunHeaderContentProps = ProtocolRunHeaderProps & {
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
   isClosingCurrentRun: boolean
   robotName: string
-  numberOfAtomicCommands: number
 }
 
 export function RunHeaderContent(props: RunHeaderContentProps): JSX.Element {

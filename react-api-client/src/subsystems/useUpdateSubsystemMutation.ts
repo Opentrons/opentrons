@@ -11,6 +11,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type {
+  HostConfig,
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
@@ -44,7 +45,7 @@ export function useUpdateSubsystemMutation(
     Subsystem
   >(
     (subsystem: Subsystem) =>
-      updateSubsystem(host!, subsystem).then(response => {
+      updateSubsystem(host as HostConfig, subsystem).then(response => {
         queryClient.removeQueries([host, 'subsystems/updates'])
         queryClient
           .invalidateQueries([host, 'subsystems/updates'])

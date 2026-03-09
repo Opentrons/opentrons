@@ -158,10 +158,10 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
         width="100%"
         color={COLORS.grey60}
       >
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('last_run_time', { time: updatedLastRun })}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('date_added_date', {
             date: formatTimeWithUtcLabel(protocol.createdAt),
           })}

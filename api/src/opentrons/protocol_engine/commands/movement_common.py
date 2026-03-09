@@ -2,25 +2,25 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import Optional, Union, TYPE_CHECKING, Literal, Any
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
-
 from ..errors import ErrorOccurrence
-from ..state.update_types import PipetteLocationUpdate, StateUpdate
 from ..types import (
-    AddressableOffsetVector,
-    CurrentWell,
-    DeckPoint,
-    LiquidHandlingWellLocation,
-    MovementAxis,
     WellLocation,
+    LiquidHandlingWellLocation,
+    DeckPoint,
+    CurrentWell,
+    MovementAxis,
+    AddressableOffsetVector,
 )
-from .command import DefinedErrorData, SuccessData
+from ..state.update_types import StateUpdate, PipetteLocationUpdate
+from .command import SuccessData, DefinedErrorData
+
 
 if TYPE_CHECKING:
     from ..execution.movement import MovementHandler

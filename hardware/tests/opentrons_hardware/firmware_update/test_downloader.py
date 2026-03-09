@@ -1,32 +1,31 @@
 """Tests for the firmware downloader."""
-
 import binascii
 from typing import List
 
 import pytest
 from mock import AsyncMock, MagicMock, call
-
-from tests.conftest import MockCanMessageNotifier
-
 from opentrons_hardware.firmware_bindings import (
-    ArbitrationId,
-    ArbitrationIdParts,
     NodeId,
     utils,
+    ArbitrationId,
+    ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.constants import ErrorCode
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition, payloads
-from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    FirmwareUpdateComplete,
-    FirmwareUpdateCompleteAcknowledge,
     FirmwareUpdateData,
+    FirmwareUpdateComplete,
     FirmwareUpdateDataAcknowledge,
+    FirmwareUpdateCompleteAcknowledge,
     SingletonMessageIndexGenerator,
 )
+from opentrons_hardware.firmware_bindings.messages import payloads
+from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
+
 from opentrons_hardware.firmware_update import downloader
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
-from opentrons_hardware.firmware_update.hex_file import Chunk, HexRecordProcessor
+from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor, Chunk
+from tests.conftest import MockCanMessageNotifier
 
 
 @pytest.fixture
@@ -69,7 +68,6 @@ async def test_messaging(
     crc32: int,
 ) -> None:
     """It should send all the chunks as CAN messages."""
-
     # TODO (amit, 2022-1-27): Replace this test with integration test.
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""

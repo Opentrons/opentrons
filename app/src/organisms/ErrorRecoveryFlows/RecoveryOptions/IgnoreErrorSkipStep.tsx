@@ -13,7 +13,9 @@ import {
 } from '@opentrons/components'
 
 import {
+  DESKTOP_ONLY,
   ERROR_KINDS,
+  ODD_ONLY,
   ODD_SECTION_TITLE_STYLE,
   RECOVERY_MAP,
 } from '../constants'
@@ -54,7 +56,6 @@ export function IgnoreErrorStepHome({
   recoveryCommands,
   routeUpdateActions,
   errorKind,
-  isOnDevice,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { ignoreErrorKindThisRun } = recoveryCommands
@@ -62,19 +63,14 @@ export function IgnoreErrorStepHome({
     routeUpdateActions
 
   const [selectedOption, setSelectedOption] = useState<IgnoreOption>(
-    head(IGNORE_OPTIONS_IN_ORDER)!
+    head(IGNORE_OPTIONS_IN_ORDER) as IgnoreOption
   )
 
   // Reset client choice to ignore all errors whenever navigating back to this view. This prevents unexpected
   // behavior after pressing "go back" and ending up on this screen.
-  useEffect(
-    () => {
-      void ignoreErrorKindThisRun(false)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    void ignoreErrorKindThisRun(false)
+  }, [])
 
   // In order to keep routing linear, all extended "skip" flows should be kept as separate recovery options with
   // go back functionality that routes to this view. Those "skip" views encapsulate the generic "skip" view.
@@ -127,37 +123,42 @@ export function IgnoreErrorStepHome({
       >
         {t('ignore_similar_errors_later_in_run')}
       </StyledText>
-      {isOnDevice ? (
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <IgnoreOptions
-            ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
-            setSelectedOption={setSelectedOption}
-            selectedOption={selectedOption}
-          />
-        </Flex>
-      ) : (
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <RecoveryRadioGroup
-            value={selectedOption}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setSelectedOption(e.currentTarget.value as IgnoreOption)
-            }}
-            options={IGNORE_OPTIONS_IN_ORDER.map(option => {
-              return {
-                value: option,
-                children: (
-                  <StyledText
-                    css={RADIO_GROUP_MARGIN}
-                    desktopStyle="bodyDefaultRegular"
-                  >
-                    {t(option)}
-                  </StyledText>
-                ),
-              }
-            })}
-          />
-        </Flex>
-      )}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={ODD_ONLY}
+      >
+        <IgnoreOptions
+          ignoreOptions={IGNORE_OPTIONS_IN_ORDER}
+          setSelectedOption={setSelectedOption}
+          selectedOption={selectedOption}
+        />
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        css={DESKTOP_ONLY}
+      >
+        <RecoveryRadioGroup
+          value={selectedOption}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setSelectedOption(e.currentTarget.value as IgnoreOption)
+          }}
+          options={IGNORE_OPTIONS_IN_ORDER.map(option => {
+            return {
+              value: option,
+              children: (
+                <StyledText
+                  css={RADIO_GROUP_MARGIN}
+                  desktopStyle="bodyDefaultRegular"
+                >
+                  {t(option)}
+                </StyledText>
+              ),
+            }
+          })}
+        />
+      </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}
         secondaryBtnOnClick={goBackPrevStep}

@@ -1,6 +1,5 @@
 ---
 title: "Heater-Shaker Module: Additional Product Information"
-description: "Warranty, support, app download, and manufacturer information for the Heater-Shaker."
 ---
 
 ## Warranty

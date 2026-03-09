@@ -9,7 +9,6 @@ type StyleKey =
   | 'captionBold'
   | 'bodyDefaultSemiBold'
   | 'smallBodyTextBold'
-  | 'headingLargeBold'
 
 interface PlaceholderStyledTextProps {
   children: ReactNode
@@ -33,15 +32,14 @@ export const PlaceholderStyledText = (
     captionBold: styles.caption_bold,
     bodyDefaultSemiBold: styles.body_default_semi_bold,
     smallBodyTextBold: styles.small_body_text_bold,
-    headingLargeBold: styles.heading_large_bold,
   }
   const combinedClassName = clsx(
     desktopStyle != null ? styleMap[desktopStyle as StyleKey] : null,
     oddStyle != null ? styleMap[oddStyle as StyleKey] : null
   )
   return (
-    <span className={combinedClassName} style={{ color: color ?? '' }}>
+    <text className={combinedClassName} style={{ color: color ?? '' }}>
       {children}
-    </span>
+    </text>
   )
 }

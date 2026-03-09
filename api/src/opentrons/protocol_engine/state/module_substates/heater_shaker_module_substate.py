@@ -3,17 +3,17 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
-from opentrons.protocol_engine.errors import (
-    CannotPerformModuleAction,
-    InvalidTargetSpeedError,
-    InvalidTargetTemperatureError,
-    NoTargetTemperatureSetError,
-)
+from opentrons.hardware_control.modules import ModuleDataValidator, ModuleData
 from opentrons.protocol_engine.types import (
-    HeaterShakerLatchStatus,
-    SpeedRange,
     TemperatureRange,
+    SpeedRange,
+    HeaterShakerLatchStatus,
+)
+from opentrons.protocol_engine.errors import (
+    InvalidTargetTemperatureError,
+    InvalidTargetSpeedError,
+    NoTargetTemperatureSetError,
+    CannotPerformModuleAction,
 )
 
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)

@@ -78,8 +78,6 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
       case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
       case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
-      case ERROR_KINDS.VACUUM_CARBOY_FULL:
-      case ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED:
         return true
       default:
         return false
@@ -244,10 +242,6 @@ export function NotificationBanner({
         return <StackerShuttleOccupiedErrorBanner />
       case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
         return <StackerHopperOrShuttleEmptyErrorBanner />
-      case ERROR_KINDS.VACUUM_CARBOY_FULL:
-        return <VacuumCarboyFullErrorBanner />
-      case ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED:
-        return <VacuumPressureNotReachedErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -401,27 +395,6 @@ export function NoLiquidDetectedBanner(): JSX.Element {
   )
 }
 
-export function VacuumCarboyFullErrorBanner(): JSX.Element {
-  const { t } = useTranslation('error_recovery')
-
-  return (
-    <InlineNotification
-      type="alert"
-      message={t('waste_carboy_must_be_emptied')}
-    />
-  )
-}
-
-export function VacuumPressureNotReachedErrorBanner(): JSX.Element {
-  const { t } = useTranslation('error_recovery')
-
-  return (
-    <InlineNotification
-      type="alert"
-      message={t('vacuum_did_not_reach_pressure')}
-    />
-  )
-}
 // TODO(jh, 07-24-24): Using shared height/width constants for intervention modal sizing and the ErrorDetailsModal sizing
 // would be ideal.
 const DESKTOP_STEP_INFO_STYLE = css`

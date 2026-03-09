@@ -1,19 +1,15 @@
-from typing import TYPE_CHECKING, Dict, Optional
-
+from typing import Dict, Optional
 from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.types import PipetteName
-
-from ..types import CriticalPoint
-from .types import MountArgType
 from opentrons.types import Mount
+from .types import MountArgType
 
-if TYPE_CHECKING:
-    from ..dev_types import PipetteDict
-
-    # TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
-    # need to figure out how to combine them again in follow-up refactors.
-    from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+# TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
+# need to figure out how to combine them again in follow-up refactors.
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from ..dev_types import PipetteDict
+from ..types import CriticalPoint
 
 
 class InstrumentConfigurer(Protocol[MountArgType]):
@@ -55,7 +51,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
-    def get_attached_instruments(self) -> Dict[Mount, "PipetteDict"]:
+    def get_attached_instruments(self) -> Dict[Mount, PipetteDict]:
         """Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
@@ -72,7 +68,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
-    def get_attached_instrument(self, mount: MountArgType) -> "PipetteDict":
+    def get_attached_instrument(self, mount: MountArgType) -> PipetteDict:
         """Get the status dict of a single cached instrument.
 
         Return values and caveats are as get_attached_instruments.
@@ -80,10 +76,10 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         ...
 
     @property
-    def attached_instruments(self) -> Dict[Mount, "PipetteDict"]:
+    def attached_instruments(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_instruments()
 
-    def get_attached_pipettes(self) -> Dict[Mount, "PipetteDict"]:
+    def get_attached_pipettes(self) -> Dict[Mount, PipetteDict]:
         """Get the status dicts of cached attached pipettes.
 
         Works like get_attached_instruments but for pipettes only - on the Flex,
@@ -92,7 +88,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         ...
 
     @property
-    def attached_pipettes(self) -> Dict[Mount, "PipetteDict"]:
+    def attached_pipettes(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_pipettes()
 
     def calibrate_plunger(
@@ -193,7 +189,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         ...
 
     @property
-    def hardware_instruments(self) -> Dict[Mount, Optional["Pipette"]]:
+    def hardware_instruments(self) -> Dict[Mount, Optional[Pipette]]:
         """Return the underlying hardware representation of the instruments.
 
         This should rarely be used. Do not write new code that uses it.

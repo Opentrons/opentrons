@@ -29,7 +29,7 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid="PipetteRecalibrationWarning_title"
           >
@@ -37,7 +37,7 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
           </LegacyStyledText>
 
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             data-testid="PipetteRecalibrationWarning_body"
           >
             {`${t('pipette_calibrations_differ')}`}

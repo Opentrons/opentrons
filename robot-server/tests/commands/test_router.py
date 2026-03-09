@@ -1,27 +1,23 @@
 """Tests for robot_server.commands.router."""
-
-from datetime import datetime
-
 import pytest
+from datetime import datetime
 from decoy import Decoy
 
 from opentrons.protocol_engine import (
-    CommandPointer,
     CommandSlice,
-)
-from opentrons.protocol_engine import (
+    CommandPointer,
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from opentrons.protocol_runner import RunOrchestrator
-from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, RequestModel
 
+from robot_server.service.json_api import MultiBodyMeta, RequestModel
+from robot_server.errors.error_responses import ApiError
 from robot_server.commands.router import (
     create_command,
-    get_command,
     get_commands_list,
+    get_command,
 )
-from robot_server.errors.error_responses import ApiError
 
 
 @pytest.fixture()

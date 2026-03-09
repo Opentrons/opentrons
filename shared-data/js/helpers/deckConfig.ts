@@ -6,8 +6,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '../constants'
-import { isFixtureInUsbModules } from '../fixtures'
-import { getMainAAForAFixture } from './deckConfiguration/getAddressableAreaFrom'
+import { getMainAAForAFixture, isFixtureInUsbModules } from '../fixtures'
 
 import type { CutoutFixtureId, CutoutId } from '../../deck'
 import type {
@@ -38,48 +37,22 @@ export const getNewConfigForDeckConfig = (
   let newDeckConfig = deckConfig
   if (cutoutId in fixtureGroup) {
     const groupMap =
-      fixtureGroup[cutoutId]?.find(group => {
-        const match = Object.entries(group).some(([cId, cfId]) => {
-          const found = deckConfig.find(
+      fixtureGroup[cutoutId]?.find(group =>
+        Object.entries(group).every(([cId, cfId]) =>
+          deckConfig.find(
             config => config.cutoutId === cId && config.cutoutFixtureId === cfId
           )
-          return !!found
-        })
-        return match
-      }) ?? {}
-    const groupCutoutIds = Object.keys(groupMap) as CutoutId[]
-
-    // First, update existing entries and filter out duplicates
-    const existingCutoutIds = new Set<CutoutId>()
-    const updatedConfig = deckConfig
-      .map(cutoutConfig => {
-        if (cutoutConfig.cutoutId in groupMap) {
-          // Skip if we've already processed this cutoutId (handle duplicates)
-          if (existingCutoutIds.has(cutoutConfig.cutoutId)) {
-            return null // Will be filtered out
-          }
-          existingCutoutIds.add(cutoutConfig.cutoutId)
-          return {
+        )
+      ) ?? {}
+    newDeckConfig = deckConfig.map(cutoutConfig =>
+      cutoutConfig.cutoutId in groupMap
+        ? {
             ...cutoutConfig,
             cutoutFixtureId: replacementFixtureId,
             opentronsModuleSerialNumber: undefined,
           }
-        }
-        return cutoutConfig
-      })
-      .filter((config): config is NonNullable<typeof config> => config != null)
-
-    // Add entries for cutouts in the group that don't exist in deckConfig
-    const missingCutoutIds = groupCutoutIds.filter(
-      cId => !existingCutoutIds.has(cId)
+        : cutoutConfig
     )
-    const newEntries = missingCutoutIds.map(cId => ({
-      cutoutId: cId,
-      cutoutFixtureId: replacementFixtureId,
-      opentronsModuleSerialNumber: undefined,
-    }))
-
-    newDeckConfig = [...updatedConfig, ...newEntries]
   } else {
     newDeckConfig = deckConfig.map(cutoutConfig => {
       return cutoutConfig.cutoutId === cutoutId

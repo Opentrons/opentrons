@@ -60,16 +60,13 @@ export function RobotSettingsDeckCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('deck_calibration_title')}
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">
+      <LegacyStyledText as="p">
         {t('deck_calibration_description')}
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
+      <LegacyStyledText as="label" color={COLORS.grey60}>
         {deckLastModified}
       </LegacyStyledText>
     </Flex>

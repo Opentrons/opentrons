@@ -1,6 +1,5 @@
 ---
 title: "Thermocycler Module: Product Specifications"
-description: "Dimensions, temperature profiles, included parts, and physical specs."
 ---
 
 ![Thermocycler with labeled main features](images/specifications.png)

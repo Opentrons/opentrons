@@ -1,5 +1,7 @@
-from anyio import Path as AsyncPath
 from typing_extensions import Final
+
+from anyio import Path as AsyncPath
+
 
 # The on-device display process knows to look for this file here.
 _RESET_MARKER_PATH: Final = AsyncPath("/data/ODD/_CONFIG_TO_BE_DELETED_ON_REBOOT")

@@ -1,13 +1,13 @@
-from .async_serial import AsyncSerial
-from .serial_connection import AsyncResponseSerialConnection, SerialConnection
+from .serial_connection import SerialConnection, AsyncResponseSerialConnection
 from opentrons.drivers.asyncio.communication.errors import (
-    AlarmResponse,
-    DefaultErrorCodes,
-    ErrorResponse,
-    NoResponse,
     SerialException,
+    NoResponse,
+    AlarmResponse,
+    ErrorResponse,
     UnhandledGcode,
+    DefaultErrorCodes,
 )
+from .async_serial import AsyncSerial
 
 __all__ = [
     "SerialConnection",

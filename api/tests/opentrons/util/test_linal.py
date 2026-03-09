@@ -1,10 +1,8 @@
-from math import cos, pi, sin
-
-import numpy as np
+from math import pi, sin, cos
+from opentrons.util.linal import solve, add_z, apply_transform, solve_attitude
 from numpy.linalg import inv
+import numpy as np
 from numpy.typing import NDArray
-
-from opentrons.util.linal import add_z, apply_transform, solve, solve_attitude
 
 
 def test_solve() -> None:

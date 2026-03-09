@@ -1,14 +1,11 @@
 """Comment command request, result, and implementation models."""
-
 from __future__ import annotations
-
-from typing import Optional, Type
-
 from pydantic import BaseModel, Field
+from typing import Optional, Type
 from typing_extensions import Literal
 
-from ..errors.error_occurrence import ErrorOccurrence
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 CommentCommandType = Literal["comment"]
 

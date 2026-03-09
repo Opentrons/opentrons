@@ -1,14 +1,13 @@
 """Input file role analysis."""
-
 from dataclasses import dataclass
 from typing import List, Sequence, Union
 
 from .file_identifier import (
-    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedLabwareDefinition,
     IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
+    IdentifiedData,
 )
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
 

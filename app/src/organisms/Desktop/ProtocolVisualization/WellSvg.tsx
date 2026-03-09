@@ -1,16 +1,6 @@
-import { useId } from 'react'
-
 import { COLORS } from '@opentrons/components'
 
 import type { Dispatch, SetStateAction } from 'react'
-
-export const WELL_VIEWBOX = { width: 165, height: 136 }
-export const WELL_GEOMETRY = {
-  topY: 21.4,
-  bottomY: 109.1,
-  leftX: 43.2,
-  rightX: 112.2,
-}
 
 interface WellSvgProps {
   volume: number
@@ -27,23 +17,23 @@ export function WellSvg({
   setIsHovered,
   isHovered,
 }: WellSvgProps): JSX.Element {
-  const clipId = useId()
   const percent = Math.min(Math.max(volume / maxVolume, 0), 1)
 
-  const wellHeight = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
+  const wellTopY = 21.4
+  const wellBottomY = 109.1
+  const wellHeight = wellBottomY - wellTopY
   const fillHeight = wellHeight * percent
-  const fillYStart = WELL_GEOMETRY.bottomY - fillHeight
+  const fillYStart = wellBottomY - fillHeight
 
   return (
-    <g aria-label="Side: Cover, Well + measurements">
+    <svg
+      viewBox="0 0 165 136"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Side: Cover, Well + measurements"
+    >
       <defs>
-        <clipPath id={clipId}>
-          <rect
-            x={WELL_GEOMETRY.leftX}
-            y={fillYStart}
-            width={WELL_GEOMETRY.rightX - WELL_GEOMETRY.leftX}
-            height={fillHeight}
-          />
+        <clipPath id="wellFillClip">
+          <rect x="43.2" y={fillYStart} width="69" height={fillHeight} />
         </clipPath>
       </defs>
 
@@ -64,7 +54,7 @@ export function WellSvg({
       <path
         d="M43.2 21.4H53.2V109.1H102.2V21.4H112.2"
         fill={isHovered ? COLORS.flex50 : color}
-        clipPath={`url(#${clipId})`}
+        clipPath="url(#wellFillClip)"
         onMouseEnter={() => {
           setIsHovered(true)
         }}
@@ -80,6 +70,6 @@ export function WellSvg({
         className="cls-3"
         d="M125.5 21.4V34.5M130 21.4H120.9M125.5 109.1V95.9M120.9 109.1H130"
       />
-    </g>
+    </svg>
   )
 }

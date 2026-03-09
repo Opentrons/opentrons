@@ -62,7 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -225,7 +225,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
+  const host = useHost() as HostConfig
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -283,7 +283,7 @@ export function ModulesListItem({
         }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('view_setup_instructions')}
           </LegacyStyledText>
         </Flex>
@@ -292,7 +292,7 @@ export function ModulesListItem({
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
       <LegacyStyledText
-        forwardedAs="p"
+        as="p"
         marginLeft={SPACING.spacing20}
         color={COLORS.grey50}
       >
@@ -391,11 +391,6 @@ export function ModulesListItem({
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
   const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
-  const fixtureDisplayName =
-    comboFixtureId != null
-      ? getFixtureDisplayName(t as TFunction, comboFixtureId)
-      : displayName
-
   return (
     <>
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
@@ -442,14 +437,15 @@ export function ModulesListItem({
                   ? getFixtureImage(comboFixtureId)
                   : getModuleImage(moduleModel)
               }
-              alt={`Image of a ${fixtureDisplayName}`}
             />
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {fixtureDisplayName}
+                {comboFixtureId != null
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
+                  : displayName}
               </LegacyStyledText>
               {subText}
             </Flex>
@@ -459,11 +455,11 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <LegacyStyledText forwardedAs="p">
+            <LegacyStyledText as="p">
               {getModuleDeckLabel(moduleType, slotName)}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText forwardedAs="p">{portDisplay}</LegacyStyledText>
+              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
@@ -488,7 +484,7 @@ export function ModulesListItem({
                     setShowLocationConflictModal(true)
                   }}
                 >
-                  <LegacyStyledText forwardedAs="label" cursor="pointer">
+                  <LegacyStyledText as="label" cursor="pointer">
                     {t('resolve')}
                   </LegacyStyledText>
                 </TertiaryButton>

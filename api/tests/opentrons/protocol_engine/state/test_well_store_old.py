@@ -5,18 +5,17 @@ Try to add new tests to well_state.py, where they can be tested together,
 treating WellState as a private implementation detail.
 """
 
-from datetime import datetime
-
 import pytest
-
-from .command_fixtures import (
-    create_aspirate_command,
-    create_liquid_probe_command,
-    create_load_liquid_command,
-)
+from datetime import datetime
+from opentrons.protocol_engine.state.wells import WellStore
 from opentrons.protocol_engine.actions.actions import SucceedCommandAction
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.wells import WellStore
+
+from .command_fixtures import (
+    create_liquid_probe_command,
+    create_load_liquid_command,
+    create_aspirate_command,
+)
 
 
 @pytest.fixture

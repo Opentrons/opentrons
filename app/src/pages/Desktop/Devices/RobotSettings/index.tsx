@@ -24,7 +24,11 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { useIsRobotBusy, useRobot } from '/app/redux-resources/robots'
+import {
+  useIsRobotBusy,
+  useRobot,
+  useRobotType,
+} from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
 import {
   CONNECTABLE,
@@ -64,6 +68,7 @@ export function RobotSettingsComponent({
   const { robotName, robotSettingsTab } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
+  const robotType = useRobotType(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
@@ -92,7 +97,7 @@ export function RobotSettingsComponent({
       />
     ),
     camera: (
-      <RobotSettingsCamera robotName={robotName} isRobotBusy={isRobotBusy} />
+      <RobotSettingsCamera robotType={robotType} isRobotBusy={isRobotBusy} />
     ),
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
@@ -140,7 +145,7 @@ export function RobotSettingsComponent({
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {t('some_robot_controls_are_not_available')}
               </LegacyStyledText>
             </Banner>

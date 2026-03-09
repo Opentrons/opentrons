@@ -5,7 +5,7 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
 )
-from abr_testing.protocols.helpers import run_helpers, background_helpers
+from abr_testing.protocols import helpers
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
@@ -25,7 +25,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.27",
+    "apiLevel": "2.26",
 }
 
 
@@ -62,24 +62,18 @@ RUN = 1
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
-    run_helpers.create_hs_speed_parameter(parameters)
-    run_helpers.create_error_capture_duration_duration(parameters)
-    run_helpers.create_dot_bottom_parameter(parameters)
-    run_helpers.create_disposable_lid_parameter(parameters)
-    run_helpers.create_tc_lid_deck_riser_parameter(parameters)
-    run_helpers.create_disposable_lid_trash_location(parameters)
-    run_helpers.create_deactivate_modules_parameter(parameters)
-    run_helpers.create_probe_liquid_height_parameter(parameters)
-    run_helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_hs_speed_parameter(parameters)
+    helpers.create_dot_bottom_parameter(parameters)
+    helpers.create_disposable_lid_parameter(parameters)
+    helpers.create_tc_lid_deck_riser_parameter(parameters)
+    helpers.create_disposable_lid_trash_location(parameters)
+    helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
-    protocol.capture_image(filename="start_of_run")
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
@@ -88,9 +82,9 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    run_helpers.comment_protocol_version(protocol, "05")
+    helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     global p200_tips
@@ -106,30 +100,30 @@ def run(protocol: ProtocolContext) -> None:
     # DECK SETUP AND LABWARE
     # ========== FIRST ROW ===========
     heatershaker: HeaterShakerContext = protocol.load_module(
-        run_helpers.hs_str, "1"
+        helpers.hs_str, "1"
     )  # type: ignore[assignment]
-    sample_plate_2, hs_adapter = run_helpers.load_hs_adapter_and_labware(
+    sample_plate_2, hs_adapter = helpers.load_hs_adapter_and_labware(
         "nest_96_wellplate_2ml_deep", heatershaker, "Sample Plate 2"
     )
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "2", "Liquid Waste")
     temp_block: TemperatureModuleContext = protocol.load_module(
-        run_helpers.temp_str, "3"
+        helpers.temp_str, "3"
     )  # type: ignore[assignment]
-    reagent_plate, temp_adapter = run_helpers.load_temp_adapter_and_labware(
+    reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
-        run_helpers.mag_str, "C1"
+        helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
     # Opentrons tough pcr auto sealing lids
     if disposable_lid:
-        unused_lids = run_helpers.load_disposable_lids(protocol, 3, "C4", deck_riser)
+        unused_lids = helpers.load_disposable_lids(protocol, 3, "C4", deck_riser)
     # ========== THIRD ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
-        run_helpers.tc_str
+        helpers.tc_str
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt"
@@ -242,11 +236,11 @@ def run(protocol: ProtocolContext) -> None:
         heatershaker.close_labware_latch()
         thermocycler.open_lid()
         if probe_liquid_height_bool:
-            run_helpers.find_liquid_height_of_loaded_liquids(
+            helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, p50
             )
         else:
-            run_helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         # tip and sample tracking
         if COLUMNS == 1:
             column_1_list = ["A1"]  # Plate 1
@@ -297,18 +291,14 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 if STEP_HYB == 1:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    tc_block_task = thermocycler.start_set_block_temperature(4)
-                    tc_lid_task = thermocycler.start_set_lid_temperature(100)
-                    temp_block_task = temp_block.start_set_temperature(4)
-                    protocol.wait_for_tasks(
-                        [tc_block_task, tc_lid_task, temp_block_task]
-                    )
+                    thermocycler.set_block_temperature(4)
+                    thermocycler.set_lid_temperature(100)
+                    temp_block.set_temperature(4)
                 else:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    tc_block_task = thermocycler.start_set_block_temperature(58)
-                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
-                    hs_task = heatershaker.set_target_temperature(58)
-                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
+                    thermocycler.set_block_temperature(58)
+                    thermocycler.set_lid_temperature(58)
+                    heatershaker.set_and_wait_for_temperature(58)
             heatershaker.close_labware_latch()
 
             # Sample Plate contains 30ul  of DNA
@@ -380,7 +370,7 @@ def run(protocol: ProtocolContext) -> None:
                 if HYBRIDDECK:
                     protocol.comment("Hybridize on Deck")
                     if disposable_lid:
-                        run_helpers.use_disposable_lid_with_tc(
+                        helpers.use_disposable_lid_with_tc(
                             protocol, unused_lids, sample_plate_1, thermocycler
                         )
                     else:
@@ -436,10 +426,11 @@ def run(protocol: ProtocolContext) -> None:
 
                 if DRYRUN is False:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    tc_block_task = thermocycler.start_set_block_temperature(58)
-                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
-                    hs_task = heatershaker.set_target_temperature(58)
-                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
+                    thermocycler.set_block_temperature(58)
+                    thermocycler.set_lid_temperature(58)
+
+                if DRYRUN is False:
+                    heatershaker.set_and_wait_for_temperature(58)
 
                 protocol.comment("--> Transfer Hybridization")
                 TransferSup = 100
@@ -462,7 +453,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                 if disposable_lid:
-                    run_helpers.use_disposable_lid_with_tc(
+                    helpers.use_disposable_lid_with_tc(
                         protocol,
                         unused_lids,
                         sample_plate_1,
@@ -515,12 +506,10 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                 # ==============================
-                run_helpers.set_hs_speed(
-                    protocol, heatershaker, SMBMixRPM, SMBMixRep, True
-                )
+                helpers.set_hs_speed(protocol, heatershaker, SMBMixRPM, SMBMixRep, True)
 
                 # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
-                run_helpers.move_labware_from_hs_to_destination(
+                helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
 
@@ -553,7 +542,7 @@ def run(protocol: ProtocolContext) -> None:
                     tipcheck()
 
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
-                run_helpers.move_labware_to_hs(
+                helpers.move_labware_to_hs(
                     protocol, sample_plate_2, heatershaker, hs_adapter
                 )
 
@@ -575,7 +564,7 @@ def run(protocol: ProtocolContext) -> None:
                         p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                         p200_tips += 1
                         tipcheck()
-                    run_helpers.set_hs_speed(
+                    helpers.set_hs_speed(
                         protocol,
                         heatershaker,
                         int(heater_shaker_speed * 0.9),
@@ -588,7 +577,7 @@ def run(protocol: ProtocolContext) -> None:
                         protocol.delay(seconds=5 * 60)
 
                     # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
-                    run_helpers.move_labware_from_hs_to_destination(
+                    helpers.move_labware_from_hs_to_destination(
                         protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                     )
 
@@ -616,7 +605,7 @@ def run(protocol: ProtocolContext) -> None:
 
                     # ============================================================================================
                     # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
-                    run_helpers.move_labware_to_hs(
+                    helpers.move_labware_to_hs(
                         protocol, sample_plate_2, heatershaker, hs_adapter
                     )
                     washcount += 1
@@ -636,7 +625,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
 
-                run_helpers.set_hs_speed(
+                helpers.set_hs_speed(
                     protocol, heatershaker, int(heater_shaker_speed * 0.9), 4.0, True
                 )
 
@@ -660,7 +649,7 @@ def run(protocol: ProtocolContext) -> None:
                     protocol.delay(seconds=5 * 60)
 
                 # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
-                run_helpers.move_labware_from_hs_to_destination(
+                helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
                 if DRYRUN is False:
@@ -720,11 +709,11 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.move_lid(lid, reagent_plate, use_gripper=True)
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
-                run_helpers.move_labware_to_hs(
+                helpers.move_labware_to_hs(
                     protocol, sample_plate_2, heatershaker, hs_adapter
                 )
                 # ============================================================================================
-                run_helpers.set_hs_speed(
+                helpers.set_hs_speed(
                     protocol, heatershaker, int(heater_shaker_speed * 0.9), 2.0, True
                 )
                 heatershaker.open_labware_latch()
@@ -734,7 +723,7 @@ def run(protocol: ProtocolContext) -> None:
 
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM heatershaker TO MAGPLATE
-                run_helpers.move_labware_from_hs_to_destination(
+                helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
                 protocol.comment("--> Transfer Elution")
@@ -809,7 +798,7 @@ def run(protocol: ProtocolContext) -> None:
                 if DRYRUN is False:
                     if DRYRUN is False:
                         if disposable_lid:
-                            run_helpers.use_disposable_lid_with_tc(
+                            helpers.use_disposable_lid_with_tc(
                                 protocol,
                                 unused_lids,
                                 sample_plate_1,
@@ -854,7 +843,7 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.comment("==============================================")
 
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
-                run_helpers.move_labware_to_hs(
+                helpers.move_labware_to_hs(
                     protocol, sample_plate_2, heatershaker, hs_adapter
                 )
 
@@ -902,7 +891,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                 # ========NEW HS MIX=========================
-                run_helpers.set_hs_speed(
+                helpers.set_hs_speed(
                     protocol,
                     heatershaker,
                     int(heater_shaker_speed * 0.9),
@@ -911,7 +900,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
 
                 # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
-                run_helpers.move_labware_from_hs_to_destination(
+                helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
 
@@ -1005,7 +994,7 @@ def run(protocol: ProtocolContext) -> None:
                     protocol.delay(minutes=1)
 
                 # GRIPPER MOVE PLATE FROM MAG PLATE TO HEATER SHAKER
-                run_helpers.move_labware_to_hs(
+                helpers.move_labware_to_hs(
                     protocol, sample_plate_2, heatershaker, hs_adapter
                 )
 
@@ -1048,7 +1037,7 @@ def run(protocol: ProtocolContext) -> None:
                     p200_tips += 1
                     tipcheck()
                     if DRYRUN is False:
-                        run_helpers.set_hs_speed(
+                        helpers.set_hs_speed(
                             protocol,
                             heatershaker,
                             int(heater_shaker_speed * 0.8),
@@ -1057,7 +1046,7 @@ def run(protocol: ProtocolContext) -> None:
                         )
 
                 # GRIPPER MOVE PLATE FROM HEATER SHAKER TO MAG PLATE
-                run_helpers.move_labware_from_hs_to_destination(
+                helpers.move_labware_from_hs_to_destination(
                     protocol, sample_plate_2, heatershaker, MAG_PLATE_SLOT
                 )
 
@@ -1089,20 +1078,16 @@ def run(protocol: ProtocolContext) -> None:
         ]
         protocol.move_lid(reagent_plate, lid, use_gripper=True)
         if probe_liquid_height_bool:
-            run_helpers.find_liquid_height_of_all_wells(
+            helpers.find_liquid_height_of_all_wells(
                 protocol, p50, liquids_to_probe_at_end
             )
         if deactivate_modules_bool:
-            run_helpers.deactivate_modules(protocol)
-
-        protocol.capture_image(filename="end_of_run")
+            helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

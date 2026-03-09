@@ -12,17 +12,17 @@ import {
 } from '../step-forms/selectors'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 
-import type { HintKey, HintParams } from '.'
+import type { HintKey } from '.'
 import type { BaseState, Selector } from '../types'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 
-export const getHint: Selector<HintParams | null | undefined> = createSelector(
+export const getHint: Selector<HintKey | null | undefined> = createSelector(
   rootSelector,
   tutorial => {
     const dismissedKeys = Object.keys(tutorial.dismissedHints)
     const hints = tutorial.hints.filter(
-      hint => !dismissedKeys.includes(hint.hintKey)
+      hintKey => !dismissedKeys.includes(hintKey)
     )
     // TODO: Ian 2018-10-08 ordering of multiple hints is TBD.
     // For now, show 1 non-dismissed hint at a time

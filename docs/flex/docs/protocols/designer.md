@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Protocol Designer"
-description: "Create protocols visually with Protocol Designer for Flex."
 ---
 
 Protocol Designer is a web-based, no-code tool for developing protocols that run on Opentrons robots, including Opentrons Flex. You can use Protocol Designer to create protocols that:

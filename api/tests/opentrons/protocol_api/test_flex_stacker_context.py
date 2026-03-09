@@ -5,18 +5,19 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy, matchers
 
-from . import versions_at_or_above, versions_between
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocol_api import FlexStackerContext, Labware
-from opentrons.protocol_api.core.common import (
-    FlexStackerCore,
-    LabwareCore,
-    ProtocolCore,
-)
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import FlexStackerContext, Labware
+from opentrons.protocol_api.core.common import (
+    ProtocolCore,
+    LabwareCore,
+    FlexStackerCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+
+from . import versions_at_or_above, versions_between
 
 
 @pytest.fixture

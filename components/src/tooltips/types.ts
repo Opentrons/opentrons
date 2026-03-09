@@ -62,7 +62,8 @@ export type UseHoverTooltipOptions = Partial<
 >
 
 export interface UseHoverTooltipTargetProps
-  extends UseTooltipResultTargetProps, HoverHandlers {}
+  extends UseTooltipResultTargetProps,
+    HoverHandlers {}
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,

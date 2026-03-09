@@ -1,11 +1,9 @@
 """Protocol engine types to do with liquids."""
-
 from dataclasses import dataclass
+from enum import Enum
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, RootModel
-
-from opentrons_shared_data.util import StrEnum
+from pydantic import RootModel, BaseModel, Field
 
 
 class HexColor(RootModel[str]):
@@ -27,7 +25,7 @@ class Liquid(BaseModel):
     displayColor: Optional[HexColor] = None
 
 
-class FluidKind(StrEnum):
+class FluidKind(str, Enum):
     """A kind of fluid that can be inside a pipette."""
 
     LIQUID = "LIQUID"

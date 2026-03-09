@@ -1,14 +1,14 @@
 from typing import Optional
-
 from typing_extensions import Protocol
 
-from .calibratable import Calibratable
-from .configurable import Configurable
+from opentrons.types import Point
+from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
+from .types import MountArgType, CalibrationType, ConfigType
+
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
-from .types import CalibrationType, ConfigType, MountArgType
-from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
-from opentrons.types import Point
+from .configurable import Configurable
+from .calibratable import Calibratable
 
 
 class LiquidHandler(
@@ -202,7 +202,8 @@ class LiquidHandler(
         mount: MountArgType,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ) -> None: ...
+    ) -> None:
+        ...
 
     async def pick_up_tip(
         self,
@@ -236,7 +237,8 @@ class LiquidHandler(
         home_after: bool = True,
         ignore_plunger: bool = False,
         scrape_type: TipScrapeType = TipScrapeType.NONE,
-    ) -> None: ...
+    ) -> None:
+        ...
 
     async def drop_tip(
         self,

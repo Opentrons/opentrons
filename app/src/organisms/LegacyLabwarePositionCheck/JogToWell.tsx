@@ -7,7 +7,6 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
-  CenterLabwareInSlot,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -48,7 +47,7 @@ import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { WellStrokeByName } from '@opentrons/components'
+import type { WellStroke } from '@opentrons/components'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 
@@ -89,25 +88,20 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     useState<VectorOffset>(initialPosition)
   const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = useState(false)
-  useEffect(
-    () => {
-      //  NOTE: this will perform a "null" jog when the jog controls mount so
-      //  if a user reaches the "confirm exit" modal (unmounting this component)
-      //  and clicks "go back" we are able so initialize the live offset to whatever
-      //  distance they had already jogged before clicking exit.
-      // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
-      let mounted = true
-      if (mounted) {
-        handleJog('x', 1, 0, setJoggedPosition)
-      }
-      return () => {
-        mounted = false
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    //  NOTE: this will perform a "null" jog when the jog controls mount so
+    //  if a user reaches the "confirm exit" modal (unmounting this component)
+    //  and clicks "go back" we are able so initialize the live offset to whatever
+    //  distance they had already jogged before clicking exit.
+    // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
+    let mounted = true
+    if (mounted) {
+      handleJog('x', 1, 0, setJoggedPosition)
+    }
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   let wellsToHighlight: string[] = []
   if (
@@ -119,7 +113,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     wellsToHighlight = ['A1']
   }
 
-  const wellStroke: WellStrokeByName = wellsToHighlight.reduce(
+  const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
@@ -154,10 +148,10 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
-              <CenterLabwareInSlot definition={labwareDef}>
+              <>
                 <LabwareRender
                   definition={labwareDef}
-                  positioningMode="passThrough"
+                  positioningMode="offsetInSlot"
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
@@ -169,7 +163,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   pipetteName={pipetteName}
                   usingMetalProbe={shouldUseMetalProbe}
                 />
-              </CenterLabwareInSlot>
+              </>
             )}
           </RobotWorkSpace>
           <Flex css={LEVEL_CONTAINER_STYLE}>
@@ -223,7 +217,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   header={
                     <LegacyStyledText
-                      forwardedAs="h4"
+                      as="h4"
                       css={css`
                         font-weight: ${TYPOGRAPHY.fontWeightBold};
                         font-size: ${TYPOGRAPHY.fontSize28};

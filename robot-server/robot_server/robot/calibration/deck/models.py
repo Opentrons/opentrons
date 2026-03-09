@@ -1,6 +1,5 @@
+from pydantic import ConfigDict, BaseModel, Field
 from typing import List
-
-from pydantic import BaseModel, ConfigDict, Field
 
 from ..helper_classes import AttachedPipette, RequiredLabware
 

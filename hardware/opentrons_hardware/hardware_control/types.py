@@ -1,12 +1,11 @@
 """Types and definitions for hardware bindings."""
-
 import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Mapping, TypeVar, Dict, List, Optional, Tuple
 from functools import total_ordering
-from typing import Dict, List, Mapping, Optional, Tuple, TypeVar
 
-from opentrons_hardware.firmware_bindings.constants import MoveAckId, NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, MoveAckId
 
 MapPayload = TypeVar("MapPayload")
 

@@ -9,8 +9,9 @@ import {
 
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../testing/utils'
+import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
 import { mockRobotSideAnalysis } from '../fixtures'
-import { CommandText, getCommandTextData } from '../index'
+import { CommandText } from '../index'
 
 import type {
   AspirateInPlaceRunTimeCommand,
@@ -32,7 +33,7 @@ import type {
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData } from '../index'
+import type { CommandTextData } from '../../ProtocolTimelineScrubber'
 
 const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,

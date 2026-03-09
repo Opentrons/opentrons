@@ -1,12 +1,16 @@
-import type { HintKey, HintParams } from './index'
+import type { HintKey } from './index'
 
 export interface AddHintAction {
   type: 'ADD_HINT'
-  payload: HintParams
+  payload: {
+    hintKey: HintKey
+  }
 }
-export const addHint = (hintParams: HintParams): AddHintAction => ({
+export const addHint = (hintKey: HintKey): AddHintAction => ({
   type: 'ADD_HINT',
-  payload: hintParams,
+  payload: {
+    hintKey,
+  },
 })
 export interface RemoveHintAction {
   type: 'REMOVE_HINT'

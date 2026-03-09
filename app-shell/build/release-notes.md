@@ -6,46 +6,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
-## Opentrons App Changes in 9.0.0
-
-Welcome to the v9.0.0 release of the Opentrons App! This release includes protocol visualization and other feature improvements and bug fixes.
-
-### New Features
-
-- Bring your protocols to life in the Opentrons App! Protocol visualization lets you:
-  - View Python protocol steps like tip pickup and disposal, labware and liquid moves, module steps, and more alongside a view of the robot deck.
-  - Check new Python protocol steps and errors in a visual, playable format.
-  - Assess the results of an OpentronsAI protocol before running on the Flex.
-
-  Click **Visualize** on the details page of any Flex protocol to get started.
-
-### Improvements
-
-- Enable the Flex or OT-2's built-in camera for additional settings:
-  - Adjust image and video settings like zoom, brightness, contrast, and saturation.
-  - Preview an image of the Flex or OT-2's deck when customizing camera controls.
-  - Updated image filenames make it easier to find images from your protocol runs.
-
-### Bug Fixes
-
-- Drop tip locations are properly exported in Quick Transfer protocols.
-- Adding a CSV file to an imported protocol no longer causes analysis errors.
-- Protocol run logs include correct descriptions for partial tip pickup with the Flex 96-channel pipette.
-
-### Known Issues
-
-- You can't open protocol visualization when re-running a completed protocol, only if the protocol was started on a different computer. Open visualization from the protocol details page instead.
-- Protocol visualization will produce an error for protocols that dispose of tips into a standard labware instead of a trash container.
-
----
-
 ## Opentrons App Changes in 8.8.1
 
 There are no changes to the Opentrons App in v8.8.1.
 
 Installing robot software v8.8.1 allows all robots to properly boot after a recent upgrade to robot software v8.8.0.
-
----
 
 ## Opentrons App Changes in 8.8.0
 
@@ -56,10 +21,9 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
 - Choose to run module actions like setting temperatures, setting shake speed, or running a Thermocycler Module profile without pausing other protocol steps until they're complete. You can run these concurrent module actions with multiple Temperature, Heater-Shaker, or Thermocycler Modules, or simultaneously perform pipetting actions.
 - Use the Flex and OT-2's cameras to capture images. Manage camera use, images, and live view from the Opentrons App:
   - Enable or disable the camera. The camera can capture images of the deck during a protocol or take an image when an error occurs.
-  - Turn on a live view of the deck during your protocol run (Flex only).
+  - Turn on a live view of the Flex or OT-2 deck during your protocol run.
   - View, download, or delete images after a protocol run.
-- Choose to return tips to the tip rack in a quick transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
-- Protocols you create in Quick Transfer are exported as .py files, not .json.
+- Choose to return tips to the tip rack in a Quick Transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
 
 ### Bug Fixes
 

@@ -1,5 +1,4 @@
 from asyncio import AbstractEventLoop
-
 from typing_extensions import Protocol
 
 

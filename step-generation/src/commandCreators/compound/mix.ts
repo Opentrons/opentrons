@@ -1,11 +1,11 @@
 import flatMap from 'lodash/flatMap'
 
 import {
+  ALL,
   getByVolumeValue,
   getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
-  POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   WELL_ORIGIN_BOTTOM,
 } from '@opentrons/shared-data'
 
@@ -16,6 +16,7 @@ import {
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
+  getDefaultPrimaryNozzle,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -35,11 +36,7 @@ import {
 } from '../atomic'
 import { replaceTip } from './replaceTip'
 
-import type {
-  MoveToWellParams,
-  WellLocation,
-  WellOrigin,
-} from '@opentrons/shared-data'
+import type { MoveToWellParams, WellLocation } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -69,10 +66,9 @@ const makePythonCommandCreator: (args: {
   positionArgs?: {
     labware: string
     well: string
-    wellOrigin: WellOrigin
     xOffset: number
     yOffset: number
-    zOffset: number
+    offsetFromBottomMm: number
   }
 }) => CurriedCommandCreator = args => () => {
   const {
@@ -92,12 +88,11 @@ const makePythonCommandCreator: (args: {
   const pipettePythonName = pipetteEntities[pipette].pythonName
   let locationPythonArg: string | null = null
   if (positionArgs != null) {
-    const { labware, well, wellOrigin, xOffset, yOffset, zOffset } =
-      positionArgs
+    const { labware, well, xOffset, yOffset, offsetFromBottomMm } = positionArgs
     const labwarePythonName = labwareEntities[labware].pythonName
     const pythonWellLocation: WellLocation = {
-      origin: wellOrigin,
-      offset: { x: xOffset, y: yOffset, z: zOffset },
+      origin: 'bottom',
+      offset: { x: xOffset, y: yOffset, z: offsetFromBottomMm },
     }
     locationPythonArg = `location=${labwarePythonName}[${formatPyStr(
       well
@@ -141,7 +136,6 @@ export const mixInPlaceUtil = (args: {
   liquidClass: string | null
   tiprack: string
   generatePython: boolean
-  // TODO: This function shouldn't be called "mixInPlaceUtil()" if we support moveToWellParams:
   moveToWellParams?: MoveToWellParams
 }): CurriedCommandCreator[] => {
   const {
@@ -175,11 +169,9 @@ export const mixInPlaceUtil = (args: {
         ? {
             labware: moveToWellParams.labwareId,
             well: moveToWellParams.wellName,
-            wellOrigin:
-              moveToWellParams.wellLocation?.origin ?? WELL_ORIGIN_BOTTOM,
             xOffset: moveToWellParams.wellLocation?.offset?.x ?? 0,
             yOffset: moveToWellParams.wellLocation?.offset?.y ?? 0,
-            zOffset: moveToWellParams.wellLocation?.offset?.z ?? 0,
+            offsetFromBottomMm: moveToWellParams.wellLocation?.offset?.z ?? 0,
           }
         : undefined,
   })
@@ -275,19 +267,17 @@ export const mix: CommandCreator<MixArgs> = (
     volume,
     times,
     changeTip,
+    offsetFromBottomMm,
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
     dropTipLocation,
     tipRack,
-    positionReference,
     xOffset,
     yOffset,
-    zOffset,
     finalPushOut,
     nozzles,
-    primaryNozzle,
     tipsSelected,
     tiprackSelected,
     tipTracking,
@@ -377,8 +367,6 @@ export const mix: CommandCreator<MixArgs> = (
       labwareId: labware,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
-      primaryNozzle,
-      nozzleConfiguration: nozzles,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -387,8 +375,6 @@ export const mix: CommandCreator<MixArgs> = (
       labwareId: labware,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
-      primaryNozzle,
-      nozzleConfiguration: nozzles,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       return {
@@ -416,11 +402,14 @@ export const mix: CommandCreator<MixArgs> = (
     tiprackSelected != null &&
     tipsSelected != null &&
     tipsSelected.length > 0
-
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles,
+        nozzles: nozzles ?? ALL,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -437,14 +426,13 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
-            primaryNozzle,
             // the tip will only be dropped on the first time through this loop if we are returning tip to tiprack
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack,
-            nozzles,
+            ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null
@@ -532,11 +520,11 @@ export const mix: CommandCreator<MixArgs> = (
           labwareId: labware,
           wellName: well,
           wellLocation: {
-            origin: POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[positionReference],
+            origin: WELL_ORIGIN_BOTTOM,
             offset: {
+              z: offsetFromBottomMm,
               x: xOffset,
               y: yOffset,
-              z: zOffset,
             },
           },
         },

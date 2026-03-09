@@ -69,6 +69,7 @@ export function registerSystemInfo(
   }
 
   app.once('will-quit', () => {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (usbMonitor != null) {
       log.debug('stopping usb monitoring')
       usbMonitor.stop()

@@ -38,16 +38,11 @@ export function useCalibrationError(
   const dispatch = useDispatch()
 
   // Dismiss all network requests during a unique session to prevent stale error state.
-  useEffect(
-    () => {
-      if (sessionId != null) {
-        dispatch(dismissAllRequests())
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sessionId]
-  )
+  useEffect(() => {
+    if (sessionId != null) {
+      dispatch(dismissAllRequests())
+    }
+  }, [sessionId])
 
   const reqs = useSelector((state: State) => {
     return getRequests(state, requestIds)
@@ -99,7 +94,7 @@ export function CalibrationError({
   return (
     <Flex css={CONTAINER_STYLE}>
       <Flex css={CONTENT_CONTAINER_STYLE}>
-        <Icon name="ot-alert" css={ICON_STYLE} color={COLORS.red50} />
+        <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {title}
         </StyledText>

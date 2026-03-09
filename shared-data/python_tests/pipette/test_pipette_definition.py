@@ -1,19 +1,17 @@
-from typing import List, cast
-
 import pytest
-
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteLiquidPropertiesDefinition,
-    SupportedTipsDefinition,
-    liquid_class_for_volume_between_default_and_defaultlowvolume,
-)
+from typing import cast, List
 from opentrons_shared_data.pipette.types import (
-    LiquidClasses,
     PipetteChannelType,
-    PipetteModelMajorVersionType,
-    PipetteModelMinorVersionType,
     PipetteModelType,
     PipetteVersionType,
+    PipetteModelMajorVersionType,
+    PipetteModelMinorVersionType,
+    LiquidClasses,
+)
+from opentrons_shared_data.pipette.pipette_definition import (
+    liquid_class_for_volume_between_default_and_defaultlowvolume,
+    PipetteLiquidPropertiesDefinition,
+    SupportedTipsDefinition,
 )
 
 

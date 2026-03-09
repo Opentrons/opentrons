@@ -22,10 +22,7 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadius16}
     >
-      <LegacyStyledText
-        forwardedAs="h4"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      <LegacyStyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}
       </LegacyStyledText>
     </Flex>

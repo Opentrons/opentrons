@@ -27,7 +27,7 @@ export function MetadataDetails({
   protocolType,
 }: MetadataDetailsProps): JSX.Element {
   if (protocolType === 'json') {
-    return <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+    return <LegacyStyledText as="p">{description}</LegacyStyledText>
   } else {
     const filteredMetaData = Object.entries(
       omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
@@ -39,20 +39,20 @@ export function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description}
         </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <Fragment key={index}>
               <LegacyStyledText
-                forwardedAs="h6"
+                as="h6"
                 marginTop={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {startCase(item.label)}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">{item.value}</LegacyStyledText>
+              <LegacyStyledText as="p">{item.value}</LegacyStyledText>
             </Fragment>
           )
         })}

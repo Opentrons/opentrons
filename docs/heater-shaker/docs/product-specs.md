@@ -1,6 +1,5 @@
 ---
 title: "Heater-Shaker Module: Product Specifications"
-description: "Physical specs, heating and shaking profiles, and included parts."
 ---
 
 ![Heater-Shaker with external features labeled](images/hs-with-labels.svg)

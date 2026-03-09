@@ -6,11 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   Modal,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -61,19 +62,19 @@ export function useProtocolAnalysisErrorsModal({
 }
 
 export interface ProtocolAnalysisErrorModalProps {
+  displayName: string | null
   errors: AnalysisError[]
   onClose: () => void
-  displayName?: string | null
-  robotName?: string
+  robotName: string
 }
 
 export function ProtocolAnalysisErrorModal({
+  displayName,
   errors,
   onClose,
   robotName,
-  displayName,
 }: ProtocolAnalysisErrorModalProps): JSX.Element {
-  const { t, i18n } = useTranslation(['run_details', 'shared'])
+  const { t } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
     <Modal
@@ -83,17 +84,12 @@ export function ProtocolAnalysisErrorModal({
       onClose={onClose}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-        {robotName == null && displayName == null ? null : (
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-          >
-            {t('analysis_failure_on_robot', {
-              protocolName: displayName,
-              robotName,
-            })}
-          </StyledText>
-        )}
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {t('analysis_failure_on_robot', {
+            protocolName: displayName,
+            robotName,
+          })}
+        </LegacyStyledText>
         {errors.map((error, index) => (
           <CodeBlock key={`error-${index}`}>{error?.detail}</CodeBlock>
         ))}
@@ -106,9 +102,12 @@ export function ProtocolAnalysisErrorModal({
           padding={`${SPACING.spacing8} ${SPACING.spacing48}`}
           onClick={onClose}
         >
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {i18n.format(t('shared:close'), 'capitalize')}
-          </StyledText>
+          <LegacyStyledText
+            css={TYPOGRAPHY.pSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+          >
+            {t('shared:close')}
+          </LegacyStyledText>
         </PrimaryButton>
       </Flex>
     </Modal>,

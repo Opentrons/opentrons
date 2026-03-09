@@ -1,60 +1,56 @@
 """Utilities for calculating the labware origin offset position."""
-
 import dataclasses
 import enum
-from typing import Optional, Union, overload
+from typing import Union, overload, Optional
 
 from typing_extensions import assert_type
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons.types import Point, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import (
-    AxisAlignedBoundingBox3D,
-    Extents,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
+    Extents,
+    AxisAlignedBoundingBox3D,
     Vector3D,
 )
 from opentrons_shared_data.labware.types import (
-    LocatingFeatures,
     SlotFootprintAsChildFeature,
-    SlotFootprintAsParentFeature,
+    LocatingFeatures,
     SpringDirectionalForce,
-)
-from opentrons_shared_data.labware.types import (
+    SlotFootprintAsParentFeature,
     Vector3D as LabwareVector3D,
 )
 from opentrons_shared_data.module.types import ModuleOrientation
-
-from .errors import (
-    IncompatibleLocatingFeatureError,
-    InvalidLabwarePlacementError,
-    MissingLocatingFeatureError,
+from opentrons.protocol_engine.resources.labware_validation import (
+    validate_definition_is_lid,
+    is_absorbance_reader_lid,
 )
 from opentrons.protocol_engine.errors import (
-    InvalidModuleOrientation,
     LabwareNotOnDeckError,
     LabwareOffsetDoesNotExistError,
+    InvalidModuleOrientation,
 )
-from opentrons.protocol_engine.resources.labware_validation import (
-    is_absorbance_reader_lid,
-    validate_definition_is_lid,
+from .errors import (
+    MissingLocatingFeatureError,
+    IncompatibleLocatingFeatureError,
+    InvalidLabwarePlacementError,
 )
+from opentrons.protocol_engine.types import AddressableArea
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons.protocol_engine.types import (
-    WASTE_CHUTE_LOCATION,
-    AddressableArea,
-    AddressableAreaLocation,
+    ModuleDefinition,
+    ModuleModel,
     DeckLocationDefinition,
-    DeckSlotLocation,
     LabwareLocation,
+    ModuleLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+    OnLabwareLocation,
     LabwareMovementOffsetData,
     LabwareOffsetVector,
-    ModuleDefinition,
-    ModuleLocation,
-    ModuleModel,
-    OnLabwareLocation,
+    WASTE_CHUTE_LOCATION,
 )
-from opentrons.types import DeckSlotName, Point
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
 
@@ -271,7 +267,8 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point: ...
+) -> Point:
+    ...
 
 
 @overload
@@ -283,7 +280,8 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point: ...
+) -> Point:
+    ...
 
 
 @overload
@@ -295,7 +293,8 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point: ...
+) -> Point:
+    ...
 
 
 def _get_parent_placement_origin_to_lw_origin(
@@ -1288,7 +1287,7 @@ def _get_tc_lid_gripper_offsets(
         bottom_most_lw_location = stackup_lw_info_top_to_bottom[-1][1]
 
         # This is done as a workaround for some TC geometry inaccuracies.
-        # See EXEC-1267 for context.
+        # See PLAT-579 for context.
         if (
             isinstance(bottom_most_lw_location, ModuleLocation)
             and getattr(underlying_ancestor_definition, "model", None)

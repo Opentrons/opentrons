@@ -60,17 +60,17 @@ export function RobotServerVersion({
           >
             {t('robot_server_version')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
+          <LegacyStyledText as="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
           </LegacyStyledText>
           {isFlex ? (
-            <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
+            <LegacyStyledText as="p" paddingBottom={SPACING.spacing4}>
               {t('branded:robot_server_version_ot3_description')}
             </LegacyStyledText>
           ) : null}
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('shared:view_latest_release_notes')}
             <Link
               external
@@ -83,7 +83,7 @@ export function RobotServerVersion({
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <LegacyStyledText
-              forwardedAs="label"
+              as="label"
               color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >

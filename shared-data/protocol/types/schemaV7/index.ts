@@ -57,9 +57,8 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
  * and should not be mixed with our Protocol types
  * @deprecated Use {@link ProtocolFile}
  */
-export interface ProtocolAnalysisFile<
-  DesignerApplicationData = {},
-> extends Omit<ProtocolFile<DesignerApplicationData>, 'commands'> {
+export interface ProtocolAnalysisFile<DesignerApplicationData = {}>
+  extends Omit<ProtocolFile<DesignerApplicationData>, 'commands'> {
   commands: RunTimeCommand[]
 }
 

@@ -1,5 +1,4 @@
 """Firmware update target."""
-
 from dataclasses import dataclass
 
 from opentrons_hardware.firmware_bindings import NodeId

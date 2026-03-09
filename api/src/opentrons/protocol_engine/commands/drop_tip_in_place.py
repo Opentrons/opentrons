@@ -1,10 +1,9 @@
 """Drop tip in place command request, result, and implementation models."""
-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Type, Any, Union
 
-from pydantic import BaseModel, Field
+from pydantic import Field, BaseModel
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
 
@@ -13,10 +12,6 @@ from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
 )
 
-from ..errors.error_occurrence import ErrorOccurrence
-from ..errors.exceptions import TipAttachedError
-from ..resources.model_utils import ModelUtils
-from ..state import update_types
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -26,13 +21,17 @@ from .command import (
 )
 from .movement_common import StallOrCollisionError
 from .pipetting_common import (
-    OverpressureError,
     PipetteIdMixin,
     TipPhysicallyAttachedError,
+    OverpressureError,
 )
+from ..errors.exceptions import TipAttachedError
+from ..errors.error_occurrence import ErrorOccurrence
+from ..resources.model_utils import ModelUtils
+from ..state import update_types
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, TipHandler
+    from ..execution import TipHandler, GantryMover
 
 
 DropTipInPlaceCommandType = Literal["dropTipInPlace"]
@@ -192,9 +191,9 @@ class DropTipInPlace(
     params: DropTipInPlaceParams
     result: Optional[DropTipInPlaceResult] = None
 
-    _ImplementationCls: Type[DropTipInPlaceImplementation] = (
+    _ImplementationCls: Type[
         DropTipInPlaceImplementation
-    )
+    ] = DropTipInPlaceImplementation
 
 
 class DropTipInPlaceCreate(BaseCommandCreate[DropTipInPlaceParams]):

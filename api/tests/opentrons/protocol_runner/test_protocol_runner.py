@@ -1,13 +1,12 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
-
-from datetime import datetime
-from pathlib import Path
-from typing import List, Type, Union, cast
 from unittest.mock import sentinel
+from datetime import datetime
 
 import pytest
-from decoy import Decoy, matchers
 from pytest_lazy_fixtures import lf as lazy_fixture
+from decoy import Decoy, matchers
+from pathlib import Path
+from typing import List, cast, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 from opentrons_shared_data.labware.types import (
@@ -17,49 +16,45 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSche
 from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
-
-from opentrons import protocol_reader
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_engine import (
-    CommandStatus,
-    Liquid,
-    ProtocolEngine,
-)
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-)
-from opentrons.protocol_engine import (
-    errors as pe_errors,
-)
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocols.types import PythonProtocol, JsonProtocol
+from opentrons.util.broker import Broker
+
+from opentrons import protocol_reader
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    CommandStatus,
+    Liquid,
+    commands as pe_commands,
+    errors as pe_errors,
+)
 from opentrons.protocol_reader import (
-    JsonProtocolConfig,
     ProtocolSource,
+    JsonProtocolConfig,
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner import (
-    AnyRunner,
-    JsonRunner,
-    LiveRunner,
-    PythonAndLegacyRunner,
     create_protocol_runner,
+    JsonRunner,
+    PythonAndLegacyRunner,
+    LiveRunner,
+    AnyRunner,
 )
+from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.python_protocol_wrappers import (
-    ProtocolContextCreator,
     PythonAndLegacyFileReader,
+    ProtocolContextCreator,
     PythonProtocolExecutor,
 )
-from opentrons.protocol_runner.task_queue import TaskQueue
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
-from opentrons.protocols.types import JsonProtocol, PythonProtocol
-from opentrons.util.broker import Broker
 
 
 @pytest.fixture
@@ -398,13 +393,8 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
-    decoy.when(
-        json_translator.translate_legacy_command_annotations(json_protocol)
-    ).then_return([])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
-        commands
-    )
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
     decoy.when(
         await protocol_engine.add_and_execute_command_wait_for_recovery(
@@ -511,12 +501,7 @@ async def test_load_json_runner(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(
-        json_translator.translate_legacy_command_annotations(json_protocol)
-    ).then_return([])
-    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
-        commands
-    )
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
     await json_runner_subject.load(json_protocol_source)

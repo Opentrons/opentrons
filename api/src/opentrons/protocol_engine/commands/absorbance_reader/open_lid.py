@@ -1,27 +1,30 @@
 """Command models to close the lid on an Absorbance Reader."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Literal, Optional
-
-from pydantic import BaseModel, Field
+from typing import Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 
-from ...errors import CannotPerformModuleAction
-from ...errors.error_occurrence import ErrorOccurrence
-from ...state.update_types import StateUpdate
+from pydantic import BaseModel, Field
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from .common import LID_Z_CLEARANCE
-from opentrons.drivers.types import AbsorbanceReaderLidStatus
+from ...errors.error_occurrence import ErrorOccurrence
+from ...errors import CannotPerformModuleAction
+
 from opentrons.protocol_engine.types import AddressableAreaLocation
 from opentrons.types import Point
 
+from opentrons.drivers.types import AbsorbanceReaderLidStatus
+
+from .common import LID_Z_CLEARANCE
+
+from ...state.update_types import StateUpdate
+
+
 if TYPE_CHECKING:
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
         EquipmentHandler,
         LabwareMovementHandler,
     )
-    from opentrons.protocol_engine.state.state import StateView
 
 
 OpenLidCommandType = Literal["absorbanceReader/openLid"]

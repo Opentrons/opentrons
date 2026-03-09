@@ -1,36 +1,31 @@
 """Test pipette data provider."""
-
-from sys import maxsize
 from typing import Dict
-
+from sys import maxsize
 import pytest
-
-from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.pipette import types as pip_types
-from opentrons_shared_data.pipette.pipette_definition import (
-    TIP_OVERLAP_VERSION_MAXIMUM,
-    AvailableSensorDefinition,
-    PipetteBoundingBoxOffsetDefinition,
-)
 from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    PipetteModel,
     LiquidClasses as VolumeModes,
 )
-from opentrons_shared_data.pipette.types import (
-    PipetteModel,
-    PipetteNameType,
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteBoundingBoxOffsetDefinition,
+    TIP_OVERLAP_VERSION_MAXIMUM,
+    AvailableSensorDefinition,
 )
 
-from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine.errors.exceptions import InvalidLoadPipetteSpecsError
-from opentrons.protocol_engine.resources import pipette_data_provider as subject
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
     VirtualPipetteDataProvider,
-    get_latest_tip_overlap_before_version,
     validate_and_default_tip_overlap_version,
+    get_latest_tip_overlap_before_version,
 )
-from opentrons.protocol_engine.types import FlowRates
+
+from opentrons.protocol_engine.resources import pipette_data_provider as subject
+from opentrons.protocol_engine.errors.exceptions import InvalidLoadPipetteSpecsError
+from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.types import Point
 
 
@@ -79,8 +74,8 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
         nozzle_map=result.nozzle_map,
-        back_left_corner_offset=Point(-16, 22.25, 10.45),
-        front_right_corner_offset=Point(16, -22.25, 10.45),
+        back_left_corner_offset=Point(0, 0, 10.45),
+        front_right_corner_offset=Point(0, 0, 10.45),
         pipette_lld_settings={},
         plunger_positions={
             "top": 19.5,
@@ -91,7 +86,6 @@ def test_get_virtual_pipette_static_config(
         shaft_ul_per_mm=0.785,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={VolumeModes.default: 1.0},
     )
 
 
@@ -134,10 +128,6 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
-        },
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -148,7 +138,7 @@ def test_configure_virtual_pipette_for_volume(
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
         display_name="Flex 1-Channel 50 µL",
-        min_volume=0.5,
+        min_volume=1,
         max_volume=30,
         channels=1,
         nozzle_offset_z=-259.15,
@@ -176,10 +166,6 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
-        },
     )
 
 
@@ -219,9 +205,6 @@ def test_load_virtual_pipette_by_model_string(
         shaft_ul_per_mm=9.621,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 20.0,
-        },
     )
 
 
@@ -324,7 +307,6 @@ def pipette_dict(
         "shaft_ul_per_mm": 5.0,
         "available_sensors": available_sensors,
         "volume_mode": VolumeModes.lowVolumeDefault,
-        "available_volume_modes": {},
     }
 
 
@@ -376,7 +358,6 @@ def test_get_pipette_static_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={},
     )
 
 
@@ -404,7 +385,7 @@ def test_default_tip_overlap_versions() -> None:
     )
 
 
-@pytest.mark.parametrize("version", ["v0", "v1", f"v{maxsize + 1}"])
+@pytest.mark.parametrize("version", ["v0", "v1", f"v{maxsize+1}"])
 def test_pass_valid_tip_overlap_versions(version: str) -> None:
     """Pass valid tip overlap specs."""
     assert validate_and_default_tip_overlap_version(version) == version

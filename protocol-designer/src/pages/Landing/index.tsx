@@ -4,15 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
-  ALIGN_CENTER,
   BasicButton,
   COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   INFO_TOAST,
-  JUSTIFY_CENTER,
   LargeButton,
-  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -58,37 +53,32 @@ export function Landing(): JSX.Element {
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
     hasOptedIn != null
 
-  useEffect(
-    () => {
-      if (
-        userHasNotSeenAnnouncement &&
-        appVersion != null &&
-        hasOptedIn != null
-      ) {
-        const toastId = bakeToast(
-          t('learn_more', { version: _OT_PD_VERSION_ }) as string,
-          INFO_TOAST,
-          {
-            heading: t('updated_protocol_designer'),
-            closeButton: true,
-            linkText: t('view_release_notes'),
-            onClose: () => {
-              setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
-            },
-            onLinkClick: () => {
-              eatToast(toastId)
-              setShowAnnouncementModal(true)
-            },
-            disableTimeout: true,
-            justifyContent: JUSTIFY_CENTER,
-          }
-        )
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [userHasNotSeenAnnouncement, appVersion, hasOptedIn]
-  )
+  useEffect(() => {
+    if (
+      userHasNotSeenAnnouncement &&
+      appVersion != null &&
+      hasOptedIn != null
+    ) {
+      const toastId = bakeToast(
+        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
+        INFO_TOAST,
+        {
+          heading: t('updated_protocol_designer'),
+          closeButton: true,
+          linkText: t('view_release_notes'),
+          onClose: () => {
+            setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
+          },
+          onLinkClick: () => {
+            eatToast(toastId)
+            setShowAnnouncementModal(true)
+          },
+          disableTimeout: true,
+          justifyContent: 'center',
+        }
+      )
+    }
+  }, [userHasNotSeenAnnouncement, appVersion, hasOptedIn])
 
   useEffect(() => {
     if (metadata?.created != null) {
@@ -117,32 +107,15 @@ export function Landing(): JSX.Element {
           }}
         />
       ) : null}
-      <Flex
-        data-cy="landing-page"
-        backgroundColor={COLORS.grey10}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 9rem)"
-        width="100%"
-        gridGap={SPACING.spacing32}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          alignItems={ALIGN_CENTER}
-        >
+      <div data-cy="landing-page" className={styles.landing_page}>
+        <div className={styles.content_section}>
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.text_section}>
             <StyledText desktopStyle="headingLargeBold">
               {t('welcome')}
             </StyledText>
@@ -154,8 +127,8 @@ export function Landing(): JSX.Element {
             >
               {t('no-code-required')}
             </StyledText>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
         <NavLink to="/createNew" className={styles.nav_link}>
           <LargeButton
             onClick={() => {
@@ -181,7 +154,7 @@ export function Landing(): JSX.Element {
             accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
-      </Flex>
+      </div>
       <EndUserAgreementFooter />
     </>
   )

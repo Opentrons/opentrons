@@ -52,7 +52,8 @@
 .cards_container {
   display: flex;
   width: 100%;
-  flex-flow: row wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: stretch;
   justify-content: center;
   gap: var(--spacing-24);

@@ -1,13 +1,11 @@
 """Tests for FastAPI application object of the robot server."""
-
-from typing import Iterator
-
 import pytest
+from mock import MagicMock, patch
 from fastapi import status
 from fastapi.testclient import TestClient
-from mock import MagicMock, patch
+from typing import Iterator
 
-from robot_server.versioning import API_VERSION, API_VERSION_HEADER
+from robot_server.versioning import API_VERSION_HEADER, API_VERSION
 
 
 @pytest.fixture

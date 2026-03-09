@@ -1,9 +1,10 @@
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
+PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
@@ -21,27 +22,15 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 
 
-
-
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: dev
+dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate.buildroot --log-level debug --port $(port)
-
-.PHONY: dev-flex
-dev-flex:
-	$(python) -m otupdate.openembedded --log-level debug --port $(port)
+	$(python) -m otupdate --log-level debug --port $(port)
 
 .PHONY: clean
 clean:
@@ -56,21 +45,21 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
-	$(pytest) $(test_opts) $(tests)
+	$(python) -m pytest $(test_opts) $(tests)
 
 .PHONY: lint
 lint:
 	$(python) -m mypy otupdate tests
-	$(ruff) check otupdate tests
+	$(python) -m black --check ./otupdate ./tests
+	$(python) -m flake8 otupdate tests
 
 .PHONY: format
 format:
-	$(ruff) format otupdate tests
-	$(ruff) check --select I --fix otupdate tests
+	$(python) -m black otupdate tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

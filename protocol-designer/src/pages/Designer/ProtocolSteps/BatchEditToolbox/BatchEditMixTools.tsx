@@ -67,9 +67,8 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      padding={SPACING.spacing12}
+      spacing={SPACING.spacing12}
       gridGap={SPACING.spacing16}
-      backgroundColor="red"
     >
       <Flex padding={`${SPACING.spacing16} ${SPACING.spacing16} 0`}>
         <Tabs tabs={[aspirateTab, dispenseTab]} />

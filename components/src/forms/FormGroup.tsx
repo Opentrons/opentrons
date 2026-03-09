@@ -12,13 +12,13 @@ export interface FormGroupProps {
   /** form content */
   children?: ReactNode
   /** classes to apply */
-  className?: string | null
+  className?: string | null | undefined
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
-  error?: string | null
+  error?: string | null | undefined
   /** enable disabled style. Overridden by truthy `error` */
-  disabled?: boolean | null
+  disabled?: boolean | null | undefined
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: HoverTooltipHandlers | null
+  hoverTooltipHandlers?: HoverTooltipHandlers | null | undefined
   /** boolean indicating formGroup used in pipette Settings slideout */
   isPipetteSettingsSlideout?: boolean
 }

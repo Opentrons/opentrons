@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react'
 
 import {
-  AlignToModuleChildSlot,
+  AlignControlToModule,
   BaseDeck,
   Box,
-  CenterLabwareInSlot,
   DIRECTION_COLUMN,
   Flex,
-  LabwareInfoOverlay,
   LabwareRender,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
@@ -31,6 +29,7 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { SlotDetailModal } from './SlotDetailModal'
 
@@ -90,8 +89,6 @@ export function SetupLabwareMap({
           : null
       // TODO: ja 8.27.25: find a better way to find the matching lid def without
       // relying on the lidDisplayNames
-      // TODO: mm 12.3.25: deduplicate with other places where we're doing the same thing
-      // (grep for matchingLidDef)
       const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
         uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
       )
@@ -145,7 +142,10 @@ export function SetupLabwareMap({
             cursor="pointer"
           >
             {topLabwareDefinition != null && topLabwareInfo != null ? (
-              <AlignToModuleChildSlot
+              <AlignControlToModule
+                // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be an
+                // <AlignLabwareToModule>. Right now, this will misalign the overlay
+                // for schema-3 labware definitions.
                 deckId={deckDef.otId}
                 slotId={slotName}
                 moduleDefinition={moduleDefinition}
@@ -154,6 +154,7 @@ export function SetupLabwareMap({
                   definition={topLabwareDefinition}
                   labwareId={topLabwareInfo.labwareId}
                   displayName={topLabwareInfo.displayName}
+                  runId={runId}
                   labwareHasLiquid={
                     wellFill != null && Object.values(wellFill).length > 0
                   }
@@ -163,7 +164,7 @@ export function SetupLabwareMap({
                       : 0
                   }
                 />
-              </AlignToModuleChildSlot>
+              </AlignControlToModule>
             ) : null}
           </g>
         ),
@@ -178,10 +179,6 @@ export function SetupLabwareMap({
       topLabwareInfo != null
         ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
-    // TODO: ja 8.27.25: find a better way to find the matching lid def without
-    // relying on the lidDisplayNames
-    // TODO: mm 12.3.25: deduplicate with other places where we're doing the same thing
-    // (grep for matchingLidDef)
     const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
       uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
     )
@@ -203,12 +200,10 @@ export function SetupLabwareMap({
       labwareChildren: (
         <>
           {matchingLidDef != null ? (
-            <CenterLabwareInSlot definition={matchingLidDef}>
-              <LabwareRender
-                definition={matchingLidDef}
-                positioningMode="passThrough"
-              />
-            </CenterLabwareInSlot>
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
           ) : null}
           <g
             cursor="pointer"
@@ -226,6 +221,7 @@ export function SetupLabwareMap({
               definition={topLabwareDefinition}
               labwareId={topLabwareInfo.labwareId}
               displayName={topLabwareInfo.displayName}
+              runId={runId}
               labwareHasLiquid={Object.values(wellFill).length > 0}
             />
           </g>

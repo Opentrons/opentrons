@@ -81,14 +81,9 @@ export const WellSelectionField = (
     }
   }, [nozzleType, updateValue])
 
-  useEffect(
-    () => {
-      setPrimaryWellCount(calculateWellCount)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedWells]
-  )
+  useEffect(() => {
+    setPrimaryWellCount(calculateWellCount)
+  }, [selectedWells])
 
   const getModalKey = (): string => {
     return `${String(stepId)}${name}${pipetteId || 'noPipette'}${

@@ -20,20 +20,18 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getFullStackFromLabwares,
-  getLiquidIdsOnLabwareStack,
-  HOPPER_STACKER_LOCATION,
-} from '@opentrons/step-generation'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { getAllLabwareIdsOfCertainURIOnStack } from '/protocol-designer/utils'
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
-import { getCanModifyLabwareQuantity, getLiquidText } from './utils'
 
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -41,53 +39,45 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 interface LabwareCardProps {
   labware: LabwareOnDeck
   quantity: number
-  location: string // slotId, off-deck, fake hopper location
   lidId?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidId, quantity, location } = props
+  const { labware, lidId, quantity } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
+  const enableStacking = useSelector(getEnableStacking)
   const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const largestStack = getFullStackFromLabwares(deckSetupLabware, location)
-  const isLabwareCardForAdapter = labware.def.allowedRoles?.includes('adapter')
-  const filteredStack = largestStack.filter(
-    id =>
-      deckSetupLabware[id] != null &&
-      (isLabwareCardForAdapter
-        ? deckSetupLabware[id].def.allowedRoles?.includes('adapter')
-        : !deckSetupLabware[id].def.allowedRoles?.includes('adapter'))
+  const allLabwareIdsOnStack = getAllLabwareIdsOfCertainURIOnStack(
+    deckSetupLabware,
+    labware
   )
-  const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
+  const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
   const wellContents =
     allWellContentsForActiveItem != null
-      ? Object.values(allWellContentsForActiveItem)
-      : []
-  const displayName = def.metadata.displayName
+      ? allWellContentsForActiveItem[labware.id]
+      : null
+  const displayName = labware.def.metadata.displayName
+  const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
   const isLid = def.allowedRoles?.includes('lid')
-  const liquidIds = getLiquidIdsOnLabwareStack(wellContents)
-  const numOfUniqueLiquids = liquidIds.length
+  const isNicknameDifferent = nickName !== displayName
+  const liquidIds = getLiquidIdsOnLabware(wellContents)
+  const canModifyQuantity =
+    labware.def.stackLimit != null && labware.def.stackLimit > 1
 
-  const liquidText = getLiquidText(numOfUniqueLiquids, t)
-
-  const canModifyQuantity = getCanModifyLabwareQuantity(def, isOnHopper)
   let editButton: null | string = null
-  if (
-    (isOnHopper && def.parameters.isTiprack) ||
-    (isLid && canModifyQuantity)
-  ) {
+  if (isLid && canModifyQuantity) {
     editButton = t('edit_quantity')
-  } else if (!isAdapterOrTiprack && canModifyQuantity) {
+  } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
     editButton = t('edit_liquid_and_quantity')
   } else if (!isAdapterOrTiprack || (isLid && !canModifyQuantity)) {
     editButton = t('edit_liquid')
@@ -109,16 +99,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             setShowQuantityModal(false)
           }}
           labwareId={labware.id}
-          allLabwareIdsOnStack={filteredStack}
-          isOnHopper={isOnHopper}
-          location={location}
+          allLabwareIdsOnStack={allLabwareIdsOnStack}
         />
       ) : null}
       <Box position={POSITION_RELATIVE}>
         {showOverflowMenu ? (
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
-            labwareIds={filteredStack}
+            labwareIds={allLabwareIdsOnStack}
             lidId={lidId}
           />
         ) : null}
@@ -137,8 +125,16 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
-                  {displayName}
+                  {nickName}
                 </StyledText>
+                {isNicknameDifferent ? (
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    color={COLORS.grey60}
+                  >
+                    {displayName}
+                  </StyledText>
+                ) : null}
                 {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
@@ -151,7 +147,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 ) : null}
                 <Flex gridGap={SPACING.spacing8} paddingTop={SPACING.spacing8}>
                   {!isAdapterOrTiprack && !isLid ? (
-                    <LiquidInfoDisplay text={liquidText} />
+                    <LiquidInfoDisplay
+                      text={
+                        liquidIds.length === 0
+                          ? t('no_liquids_added')
+                          : t('num_liquid', { count: liquidIds.length })
+                      }
+                    />
                   ) : null}
                   {quantity > 1 ? (
                     <LiquidInfoDisplay

@@ -27,7 +27,7 @@ export function ServerInitializing(): JSX.Element {
     >
       <Icon name="ot-spinner" spin size="6rem" color={COLORS.grey60} />
       <LegacyStyledText
-        forwardedAs="h4"
+        as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={COLORS.grey60}
       >

@@ -1,13 +1,14 @@
 from typing import Dict, List, Optional, Tuple
+from opentrons.util.async_helpers import ensure_yield
 
-from .abstract import AbstractAbsorbanceReaderDriver
 from opentrons.drivers.types import (
     ABSMeasurementMode,
-    AbsorbanceReaderDeviceState,
     AbsorbanceReaderLidStatus,
+    AbsorbanceReaderDeviceState,
     AbsorbanceReaderPlatePresence,
 )
-from opentrons.util.async_helpers import ensure_yield
+
+from .abstract import AbstractAbsorbanceReaderDriver
 
 
 class SimulatingDriver(AbstractAbsorbanceReaderDriver):

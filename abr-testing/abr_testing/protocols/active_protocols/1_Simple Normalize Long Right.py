@@ -6,7 +6,7 @@ from opentrons.protocol_api import (
     ALL,
     Well,
 )
-from abr_testing.protocols.helpers import run_helpers, background_helpers
+from abr_testing.protocols import helpers
 from typing import List, Dict
 
 metadata = {
@@ -15,34 +15,28 @@ metadata = {
     "source": "Protocol Library",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    run_helpers.create_probe_liquid_height_parameter(parameters)
-    run_helpers.create_csv_parameter(parameters)
-    run_helpers.create_meniscus_z_parameter(parameters)
-    run_helpers.create_error_capture_duration_duration(parameters)
+    helpers.create_probe_liquid_height_parameter(parameters)
+    helpers.create_csv_parameter(parameters)
+    helpers.create_meniscus_z_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
-    run_helpers.comment_protocol_version(protocol, "05")
+    helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
-    protocol.capture_image(filename="start_of_run")
     protocol.comment("THIS IS A NO MODULE RUN")
     tiprack_x_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
     tiprack_x_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -91,7 +85,7 @@ def run(protocol: ProtocolContext) -> None:
     # LOAD LIQUIDS
     liquid_volumes = [675.0, 675.0, 675.0, 675.0, 675.0]
     wells = [Dye_1, Dye_2, Dye_3, Diluent_1, Diluent_2, Diluent_3]
-    run_helpers.load_wells_with_water(protocol, wells, liquid_volumes)
+    helpers.load_wells_with_water(protocol, wells, liquid_volumes)
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Dye": [{"well": [Dye_1, Dye_2, Dye_3], "volume": 675.0}],
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
@@ -117,11 +111,11 @@ def run(protocol: ProtocolContext) -> None:
     p1000.configure_nozzle_layout(style=SINGLE, start="H1", tip_racks=[tiprack_x_1])
     try:
         if probe_height_bool:
-            run_helpers.find_liquid_height_of_loaded_liquids(
+            helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, p1000_single
             )
         else:
-            run_helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
 
         for X in range(10):
             protocol.comment("==============================================")
@@ -154,12 +148,7 @@ def run(protocol: ProtocolContext) -> None:
                 DilutionVol = float(data[current][2])
                 while Diluent_1.current_liquid_volume() < DilutionVol:
                     p1000.aspirate(
-                        DilutionVol,
-                        location=Diluent_1.meniscus(
-                            z=meniscus_z,
-                            target="start",
-                        ),
-                        end_location=Diluent_1.meniscus(z=-1, target="end"),
+                        DilutionVol, Diluent_1.meniscus(z=meniscus_z, target="end")
                     )
                     p1000.dispense(
                         DilutionVol,
@@ -200,9 +189,7 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_2.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol,
-                        location=Diluent_2.meniscus(z=meniscus_z, target="start"),
-                        end_location=Diluent_2.meniscus(z=meniscus_z, target="end"),
+                        DilutionVol, Diluent_2.meniscus(z=meniscus_z, target="end")
                     )
                     p1000_single.dispense(
                         DilutionVol,
@@ -240,9 +227,7 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_3.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol,
-                        location=Diluent_3.meniscus(z=meniscus_z, target="start"),
-                        end_location=Diluent_3.meniscus(z=meniscus_z, target="end"),
+                        DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
                     )
                     p1000_single.dispense(
                         DilutionVol,
@@ -282,9 +267,7 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_3.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol,
-                        location=Diluent_3.meniscus(z=meniscus_z, target="start"),
-                        end_location=Diluent_3.meniscus(z=meniscus_z, target="end"),
+                        DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
                     )
                     p1000_single.dispense(
                         DilutionVol,
@@ -300,23 +283,20 @@ def run(protocol: ProtocolContext) -> None:
             current = 0
         # Probe heights
         p1000.configure_nozzle_layout(style=ALL, tip_racks=[tiprack_x_3])
-        run_helpers.clean_up_plates(
+        helpers.clean_up_plates(
             protocol,
             p1000,
             [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4, reservoir],
             waste_reservoir["A1"],
         )
-        run_helpers.find_liquid_height_of_all_wells(
+        helpers.find_liquid_height_of_all_wells(
             protocol, p1000_single, [waste_reservoir["A1"]]
         )
-        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

@@ -1,28 +1,26 @@
 """Test blow-out-in-place commands."""
-
 from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
-
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.execution.gantry_mover import GantryMover
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.commands.blow_out_in_place import (
-    BlowOutInPlaceImplementation,
     BlowOutInPlaceParams,
     BlowOutInPlaceResult,
+    BlowOutInPlaceImplementation,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
-from opentrons.protocol_engine.execution.gantry_mover import GantryMover
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import Point
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
 
 @pytest.fixture
@@ -101,7 +99,7 @@ async def test_overpressure_error(
     )
 
     decoy.when(
-        await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234)  # type: ignore[func-returns-value]
+        await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234)
     ).then_raise(PipetteOverpressureError())
 
     decoy.when(model_utils.generate_id()).then_return(error_id)

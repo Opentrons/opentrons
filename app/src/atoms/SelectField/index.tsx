@@ -90,7 +90,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       {title != null ? (
         <LegacyStyledText
-          forwardedAs="label"
+          as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >

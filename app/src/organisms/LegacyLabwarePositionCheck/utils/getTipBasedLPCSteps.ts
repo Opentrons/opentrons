@@ -1,4 +1,4 @@
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'lodash'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {

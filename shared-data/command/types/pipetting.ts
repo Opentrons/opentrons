@@ -59,7 +59,8 @@ export type PipettingCreateCommand =
   | PipetteUnsealFromTipCreateCommand
   | PressureDispenseCreateCommand
 
-export interface ConfigureForVolumeCreateCommand extends CommonCommandCreateInfo {
+export interface ConfigureForVolumeCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'configureForVolume'
   params: ConfigureForVolumeParams
 }
@@ -69,7 +70,8 @@ export interface ConfigureForVolumeParams {
   volume: number
 }
 export interface ConfigureForVolumeRunTimeCommand
-  extends CommonCommandRunTimeInfo, ConfigureForVolumeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    ConfigureForVolumeCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -85,7 +87,8 @@ export interface AirGapInPlaceCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface AirGapInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo, AirGapInPlaceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    AirGapInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -94,16 +97,19 @@ export interface AspirateCreateCommand extends CommonCommandCreateInfo {
   params: AspDispAirgapParams
 }
 export interface AspirateRunTimeCommand
-  extends CommonCommandRunTimeInfo, AspirateCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    AspirateCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
-export interface AspirateWhileTrackingCreateCommand extends CommonCommandCreateInfo {
+export interface AspirateWhileTrackingCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'aspirateWhileTracking'
   params: AspDispWhileTrackingParams
 }
 export interface AspirateWhileTrackingRunTimeCommand
-  extends CommonCommandRunTimeInfo, AspirateWhileTrackingCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    AspirateWhileTrackingCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -112,7 +118,8 @@ export interface AspirateInPlaceCreateCommand extends CommonCommandCreateInfo {
   params: AspirateInPlaceParams
 }
 export interface AspirateInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo, AspirateInPlaceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    AspirateInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -122,7 +129,8 @@ export interface DispenseCreateCommand extends CommonCommandCreateInfo {
   params: DispenseParams
 }
 export interface DispenseRunTimeCommand
-  extends CommonCommandRunTimeInfo, DispenseCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -131,19 +139,22 @@ export interface DispenseInPlaceCreateCommand extends CommonCommandCreateInfo {
   params: DispenseInPlaceParams
 }
 export interface DispenseInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo, DispenseInPlaceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DispenseInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
 export type DispenseWhileTrackingParams = AspDispWhileTrackingParams & {
   pushOut?: number
 }
-export interface DispenseWhileTrackingCreateCommand extends CommonCommandCreateInfo {
+export interface DispenseWhileTrackingCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'dispenseWhileTracking'
   params: DispenseWhileTrackingParams
 }
 export interface DispenseWhileTrackingRunTimeCommand
-  extends CommonCommandRunTimeInfo, DispenseWhileTrackingCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DispenseWhileTrackingCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
@@ -151,7 +162,8 @@ export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   params: BlowoutParams
 }
 export interface BlowoutRunTimeCommand
-  extends CommonCommandRunTimeInfo, BlowoutCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    BlowoutCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -160,7 +172,8 @@ export interface BlowoutInPlaceCreateCommand extends CommonCommandCreateInfo {
   params: BlowoutInPlaceParams
 }
 export interface BlowoutInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo, BlowoutInPlaceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    BlowoutInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -169,7 +182,8 @@ export interface TouchTipCreateCommand extends CommonCommandCreateInfo {
   params: TouchTipParams
 }
 export interface TouchTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, TouchTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    TouchTipCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -178,7 +192,8 @@ export interface PickUpTipCreateCommand extends CommonCommandCreateInfo {
   params: PickUpTipParams
 }
 export interface PickUpTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, PickUpTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    PickUpTipCreateCommand {
   result?: any
 }
 
@@ -187,7 +202,8 @@ export interface DropTipCreateCommand extends CommonCommandCreateInfo {
   params: DropTipParams
 }
 export interface DropTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, DropTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DropTipCreateCommand {
   result?: any
 }
 
@@ -196,27 +212,30 @@ export interface DropTipInPlaceCreateCommand extends CommonCommandCreateInfo {
   params: DropTipInPlaceParams
 }
 export interface DropTipInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo, DropTipInPlaceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    DropTipInPlaceCreateCommand {
   result?: any
 }
 
-export interface MoveToAddressableAreaForDropTipCreateCommand extends CommonCommandCreateInfo {
+export interface MoveToAddressableAreaForDropTipCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'moveToAddressableAreaForDropTip'
   params: MoveToAddressableAreaForDropTipParams
 }
 export interface MoveToAddressableAreaForDropTipRunTimeCommand
-  extends
-    CommonCommandRunTimeInfo,
+  extends CommonCommandRunTimeInfo,
     MoveToAddressableAreaForDropTipCreateCommand {
   result?: any
 }
 
-export interface PrepareToAspirateCreateCommand extends CommonCommandCreateInfo {
+export interface PrepareToAspirateCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'prepareToAspirate'
   params: PipetteIdentityParams
 }
 export interface PrepareToAspirateRunTimeCommand
-  extends CommonCommandRunTimeInfo, PrepareToAspirateCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    PrepareToAspirateCreateCommand {
   result?: any
 }
 
@@ -225,7 +244,8 @@ export interface GetTipPresenceCreateCommand extends CommonCommandCreateInfo {
   params: PipetteIdentityParams
 }
 export interface GetTipPresenceRunTimeCommand
-  extends CommonCommandRunTimeInfo, GetTipPresenceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    GetTipPresenceCreateCommand {
   result?: TipPresenceResult
 }
 
@@ -234,16 +254,19 @@ export interface GetNextTipCreateCommand extends CommonCommandCreateInfo {
   params: GetNextTipParams
 }
 export interface GetNextTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, GetNextTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    GetNextTipCreateCommand {
   result?: GetNextTipResult
 }
 
-export interface VerifyTipPresenceCreateCommand extends CommonCommandCreateInfo {
+export interface VerifyTipPresenceCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'verifyTipPresence'
   params: VerifyTipPresenceParams
 }
 export interface VerifyTipPresenceRunTimeCommand
-  extends CommonCommandRunTimeInfo, VerifyTipPresenceCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    VerifyTipPresenceCreateCommand {
   result?: any
 }
 
@@ -253,7 +276,8 @@ export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
-  extends CommonCommandRunTimeInfo, LiquidProbeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    LiquidProbeCreateCommand {
   result?: Record<string, unknown>
 }
 
@@ -262,7 +286,8 @@ export interface TryLiquidProbeCreateCommand extends CommonCommandCreateInfo {
   params: WellLocationParam & PipetteAccessParams
 }
 export interface TryLiquidProbeRunTimeCommand
-  extends CommonCommandRunTimeInfo, TryLiquidProbeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    TryLiquidProbeCreateCommand {
   result?: Record<string, unknown>
 }
 
@@ -270,7 +295,8 @@ export interface PipetteSealToTipCreateCommand extends CommonCommandCreateInfo {
   commandType: 'sealPipetteToTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface PipetteUnsealFromTipCreateCommand extends CommonCommandCreateInfo {
+export interface PipetteUnsealFromTipCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'unsealPipetteFromTip'
   params: PipetteAccessParams & WellLocationParam
 }
@@ -283,15 +309,18 @@ export interface PressureDispenseCreateCommand extends CommonCommandCreateInfo {
     VolumeParams
 }
 export interface PipetteSealToTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, PipetteSealToTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    PipetteSealToTipCreateCommand {
   result?: PipetteSealToTipResult
 }
 export interface PipetteUnsealFromTipRunTimeCommand
-  extends CommonCommandRunTimeInfo, PipetteUnsealFromTipCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    PipetteUnsealFromTipCreateCommand {
   result?: PipetteUnsealFromTipResult
 }
 export interface PressureDispenseRunTimeCommand
-  extends CommonCommandRunTimeInfo, PressureDispenseCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    PressureDispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 export type AspDispAirgapParams = FlowRateParams &

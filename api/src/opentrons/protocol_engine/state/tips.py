@@ -1,19 +1,22 @@
 """Tip state tracking."""
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Dict, Iterable, Optional, List, Set
 
-from ..actions import Action, get_state_updates
-from ._abstract_store import HandlesActions, HasState
-from ._well_math import (
-    wells_covered_by_physical_pipette,
-    wells_covered_by_pipette_configuration,
-    wells_covered_dense,
-)
-from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.types import NozzleMapInterface, NozzleConfigurationType
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import TipRackWellState
-from opentrons.types import NozzleConfigurationType, NozzleMapInterface
+
+from ._abstract_store import HasState, HandlesActions
+from ._well_math import (
+    wells_covered_dense,
+    wells_covered_by_pipette_configuration,
+    wells_covered_by_physical_pipette,
+)
+from ..actions import Action, get_state_updates
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 
 _TipRackStateByWellName = Dict[str, TipRackWellState]
 
@@ -181,9 +184,10 @@ class TipView:
                     tip_well_states[well_name]
                     for well_name in wells_covered_physically.difference(well_list)
                 ]
-                # If any of the wells in the way are NOT empty, this is not a valid configuration
-                if not all(
-                    well_state == TipRackWellState.EMPTY
+                # TODO(jbl 2025-08-25) this should be changed to ensure all these extra wells are EMPTY when further
+                #   tip return work occurs
+                if any(
+                    well_state == TipRackWellState.CLEAN
                     for well_state in wells_in_way_well_state
                 ):
                     return False

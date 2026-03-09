@@ -1,7 +1,6 @@
 """Classes for controlling GoPros."""
 import requests
 from typing import Dict, Union
-from pathlib import Path
 from urllib.parse import urlparse
 import subprocess
 import time
@@ -211,7 +210,7 @@ class GoProCamera:
             return {"error": str(e)}
 
 
-def run(storage_directory: Path) -> None:
+def run(storage_directory: str) -> None:
     """Run script."""
     ip_json_file = os.path.join(storage_directory, "IPs.json")
     try:

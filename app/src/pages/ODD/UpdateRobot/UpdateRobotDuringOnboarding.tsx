@@ -47,23 +47,18 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     getOnDeviceDisplaySettings
   )
 
-  useEffect(
-    () => {
-      if (robotUpdateType !== 'upgrade') {
-        const checkUpdateTimer = setTimeout(() => {
-          setIsShowCheckingUpdates(false)
-        }, CHECK_UPDATES_DURATION)
-        return () => {
-          clearTimeout(checkUpdateTimer)
-        }
-      } else {
-        return () => {}
+  useEffect(() => {
+    if (robotUpdateType !== 'upgrade') {
+      const checkUpdateTimer = setTimeout(() => {
+        setIsShowCheckingUpdates(false)
+      }, CHECK_UPDATES_DURATION)
+      return () => {
+        clearTimeout(checkUpdateTimer)
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+    } else {
+      return () => {}
+    }
+  }, [])
 
   const [errorString, setErrorString] = useState<string | null>(null)
   const handleSuccessfulUpdate = (): void => {

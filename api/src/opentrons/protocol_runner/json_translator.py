@@ -1,35 +1,31 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
 
-from typing import Dict, Iterator, List, Optional, Union
+from typing import List, Union, Iterator
+from pydantic import ValidationError as PydanticValidationError, TypeAdapter
 
-from pydantic import TypeAdapter
-from pydantic import ValidationError as PydanticValidationError
-
-from opentrons_shared_data import command as command_schema
-from opentrons_shared_data.errors.exceptions import InvalidProtocolData, PythonException
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.protocol.models import (
+    ProtocolSchemaV6,
+    protocol_schema_v6,
+    ProtocolSchemaV7,
+    protocol_schema_v7,
+    ProtocolSchemaV8,
+    protocol_schema_v8,
     Location,
     #    CommandSchemaId,
-    ProtocolSchemaV6,
-    ProtocolSchemaV7,
-    ProtocolSchemaV8,
-    protocol_schema_v6,
-    protocol_schema_v7,
-    protocol_schema_v8,
 )
+from opentrons_shared_data import command as command_schema
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData, PythonException
 
-from opentrons.protocol_engine import (
-    DeckSlotLocation,
-    Liquid,
-    LoadableLabwareLocation,
-    ModuleModel,
-)
+from opentrons.types import MountType
 from opentrons.protocol_engine import (
     commands as pe_commands,
+    LoadableLabwareLocation,
+    ModuleModel,
+    DeckSlotLocation,
+    Liquid,
 )
-from opentrons.protocol_engine.types import HexColor, LegacyCommandAnnotation
-from opentrons.types import MountType
+from opentrons.protocol_engine.types import HexColor, CommandAnnotation
 
 
 class CommandTranslatorError(Exception):
@@ -44,8 +40,8 @@ class CommandTranslatorError(Exception):
 LabwareLocationAdapter: TypeAdapter[LoadableLabwareLocation] = TypeAdapter(
     LoadableLabwareLocation
 )
-CommandAnnotationAdapter: TypeAdapter[LegacyCommandAnnotation] = TypeAdapter(
-    LegacyCommandAnnotation
+CommandAnnotationAdapter: TypeAdapter[CommandAnnotation] = TypeAdapter(
+    CommandAnnotation
 )
 
 
@@ -196,7 +192,6 @@ def _translate_simple_command(
         protocol_schema_v7.Command,
         protocol_schema_v8.Command,
     ],
-    command_annotations: Optional[List[str]] = None,
 ) -> pe_commands.CommandCreate:
     dict_command = command.model_dump(exclude_none=True)
 
@@ -206,7 +201,7 @@ def _translate_simple_command(
             dict_command["commandType"] = "waitForResume"
         else:
             dict_command["commandType"] = "waitForDuration"
-    dict_command["commandAnnotationIds"] = command_annotations or []
+
     return pe_commands.CommandCreateAdapter.validate_python(dict_command)
 
 
@@ -234,7 +229,6 @@ class JsonTranslator:
     def translate_commands(
         self,
         protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
-        command_keys_to_annotation_ids: Optional[Dict[str, List[str]]] = None,
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol and translates commands->protocol engine commands."""
         if isinstance(protocol, ProtocolSchemaV6):
@@ -242,13 +236,13 @@ class JsonTranslator:
         elif isinstance(protocol, ProtocolSchemaV7):
             return self._translate_v7_commands(protocol)
         else:
-            return self._translate_v8_commands(protocol, command_keys_to_annotation_ids)
+            return self._translate_v8_commands(protocol)
 
     def _translate_v6_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
-        """Takes JSON protocol v6 and translates commands->protocol engine commands."""
+        """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             if command.commandType == "loadPipette":
@@ -266,25 +260,17 @@ class JsonTranslator:
         self,
         protocol: Union[ProtocolSchemaV7],
     ) -> List[pe_commands.CommandCreate]:
-        """Takes JSON protocol v7 and translates commands->protocol engine commands."""
+        """Takes json protocol v7 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)
         return commands_list
 
-    # Schema v8 JSON protocols introduced the first version (schema v1) of command annotations which were
-    # only specified in a top level field in the JSON protocol file.
-    # We now use Schema v2 command annotations which have a different shape and are listed in the engine commands,
-    # on top of being listed at the top level of the JSON protocol file.
-    # So we fetch the old command annotations from a schema v8 file, send them to the engine to generate annotation IDs,
-    # and then add the annotation IDs to the engine commands as part of the translation process.
     def _translate_v8_commands(
-        self,
-        protocol: ProtocolSchemaV8,
-        command_keys_to_annotation_ids: Optional[Dict[str, List[str]]] = None,
+        self, protocol: ProtocolSchemaV8
     ) -> List[pe_commands.CommandCreate]:
-        """Translate commands in JSON protocol schema v8, which might be of different command schemas."""
+        """Translate commands in json protocol schema v8, which might be of different command schemas."""
         command_schema_ref = protocol.commandSchemaId.value
 
         # these calls will raise if the command schema version is invalid or unknown
@@ -297,14 +283,8 @@ class JsonTranslator:
 
         def translate_all_commands() -> Iterator[pe_commands.CommandCreate]:
             for command in protocol.commands:
-                command_annotations = (
-                    (command_keys_to_annotation_ids.get(command.key, []))
-                    if command_keys_to_annotation_ids is not None
-                    and command.key is not None
-                    else []
-                )
                 try:
-                    yield _translate_simple_command(command, command_annotations)
+                    yield _translate_simple_command(command)
                 except PydanticValidationError as pve:
                     raise InvalidProtocolData(
                         message=(
@@ -317,20 +297,18 @@ class JsonTranslator:
 
         return list(translate_all_commands())
 
-    def translate_legacy_command_annotations(
+    def translate_command_annotations(
         self,
         protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
-    ) -> List[LegacyCommandAnnotation]:
+    ) -> List[CommandAnnotation]:
         """Translate command annotations in json protocol schema v8."""
         if isinstance(protocol, (ProtocolSchemaV6, ProtocolSchemaV7)):
             return []
-        elif protocol.commandAnnotationSchemaId == "opentronsCommandAnnotationSchemaV1":
-            command_annotations: List[LegacyCommandAnnotation] = [
+        else:
+            command_annotations: List[CommandAnnotation] = [
                 CommandAnnotationAdapter.validate_python(
                     command_annotation.model_dump(),
                 )
                 for command_annotation in protocol.commandAnnotations
             ]
             return command_annotations
-        else:
-            return []

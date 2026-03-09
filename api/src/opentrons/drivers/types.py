@@ -1,10 +1,7 @@
-"""Type definitions for modules in this tree"""
-
+""" Type definitions for modules in this tree """
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any, Dict, List, NamedTuple, Optional
-
-from opentrons_shared_data.util import StrEnum
+from enum import Enum
 
 
 class MoveSplit(NamedTuple):
@@ -35,7 +32,7 @@ class RPM:
     target: Optional[int]
 
 
-class HeaterShakerLabwareLatchStatus(StrEnum):
+class HeaterShakerLabwareLatchStatus(str, Enum):
     """Heater-shaker labware latch status"""
 
     OPENING = "opening"
@@ -53,7 +50,7 @@ class PlateTemperature(Temperature):
     hold: Optional[float]
 
 
-class ThermocyclerLidStatus(StrEnum):
+class ThermocyclerLidStatus(str, Enum):
     """Thermocycler lid status."""
 
     UNKNOWN = "unknown"
@@ -63,7 +60,7 @@ class ThermocyclerLidStatus(StrEnum):
     MAX = "max"
 
 
-class AbsorbanceReaderLidStatus(StrEnum):
+class AbsorbanceReaderLidStatus(str, Enum):
     """Absorbance reader lid status."""
 
     UNKNOWN = "unknown"
@@ -71,7 +68,7 @@ class AbsorbanceReaderLidStatus(StrEnum):
     OFF = "off"
 
 
-class AbsorbanceReaderPlatePresence(StrEnum):
+class AbsorbanceReaderPlatePresence(str, Enum):
     """Absorbance reader plate presence."""
 
     UNKNOWN = "unknown"
@@ -79,7 +76,7 @@ class AbsorbanceReaderPlatePresence(StrEnum):
     ABSENT = "absent"
 
 
-class AbsorbanceReaderDeviceState(StrEnum):
+class AbsorbanceReaderDeviceState(str, Enum):
     """Absorbance reader device state."""
 
     UNKNOWN = "unknown"

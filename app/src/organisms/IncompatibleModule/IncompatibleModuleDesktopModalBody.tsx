@@ -36,7 +36,7 @@ export function IncompatibleModuleDesktopModalBody({
     <InterventionModal
       iconHeading={
         <Trans
-          forwardedAs="h4"
+          as="h4"
           fontSize={TYPOGRAPHY.fontSizeH4}
           t={t}
           i18nKey="needs_your_assistance"
@@ -51,7 +51,7 @@ export function IncompatibleModuleDesktopModalBody({
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
           maxHeight="196px"
-          // forwardedAs="ul"
+          as="ul"
         >
           {modules.map(module => (
             <li key={module.id}>
@@ -63,12 +63,12 @@ export function IncompatibleModuleDesktopModalBody({
                 paddingBottom={SPACING.spacing12}
               >
                 <Icon
-                  name="ot-alert"
+                  name="alert-circle"
                   size={SPACING.spacing32}
                   color={COLORS.red50}
                 />
                 <LegacyStyledText
-                  forwardedAs="p"
+                  as="p"
                   key={module.id}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   paddingLeft={SPACING.spacing12}
@@ -86,7 +86,7 @@ export function IncompatibleModuleDesktopModalBody({
             </li>
           ))}
         </Flex>
-        <LegacyStyledText forwardedAs="p" paddingTop={SPACING.spacing12}>
+        <LegacyStyledText as="p" paddingTop={SPACING.spacing12}>
           <Trans t={t} i18nKey="remove_before_using" />
         </LegacyStyledText>
       </Flex>

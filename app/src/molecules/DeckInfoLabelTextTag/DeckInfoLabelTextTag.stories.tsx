@@ -51,7 +51,7 @@ const Template: Story<DeckInfoLabelTextTagStoryProps> = args => {
     <Tag
       text={tagText}
       type="default"
-      iconName="ot-alert"
+      iconName="alert-circle"
       iconPosition="left"
       shrinkToContent={true}
     />

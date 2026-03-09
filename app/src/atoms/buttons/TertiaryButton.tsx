@@ -2,25 +2,26 @@ import styled from 'styled-components'
 
 import {
   BORDERS,
-  Btn,
   COLORS,
+  NewPrimaryBtn,
   SPACING,
   styleProps,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export const TertiaryButton: typeof Btn = styled(Btn)`
+export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
   color: ${COLORS.white};
   overflow: no-wrap;
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
 
-  ${styleProps as any}
+  ${styleProps}
 
   &:hover {
     background-color: ${COLORS.blue55};
@@ -33,7 +34,7 @@ export const TertiaryButton: typeof Btn = styled(Btn)`
 
   &:focus-visible {
     background-color: ${COLORS.blue55};
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {

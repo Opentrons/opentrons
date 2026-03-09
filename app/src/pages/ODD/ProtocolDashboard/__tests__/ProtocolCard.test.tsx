@@ -1,7 +1,8 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { COLORS } from '@opentrons/components'
 import {
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -16,14 +17,13 @@ import { ProtocolCard } from '../ProtocolCard'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
-import type { Chip, UseLongPressResult } from '@opentrons/components'
+import type { Chip } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
-const mockUseLongPress = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
@@ -39,7 +39,6 @@ vi.mock('@opentrons/components', async importOriginal => {
   return {
     ...actual,
     Chip: vi.fn(() => <div>mock Chip</div>),
-    useLongPress: () => mockUseLongPress(),
   }
 })
 
@@ -92,23 +91,9 @@ const render = (props: ComponentProps<typeof ProtocolCard>) => {
 
 describe('ProtocolCard', () => {
   let props: ComponentProps<typeof ProtocolCard>
-  let mockLongPress: UseLongPressResult
   vi.useFakeTimers()
 
   beforeEach(() => {
-    mockLongPress = {
-      isLongPressed: false,
-      isTapped: false,
-      isEnabled: true,
-      ref: { current: null },
-      style: { touchAction: 'none' },
-      setIsLongPressed: vi.fn(),
-      setIsTapped: vi.fn(),
-      enable: vi.fn(),
-      disable: vi.fn(),
-    }
-    mockUseLongPress.mockReturnValue(mockLongPress)
-
     props = {
       protocol: mockProtocol,
       longPress: vi.fn(),
@@ -128,7 +113,8 @@ describe('ProtocolCard', () => {
   it('should redirect to protocol details after short click', () => {
     render(props)
     const name = screen.getByText('yay mock protocol')
-    screen.getByTestId('protocol_card')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.grey35}`)
     fireEvent.click(name)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
@@ -155,16 +141,22 @@ describe('ProtocolCard', () => {
   })
 
   it('should display modal after long click', async () => {
-    mockLongPress.isLongPressed = true
+    vi.useFakeTimers()
     render(props)
 
-    expect(props.longPress).toHaveBeenCalledWith(true)
+    const name = screen.getByText('yay mock protocol')
+    fireEvent.mouseDown(name)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
+    expect(props.longPress).toHaveBeenCalled()
     screen.getByText('Run protocol')
     screen.getByText('Pin protocol')
     screen.getByText('Delete protocol')
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
+    vi.useFakeTimers()
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
@@ -172,12 +164,16 @@ describe('ProtocolCard', () => {
       data: { result: 'not-ok', errors: ['some analysis error'] } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
 
-    mockLongPress.isLongPressed = true
     render(props)
-
-    expect(props.longPress).toHaveBeenCalledWith(true)
+    const name = screen.getByText('yay mock protocol')
+    fireEvent.mouseDown(name)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
+    expect(props.longPress).toHaveBeenCalled()
     screen.getByText('mock Chip')
-    screen.getByTestId('protocol_card')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.red35}`)
     fireEvent.click(screen.getByText('yay mock protocol'))
     screen.getByText('Protocol analysis failed')
     screen.getByText(
@@ -194,10 +190,13 @@ describe('ProtocolCard', () => {
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
 
-    mockLongPress.isLongPressed = true
     render(props)
-
-    expect(props.longPress).toHaveBeenCalledWith(true)
+    const name = screen.getByText('yay mock protocol')
+    fireEvent.mouseDown(name)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
+    expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('Protocol is loading')
     fireEvent.click(screen.getByText('yay mock protocol'))
   })
@@ -212,6 +211,7 @@ describe('ProtocolCard', () => {
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render({ ...props, protocol: mockProtocolWithCSV })
     screen.getByText('mock Chip')
-    screen.getByTestId('protocol_card')
+    const card = screen.getByTestId('protocol_card')
+    expect(card).toHaveStyle(`background-color: ${COLORS.yellow35}`)
   })
 })

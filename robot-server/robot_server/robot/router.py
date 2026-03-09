@@ -1,5 +1,4 @@
 """Router for /robot endpoints."""
-
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from .control.router import control_router

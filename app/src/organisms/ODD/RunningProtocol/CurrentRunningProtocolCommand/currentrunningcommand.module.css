@@ -1,4 +1,4 @@
-@keyframes fade-in {
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translate3d(0, 15%, 0);
@@ -85,9 +85,9 @@
   font-size: 1.375rem;
   font-weight: var(--font-weight-regular);
   line-height: 1.75rem;
-  overflow-wrap: break-word;
   text-align: center;
   white-space: normal;
+  word-break: break-word;
 }
 
 .command_container * {
@@ -98,8 +98,8 @@
 }
 
 .animated {
-  animation: fade-in 1.5s ease-in-out;
+  animation: fadeIn 1.5s ease-in-out;
   backface-visibility: hidden;
-  perspective: 1000px;
+  perspective: 1000;
   will-change: opacity, transform;
 }

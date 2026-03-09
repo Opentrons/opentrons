@@ -36,7 +36,7 @@ export function useSetLightsMutation(
   const mutation = useMutation<Lights, AxiosError, SetLightsData>(
     [host, 'robot', 'lights'],
     setLightsData =>
-      setLights(host!, setLightsData)
+      setLights(host as HostConfig, setLightsData)
         .then(response => response.data)
         .catch(e => {
           throw e

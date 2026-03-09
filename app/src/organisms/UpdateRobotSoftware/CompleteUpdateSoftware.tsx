@@ -35,13 +35,13 @@ export function CompleteUpdateSoftware({
         borderRadius={BORDERS.borderRadius12}
       >
         <LegacyStyledText
-          forwardedAs="h2"
+          as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={COLORS.black90}
         >
           {t('update_complete')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="h3" marginTop={SPACING.spacing16}>
+        <LegacyStyledText as="h3" marginTop={SPACING.spacing16}>
           {t('restarting_robot')}
         </LegacyStyledText>
         <Box width="47.5rem">

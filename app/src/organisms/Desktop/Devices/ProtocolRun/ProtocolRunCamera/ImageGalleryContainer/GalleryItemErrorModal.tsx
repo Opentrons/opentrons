@@ -57,7 +57,7 @@ export function GalleryItemErrorModal({
     <Modal {...buildModalProps()}>
       <div className={styles.error_container}>
         <ErrorContent erroredCommand={erroredCommand} />
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('branded:run_failed_modal_description_desktop')}
         </LegacyStyledText>
         <div className={styles.error_footer_container}>
@@ -86,10 +86,7 @@ export function ErrorContent({
     <div className={styles.error_content_container}>
       <div className={styles.error_message_container}>
         {erroredCommand?.error != null && (
-          <LegacyStyledText
-            forwardedAs="p"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
+          <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {`${erroredCommand.error.errorCode}: ${erroredCommand.error.detail}`}
           </LegacyStyledText>
         )}

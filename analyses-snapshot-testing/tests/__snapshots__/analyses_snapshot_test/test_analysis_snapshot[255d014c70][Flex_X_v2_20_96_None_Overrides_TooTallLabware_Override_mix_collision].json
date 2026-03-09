@@ -5,7 +5,6 @@
   },
   "commands": [
     {
-      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +17,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1184,7 +1182,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1204,7 +1201,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1223,7 +1219,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1461,7 +1456,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2649,7 +2643,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2683,7 +2676,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

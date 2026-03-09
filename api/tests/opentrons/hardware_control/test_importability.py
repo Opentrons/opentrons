@@ -1,5 +1,4 @@
 import pytest
-
 from opentrons.hardware_control.ot3api import OT3API
 
 

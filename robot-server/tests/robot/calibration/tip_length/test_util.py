@@ -1,7 +1,5 @@
-from typing import List, Tuple
-
 import pytest
-
+from typing import List, Tuple
 from robot_server.robot.calibration import util
 
 
@@ -11,7 +9,7 @@ def machine():
         "imaginingTable",
         "millingLumber",
         "sawingToDimensions",
-        "assemblingTablegluingUprethinkingDesign",
+        "assemblingTable" "gluingUp" "rethinkingDesign",
         "sandingDown",
         "applyingFinish",
         "admiringWork",

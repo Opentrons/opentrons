@@ -1,3 +1,5 @@
+import { css } from 'styled-components'
+
 import {
   Box,
   Btn,
@@ -8,9 +10,8 @@ import {
   SPACING,
   StepMeter,
   Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import styles from './wizardheader.module.css'
 
 import type * as React from 'react'
 
@@ -22,29 +23,43 @@ interface WizardHeaderProps {
   exitDisabled?: boolean
 }
 
+const EXIT_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  color: ${COLORS.grey50};
+
+  &:hover {
+    opacity: 70%;
+  }
+`
+const HEADER_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_ROW};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing16} ${SPACING.spacing32};
+`
+const TEXT_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold}
+`
+
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit, exitDisabled } = props
   return (
     <Box backgroundColor={COLORS.white}>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
-      >
+      <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW}>
-          <Text className={styles.text} marginRight={SPACING.spacing8}>
+          <Text css={TEXT_STYLE} marginRight={SPACING.spacing8}>
             {title}
           </Text>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <Text className={styles.text} color={COLORS.grey50}>
+            <Text css={TEXT_STYLE} color={COLORS.grey50}>
               {`Steps: ${currentStep}/${totalSteps}`}
             </Text>
           ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
-            <Text className={styles.exit_button}>Exit</Text>
+            <Text css={EXIT_BUTTON_STYLE}>Exit</Text>
           </Btn>
         ) : null}
       </Flex>

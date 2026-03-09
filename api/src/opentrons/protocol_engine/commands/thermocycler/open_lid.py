@@ -1,20 +1,18 @@
 """Command models to open a Thermocycler's lid."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional
-
-from pydantic import BaseModel, Field
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
-from ...errors.error_occurrence import ErrorOccurrence
-from ...state import update_types
+from pydantic import BaseModel, Field
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...state import update_types
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 
 OpenLidCommandType = Literal["thermocycler/openLid"]

@@ -1,5 +1,4 @@
-"""Functions and variables for the smoothie update process"""
-
+""" Functions and variables for the smoothie update process """
 import os
 import shutil
 

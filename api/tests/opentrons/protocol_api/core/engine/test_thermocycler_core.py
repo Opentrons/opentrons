@@ -1,26 +1,25 @@
 """Tests for the engine based Protocol API module core implementations."""
 
 from typing import cast
-
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
-from ... import versions_at_or_above, versions_below
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import (
-    ModuleType,
-    TemperatureStatus,
     Thermocycler,
+    TemperatureStatus,
+    ModuleType,
 )
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
-from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
+from ... import versions_below, versions_at_or_above
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -40,9 +39,7 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncThermocyclerHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    mock_protocol_core = decoy.mock(cls=ProtocolCore)
-    decoy.when(mock_protocol_core.annotation_ids).then_return([])
-    return mock_protocol_core
+    return decoy.mock(cls=ProtocolCore)
 
 
 @pytest.fixture
@@ -122,8 +119,7 @@ def test_open_lid(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.OpenLidParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.OpenLidParams(moduleId="1234")
         ),
         times=1,
     )
@@ -138,8 +134,7 @@ def test_close_lid(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.CloseLidParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.CloseLidParams(moduleId="1234")
         ),
         times=1,
     )
@@ -165,8 +160,7 @@ def test_set_target_block_temperature(
                 blockMaxVolumeUl=3.4,
                 holdTimeSeconds=1.2,
                 ramp_rate=None,
-            ),
-            command_annotations=[],
+            )
         ),
         times=1,
     )
@@ -184,8 +178,7 @@ def test_start_set_target_block_temperature(
                 celsius=42.0,
                 blockMaxVolumeUl=3.4,
                 ramp_rate=None,
-            ),
-            command_annotations=[],
+            )
         )
     ).then_return(
         cmd.thermocycler.SetTargetBlockTemperatureResult(
@@ -210,8 +203,7 @@ def test_wait_for_block_temperature(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId="1234")
         ),
         times=1,
     )
@@ -229,8 +221,7 @@ def test_set_target_lid_temperature(
         mock_engine_client.execute_command(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId="1234", celsius=42.0
-            ),
-            command_annotations=[],
+            )
         ),
         times=1,
     )
@@ -247,8 +238,7 @@ def test_start_set_target_lid_temperature(
         mock_engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId="1234", celsius=42.0
-            ),
-            command_annotations=[],
+            )
         ),
     ).then_return(
         cmd.thermocycler.SetTargetLidTemperatureResult(
@@ -269,8 +259,7 @@ def test_wait_for_lid_temperature(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.WaitForLidTemperatureParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.WaitForLidTemperatureParams(moduleId="1234")
         ),
         times=1,
     )
@@ -301,8 +290,7 @@ def test_execute_profile_below_221(
                     ),
                 ],
                 blockMaxVolumeUl=78.9,
-            ),
-            command_annotations=[],
+            )
         )
     )
 
@@ -339,8 +327,7 @@ def test_execute_profile_above_221(
                     )
                 ],
                 blockMaxVolumeUl=25,
-            ),
-            command_annotations=[],
+            )
         )
     )
 
@@ -370,8 +357,7 @@ def test_start_execute_profile(
                     )
                 ],
                 blockMaxVolumeUl=25,
-            ),
-            command_annotations=[],
+            )
         )
     ).then_return(cmd.thermocycler.StartRunExtendedProfileResult(taskId="taskId"))
     task_mock._id = "taskId"
@@ -395,8 +381,7 @@ def test_deactivate_lid(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.DeactivateLidParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.DeactivateLidParams(moduleId="1234")
         ),
         times=1,
     )
@@ -410,8 +395,7 @@ def test_deactivate_block(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.DeactivateBlockParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.DeactivateBlockParams(moduleId="1234")
         ),
         times=1,
     )
@@ -425,12 +409,10 @@ def test_deactivate(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.thermocycler.DeactivateBlockParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.DeactivateBlockParams(moduleId="1234")
         ),
         mock_engine_client.execute_command(
-            cmd.thermocycler.DeactivateLidParams(moduleId="1234"),
-            command_annotations=[],
+            cmd.thermocycler.DeactivateLidParams(moduleId="1234")
         ),
     )
 

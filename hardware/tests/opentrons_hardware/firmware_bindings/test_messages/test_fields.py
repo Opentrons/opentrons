@@ -1,8 +1,6 @@
 """Fields tests."""
-
-from typing import Optional
-
 import pytest
+from typing import Optional
 
 from opentrons_hardware.firmware_bindings.messages import fields
 

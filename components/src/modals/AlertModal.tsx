@@ -25,7 +25,7 @@ export interface AlertModalProps {
   /** lightens overlay (alert modal over existing modal) */
   alertOverlay?: boolean
   /** override default alert icon */
-  iconName?: IconName | null
+  iconName?: IconName | null | undefined
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean
 }

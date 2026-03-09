@@ -1,10 +1,9 @@
 """RailLights handler."""
-
 import pytest
 from decoy import Decoy
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 
 @pytest.fixture

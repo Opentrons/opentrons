@@ -34,7 +34,7 @@ const modifiedQuickTransferState = {
 }
 const mockDeckConfig = [
   {
-    cutoutId: 'cutoutA3', // should match trashbin position in QuickTransferState
+    cutoutId: 'cutoutC3',
     cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
 ]
@@ -83,7 +83,7 @@ describe('DisposalVolume', () => {
     await user.click(screen.getByText('Continue'))
     screen.getByText('Select blowout location')
     screen.getByText('Continue')
-    screen.getByText('Trash bin in A3')
+    screen.getByText('Trash bin in C3')
     screen.getByText('Source well')
   })
 

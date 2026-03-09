@@ -1,11 +1,12 @@
 """Abstract interface for Well core implementations."""
 
 from abc import ABC, abstractmethod
-from typing import Optional, TypeVar, Union
+from typing import TypeVar, Optional, Union
+
+from opentrons.types import Point, Mount
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 from .._liquid import Liquid
-from opentrons.protocol_engine.types import LiquidTrackingType
-from opentrons.types import Mount, Point
 
 
 class AbstractWellCore(ABC):

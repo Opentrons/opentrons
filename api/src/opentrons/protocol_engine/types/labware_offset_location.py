@@ -3,12 +3,13 @@
 This is its own module to fix circular imports.
 """
 
-from typing import Annotated, Literal, Optional
+from typing import Optional, Literal, Annotated
 
 from pydantic import BaseModel, Field
 
-from .module import ModuleModel
 from opentrons.types import DeckSlotName
+
+from .module import ModuleModel
 
 
 class OnLabwareOffsetLocationSequenceComponent(BaseModel):

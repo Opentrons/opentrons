@@ -1,5 +1,4 @@
 """Run control side-effect handler."""
-
 from time import monotonic as time_monotonic
 
 import pytest

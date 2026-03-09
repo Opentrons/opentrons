@@ -5,7 +5,6 @@ This module has functions that actually accomplish the various tasks required
 for an update: unzipping update files, hashing rootfs, checking signatures,
 writing to root partitions
 """
-
 import contextlib
 import enum
 import logging
@@ -16,16 +15,17 @@ import tempfile
 from typing import Callable, Generator, Optional
 
 from otupdate.common.constants import MODEL_OT2
+
 from otupdate.common.file_actions import (
-    HashMismatch,
     InvalidPKGName,
     InvalidRobotType,
-    hash_file,
     load_version_file,
     unzip_update,
+    hash_file,
+    HashMismatch,
     verify_signature,
 )
-from otupdate.common.update_actions import Partition, UpdateActionsInterface
+from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
 UPDATE_PKG_BR = ["ot2-system.zip", "system-update.zip"]
 UPDATE_PKG_VERSION_FILE = "VERSION.json"
@@ -37,8 +37,8 @@ LOG = logging.getLogger(__name__)
 
 
 class RootPartitions(enum.Enum):
-    TWO = Partition(2, "/dev/mmcblk0p2")
-    THREE = Partition(3, "/dev/mmcblk0p3")
+    TWO: Partition = Partition(2, "/dev/mmcblk0p2")
+    THREE: Partition = Partition(3, "/dev/mmcblk0p3")
 
 
 class OT2UpdateActions(UpdateActionsInterface):

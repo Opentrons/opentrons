@@ -3,7 +3,6 @@
 # python-opentrons-shared-data
 #
 ################################################################################
-OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 OT_PYTHON := python3

@@ -34,10 +34,10 @@ export const RenderMountInformation = ({
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >{`${mount} MOUNT`}</LegacyStyledText>
       {pipette != null ? (
-        <LegacyStyledText forwardedAs="p">{displayName}</LegacyStyledText>
+        <LegacyStyledText as="p">{displayName}</LegacyStyledText>
       ) : (
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('empty')}

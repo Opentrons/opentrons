@@ -1,6 +1,5 @@
 ---
 title: "HEPA/UV Module: Safety Information and Regulatory Compliance"
-description: "Environmental conditions, safe use, and regulatory compliance for the HEPA/UV Module."
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.

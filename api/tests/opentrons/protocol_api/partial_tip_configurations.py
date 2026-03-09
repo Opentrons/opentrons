@@ -1,9 +1,7 @@
 """Partial tip configurations for tests."""
-
-from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, NamedTuple, Optional
-
 import pytest
+from contextlib import nullcontext as does_not_raise
+from typing import NamedTuple, Optional, ContextManager, Any
 
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.api_support.util import UnsupportedAPIError

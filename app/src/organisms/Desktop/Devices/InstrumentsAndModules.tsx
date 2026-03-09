@@ -40,8 +40,6 @@ import type {
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
-
-// stubbed vacuum module for testing
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
@@ -118,10 +116,7 @@ export function InstrumentsAndModules({
   const halfAttachedModulesSize = isFlex
     ? Math.floor(attachedModules?.length / 2)
     : Math.ceil(attachedModules?.length / 2)
-  const leftColumnModules = [
-    ...attachedModules?.slice(0, halfAttachedModulesSize),
-    // STUBBED_ATTACHED_VACUUM_MODULE,
-  ]
+  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return (
@@ -288,7 +283,7 @@ export function InstrumentsAndModules({
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               color={COLORS.grey40}
               id="InstrumentsAndModules_offline"
             >

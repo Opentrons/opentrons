@@ -1,6 +1,5 @@
 ---
 title: "Thermocycler Module: OT-2 Attachment Steps"
-description: "Attach exhaust duct, mount on deck, and connect USB and power on OT-2."
 ---
 
 To attach the Thermocycler to your OT-2:

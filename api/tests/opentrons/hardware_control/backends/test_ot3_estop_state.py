@@ -1,18 +1,16 @@
-from typing import List, Optional, Tuple, cast
-
 import pytest
 from decoy import Decoy
-
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopDetector,
-    EstopSummary,
-)
+from typing import List, Tuple, Optional, cast
 
 from opentrons.hardware_control.backends.estop_state import EstopStateMachine
+from opentrons_hardware.hardware_control.estop.detector import (
+    EstopSummary,
+    EstopDetector,
+)
 from opentrons.hardware_control.types import (
-    EstopAttachLocation,
-    EstopPhysicalStatus,
     EstopState,
+    EstopPhysicalStatus,
+    EstopAttachLocation,
     EstopStateNotification,
     HardwareEvent,
 )
@@ -109,7 +107,7 @@ async def test_estop_state_listener(
     ]
 
     prev: Optional[EstopState] = None
-    for input, result in steps:
+    for (input, result) in steps:
         subject.detector_listener(summary=input)
         assert len(events) == 1
         event = events.pop(0)
@@ -237,7 +235,7 @@ async def test_estop_state_machine(
         ),
     ]
 
-    for input, result in steps:
+    for (input, result) in steps:
         subject.detector_listener(input)
         assert subject.state == result
 

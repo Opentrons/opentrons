@@ -1,7 +1,8 @@
 from typing import List
 
-from pydantic import BaseModel, Field
 from typing_extensions import Literal
+
+from pydantic import BaseModel, Field
 
 
 class ModuleConnection(BaseModel):

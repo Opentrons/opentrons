@@ -1,19 +1,21 @@
 """Post-protocol hardware stopper."""
-
 import logging
 from typing import Optional
 
-from ...hardware_control.types import OT3Mount
-from ..errors import HardwareNotSupportedError
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
+
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state.state import StateStore
 from ..types import MotorAxis, PostRunHardwareState
-from .gantry_mover import HardwareGantryMover
+from ..errors import HardwareNotSupportedError
+
 from .movement import MovementHandler
-from .tip_handler import HardwareTipHandler, TipHandler
-from opentrons.hardware_control import HardwareControlAPI
+from .gantry_mover import HardwareGantryMover
+from .tip_handler import TipHandler, HardwareTipHandler
+from ...hardware_control.types import OT3Mount
+
 from opentrons.protocol_engine.types import AddressableOffsetVector
-from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
 log = logging.getLogger(__name__)
 

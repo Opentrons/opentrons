@@ -1,40 +1,40 @@
 import asyncio
-from typing import Dict, Generator, Optional
-
+from typing import Generator, Optional, Dict
 import mock
+from opentrons.drivers.smoothie_drivers.simulator import SimulatingDriver
+from opentrons.hardware_control.backends.simulator import Simulator
+from opentrons.hardware_control.thread_manager import ThreadManager
+from opentrons_shared_data.pipette.types import PipetteModel
 import pytest
 from decoy import Decoy
-
-from opentrons_shared_data.errors.exceptions import (
-    MoveConditionNotMetError,
-    PositionUnknownError,
-)
-from opentrons_shared_data.pipette.types import PipetteModel
 
 from opentrons import config, types
 from opentrons import hardware_control as hc
 from opentrons.calibration_storage.types import (
-    CalibrationStatus,
     SourceType,
+    CalibrationStatus,
 )
 from opentrons.config.types import AxisDict, GantryLoad
-from opentrons.drivers.smoothie_drivers.simulator import SimulatingDriver
-from opentrons.hardware_control import API
-from opentrons.hardware_control.backends.simulator import Simulator
-from opentrons.hardware_control.errors import (
-    InvalidCriticalPoint,
-    OutOfBoundsMove,
-)
-from opentrons.hardware_control.robot_calibration import (
-    DeckCalibration,
-    RobotCalibration,
-)
-from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
     MotionChecks,
 )
+from opentrons.hardware_control.errors import (
+    InvalidCriticalPoint,
+    OutOfBoundsMove,
+)
+from opentrons.hardware_control.robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
+
+from opentrons_shared_data.errors.exceptions import (
+    MoveConditionNotMetError,
+    PositionUnknownError,
+)
+
+from opentrons.hardware_control import API
 
 
 async def test_controller_must_home(hardware_api: API) -> None:
@@ -291,6 +291,7 @@ async def test_critical_point_applied(hardware_api: API) -> None:
 async def test_tip_pickup_routine(
     hardware_api: API, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+
     _move = mock.Mock(side_effect=hardware_api._move)
     monkeypatch.setattr(hardware_api, "_move", _move)
 

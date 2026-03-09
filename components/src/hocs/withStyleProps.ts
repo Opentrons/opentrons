@@ -1,9 +1,9 @@
-import { createElement, forwardRef } from 'react'
+import { createElement } from 'react'
 
-import { isntStyleProp, styleProps } from '../primitives/style-props'
+import { styleProps } from '../primitives'
 
-import type { ComponentProps, ComponentType, ForwardedRef } from 'react'
-import type { StyleProps } from '../primitives/types'
+import type { ComponentProps, ComponentType } from 'react'
+import type { StyleProps } from '../primitives'
 
 /**
  * A Higher-Order Component (HOC) that enhances a component by enabling it to
@@ -32,31 +32,18 @@ import type { StyleProps } from '../primitives/types'
 export function withStyleProps<T extends ComponentType<any>>(
   Component: T
 ): T & ComponentType<ComponentProps<T> & StyleProps> {
-  const ComponentWithStyleProps = forwardRef(
-    (
-      { style, ...props }: ComponentProps<T> & StyleProps,
-      ref: ForwardedRef<unknown>
-    ): JSX.Element => {
-      const stylePropsStyles = styleProps(props)
-      const combinedStyles = { ...stylePropsStyles, ...style }
+  const ComponentWithStyleProps = ({
+    style,
+    ...props
+  }: ComponentProps<T> & StyleProps): JSX.Element => {
+    const stylePropsStyles = styleProps(props)
+    const combinedStyles = { ...stylePropsStyles, ...style }
 
-      const forwardedProps = Object.entries(props).reduce(
-        (acc: Record<string, unknown>, [prop, value]) => {
-          if (isntStyleProp(prop)) {
-            acc[prop] = value
-          }
-          return acc
-        },
-        {}
-      )
-
-      return createElement(Component, {
-        ...(forwardedProps as ComponentProps<T>),
-        ref,
-        style: combinedStyles,
-      })
-    }
-  )
+    return createElement(Component, {
+      ...props,
+      style: combinedStyles,
+    })
+  }
 
   ComponentWithStyleProps.displayName = `withStyleProps(${
     Component.displayName ?? Component.name

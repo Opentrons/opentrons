@@ -1,47 +1,46 @@
 """Tests for the RunOrchestrator."""
 
-from datetime import datetime
 from pathlib import Path
-from typing import Generator, Union
 
 import pytest
-from decoy import Decoy
-from pytest_lazy_fixtures import lf as lazy_fixture
+from datetime import datetime
 
-from opentrons import protocol_runner
+from pytest_lazy_fixtures import lf as lazy_fixture
+from decoy import Decoy
+from typing import Union, Generator
+
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.errors import RunStoppedError
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.types import (
+    PostRunHardwareState,
+    ModuleModel as EngineModuleModel,
+)
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel as HardwareTemperatureModuleModel,
 )
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine import commands as pe_commands
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-from opentrons.protocol_engine.errors import RunStoppedError
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.types import (
-    ModuleModel as EngineModuleModel,
-)
-from opentrons.protocol_engine.types import (
-    PostRunHardwareState,
-)
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
-    ProtocolSource,
     PythonProtocolConfig,
-)
-from opentrons.protocol_runner.protocol_runner import (
-    JsonRunner,
-    LiveRunner,
-    PythonAndLegacyRunner,
+    ProtocolSource,
 )
 from opentrons.protocol_runner.run_orchestrator import (
-    ParseMode,
-    RunNotFound,
     RunOrchestrator,
+    RunNotFound,
+    ParseMode,
 )
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons import protocol_runner
+from opentrons.protocol_runner.protocol_runner import (
+    JsonRunner,
+    PythonAndLegacyRunner,
+    LiveRunner,
+)
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 
 @pytest.fixture

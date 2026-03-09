@@ -77,7 +77,7 @@ export function Tick(props: TickProps): JSX.Element {
       left={`${percent}%`}
       transform={`translateX(-${percent}%)`}
     >
-      <LegacyStyledText forwardedAs="h6">
+      <LegacyStyledText as="h6">
         {isAggregatedTick ? count : null}
       </LegacyStyledText>
       {createPortal(
@@ -91,14 +91,14 @@ export function Tick(props: TickProps): JSX.Element {
               <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="label">
+              <LegacyStyledText as="label">
                 {t('step_number', {
                   step_number: isAggregatedTick
                     ? `${stepNumber} - ${stepNumber + range}`
                     : stepNumber,
                 })}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="label">
+              <LegacyStyledText as="label">
                 {commandTKey != null ? t(commandTKey) : null}
               </LegacyStyledText>
               {isAggregatedTick ? (

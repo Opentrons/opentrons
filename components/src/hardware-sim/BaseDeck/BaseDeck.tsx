@@ -25,21 +25,17 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import {
-  AlignToModuleChildSlot,
-  CenterLabwareInModuleChildSlot,
-  CenterLabwareInSlot,
-  FixedTrashText,
-} from '../..'
+import { FixedTrashText } from '../..'
 import { COLORS } from '../../helix-design-system'
+import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
 import { SlotLabels } from '../Deck'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
+import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { LabwareRender } from '../Labware'
-import { Module } from '../Module'
+import { AlignLabwareToModule, Module } from '../Module'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { SingleSlotFixture } from './SingleSlotFixture'
-import { StackedBadge } from './StackedBadge'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
@@ -55,13 +51,13 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
-import type { WellFillByName, WellGroup } from '../Labware'
+import type { WellFill, WellGroup } from '../Labware'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition
-  wellFill?: WellFillByName
+  wellFill?: WellFill
   missingTips?: WellGroup
   /**
    * Additional children to render alongside this labware.
@@ -79,7 +75,7 @@ export interface ModuleOnDeck {
   moduleModel: ModuleModel
   moduleLocation: ModuleLocation
   nestedLabwareDefsBottomToTop: LabwareDefinition[]
-  nestedLabwareWellFill?: WellFillByName
+  nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
   /**
    * Additional children to render atop this module, after `nestedLabwareDef`.
@@ -95,7 +91,7 @@ export interface ModuleOnDeck {
 }
 export interface HopperLabwareProps {
   hopperLabwareDef: LabwareDefinition | null
-  hopperLabwareWellFill: WellFillByName
+  hopperLabwareWellFill: WellFill
   hopperOnLabwareClick: () => void
   hopperHighlightLabware: boolean
   hopperStacked: boolean
@@ -131,6 +127,8 @@ interface BaseDeckProps {
    */
   svgProps?: any
 }
+
+const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const {
@@ -322,9 +320,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
             const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
-              <Fragment
-                key={`stacker_${moduleModel}_${moduleLocation.slotName}`}
-              >
+              <>
                 <StagingAreaFixture
                   cutoutId={
                     `cutout${moduleLocation.slotName}` as StagingAreaLocation
@@ -362,8 +358,20 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   targetSlotId={moduleLocation.slotName}
                   childrenPositioningMode="passThrough"
                 >
+                  {/* TODO(ja, 8.27.25): create a <AlignLabwareToLabware/> component to align the lid
+                      to the labware. We want to make something like this:
+                      <Module ...>
+                      <AlignLabwareToModule ...> <!-- Align 1st labware to module. -->
+                      <AlignLabwareToLabware ...> <!-- Align 2nd labware to 1st labware. This doesn't exist yet. -->
+                      <LabwareRender ... /> <!-- Render 2nd labware. -->
+                      </AlignLabwareToLabware>
+                      </AlignLabwareToModule>
+                      </Module ...>
+                      */}
                   {nestedLabwareDefsBottomToTop.length > 0 ? (
-                    <CenterLabwareInModuleChildSlot
+                    <AlignLabwareToModule
+                      // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use
+                      // in the face of STACKER_HOPPER_LABWARE_X_OFFSET.
                       deckId={deckDef.otId}
                       slotId={moduleLocation.slotName}
                       moduleDefinition={moduleDef}
@@ -388,11 +396,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                           highlightShadow={highlightShadowLabware}
                         />
                       </g>
-                    </CenterLabwareInModuleChildSlot>
+                    </AlignLabwareToModule>
                   ) : null}
                   {moduleChildren}
                 </Module>
-              </Fragment>
+              </>
             ) : null
           }
         )}
@@ -429,16 +437,16 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 childrenPositioningMode="passThrough"
               >
                 {nestedLabwareDefsBottomToTop.length > 0 ? (
-                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
-                    {nestedLabwareDefsBottomToTop.map((def, index) => (
-                      <CenterLabwareInModuleChildSlot
-                        key={`${index}_${def.parameters.loadName}`}
-                        deckId={deckDef.otId}
-                        slotId={moduleLocation.slotName}
-                        moduleDefinition={moduleDef}
-                        labwareDefinition={def}
-                      >
+                  <AlignLabwareToModule
+                    deckId={deckDef.otId}
+                    slotId={moduleLocation.slotName}
+                    moduleDefinition={moduleDef}
+                    labwareDefinition={nestedLabwareDefsBottomToTop[0]}
+                  >
+                    <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                      {nestedLabwareDefsBottomToTop.map((def, index) => (
                         <LabwareRender
+                          key={`${index}_${def.parameters.loadName}`}
                           definition={def}
                           positioningMode="passThrough"
                           onLabwareClick={onLabwareClick}
@@ -454,9 +462,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                           highlight={highlightLabware}
                           highlightShadow={highlightShadowLabware}
                         />
-                      </CenterLabwareInModuleChildSlot>
-                    ))}
-                  </g>
+                      ))}
+                    </g>
+                  </AlignLabwareToModule>
                 ) : null}
                 {moduleChildren}
               </Module>
@@ -496,17 +504,15 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
                 cursor={onLabwareClick != null ? 'pointer' : ''}
               >
-                <CenterLabwareInSlot definition={definition}>
-                  <LabwareRender
-                    definition={definition}
-                    positioningMode="passThrough"
-                    onLabwareClick={onLabwareClick}
-                    wellFill={wellFill ?? undefined}
-                    missingTips={missingTips}
-                    highlight={highlight}
-                    highlightShadow={highlightShadow}
-                  />
-                </CenterLabwareInSlot>
+                <LabwareRender
+                  definition={definition}
+                  positioningMode="offsetInSlot"
+                  onLabwareClick={onLabwareClick}
+                  wellFill={wellFill ?? undefined}
+                  missingTips={missingTips}
+                  highlight={highlight}
+                  highlightShadow={highlightShadow}
+                />
                 {labwareChildren}
               </g>
             ) : null
@@ -516,34 +522,37 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
             const moduleDef = getModuleDef(moduleModel)
-            const parentSlotName =
+            const slotPosition = getPositionFromSlotId(
               moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStackerLocationFromSlot(moduleLocation.slotName)
-                : moduleLocation.slotName
-            const parentSlotPosition = getPositionFromSlotId(
-              parentSlotName,
+                : moduleLocation.slotName,
               deckDef
             )
-
-            const xAdjustment =
-              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-                ? STACKER_HOPPER_LABWARE_X_OFFSET
+            let { x: nestedLabwareOffsetX, y: nestedLabwareOffsetY } =
+              moduleDef.labwareOffset
+            if (moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE) {
+              nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
+            }
+            // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
+            const clampedLabwareOffsetX =
+              Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+                ? nestedLabwareOffsetX
                 : 0
+            const clampedLabwareOffsetY =
+              Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+                ? nestedLabwareOffsetY
+                : 0
+            // transform to be applied to children which render within the labware interfacing surface of the module
+            const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
 
-            return parentSlotPosition != null && stacked ? (
+            return slotPosition != null && stacked ? (
               <g
                 key={`stacked_${moduleLocation.slotName}`}
-                transform={`translate(${parentSlotPosition[0]},${parentSlotPosition[1]})`}
+                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
               >
-                <AlignToModuleChildSlot
-                  deckId={deckDef.otId}
-                  slotId={parentSlotName}
-                  moduleDefinition={moduleDef}
-                >
-                  <g transform={`translate(${xAdjustment}, 0)`}>
-                    <StackedBadge />
-                  </g>
-                </AlignToModuleChildSlot>
+                <g transform={childrenTransform}>
+                  <StackedBadge />
+                </g>
               </g>
             ) : null
           }
@@ -579,6 +588,19 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       </>
       {children}
     </RobotCoordinateSpace>
+  )
+}
+
+function StackedBadge(): JSX.Element {
+  return (
+    <RobotCoordsForeignObject height="2.5rem" width="2.5rem" x={113} y={53}>
+      <RobotInfoLabel
+        height="1.25rem"
+        svgSize="0.875rem"
+        highlight
+        iconName="stacked"
+      />
+    </RobotCoordsForeignObject>
   )
 }
 

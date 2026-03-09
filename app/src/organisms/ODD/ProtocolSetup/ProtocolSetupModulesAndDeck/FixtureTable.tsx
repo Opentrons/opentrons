@@ -212,10 +212,7 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
-            forwardedAs="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null && isCurrentFixtureCompatible
               ? getFixtureDisplayName(
                   t as TFunction,

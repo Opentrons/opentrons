@@ -42,20 +42,15 @@ export function Chat(): JSX.Element | null {
 
   // Redirect to home page if there is no prompt (user has refreshed the page)
   // Exception: Allow direct chat access
-  useEffect(
-    () => {
-      if (
-        updateProtocolChat.prompt === '' &&
-        createProtocolChat.prompt === '' &&
-        !isDirectChatAccess
-      ) {
-        navigate('/')
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    if (
+      updateProtocolChat.prompt === '' &&
+      createProtocolChat.prompt === '' &&
+      !isDirectChatAccess
+    ) {
+      navigate('/')
+    }
+  }, [])
 
   useEffect(() => {
     if (scrollRef.current != null)

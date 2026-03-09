@@ -1,11 +1,10 @@
-from typing import TYPE_CHECKING, Generator
+import pytest
+from typing import Generator, TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
-import pytest
+from opentrons.config import reset
 
 from opentrons_shared_data.robot.types import RobotTypeEnum
-
-from opentrons.config import reset
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.types import RobotModel

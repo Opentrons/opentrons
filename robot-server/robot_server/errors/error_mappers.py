@@ -1,5 +1,4 @@
 """Map errors to Exceptions."""
-
 from opentrons_shared_data.errors import EnumeratedError, PythonException
 
 

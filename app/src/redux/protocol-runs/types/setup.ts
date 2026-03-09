@@ -1,5 +1,3 @@
-import type { CameraImageSettings } from '@opentrons/api-client'
-import type { CameraId } from '@opentrons/shared-data'
 import type {
   CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
@@ -16,14 +14,6 @@ export type LPCStepKey = typeof LPC_STEP_KEY
 export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
 export type CameraSetupStepKey = typeof CAMERA_SETUP_STEP_KEY
 
-export interface CameraState {
-  enabled: boolean
-  liveStreamEnabled: boolean
-  recoveryEnabled: boolean
-}
-
-export type CameraImageSettingsById = Record<CameraId, CameraImageSettings>
-
 export type StepKey =
   | RobotCalibrationStepKey
   | ModuleSetupStepKey
@@ -31,32 +21,15 @@ export type StepKey =
   | LabwareSetupStepKey
   | CameraSetupStepKey
 
-export interface BaseStepState {
+export interface StepState {
   required: boolean
   complete: boolean
 }
 
-export interface CameraStepState extends BaseStepState {
-  cameraEnabled: boolean
-  liveStreamEnabled: boolean
-  recoveryEnabled: boolean
-  cameraImageSettings: CameraImageSettingsById
-}
+export type StepMap<V> = { [Step in StepKey]: V }
 
-export interface RunSetupStatusPartial {
-  [ROBOT_CALIBRATION_STEP_KEY]?: Partial<BaseStepState>
-  [MODULE_SETUP_STEP_KEY]?: Partial<BaseStepState>
-  [LPC_STEP_KEY]?: Partial<BaseStepState>
-  [LABWARE_SETUP_STEP_KEY]?: Partial<BaseStepState>
-  [CAMERA_SETUP_STEP_KEY]?: Partial<CameraStepState>
-}
-
-export interface RunSetupStatus {
-  [ROBOT_CALIBRATION_STEP_KEY]: BaseStepState
-  [MODULE_SETUP_STEP_KEY]: BaseStepState
-  [LPC_STEP_KEY]: BaseStepState
-  [LABWARE_SETUP_STEP_KEY]: BaseStepState
-  [CAMERA_SETUP_STEP_KEY]: CameraStepState
+export type RunSetupStatus = {
+  [Step in StepKey]: StepState
 }
 
 export interface UpdateRunSetupStepsCompleteAction {
@@ -75,52 +48,6 @@ export interface UpdateRunSetupStepsRequiredAction {
   }
 }
 
-export interface UpdateCameraEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    cameraEnabled: boolean
-  }
-}
-
-export interface UpdateCameraErrorRecoveryEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    recoveryEnabled: boolean
-  }
-}
-export interface UpdateLivestreamEnabled {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    liveStreamEnabled: boolean
-  }
-}
-
-export interface UpdateAllCameraSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    liveStreamEnabled: boolean
-    recoveryEnabled: boolean
-    cameraEnabled: boolean
-  }
-}
-
-export interface UpdateCameraSpecificImageSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    cameraId: string
-    cameraImageSettings: CameraImageSettings
-  }
-}
 export type RunSetupStepsAction =
   | UpdateRunSetupStepsCompleteAction
   | UpdateRunSetupStepsRequiredAction
-  | UpdateCameraEnablement
-  | UpdateAllCameraSettings
-  | UpdateLivestreamEnabled
-  | UpdateCameraErrorRecoveryEnablement
-  | UpdateCameraSpecificImageSettings

@@ -1,27 +1,26 @@
 """StartRunProfile command request, result, and implementation models."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, List, Optional, Union, overload
-
 from pydantic import BaseModel, Field
-from pydantic.json_schema import SkipJsonSchema
+from typing import List, Optional, TYPE_CHECKING, overload, Union, Any
 from typing_extensions import Literal, Type
+from pydantic.json_schema import SkipJsonSchema
 
-from ...errors.error_occurrence import ErrorOccurrence
+from opentrons.hardware_control.modules.types import ThermocyclerStep, ThermocyclerCycle
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from .run_extended_profile import ProfileCycle, ProfileStep
-from opentrons.hardware_control.modules.types import ThermocyclerCycle, ThermocyclerStep
+from ...errors.error_occurrence import ErrorOccurrence
+from .run_extended_profile import ProfileStep, ProfileCycle
 
 if TYPE_CHECKING:
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
-        EquipmentHandler,
         TaskHandler,
+        EquipmentHandler,
     )
     from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
         ThermocyclerModuleSubState,
     )
-    from opentrons.protocol_engine.state.state import StateView
 
 StartRunExtendedProfileCommandType = Literal["thermocycler/startRunExtendedProfile"]
 
@@ -80,13 +79,15 @@ def _transform_profile_step(
 @overload
 def _transform_profile_element(
     element: ProfileStep, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerStep: ...
+) -> ThermocyclerStep:
+    ...
 
 
 @overload
 def _transform_profile_element(
     element: ProfileCycle, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerCycle: ...
+) -> ThermocyclerCycle:
+    ...
 
 
 def _transform_profile_element(

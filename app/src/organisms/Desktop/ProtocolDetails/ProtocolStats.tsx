@@ -181,14 +181,14 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginX={SPACING.spacing16}
         >
           {displayName}
         </LegacyStyledText>
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey50}
           marginX={SPACING.spacing16}
@@ -205,10 +205,7 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
           {datum}
         </LegacyStyledText>
       </Flex>

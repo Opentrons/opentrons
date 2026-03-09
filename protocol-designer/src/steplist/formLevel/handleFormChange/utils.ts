@@ -40,7 +40,6 @@ import type {
   LabwareDefinition2,
   LiquidHandlingPropertyByVolume,
   MixProperties,
-  NozzleConfigurationStyle,
   PipetteChannels,
   PositionReference,
   RetractAspirate,
@@ -72,7 +71,6 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
-    'primaryNozzle',
     'labware',
     'wells',
     'volume',
@@ -89,7 +87,6 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
-    'primaryNozzle',
     'aspirate_labware',
     'aspirate_wells',
     'dispense_labware',
@@ -243,16 +240,9 @@ interface GetDefaultWellsArgs {
   pipetteId: string | null | undefined
   labwareEntities: LabwareEntities
   pipetteEntities: PipetteEntities
-  nozzleConfiguration: NozzleConfigurationStyle
 }
 export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
-  const {
-    labwareId,
-    pipetteId,
-    labwareEntities,
-    pipetteEntities,
-    nozzleConfiguration,
-  } = args
+  const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
   if (
     !labwareId ||
     !labwareEntities[labwareId] ||
@@ -263,7 +253,6 @@ export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
   const labwareDef = labwareEntities[labwareId].def
   const pipetteCanUseLabware = canPipetteUseLabware(
     pipetteEntities[pipetteId].spec,
-    nozzleConfiguration,
     labwareDef
   )
   if (!pipetteCanUseLabware) return []
@@ -1539,7 +1528,6 @@ export const updateFieldsForLiquidClass = (args: {
     liquidHandlingAction,
     robotType,
   })
-
   Object.entries(fieldUpdates).forEach(([field, value]) => {
     if (field in propsForFields) {
       propsForFields[field].updateValue(value)

@@ -6,8 +6,8 @@ export type RobotDevicesRunTimeCommand = CaptureImageRunTimeCommand
 
 export type RobotDevicesCreateCommand = CaptureImageCreateCommand
 
-export type Width = number
-export type Height = number
+type Width = number
+type Height = number
 
 export interface CaptureImageParams {
   homeBefore?: boolean
@@ -25,7 +25,8 @@ export interface CaptureImageCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface CaptureImageRunTimeCommand
-  extends CommonCommandRunTimeInfo, CaptureImageCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    CaptureImageCreateCommand {
   // eslint-disable-next-line @typescript-eslint/ban-types
   result?: {} // Returns an empty object currently.
 }

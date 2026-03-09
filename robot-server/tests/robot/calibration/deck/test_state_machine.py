@@ -1,15 +1,12 @@
+import pytest
 from typing import List, Tuple
 
-import pytest
-
-from robot_server.robot.calibration.deck.state_machine import (
-    DeckCalibrationStateMachine,
-)
 from robot_server.service.session.models.command_definitions import (
     CalibrationCommand as CalCommand,
-)
-from robot_server.service.session.models.command_definitions import (
     DeckCalibrationCommand as DeckCommand,
+)
+from robot_server.robot.calibration.deck.state_machine import (
+    DeckCalibrationStateMachine,
 )
 
 valid_commands: List[Tuple[str, str, str]] = [

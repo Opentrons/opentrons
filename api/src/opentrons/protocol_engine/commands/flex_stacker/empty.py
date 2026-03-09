@@ -2,38 +2,39 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, Literal, Optional
+from __future__ import annotations
+from typing import Optional, Literal, TYPE_CHECKING, Annotated
+from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Type
 
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors import (
     ErrorOccurrence,
 )
 from ...errors.exceptions import FlexStackerLabwarePoolNotYetDefinedError
 from ...state import update_types
 from ...types import (
-    OFF_DECK_LOCATION,
-    InStackerHopperLocation,
-    LabwareLocation,
-    LabwareLocationSequence,
-    NotOnDeckLocationSequenceComponent,
-    OnLabwareLocation,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    NotOnDeckLocationSequenceComponent,
+    OFF_DECK_LOCATION,
+    InStackerHopperLocation,
+    LabwareLocationSequence,
+    OnLabwareLocation,
+    LabwareLocation,
 )
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .common import (
-    adapter_location_sequences_with_default,
     labware_locations_for_group,
-    lid_location_sequences_with_default,
     primary_location_sequences,
+    adapter_location_sequences_with_default,
+    lid_location_sequences_with_default,
 )
 
 if TYPE_CHECKING:
-    from ...execution import EquipmentHandler, RunControlHandler
     from ...state.state import StateView
+    from ...execution import RunControlHandler, EquipmentHandler
 
 EmptyCommandType = Literal["flexStacker/empty"]
 

@@ -84,10 +84,7 @@ export function RobotSettingsTipLengthCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('tip_length_calibrations_title')}
       </LegacyStyledText>
       <TipLengthCalibrationItems

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components'
-import { COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
 import {
   arrayToWellGroup,
@@ -16,10 +16,10 @@ import { WellTooltip } from './WellTooltip'
 
 import type { ComponentProps } from 'react'
 import type {
-  WellFillByName,
+  WellFill,
   WellGroup,
   WellMouseEvent,
-  WellStrokeByName,
+  WellStroke,
 } from '@opentrons/components'
 import type { GenericRect } from '/protocol-designer/collision-types'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
@@ -39,14 +39,11 @@ export interface SelectableLabwareProps {
   showBorder: boolean
 }
 
-type ChannelType = 8 | 12 | 96
+type ChannelType = 8 | 96
 
 const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
-  }
-  if (nozzleType === ROW) {
-    return 12
   } else {
     return 96
   }
@@ -180,8 +177,8 @@ export const SelectableLabware = (
         )
       : selectedPrimaryWells
 
-  const wellFillWithLiq: WellFillByName = {}
-  const wellStroke: WellStrokeByName = {}
+  const wellFillWithLiq: WellFill = {}
+  const wellStroke: WellStroke = {}
   Object.keys(labwareDef.wells).forEach(wellName => {
     wellFillWithLiq[wellName] = COLORS.blue35
     wellStroke[wellName] = COLORS.transparent
@@ -201,14 +198,9 @@ export const SelectableLabware = (
     })
   }
 
-  useEffect(
-    () => {
-      updateHighlightedWells({})
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    updateHighlightedWells({})
+  }, [])
 
   return (
     <SelectionRect

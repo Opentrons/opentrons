@@ -1,7 +1,7 @@
 """Errors raised by serial connection."""
 
 from enum import Enum
-from typing import Dict, Optional, Type
+from typing import Dict, Type, Optional
 
 
 class SerialException(Exception):

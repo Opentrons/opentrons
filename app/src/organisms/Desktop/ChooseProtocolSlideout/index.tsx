@@ -131,31 +131,21 @@ export function ChooseProtocolSlideoutComponent(
     }
   }, [currentPage])
 
-  useEffect(
-    () => {
-      setRunTimeParametersOverrides(
-        selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-      )
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedProtocol?.protocolKey]
-  )
+  useEffect(() => {
+    setRunTimeParametersOverrides(
+      selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
+    )
+  }, [selectedProtocol?.protocolKey])
 
-  useEffect(
-    () => {
-      setHasParamError(errors.length > 0)
-      setHasMissingFileParam(
-        runTimeParametersOverrides.some(
-          parameter =>
-            parameter.type === 'csv_file' && parameter.file?.file == null
-        )
+  useEffect(() => {
+    setHasParamError(errors.length > 0)
+    setHasMissingFileParam(
+      runTimeParametersOverrides.some(
+        parameter =>
+          parameter.type === 'csv_file' && parameter.file?.file == null
       )
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runTimeParametersOverrides]
-  )
+    )
+  }, [runTimeParametersOverrides])
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
@@ -399,7 +389,7 @@ export function ChooseProtocolSlideoutComponent(
                   key={runtimeParam.variableName}
                 >
                   <LegacyStyledText
-                    forwardedAs="label"
+                    as="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
@@ -438,16 +428,13 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
                     </LegacyStyledText>
                   </Flex>
-                  <LegacyStyledText
-                    forwardedAs="label"
-                    paddingTop={SPACING.spacing8}
-                  >
+                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
                     {runtimeParam.description}
                   </LegacyStyledText>
                 </Flex>
@@ -464,7 +451,7 @@ export function ChooseProtocolSlideoutComponent(
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing8}
+                  gridgap={SPACING.spacing8}
                   key={runtimeParam.variableName}
                 >
                   <Flex
@@ -474,12 +461,12 @@ export function ChooseProtocolSlideoutComponent(
                     marginBottom={SPACING.spacing16}
                   >
                     <LegacyStyledText
-                      forwardedAs="h3"
+                      as="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('protocol_details:csv_file')}
                     </LegacyStyledText>
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {t('protocol_details:csv_required')}
                     </LegacyStyledText>
                   </Flex>
@@ -504,7 +491,7 @@ export function ChooseProtocolSlideoutComponent(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <LegacyStyledText forwardedAs="p">
+                        <LegacyStyledText as="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -513,7 +500,7 @@ export function ChooseProtocolSlideoutComponent(
                                 <LinkComponent
                                   color={COLORS.blue55}
                                   role="button"
-                                  // to=""
+                                  to=""
                                 />
                               ),
                             }}
@@ -755,14 +742,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
   ).filter(
     protocol => protocol.mostRecentAnalysis?.robotType === robot.robotModel
   )
-  useEffect(
-    () => {
-      handleSelectProtocol(first(storedProtocols) ?? null)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    handleSelectProtocol(first(storedProtocols) ?? null)
+  }, [])
 
   return storedProtocols.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -816,7 +798,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     />
                   )}
                   <LegacyStyledText
-                    forwardedAs="p"
+                    as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
@@ -833,7 +815,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
-                      name="ot-alert"
+                      name="alert-circle"
                       size="1.25rem"
                       color={
                         runCreationError != null
@@ -847,7 +829,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             </Flex>
             {runCreationError != null && isSelected ? (
               <LegacyStyledText
-                forwardedAs="label"
+                as="label"
                 color={COLORS.red60}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 display={DISPLAY_BLOCK}
@@ -877,7 +859,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             ) : null}
             {requiresCsvRunTimeParameter && isSelected ? (
               <LegacyStyledText
-                forwardedAs="label"
+                as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
@@ -889,7 +871,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             ) : null}
             {missingAnalysisData && isSelected ? (
               <LegacyStyledText
-                forwardedAs="label"
+                as="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
@@ -937,9 +919,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         }
       `}
     >
-      <Icon size="1.25rem" name="ot-alert" color={COLORS.grey30} />
+      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
       <LegacyStyledText
-        forwardedAs="p"
+        as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginTop={SPACING.spacing8}
         role="heading"
@@ -947,7 +929,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         {t('no_protocols_found')}
       </LegacyStyledText>
       <LegacyStyledText
-        forwardedAs="p"
+        as="p"
         marginTop={SPACING.spacing8}
         textAlign={TYPOGRAPHY.textAlignCenter}
       >

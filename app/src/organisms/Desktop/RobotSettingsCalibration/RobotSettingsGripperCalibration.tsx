@@ -89,17 +89,14 @@ export function RobotSettingsGripperCalibration(
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('gripper_calibration_title')}
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">
+      <LegacyStyledText as="p">
         {t('gripper_calibration_description')}
       </LegacyStyledText>
       {gripper == null ? (
-        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
           {t('no_gripper_attached')}
         </LegacyStyledText>
       ) : (
@@ -115,18 +112,18 @@ export function RobotSettingsGripperCalibration(
           <tbody css={BODY_STYLE}>
             <StyledTableRow>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <LegacyStyledText as="p">
                   {gripper.serialNumber}
                 </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
                 <Flex alignItems={ALIGN_CENTER}>
                   {gripperCalibrationLastModified != null ? (
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {formatLastCalibrated(gripperCalibrationLastModified)}
                     </LegacyStyledText>
                   ) : (
-                    <LegacyStyledText forwardedAs="p">
+                    <LegacyStyledText as="p">
                       {t('not_calibrated_short')}
                     </LegacyStyledText>
                   )}

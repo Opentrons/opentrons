@@ -4,40 +4,19 @@ import { getAllDefinitions, getAllPipetteNames } from '@opentrons/shared-data'
 
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from '../Labware'
-import { PipetteRender as PipetteRenderComponent } from './'
+import { PipetteRender } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 const DECK_MAP_VIEWBOX = '0 -140 230 230'
 
-const allDefinitions = getAllDefinitions()
-
-// Find labware definitions by loadName
-const findLabwareByLoadName = (
-  loadName: string
-): LabwareDefinition | undefined => {
-  const definitions = Object.values(allDefinitions) as LabwareDefinition[]
-  return definitions.find(def => def.parameters.loadName === loadName)
-}
-
-const allDefsArray = Object.values(allDefinitions) as LabwareDefinition[]
-const defaultDef = allDefsArray[0]
-
-if (defaultDef == null) {
-  throw new Error('No labware definitions found')
-}
-
-const opentrons300UlTiprack =
-  findLabwareByLoadName('opentrons_96_tiprack_300ul') ?? defaultDef
-const opentrons10UlTiprack =
-  findLabwareByLoadName('opentrons_96_tiprack_10ul') ?? defaultDef
-const nest12Reservoir15ml =
-  findLabwareByLoadName('nest_12_reservoir_15ml') ?? defaultDef
-const axygenReservoir90ml =
-  findLabwareByLoadName('axygen_1_reservoir_90ml') ?? defaultDef
+const opentrons300UlTiprack = getAllDefinitions().opentrons96Tiprack300UlV1
+const opentrons10UlTiprack = getAllDefinitions().opentrons96Tiprack10UlV1
+const nest12Reservoir15ml = getAllDefinitions().nest12Reservoir15MlV1
+const axygenReservoir90ml = getAllDefinitions().axygen1Reservoir90MlV1
 const opentrons6TuberackNest50mlConical =
-  findLabwareByLoadName('opentrons_6_tuberack_nest_50ml_conical') ?? defaultDef
+  getAllDefinitions().opentrons6TuberackNest50MlConicalV1
 
 const labwareDefMap: Record<string, LabwareDefinition> = {
   [opentrons300UlTiprack.metadata.displayName]: opentrons300UlTiprack,
@@ -48,57 +27,47 @@ const labwareDefMap: Record<string, LabwareDefinition> = {
     opentrons6TuberackNest50mlConical,
 }
 const pipetteNames = Object.keys(getAllPipetteNames()) as PipetteName[]
-const labwareDisplayNames = Object.keys(labwareDefMap)
 
-interface StoryArgs {
+export default {
+  title: 'Library/Molecules/Simulation/Pipette/PipetteRender',
+} as Meta
+
+const Template: Story<{
   labwareName: string
   pipetteName: PipetteName
+}> = args => {
+  const labwareDef = labwareDefMap[args.labwareName]
+  return (
+    <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
+      {() => (
+        <Fragment>
+          <LabwareRender definition={labwareDef} />
+          <PipetteRender
+            labwareDef={labwareDef}
+            pipetteName={args.pipetteName}
+          />
+        </Fragment>
+      )}
+    </RobotWorkSpace>
+  )
 }
+export const Pipette = Template.bind({})
 
-const meta: Meta<StoryArgs> = {
-  title: 'Library/Molecules/Simulation/Pipette/PipetteRender',
-  argTypes: {
-    labwareName: {
-      control: {
-        type: 'select',
-      },
-      options: labwareDisplayNames,
+Pipette.argTypes = {
+  labwareName: {
+    control: {
+      type: 'select',
+      options: Object.keys(labwareDefMap).map(
+        d => labwareDefMap[d].metadata.displayName
+      ),
     },
-    pipetteName: {
-      control: {
-        type: 'select',
-      },
+    defaultValue: opentrons300UlTiprack.metadata.displayName,
+  },
+  pipetteName: {
+    control: {
+      type: 'select',
       options: pipetteNames,
     },
-  },
-  decorators: [
-    Story => (
-      <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
-        {() => <Story />}
-      </RobotWorkSpace>
-    ),
-  ],
-}
-
-export default meta
-
-type Story = StoryObj<StoryArgs>
-
-export const PipetteRender: Story = {
-  args: {
-    labwareName: opentrons300UlTiprack.metadata.displayName,
-    pipetteName: pipetteNames[0],
-  },
-  render: args => {
-    const labwareDef = labwareDefMap[args.labwareName] ?? opentrons300UlTiprack
-    return (
-      <Fragment>
-        <LabwareRender definition={labwareDef} positioningMode="passThrough" />
-        <PipetteRenderComponent
-          labwareDef={labwareDef}
-          pipetteName={args.pipetteName}
-        />
-      </Fragment>
-    )
+    defaultValue: pipetteNames[0],
   },
 }

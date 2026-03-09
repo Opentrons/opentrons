@@ -13,8 +13,8 @@ from typing import (
     Union,
     overload,
 )
-
 from typing_extensions import Literal
+
 
 _SetElementT = TypeVar("_SetElementT", bound=Hashable)
 
@@ -69,12 +69,14 @@ class OrderedSet(Generic[_SetElementT]):
         self._elements.clear()
 
     @overload
-    def head(self) -> _SetElementT: ...
+    def head(self) -> _SetElementT:
+        ...
 
     @overload
     def head(
         self, default_value: _DefaultValueT
-    ) -> Union[_SetElementT, _DefaultValueT]: ...
+    ) -> Union[_SetElementT, _DefaultValueT]:
+        ...
 
     def head(
         self, default_value: Union[_DefaultValueT, _NOT_SPECIFIED] = _NOT_SPECIFIED()

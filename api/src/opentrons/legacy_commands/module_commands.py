@@ -1,9 +1,10 @@
-from math import trunc
 from typing import Any, List
+from math import trunc
 
-from . import types as command_types
 from opentrons.drivers import utils
 from opentrons.hardware_control.modules import ThermocyclerStep
+
+from . import types as command_types
 
 
 def magdeck_engage() -> command_types.MagdeckEngageCommand:
@@ -206,9 +207,7 @@ def heater_shaker_set_target_temperature(
     }
 
 
-def heater_shaker_wait_for_temperature() -> (
-    command_types.HeaterShakerWaitForTemperatureCommand
-):
+def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
     text = "Waiting for Heater-Shaker to reach target temperature"
     return {
         "name": command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE,
@@ -236,9 +235,7 @@ def heater_shaker_set_shake_speed(
     }
 
 
-def heater_shaker_open_labware_latch() -> (
-    command_types.HeaterShakerOpenLabwareLatchCommand
-):
+def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
     text = "Unlatching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH,
@@ -246,9 +243,7 @@ def heater_shaker_open_labware_latch() -> (
     }
 
 
-def heater_shaker_close_labware_latch() -> (
-    command_types.HeaterShakerCloseLabwareLatchCommand
-):
+def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatchCommand:
     text = "Latching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH,
@@ -256,9 +251,7 @@ def heater_shaker_close_labware_latch() -> (
     }
 
 
-def heater_shaker_deactivate_shaker() -> (
-    command_types.HeaterShakerDeactivateShakerCommand
-):
+def heater_shaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShakerCommand:
     text = "Deactivating Shaker"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_SHAKER,
@@ -266,9 +259,7 @@ def heater_shaker_deactivate_shaker() -> (
     }
 
 
-def heater_shaker_deactivate_heater() -> (
-    command_types.HeaterShakerDeactivateHeaterCommand
-):
+def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeaterCommand:
     text = "Deactivating Heater"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,

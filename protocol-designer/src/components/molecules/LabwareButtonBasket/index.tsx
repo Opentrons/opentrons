@@ -2,20 +2,16 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { LabwareButton } from '../../organisms/LabwareButton'
+import { LabwareButton } from '../../atoms'
 import styles from './labwarebuttonbasket.module.css'
 
-import type { MouseEvent } from 'react'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 interface LabwareButtonBasketProps {
   stackOfLabware: string[]
   labware: AllTemporalPropertiesForTimelineFrame['labware']
-  setSelectedLabware: (
-    selectedLabwareId: string,
-    event: MouseEvent<HTMLButtonElement>
-  ) => void
-  selectedLabware: string[]
+  setSelectedLabware: (selectedLabwareId: string) => void
+  selectedLabware: string
 }
 export function LabwareButtonBasket(
   props: LabwareButtonBasketProps
@@ -27,20 +23,18 @@ export function LabwareButtonBasket(
     <div className={styles.basket}>
       <StyledText desktopStyle="captionRegular">{t('top_of_stack')}</StyledText>
       <div className={styles.basket_container}>
-        {stackOfLabware.map((item, index) =>
-          labware[item] ? (
-            <LabwareButton
-              key={`${item}_${index}`}
-              numberInStack={stackOfLabware.length - index}
-              displayName={labware[item].def.metadata.displayName}
-              isSelected={selectedLabware.includes(item)}
-              onClick={(id, event) => {
-                setSelectedLabware(id, event)
-              }}
-              id={item}
-            />
-          ) : null
-        )}
+        {stackOfLabware.map((item, index) => (
+          <LabwareButton
+            key={`${item}_${index}`}
+            numberInStack={index + 1}
+            displayName={labware[item].def.metadata.displayName}
+            isSelected={selectedLabware === item}
+            onClick={id => {
+              setSelectedLabware(id)
+            }}
+            id={item}
+          />
+        ))}
       </div>
       <StyledText desktopStyle="captionRegular">
         {t('bottom_of_stack')}

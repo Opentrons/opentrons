@@ -447,6 +447,7 @@ resuming."
         remove_supernatant(vol, park=park)
 
     def dnase(vol, source, mix_reps=6, park=True, resuspend=True):
+
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 
@@ -478,6 +479,7 @@ resuming."
         )
 
     def stop_reaction(vol, source, mix_reps=6, park=True, resuspend=True):
+
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 

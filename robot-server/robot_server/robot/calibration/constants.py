@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Dict, Final, Set
+from dataclasses import dataclass
+from opentrons.types import Point, Mount
 
-from opentrons.types import Mount, Point
 
 STATE_WILDCARD: Final = "*"
 

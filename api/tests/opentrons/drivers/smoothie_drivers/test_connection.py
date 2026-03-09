@@ -1,9 +1,8 @@
 import pytest
 from mock import AsyncMock
-
 from opentrons.drivers.asyncio.communication import AsyncSerial
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.smoothie_drivers.constants import SMOOTHIE_COMMAND_TERMINATOR
 
 

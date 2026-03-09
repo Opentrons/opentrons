@@ -1,6 +1,5 @@
 ---
 title: "HEPA/UV Module: Hardware Controls"
-description: "Fan and UV light buttons, status indicators, and safe operation."
 ---
 
 Separate on/off buttons on the front of the HEPA/UV Module control the fan and UV lights. You can operate these systems simultaneously or independently of each other.

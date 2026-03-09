@@ -108,19 +108,14 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   // Resume recovery when the run when the door is closed.
   // The CTA/flow for handling a door open event within the ER wizard is different, and because this splash always renders
   // behind the wizard, we want to ensure we only implicitly resume recovery when only viewing the splash from this app.
-  useEffect(
-    () => {
-      if (
-        runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
-        resumePausedRecovery
-      ) {
-        recoveryActionMutationUtils.resumeRecovery()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runStatus, resumePausedRecovery]
-  )
+  useEffect(() => {
+    if (
+      runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED &&
+      resumePausedRecovery
+    ) {
+      recoveryActionMutationUtils.resumeRecovery()
+    }
+  }, [runStatus, resumePausedRecovery])
   const buildDoorOpenAlert = (): void => {
     makeToast(t('close_door_to_resume') as string, WARNING_TOAST)
   }
@@ -213,7 +208,6 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             <StepInfo
               {...props}
               oddStyle="level3HeaderBold"
-              display="-webkit-box"
               overflow="hidden"
               overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
               color={COLORS.white}
@@ -269,7 +263,6 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
               <StepInfo
                 {...props}
                 desktopStyle="bodyDefaultRegular"
-                display="-webkit-box"
                 overflow="hidden"
                 overflowWrap={OVERFLOW_WRAP_BREAK_WORD}
                 textAlign={TEXT_ALIGN_CENTER}

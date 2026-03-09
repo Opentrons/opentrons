@@ -13,7 +13,8 @@ import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
-interface CheckStackerInstallProps extends ModuleSetupWizardMaybePipetteStepProps {
+interface CheckStackerInstallProps
+  extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   attachedModules: AttachedModule[]
   doorOpenStatus: boolean

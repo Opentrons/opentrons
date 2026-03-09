@@ -16,32 +16,31 @@ If there are no data and result models, then add the CommandDefinition to
 5) If not using `CommandsEmptyData` then add specialized request and response
 types to `RequestTypes` and `ResponseTypes`.
 """
-
-import typing
 from datetime import datetime
+from enum import Enum
+import typing
 
-from pydantic import BaseModel, Field
 from typing_extensions import Literal
+from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import commands
 from opentrons.util.helpers import utc_now
-from opentrons_shared_data.util import StrEnum
-from server_utils.fastapi_utils.models.json_api import (
-    DeprecatedResponseDataModel,
-    DeprecatedResponseModel,
-    RequestModel,
-)
+from opentrons.protocol_engine import commands
 
 from robot_server.service.session.models.command_definitions import (
-    CalibrationCommand,
-    CheckCalibrationCommand,
-    CommandDefinitionType,
-    DeckCalibrationCommand,
+    ProtocolCommand,
     EquipmentCommand,
     PipetteCommand,
-    ProtocolCommand,
+    CalibrationCommand,
+    DeckCalibrationCommand,
+    CheckCalibrationCommand,
+    CommandDefinitionType,
 )
 from robot_server.service.session.models.common import EmptyModel, JogPosition
+from robot_server.service.json_api import (
+    DeprecatedResponseModel,
+    RequestModel,
+    DeprecatedResponseDataModel,
+)
 
 
 class LoadLabwareByDefinitionRequestData(BaseModel):
@@ -56,7 +55,7 @@ class SetHasCalibrationBlockRequestData(BaseModel):
     )
 
 
-class CommandStatus(StrEnum):
+class CommandStatus(str, Enum):
     """The command status."""
 
     executed = "executed"

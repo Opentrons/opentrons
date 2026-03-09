@@ -1,7 +1,7 @@
 # opentrons robot server makefile
 
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 SHX := npx shx
 
@@ -52,19 +52,10 @@ clean_all_cmd = $(clean_cmd) dist
 .PHONY: all
 all: clean wheel
 
-
-
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -73,7 +64,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
@@ -94,12 +85,17 @@ test-cov:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(ruff) check .
+	$(python) -m black --check .
+	$(python) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: format
 format:
-	$(ruff) format .
-	$(ruff) check --select I --fix .
+	$(python) -m black .
+
+
+.PHONY: local-shell
+local-shell:
+	$(pipenv) shell
 
 .PHONY: push
 push: wheel
@@ -107,7 +103,5 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: wheel
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-auth-server/)
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-system-server/)
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-update-server/)
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)

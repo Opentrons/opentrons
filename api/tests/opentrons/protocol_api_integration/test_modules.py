@@ -1,7 +1,6 @@
 """Tests for modules."""
 
 import typing
-
 import pytest
 
 from opentrons import protocol_api

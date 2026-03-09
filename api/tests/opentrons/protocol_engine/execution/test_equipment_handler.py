@@ -1,74 +1,73 @@
 """Test equipment command execution side effects."""
 
+from unittest.mock import sentinel
 import inspect
 from datetime import datetime
-from typing import Any, Dict, Optional, cast
-from unittest.mock import sentinel
+from decoy import Decoy, matchers
+from typing import Any, Optional, cast, Dict
 
 import pytest
 from _pytest.fixtures import SubRequest
-from decoy import Decoy, matchers
 
-from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.pipette.types import (
-    LiquidClasses as VolumeModes,
-)
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.labware.types import LabwareUri
+
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import (
+    TempDeck,
+    MagDeck,
+    HeaterShaker,
+    AbstractModule,
+)
+from opentrons.hardware_control.dev_types import PipetteDict
+
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    DeckType,
+    ModuleLocation,
+    OnLabwareLocation,
+    NonStackedLocation,
+    LoadedPipette,
+    LabwareOffset,
+    LabwareOffsetVector,
+    LegacyLabwareOffsetLocation,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    ModuleModel,
+    ModuleDefinition,
+    OFF_DECK_LOCATION,
+    FlowRates,
+    AddressableAreaLocation,
 )
 
-from ..pipette_fixtures import get_default_nozzle_map
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    HeaterShaker,
-    MagDeck,
-    TempDeck,
-)
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.execution.equipment import (
-    EquipmentHandler,
-    LoadedLabwareData,
-    LoadedModuleData,
-    LoadedPipetteData,
-)
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
-    LabwareDataProvider,
     ModelUtils,
+    LabwareDataProvider,
     ModuleDataProvider,
-    deck_configuration_provider,
     pipette_data_provider,
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
-from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.modules import HardwareModule
-from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.types import (
-    OFF_DECK_LOCATION,
-    AddressableAreaLocation,
-    DeckSlotLocation,
-    DeckType,
-    FlowRates,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LegacyLabwareOffsetLocation,
-    LoadedPipette,
-    ModuleDefinition,
-    ModuleLocation,
-    ModuleModel,
-    NonStackedLocation,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnLabwareLocation,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnModuleOffsetLocationSequenceComponent,
+from opentrons.protocol_engine.execution.equipment import (
+    EquipmentHandler,
+    LoadedPipetteData,
+    LoadedModuleData,
+    LoadedLabwareData,
 )
-from opentrons.types import DeckSlotName, MountType, Point
-from opentrons.types import Mount as HwMount
+from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.resources import deck_configuration_provider
 
 
 def _make_config(use_virtual_modules: bool) -> Config:
@@ -183,7 +182,6 @@ def loaded_static_pipette_data(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
     )
 
 
@@ -1103,7 +1101,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
-        await hardware_api.cache_instruments(  # type: ignore[func-returns-value]
+        await hardware_api.cache_instruments(
             {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
         )
     ).then_raise(

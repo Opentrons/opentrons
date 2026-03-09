@@ -11,7 +11,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  OT2_ROBOT_TYPE,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 import {
   AUTOMATIC,
   getDefaultPrimaryNozzle,
@@ -33,10 +38,7 @@ import { getValidTiprackIds } from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
-import type {
-  NozzleConfigurationStyle,
-  PrimaryNozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { PathOption, TipTrackingOption } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../types'
@@ -66,12 +68,31 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
-  const primaryNozzle =
-    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
-    getDefaultPrimaryNozzle({ nozzles, channels })
   const tiprackDefinition = Object.values(labwareEntities).find(
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
+
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassDef =
+    allLiquidClassDefs[formData.liquidClass ?? ''] ??
+    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME]
+  const convertedPipetteName =
+    pipette != null ? getFlexNameConversion(pipette.spec) : null
+  const liquidClassValuesForPipette = liquidClassDef.byPipette.find(
+    ({ pipetteModel }) => convertedPipetteName === pipetteModel
+  )
+  const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
+    tipObject => tipObject.tiprack === formData.tipRack
+  )
+
+  let airGapByVolume: Array<[number, number]> = []
+  // no air gap included for mix step
+  if (formData.stepType === 'moveLiquid') {
+    airGapByVolume =
+      (liquidClassValuesForTip?.aspirate.retract.airGapByVolume as Array<
+        [number, number]
+      >) ?? []
+  }
 
   const transferPlanAndReferenceVolumes =
     pipette != null && tiprackDefinition != null && formData != null
@@ -92,14 +113,14 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           conditioningByVolume:
             robotType === OT2_ROBOT_TYPE
               ? []
-              : [[0, Number(formData.conditioning_volume ?? 0)]],
+              : ((liquidClassValuesForTip?.multiDispense
+                  ?.conditioningByVolume as Array<[number, number]>) ?? null),
           disposalByVolume:
             robotType === OT2_ROBOT_TYPE
               ? []
-              : [[0, Number(formData.disposalVolume_volume ?? 0)]],
-          aspirateAirGapByVolume: [
-            [0, Number(formData.aspirate_airGap_volume ?? 0)],
-          ],
+              : ((liquidClassValuesForTip?.multiDispense
+                  ?.disposalByVolume as Array<[number, number]>) ?? null),
+          aspirateAirGapByVolume: airGapByVolume,
         })
       : null
 
@@ -129,6 +150,11 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       value: MANUAL,
     },
   ]
+
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles,
+    channels,
+  })
 
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({
@@ -160,9 +186,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           {t('step_edit_form.field.tip_tracking.label')}
         </StyledText>
         <Flex className={styles.radio_buttons_container}>
-          {tipTrackingOptions.map(({ title, description, value }) => (
+          {tipTrackingOptions.map(({ title, description, value }, i) => (
             <RadioButton
-              key={value}
+              key={i}
               buttonLabel={title}
               buttonSubLabel={{
                 label: description,
@@ -222,7 +248,6 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           setShowTipSelectionModal={setShowTipSelectionModal}
           formTiprackUri={formData.tipRack as string}
           pipetteId={pipetteId}
-          primaryNozzle={primaryNozzle}
           nozzles={nozzles}
           numPickups={numPickups}
           tiprackSelected={formData.tiprack_selected}

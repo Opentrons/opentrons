@@ -20,6 +20,7 @@ import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -43,7 +44,7 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
-  const host = useHost()!
+  const host = useHost() as HostConfig
 
   const {
     menuOverlay,

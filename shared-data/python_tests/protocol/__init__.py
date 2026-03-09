@@ -1,5 +1,5 @@
-from pathlib import Path
 from typing import List
+from pathlib import Path
 
 
 def list_fixtures(version: int) -> List[Path]:

@@ -2,10 +2,9 @@ import { useEffect } from 'react'
 import { css } from 'styled-components'
 
 import {
+  AlignControlToModule,
   BaseDeck,
   Box,
-  CenterLabwareInModuleChildSlot,
-  CenterLabwareInSlot,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -16,9 +15,10 @@ import {
 import {
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
-  getLabwareViewBox,
   getModuleDef,
   getModuleType,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
 } from '@opentrons/shared-data'
 
 import type { ComponentProps } from 'react'
@@ -31,10 +31,11 @@ import type {
 
 export type MapKind = 'intervention' | 'deck-config'
 
-export interface InterventionStyleDeckMapContentProps extends Pick<
-  ComponentProps<typeof BaseDeck>,
-  'deckConfig' | 'robotType' | 'labwareOnDeck' | 'modulesOnDeck'
-> {
+export interface InterventionStyleDeckMapContentProps
+  extends Pick<
+    ComponentProps<typeof BaseDeck>,
+    'deckConfig' | 'robotType' | 'labwareOnDeck' | 'modulesOnDeck'
+  > {
   kind: 'intervention'
   highlightLabwareEventuallyIn: string[]
 }
@@ -72,16 +73,10 @@ function InterventionStyleDeckMapContent(
         ? {
             ...labwareOnDeck,
             labwareChildren: (
-              <CenterLabwareInSlot definition={labwareOnDeck.definition}>
-                {/*
-                LabwareHighlight is a valid "labware" in CenterLabwareInSlot because it
-                sizes and positions itself exactly like the underlying labware definition would.
-                */}
-                <LabwareHighlight
-                  highlight={true}
-                  definition={labwareOnDeck.definition}
-                />
-              </CenterLabwareInSlot>
+              <LabwareHighlight
+                highlight={true}
+                definition={labwareOnDeck.definition}
+              />
             ),
           }
         : labwareOnDeck
@@ -101,20 +96,16 @@ function InterventionStyleDeckMapContent(
             ...module,
             moduleChildren:
               module?.nestedLabwareDefsBottomToTop.length > 0 ? (
-                <CenterLabwareInModuleChildSlot
+                <AlignControlToModule
+                  // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
+                  // <AlignLabwareToModule>; right now, this will misalign the highlight
+                  // for schema-3 labware definitions. Before we can do that,
+                  // <LabwareHighlight> and probably <BaseDeck>'s labwareChildren prop
+                  // will need to be modified.
                   deckId={deckDef.otId}
                   slotId={module.moduleLocation.slotName}
                   moduleDefinition={getModuleDef(module.moduleModel)}
-                  labwareDefinition={
-                    module.nestedLabwareDefsBottomToTop[
-                      module.nestedLabwareDefsBottomToTop.length - 1
-                    ]
-                  }
                 >
-                  {/*
-                  LabwareHighlight is a valid "labware" in CenterLabwareInModuleChildSlot because it
-                  sizes and positions itself exactly like the underlying labware definition would.
-                  */}
                   <LabwareHighlight
                     highlight={true}
                     definition={
@@ -123,7 +114,7 @@ function InterventionStyleDeckMapContent(
                       ]
                     }
                   />
-                </CenterLabwareInModuleChildSlot>
+                </AlignControlToModule>
               ) : undefined,
           }
         : module
@@ -153,22 +144,22 @@ function DeckConfigStyleDeckMapContent({
   return <>{DeckLocationSelect}</>
 }
 
-function LabwareHighlight({
+export function LabwareHighlight({
   highlight,
   definition,
 }: {
   highlight: boolean
   definition: LabwareDefinition
 }): JSX.Element {
-  // Size and position ourselves exactly like the underlying labware.
-  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
+  const { xDimension: width, yDimension: height } =
+    getSchema2Dimensions(definition)
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
 
   return (
     <RobotCoordsForeignDiv
-      x={minX}
-      y={minY}
-      width={xDimension}
-      height={yDimension}
+      x={cornerOffsetFromSlot.x}
+      y={cornerOffsetFromSlot.y}
+      {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,

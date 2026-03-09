@@ -87,14 +87,14 @@ export function FatalError(props: FatalErrorProps): JSX.Element {
       </ErrorHeader>
       {shouldUseMetalProbe ? (
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textAlign={TEXT_ALIGN_CENTER}
         >
           {t('remove_probe_before_exit')}
         </LegacyStyledText>
       ) : null}
-      <LegacyStyledText forwardedAs="p" textAlign={TEXT_ALIGN_CENTER}>
+      <LegacyStyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
         {t('branded:help_us_improve_send_error_report', {
           support_email: SUPPORT_EMAIL,
         })}

@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { SlotDetails } from '/app/organisms/Desktop/ProtocolVisualization/SlotDetails'
-
-import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
+import { SlotDetails } from '../Protocols/ProtocolVisualization/SlotDetails'
 
 import type {
   Liquid,
@@ -55,12 +53,12 @@ export function StepDetailViewer(): JSX.Element {
     }
 
     // initial fetch
-    void fetchData()
+    fetchData()
 
     // listen for updates
     const listener = (_event: unknown, updatedKey: string): void => {
       if (updatedKey === protocolKey) {
-        void fetchData()
+        fetchData()
       }
     }
 
@@ -76,16 +74,18 @@ export function StepDetailViewer(): JSX.Element {
   }, [protocolKey])
 
   if (loading) {
-    return <SkeletonForSlotDetail />
+    return <div>loading</div>
   }
-  if (data === null) {
+  if (!data) {
     return <div>no data found</div>
   }
-  const { slot, robotState, invariantContext, analysis, liquids } = data
+  const { slot, command, robotState, invariantContext, analysis, liquids } =
+    data
 
   return (
     <SlotDetails
       slotId={slot}
+      command={command}
       robotState={robotState}
       invariantContext={invariantContext}
       analysis={analysis}

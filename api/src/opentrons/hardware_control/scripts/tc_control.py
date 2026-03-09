@@ -1,8 +1,7 @@
+from serial import Serial  # type: ignore[import-untyped]
 import asyncio
 import subprocess
 from typing import Any
-
-from serial import Serial  # type: ignore[import-untyped]
 
 _READ_ALL = "readall"
 _READ_LINE = "read"

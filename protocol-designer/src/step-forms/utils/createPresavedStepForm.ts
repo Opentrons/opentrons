@@ -3,7 +3,6 @@ import last from 'lodash/last'
 import {
   ABSORBANCE_READER_TYPE,
   ALL,
-  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -320,34 +319,6 @@ const _patchHeaterShakerModuleId =
     return null
   }
 
-const _patchFlexStackerModuleId =
-  (args: {
-    initialDeckSetup: InitialDeckSetup
-    stepType: StepType
-  }): FormUpdater =>
-  () => {
-    const { initialDeckSetup, stepType } = args
-    const numOfModules =
-      Object.values(initialDeckSetup.modules).filter(
-        module => module.type === FLEX_STACKER_MODULE_TYPE
-      )?.length ?? 1
-    const hasFlexStackerModuleId = stepType === 'flexStacker'
-    // pre-select form type if module is set
-    if (hasFlexStackerModuleId && numOfModules === 1) {
-      const moduleId =
-        getModuleOnDeckByType(initialDeckSetup, FLEX_STACKER_MODULE_TYPE)?.id ??
-        null
-      if (moduleId == null) {
-        return null
-      }
-      // get labware details in hopper at moment
-      return {
-        moduleId,
-      }
-    }
-    return null
-  }
-
 const _patchAbsorbanceReaderModuleId =
   (args: {
     initialDeckSetup: InitialDeckSetup
@@ -364,9 +335,6 @@ const _patchAbsorbanceReaderModuleId =
       )?.length ?? 1
     const hasAbsorbanceReaderModuleId = stepType === 'absorbanceReader'
 
-    // todo(mm, 2025-12-15): If this is the first step in the timeline (i.e. last()
-    // returns null), it seems like this ought to fall back to the initial module state
-    // defined by step-generation.
     const robotState: RobotState | null =
       last(robotStateTimeline.timeline)?.robotState ?? null
 
@@ -421,25 +389,17 @@ const _patchThermocyclerFields =
     const moduleId = getNextDefaultThermocyclerModuleId(
       initialDeckSetup.modules
     )
-    // todo(mm, 2025-12-15): If this is the first step in the timeline (i.e. last()
-    // returns null), it seems like this ought to fall back to the initial module state
-    // defined by step-generation.
     const lastRobotState: RobotState | null | undefined = last(
       robotStateTimeline.timeline
     )?.robotState
+    // @ts-expect-error(sa, 2021-05-26): module id might be null, need to type narrow
+    const moduleState = lastRobotState?.modules[moduleId]?.moduleState
 
-    const moduleState =
-      moduleId != null ? lastRobotState?.modules[moduleId]?.moduleState : null
-
-    if (moduleState != null && moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+    if (moduleState && moduleState.type === THERMOCYCLER_MODULE_TYPE) {
       return {
         moduleId,
-        blockIsActive:
-          moduleState.currentBlockActivity.type === 'blockTargetTemp',
-        blockTargetTemp:
-          moduleState.currentBlockActivity.type === 'blockTargetTemp'
-            ? moduleState.currentBlockActivity.blockTargetTemp
-            : null,
+        blockIsActive: moduleState.blockTargetTemp !== null,
+        blockTargetTemp: moduleState.blockTargetTemp,
         lidIsActive: moduleState.lidTargetTemp !== null,
         lidTargetTemp: moduleState.lidTargetTemp,
         lidOpen: moduleState.lidOpen,
@@ -534,11 +494,6 @@ export const createPresavedStepForm = ({
     robotStateTimeline,
   })
 
-  const updateFlexStackerModuleId = _patchFlexStackerModuleId({
-    initialDeckSetup,
-    stepType,
-  })
-
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
@@ -560,7 +515,6 @@ export const createPresavedStepForm = ({
     updateHeaterShakerModuleId,
     updateMagneticModuleId,
     updateAbsorbanceReaderModuleId,
-    updateFlexStackerModuleId,
     updateDefaultLabwareLocations,
     updateMoveLabwareFields,
   ].reduce<FormData>(

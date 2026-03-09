@@ -67,7 +67,6 @@ export interface CommonCommandRunTimeInfo<
   intent?: CommandIntent
   notes?: CommandNote[] | null
   failedCommandId?: string // only present if intent === 'fixit'
-  commandAnnotationIds?: string[]
 }
 export interface CommonCommandCreateInfo {
   intent?: CommandIntent
@@ -138,7 +137,8 @@ export interface RunCommandErrorOverpressure extends RunCommandErrorBase {
   errorInfo: { retryLocation: [number, number, number] }
 }
 
-export interface RunCommandErrorTipPhysicallyAttached extends RunCommandErrorBase {
+export interface RunCommandErrorTipPhysicallyAttached
+  extends RunCommandErrorBase {
   errorCode: '3004'
   errorType: 'tipPhysicallyAttached'
   isDefined: true
@@ -152,28 +152,32 @@ export interface RunCommandErrorFlexStackerStall extends RunCommandErrorBase {
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleMissing extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleMissing
+  extends RunCommandErrorBase {
   errorCode: '3020'
   errorType: 'flexStackerShuttleMissing'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleLabware extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleLabware
+  extends RunCommandErrorBase {
   errorCode: '3021'
   errorType: 'flexStackerLabwareRetrieveFailed'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerHopperLabware extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerHopperLabware
+  extends RunCommandErrorBase {
   errorCode: '3022'
   errorType: 'flexStackerHopperLabwareFailed'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleOccupied extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleOccupied
+  extends RunCommandErrorBase {
   errorCode: '3023'
   errorType: 'flexStackerShuttleOccupied'
   isDefined: true

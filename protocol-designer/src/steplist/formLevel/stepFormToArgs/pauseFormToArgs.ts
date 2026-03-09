@@ -8,7 +8,6 @@ import { getTimeFromForm } from '../../utils/getTimeFromForm'
 
 import type {
   PauseArgs,
-  WaitForModuleTaskArgs,
   WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
 import type { HydratedPauseFormData } from '../../../form-types'
@@ -16,7 +15,7 @@ import type { GetCastFormData } from '../../fieldLevel'
 
 export const pauseFormToArgs = (
   castFormData: GetCastFormData<HydratedPauseFormData>
-): PauseArgs | WaitForModuleTaskArgs | WaitForTemperatureArgs | null => {
+): PauseArgs | WaitForTemperatureArgs | null => {
   const { hours, minutes, seconds } = getTimeFromForm(
     'pauseTime' in castFormData ? (castFormData.pauseTime ?? null) : null
   )
@@ -66,11 +65,11 @@ export const pauseFormToArgs = (
       }
 
     case PAUSE_UNTIL_TC_PROFILE_COMPLETE:
-      return {
-        commandCreatorFnName: 'waitForModuleTask',
-        waitCondition: 'thermocyclerProfileComplete',
-        moduleId: castFormData.moduleId ?? '',
-      }
+      // todo(mm, 2025-10-15): Implement this.
+      console.warn(
+        'pauseFormToArgs() does not yet implement PAUSE_UNTIL_TC_PROFILE_COMPLETE.'
+      )
+      return null
 
     default:
       return null

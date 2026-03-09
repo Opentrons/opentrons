@@ -1,12 +1,10 @@
 """Tests for the usb_monitor module."""
 
-import os
-from pathlib import Path
-
-import mock
 import pytest
+import mock
+from pathlib import Path
+import os
 import pyudev  # type: ignore[import-untyped]
-
 from ot3usb import usb_monitor
 
 TEST_PHY_NAME = "usbphy123"

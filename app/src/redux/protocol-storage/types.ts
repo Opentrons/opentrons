@@ -4,7 +4,6 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
 
 export type ProtocolSort =
   | 'alphabetical'
@@ -15,12 +14,10 @@ export type ProtocolSort =
   | 'ot2'
 
 interface ParentNode {
-  annotationId: string
+  annotationIndex: number
   subCommands: LeafNode[]
   isHighlighted: boolean
-  annotation?: CommandAnnotationV2
 }
-
 export interface LeafNode {
   command: RunTimeCommand
   isHighlighted: boolean

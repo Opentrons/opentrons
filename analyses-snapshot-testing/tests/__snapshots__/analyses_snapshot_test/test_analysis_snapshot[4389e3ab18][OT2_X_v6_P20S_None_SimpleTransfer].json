@@ -5,7 +5,6 @@
   },
   "commands": [
     {
-      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +17,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -37,7 +35,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -145,7 +142,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -407,7 +403,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -572,7 +567,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1740,7 +1734,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1764,7 +1757,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1783,7 +1775,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1817,7 +1808,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

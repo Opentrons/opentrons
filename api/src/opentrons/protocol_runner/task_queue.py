@@ -1,8 +1,7 @@
 """Asynchronous task queue to accomplish a protocol run."""
-
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, Concatenate, Optional, ParamSpec
+from typing import Any, Awaitable, Callable, Optional, ParamSpec, Concatenate
 
 log = logging.getLogger(__name__)
 

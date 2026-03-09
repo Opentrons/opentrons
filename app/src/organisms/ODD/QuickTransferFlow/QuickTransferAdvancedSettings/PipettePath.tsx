@@ -53,7 +53,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   >(state.blowOutDispense?.location)
 
   const [disposalVolume, setDisposalVolume] = useState<number | undefined>(
-    state?.disposalVolumeDispenseSettings?.volume
+    state?.disposalVolume
   )
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
@@ -88,8 +88,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
 
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
-    state.transferType,
-    state.dropTipLocation
+    state.transferType
   )
 
   const handleClickBackOrExit = (): void => {
@@ -119,6 +118,8 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
       dispatch({
         type: ACTIONS.SET_PIPETTE_PATH,
         path: selectedPath as PathOption,
+        disposalVolume,
+        blowOutLocation,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,

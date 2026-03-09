@@ -2,9 +2,7 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
-  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
-  Height,
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
@@ -17,15 +15,11 @@ import type {
   PipetteName,
   PipetteV2Specs,
   PositionReference,
-  PrimaryNozzleConfigurationStyle,
   ShakeSpeedParams,
-  StackerStoredLabwareDefinitionURIs,
-  TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  VACUUM_MODULE_TYPE,
-  Width,
 } from '@opentrons/shared-data'
+import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AUTOMATIC,
   CLEAN,
@@ -50,10 +44,6 @@ export interface LabwareTemporalProperties {
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
-  // this is needed for PV to determine which labware is being moved
-  // into the hopper based on the setStoredLabware count
-  setStoredLabwareCount?: number
-  fillCount?: number
 }
 
 export interface PipetteTemporalProperties {
@@ -68,8 +58,6 @@ export interface PipetteTemporalProperties {
   tiprackId?: string
   //  last primary tip well accessed (used for return tip)
   tipWell?: string
-  // primary nozzle to use
-  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -87,51 +75,11 @@ export interface TemperatureModuleState {
   status: TemperatureStatus
   targetTemperature: number | null
 }
-
 export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
-
-  lidTargetTemp: number | null /** null means lid is deactivated. */
-
-  /** What the thermal block is currently doing. */
-  currentBlockActivity:
-    | ProfileBlockActivity
-    | TargetTempBlockActivity
-    | DeactivatedBlockActivity
-
-  /** If false, closed. If null, unknown. */
-  lidOpen: boolean | null
-
-  /** Useful for generating unique task IDs every time a new profile is started. */
-  numProfilesStarted: number
-}
-
-/**
- * A profile has been started on this Thermocycler
- * and not yet awaited, so it's possibly still ongoing.
- */
-export interface ProfileBlockActivity {
-  type: 'profile'
-  /** The steps of the profile that's currently running. */
-  profileElements: TCExtendedProfileParams['profileElements']
-  /**
-   * The ID of the concurrent task that represents this profile.
-   *
-   * `null` for unknown. Theoretically, the task ID is always knowable,
-   * but sometimes it's only available from a startRunExtendedProfile result,
-   * and step-generation only has access to the startRunExtendedProfile params.
-   */
-  taskId: string | null
-}
-
-/** The thermal block is targeting a constant temperature, outside of a profile. */
-export interface TargetTempBlockActivity {
-  type: 'blockTargetTemp'
-  blockTargetTemp: number
-}
-
-export interface DeactivatedBlockActivity {
-  type: 'blockDeactivated'
+  blockTargetTemp: number | null // null means block is deactivated
+  lidTargetTemp: number | null // null means lid is deactivated
+  lidOpen: boolean | null // if false, closed. If null, unknown
 }
 
 export interface HeaterShakerModuleState {
@@ -140,7 +88,6 @@ export interface HeaterShakerModuleState {
   targetSpeed: number | null
   latchOpen: boolean | null
 }
-
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
@@ -157,21 +104,9 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
-export interface FlexStackerModuleState {
+export interface FlexStackerState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  storedLabwareDetails: StackerStoredLabwareDefinitionURIs | null
-  // labware in hopper is the bottom up
-  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
-  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
-  // this is needed in order to differentiate between the different
-  // off-deck labwares and when they get loaded onto the hopper for setStoredLabware
-  setStoredLabwareCount?: number
-  fillCount?: number
-}
-
-// TODO (nd: 02/04/2026): configure this type for vacuum module
-export interface VacuumModuleState {
-  type: typeof VACUUM_MODULE_TYPE
+  //  TODO: extend this state
 }
 
 export type ModuleState =
@@ -181,8 +116,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
-  | FlexStackerModuleState
-  | VacuumModuleState
+  | FlexStackerState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -194,7 +128,6 @@ export interface LabwareEntity {
   def: LabwareDefinition2
   pythonName: string
 }
-
 export interface LabwareEntities {
   [labwareId: string]: LabwareEntity
 }
@@ -241,7 +174,6 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
-
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
@@ -354,9 +286,7 @@ interface CommonArgs {
 export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
-  nozzles: NozzleConfigurationStyle // setting for 96-channel
-  primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
-
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -496,7 +426,7 @@ export type MixArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   labware: string
   pipette: string
-  nozzles: NozzleConfigurationStyle // setting for 96-channel
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number
@@ -514,16 +444,15 @@ export type MixArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
-  /** mix position offset relative to this PositionReference */
-  positionReference: PositionReference
+  /**  z offset from bottom of well in mm */
+  offsetFromBottomMm: number
   /** x offset */
   xOffset: number
   /** y offset */
   yOffset: number
-  /** z offset */
-  zOffset: number
-
   /** flow rates in uL/sec */
+  zOffset: number
+  positionReference: PositionReference
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
@@ -533,7 +462,6 @@ export type MixArgs = CommonArgs & {
   tipTracking: TipTrackingOption
   tipsSelected: string[][]
   tiprackSelected: string | null
-  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export type PauseArgs = CommonArgs & {
@@ -556,16 +484,6 @@ export interface WaitForTemperatureArgs extends CommonArgs {
   commandCreatorFnName: 'waitForTemperature'
   celsius: number
   message?: string
-}
-
-export interface WaitForModuleTaskArgs extends CommonArgs {
-  commandCreatorFnName: 'waitForModuleTask'
-
-  /** This step will wait for this to happen before moving on. */
-  // Note: Leaving room for this to become a union with stuff like 'temperatureModuleReachedTarget'.
-  waitCondition: 'thermocyclerProfileComplete'
-
-  moduleId: string
 }
 
 export type EngageMagnetArgs = CommonArgs & {
@@ -634,25 +552,19 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
-/**
- * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
- * step immediately after the profile starts, and the profile will continue in the
- * background.
- */
-export type ThermocyclerProfileStepArgs = CommonArgs & {
-  commandCreatorFnName: THERMOCYCLER_PROFILE
-
+export interface ThermocyclerProfileStepArgs extends CommonArgs {
   moduleId: string
-
-  profileElements: TCExtendedProfileParams['profileElements']
+  commandCreatorFnName: THERMOCYCLER_PROFILE
+  blockTargetTempHold: number | null
+  lidOpenHold: boolean
+  lidTargetTempHold: number | null
+  message?: string
+  profileSteps: AtomicProfileStep[]
   profileTargetLidTemp: number
   profileVolume: number
-
   meta?: {
     rawProfileItems: ProfileItem[]
   }
-
-  message?: string
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
@@ -703,54 +615,14 @@ export interface CommentArgs extends CommonArgs {
   message: string
 }
 
-export interface CaptureImageArgs extends CommonArgs {
-  commandCreatorFnName: 'captureImage'
-  homeBefore: boolean
-  fileName: string
-  resolution: [Width, Height]
-  zoom: number
-  contrast: number
-  brightness: number
-  saturation: number
-}
-
-export interface FlexStackerEmptyArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerEmpty'
-  interventionMessage: string | null
-}
-export interface FlexStackerFillItemsArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerFillItems'
-  fillLabwareUri: string | null
-  fillLabwareIds: string[]
-  interventionMessage: string | null
-}
-export interface FlexStackerStoreArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerStore'
-}
-export interface FlexStackerRetrieveArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerRetrieve'
-}
-
-export type FlexStackerArgs =
-  | FlexStackerEmptyArgs
-  | FlexStackerFillItemsArgs
-  | FlexStackerRetrieveArgs
-  | FlexStackerStoreArgs
-
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
   | AbsorbanceReaderLidArgs
   | ConsolidateArgs
-  | CaptureImageArgs
   | DistributeArgs
   | MixArgs
   | PauseArgs
-  | WaitForModuleTaskArgs
   | TransferArgs
   | EngageMagnetArgs
   | DisengageMagnetArgs
@@ -762,7 +634,6 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
-  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -817,7 +688,6 @@ export interface TimelineFrame {
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
-        /** TODO: tiprackURI is a misnomer: it's a labwareId, not a URI */
         tiprackURI: string | null
       }
     }
@@ -854,7 +724,6 @@ export type ErrorType =
   | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
-  | 'FLEX_STACKER_NO_GRIPPER'
   | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
@@ -863,26 +732,18 @@ export type ErrorType =
   | 'HEATER_SHAKER_LATCH_OPEN'
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
-  | 'HOPPER_EMPTY'
-  | 'HOPPER_FULL'
-  | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
   | 'LABWARE_DISCARDED_IN_TRASH'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
-  | 'LABWARE_ON_HOPPER'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
-  | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
-  | 'MISSING_PROFILE_STEP'
-  | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
-  | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
-  | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'
+  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
   | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
@@ -895,17 +756,13 @@ export type ErrorType =
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
   | 'RETURN_TIP_UNAVAILABLE'
-  | 'SHUTTLE_FULL'
-  | 'SHUTTLE_EMPTY'
   | 'STACK_TOO_HIGH'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
-  | 'THERMOCYCLER_BUSY_WITH_PROFILE'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
-  | 'TOO_MANY_TIPS'
 
 export interface CommandCreatorError {
   message: string
@@ -918,7 +775,6 @@ export type WarningType =
   | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
   | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
   | 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE'
-  | 'WAITING_FOR_NONEXISTENT_TASK'
 
 export interface CommandCreatorWarning {
   message: string

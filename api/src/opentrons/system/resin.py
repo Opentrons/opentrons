@@ -1,7 +1,6 @@
-import logging
-import os
-
 from opentrons import config
+import os
+import logging
 
 log = logging.getLogger(__name__)
 lock_file_path = "/tmp/resin/resin-updates.lock"

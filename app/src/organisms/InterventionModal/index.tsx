@@ -3,6 +3,12 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
@@ -24,7 +30,6 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { isTerminatingRunStatus } from '/app/local-resources/runs/utils'
 import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
 import { OddModal } from '/app/molecules/OddModal'
 import { useRobotType } from '/app/redux-resources/robots'
@@ -44,6 +49,13 @@ import type {
 } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+const TERMINAL_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_SUCCEEDED,
+]
 
 export interface UseInterventionModalProps {
   runData: RunData | null
@@ -73,7 +85,7 @@ export function useInterventionModal({
     isInterventionCommand(lastRunCommand) &&
     runData != null &&
     runStatus != null &&
-    !isTerminatingRunStatus(runStatus)
+    !TERMINAL_RUN_STATUSES.includes(runStatus)
   const { t } = useTranslation('run_details')
 
   if (!isValidIntervention) {
@@ -241,9 +253,7 @@ export function InterventionModal({
     </OddModal>
   ) : (
     <InterventionModalMolecule
-      iconHeading={
-        <LegacyStyledText forwardedAs="h1">{headerTitle}</LegacyStyledText>
-      }
+      iconHeading={<LegacyStyledText as="h1">{headerTitle}</LegacyStyledText>}
       iconName={iconName}
       type="intervention-required"
       iconSize={iconSize}

@@ -1,10 +1,9 @@
 """Tests for performance_helpers."""
 
 from pathlib import Path
-
 from opentrons.util.performance_helpers import (
-    _get_robot_activity_tracker,
     _StubbedTracker,
+    _get_robot_activity_tracker,
 )
 
 

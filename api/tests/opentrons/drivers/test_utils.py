@@ -1,13 +1,11 @@
 from typing import Dict
-
 import pytest
-
 from opentrons.drivers import utils
 from opentrons.drivers.types import (
+    Temperature,
+    PlateTemperature,
     RPM,
     HeaterShakerLabwareLatchStatus,
-    PlateTemperature,
-    Temperature,
 )
 
 

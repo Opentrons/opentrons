@@ -96,7 +96,7 @@ function ProgressTrackerItem({
           width="1.25rem"
           borderRadius="0.625rem"
         >
-          <LegacyStyledText forwardedAs="label">
+          <LegacyStyledText as="label">
             {(taskIndex + 1).toString()}
           </LegacyStyledText>
         </Flex>
@@ -236,10 +236,7 @@ function SubTask({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
       >
-        <LegacyStyledText
-          forwardedAs="h3"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_ROW}
@@ -248,9 +245,9 @@ function SubTask({
             {title}
           </Flex>
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        <LegacyStyledText as="p">{description}</LegacyStyledText>
         {footer != null ? (
-          <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+          <LegacyStyledText as="p" color={COLORS.grey60}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -258,7 +255,7 @@ function SubTask({
             >
               {markedBad === true && (
                 <Icon
-                  name="ot-alert"
+                  name="alert-circle"
                   backgroundColor={COLORS.yellow20}
                   color={COLORS.yellow50}
                   height="1rem"
@@ -392,7 +389,7 @@ function Task({
             gridGap={SPACING.spacing4}
           >
             <LegacyStyledText
-              forwardedAs="h3"
+              as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               <Flex
@@ -402,7 +399,7 @@ function Task({
               >
                 {markedBad === true && (
                   <Icon
-                    name="ot-alert"
+                    name="alert-circle"
                     backgroundColor={COLORS.yellow20}
                     color={COLORS.yellow50}
                     height="1rem"
@@ -412,9 +409,9 @@ function Task({
                 {title}
               </Flex>
             </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+            <LegacyStyledText as="p">{description}</LegacyStyledText>
             {footer != null ? (
-              <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+              <LegacyStyledText as="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

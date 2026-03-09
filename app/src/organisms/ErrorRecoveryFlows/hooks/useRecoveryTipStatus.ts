@@ -88,6 +88,7 @@ export function useRecoveryTipStatus(
     }).data?.data.tipStates ?? null
 
   const gripperErrorFirstPipetteWithTip =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     Object.entries(currentTipStates ?? {}).find(
       ([_, state]) => state.hasTip
     )?.[0] ?? null

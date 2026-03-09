@@ -1,12 +1,13 @@
 """Error categories."""
 
-import json
-from dataclasses import dataclass
 from enum import Enum
+from dataclasses import dataclass
+import json
 from functools import lru_cache
 from typing import Dict
 
 from ..load import load_shared_data
+
 
 CATEGORIES: Dict[str, Dict[str, str]] = json.loads(
     load_shared_data("errors/definitions/1/errors.json")

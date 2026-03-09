@@ -1,46 +1,46 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
+from opentrons_shared_data.data_files import RunFileNameMetadata
 
 from opentrons import config
+from opentrons.types import NozzleMapInterface
 from opentrons.protocol_engine import (
-    Command,
-    CommandErrorSlice,
-    CommandPointer,
-    CommandSlice,
     EngineStatus,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
+    CommandSlice,
+    CommandErrorSlice,
+    CommandPointer,
+    Command,
 )
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
-from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
-    CommandAnnotation,
-    CSVRuntimeParamPaths,
-    DeckConfigurationType,
     PrimitiveRunTimeParamValuesType,
-    RunTimeParameter,
+    CSVRuntimeParamPaths,
 )
-from opentrons.system import camera
-from opentrons.types import NozzleMapInterface
-from opentrons_shared_data.data_files import RunFileNameMetadata
-from opentrons_shared_data.errors.exceptions import EnumeratedError, InvalidStoredData
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.camera.settings.store import CameraSettingStore
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.service.task_runner import TaskRunner
+from robot_server.service.notifications import RunsPublisher
 from . import error_recovery_mapping
 from .error_recovery_models import ErrorRecoveryRule
-from .run_models import BadRun, Run, RunDataError
+
 from .run_orchestrator_store import RunOrchestratorStore
-from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
-from robot_server.camera.settings.store import CameraSettingStore
-from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
+from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
+from .run_models import Run, BadRun, RunDataError
+
+from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.system import camera
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -228,7 +228,6 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
-                command_annotations=prev_run_result.command_annotations,
                 run_time_parameters=prev_run_result.parameters,
             )
 
@@ -290,9 +289,6 @@ class RunDataManager:
             True,
             camera_provider,
             state_summary.cameraSettings,
-        )
-        self._run_orchestrator_store.add_camera_capture_image_settings(
-            capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
         )
 
         return _build_run(
@@ -418,14 +414,13 @@ class RunDataManager:
             run_result = await self._run_orchestrator_store.clear()
             state_summary = run_result.state_summary
             parameters = run_result.parameters
-            run_resource: Union[RunResource, BadRunResource] = (
-                self._run_store.update_run_state(
-                    run_id=run_id,
-                    summary=run_result.state_summary,
-                    commands=run_result.commands,
-                    command_annotations=run_result.command_annotations,
-                    run_time_parameters=run_result.parameters,
-                )
+            run_resource: Union[
+                RunResource, BadRunResource
+            ] = self._run_store.update_run_state(
+                run_id=run_id,
+                summary=run_result.state_summary,
+                commands=run_result.commands,
+                run_time_parameters=run_result.parameters,
             )
             self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
             self._file_provider.clear_run_metadata()
@@ -556,38 +551,6 @@ class RunDataManager:
         if run_id == self._run_orchestrator_store.current_run_id:
             return len(self._run_orchestrator_store.get_command_errors())
         return self._run_store.get_command_errors_count(run_id)
-
-    def get_total_command_annotations_count(self, run_id: str) -> int:
-        """Get the total number of command annotations in the specified run."""
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_total_command_annotations_count()
-        return self._run_store.get_total_command_annotations_count(run_id)
-
-    def get_command_annotations_slice(
-        self, run_id: str, cursor: int, length: int
-    ) -> CommandAnnotationsSlice:
-        """Get a slice of the run's commands annotations.
-
-        Args:
-            run_id: ID of the run.
-            cursor: Requested index of the first command annotation in the returned slice.
-            length: Length of slice to return.
-        """
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_annotations_slice(
-                cursor=cursor, length=length
-            )
-        return self._run_store.get_command_annotations_slice(
-            run_id=run_id, cursor=cursor, length=length
-        )
-
-    def get_command_annotation(
-        self, run_id: str, annotation_id: str
-    ) -> CommandAnnotation:
-        """Get a run's command annotation by ID."""
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_annotation(annotation_id)
-        return self._run_store.get_command_annotation(run_id, annotation_id)
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""

@@ -1,5 +1,4 @@
 """Action pipeline module."""
-
 from typing import List
 
 from .action_handler import ActionHandler

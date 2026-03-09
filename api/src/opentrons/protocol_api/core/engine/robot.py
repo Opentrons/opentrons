@@ -1,17 +1,15 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Dict, Optional, Union
-
-from opentrons_shared_data.pipette import types as pip_types
-
+from typing import Optional, Dict, Union
 from opentrons.hardware_control import SyncHardwareAPI
+
+from opentrons.types import Mount, MountType, Point, AxisType, AxisMapType
+from opentrons_shared_data.pipette import types as pip_types
 from opentrons.protocol_api._types import PipetteActionTypes, PlungerPositionTypes
-from opentrons.protocol_api.core.robot import AbstractRobot
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import DeckPoint, MotorAxis
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import AxisMapType, AxisType, Mount, MountType, Point
+
+from opentrons.protocol_api.core.robot import AbstractRobot
+
 
 _AXIS_TYPE_TO_MOTOR_AXIS = {
     AxisType.X: MotorAxis.X,
@@ -25,30 +23,20 @@ _AXIS_TYPE_TO_MOTOR_AXIS = {
     AxisType.Q: MotorAxis.AXIS_96_CHANNEL_CAM,
 }
 
-if TYPE_CHECKING:
-    from .protocol import ProtocolCore
-
 
 class RobotCore(AbstractRobot):
     """Robot API core using a ProtocolEngine.
 
     Args:
         engine_client: A client to the ProtocolEngine that is executing the protocol.
-        protocol_core: The protocol engine core that created this core.
-        api_version: The Python Protocol API version at which  this core is operating.
-        sync_hardware_api: A SynchronousAdapter-wrapped Hardware Control API.
+        api_version: The Python Protocol API versionat which  this core is operating.
+        sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
     def __init__(
-        self,
-        engine_client: EngineClient,
-        protocol_core: ProtocolCore,
-        api_version: APIVersion,
-        sync_hardware_api: SyncHardwareAPI,
+        self, engine_client: EngineClient, sync_hardware_api: SyncHardwareAPI
     ) -> None:
         self._engine_client = engine_client
-        self._protocol_core = protocol_core
-        self._api_version = api_version
         self._sync_hardware_api = sync_hardware_api
 
     def _convert_to_engine_mount(self, axis_map: AxisMapType) -> Dict[MotorAxis, float]:
@@ -113,8 +101,7 @@ class RobotCore(AbstractRobot):
         self._engine_client.execute_command(
             cmd.robot.MoveToParams(
                 mount=engine_mount, destination=engine_destination, speed=speed
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def move_axes_to(
@@ -134,25 +121,19 @@ class RobotCore(AbstractRobot):
                 axis_map=axis_engine_map,
                 critical_point=critical_point_engine,
                 speed=speed,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def move_axes_relative(self, axis_map: AxisMapType, speed: Optional[float]) -> None:
         axis_engine_map = self._convert_to_engine_mount(axis_map)
         self._engine_client.execute_command(
-            cmd.robot.MoveAxesRelativeParams(axis_map=axis_engine_map, speed=speed),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.robot.MoveAxesRelativeParams(axis_map=axis_engine_map, speed=speed)
         )
 
     def release_grip(self) -> None:
-        self._engine_client.execute_command(
-            cmd.robot.OpenGripperJawParams(),
-            command_annotations=self._protocol_core.annotation_ids,
-        )
+        self._engine_client.execute_command(cmd.robot.OpenGripperJawParams())
 
     def close_gripper(self, force: Optional[float] = None) -> None:
         self._engine_client.execute_command(
-            cmd.robot.CloseGripperJawParams(force=force),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.robot.CloseGripperJawParams(force=force)
         )

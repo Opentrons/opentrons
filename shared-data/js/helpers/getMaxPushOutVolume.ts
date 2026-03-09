@@ -1,4 +1,4 @@
-import round from 'lodash/round'
+import { round } from 'lodash'
 
 import type { PipetteV2Specs } from '../types'
 

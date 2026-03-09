@@ -1,25 +1,25 @@
+from typing import Optional
 import logging
 import math
-from typing import Optional
 
-from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
-    GripperNotPresentError,
-)
-
-from .gripper import Gripper
+from opentrons.types import Point
 from .instrument_calibration import (
     GripperCalibrationOffset,
     load_gripper_calibration_offset,
 )
 from opentrons.hardware_control.dev_types import GripperDict
-from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
     GripperProbe,
 )
-from opentrons.types import Point
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons_shared_data.errors.exceptions import (
+    GripperNotPresentError,
+    CommandPreconditionViolated,
+)
+from .gripper import Gripper
+
 
 MOD_LOG = logging.getLogger(__name__)
 

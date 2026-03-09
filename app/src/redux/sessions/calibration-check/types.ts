@@ -73,7 +73,8 @@ type CalibrationCheckComparisonByStep = Record<
   RobotCalibrationCheckStep,
   CalibrationCheckComparison
 >
-export interface CalibrationCheckComparisonMap extends CalibrationCheckComparisonByStep {
+export interface CalibrationCheckComparisonMap
+  extends CalibrationCheckComparisonByStep {
   status: RobotCalibrationCheckStatus
 }
 

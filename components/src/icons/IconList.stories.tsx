@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 
 import {
   ALIGN_CENTER,
@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  StyledText,
+  Text,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -15,20 +15,23 @@ import {
 import { Icon as IconComponent } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 import type { IconName } from './Icon'
 
-const COPY_TIMEOUT_MS = 2000
+export default {
+  title: 'Library/Atoms/IconList',
+  decorators: [Story => <Story />],
+} as Meta
 
 interface IconState {
   name: IconName
   showCopied: boolean
 }
 
-function IconListComponent(): JSX.Element {
-  const ICON_NAMES = Object.keys(ICON_DATA_BY_NAME) as IconName[]
+const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
+  // const { backgroundColor } = args
   const [icons, setIcons] = React.useState<IconState[]>(() =>
-    ICON_NAMES.map(name => ({
+    Object.keys(ICON_DATA_BY_NAME).map(name => ({
       name,
       showCopied: false,
     }))
@@ -73,14 +76,14 @@ function IconListComponent(): JSX.Element {
       setIcons(prevIcons =>
         prevIcons.map(icon => ({ ...icon, showCopied: false }))
       )
-    }, COPY_TIMEOUT_MS)
+    }, 2000)
     return () => {
       clearTimeout(timer)
     }
   }, [icons])
 
   return (
-    <Flex flexWrap={WRAP} gap={SPACING.spacing8} padding={SPACING.spacing16}>
+    <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
       {icons.map(({ name, showCopied }) => (
         <Flex
           key={`icon_${name}`}
@@ -92,20 +95,20 @@ function IconListComponent(): JSX.Element {
           border={`2px solid ${COLORS.black90}`}
         >
           <IconComponent name={name} size="4rem" />
-          <StyledText
+          <Text
             textAlign={TYPOGRAPHY.textAlignCenter}
             paddingTop={SPACING.spacing8}
-            desktopStyle="captionRegular"
+            fontSize={TYPOGRAPHY.fontSizeP}
           >
             {name}
-          </StyledText>
+          </Text>
           <Flex
             paddingTop={SPACING.spacing8}
             gap={SPACING.spacing4}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText
-              desktopStyle="captionRegular"
+            <Text
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               color={COLORS.blue50}
               cursor="pointer"
               onClick={() => {
@@ -116,15 +119,12 @@ function IconListComponent(): JSX.Element {
               }}
             >
               copy
-            </StyledText>
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              color={COLORS.grey50}
-            >
+            </Text>
+            <Text fontSize={TYPOGRAPHY.fontSizeCaption} color={COLORS.grey50}>
               |
-            </StyledText>
-            <StyledText
-              desktopStyle="captionRegular"
+            </Text>
+            <Text
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               color={COLORS.blue50}
               cursor="pointer"
               onClick={() => {
@@ -135,13 +135,16 @@ function IconListComponent(): JSX.Element {
               }}
             >
               download
-            </StyledText>
+            </Text>
           </Flex>
           <Flex height="1rem" alignItems={ALIGN_CENTER}>
             {showCopied ? (
-              <StyledText desktopStyle="captionRegular" color={COLORS.green50}>
+              <Text
+                fontSize={TYPOGRAPHY.fontSizeCaption}
+                color={COLORS.green50}
+              >
                 copied!
-              </StyledText>
+              </Text>
             ) : null}
           </Flex>
         </Flex>
@@ -149,20 +152,7 @@ function IconListComponent(): JSX.Element {
     </Flex>
   )
 }
-
-const meta: Meta<typeof IconListComponent> = {
-  title: 'Helix/Atoms/IconList',
-  component: IconListComponent,
-  decorators: [Story => <Story />],
-}
-export default meta
-
-type Story = StoryObj<typeof IconListComponent>
-
-export const IconList: Story = {
-  args: {
-    iconProps: {
-      backgroundColor: COLORS.blue50,
-    },
-  },
+export const IconList = Template.bind({})
+IconList.args = {
+  backgroundColor: COLORS.blue50,
 }

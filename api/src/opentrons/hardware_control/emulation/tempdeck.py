@@ -6,12 +6,14 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 import logging
 from typing import Optional
 
-from .abstract_emulator import AbstractEmulator
-from .simulations import Temperature
 from opentrons.drivers.temp_deck.driver import GCODE
 from opentrons.hardware_control.emulation import util
-from opentrons.hardware_control.emulation.parser import Command, Parser
+from opentrons.hardware_control.emulation.parser import Parser, Command
 from opentrons.hardware_control.emulation.settings import TempDeckSettings
+
+from .abstract_emulator import AbstractEmulator
+from .simulations import Temperature
+
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +52,9 @@ class TempDeckEmulator(AbstractEmulator):
             return res
         elif command.gcode == GCODE.SET_TEMP:
             temperature = command.params["S"]
-            assert isinstance(temperature, float), (
-                f"invalid temperature '{temperature}'"
-            )
+            assert isinstance(
+                temperature, float
+            ), f"invalid temperature '{temperature}'"
             self._temperature.set_target(temperature)
         elif command.gcode == GCODE.DISENGAGE:
             self._temperature.deactivate(util.TEMPERATURE_ROOM)

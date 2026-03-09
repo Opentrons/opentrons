@@ -13,14 +13,13 @@ import {
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
-import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
+  useRunStatus,
 } from '/app/resources/runs'
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
@@ -33,6 +32,7 @@ import {
   useRunHeaderModalContainer,
 } from './RunHeaderModalContainer'
 import { RunHeaderProtocolName } from './RunHeaderProtocolName'
+import { isCancellableStatus } from './utils'
 
 import type { RefObject } from 'react'
 
@@ -50,13 +50,10 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
-  const runStatus = runRecord?.data.status ?? null
+  const runStatus = useRunStatus(runId)
 
   const attachedModules =
     useModulesQuery({
@@ -65,7 +62,7 @@ export function ProtocolRunHeader(
     })?.data?.data ?? []
   const runErrors = useRunErrors({
     runRecord: runRecord ?? null,
-    runStatus: runStatus,
+    runStatus,
     runId,
   })
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -128,11 +125,6 @@ export function ProtocolRunHeader(
           protocolRunControls={protocolRunControls}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           isClosingCurrentRun={isClosingCurrentRun}
-          numberOfAtomicCommands={
-            protocolData?.status === 'completed'
-              ? protocolData.commands.length
-              : 0
-          }
           {...props}
         />
         <RunProgressMeter {...props} />

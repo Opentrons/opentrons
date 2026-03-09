@@ -20,9 +20,7 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import {
@@ -31,10 +29,7 @@ import {
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
-import {
-  getInitialDeckSetup,
-  getLiquidEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -44,11 +39,7 @@ import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
-import type { DropdownOption, WellGroup } from '@opentrons/components'
-import type {
-  LabwareLiquidState,
-  LiquidEntities,
-} from '@opentrons/step-generation'
+import type { DropdownOption } from '@opentrons/components'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 export interface LiquidInfo {
@@ -67,55 +58,43 @@ interface ToolboxFormValues {
   selectedLiquidId?: string | null
   volume?: string | null
 }
-
-interface LiquidToolboxData {
-  liquids: LiquidEntities
-  labwareId: string | null
-  selectedWellGroups: WellGroup
-  nickNames: Record<string, string>
-  liquidLocations: LabwareLiquidState
-  commonSelectedLiquidId: string | null
-  commonSelectedVolume: number | null
-  selectedWellsMaxVolume: number | null
-  liquidSelectionOptions: DropdownOption[]
-  allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null
-}
-
 interface LiquidToolboxProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
-  showLiquidLayoutOverlay: boolean
-  data: LiquidToolboxData
-  selectedLabwareIds: string[]
 }
-function LiquidToolbox({
+export function LiquidToolbox({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
-  selectedLabwareIds,
-  showLiquidLayoutOverlay,
-  data,
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
-  const {
-    liquids,
-    labwareId,
-    selectedWellGroups,
-    nickNames,
-    liquidLocations,
-    commonSelectedLiquidId,
-    commonSelectedVolume,
-    selectedWellsMaxVolume,
-    liquidSelectionOptions,
-    allWellContentsForActiveItem,
-  } = data
-
+  const liquids = useSelector(getLiquidEntities)
+  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const selectedWellGroups = useSelector(getSelectedWells)
+  const nickNames = useSelector(getLabwareNicknamesById)
   const selectedWells = Object.keys(selectedWellGroups)
   const labwareDisplayName = labwareId != null ? nickNames[labwareId] : ''
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+  const commonSelectedLiquidId = useSelector(
+    wellContentsSelectors.getSelectedWellsCommonIngredId
+  )
+  const commonSelectedVolume = useSelector(
+    wellContentsSelectors.getSelectedWellsCommonVolume
+  )
+  const selectedWellsMaxVolume = useSelector(
+    wellContentsSelectors.getSelectedWellsMaxVolume
+  )
+  const liquidSelectionOptions = useSelector(
+    labwareIngredSelectors.getLiquidSelectionOptions
+  )
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
 
   const allWellsForActiveItem =
     labwareId != null
@@ -130,10 +109,10 @@ function LiquidToolbox({
 
   const selectionHasLiquids = Boolean(
     labwareId != null &&
-    liquidLocations[labwareId] != null &&
-    Object.keys(selectedWellGroups).some(
-      well => liquidLocations[labwareId][well]
-    )
+      liquidLocations[labwareId] != null &&
+      Object.keys(selectedWellGroups).some(
+        well => liquidLocations[labwareId][well]
+      )
   )
 
   const getInitialValues: () => ValidFormValues = () => {
@@ -177,18 +156,16 @@ function LiquidToolbox({
   }
 
   const handleClearAllWells: () => void = () => {
-    if (
-      global.confirm(t('application:are_you_sure_clear_all_wells') as string)
-    ) {
-      for (const labwareId of selectedLabwareIds) {
-        if (labwareId != null && activeItemHasLiquids) {
-          dispatch(
-            removeWellsContents({
-              labwareId,
-              wells: allWellsForActiveItem,
-            })
-          )
-        }
+    if (labwareId != null && activeItemHasLiquids) {
+      if (
+        global.confirm(t('application:are_you_sure_clear_all_wells') as string)
+      ) {
+        dispatch(
+          removeWellsContents({
+            labwareId,
+            wells: allWellsForActiveItem,
+          })
+        )
       }
     }
   }
@@ -231,7 +208,7 @@ function LiquidToolbox({
       dispatch(
         setWellContents({
           liquidGroupId: selectedLiquidId,
-          labwareId: selectedLabwareIds,
+          labwareId,
           wells: selectedWells ?? [],
           volume: Number(values.volume),
         })
@@ -273,42 +250,11 @@ function LiquidToolbox({
     })
     .filter(Boolean)
 
-  const hasLiquids =
-    wellContents != null
-      ? Object.values(wellContents).flatMap(content => content.groupIds)
-          .length > 0
-      : false
-  const hasSelection = selectedWells.length > 0
-  const canEdit = !showLiquidLayoutOverlay && (hasLiquids || hasSelection)
-  const { labware, modules } = useSelector(getInitialDeckSetup)
-  const stackerModuleIds = Object.entries(modules).reduce<string[]>(
-    (stackerIds, [moduleId, moduleOnDeck]) => {
-      return moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
-        ? stackerIds.concat(moduleId)
-        : stackerIds
-    },
-    []
-  )
-
-  const labwareOnStackerWithLiquid = Object.entries(labware).filter(
-    ([, labwareInfo]) =>
-      labwareInfo.stack != null &&
-      stackerModuleIds.some(stackerId => labwareInfo.stack.includes(stackerId))
-  )
   const handleConfirmClick = (): void => {
-    if (labwareOnStackerWithLiquid.length > 0) {
-      dispatch(
-        analyticsEvent({
-          name: 'liquidInLabwareInStacker',
-          properties: {},
-        })
-      )
-    }
     if (selectedWells.length > 0) {
       setShowBadFormState(true)
       return
     }
-
     dispatch(deselectAllWells())
     navigate('/designer')
   }
@@ -332,7 +278,8 @@ function LiquidToolbox({
           </StyledText>
         }
       >
-        {canEdit ? (
+        {(liquidsInLabware != null && liquidsInLabware.length > 0) ||
+        selectedWells.length > 0 ? (
           <form onSubmit={handleSubmit(handleSaveSubmit)}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {selectedWells.length > 0 ? (
@@ -455,7 +402,7 @@ function LiquidToolbox({
                               message: t(t('liquid_volume_nonzero')),
                             },
                             max: {
-                              value: selectedWellsMaxVolume ?? 0,
+                              value: selectedWellsMaxVolume,
                               message: t(
                                 'form:liquid_placement.errors.volume_exceeded',
                                 { volume: selectedWellsMaxVolume }
@@ -533,77 +480,5 @@ function LiquidToolbox({
         )}
       </Toolbox>
     </>
-  )
-}
-
-interface LiquidToolboxContainerProps {
-  showBadFormState: boolean
-  setShowBadFormState: Dispatch<SetStateAction<boolean>>
-  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
-  showLiquidLayoutOverlay: boolean
-}
-
-export function LiquidToolboxContainer({
-  showBadFormState,
-  setShowBadFormState,
-  setDefineLiquidModal,
-  showLiquidLayoutOverlay,
-}: LiquidToolboxContainerProps): JSX.Element {
-  // All selectors moved here
-  const liquids = useSelector(getLiquidEntities)
-  const multipleSelectedLabwareIds = useSelector(
-    labwareIngredSelectors.getSelectedLabwareIds
-  )
-  const selectedLabwareId = useSelector(
-    labwareIngredSelectors.getSelectedLabwareId
-  )
-  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const selectedWellGroups = useSelector(getSelectedWells)
-  const nickNames = useSelector(getLabwareNicknamesById)
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
-  const commonSelectedLiquidId = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonIngredId
-  )
-  const commonSelectedVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonVolume
-  )
-  const selectedWellsMaxVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsMaxVolume
-  )
-  const liquidSelectionOptions = useSelector(
-    labwareIngredSelectors.getLiquidSelectionOptions
-  )
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
-
-  const data: LiquidToolboxData = {
-    liquids,
-    labwareId: labwareId ?? null,
-    selectedWellGroups: selectedWellGroups ?? {},
-    nickNames,
-    liquidLocations,
-    commonSelectedLiquidId: commonSelectedLiquidId ?? null,
-    commonSelectedVolume: commonSelectedVolume ?? null,
-    selectedWellsMaxVolume: selectedWellsMaxVolume ?? null,
-    liquidSelectionOptions,
-    allWellContentsForActiveItem,
-  }
-
-  return (
-    <LiquidToolbox
-      showBadFormState={showBadFormState}
-      setShowBadFormState={setShowBadFormState}
-      setDefineLiquidModal={setDefineLiquidModal}
-      showLiquidLayoutOverlay={showLiquidLayoutOverlay}
-      data={data}
-      selectedLabwareIds={
-        !multipleSelectedLabwareIds?.includes(selectedLabwareId ?? '')
-          ? [selectedLabwareId ?? '']
-          : multipleSelectedLabwareIds
-      }
-    />
   )
 }

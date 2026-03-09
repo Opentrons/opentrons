@@ -105,16 +105,12 @@ export const SecondStepsMoveLiquidTools = ({
     formData.tipRack as string
   )
   // TODO: replace this with the actual individual byVolume values, separated by aspirate/dispense etc.
-  const liquidClassDef =
-    getAllLiquidClassDefs()[
+  const stubbedByTipValues = getAllLiquidClassDefs()
+    [
       formData.liquidClass !== NONE_LIQUID_CLASS_NAME
         ? formData.liquidClass
         : WATER_LIQUID_CLASS_NAME
-    ]
-  if (!liquidClassDef)
-    throw new Error(`Liquid class '${formData.liquidClass}' does not exist`)
-  const stubbedByTipValues = liquidClassDef.byPipette
-    .find(
+    ].byPipette.find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
     )
     ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)
@@ -215,8 +211,6 @@ export const SecondStepsMoveLiquidTools = ({
         pipetteSpecs: pipetteSpec,
         tiprackDef: tiprackDef,
       }),
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       formData.transferVolume,
       formData.disposalVolume_volume,

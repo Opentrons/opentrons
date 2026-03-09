@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -82,6 +82,13 @@ export const DesktopApp = (): JSX.Element => {
       name: 'Visualization',
       path: '/protocols/:protocolKey/visualization',
     },
+    // for protocol visualization path from protocol setup page and back to protocol setup page
+    // protocolKey is for visualization page and runId is for back to protocol setup page
+    {
+      Component: ProtocolVisualization,
+      name: 'Visualization',
+      path: '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
+    },
     {
       Component: Labware,
       name: 'labware',
@@ -100,19 +107,14 @@ export const DesktopApp = (): JSX.Element => {
       path: '/devices/:robotName',
     },
     {
-      Component: CalibrationDashboard,
-      name: 'Calibration Dashboard',
-      path: '/devices/:robotName/robot-settings/calibration/dashboard',
-    },
-    {
       Component: RobotSettings,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
-      Component: ProtocolVisualization,
-      name: 'Visualization',
-      path: '/devices/:robotName/protocol-runs/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
+      Component: CalibrationDashboard,
+      name: 'Calibration Dashboard',
+      path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
     {
       Component: ProtocolRunDetails,
@@ -140,7 +142,7 @@ export const DesktopApp = (): JSX.Element => {
                 setIsEmergencyStopModalDismissed,
               }}
             >
-              <Box width="100%" height="100vh">
+              <Box width="100%">
                 <Alerts>
                   <Routes>
                     {desktopRoutes.map(({ Component, path }: RouteProps) => {
@@ -148,18 +150,12 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <Box
-                              key={Component.name}
-                              display="flex"
-                              flexDirection="column"
-                              height="100%"
-                            >
+                            <Fragment key={Component.name}>
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
                                 width="100%"
-                                flex="1"
-                                minHeight="0"
+                                height="100%"
                               >
                                 <Box
                                   width="100%"
@@ -171,7 +167,7 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </Box>
+                            </Fragment>
                           }
                           path={path}
                         />

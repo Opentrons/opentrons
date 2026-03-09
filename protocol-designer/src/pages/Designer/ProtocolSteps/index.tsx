@@ -64,7 +64,6 @@ import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData } from '/protocol-designer/form-types'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -140,16 +139,16 @@ export function ProtocolSteps({
         dispatch(saveProtocolFile())
       },
     })
-  let currentStep: FormData | null
-  if (formData?.stepType === 'flexStacker') {
-    currentStep = formData
-  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+
+  let currentStep
+  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
+
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
@@ -169,16 +168,11 @@ export function ProtocolSteps({
     }
   }
 
-  useEffect(
-    () => {
-      if (selectedStepId != null) {
-        handleScrollToTop()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedStepId]
-  )
+  useEffect(() => {
+    if (selectedStepId != null) {
+      handleScrollToTop()
+    }
+  }, [selectedStepId])
 
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
@@ -190,49 +184,36 @@ export function ProtocolSteps({
   const zoomedInOnOffDeck =
     zoomedInSlot != null && labware[zoomedInSlot] != null
   //  zoom in already if you are exiting from adding liquids
-  useEffect(
-    () => {
-      if (zoomedInSlot != null && !zoomedInOnOffDeck) {
-        const zoomInSlotPosition = getPositionFromSlotId(
-          zoomedInSlot ?? '',
-          deckDef
-        )
-        if (zoomInSlotPosition != null) {
-          const zoomedInViewBox = zoomInOnCoordinate({
-            x: zoomInSlotPosition[0],
-            y: zoomInSlotPosition[1],
+  useEffect(() => {
+    if (zoomedInSlot != null && !zoomedInOnOffDeck) {
+      const zoomInSlotPosition = getPositionFromSlotId(
+        zoomedInSlot ?? '',
+        deckDef
+      )
+      if (zoomInSlotPosition != null) {
+        const zoomedInViewBox = zoomInOnCoordinate({
+          x: zoomInSlotPosition[0],
+          y: zoomInSlotPosition[1],
 
-            deckDef,
-          })
-          setViewBox(zoomedInViewBox)
-        }
-      } else if (
-        zoomedInOnOffDeck &&
-        selectedTerminalItemId! === START_TERMINAL_ITEM_ID
-      ) {
-        setDeckView(rightString)
+          deckDef,
+        })
+        setViewBox(zoomedInViewBox)
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [zoomedInSlot, labware, zoomedInOnOffDeck]
-  )
+    } else if (zoomedInOnOffDeck) {
+      setDeckView(rightString)
+    }
+  }, [zoomedInSlot, labware, zoomedInOnOffDeck])
 
   //  zoom out if you select on any step other than starting deck state in the timeline toolbox
-  useEffect(
-    () => {
-      if (
-        zoomedInSlot != null &&
-        selectedTerminalItemId !== START_TERMINAL_ITEM_ID
-      ) {
-        dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-        setViewBox(initialViewBox)
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [zoomedInSlot, selectedTerminalItemId]
-  )
+  useEffect(() => {
+    if (
+      zoomedInSlot != null &&
+      selectedTerminalItemId !== START_TERMINAL_ITEM_ID
+    ) {
+      dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+      setViewBox(initialViewBox)
+    }
+  }, [zoomedInSlot, selectedTerminalItemId])
 
   return (
     <>
@@ -278,6 +259,7 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
+                zIndex={showDefineLiquidModal ? 1 : 1000}
               >
                 <ExportButton onClick={handleExportClick} />
               </Flex>
@@ -351,7 +333,6 @@ export function ProtocolSteps({
                     hoverSlot={hoverSlot}
                     setHoverSlot={setHoverSlot}
                     robotType={robotType}
-                    currentStep={currentStep}
                   />
                 ) : (
                   <OffDeck setOverflowMenu={showLiquidOverflowMenu} />

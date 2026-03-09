@@ -1,22 +1,21 @@
-from typing import AsyncGenerator, Type, Union
-
-import mock
+from typing import Type, Union, AsyncGenerator
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
+import mock
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    SerialConnection,
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.asyncio.communication.errors import (
+    NoResponse,
     AlarmResponse,
+    ErrorResponse,
+    UnhandledGcode,
     BaseErrorCode,
     DefaultErrorCodes,
-    ErrorResponse,
-    NoResponse,
-    UnhandledGcode,
-)
-from opentrons.drivers.asyncio.communication.serial_connection import (
-    AsyncResponseSerialConnection,
-    SerialConnection,
 )
 
 
@@ -36,7 +35,7 @@ SerialKind = Union[AsyncResponseSerialConnection, SerialConnection]
 # Async because SerialConnection.__init__() needs an event loop,
 # so this fixture needs to run in an event loop.
 @pytest.fixture(
-    params=[AsyncResponseSerialConnection, SerialConnection],
+    params=[AsyncResponseSerialConnection, SerialConnection],  # type: ignore[return]
 )
 async def subject(
     request: SubRequest, mock_serial_port: AsyncMock, ack: str
@@ -66,8 +65,6 @@ async def subject(
             error_keyword="error",
             alarm_keyword="alarm",
         )
-    else:
-        raise AssertionError(f"Unexpected serial_class: {serial_class}")
 
 
 @pytest.fixture

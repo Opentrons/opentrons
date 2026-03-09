@@ -4,8 +4,6 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { ComponentProps } from 'react'
-
 const BASE_STYLES = css`
   border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
@@ -83,22 +81,9 @@ const STYLE_MAP = {
   `,
 }
 
-type ButtonType = 'primary' | 'secondary' | 'white'
-
-type TertiaryButtonProps = Omit<ComponentProps<typeof Btn>, 'ref'> & {
-  buttonType: ButtonType
-}
-
-const StyledTertiaryButton = styled(Btn)<{
-  $buttonType: ButtonType
+export const TertiaryButton = styled(Btn)<{
+  buttonType: 'primary' | 'secondary' | 'white'
 }>`
   ${BASE_STYLES}
-  ${({ $buttonType }) => STYLE_MAP[$buttonType]}
+  ${({ buttonType }) => STYLE_MAP[buttonType] || ''}
 `
-
-export function TertiaryButton({
-  buttonType,
-  ...props
-}: TertiaryButtonProps): JSX.Element {
-  return <StyledTertiaryButton $buttonType={buttonType} {...props} />
-}

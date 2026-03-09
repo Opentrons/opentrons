@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Service"
-description: "Opentrons Care, repairs, preventive maintenance, and service plans."
 ---
 
 Opentrons Flex is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair Flex yourself. Opentrons offers multiple levels of service for Flex and related Opentrons hardware, some of which include maintenance and repairs.

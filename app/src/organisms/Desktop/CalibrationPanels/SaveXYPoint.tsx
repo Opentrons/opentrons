@@ -222,12 +222,12 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t(isHealthCheck ? 'check_xy_axes' : 'calibrate_xy_axes', {
                 slotName: slotNumber,
               })}
             </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
+            <LegacyStyledText as="p">
               {t('jog_pipette_to_touch_cross', { slotName: slotNumber })}
             </LegacyStyledText>
           </Flex>

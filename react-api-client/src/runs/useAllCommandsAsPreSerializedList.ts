@@ -9,6 +9,7 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   CommandsData,
   GetRunCommandsParams,
+  HostConfig,
   RunCommandSummary,
 } from '@opentrons/api-client'
 
@@ -47,8 +48,8 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
     ],
     () => {
       return getCommandsAsPreSerializedList(
-        host!,
-        runId!,
+        host as HostConfig,
+        runId as string,
         finalizedParams
       ).then(response => {
         const responseData = response.data

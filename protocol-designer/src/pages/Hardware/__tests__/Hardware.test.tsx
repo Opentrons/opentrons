@@ -17,7 +17,6 @@ vi.mock('../../../feature-flags/selectors')
 vi.mock('../../../tutorial/selectors')
 vi.mock('../../../components/organisms/FlexHardware')
 vi.mock('../../../components/organisms/Ot2Modules')
-
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>

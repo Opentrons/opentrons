@@ -11,13 +11,10 @@ import styles from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCa
 
 import type { JSX } from 'react'
 
-export function RobotSettingsCameraControls({
-  disabled,
-}: {
-  disabled: boolean
-}): JSX.Element {
+export function RobotSettingsCameraControls(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
+
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -36,7 +33,7 @@ export function RobotSettingsCameraControls({
             {t('configure_camera_settings')}
           </StyledText>
         </div>
-        <TertiaryButton onClick={toggleControls} disabled={disabled}>
+        <TertiaryButton onClick={toggleControls}>
           <StyledText desktopStyle="captionSemiBold">
             {t('edit_settings')}
           </StyledText>
@@ -44,7 +41,7 @@ export function RobotSettingsCameraControls({
       </div>
       {showControls &&
         createPortal(
-          <CameraControls onClose={toggleControls} runId={null} />,
+          <CameraControls onClose={toggleControls} />,
           getTopPortalEl()
         )}
     </div>

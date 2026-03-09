@@ -5,7 +5,6 @@
   },
   "commands": [
     {
-      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +17,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -40,7 +38,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1236,7 +1233,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1251,7 +1247,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1272,7 +1267,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1655,7 +1649,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2864,7 +2857,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4163,7 +4155,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5346,7 +5337,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6538,7 +6528,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7715,7 +7704,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8892,7 +8880,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10071,7 +10058,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11248,7 +11234,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12425,7 +12410,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13602,7 +13586,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14779,7 +14762,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15956,7 +15938,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17136,7 +17117,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17156,7 +17136,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17176,7 +17155,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17195,7 +17173,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17214,7 +17191,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17233,7 +17209,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17252,7 +17227,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17271,7 +17245,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17290,7 +17263,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17309,7 +17281,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17328,7 +17299,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17347,7 +17317,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17366,7 +17335,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17385,7 +17353,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17404,7 +17371,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17423,7 +17389,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17442,7 +17407,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17461,7 +17425,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17480,7 +17443,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17499,7 +17461,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17518,7 +17479,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17537,7 +17497,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17556,7 +17515,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17575,7 +17533,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17594,7 +17551,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17613,7 +17569,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17632,7 +17587,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17651,7 +17605,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17670,7 +17623,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17689,7 +17641,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17708,7 +17659,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17727,7 +17677,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17746,7 +17695,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17765,7 +17713,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17784,7 +17731,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17803,7 +17749,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17822,7 +17767,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17841,7 +17785,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17860,7 +17803,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17879,7 +17821,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17898,7 +17839,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17917,7 +17857,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17936,7 +17875,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17955,7 +17893,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17974,7 +17911,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17993,7 +17929,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18012,7 +17947,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18031,7 +17965,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18050,7 +17983,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18069,7 +18001,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18088,7 +18019,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18107,7 +18037,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18126,7 +18055,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18145,7 +18073,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18164,7 +18091,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18183,7 +18109,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18202,7 +18127,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18221,7 +18145,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18240,7 +18163,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18259,7 +18181,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18278,7 +18199,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18297,7 +18217,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18316,7 +18235,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18335,7 +18253,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18354,7 +18271,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18373,7 +18289,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18392,7 +18307,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18411,7 +18325,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18430,7 +18343,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18449,7 +18361,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18468,7 +18379,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18487,7 +18397,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18506,7 +18415,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18525,7 +18433,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18544,7 +18451,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18563,7 +18469,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18582,7 +18487,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18601,7 +18505,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18620,7 +18523,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18639,7 +18541,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18658,7 +18559,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18677,7 +18577,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18696,7 +18595,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18715,7 +18613,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18730,7 +18627,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18764,7 +18660,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18799,7 +18694,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18834,7 +18728,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18869,7 +18762,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18904,7 +18796,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18939,7 +18830,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18975,7 +18865,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19010,7 +18899,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19046,7 +18934,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19081,7 +18968,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19117,7 +19003,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19152,7 +19037,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19188,7 +19072,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19223,7 +19106,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19259,7 +19141,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19294,7 +19175,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19330,7 +19210,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19365,7 +19244,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19401,7 +19279,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19436,7 +19313,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19472,7 +19348,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19507,7 +19382,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19543,7 +19417,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19578,7 +19451,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19613,7 +19485,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19648,7 +19519,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19683,7 +19553,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19717,7 +19586,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19746,7 +19614,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19761,7 +19628,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19776,7 +19642,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19791,7 +19656,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19825,7 +19689,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19860,7 +19723,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19895,7 +19757,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19930,7 +19791,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19966,7 +19826,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20001,7 +19860,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20037,7 +19895,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20072,7 +19929,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20107,7 +19963,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20140,7 +19995,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20174,7 +20028,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20203,7 +20056,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20218,7 +20070,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20236,7 +20087,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20251,7 +20101,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20266,7 +20115,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20281,7 +20129,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20315,7 +20162,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20350,7 +20196,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20386,7 +20231,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20421,7 +20265,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20457,7 +20300,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20492,7 +20334,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20528,7 +20369,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20563,7 +20403,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20599,7 +20438,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20634,7 +20472,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20670,7 +20507,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20705,7 +20541,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20741,7 +20576,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20776,7 +20610,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20812,7 +20645,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20847,7 +20679,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20883,7 +20714,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20918,7 +20748,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20954,7 +20783,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20989,7 +20817,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21025,7 +20852,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21060,7 +20886,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21096,7 +20921,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21131,7 +20955,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21167,7 +20990,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21202,7 +21024,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21238,7 +21059,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21273,7 +21093,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21309,7 +21128,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21344,7 +21162,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21380,7 +21197,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21415,7 +21231,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21451,7 +21266,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21486,7 +21300,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21522,7 +21335,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21557,7 +21369,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21593,7 +21404,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21628,7 +21438,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21664,7 +21473,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21699,7 +21507,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21734,7 +21541,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21769,7 +21575,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21804,7 +21609,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21839,7 +21643,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21875,7 +21678,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21910,7 +21712,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21946,7 +21747,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21981,7 +21781,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22016,7 +21815,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22049,7 +21847,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22083,7 +21880,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22112,7 +21908,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22127,7 +21922,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22145,7 +21939,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22160,7 +21953,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22175,7 +21967,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22192,7 +21983,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22263,7 +22053,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22278,7 +22067,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22293,7 +22081,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22327,7 +22114,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22362,7 +22148,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22397,7 +22182,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22430,7 +22214,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22465,7 +22248,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22500,7 +22282,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22533,7 +22314,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22562,7 +22342,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22577,7 +22356,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22648,7 +22426,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22663,7 +22440,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22678,7 +22454,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22712,7 +22487,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22747,7 +22521,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22782,7 +22555,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22817,7 +22589,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22853,7 +22624,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22888,7 +22658,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22924,7 +22693,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22959,7 +22727,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22995,7 +22762,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23030,7 +22796,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23066,7 +22831,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23101,7 +22865,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23137,7 +22900,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23172,7 +22934,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23208,7 +22969,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23243,7 +23003,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23279,7 +23038,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23314,7 +23072,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23350,7 +23107,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23385,7 +23141,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23421,7 +23176,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23456,7 +23210,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23492,7 +23245,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23527,7 +23279,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23563,7 +23314,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23598,7 +23348,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23634,7 +23383,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23669,7 +23417,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23705,7 +23452,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23740,7 +23486,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23776,7 +23521,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23811,7 +23555,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23846,7 +23589,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23880,7 +23622,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23909,7 +23650,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23924,7 +23664,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23941,7 +23680,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24012,7 +23750,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24027,7 +23764,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24042,7 +23778,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24076,7 +23811,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24111,7 +23845,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24146,7 +23879,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24181,7 +23913,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24214,7 +23945,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24243,7 +23973,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24258,7 +23987,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24329,7 +24057,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24344,7 +24071,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24359,7 +24085,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24393,7 +24118,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24428,7 +24152,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24463,7 +24186,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24498,7 +24220,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24534,7 +24255,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24569,7 +24289,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24605,7 +24324,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24640,7 +24358,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24676,7 +24393,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24711,7 +24427,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24747,7 +24462,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24782,7 +24496,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24818,7 +24531,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24853,7 +24565,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24889,7 +24600,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24924,7 +24634,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24960,7 +24669,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24995,7 +24703,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25031,7 +24738,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25066,7 +24772,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25102,7 +24807,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25137,7 +24841,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25173,7 +24876,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25208,7 +24910,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25244,7 +24945,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25279,7 +24979,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25315,7 +25014,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25350,7 +25048,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25386,7 +25083,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25421,7 +25117,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25457,7 +25152,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25492,7 +25186,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25527,7 +25220,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25561,7 +25253,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25590,7 +25281,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25605,7 +25295,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25622,7 +25311,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25693,7 +25381,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25708,7 +25395,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25723,7 +25409,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25757,7 +25442,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25792,7 +25476,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25827,7 +25510,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25862,7 +25544,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25895,7 +25576,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25924,7 +25604,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -25939,7 +25618,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26010,7 +25688,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26025,7 +25702,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26040,7 +25716,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26074,7 +25749,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26109,7 +25783,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26144,7 +25817,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26179,7 +25851,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26215,7 +25886,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26250,7 +25920,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26286,7 +25955,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26321,7 +25989,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26357,7 +26024,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26392,7 +26058,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26428,7 +26093,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26463,7 +26127,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26499,7 +26162,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26534,7 +26196,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26570,7 +26231,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26605,7 +26265,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26641,7 +26300,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26676,7 +26334,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26712,7 +26369,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26747,7 +26403,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26783,7 +26438,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26818,7 +26472,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26854,7 +26507,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26889,7 +26541,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26925,7 +26576,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26960,7 +26610,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -26996,7 +26645,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27031,7 +26679,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27067,7 +26714,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27102,7 +26748,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27138,7 +26783,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27173,7 +26817,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27208,7 +26851,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27242,7 +26884,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27271,7 +26912,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27286,7 +26926,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27303,7 +26942,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27374,7 +27012,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27389,7 +27026,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27404,7 +27040,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27438,7 +27073,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27473,7 +27107,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27508,7 +27141,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27543,7 +27175,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27576,7 +27207,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27605,7 +27235,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27620,7 +27249,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27691,7 +27319,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27706,7 +27333,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27721,7 +27347,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27755,7 +27380,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27790,7 +27414,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27825,7 +27448,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27860,7 +27482,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27896,7 +27517,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27931,7 +27551,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27967,7 +27586,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28002,7 +27620,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28038,7 +27655,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28073,7 +27689,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28109,7 +27724,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28144,7 +27758,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28180,7 +27793,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28215,7 +27827,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28251,7 +27862,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28286,7 +27896,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28322,7 +27931,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28357,7 +27965,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28393,7 +28000,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28428,7 +28034,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28464,7 +28069,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28499,7 +28103,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28535,7 +28138,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28570,7 +28172,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28606,7 +28207,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28641,7 +28241,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28677,7 +28276,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28712,7 +28310,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28748,7 +28345,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28783,7 +28379,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28819,7 +28414,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28854,7 +28448,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28889,7 +28482,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28923,7 +28515,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28952,7 +28543,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28967,7 +28557,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -28984,7 +28573,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29055,7 +28643,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29070,7 +28657,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29085,7 +28671,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29119,7 +28704,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29154,7 +28738,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29189,7 +28772,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29222,7 +28804,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29257,7 +28838,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29292,7 +28872,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29325,7 +28904,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29354,7 +28932,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29369,7 +28946,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29384,7 +28960,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29399,7 +28974,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29433,7 +29007,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29468,7 +29041,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29503,7 +29075,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29538,7 +29109,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29574,7 +29144,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29609,7 +29178,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29645,7 +29213,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29680,7 +29247,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29715,7 +29281,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29730,7 +29295,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29765,7 +29329,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29800,7 +29363,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29833,7 +29395,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29867,7 +29428,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29896,7 +29456,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29911,7 +29470,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29945,7 +29503,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -29980,7 +29537,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30015,7 +29571,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30050,7 +29605,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30086,7 +29640,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30121,7 +29674,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30157,7 +29709,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30192,7 +29743,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30227,7 +29777,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30242,7 +29791,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30277,7 +29825,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30312,7 +29859,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30345,7 +29891,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30379,7 +29924,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30408,7 +29952,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30423,7 +29966,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30457,7 +29999,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30492,7 +30033,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30527,7 +30067,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30562,7 +30101,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30598,7 +30136,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30633,7 +30170,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30669,7 +30205,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30704,7 +30239,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30739,7 +30273,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30754,7 +30287,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30789,7 +30321,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30824,7 +30355,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30857,7 +30387,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30891,7 +30420,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30920,7 +30448,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -30935,7 +30462,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31006,7 +30532,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31021,7 +30546,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31036,7 +30560,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31051,7 +30574,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31085,7 +30607,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31120,7 +30641,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31156,7 +30676,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31191,7 +30710,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31227,7 +30745,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31262,7 +30779,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31298,7 +30814,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31333,7 +30848,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31369,7 +30883,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31404,7 +30917,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31440,7 +30952,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31475,7 +30986,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31511,7 +31021,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31546,7 +31055,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31582,7 +31090,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31617,7 +31124,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31653,7 +31159,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31688,7 +31193,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31724,7 +31228,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31759,7 +31262,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31794,7 +31296,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31829,7 +31330,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31865,7 +31365,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31900,7 +31399,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31935,7 +31433,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31970,7 +31467,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32004,7 +31500,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32039,7 +31534,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32073,7 +31567,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32108,7 +31601,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32144,7 +31636,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32179,7 +31670,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32214,7 +31704,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32249,7 +31738,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32283,7 +31771,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32318,7 +31805,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32352,7 +31838,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32387,7 +31872,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32423,7 +31907,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32458,7 +31941,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32493,7 +31975,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32528,7 +32009,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32562,7 +32042,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32597,7 +32076,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32631,7 +32109,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32666,7 +32143,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32702,7 +32178,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32737,7 +32212,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32772,7 +32246,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32807,7 +32280,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32841,7 +32313,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32876,7 +32347,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32910,7 +32380,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32945,7 +32414,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -32981,7 +32449,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33016,7 +32483,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33051,7 +32517,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33086,7 +32551,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33120,7 +32584,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33155,7 +32618,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33189,7 +32651,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33224,7 +32685,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33260,7 +32720,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33295,7 +32754,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33330,7 +32788,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33365,7 +32822,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33399,7 +32855,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33434,7 +32889,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33468,7 +32922,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33503,7 +32956,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33539,7 +32991,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33574,7 +33025,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33609,7 +33059,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33644,7 +33093,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33678,7 +33126,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33713,7 +33160,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33747,7 +33193,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33782,7 +33227,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33818,7 +33262,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33853,7 +33296,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33888,7 +33330,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33923,7 +33364,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33957,7 +33397,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -33992,7 +33431,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34026,7 +33464,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34055,7 +33492,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34070,7 +33506,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34104,7 +33539,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34139,7 +33573,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34175,7 +33608,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34210,7 +33642,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34246,7 +33677,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34281,7 +33711,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34316,7 +33745,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34351,7 +33779,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34386,7 +33813,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34401,7 +33827,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34434,7 +33859,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34468,7 +33892,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34497,7 +33920,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34512,7 +33934,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34527,7 +33948,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34545,7 +33965,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/waitForTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34560,7 +33979,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34578,7 +33996,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34593,7 +34010,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34608,7 +34024,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34651,7 +34066,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34703,7 +34117,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34718,7 +34131,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34733,7 +34145,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34767,7 +34178,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34802,7 +34212,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34837,7 +34246,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34872,7 +34280,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34908,7 +34315,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34943,7 +34349,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -34978,7 +34383,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35011,7 +34415,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35045,7 +34448,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35074,7 +34476,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35089,7 +34490,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35106,7 +34506,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35177,7 +34576,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35192,7 +34590,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35226,7 +34623,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35261,7 +34657,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35296,7 +34691,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35331,7 +34725,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35366,7 +34759,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35399,7 +34791,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35433,7 +34824,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -35462,7 +34852,6 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

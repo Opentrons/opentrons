@@ -1,7 +1,7 @@
-from opentrons_shared_data.util import StrEnum
+from enum import Enum
 
 
-class LogIdentifier(StrEnum):
+class LogIdentifier(str, Enum):
     """Identifier of the log"""
 
     api = "api.log"
@@ -13,7 +13,7 @@ class LogIdentifier(StrEnum):
     touchscreen = "touchscreen.log"
 
 
-class LogFormat(StrEnum):
+class LogFormat(str, Enum):
     """Format to use for log records"""
 
     text = "text"

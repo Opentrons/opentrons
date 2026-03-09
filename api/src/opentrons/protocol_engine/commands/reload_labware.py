@@ -1,20 +1,18 @@
 """Reload labware command request, result, and implementation models."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional, Type
-
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from .labware_handling_common import LabwarePositionResultMixin
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from .labware_handling_common import LabwarePositionResultMixin
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
     from ..state.state import StateView
+    from ..execution import EquipmentHandler
 
 
 ReloadLabwareCommandType = Literal["reloadLabware"]

@@ -133,23 +133,11 @@ async function usbListener(
       ...config,
       data,
       headers: { ...config.headers, ...formHeaders },
-      // Axios can't create proper blob types on the node layer, so we use
-      // arraybuffer instead.
-      responseType:
-        config.responseType === 'blob' ? 'arraybuffer' : config.responseType,
     })
     usbLog.silly(`${config.method} ${config.url} resolved ok`)
-
-    // Convert ArrayBuffer to regular Array for IPC transfer, since ArrayBuffer
-    //  objects cannot be sent across the IPC reliably.
-    const responseData =
-      config.responseType === 'blob' && response.data instanceof ArrayBuffer
-        ? Array.from(new Uint8Array(response.data))
-        : response.data
-
     return {
       error: null,
-      data: responseData,
+      data: response.data,
       status: response.status,
       statusText: response.statusText,
     }
@@ -205,6 +193,7 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
       }
     })
     .catch(e =>
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       usbLog.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
     )
 }

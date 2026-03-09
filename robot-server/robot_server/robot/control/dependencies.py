@@ -1,22 +1,22 @@
 """Dependencies related to /robot/control endpoints."""
-
 from typing import Annotated
 
-from fastapi import Depends, status
+from fastapi import status, Depends
 
 from opentrons.hardware_control import ThreadManagedHardware
 
-from .estop_handler import EstopHandler
+from robot_server.errors.error_responses import ApiError
+from robot_server.errors.robot_errors import (
+    EstopNotAttached,
+    EstopEngaged,
+    EstopNotAcknowledged,
+)
+
 from .models import (
     EstopState,
 )
-from robot_server.errors.error_responses import ApiError
-from robot_server.errors.robot_errors import (
-    EstopEngaged,
-    EstopNotAcknowledged,
-    EstopNotAttached,
-)
-from robot_server.hardware import get_ot3_hardware, get_thread_manager
+from .estop_handler import EstopHandler
+from robot_server.hardware import get_thread_manager, get_ot3_hardware
 
 
 async def require_estop_in_good_state(

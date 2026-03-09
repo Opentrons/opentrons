@@ -2,7 +2,6 @@ import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
 import type {
-  CompletedProtocolAnalysis,
   Liquid,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -162,7 +161,6 @@ export type NotifyTopic =
   | `robot-server/runs/${string}`
   | `robot-server/runs/pre_serialized_commands/${string}`
   | `robot-server/dataFiles/${string}/images`
-  | 'robot-server/camera'
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -211,7 +209,7 @@ export interface StepDetailViewerOpenAction {
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
-    analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
+    analysis: ProtocolAnalysisOutput
     liquids: Liquid[]
   }
   meta: {
@@ -223,21 +221,13 @@ export interface StepDetailViewerUpdateAction {
   type: 'shell:STEP_DETAIL_VIEWER_UPDATE'
   payload: {
     protocolKey: string
-    slot: string | null
+    slot: string
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
-    analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
+    analysis: ProtocolAnalysisOutput
     liquids: Liquid[]
   }
-  meta: {
-    shell: true
-  }
-}
-
-export interface StepDetailViewerCloseAction {
-  type: 'shell:STEP_DETAIL_VIEWER_CLOSE'
-  payload: { protocolKey: string }
   meta: {
     shell: true
   }
@@ -261,8 +251,6 @@ export type ShellAction =
   | CameraStreamOpenAction
   | CameraPhotoOpenAction
   | StepDetailViewerOpenAction
-  | StepDetailViewerUpdateAction
-  | StepDetailViewerCloseAction
 
 export type IPCSafeFormDataEntry =
   | {

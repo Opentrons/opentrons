@@ -1,29 +1,29 @@
 import logging
 from typing import Awaitable, Optional, cast
-
-from opentrons.protocol_api import labware
 from opentrons.types import Mount
-
-from ..configuration import SessionConfiguration
-from ..models.session import PipetteOffsetCalibrationResponseAttributes, SessionType
-from .base_session import BaseSession, SessionMetaData
+from opentrons.protocol_api import labware
+from robot_server.robot.calibration.pipette_offset.user_flow import (
+    PipetteOffsetCalibrationUserFlow,
+)
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.pipette_offset.models import (
     PipetteOffsetCalibrationSessionStatus,
 )
-from robot_server.robot.calibration.pipette_offset.user_flow import (
-    PipetteOffsetCalibrationUserFlow,
+from robot_server.service.session.errors import (
+    SessionCreationException,
+    CommandExecutionException,
 )
 from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
-    CommandExecutor,
     CompletedCommand,
+    CommandExecutor,
 )
-from robot_server.service.session.errors import (
-    CommandExecutionException,
-    SessionCreationException,
-)
+
+from .base_session import BaseSession, SessionMetaData
+from ..configuration import SessionConfiguration
+from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttributes
+
 
 log = logging.getLogger(__name__)
 
@@ -91,9 +91,9 @@ class PipetteOffsetCalibrationSession(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler: Optional[Awaitable[None]] = (
-                configuration.hardware.set_lights(rails=False)
-            )
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

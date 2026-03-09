@@ -55,17 +55,16 @@ export const ProtocolLiquidsDetails = (
                 flexDirection={DIRECTION_COLUMN}
                 marginY={SPACING.spacing16}
               >
-                <Flex
-                  flexDirection={DIRECTION_ROW}
-                  alignItems={ALIGN_CENTER}
-                  gap={SPACING.spacing16}
-                >
+                <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
                   <LiquidIcon color={liquid.displayColor} />
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
                     justifyContent={JUSTIFY_CENTER}
                   >
-                    <StyledText desktopStyle="bodyDefaultSemiBold">
+                    <StyledText
+                      desktopStyle="bodyDefaultSemiBold"
+                      marginX={SPACING.spacing16}
+                    >
                       {liquid.displayName}
                     </StyledText>
                     <StyledText
@@ -97,10 +96,7 @@ export const ProtocolLiquidsDetails = (
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
-          <LegacyStyledText
-            forwardedAs="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
+          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {i18n.format(t('liquids_not_in_protocol'), 'capitalize')}
           </LegacyStyledText>
         </Flex>

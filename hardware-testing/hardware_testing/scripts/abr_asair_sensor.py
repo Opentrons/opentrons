@@ -49,7 +49,7 @@ class _ABRAsairSensor:
             print(
                 "There are no google sheets credentials. Make sure credentials in jupyter notebook."
             )
-        results_list: List[List[object]] = []
+        results_list = []  # type: List
         timezone = pytz.timezone("America/New_York")
         start_time = datetime.datetime.now(timezone)
         # start_time = datetime.datetime.now(tz=tzinfo.utcoffset(timezone))

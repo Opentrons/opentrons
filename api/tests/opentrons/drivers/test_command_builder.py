@@ -1,7 +1,6 @@
 from typing import Optional
 
 import pytest
-
 from opentrons.drivers.command_builder import CommandBuilder
 
 

@@ -1,15 +1,10 @@
 """Worker thread to write serial data."""
-
-import logging
-import threading
-import time
-from queue import Queue
 from typing import Tuple
-
-import serial  # type: ignore[import-untyped]
 from typing_extensions import TypeAlias
-
-LOG = logging.getLogger(__name__)
+import serial  # type: ignore[import-untyped]
+import threading
+from queue import Queue
+import time
 
 QUEUE_WRITE_ITEM: TypeAlias = Tuple[serial.Serial, bytes]
 
@@ -30,7 +25,7 @@ def _try_write_all_data(serial: serial.Serial, data: bytes, packet_limit: int) -
             sent += serial.write(data[sent : min(sent + packet_limit, len(data))])
         except Exception as e:
             # Any exception means we need to quit
-            LOG.error(f"Failed to write: {e}")
+            print(f"Failed to write: {e}")
             return
         if sent < len(data):
             tries += 1

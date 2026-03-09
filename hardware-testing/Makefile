@@ -190,7 +190,6 @@ push-no-restart-ot3: wheel Pipfile.lock
 .PHONY: push-ot3
 push-ot3:
 	$(MAKE) push-no-restart-ot3
-	$(MAKE) restart-ot3
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3

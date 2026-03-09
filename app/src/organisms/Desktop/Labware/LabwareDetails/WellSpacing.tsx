@@ -43,23 +43,16 @@ export function WellSpacing(props: WellSpacingProps): JSX.Element {
   const shape = wellProperties.shape?.shape
 
   const diagram = getSpacingDiagram({
-    category,
+    category: category,
     guideType: 'spacing',
-    shape,
-    isMultiRow,
-  }).map(src => (
-    <img
-      width="250px"
-      src={src}
-      key={src}
-      alt={`Image of ${labelSuffix ?? ''}`}
-    />
-  ))
+    shape: shape,
+    isMultiRow: isMultiRow,
+  }).map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
     <>
       <ExpandingTitle
-        label={`${t('spacing')} ${labelSuffix ?? ''}`}
+        label={`${t('spacing')} ${labelSuffix != null ? labelSuffix : ''}`}
         diagram={diagram}
       />
       {spacing.map((s, index) => (

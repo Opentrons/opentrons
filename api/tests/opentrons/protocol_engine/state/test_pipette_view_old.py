@@ -6,59 +6,58 @@ treating PipetteState as a private implementation detail.
 """
 
 from collections import OrderedDict
-from typing import Dict, List, NamedTuple, Optional, Tuple, cast
+from typing import cast, Dict, List, Optional, Tuple, NamedTuple
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.pipette.pipette_definition import (
-    AvailableSensorDefinition,
-    ValidNozzleMaps,
-)
-from opentrons_shared_data.pipette.types import (
-    LiquidClasses as VolumeModes,
-)
+
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.pipette_definition import (
+    ValidNozzleMaps,
+    AvailableSensorDefinition,
 )
 
-from ..pipette_fixtures import (
-    EIGHT_CHANNEL_COLS,
-    EIGHT_CHANNEL_MAP,
-    EIGHT_CHANNEL_ROWS,
-    NINETY_SIX_COLS,
-    NINETY_SIX_MAP,
-    NINETY_SIX_ROWS,
-    get_default_nozzle_map,
-)
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control import CriticalPoint
+from opentrons.types import MountType, Mount as HwMount, Point, NozzleConfigurationType
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.errors import PipetteNotLoadedError, TipNotAttachedError
-from opentrons.protocol_engine.state import fluid_stack
-from opentrons.protocol_engine.state.pipettes import (
-    BoundingNozzlesOffsets,
-    CurrentDeckPoint,
-    HardwarePipette,
-    PipetteBoundingBoxOffsets,
-    PipetteState,
-    PipetteView,
-    StaticPipetteConfig,
-)
 from opentrons.protocol_engine.types import (
-    CurrentPipetteLocation,
-    DeckPoint,
-    FlowRates,
-    LabwareWellId,
     LoadedPipette,
     MotorAxis,
+    FlowRates,
+    DeckPoint,
+    CurrentPipetteLocation,
     TipGeometry,
+    LabwareWellId,
 )
-from opentrons.types import Mount as HwMount
-from opentrons.types import MountType, NozzleConfigurationType, Point
+from opentrons.protocol_engine.state.pipettes import (
+    PipetteState,
+    PipetteView,
+    CurrentDeckPoint,
+    HardwarePipette,
+    StaticPipetteConfig,
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
+)
+from opentrons.protocol_engine.state import fluid_stack
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
+
+from ..pipette_fixtures import (
+    NINETY_SIX_ROWS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    EIGHT_CHANNEL_ROWS,
+    EIGHT_CHANNEL_COLS,
+    EIGHT_CHANNEL_MAP,
+    get_default_nozzle_map,
+)
 
 _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
     back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)
@@ -326,7 +325,6 @@ def test_get_pipette_working_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
-                available_volume_modes_min_vol={},
             )
         },
     )
@@ -368,7 +366,6 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
-                available_volume_modes_min_vol={},
             )
         },
     )
@@ -422,7 +419,6 @@ def test_get_pipette_available_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
-                available_volume_modes_min_vol={},
             ),
             "pipette-id-none": StaticPipetteConfig(
                 min_volume=1,
@@ -448,7 +444,6 @@ def test_get_pipette_available_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
-                available_volume_modes_min_vol={},
             ),
         },
     )
@@ -571,7 +566,6 @@ def test_get_static_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
     )
 
     subject = get_pipette_view(
@@ -633,7 +627,6 @@ def test_get_nominal_tip_overlap(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
@@ -1070,7 +1063,6 @@ def test_get_pipette_bounds_at_location(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
-                available_volume_modes_min_vol={},
             )
         },
     )

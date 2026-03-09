@@ -45,6 +45,7 @@ import type {
   CreateCommand,
   DeckConfiguration,
   LoadedPipette,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
@@ -82,16 +83,11 @@ export const BeforeBeginning = (
     deckConfig,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  useEffect(
-    () => {
-      if (createdMaintenanceRunId == null) {
-        createMaintenanceRun({})
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
+  }, [])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
@@ -99,7 +95,7 @@ export const BeforeBeginning = (
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
   const pipetteDisplayName = usePipetteNameSpecs(
-    requiredPipette?.pipetteName!
+    requiredPipette?.pipetteName as PipetteName
   )?.displayName
 
   if (

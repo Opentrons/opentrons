@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
 import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
@@ -26,6 +27,7 @@ export function MixTools(
     setShowFormErrors,
   } = props
   const pipettes = useSelector(getPipetteEntities)
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
 
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
@@ -44,6 +46,7 @@ export function MixTools(
       <FirstStepMixTools
         propsForFields={propsForFields}
         formData={formData}
+        enablePartialTip={enablePartialTip}
         pipettes={pipettes}
       />
     ),

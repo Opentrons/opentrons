@@ -1,9 +1,10 @@
 """Tests for the error recovery settings store."""
 
-import pytest
-import sqlalchemy
 
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+
+import pytest
+import sqlalchemy
 
 
 @pytest.fixture

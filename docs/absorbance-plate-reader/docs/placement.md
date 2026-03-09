@@ -1,6 +1,5 @@
 ---
 title: "Plate Reader: Deck Placement"
-description: "Compatible Flex deck slots (A3–D3) and caddy mounting for the plate reader."
 hide: toc
 ---
 

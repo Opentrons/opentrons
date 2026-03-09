@@ -1,5 +1,3 @@
-import { H1_NOZZLE, PARTIAL_COLUMN } from '@opentrons/shared-data'
-
 import { formatPyStr, indentPyLines, uuid } from '../../utils'
 
 import type { ConfigureNozzleLayoutParams } from '@opentrons/shared-data'
@@ -21,20 +19,11 @@ export const configureNozzleLayout: CommandCreator<
     },
   ]
   const pythonName = invariantContext.pipetteEntities[pipetteId].pythonName
-  let pythonArgs: string[]
-  if (style === PARTIAL_COLUMN) {
-    pythonArgs = [
-      `protocol_api.${style}`,
-      ...(primaryNozzle != null
-        ? [`start=${formatPyStr(H1_NOZZLE)}, end=${formatPyStr(primaryNozzle)}`]
-        : []),
-    ]
-  } else {
-    pythonArgs = [
-      `protocol_api.${style}`,
-      ...(primaryNozzle != null ? [`start=${formatPyStr(primaryNozzle)}`] : []),
-    ]
-  }
+
+  const pythonArgs = [
+    `protocol_api.${style}`,
+    ...(primaryNozzle != null ? [`start=${formatPyStr(primaryNozzle)}`] : []),
+  ]
 
   return {
     commands,

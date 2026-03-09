@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -58,21 +57,19 @@ const LIQUID_CARD_ODD_STYLE = css`
 `
 interface LiquidDetailCardProps {
   liquidId: string
-  displayName: string | null
+  displayName: string
   description: string | null
   displayColor: string
   volumeByWell: { [well: string]: number }
   setSelectedValue: Dispatch<SetStateAction<string | undefined>>
   selectedValue: string | undefined
   labwareWellOrdering: string[][]
-  totalLiquids?: number
 }
 
 export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const {
     liquidId,
     displayName,
-    totalLiquids,
     description,
     displayColor,
     volumeByWell,
@@ -82,10 +79,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   } = props
   const trackEvent = useTrackEvent()
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('protocol_setup')
-  const newDisplayName = totalLiquids
-    ? t('liquids_count', { totalLiquids: totalLiquids })
-    : displayName
+
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
@@ -136,7 +130,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing12}
         >
-          {newDisplayName}
+          {displayName}
         </LegacyStyledText>
         <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
@@ -231,13 +225,13 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
         <LegacyStyledText
-          forwardedAs="h3"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
-          {newDisplayName}
+          {displayName}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+        <LegacyStyledText as="p" color={COLORS.grey50}>
           {description != null ? description : null}
         </LegacyStyledText>
 
@@ -281,14 +275,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                 }
               >
                 <LegacyStyledText
-                  forwardedAs="p"
+                  as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginRight={SPACING.spacing4}
                 >
                   {well.wellName}
                 </LegacyStyledText>
                 <LegacyStyledText
-                  forwardedAs="p"
+                  as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                 >
                   {well.volume.toFixed(1)} {MICRO_LITERS}

@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import dataclasses
 from typing import Dict
-
 from typing_extensions import Optional
 
 from .. import errors
 from ..actions import Action, get_state_updates
 from ..types import LiquidClassRecord
 from . import update_types
-from ._abstract_store import HandlesActions, HasState
+from ._abstract_store import HasState, HandlesActions
 
 
 @dataclasses.dataclass
@@ -47,12 +46,12 @@ class LiquidClassStore(HasState[LiquidClassState], HandlesActions):
         self, state_update: update_types.LiquidClassLoadedUpdate
     ) -> None:
         # We're just a data store. All the validation and ID generation happens in the command implementation.
-        self._state.liquid_class_record_by_id[state_update.liquid_class_id] = (
-            state_update.liquid_class_record
-        )
-        self._state.liquid_class_record_to_id[state_update.liquid_class_record] = (
+        self._state.liquid_class_record_by_id[
             state_update.liquid_class_id
-        )
+        ] = state_update.liquid_class_record
+        self._state.liquid_class_record_to_id[
+            state_update.liquid_class_record
+        ] = state_update.liquid_class_id
 
 
 class LiquidClassView:

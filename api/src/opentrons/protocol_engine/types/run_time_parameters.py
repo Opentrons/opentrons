@@ -3,8 +3,7 @@
 """Protocol Engine types that have to do with runtime parameters."""
 
 from pathlib import Path
-from typing import Dict, List, Literal, Mapping, Optional, Union
-
+from typing import Optional, Mapping, Union, Literal, Dict, List
 from pydantic import (
     BaseModel,
     Field,

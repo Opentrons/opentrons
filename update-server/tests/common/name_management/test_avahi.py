@@ -1,8 +1,7 @@
 import pytest
-
 from otupdate.common.name_management.avahi import (
-    SERVICE_NAME_MAXIMUM_OCTETS,
     alternative_service_name,
+    SERVICE_NAME_MAXIMUM_OCTETS,
 )
 
 

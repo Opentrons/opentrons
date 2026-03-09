@@ -38,7 +38,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       <LegacyStyledText
-        forwardedAs="label"
+        as="label"
         fontWeight={
           isOnDevice
             ? TYPOGRAPHY.fontWeightRegular
@@ -58,16 +58,14 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         {[x, y, z].map((axis, index) => (
           <Fragment key={index}>
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               marginLeft={SPACING.spacing8}
               marginRight={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {axisLabels[index]}
             </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
-              {axis.toFixed(1)}
-            </LegacyStyledText>
+            <LegacyStyledText as="p">{axis.toFixed(1)}</LegacyStyledText>
           </Fragment>
         ))}
       </Flex>

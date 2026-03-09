@@ -37,6 +37,7 @@ class UnparsableCLICommandError(ValueError):
 
 class PollingGCodeAdditionError(ValueError):
     def __init__(self, invalid_g_code) -> None:
+
         super().__init__(
             f'Cannot add "{invalid_g_code}" to GCodeProgram because it is'
             f"a polling command"
@@ -46,5 +47,6 @@ class PollingGCodeAdditionError(ValueError):
 
 class ConfigurationNotFoundError(ValueError):
     def __init__(self, configuration_name) -> None:
+
         super().__init__(f'Configuration "{configuration_name}" not found')
         self.configuration_name = configuration_name

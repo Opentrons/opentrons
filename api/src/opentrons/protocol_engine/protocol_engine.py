@@ -2,69 +2,69 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Any, AsyncGenerator, Callable, Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Union, AsyncGenerator, Callable
 
 from opentrons_shared_data.errors import (
-    EnumeratedError,
     ErrorCodes,
+    EnumeratedError,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from . import commands, labware_offset_standardization, slot_standardization
-from .actions import (
-    ActionDispatcher,
-    AddAddressableAreaAction,
-    AddCameraCaptureImageSettingsAction,
-    AddCameraSettingsAction,
-    AddLabwareDefinitionAction,
-    AddLabwareOffsetAction,
-    AddLiquidAction,
-    AddModuleAction,
-    CreateUserCommandAnnotation,
-    FinishAction,
-    FinishErrorDetails,
-    HardwareStoppedAction,
-    PauseAction,
-    PauseSource,
-    PlayAction,
-    QueueCommandAction,
-    SetDeckConfigurationAction,
-    SetPipetteMovementSpeedAction,
-    StopAction,
-)
-from .actions.actions import (
-    ResumeFromRecoveryAction,
-    SetErrorRecoveryPolicyAction,
-)
-from .error_recovery_policy import ErrorRecoveryPolicy
-from .errors import CommandNotAllowedError, ErrorOccurrence, ProtocolCommandFailedError
-from .errors.exceptions import EStopActivatedError
-from .execution import (
-    DoorWatcher,
-    HardwareStopper,
-    QueueWorker,
-    create_queue_worker,
-)
-from .plugins import AbstractPlugin, PluginStarter
-from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
-from .resources.camera_provider import CameraSettings
-from .state.state import StateStore, StateView
-from .state.update_types import StateUpdate
-from .types import (
-    DeckConfigurationType,
-    HexColor,
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LabwareUri,
-    LegacyLabwareOffsetCreate,
-    Liquid,
-    ModuleModel,
-    PostRunHardwareState,
-)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.system import camera
+
+from .actions.actions import (
+    ResumeFromRecoveryAction,
+    SetErrorRecoveryPolicyAction,
+)
+from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
+from .errors.exceptions import EStopActivatedError
+from .error_recovery_policy import ErrorRecoveryPolicy
+from . import commands, slot_standardization, labware_offset_standardization
+from .resources import ModelUtils, ModuleDataProvider, FileProvider, CameraProvider
+from .resources.camera_provider import CameraSettings
+from .types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    LabwareUri,
+    ModuleModel,
+    Liquid,
+    HexColor,
+    PostRunHardwareState,
+    DeckConfigurationType,
+)
+from .execution import (
+    QueueWorker,
+    create_queue_worker,
+    DoorWatcher,
+    HardwareStopper,
+)
+from .state.state import StateStore, StateView
+from .state.update_types import StateUpdate
+from .plugins import AbstractPlugin, PluginStarter
+from .actions import (
+    ActionDispatcher,
+    PlayAction,
+    PauseAction,
+    PauseSource,
+    StopAction,
+    FinishAction,
+    FinishErrorDetails,
+    QueueCommandAction,
+    AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
+    AddLiquidAction,
+    AddCameraSettingsAction,
+    SetDeckConfigurationAction,
+    AddAddressableAreaAction,
+    AddModuleAction,
+    HardwareStoppedAction,
+    SetPipetteMovementSpeedAction,
+)
+
 
 _log = getLogger(__name__)
 
@@ -219,7 +219,6 @@ class ProtocolEngine:
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
-            failed_command_id: If this is a FIXIT command, the ID this is fixing.
 
         Returns:
             The full, newly queued command.
@@ -656,23 +655,6 @@ class ProtocolEngine:
         assert camera_settings is not None
         return camera_settings
 
-    def add_camera_capture_image_settings_to_state(
-        self,
-        camera_id: Optional[str] = None,
-        resolution: Optional[Tuple[int, int]] = None,
-        zoom: Optional[float] = None,
-        pan: Optional[Tuple[int, int]] = None,
-        contrast: Optional[float] = None,
-        brightness: Optional[float] = None,
-        saturation: Optional[float] = None,
-    ) -> None:
-        """Add new camera capture image settings to the engine state."""
-        self._action_dispatcher.dispatch(
-            AddCameraCaptureImageSettingsAction(
-                camera_id, resolution, zoom, pan, contrast, brightness, saturation
-            )
-        )
-
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""
         self._action_dispatcher.dispatch(
@@ -763,26 +745,6 @@ class ProtocolEngine:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Replace the run's error recovery policy with a new one."""
         self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
-
-    def create_user_command_annotation(
-        self,
-        annotation_name: str,
-        description: Optional[str],
-        annotation_id: Optional[str],
-        params: Optional[Dict[str, Any]] = None,
-    ) -> str:
-        """Creates a new user generated command annotation."""
-        if annotation_id is None:
-            annotation_id = self._model_utils.generate_id()
-        self._action_dispatcher.dispatch(
-            CreateUserCommandAnnotation(
-                annotation_id=annotation_id,
-                name=annotation_name,
-                description=description,
-                params=params or {},
-            )
-        )
-        return annotation_id
 
     def clear_command_history(self) -> None:
         """Clear command history."""

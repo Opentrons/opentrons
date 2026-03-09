@@ -1,13 +1,15 @@
 """Prepare to aspirate command request, result, and implementation models."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional, Type, Union
-
 from pydantic import BaseModel
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
-from ..errors.error_occurrence import ErrorOccurrence
+from .pipetting_common import (
+    OverpressureError,
+    PipetteIdMixin,
+    prepare_for_aspirate,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -15,14 +17,10 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from .pipetting_common import (
-    OverpressureError,
-    PipetteIdMixin,
-    prepare_for_aspirate,
-)
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, PipettingHandler
+    from ..execution import PipettingHandler, GantryMover
     from ..resources import ModelUtils
 
 
@@ -109,9 +107,9 @@ class PrepareToAspirate(
     params: PrepareToAspirateParams
     result: Optional[PrepareToAspirateResult] = None
 
-    _ImplementationCls: Type[PrepareToAspirateImplementation] = (
+    _ImplementationCls: Type[
         PrepareToAspirateImplementation
-    )
+    ] = PrepareToAspirateImplementation
 
 
 class PrepareToAspirateCreate(BaseCommandCreate[PrepareToAspirateParams]):

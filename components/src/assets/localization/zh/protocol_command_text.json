@@ -93,7 +93,6 @@
   "pickup_tip": "从{{labware_location}}的{{labware}}的{{well_range}}孔中拾取吸头",
   "prepare_to_aspirate": "准备使用{{pipette}}吸液",
   "pressurizing_to_dispense": "加压移液器进行分配 {{volume}} µL 距离树脂尖端 {{flow_rate}} µL/s",
-  "quantity": "数量：{{count}}",
   "reloading_labware": "正在重新加载{{labware}}",
   "return_tip": "将吸头返回到{{labware_location}}的{{labware}}的{{well_name}}孔中",
   "right": "右",

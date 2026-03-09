@@ -174,7 +174,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => {
             setCurrentOption('CameraPreferences')
           }}
-          iconName="camera"
+          iconName="photo-camera"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
@@ -186,10 +186,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="privacy"
         />
         <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:error_recovery_mode'),
-            'titleCase'
-          )}
+          settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -220,7 +217,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('disable_stacker_sensors')}
           dataTestId="RobotSettingButton_disable_stacker_sensors"
           settingInfo={t('disable_stacker_sensors_description')}
-          iconName="ot-flex-stacker"
+          iconName="stacker-sensors"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
         />
@@ -262,15 +259,12 @@ function FeatureFlags(): JSX.Element {
         >
           <div className={styles.feature_flag_content}>
             <Icon
-              name="ot-alert"
+              name="alert-circle"
               className={styles.icon_large}
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText
-                forwardedAs="h4"
-                className={styles.feature_flag_title}
-              >
+              <LegacyStyledText as="h4" className={styles.feature_flag_title}>
                 {t(`__dev_internal__${flag}`)}
               </LegacyStyledText>
             </div>

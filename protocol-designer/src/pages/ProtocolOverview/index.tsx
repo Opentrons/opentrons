@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { clsx } from 'clsx'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 
@@ -21,16 +20,20 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PeripheralsInfo } from '/protocol-designer/pages/ProtocolOverview/PeripheralsInfo'
-import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
+import { InputDeviceInfo } from '/protocol-designer/pages/ProtocolOverview/InputDeviceInfo'
 
-import { COLUMN_STYLE } from '../../components/atoms'
+import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import {
   EditInstrumentsModal,
   EditProtocolMetadataModal,
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
+import {
+  getEnableCameraSupport,
+  getEnableJsonExport,
+  getEnableTimelineScrubber,
+} from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
@@ -45,6 +48,7 @@ import { HardwareInfo } from './HardwareInfo'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { ProtocolMetadata } from './ProtocolMetadata'
+import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
 
@@ -78,6 +82,9 @@ export function ProtocolOverview(): JSX.Element {
   const navigate = useNavigate()
   const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
     useState<boolean>(false)
+  const enableJsonExport = useSelector(getEnableJsonExport)
+  const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
+  const enableCameraSupport = useSelector(getEnableCameraSupport)
   const [showEditMetadataModal, setShowEditMetadataModal] =
     useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -96,19 +103,14 @@ export function ProtocolOverview(): JSX.Element {
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
 
-  useEffect(
-    () => {
-      if (formValues?.created == null) {
-        console.log(
-          'formValues was possibly refreshed while on the overview page, redirecting to landing page'
-        )
-        navigate('/')
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formValues]
-  )
+  useEffect(() => {
+    if (formValues?.created == null) {
+      console.log(
+        'formValues was possibly refreshed while on the overview page, redirecting to landing page'
+      )
+      navigate('/')
+    }
+  }, [formValues])
 
   const {
     modules: modulesOnDeck,
@@ -129,21 +131,17 @@ export function ProtocolOverview(): JSX.Element {
   const { protocolName, description, created, lastModified, author } =
     formValues
   const metaDataInfo = [
-    { title: 'description', value: description ?? null },
-    { title: 'author', value: author ?? null },
+    { description },
+    { author },
+    { created: created != null ? format(created, DATE_ONLY_FORMAT) : t('na') },
     {
-      title: 'created',
-      value: created != null ? format(created, DATE_ONLY_FORMAT) : null,
-    },
-    {
-      title: 'modified',
-      value:
-        lastModified != null ? format(lastModified, DATETIME_FORMAT) : null,
+      modified:
+        lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
     },
   ]
 
   return (
-    <>
+    <Fragment>
       {showEditMetadataModal ? (
         <EditProtocolMetadataModal
           onClose={() => {
@@ -186,11 +184,7 @@ export function ProtocolOverview(): JSX.Element {
           <Flex flex="1">
             <StyledText
               desktopStyle="displayBold"
-              className={clsx(
-                lineClampStyles.line_clamp,
-                lineClampStyles.word_break_all
-              )}
-              style={{ WebkitLineClamp: 3 }}
+              css={LINE_CLAMP_TEXT_STYLE(3)}
             >
               {protocolName != null && protocolName !== ''
                 ? protocolName
@@ -224,11 +218,26 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
+            {enableJsonExport ? (
+              <LargeButton
+                buttonType="stroke"
+                buttonText="Export JSON"
+                onClick={() => {
+                  dispatch(loadFileActions.saveJSONProtocolFile())
+                }}
+                whiteSpace={NO_WRAP}
+                height="3.5rem"
+                iconName="arrow-right"
+                css={css`
+                  border: 2px solid ${COLORS.blue50};
+                `}
+              />
+            ) : null}
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
-            flex="1"
+            flex="1.27"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
@@ -248,18 +257,20 @@ export function ProtocolOverview(): JSX.Element {
               modules={Object.values(modulesOnDeck)}
               additionalEquipment={additionalEquipmentOnDeck}
             />
-            <PeripheralsInfo robotType={robotType} />
+            {enableCameraSupport ? (
+              <InputDeviceInfo robotType={robotType} />
+            ) : null}
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
             <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
           <Flex
-            flex="1"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
+            {enableTimelineScrubber ? <ScrubberContainer /> : null}
             <StartingDeck
               robotType={robotType}
               setShowMaterialsListModal={setShowMaterialsListModal}
@@ -268,6 +279,6 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
       </Flex>
       <EndUserAgreementFooter />
-    </>
+    </Fragment>
   )
 }

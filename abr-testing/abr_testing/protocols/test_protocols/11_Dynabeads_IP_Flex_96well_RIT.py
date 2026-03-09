@@ -5,7 +5,7 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
     MagneticBlockContext,
 )
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols import helpers
 from typing import List, Dict, Union
 
 metadata = {
@@ -22,10 +22,10 @@ requirements = {
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Define parameters."""
-    run_helpers.create_hs_speed_parameter(parameters)
-    run_helpers.create_two_pipette_mount_parameters(parameters)
-    run_helpers.create_dot_bottom_parameter(parameters)
-    run_helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_hs_speed_parameter(parameters)
+    helpers.create_two_pipette_mount_parameters(parameters)
+    helpers.create_dot_bottom_parameter(parameters)
+    helpers.create_deactivate_modules_parameter(parameters)
 
 
 NUM_COL = 12
@@ -57,7 +57,7 @@ def run(protocol: ProtocolContext) -> None:
     single_channel_mount = protocol.params.pipette_mount_1  # type: ignore[attr-defined]
     eight_channel_mount = protocol.params.pipette_mount_2  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    run_helpers.comment_protocol_version(protocol, "01")
+    helpers.comment_protocol_version(protocol, "01")
 
     MIX_SPEED = heater_shaker_speed
     MIX_SEC = 10
@@ -101,21 +101,21 @@ def run(protocol: ProtocolContext) -> None:
         "flex_1channel_1000", single_channel_mount, tip_racks=[tips]
     )
     h_s: HeaterShakerContext = protocol.load_module(
-        run_helpers.hs_str, "D1"
+        helpers.hs_str, "D1"
     )  # type: ignore[assignment]
-    working_plate, h_s_adapter = run_helpers.load_hs_adapter_and_labware(
+    working_plate, h_s_adapter = helpers.load_hs_adapter_and_labware(
         "nest_96_wellplate_2ml_deep", h_s, "Working Plate"
     )
 
     if READY_FOR_SDSPAGE == 0:
         temp: TemperatureModuleContext = protocol.load_module(
-            run_helpers.temp_str, "D3"
+            helpers.temp_str, "D3"
         )  # type: ignore[assignment]
-        final_plate, temp_adapter = run_helpers.load_temp_adapter_and_labware(
+        final_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
             "nest_96_wellplate_2ml_deep", temp, "Final Plate"
         )
     mag: MagneticBlockContext = protocol.load_module(
-        run_helpers.mag_str, "C1"
+        helpers.mag_str, "C1"
     )  # type: ignore[assignment]
 
     # liquids
@@ -141,7 +141,7 @@ def run(protocol: ProtocolContext) -> None:
         "Samples 1": [{"well": samples1, "volume": 250.0}],
         "Samples 2": [{"well": samples2, "volume": 250.0}],
     }
-    run_helpers.find_liquid_height_of_loaded_liquids(
+    helpers.find_liquid_height_of_loaded_liquids(
         protocol, liquid_vols_and_wells, p1000_single
     )
 
@@ -230,14 +230,12 @@ def run(protocol: ProtocolContext) -> None:
         h_s.close_labware_latch()
         transfer_well_to_plate(BEADS_VOL, beads, working_wells, 2)
 
-        run_helpers.move_labware_from_hs_to_destination(
-            protocol, working_plate, h_s, mag
-        )
+        helpers.move_labware_from_hs_to_destination(protocol, working_plate, h_s, mag)
 
         protocol.delay(minutes=MAG_DELAY_MIN)
         discard(BEADS_VOL * 1.1, working_cols)
 
-        run_helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
+        helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
 
         transfer_plate_to_plate(SAMPLE_VOL, samples, working_cols, 1)
         transfer_well_to_plate(AB_VOL, ab, working_wells, 3)
@@ -249,9 +247,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.delay(seconds=INCUBATION_MIN * 60)
         h_s.deactivate_shaker()
 
-        run_helpers.move_labware_from_hs_to_destination(
-            protocol, working_plate, h_s, mag
-        )
+        helpers.move_labware_from_hs_to_destination(protocol, working_plate, h_s, mag)
 
         protocol.delay(minutes=MAG_DELAY_MIN)
         vol_total = SAMPLE_VOL + AB_VOL
@@ -259,39 +255,37 @@ def run(protocol: ProtocolContext) -> None:
 
         # Wash
         for _ in range(WASH_TIMES):
-            run_helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
+            helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
 
             transfer_well_to_plate(WASH_VOL, wash, working_cols, 5)
-            run_helpers.set_hs_speed(protocol, h_s, MIX_SPEED, MIX_SEC / 60, True)
-            run_helpers.move_labware_from_hs_to_destination(
+            helpers.set_hs_speed(protocol, h_s, MIX_SPEED, MIX_SEC / 60, True)
+            helpers.move_labware_from_hs_to_destination(
                 protocol, working_plate, h_s, mag
             )
             protocol.delay(minutes=MAG_DELAY_MIN)
             discard(WASH_VOL * 1.1, working_cols)
         # Elution
-        run_helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
+        helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
         transfer_well_to_plate(ELUTION_VOL, elu, working_wells, 4)
         if READY_FOR_SDSPAGE == 1:
             protocol.pause("Seal the Working Plate")
             h_s.set_and_wait_for_temperature(70)
-            run_helpers.set_hs_speed(
-                protocol, h_s, MIX_SPEED, (MIX_SEC / 60) + 10, True
-            )
+            helpers.set_hs_speed(protocol, h_s, MIX_SPEED, (MIX_SEC / 60) + 10, True)
             h_s.deactivate_heater()
             h_s.open_labware_latch()
             protocol.pause("Protocol Complete")
         elif READY_FOR_SDSPAGE == 0:
-            run_helpers.set_hs_speed(protocol, h_s, MIX_SPEED, (MIX_SEC / 60) + 2, True)
+            helpers.set_hs_speed(protocol, h_s, MIX_SPEED, (MIX_SEC / 60) + 2, True)
 
             temp.set_temperature(4)
-            run_helpers.move_labware_from_hs_to_destination(
+            helpers.move_labware_from_hs_to_destination(
                 protocol, working_plate, h_s, mag
             )
             protocol.delay(minutes=MAG_DELAY_MIN)
             transfer_plate_to_plate(ELUTION_VOL * 1.1, working_cols, final_cols, 6)
             temp.deactivate()
-        run_helpers.clean_up_plates(protocol, p1000_single, [sample_plate], waste)
-        run_helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
+        helpers.clean_up_plates(protocol, p1000_single, [sample_plate], waste)
+        helpers.move_labware_to_hs(protocol, working_plate, h_s, h_s_adapter)
 
     run(sample_plate_1)
     # swap plates
@@ -299,9 +293,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.move_labware(sample_plate_2, "B2", True)
     run(sample_plate_2)
 
-    run_helpers.clean_up_plates(protocol, p1000_single, [wash_res], waste)
-    run_helpers.find_liquid_height_of_all_wells(
-        protocol, p1000_single, [waste_res["A1"]]
-    )
+    helpers.clean_up_plates(protocol, p1000_single, [wash_res], waste)
+    helpers.find_liquid_height_of_all_wells(protocol, p1000_single, [waste_res["A1"]])
     if deactivate_modules_bool:
-        run_helpers.deactivate_modules(protocol)
+        helpers.deactivate_modules(protocol)

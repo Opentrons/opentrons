@@ -1,5 +1,4 @@
 """Tests for DataFileAutoDeleter."""
-
 import logging
 
 import pytest

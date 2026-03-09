@@ -1,18 +1,16 @@
 """CSV Parameter definition and associated classes/functions."""
-
 from typing import Optional
 
-from . import validation
-from .csv_parameter_interface import CSVParameter
-from .parameter_definition import AbstractParameterDefinition
 from opentrons.protocol_engine.types import (
-    CSVParameter as ProtocolEngineCSVParameter,
-)
-from opentrons.protocol_engine.types import (
-    FileInfo,
     RunTimeParameter,
+    CSVParameter as ProtocolEngineCSVParameter,
+    FileInfo,
 )
 from opentrons.protocols.api_support.types import APIVersion
+
+from . import validation
+from .parameter_definition import AbstractParameterDefinition
+from .csv_parameter_interface import CSVParameter
 
 
 class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):
@@ -45,7 +43,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):
         return self._value
 
     @value.setter
-    def value(self, contents: Optional[bytes]) -> None:
+    def value(self, contents: bytes) -> None:
         self._value = contents
 
     @property

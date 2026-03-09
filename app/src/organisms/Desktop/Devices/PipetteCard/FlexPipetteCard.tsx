@@ -26,9 +26,13 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { MouseEventHandler } from 'react'
-import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
+import type {
+  BadPipette,
+  HostConfig,
+  Mount,
+  PipetteData,
+} from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
@@ -62,7 +66,7 @@ export function FlexPipetteCard({
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const host = useHost()!
+  const host = useHost() as HostConfig
 
   const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =
     useState<boolean>(false)
@@ -79,8 +83,6 @@ export function FlexPipetteCard({
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
   }
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { showDTWiz, enableDTWiz, disableDTWiz } = useDropTipWizardFlows()
 
   const handleLaunchPipetteWizardFlows = (
@@ -106,7 +108,7 @@ export function FlexPipetteCard({
     handleLaunchPipetteWizardFlows(FLOWS.DETACH)
   }
 
-  const handleCalibrate: MouseEventHandler<HTMLAnchorElement> = () => {
+  const handleCalibrate: MouseEventHandler<HTMLButtonElement> = () => {
     handleLaunchPipetteWizardFlows(FLOWS.CALIBRATE)
   }
 
@@ -175,7 +177,6 @@ export function FlexPipetteCard({
             },
           },
         ]
-
   return (
     <>
       {(attachedPipette == null || attachedPipette.ok) &&
@@ -209,7 +210,7 @@ export function FlexPipetteCard({
                   side: mount === LEFT ? t('left') : t('right'),
                 })
           }
-          menuOverlayItems={menuOverlayItems as MenuOverlayItemProps[]}
+          menuOverlayItems={menuOverlayItems}
           isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}

@@ -1,12 +1,16 @@
+import typing
+import typing_extensions
+import logging
 from functools import lru_cache
 from pathlib import Path
 
-import typing_extensions
-from dotenv import load_dotenv
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
 
 from opentrons.config import infer_config_base_dir
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+log = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=1)
@@ -28,16 +32,15 @@ class Environment(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
 
+# If you update this, also update the generated settings_schema.json.
 class RobotServerSettings(BaseSettings):
     """Robot server settings.
 
     To override any of these create an environment variable with prefix
-    OT_ROBOT_SERVER_, e.g. OT_ROBOT_SERVER_persistence_directory.
+    OT_ROBOT_SERVER_.
     """
 
-    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
-
-    simulator_configuration_file_path: str | None = Field(
+    simulator_configuration_file_path: typing.Optional[str] = Field(
         default=None,
         description="Path to a json file that describes the hardware simulator.",
     )
@@ -47,29 +50,12 @@ class RobotServerSettings(BaseSettings):
         description="The endpoint to subscribe to notification server topics.",
     )
 
-    auth_server_uds: str | None = Field(
-        default=None,
-        description=(
-            "The path to the Unix domain socket where auth-server is listening."
-            " This is mutually exclusive with auth_server_url."
-            " If both are unset, access control is not enforced."
-        ),
-    )
-
-    auth_server_url: str | None = Field(
-        default=None,
-        description=(
-            "The base URL (e.g. `http://localhost:1234`) where auth-server is listening."
-            " This is mutually exclusive with auth_server_uds."
-            " If both are unset, access control is not enforced."
-        ),
-    )
-
-    # Literal must come first to avoid Pydantic parsing it as a relative Path
-    # with the filename "automatically_make_temporary".
-    persistence_directory: (
-        typing_extensions.Literal["automatically_make_temporary"] | Path
-    ) = Field(
+    persistence_directory: typing.Union[
+        # Literal must come first to avoid Pydantic parsing it as a relative Path
+        # with the filename "automatically_make_temporary".
+        typing_extensions.Literal["automatically_make_temporary"],
+        Path,
+    ] = Field(
         # TODO(mm, 2022-04-05): This should not have a default value.
         # It only does now because our code has some deep calls to get_settings(),
         # and it's difficult to override this settings object for our unit tests.
@@ -88,7 +74,7 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
-    images_directory: Path | None = Field(
+    images_directory: typing.Optional[Path] = Field(
         default=None,
         description=(
             "A directory for the server to store captured images."
@@ -134,6 +120,8 @@ class RobotServerSettings(BaseSettings):
             " currently exists."
         ),
     )
+
+    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
     maximum_quick_transfer_protocols: int = Field(
         default=20,

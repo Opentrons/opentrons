@@ -51,10 +51,7 @@ export function RobotSetupHeader({
             <Icon name="back" size="3rem" color={COLORS.black90} />
           </Btn>
         ) : null}
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
         </LegacyStyledText>
         {onClickButton != null && buttonText != null ? (

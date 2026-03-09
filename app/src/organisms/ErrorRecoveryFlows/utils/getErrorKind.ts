@@ -63,10 +63,6 @@ export function getErrorKind(
         return ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY
       case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_OCCUPIED:
         return ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED
-      case DEFINED_ERROR_TYPES.VACUUM_CARBOY_FULL:
-        return ERROR_KINDS.VACUUM_CARBOY_FULL
-      case DEFINED_ERROR_TYPES.VACUUM_PRESSURE_NOT_REACHED:
-        return ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED
       default: {
         console.error(`Unhandled error type ${errorType}`)
         return ERROR_KINDS.GENERAL_ERROR

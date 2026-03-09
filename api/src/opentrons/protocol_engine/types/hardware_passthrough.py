@@ -1,9 +1,9 @@
 """Protocol Engine types for hardware passthrough."""
 
-from opentrons_shared_data.util import StrEnum
+from enum import Enum
 
 
-class MovementAxis(StrEnum):
+class MovementAxis(str, Enum):
     """Axis on which to issue a relative movement."""
 
     X = "x"
@@ -11,7 +11,7 @@ class MovementAxis(StrEnum):
     Z = "z"
 
 
-class MotorAxis(StrEnum):
+class MotorAxis(str, Enum):
     """Motor axis on which to issue a home command."""
 
     X = "x"

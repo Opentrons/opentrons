@@ -1,11 +1,11 @@
-import pytest
 from decoy import Decoy
+import pytest
 
-from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
 )
+from opentrons.hardware_control.execution_manager import ExecutionManager
 
 
 @pytest.fixture

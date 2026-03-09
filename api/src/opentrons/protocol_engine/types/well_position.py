@@ -1,14 +1,11 @@
 """Protocol engine types to do with positions inside wells."""
-
 from enum import Enum, auto
-from typing import Literal, Union
+from typing import Union, Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.util import StrEnum
 
-
-class WellOrigin(StrEnum):
+class WellOrigin(str, Enum):
     """Origin of WellLocation offset.
 
     Props:
@@ -24,7 +21,7 @@ class WellOrigin(StrEnum):
     MENISCUS = "meniscus"
 
 
-class PickUpTipWellOrigin(StrEnum):
+class PickUpTipWellOrigin(str, Enum):
     """The origin of a PickUpTipWellLocation offset.
 
     Props:
@@ -38,7 +35,7 @@ class PickUpTipWellOrigin(StrEnum):
     CENTER = "center"
 
 
-class DropTipWellOrigin(StrEnum):
+class DropTipWellOrigin(str, Enum):
     """The origin of a DropTipWellLocation offset.
 
     Props:

@@ -1,8 +1,6 @@
 """Tests for the maintenance runs publisher."""
-
-from unittest.mock import AsyncMock, Mock
-
 import pytest
+from unittest.mock import AsyncMock, Mock
 
 from robot_server.service.notifications import MaintenanceRunsPublisher, topics
 from robot_server.service.notifications.notification_client import NotificationClient

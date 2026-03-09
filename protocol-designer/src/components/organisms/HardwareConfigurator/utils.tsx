@@ -5,10 +5,9 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAAsToFixtureIdFromDeckDefWithFakes,
-  getAAWithFakesFromCutoutFixtureId,
-  getComboFixtureFromFixtureIds,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
+  getModuleModelFromAddressableArea,
   getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
   getWasteChuteOptions,
@@ -22,11 +21,13 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  VACUUM_MODULE_MILLIPORE_V1,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
-import { FLEX_MODULE_MODELS } from '/protocol-designer/pages/Designer/DeckSetup/constants'
+import {
+  FLEX_MODULE_MODELS,
+  FLEX_MODULE_MODELS_WITH_FF,
+} from '/protocol-designer/pages/Designer/DeckSetup/constants'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 
 import { AddFixtureModal } from './AddFixtureModal'
@@ -66,7 +67,6 @@ export function useDeckConfigurationEditing(
   modules: FormModules | InitialDeckStateModules,
   fixtures: Fixtures,
   hasGripper: boolean,
-  enableVacuumModule: boolean,
   setValue?: UseFormSetValue<WizardFormState>,
   updateInitialDeckState?: (
     value: CutoutConfigMap[],
@@ -153,12 +153,6 @@ export function useDeckConfigurationEditing(
       cutoutId,
       addressableAreaId
     )
-    const aa = getAAWithFakesFromCutoutFixtureId(
-      cutoutId,
-      replacementFixtureId,
-      deckDef
-    )
-
     const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
       cutoutFixtureId,
@@ -172,7 +166,7 @@ export function useDeckConfigurationEditing(
         {
           cutoutId,
           cutoutFixtureId: replacementFixtureId,
-          addressableAreaId: aa?.[0] ?? addressableAreaId,
+          addressableAreaId,
         },
       ],
       newDeckConfig
@@ -261,11 +255,17 @@ export const getAllFixtureOptions = (
   return availableOptions
 }
 
-const getFilteredModules = (moduleModel: ModuleModel): ModuleModel[] =>
-  Object.values(FLEX_MODULE_MODELS).filter(model => model === moduleModel)
+const getFilteredModules = (
+  moduleModel: ModuleModel,
+  enableStackerFF: boolean
+): ModuleModel[] =>
+  Object.values(
+    enableStackerFF ? FLEX_MODULE_MODELS_WITH_FF : FLEX_MODULE_MODELS
+  ).filter(model => model === moduleModel)
 
 export const getThermocyclerFixtures = (
-  cutoutId: CutoutId
+  cutoutId: CutoutId,
+  enableStackerFF: boolean
 ): CutoutConfigMap[][] => {
   const fixtureIds = MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]
   if (!fixtureIds || fixtureIds.length === 0) return []
@@ -289,12 +289,15 @@ export const getThermocyclerFixtures = (
 
   const fixtureGroupMatch = firstValidGroup[0] as CutoutIdToCutoutFixtureId
   const fixtureGroupKeys = Object.keys(fixtureGroupMatch) as CutoutId[]
-  const moduleModel = getFilteredModules(THERMOCYCLER_MODULE_V2)
+  const moduleModel = getFilteredModules(
+    THERMOCYCLER_MODULE_V2,
+    enableStackerFF
+  )
   return Object.values(moduleModel).map(_ =>
     fixtureGroupKeys.map(cutout => ({
       cutoutId: cutout,
       addressableAreaId: THERMOCYCLER_MODULE_V2,
-      cutoutFixtureId: fixtureGroupMatch[cutout]!,
+      cutoutFixtureId: fixtureGroupMatch[cutout] as CutoutFixtureId,
     }))
   )
 }
@@ -304,16 +307,14 @@ export const getModuleFixtures = (
   moduleModel: ModuleModel,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  enableStackerFF: boolean,
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  const filteredModuleModels = getFilteredModules(moduleModel).filter(
-    model => model !== VACUUM_MODULE_MILLIPORE_V1 || enableVacuumModule
-  )
+  const filteredModuleModels = getFilteredModules(moduleModel, enableStackerFF)
   const isStagingAreaInSlot4 =
     fixtures != null &&
     Object.values(fixtures).some(
@@ -346,13 +347,13 @@ export const getModules = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  enableStackerFF: boolean,
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   const availableOptions: CutoutConfigMap[][] = []
 
   if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-    availableOptions.push(...getThermocyclerFixtures(cutoutId))
+    availableOptions.push(...getThermocyclerFixtures(cutoutId, enableStackerFF))
   }
 
   // staging area special case where only magnetic block can go on it
@@ -368,8 +369,8 @@ export const getModules = (
       MAGNETIC_BLOCK_V1,
       addressableAreaId,
       deckDef,
-      fixtures,
-      enableVacuumModule
+      enableStackerFF,
+      fixtures
     )
   }
 
@@ -382,8 +383,8 @@ export const getModules = (
       model as ModuleModel,
       addressableAreaId,
       deckDef,
-      fixtures,
-      enableVacuumModule
+      enableStackerFF,
+      fixtures
     )
     availableOptions.push(...moduleOptions)
   })
@@ -395,15 +396,15 @@ export const getModuleOptions = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  enableStackerFF: boolean,
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   return getModules(
     cutoutId,
     addressableAreaId,
     deckDef,
-    fixtures,
-    enableVacuumModule
+    enableStackerFF,
+    fixtures
   )
 }
 
@@ -412,9 +413,9 @@ interface AvailableOptionsProps {
   cutoutId: CutoutId
   deckDefinition: DeckDefinition
   addressableAreaId: AddressableAreaNamesWithFakes
+  enableStackerFF: boolean
   fixtures: Fixtures
   existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
-  enableVacuumModule: boolean
 }
 export const getAvailableOptions = (
   props: AvailableOptionsProps
@@ -425,8 +426,8 @@ export const getAvailableOptions = (
     existingCutoutFixtureId,
     addressableAreaId,
     deckDefinition,
+    enableStackerFF,
     fixtures,
-    enableVacuumModule,
   } = props
 
   let availableOptions: CutoutConfigMap[][] = []
@@ -443,8 +444,8 @@ export const getAvailableOptions = (
       cutoutId,
       addressableAreaId,
       deckDefinition,
-      fixtures,
-      enableVacuumModule
+      enableStackerFF,
+      fixtures
     )
   }
   if (optionStage === 'wasteChuteOptions') {
@@ -470,99 +471,14 @@ export const getFixtureNameFromAddresableArea = (
   return fixtureName
 }
 
-interface ComboFixtureMergeResult {
-  comboFixtures: CutoutConfigMap[]
-  remainingModuleConfig: CutoutConfigMap[]
-  remainingAdditionalEquipmentConfig: DeckConfiguration
-}
-
-/**
- * Merges module configs and additional equipment configs into combo fixtures
- * where applicable. Returns combo fixtures and the remaining unmerged configs.
- */
-export function mergeToComboFixtures(
-  moduleConfig: CutoutConfigMap[],
-  additionalEquipmentConfig: DeckConfiguration
-): ComboFixtureMergeResult {
-  const comboFixtures: CutoutConfigMap[] = []
-  const mergedCutoutIds: CutoutId[] = []
-  const processedCutoutIds: CutoutId[] = []
-
-  // Process module configs first
-  moduleConfig.forEach(mc => {
-    // Skip if we've already processed this cutoutId
-    if (processedCutoutIds.includes(mc.cutoutId)) return
-    processedCutoutIds.push(mc.cutoutId)
-
-    // Find all modules at this cutoutId
-    const moduleMatches = moduleConfig.filter(m => m.cutoutId === mc.cutoutId)
-    // Find all fixtures at this cutoutId
-    const fixtureMatches = additionalEquipmentConfig.filter(
-      ae => mc.cutoutId === ae.cutoutId
+export const getModuleModel = (
+  addressableAreaId: AddressableAreaNamesWithFakes
+): ModuleModel | null => {
+  if (addressableAreaId === 'thermocyclerModuleV2') {
+    return THERMOCYCLER_MODULE_V2
+  } else {
+    return getModuleModelFromAddressableArea(
+      addressableAreaId as AddressableAreaName
     )
-
-    // Combine all fixture IDs at this cutoutId
-    const allFixtureIds = [
-      ...moduleMatches.map(m => m.cutoutFixtureId),
-      ...fixtureMatches.map(f => f.cutoutFixtureId),
-    ]
-
-    // Only try to find combo if there are multiple items at this cutoutId
-    if (allFixtureIds.length > 1) {
-      const comboFixture = getComboFixtureFromFixtureIds(allFixtureIds)
-      if (comboFixture != null) {
-        comboFixtures.push({
-          cutoutId: mc.cutoutId,
-          cutoutFixtureId: comboFixture,
-          addressableAreaId: mc.addressableAreaId,
-        })
-        mergedCutoutIds.push(mc.cutoutId)
-      }
-    }
-  })
-
-  // Process additional equipment configs to handle fixture-only combos (e.g., waste chute + staging area)
-  additionalEquipmentConfig.forEach(ae => {
-    // Skip if we've already processed this cutoutId
-    if (processedCutoutIds.includes(ae.cutoutId)) return
-    processedCutoutIds.push(ae.cutoutId)
-
-    // Find all fixtures at this cutoutId
-    const fixtureMatches = additionalEquipmentConfig.filter(
-      f => f.cutoutId === ae.cutoutId
-    )
-
-    // Combine all fixture IDs at this cutoutId
-    const allFixtureIds = fixtureMatches.map(f => f.cutoutFixtureId)
-
-    // Only try to find combo if there are multiple fixtures at this cutoutId
-    if (allFixtureIds.length > 1) {
-      const comboFixture = getComboFixtureFromFixtureIds(allFixtureIds)
-      if (comboFixture != null) {
-        comboFixtures.push({
-          cutoutId: ae.cutoutId,
-          cutoutFixtureId: comboFixture,
-          addressableAreaId: ae.cutoutId.replace(
-            'cutout',
-            ''
-          ) as AddressableAreaNamesWithFakes,
-        })
-        mergedCutoutIds.push(ae.cutoutId)
-      }
-    }
-  })
-
-  // Filter out items that were merged into combo fixtures
-  const remainingModuleConfig = moduleConfig.filter(
-    mc => !mergedCutoutIds.includes(mc.cutoutId)
-  )
-  const remainingAdditionalEquipmentConfig = additionalEquipmentConfig.filter(
-    ae => !mergedCutoutIds.includes(ae.cutoutId)
-  )
-
-  return {
-    comboFixtures,
-    remainingModuleConfig,
-    remainingAdditionalEquipmentConfig,
   }
 }

@@ -1,9 +1,7 @@
 """Concurrency provider."""
 
-import asyncio
-
 import pytest
-
+import asyncio
 from opentrons.protocol_engine.resources import ConcurrencyProvider
 
 

@@ -1,16 +1,14 @@
 """Primitive and CSV run time parameter resources."""
-
 from __future__ import annotations
 
+import sqlalchemy
 import json
+
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-import sqlalchemy
-
-from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
-
 from robot_server.persistence.tables import PrimitiveParamSQLEnum
+from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 
 @dataclass

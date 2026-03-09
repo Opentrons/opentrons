@@ -99,13 +99,6 @@ export function missingTemperatureStep(): CommandCreatorError {
   }
 }
 
-export function missingProfileStep(): CommandCreatorError {
-  return {
-    message: 'This module is not currently running a profile.',
-    type: 'MISSING_PROFILE_STEP',
-  }
-}
-
 export function tipVolumeExceeded(args: {
   actionName: string
   volume: string | number
@@ -140,14 +133,6 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
     type: 'MODULE_PIPETTE_COLLISION_DANGER',
     message:
       'Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules.',
-  }
-}
-
-export const thermocyclerBusyWithProfile = (): CommandCreatorError => {
-  return {
-    type: 'THERMOCYCLER_BUSY_WITH_PROFILE',
-    message:
-      'This step cannot run while the Thermocycler is running a profile. Move the step outside the profile.',
   }
 }
 
@@ -199,57 +184,6 @@ export const absorbanceReaderNoGripper = (): CommandCreatorError => {
   }
 }
 
-export const flexStackerNoGripper = (): CommandCreatorError => {
-  return {
-    type: 'FLEX_STACKER_NO_GRIPPER',
-    message:
-      'This step involves a gripper. Add a gripper or remove step to proceed.',
-  }
-}
-
-export const flexStackerHopperEmpty = (): CommandCreatorError => {
-  return {
-    type: 'HOPPER_EMPTY',
-    message: 'Cannot retrieve labware from empty stacker',
-  }
-}
-
-export const flexStackerShuttleFull = (): CommandCreatorError => {
-  return {
-    type: 'SHUTTLE_FULL',
-    message:
-      'Shuttle must be empty in order to retrieve labware from the stacker',
-  }
-}
-
-export const flexStackerShuttleEmpty = (): CommandCreatorError => {
-  return {
-    type: 'SHUTTLE_EMPTY',
-    message: 'Shuttle must have labware in order to store it in the stacker',
-  }
-}
-
-export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
-  return {
-    type: 'MISMATCHED_STACKER_LABWARE_TYPE',
-    message: 'The stacker can only store a single type of labware at a time',
-  }
-}
-
-export const flexStackerLabwareTypeMissing = (): CommandCreatorError => {
-  return {
-    type: 'MISSING_STACKER_LABWARE_TYPE',
-    message:
-      'Add labware to the stacker in the starting deck so that you can refill it later',
-  }
-}
-
-export const flexStackerHopperFull = (): CommandCreatorError => {
-  return {
-    type: 'HOPPER_FULL',
-    message: 'The hopper has reached capacity',
-  }
-}
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
@@ -400,19 +334,10 @@ export const retractBelowDispense = (): CommandCreatorError => {
   }
 }
 
-export const multiAspirateVolumeTooHigh = (): CommandCreatorError => {
+export const multiDispenseValuesNotFound = (): CommandCreatorError => {
   return {
-    type: 'MULTI_ASPIRATE_VOLUME_TOO_HIGH',
-    message:
-      'Consolidate pipette path was selected but cannot fit volume for more than 1 well in the tip',
-  }
-}
-
-export const multiDispenseVolumeTooHigh = (): CommandCreatorError => {
-  return {
-    type: 'MULTI_DISPENSE_VOLUME_TOO_HIGH',
-    message:
-      'Distribute pipette path was selected but cannot fit volume for more than 1 well in the tip',
+    type: 'MULTI_DISPENSE_VALUES_NOT_FOUND',
+    message: 'Multi dispense values not found for liquid class',
   }
 }
 
@@ -450,26 +375,5 @@ export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
   return {
     type: 'STACK_TOO_HIGH',
     message: `The stack on slot ${args.slot} is too high`,
-  }
-}
-
-export const tooManyTips = (): CommandCreatorError => {
-  return {
-    type: 'TOO_MANY_TIPS',
-    message: 'Action will pick up too many tips',
-  }
-}
-
-export const incompletePickup = (): CommandCreatorError => {
-  return {
-    type: 'INCOMPLETE_PICKUP',
-    message: 'At least one of the selected tips is empty',
-  }
-}
-
-export const labwareOnHopper = (): CommandCreatorError => {
-  return {
-    type: 'LABWARE_ON_HOPPER',
-    message: 'Labware cannot be moved from the Flex Stacker Hopper',
   }
 }

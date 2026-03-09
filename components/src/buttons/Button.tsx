@@ -20,9 +20,9 @@ export interface ButtonProps {
   /** title attribute */
   title?: string
   /** disabled attribute (setting disabled removes onClick) */
-  disabled?: boolean | null
+  disabled?: boolean | null | undefined
   /** use hover style even when not hovered */
-  hover?: boolean | null
+  hover?: boolean | null | undefined
   /** optional Icon name */
   iconName?: IconName
   /** classes to apply */
@@ -41,7 +41,7 @@ export interface ButtonProps {
   /** custom element or component to use instead of `<button>` */
   Component?: ComponentType<any> | keyof JSX.IntrinsicElements
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null
+  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null | undefined
   /** html tabindex property */
   tabIndex?: number
   /** catch all prop for pass-through props */

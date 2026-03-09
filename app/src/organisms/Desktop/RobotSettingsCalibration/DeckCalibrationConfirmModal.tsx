@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -10,6 +9,7 @@ import {
   LegacyStyledText,
   Link,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -32,11 +32,11 @@ export function DeckCalibrationConfirmModal({
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
         </LegacyStyledText>
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing24}
         >
@@ -54,14 +54,15 @@ export function DeckCalibrationConfirmModal({
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton
+          <PrimaryButton
+            backgroundColor={COLORS.red50}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             onClick={confirm}
           >
             {t('shared:yes')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

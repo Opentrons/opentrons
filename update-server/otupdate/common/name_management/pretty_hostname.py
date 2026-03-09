@@ -4,9 +4,11 @@ See the `name_management` package docstring for background on the pretty hostnam
 and how it's distinct from other names on the machine.
 """
 
+
 import asyncio
 from logging import getLogger
 from typing import List, Union
+
 
 _log = getLogger(__name__)
 
@@ -115,7 +117,8 @@ async def _run_subprocess(
     ret = process.returncode
     if ret != 0:
         _log.error(
-            f"Error calling {command!r}: {ret} stdout: {stdout!r} stderr: {stderr!r}"
+            f"Error calling {command!r}: {ret} "
+            f"stdout: {stdout!r} stderr: {stderr!r}"
         )
         # TODO(mm, 2022-07-18): Use a structured and specific exception type
         # once this function is deduplicated.

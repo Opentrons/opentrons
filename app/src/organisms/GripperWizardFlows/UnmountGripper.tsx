@@ -150,7 +150,7 @@ export const UnmountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('hold_gripper_and_loosen_screws')}
         </LegacyStyledText>
       }

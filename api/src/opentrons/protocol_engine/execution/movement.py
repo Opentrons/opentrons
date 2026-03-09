@@ -3,28 +3,30 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Union
+from typing import Optional, List, Union
 
-from opentrons_shared_data.errors.exceptions import PositionUnknownError
-
-from ..resources import ModelUtils
-from ..state.state import StateStore
-from ..types import (
-    AddressableOffsetVector,
-    CurrentWell,
-    DeckPoint,
-    LiquidHandlingWellLocation,
-    MotorAxis,
-    MovementAxis,
-    WellLocation,
-)
-from .equipment import EquipmentHandler
-from .gantry_mover import GantryMover
-from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
-from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from opentrons.types import Point, MountType, StagingSlotName
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 from opentrons.protocol_engine.errors import LocationIsStagingSlotError
-from opentrons.types import MountType, Point, StagingSlotName
+
+from ..types import (
+    WellLocation,
+    LiquidHandlingWellLocation,
+    DeckPoint,
+    MovementAxis,
+    MotorAxis,
+    CurrentWell,
+    AddressableOffsetVector,
+)
+from ..state.state import StateStore
+from ..resources import ModelUtils
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+
+from .gantry_mover import GantryMover
+from .equipment import EquipmentHandler
+
 
 log = logging.getLogger(__name__)
 

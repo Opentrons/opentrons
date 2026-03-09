@@ -1,6 +1,6 @@
 import os
-import random
 import tempfile
+import random
 from pathlib import Path
 
 import pytest

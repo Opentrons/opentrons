@@ -3,21 +3,14 @@ import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  useAddCameraImageSettingsToRunMutation,
-  useAddCameraSettingsToRunMutation,
-} from '@opentrons/react-api-client'
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
-import {
-  getCameraImageSettings,
-  getCameraUsageState,
-} from '/app/redux/protocol-runs'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
@@ -37,7 +30,6 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/redux-resources/robots')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -49,12 +41,10 @@ describe('SetupCamera', () => {
   let mockProps: SetupCameraProps
   let mockNavigate: Mock
   let mockAddCameraToRun: Mock
-  let mockAddCameraImageToRun: Mock
 
   beforeEach(() => {
     mockNavigate = vi.fn()
-    mockAddCameraToRun = vi.fn().mockResolvedValue(undefined)
-    mockAddCameraImageToRun = vi.fn().mockResolvedValue(undefined)
+    mockAddCameraToRun = vi.fn()
     mockProps = {
       isCameraRequired: true,
       runId: 'MOCK-RUN-ID',
@@ -82,32 +72,17 @@ describe('SetupCamera', () => {
       recoveryEnabled: true,
       liveStreamEnabled: true,
     })
-    vi.mocked(getCameraImageSettings as Mock).mockReturnValue(null)
     vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
-      mutateAsync: mockAddCameraToRun,
+      addCameraSettingsToRun: mockAddCameraToRun,
     } as any)
-    vi.mocked(useAddCameraImageSettingsToRunMutation).mockReturnValue({
-      mutateAsync: mockAddCameraImageToRun,
-    } as any)
-    vi.mocked(useIsFlex).mockReturnValue(true)
   })
 
-  it('renders camera status section for the Flex', () => {
+  it('renders camera status section', () => {
     render(mockProps)
 
     screen.getByText('Camera Status')
     screen.getByText(
-      'The deck camera offers live video monitoring during protocol runs and can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
-    )
-  })
-
-  it('renders camera status section for the OT-2', () => {
-    vi.mocked(useIsFlex).mockReturnValue(false)
-    render(mockProps)
-
-    screen.getByText('Camera Status')
-    screen.getByText(
-      'The deck camera can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
     )
   })
 

@@ -1,21 +1,21 @@
 # opentrons api makefile
 
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 
-# python and uv config
-sphinx_build := $(UV) run --python $(UV_PYTHON) sphinx-build -W --keep-going
+# python and pipenv config
+sphinx_build := $(pipenv) run sphinx-build -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(UV) run --python $(UV_PYTHON) sphinx-build
+sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -66,21 +66,14 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: setup-ot2
 setup-ot2:
-	@$(uv_sync_dev)
-	@$(UV) pip uninstall python-can
-	@$(UV) pip list
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y python-can
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean: docs-clean
@@ -89,7 +82,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -134,12 +127,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests integration_testing
-	$(ruff) check src tests integration_testing docs/v2/example_protocols
+	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
+	$(python) -m flake8 src tests integration_testing
 
 .PHONY: format
 format:
-	$(ruff) format src tests integration_testing docs/v2/example_protocols
-	$(ruff) check --select I --fix src tests integration_testing docs/v2/example_protocols
+	$(python) -m black src tests integration_testing docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -165,7 +158,7 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/hardware
+docs: docs/dist/v2 docs/dist/hardware
 
 .PHONY: docs-clean
 docs-clean:
@@ -178,7 +171,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	$(UV) run --python $(UV_PYTHON) bash
+	$(pipenv) shell
 
 .PHONY: push-no-restart
 push-no-restart: wheel

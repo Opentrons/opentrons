@@ -1,73 +1,72 @@
 """OT3 Hardware Controller Backend."""
 
 from __future__ import annotations
-
 import asyncio
-import logging
 from contextlib import asynccontextmanager
+import logging
 from typing import (
-    AsyncIterator,
     Dict,
     List,
-    Mapping,
     Optional,
-    Sequence,
-    Set,
     Tuple,
-    Union,
+    Sequence,
+    AsyncIterator,
     cast,
+    Set,
+    Union,
+    Mapping,
 )
 
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons_shared_data.pipette import (
-    load_data as load_pipette_data,
-)
-from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
-)
-from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
-
-from .flex_protocol import (
-    FlexBackend,
-)
-from .types import HWStopCondition
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import gripper_config
-from opentrons.config.types import GantryLoad, OT3Config
-from opentrons.hardware_control import modules
-from opentrons.hardware_control.dev_types import (
-    AttachedGripper,
-    AttachedPipette,
-    GripperSpec,
-    OT3AttachedInstruments,
-    PipetteSpec,
-)
+
 from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
-    Axis,
     BoardRevision,
-    CurrentConfig,
-    EstopOverallStatus,
-    EstopPhysicalStatus,
-    EstopState,
-    GripperJawState,
-    HardwareEventHandler,
-    HardwareEventUnsubscriber,
-    HardwareFeatureFlags,
+    Axis,
     HepaFanState,
     HepaUVState,
+    OT3Mount,
+    OT3AxisMap,
+    CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
-    OT3AxisMap,
-    OT3Mount,
-    PipetteSensorResponseQueue,
-    StatusBarState,
+    UpdateStatus,
+    UpdateState,
     SubSystem,
     SubSystemState,
     TipStateType,
-    UpdateState,
-    UpdateStatus,
+    GripperJawState,
+    HardwareFeatureFlags,
+    StatusBarState,
+    EstopOverallStatus,
+    EstopState,
+    EstopPhysicalStatus,
+    HardwareEventHandler,
+    HardwareEventUnsubscriber,
+    PipetteSensorResponseQueue,
+)
+
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons.hardware_control.dev_types import (
+    PipetteSpec,
+    GripperSpec,
+    AttachedPipette,
+    AttachedGripper,
+    OT3AttachedInstruments,
 )
 from opentrons.util.async_helpers import ensure_yield
+from .types import HWStopCondition
+from .flex_protocol import (
+    FlexBackend,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +183,7 @@ class OT3Simulator(FlexBackend):
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
-                f"{passed_ai['model']} is not"
+                f'{passed_ai["model"]} is not'
             )
 
         self._attached_instruments = {

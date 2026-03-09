@@ -21,7 +21,7 @@ import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 
-import { SecondaryWindowAppFallback } from './SecondaryWindowAppFallback'
+import { DesktopAppFallback } from './DesktopAppFallback'
 import { ReactQueryDevtools } from './tools'
 
 import type { ReactNode } from 'react'
@@ -49,7 +49,7 @@ export const SecondaryWindowApp = (): JSX.Element => {
 
   return (
     <LocalizationProvider>
-      <ErrorBoundary FallbackComponent={SecondaryWindowAppFallback}>
+      <ErrorBoundary FallbackComponent={DesktopAppFallback}>
         <ReactQueryDevtools />
         <Box width="100%">
           <Routes>

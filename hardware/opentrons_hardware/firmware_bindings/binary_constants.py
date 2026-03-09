@@ -4,7 +4,6 @@ This file is used as a source for code generation, which does not run in a venv
 by default. Please do not unconditionally import things outside the python standard
 library.
 """
-
 from enum import Enum, unique
 
 

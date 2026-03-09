@@ -1,20 +1,20 @@
-from typing import Any, Dict, List, Optional, Union
-
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, BaseModel, Field
+from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
 
-from .shared_models import (
-    CommandAnnotation,
-    DesignerApplication,
-    Liquid,
-    Location,
-    Metadata,
-    OffsetVector,
-    ProfileStep,
-    Robot,
-    WellLocation,
-)
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+
+from .shared_models import (
+    Liquid,
+    CommandAnnotation,
+    Location,
+    ProfileStep,
+    WellLocation,
+    OffsetVector,
+    Metadata,
+    Robot,
+    DesignerApplication,
+)
 
 
 # TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583

@@ -1,6 +1,4 @@
 """Tests for OE Updater."""
-
-import lzma
 import os
 from unittest import mock
 from unittest.mock import MagicMock
@@ -13,6 +11,9 @@ from otupdate.openembedded.update_actions import (
     PartitionManager,
     RootFSInterface,
 )
+
+import lzma
+
 
 # test valid partition switch
 
@@ -163,9 +164,9 @@ def test_decomp_and_write_raises_runtime_error(
         # make sure we catch RunTime Exception if the update size is larger than the partition size
         try:
             updater.decomp_and_write(rfs_path, lambda x: x(2))
-            assert False, (
-                "Did not raise RunTime error when update file is larger than partition."
-            )
+            assert (
+                False
+            ), "Did not raise RunTime error when update file is larger than partition."
         except RuntimeError:
             assert True, ""
 

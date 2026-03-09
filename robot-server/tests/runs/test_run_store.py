@@ -1,53 +1,45 @@
 """Tests for robot_server.runs.run_store."""
 
-import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Type
-from unittest import mock
+import warnings
 
 import pytest
 from decoy import Decoy
-from sqlalchemy.engine import Engine
-
-from opentrons.protocol_engine import (
-    CommandSlice,
-    EngineStatus,
-    ErrorOccurrence,
-    Liquid,
-    StateSummary,
-)
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-)
-from opentrons.protocol_engine import (
-    errors as pe_errors,
-)
-from opentrons.protocol_engine import (
-    types as pe_types,
-)
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
-from opentrons.protocol_engine.types import CommandAnnotation
-from opentrons.types import DeckSlotName, MountType
-from opentrons_shared_data.data_files import DataFileInfo, MimeType
-from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons_shared_data.pipette.types import PipetteNameType
-
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
+from sqlalchemy.engine import Engine
+from unittest import mock
+
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.errors.codes import ErrorCodes
+
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import (
-    BadStateSummary,
-    CommandAnnotationNotFoundError,
-    CommandNotFoundError,
     CSVParameterRunResource,
-    RunResource,
     RunStore,
+    RunResource,
+    CommandNotFoundError,
+    BadStateSummary,
 )
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.action_models import RunAction, RunActionType
 from robot_server.service.notifications import RunsPublisher
+
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    errors as pe_errors,
+    types as pe_types,
+    StateSummary,
+    CommandSlice,
+    Liquid,
+    EngineStatus,
+    ErrorOccurrence,
+)
+from opentrons.types import MountType, DeckSlotName
 
 
 @pytest.fixture()
@@ -79,7 +71,6 @@ def protocol_commands() -> List[pe_commands.Command]:
             params=pe_commands.WaitForResumeParams(message="hello world"),
             result=pe_commands.WaitForResumeResult(),
             intent=pe_commands.CommandIntent.PROTOCOL,
-            commandAnnotationIds=["annotation-1"],
         ),
         pe_commands.WaitForResume(
             id="pause-2",
@@ -97,7 +88,6 @@ def protocol_commands() -> List[pe_commands.Command]:
             createdAt=datetime(year=2023, month=3, day=3),
             params=pe_commands.WaitForResumeParams(message="sup world"),
             result=pe_commands.WaitForResumeResult(),
-            commandAnnotationIds=["annotation-1", "annotation-2"],
         ),
         pe_commands.WaitForResume(
             id="fixit-pause-1",
@@ -208,29 +198,6 @@ def state_summary() -> StateSummary:
     )
 
 
-@pytest.fixture
-def command_annotations() -> List[CommandAnnotation]:
-    """Get a list of sample command annotations."""
-    return [
-        CommandAnnotation(
-            id="annotation-1",
-            source="userCommand",
-            name="A notation",
-            description="A notation description",
-            parentId=None,
-            params={},
-        ),
-        CommandAnnotation(
-            id="annotation-2",
-            source="userCommand",
-            name="An other notation",
-            description="An other notation description",
-            parentId="annotation-1",
-            params={},
-        ),
-    ]
-
-
 @pytest.fixture()
 def run_time_parameters() -> List[pe_types.RunTimeParameter]:
     """Get a RunTimeParameter list."""
@@ -339,7 +306,6 @@ async def test_update_run_state(
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
     run_time_parameters: List[pe_types.RunTimeParameter],
-    command_annotations: List[CommandAnnotation],
     mock_runs_publisher: mock.Mock,
 ) -> None:
     """It should be able to update a run state to the store."""
@@ -360,7 +326,6 @@ async def test_update_run_state(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=run_time_parameters,
     )
     run_summary_result = subject.get_state_summary(run_id="run-id")
@@ -371,7 +336,7 @@ async def test_update_run_state(
         cursor=0,
         include_fixit_commands=True,
     )
-    # TODO: add command annotation getters
+
     assert result == RunResource(
         ok=True,
         run_id="run-id",
@@ -416,7 +381,6 @@ async def test_update_run_state_command_with_errors(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands_errors,
-        command_annotations=[],
         run_time_parameters=run_time_parameters,
     )
 
@@ -480,7 +444,6 @@ def test_update_state_run_not_found(
             run_id="run-not-found",
             summary=state_summary,
             commands=protocol_commands,
-            command_annotations=[],
             run_time_parameters=[],
         )
 
@@ -720,11 +683,7 @@ def test_get_state_summary(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=[],
-        command_annotations=[],
-        run_time_parameters=[],
+        run_id="run-id", summary=state_summary, commands=[], run_time_parameters=[]
     )
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
@@ -755,7 +714,6 @@ def test_get_state_summary_failure(
             run_id="run-id",
             summary=invalid_state_summary,
             commands=[],
-            command_annotations=[],
             run_time_parameters=[],
         )
 
@@ -791,7 +749,6 @@ def test_get_run_time_parameters(
         run_id="run-id",
         summary=state_summary,
         commands=[],
-        command_annotations=[],
         run_time_parameters=run_time_parameters,
     )
     result = subject.get_run_time_parameters(run_id="run-id")
@@ -813,7 +770,6 @@ def test_get_run_time_parameters_invalid(
         run_id="run-id",
         summary=state_summary,
         commands=[],
-        command_annotations=[],
         run_time_parameters=bad_parameters,  # type: ignore[arg-type]
     )
     result = subject.get_run_time_parameters(run_id="run-id")
@@ -854,7 +810,6 @@ def test_has_no_run_id(subject: RunStore) -> None:
 def test_get_command(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
 ) -> None:
     """Should return a run command from the db."""
@@ -865,160 +820,11 @@ def test_get_command(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_command(run_id="run-id", command_id="pause-2")
 
     assert result == protocol_commands[1]
-
-
-def test_get_command_annotation(
-    subject: RunStore,
-    protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
-    state_summary: StateSummary,
-) -> None:
-    """Should return a run command annotation from the db."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=protocol_commands,
-        command_annotations=command_annotations,
-        run_time_parameters=[],
-    )
-    result = subject.get_command_annotation(
-        run_id="run-id", command_annotation_id="annotation-2"
-    )
-    assert result == command_annotations[1]
-
-
-def test_get_command_annotation_missing(
-    subject: RunStore,
-    protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
-    state_summary: StateSummary,
-) -> None:
-    """Should raise if the command annotation does not exist."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=protocol_commands,
-        command_annotations=command_annotations,
-        run_time_parameters=[],
-    )
-    with pytest.raises(
-        CommandAnnotationNotFoundError, match="non-existent-annotation-id"
-    ):
-        subject.get_command_annotation(
-            run_id="run-id", command_annotation_id="non-existent-annotation-id"
-        )
-
-
-def test_get_total_command_annotations_count(
-    subject: RunStore,
-    protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
-    state_summary: StateSummary,
-) -> None:
-    """Should return a run command annotation from the db."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=protocol_commands,
-        command_annotations=command_annotations,
-        run_time_parameters=[],
-    )
-    result = subject.get_total_command_annotations_count(run_id="run-id")
-    assert result == 2
-
-
-_many_command_annotations = [
-    CommandAnnotation(
-        id=f"annotation-{i}",
-        name=f"My annotation {i}",
-        description=f"This is annotation {i}",
-        source="userCommand",
-        parentId=None,
-        params={f"param-{i}": "nothing"},
-    )
-    for i in range(20)
-]
-
-
-@pytest.mark.parametrize(
-    argnames=["cursor", "length", "expected_result"],
-    argvalues=[
-        (
-            0,
-            5,
-            CommandAnnotationsSlice(
-                command_annotations=_many_command_annotations[0:5],
-                cursor=0,
-                total_length=20,
-            ),
-        ),
-        (
-            5,
-            3,
-            CommandAnnotationsSlice(
-                command_annotations=_many_command_annotations[5:8],
-                cursor=5,
-                total_length=20,
-            ),
-        ),
-        (
-            18,
-            10,
-            CommandAnnotationsSlice(
-                command_annotations=_many_command_annotations[18:20],
-                cursor=18,
-                total_length=20,
-            ),
-        ),
-        (
-            0,
-            25,
-            CommandAnnotationsSlice(
-                command_annotations=_many_command_annotations, cursor=0, total_length=20
-            ),
-        ),
-    ],
-)
-def test_get_command_annotations_slice(
-    subject: RunStore,
-    protocol_commands: List[pe_commands.Command],
-    state_summary: StateSummary,
-    cursor: int,
-    length: int,
-    expected_result: CommandAnnotationsSlice,
-) -> None:
-    """Should return a run command annotation from the db."""
-    subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
-    )
-    subject.update_run_state(
-        run_id="run-id",
-        summary=state_summary,
-        commands=protocol_commands,
-        command_annotations=_many_command_annotations,
-        run_time_parameters=[],
-    )
-    result = subject.get_command_annotations_slice(
-        run_id="run-id",
-        cursor=cursor,
-        length=length,
-    )
-    assert result == expected_result
 
 
 @pytest.mark.parametrize(
@@ -1031,7 +837,6 @@ def test_get_command_annotations_slice(
 def test_get_command_raise_exception(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
     input_run_id: str,
     input_command_id: str,
@@ -1045,7 +850,6 @@ def test_get_command_raise_exception(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     with pytest.raises(expected_exception):
@@ -1055,7 +859,6 @@ def test_get_command_raise_exception(
 def test_get_command_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
 ) -> None:
     """It should return slices of commands."""
@@ -1068,7 +871,6 @@ def test_get_command_slice(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_commands_slice(
@@ -1103,7 +905,6 @@ def test_get_command_slice(
 def test_get_commands_slice_clamping(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
     input_cursor: Optional[int],
     input_length: int,
@@ -1120,7 +921,6 @@ def test_get_commands_slice_clamping(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_commands_slice(
@@ -1165,7 +965,6 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
 def test_get_commands_slice_no_fixit_commands(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
 ) -> None:
     """Should raise an error RunNotFoundError."""
@@ -1178,7 +977,6 @@ def test_get_commands_slice_no_fixit_commands(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_commands_slice(
@@ -1200,7 +998,6 @@ def test_get_commands_slice_no_fixit_commands(
 def test_get_all_commands_as_preserialized_list(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
 ) -> None:
     """It should get all commands stored in DB as a pre-serialized list."""
@@ -1213,7 +1010,6 @@ def test_get_all_commands_as_preserialized_list(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_all_commands_as_preserialized_list(
@@ -1221,24 +1017,17 @@ def test_get_all_commands_as_preserialized_list(
     )
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"protocol"}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
-        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
-        '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"fixit","commandAnnotationIds":[]}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},"intent":"protocol"}',
+        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{}}',
+        '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"fixit"}',
     ]
 
 
 def test_get_all_commands_as_preserialized_list_no_fixit(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
-    command_annotations: List[pe_types.CommandAnnotation],
     state_summary: StateSummary,
 ) -> None:
     """It should get all commands stored in DB without fixit commands as a pre-serialized list."""
@@ -1251,7 +1040,6 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
-        command_annotations=command_annotations,
         run_time_parameters=[],
     )
     result = subject.get_all_commands_as_preserialized_list(
@@ -1259,12 +1047,8 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
     )
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},"intent":"protocol"}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
-        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
-        '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
+        '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},"intent":"protocol"}',
+        '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume","key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{}}',
     ]

@@ -1,11 +1,10 @@
+import pytest
 from typing import List, Tuple
 
-import pytest
-
+from robot_server.service.session.models.command_definitions import CalibrationCommand
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine,
 )
-from robot_server.service.session.models.command_definitions import CalibrationCommand
 
 valid_commands: List[Tuple[str, str, str]] = [
     (CalibrationCommand.load_labware, "sessionStarted", "labwareLoaded"),

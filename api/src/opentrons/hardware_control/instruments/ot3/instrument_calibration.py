@@ -1,28 +1,25 @@
 import typing
+from typing_extensions import Literal, Final
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from typing_extensions import Final, Literal
-
-from opentrons.calibration_storage import (
-    gripper_offset,
+from opentrons.config import feature_flags as ff
+from opentrons.config.robot_configs import (
+    default_pipette_offset,
+    default_gripper_calibration_offset,
 )
-from opentrons.calibration_storage import (
-    types as cal_top_types,
-)
+from opentrons.types import Point, Mount
 
 # TODO change this when imports are fixed
 from opentrons.calibration_storage.ot3.pipette_offset import (
-    get_pipette_offset,
     save_pipette_calibration,
+    get_pipette_offset,
 )
-from opentrons.config import feature_flags as ff
-from opentrons.config.robot_configs import (
-    default_gripper_calibration_offset,
-    default_pipette_offset,
+from opentrons.calibration_storage import (
+    types as cal_top_types,
+    gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Mount, Point
 
 PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 4.0
 

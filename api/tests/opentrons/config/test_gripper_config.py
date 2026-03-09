@@ -1,8 +1,6 @@
 import pytest
-
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-
 from opentrons.config import gripper_config as gc
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
 
 
 def test_load_gripper_config() -> None:

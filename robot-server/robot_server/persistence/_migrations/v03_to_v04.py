@@ -6,15 +6,14 @@ Summary of changes from schema 3:
 - Adds a new "run_time_parameters" column to run table
 """
 
-from contextlib import ExitStack
 from pathlib import Path
+from contextlib import ExitStack
 
-from server_utils.persistence.folder_migrator import Migration
-
+from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
 from ..tables import schema_04
-from ._util import add_column, copy_contents
+from .._folder_migrator import Migration
 
 
 class Migration3to4(Migration):  # noqa: D101

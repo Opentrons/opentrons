@@ -1,12 +1,11 @@
 """Unit tests for `protocol_auto_deleter`."""
 
-import logging
+
 from datetime import datetime
+import logging
 
 import pytest
 from decoy import Decoy
-
-from opentrons.protocol_reader import ProtocolSource
 
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
@@ -16,6 +15,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolUsageInfo,
 )
+from opentrons.protocol_reader import ProtocolSource
 
 
 def test_make_room_for_new_protocol(

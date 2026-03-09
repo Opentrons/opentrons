@@ -26,9 +26,8 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
+  useRunStatus,
 } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -61,10 +60,7 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
-  const runStatus = runRecord?.data.status ?? null
+  const runStatus = useRunStatus(runId)
   useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       navigate('/protocols')

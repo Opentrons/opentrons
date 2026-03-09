@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -9,13 +8,13 @@ import {
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
+  LINE_CLAMP_TEXT_STYLE,
   ListItem,
   RobotInfoLabel,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { DropdownOption, MenuPlacement } from '@opentrons/components'
@@ -86,16 +85,11 @@ export function DropdownStepFormField(
     }
   }
 
-  useEffect(
-    () => {
-      if (options.length === 1) {
-        updateValue(options[0].value)
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [options.length]
-  )
+  useEffect(() => {
+    if (options.length === 1) {
+      updateValue(options[0].value)
+    }
+  }, [options.length])
 
   return (
     <Flex padding={padding ?? SPACING.spacing16}>
@@ -123,7 +117,6 @@ export function DropdownStepFormField(
           onEnter={onEnter}
           onExit={onExit}
           menuPlacement={menuPlacement}
-          testId={fieldName}
         />
       ) : (
         <Flex
@@ -150,11 +143,7 @@ export function DropdownStepFormField(
                 {options[0].name !== options[0].deckLabel ? (
                   <StyledText
                     desktopStyle="captionRegular"
-                    className={clsx(
-                      lineClampStyles.line_clamp,
-                      lineClampStyles.word_normal
-                    )}
-                    style={{ WebkitLineClamp: 3 }}
+                    css={LINE_CLAMP_TEXT_STYLE(3, true)}
                   >
                     {options[0].name}
                   </StyledText>

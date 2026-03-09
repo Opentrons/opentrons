@@ -1,9 +1,8 @@
 """Run a full snapshot test of labware stackup logic."""
 
 import argparse
-import sys
 from pathlib import Path
-
+import sys
 from . import create_stackups, data, stackup_snapshot_test
 
 

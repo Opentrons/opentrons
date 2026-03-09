@@ -21,7 +21,8 @@ export const commandCreatorsTimeline = (
       const prevRobotState =
         acc.timeline.length === 0
           ? initialRobotState
-          : last(acc.timeline)!.robotState
+          : // @ts-expect-error(SA, 2021-05-03): last might return undefined
+            last(acc.timeline).robotState
 
       if (acc.errors != null) {
         // error short-circuit

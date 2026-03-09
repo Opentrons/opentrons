@@ -1,8 +1,7 @@
 from typing import Dict, Optional
-
 from typing_extensions import Protocol
 
-from ..types import Axis, SubSystem, SubSystemState
+from ..types import SubSystem, SubSystemState, Axis
 
 
 class HardwareManager(Protocol):

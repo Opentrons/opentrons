@@ -32,7 +32,7 @@ export function EnableDevTools(): JSX.Element {
         >
           {t('enable_dev_tools')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('enable_dev_tools_description')}
         </LegacyStyledText>
       </Box>

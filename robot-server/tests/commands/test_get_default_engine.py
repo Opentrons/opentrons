@@ -1,5 +1,4 @@
 """Tests for robot_server.commands.get_default_orchestrator."""
-
 import pytest
 from decoy import Decoy
 
@@ -7,13 +6,13 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocol_runner import RunOrchestrator
 
-from robot_server.commands.get_default_orchestrator import get_default_orchestrator
 from robot_server.errors.error_responses import ApiError
-from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 from robot_server.runs.run_orchestrator_store import (
-    RunConflictError,
     RunOrchestratorStore,
+    RunConflictError,
 )
+from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
+from robot_server.commands.get_default_orchestrator import get_default_orchestrator
 
 
 @pytest.fixture()

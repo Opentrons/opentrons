@@ -4,11 +4,10 @@ from pathlib import Path
 from typing import Callable
 
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-
 from opentrons.util.entrypoint_util import (
     FoundLabware,
-    datafiles_from_paths,
     labware_from_paths,
+    datafiles_from_paths,
 )
 
 

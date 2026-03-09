@@ -5,7 +5,6 @@ import {
   useCreateProtocolMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
-import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -15,7 +14,6 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
-import mockQuickTransferState from '../QuickTransferAdvancedSettings/__fixtures__/QuickTransferState.json'
 import { SummaryAndSettings } from '../SummaryAndSettings'
 import { createQuickTransferPythonFile, getInitialSummaryState } from '../utils'
 
@@ -23,10 +21,6 @@ import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
-const mockFixture = {
-  cutoutId: 'cutoutA3',
-  cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-}
 
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
@@ -69,19 +63,15 @@ describe('SummaryAndSettings', () => {
         onClick: vi.fn(),
       },
       state: {
-        pipette: mockQuickTransferState.pipette as any,
+        pipette: {} as any,
         mount: 'left',
-        tipRack: mockQuickTransferState.tipRack as any,
+        tipRack: {} as any,
         source: {} as any,
         sourceWells: ['A1'],
         destination: {} as any,
         destinationWells: ['A1'],
         transferType: 'transfer',
         volume: 25,
-        path: 'single',
-        liquidClassName: 'none',
-        changeTip: 'once',
-        dropTipLocation: undefined,
       },
       analyticsStartTime: new Date(),
     }
@@ -89,7 +79,9 @@ describe('SummaryAndSettings', () => {
       () => new Promise(resolve => resolve({}))
     )
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
-      data: [mockFixture],
+      data: {
+        data: [],
+      },
     } as any)
     vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
       trackEventWithRobotSerial: mockTrackEventWithRobotSerial,

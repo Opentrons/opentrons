@@ -71,8 +71,6 @@ export function GeneralSettings(): JSX.Element {
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
   let transactionId = ''
   useEffect(() => {
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     transactionId = uuid()
   }, [])
   const handleDropdownClick = (value: string): void => {
@@ -173,13 +171,13 @@ export function GeneralSettings(): JSX.Element {
                 {t('software_version')}
               </LegacyStyledText>
               <LegacyStyledText
-                forwardedAs="p"
+                as="p"
                 paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {t('shared:view_latest_release_notes')}
                 <Link
                   external
@@ -212,7 +210,7 @@ export function GeneralSettings(): JSX.Element {
             )}
           </Flex>
           <Box width="70%">
-            <LegacyStyledText forwardedAs="p" paddingY={SPACING.spacing8}>
+            <LegacyStyledText as="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
             </LegacyStyledText>
           </Box>
@@ -249,7 +247,7 @@ export function GeneralSettings(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('branded:receive_alert')}
           </LegacyStyledText>
           <ToggleButton
@@ -297,7 +295,7 @@ export function GeneralSettings(): JSX.Element {
                 >
                   {t('app_language_preferences')}
                 </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p">
+                <LegacyStyledText as="p">
                   {t('app_language_description')}
                 </LegacyStyledText>
               </Flex>

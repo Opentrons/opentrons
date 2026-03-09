@@ -1,6 +1,5 @@
 ---
 title: "HEPA/UV Module: Product Specifications"
-description: "Included parts, dimensions, power, and physical specs for the HEPA/UV Module."
 ---
 
 ![Labeled HEPA/UV Module diagram](images/hepa-features-labeled.png)

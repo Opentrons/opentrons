@@ -1,33 +1,30 @@
-import logging
 import os
-import re
+
 from pathlib import Path
+import logging
+import re
 from typing import Any, List, Tuple
 
-from ._version import version
-from opentrons.config import (
-    IS_ROBOT,
-    ROBOT_FIRMWARE_DIR,
-    name,
-    robot_configs,
-)
-from opentrons.config import (
-    feature_flags as ff,
-)
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
     API as HardwareAPI,
-)
-from opentrons.hardware_control import (
-    ThreadManagedHardware,
     ThreadManager,
-)
-from opentrons.hardware_control import (
+    ThreadManagedHardware,
     types as hw_types,
 )
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.types import ApiDeprecationError
+
+from opentrons.config import (
+    feature_flags as ff,
+    name,
+    robot_configs,
+    IS_ROBOT,
+    ROBOT_FIRMWARE_DIR,
+)
 from opentrons.util import logging_config
+from opentrons.protocols.types import ApiDeprecationError
+from opentrons.protocols.api_support.types import APIVersion
+
+from ._version import version
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version

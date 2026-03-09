@@ -1,17 +1,15 @@
-from datetime import datetime
-
 import pytest
-
 from opentrons.calibration_storage.types import (
-    CalibrationStatus,
     SourceType,
-)
-from opentrons.hardware_control import API, ThreadManager
-from opentrons.hardware_control.robot_calibration import (
-    DeckCalibration,
-    RobotCalibration,
+    CalibrationStatus,
 )
 from opentrons.hardware_control.util import DeckTransformState
+from opentrons.hardware_control.robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
+from opentrons.hardware_control import ThreadManager, API
+from datetime import datetime
 
 
 @pytest.mark.ot2_only  # ot3 attitude is always correct

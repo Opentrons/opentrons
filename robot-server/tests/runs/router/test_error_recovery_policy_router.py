@@ -3,8 +3,6 @@
 import pytest
 from decoy import Decoy
 
-from server_utils.fastapi_utils.models.json_api.request import RequestModel
-
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs import error_recovery_models as er_models
 from robot_server.runs.router.error_recovery_policy_router import (
@@ -12,6 +10,7 @@ from robot_server.runs.router.error_recovery_policy_router import (
     put_error_recovery_policy,
 )
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
+from robot_server.service.json_api.request import RequestModel
 
 
 async def test_put(decoy: Decoy, mock_run_data_manager: RunDataManager) -> None:
@@ -35,7 +34,7 @@ async def test_put_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=er_models.ErrorRecoveryPolicy)
     decoy.when(
-        mock_run_data_manager.set_error_recovery_rules(  # type: ignore[func-returns-value]
+        mock_run_data_manager.set_error_recovery_rules(
             run_id="run-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())

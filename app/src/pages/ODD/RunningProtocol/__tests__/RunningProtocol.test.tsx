@@ -46,6 +46,7 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
+  useRunStatus,
   useRunTimestamps,
 } from '/app/resources/runs'
 
@@ -60,14 +61,14 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/organisms/ODD/RunningProtocol')
 vi.mock('/app/redux/discovery')
+vi.mock('/app/organisms/ODD/RunningProtocol/CancelingRunModal')
+vi.mock('/app/organisms/ODD/OpenDoorAlertModal')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')
 vi.mock('/app/organisms/InterventionModal')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/local-resources/images/hooks/useToastOnErrorImage')
-vi.mock('/app/organisms/ODD/RunningProtocol/CancelingRunModal')
-vi.mock('/app/organisms/ODD/OpenDoorAlertModal')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -101,16 +102,12 @@ const render = (path = '/') => {
 describe('RunningProtocol', () => {
   beforeEach(() => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
+      .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
         data: {
           data: {
             id: RUN_ID,
             protocolId: PROTOCOL_ID,
-            status: RUN_STATUS_IDLE,
             errors: [],
           },
         },
@@ -121,6 +118,7 @@ describe('RunningProtocol', () => {
       .thenReturn({
         trackProtocolRunEvent: vi.fn(),
       })
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     when(vi.mocked(useProtocolAnalysesQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
       .thenReturn({
@@ -198,26 +196,10 @@ describe('RunningProtocol', () => {
     expect(vi.mocked(RunningProtocolSkeleton)).toHaveBeenCalled()
   })
   it('should render the canceling run modal when run status is stop requested', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        key: PROTOCOL_KEY,
-        data: {
-          data: {
-            id: RUN_ID,
-            status: RUN_STATUS_STOP_REQUESTED,
-            protocol_id: PROTOCOL_KEY,
-          },
-        },
-      } as any)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mock protocol name' } } },
-    } as any)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_STOP_REQUESTED)
     render(`/runs/${RUN_ID}/run`)
-
     expect(vi.mocked(CancelingRunModal)).toHaveBeenCalled()
   })
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {
@@ -225,24 +207,13 @@ describe('RunningProtocol', () => {
     expect(vi.mocked(CurrentRunningProtocolCommand)).toHaveBeenCalled()
   })
 
-  it('should render open door alert modal, when run status is blocked by open door', () => {
+  it('should render open door alert modal, when run staus is blocked by open door', () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(DOOR_RESULT)
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
-      } as any)
-    when(vi.mocked(useIsDoorOpen))
-      .calledWith(ROBOT_NAME)
-      .thenReturn(DOOR_RESULT)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
       { moduleDoorLocation: null },
@@ -251,15 +222,9 @@ describe('RunningProtocol', () => {
   })
 
   it('should render open stacker door alert modal, when run staus is blocked by open stacker door', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
-      } as any)
-
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const mockOpenStacker = {
       isDoorOpen: true,
       moduleDoorLocation: 'A4',
@@ -267,9 +232,6 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockOpenStacker)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
       { moduleDoorLocation: mockOpenStacker.moduleDoorLocation },
@@ -278,15 +240,9 @@ describe('RunningProtocol', () => {
   })
 
   it('should render open unconfigured stacker door alert modal, when run staus is blocked by open stacker door not in the deck config', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
-      } as any)
-
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const mockUnconfiguredOpenStacker = {
       isDoorOpen: true,
       moduleDoorLocation: NOT_CONFIGURED,
@@ -294,9 +250,6 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockUnconfiguredOpenStacker)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalledWith(
       { moduleDoorLocation: NOT_CONFIGURED },
@@ -305,43 +258,24 @@ describe('RunningProtocol', () => {
   })
 
   it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        data: {
-          data: {
-            id: RUN_ID,
-            status: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-          },
-        },
-      } as any)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).not.toHaveBeenCalled()
   })
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, {
-        staleTime: Infinity,
-        refetchInterval: 5000,
-      })
-      .thenReturn({
-        data: { data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY } },
-      } as any)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
     render(`/runs/${RUN_ID}/run`)
   })
 
   it('should render ErrorRecovery appropriately', () => {
+    render(`/runs/${RUN_ID}/run`)
     expect(screen.queryByText('MOCK ERROR RECOVERY')).not.toBeInTheDocument()
+
     vi.mocked(useErrorRecoveryFlows).mockReturnValue({
       isERActive: true,
       failedCommand: {} as any,

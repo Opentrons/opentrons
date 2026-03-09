@@ -29,7 +29,7 @@ export function DisplaySearchNetwork(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
       >
         <LegacyStyledText
-          forwardedAs="h3"
+          as="h3"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}

@@ -1,10 +1,8 @@
 from typing import List
-
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class PipetteSettings(BaseModel):

@@ -60,7 +60,7 @@ export function ChooseEnum({
         paddingBottom={SPACING.spacing40}
       >
         <LegacyStyledText
-          forwardedAs="h4"
+          as="h4"
           textAlign={TYPOGRAPHY.textAlignLeft}
           marginBottom={SPACING.spacing16}
         >

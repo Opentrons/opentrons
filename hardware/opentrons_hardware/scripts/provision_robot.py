@@ -54,22 +54,23 @@ Notes:
         --property FORMAT_VERSION 2
 """
 
-import argparse
 import re
+import argparse
 import subprocess
 import textwrap
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
+from pathlib import Path
+from typing import Dict, Tuple, List, Any, Optional
+
+from opentrons_hardware.drivers.eeprom.build import build_eeprom_driver
 from opentrons_hardware.drivers.eeprom import (
-    DEFAULT_ADDRESS,
-    DEFAULT_BUS,
-    DEFAULT_READ_SIZE,
-    FORMAT_VERSION,
     EEPROMDriver,
     PropId,
+    DEFAULT_BUS,
+    DEFAULT_ADDRESS,
+    DEFAULT_READ_SIZE,
+    FORMAT_VERSION,
 )
-from opentrons_hardware.drivers.eeprom.build import build_eeprom_driver
 
 # Set of operations this script can perform
 ACTIONS = ["clear", "write", "print"]

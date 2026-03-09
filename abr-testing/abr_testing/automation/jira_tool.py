@@ -4,7 +4,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
-from pathlib import Path
 import argparse
 from typing import List, Dict, Any, Tuple
 import os
@@ -26,10 +25,24 @@ class JiraTicket:
 
     def issues_on_board(self, project_key: str) -> List[List[Any]]:
         """Print Issues on board."""
-        all_issues = self.get_project_issues(project_key)
-        issues_dict = all_issues["issues"]
+        params = {"jql": f"project = {project_key}", "fields": "*all"}
+        response = requests.get(
+            f"{self.url}/rest/api/3/search/jql",
+            headers=self.headers,
+            params=params,
+            auth=self.auth,
+        )
+
+        response.raise_for_status()
+        try:
+            board_data = response.json()
+            all_issues = board_data["issues"]
+        except json.JSONDecodeError as e:
+            print("Error decoding json: ", e)
+        # convert issue id's into array and have one key as
+        # the issue key and one be summary, return entire array
         issue_ids = []
-        for i in issues_dict:
+        for i in all_issues:
             issue_id = i.get("id")
             issue_summary = i["fields"].get("summary")
             issue_ids.append([issue_id, issue_summary])
@@ -105,6 +118,7 @@ class JiraTicket:
         summary: str,
         description: str,
         project_key: str,
+        reporter_id: str,
         assignee_id: str,
         issue_type: str,
         priority: str,
@@ -114,28 +128,31 @@ class JiraTicket:
     ) -> Tuple[str, str]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
+        # TODO: automate parent linking
         data = {
             "fields": {
-                "project": {"key": project_key},
+                "project": {"id": "10273", "key": project_key},
                 "issuetype": {"name": issue_type},
                 "summary": summary,
+                "reporter": {"id": reporter_id},
                 "assignee": {"id": assignee_id},
+                # "parent": {"key": parent_name},
                 "labels": labels,
                 "priority": {"name": priority},
                 "components": [{"name": component} for component in components],
                 "description": {
-                    "type": "doc",
-                    "version": 1,
                     "content": [
                         {
+                            "content": [{"text": description, "type": "text"}],
                             "type": "paragraph",
-                            "content": [{"type": "text", "text": description}],
                         }
                     ],
-                },
+                    "type": "doc",
+                    "version": 1,
+                }
+                # Include other required fields as needed
             }
         }
-
         available_versions = self.get_project_versions(project_key)
 
         if affects_versions in available_versions:
@@ -185,22 +202,17 @@ class JiraTicket:
             print(f"JSON decoding error occurred. Response content: {error_message}.")
 
     def get_project_issues(self, project_key: str) -> Dict[str, Any]:
-        """Get all issues for a project."""
-        url = f"{self.url}/rest/api/3/search/jql"
-        query = {
-            "jql": 'project = "Robotics ABR"',
-            "maxResults": "273",
-            "reconcileIssues": "2154",
-            "fields": "assignee, summary, id",
-        }
+        """Retrieve all issues for the given project key."""
+        # TODO: add field for ticket type.
+        headers = {"Accept": "application/json"}
+        query = {"jql": f"project={project_key}", "fields": "*all"}
         response = requests.request(
             "GET",
-            url,
-            headers=self.headers,
-            auth=self.auth,
+            f"{self.url}/rest/api/3/search/jql",
+            headers=headers,
             params=query,
+            auth=self.auth,
         )
-
         return response.json()
 
     def get_project_versions(self, project_key: str) -> List[str]:
@@ -234,17 +246,17 @@ class JiraTicket:
                 }
         return users
 
-    def save_users_to_file(self, users: Dict[str, Any], storage_directory: Path) -> str:
+    def save_users_to_file(self, users: Dict[str, Any], storage_directory: str) -> str:
         """Save users to a JSON file."""
         file_path = os.path.join(storage_directory, "RABR_Users.json")
         with open(file_path, mode="w") as file:
             json.dump(users, file, indent=4)
         return file_path
 
-    def get_jira_users(self, storage_directory: Path, project_key: str) -> str:
+    def get_jira_users(self, storage_directory: str) -> str:
         """Get all Jira users associated with the project key."""
         try:
-            issues = self.get_project_issues(project_key)
+            issues = self.get_project_issues("RABR")
             users = self.extract_users_from_issues(issues)
             file_path = self.save_users_to_file(users, storage_directory)
         except requests.RequestException as e:

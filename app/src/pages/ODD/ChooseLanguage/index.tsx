@@ -30,15 +30,11 @@ export function ChooseLanguage(): JSX.Element {
 
   const appLanguage = useSelector(getAppLanguage)
 
-  useEffect(
-    () => {
-      // initialize en-US language on mount
-      dispatch(updateConfigValue('language.appLanguage', US_ENGLISH))
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  useEffect(() => {
+    // initialize en-US language on mount
+    dispatch(updateConfigValue('language.appLanguage', US_ENGLISH))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  }, [])
 
   return (
     <Flex

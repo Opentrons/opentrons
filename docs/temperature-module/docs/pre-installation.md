@@ -1,6 +1,5 @@
 ---
 title: "Temperature Module: Before You Begin"
-description: "Deck placement, Flex caddies, and anchor adjustments before installation."
 ---
 
 Review this section for important information about deck placement, alignment, and anchor adjustments for the Temperature Module.

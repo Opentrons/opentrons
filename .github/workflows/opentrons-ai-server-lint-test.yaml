@@ -6,7 +6,6 @@ on:
   pull_request:
     paths:
       - 'opentrons-ai-server/**'
-      - '.github/workflows/opentrons-ai-server-lint-test.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -23,18 +22,22 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v6'
+        uses: 'actions/checkout@v4'
 
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+      - name: Setup Python
+        uses: 'actions/setup-python@v5'
         with:
-          python-version: "3.12"
-          enable-cache: true
-          cache-dependency-glob: "./opentrons-ai-server/uv.lock"
+          python-version: '3.12'
+          cache: 'pipenv'
+          cache-dependency-path: opentrons-ai-server/Pipfile.lock
       - name: Setup
         id: install
         working-directory: ./opentrons-ai-server
         run: make setup
+      - name: black-check
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make black-check
       - name: ruff
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./opentrons-ai-server

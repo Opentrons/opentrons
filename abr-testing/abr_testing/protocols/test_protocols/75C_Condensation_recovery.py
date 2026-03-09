@@ -25,9 +25,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
     try:
         if not protocol.is_simulating():
-            from abr_testing.protocols.helpers import run_helpers
+            from abr_testing.protocols import helpers
 
-            slack_bot = run_helpers.set_up_slack()
+            slack_bot = helpers.set_up_slack()
             slack_bot.send_run_started_message(metadata["protocolName"])
 
         # PROTOCOL STEPS
@@ -48,6 +48,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         thermocycler_module_1.deactivate_lid()
     except Exception as e:
         if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
+            helpers.send_slack_error_message_with_log(
                 slack_bot, metadata["protocolName"], str(e)
             )

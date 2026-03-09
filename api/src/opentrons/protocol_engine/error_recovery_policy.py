@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, Optional, Protocol
+from typing import Optional, Protocol, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.commands import (
@@ -63,7 +63,8 @@ class ErrorRecoveryPolicy(Protocol):
         config: Config,
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
-    ) -> ErrorRecoveryType: ...
+    ) -> ErrorRecoveryType:
+        ...
 
 
 def never_recover(

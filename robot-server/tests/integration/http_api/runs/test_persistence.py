@@ -11,6 +11,9 @@ from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
+pytestmark = pytest.mark.slow
+
+
 class ClientServerFixture(NamedTuple):
     client: RobotClient
     server: DevServer
@@ -76,7 +79,6 @@ async def _assert_run_persisted(
     assert get_persisted_run_response.json()["data"] == expected_run_data
 
 
-@pytest.mark.slow
 async def test_untimely_restart_marks_runs_bad(
     client_and_server: ClientServerFixture,
 ) -> None:
@@ -116,7 +118,6 @@ async def test_untimely_restart_marks_runs_bad(
     await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
-@pytest.mark.slow
 async def test_runs_persist_via_patch(client_and_server: ClientServerFixture) -> None:
     """Test that runs are persisted through dev server restart."""
     client, server = client_and_server
@@ -138,7 +139,6 @@ async def test_runs_persist_via_patch(client_and_server: ClientServerFixture) ->
     await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
-@pytest.mark.slow
 async def test_runs_persist_via_actions_router(
     client_and_server: ClientServerFixture,
 ) -> None:
@@ -170,7 +170,6 @@ async def test_runs_persist_via_actions_router(
     await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
-@pytest.mark.slow
 async def test_run_actions_and_labware_offsets_persist(
     client_and_server: ClientServerFixture,
 ) -> None:
@@ -228,7 +227,6 @@ async def test_run_actions_and_labware_offsets_persist(
     await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
-@pytest.mark.slow
 async def test_run_commands_persist(client_and_server: ClientServerFixture) -> None:
     """Test that run commands are persisted through restart."""
     client, server = client_and_server
@@ -265,12 +263,7 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     assert get_all_persisted_commands_response.json()["data"] == [
         # NOTE: GET /run/:id/commands returns command summaries,
         # which are commands without the `result` key
-        # TODO(jbl, 2026-01-27) undo this with robot server work, this should start failing when we persist this
-        {
-            k: v
-            for k, v in expected_command.items()
-            if k != "result" and k != "commandAnnotationIds"
-        }
+        {k: v for k, v in expected_command.items() if k != "result"}
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
 
@@ -280,7 +273,6 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     assert json_converted_command == expected_command
 
 
-@pytest.mark.slow
 async def test_runs_completed_started_at_persist_via_actions_router(
     client_and_server: ClientServerFixture,
 ) -> None:
@@ -322,7 +314,6 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     assert run_data["startedAt"] < run_data["completedAt"]
 
 
-@pytest.mark.slow
 async def test_runs_completed_filled_started_at_none_persist(
     client_and_server: ClientServerFixture,
 ) -> None:

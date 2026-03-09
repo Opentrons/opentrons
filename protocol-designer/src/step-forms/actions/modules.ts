@@ -1,7 +1,6 @@
 import { uuid } from '../../utils'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { DeckSlot } from '../../types'
 
 export interface CreateModuleAction {
@@ -26,16 +25,3 @@ export interface DeleteModuleAction {
     id: string
   }
 }
-export interface UpdateStackerModuleStateAction {
-  type: 'UPDATE_STACKER_MODULE_STATE'
-  payload: {
-    moduleId: string
-    moduleState: FlexStackerModuleState
-  }
-}
-export const updateStackerModuleState = (
-  args: UpdateStackerModuleStateAction['payload']
-): UpdateStackerModuleStateAction => ({
-  type: 'UPDATE_STACKER_MODULE_STATE',
-  payload: args,
-})

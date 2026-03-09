@@ -1,4 +1,4 @@
-import groupBy from 'lodash/groupBy'
+import { groupBy } from 'lodash'
 
 import {
   getAllDefinitions as _getAllDefinitions,
@@ -30,33 +30,26 @@ let _latestDefs: LabwareDef2ByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDef2ByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
-    const allURIs = Object.keys(allDefs as Record<string, LabwareDefinition>)
-    const defsArray: LabwareDefinition[] = allURIs.map(
-      (uri: string) => allDefs[uri] as LabwareDefinition
-    )
+    const allURIs = Object.keys(allDefs)
     const labwareDefGroups: Record<string, LabwareDefinition[]> = groupBy(
-      defsArray,
+      allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )
-    const initialValue: LabwareDef2ByDefURI = {}
-    const result = Object.keys(labwareDefGroups).reduce<LabwareDef2ByDefURI>(
-      (acc: LabwareDef2ByDefURI, groupKey: string) => {
-        const group: LabwareDefinition[] = labwareDefGroups[groupKey] ?? []
-        const allVersions: number[] = group.map(d => d.version)
+    _latestDefs = Object.keys(labwareDefGroups).reduce(
+      (acc, groupKey: string) => {
+        const group = labwareDefGroups[groupKey]
+        const allVersions = group.map(d => d.version)
         const highestVersionNum = Math.max(...allVersions)
         const resultIdx = group.findIndex(d => d.version === highestVersionNum)
         const latestDefInGroup = group[resultIdx]
-        // Defs from getAllDefinitions() are LabwareDefinition2; reduce type is union
-        const next = {
+        return {
           ...acc,
           [getLabwareDefURI(latestDefInGroup)]: latestDefInGroup,
         }
-        return next as LabwareDef2ByDefURI
       },
-      initialValue
+      {}
     )
-    _latestDefs = result
   }
 
-  return _latestDefs!
+  return _latestDefs
 }

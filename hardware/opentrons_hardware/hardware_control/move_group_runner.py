@@ -1,88 +1,89 @@
 """Class that schedules motion on can bus."""
 
 import asyncio
-import logging
-import time
 from collections import defaultdict
-from typing import Iterator, List, Optional, Set, Tuple, Union
-
+import logging
+from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
+import time
+
 from opentrons_shared_data.errors.exceptions import (
+    GeneralError,
+    MoveConditionNotMetError,
     EnumeratedError,
     EStopActivatedError,
-    GeneralError,
     MotionFailedError,
-    MotorDriverError,
-    MoveConditionNotMetError,
     PythonException,
+    MotorDriverError,
 )
 
-from .constants import (
-    brushed_motor_interrupts_per_sec,
-    interrupts_per_sec,
-    tip_interrupts_per_sec,
-)
-from .types import MotorPositionStatus, NodeDict
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
     ErrorCode,
     ErrorSeverity,
     GearMotorId,
-    MotorDriverErrorCode,
     MoveAckId,
-    NodeId,
+    MotorDriverErrorCode,
 )
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    MoveStopConditionField,
-    PipetteTipActionTypeField,
-    SensorIdField,
-    SensorTypeField,
-)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    AddBrushedLinearMoveRequest,
-    AddLinearMoveRequest,
-    AddSensorLinearMoveRequest,
     ClearAllMoveGroupsRequest,
-    ErrorMessage,
+    AddLinearMoveRequest,
+    MoveCompleted,
     ExecuteMoveGroupRequest,
+    HomeRequest,
     GripperGripRequest,
     GripperHomeRequest,
-    HomeRequest,
-    MoveCompleted,
-    ReadMotorDriverErrorStatusResponse,
-    StopRequest,
+    AddBrushedLinearMoveRequest,
     TipActionRequest,
     TipActionResponse,
+    ErrorMessage,
+    StopRequest,
+    ReadMotorDriverErrorStatusResponse,
+    AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
-    AddSensorLinearMoveBasePayload,
-    EmptyPayload,
     ExecuteMoveGroupRequestPayload,
-    GripperMoveRequestPayload,
     HomeRequestPayload,
+    GripperMoveRequestPayload,
     TipActionRequestPayload,
+    EmptyPayload,
+    AddSensorLinearMoveBasePayload,
 )
-from opentrons_hardware.firmware_bindings.utils import (
-    Int32Field,
-    UInt8Field,
-    UInt32Field,
+from .constants import (
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+    brushed_motor_interrupts_per_sec,
 )
+from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
     MoveGroupTipActionStep,
-    MoveStopCondition,
     MoveType,
     SingleMoveStep,
 )
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    UInt32Field,
+    Int32Field,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    PipetteTipActionTypeField,
+    MoveStopConditionField,
+    SensorIdField,
+    SensorTypeField,
+)
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motor_position_status import (
     extract_motor_status_info,
 )
+
+from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
 
@@ -178,9 +179,9 @@ class MoveGroupRunner:
     def _accumulate_move_completions(
         completions: _Completions,
     ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[List[Tuple[Tuple[int, int], MotorPositionStatus]]] = (
-            defaultdict(list)
-        )
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
+        ] = defaultdict(list)
         gear_motor_position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
@@ -467,16 +468,14 @@ class MoveScheduler:
             self._completion_queue.put_nowait((arbitration_id, message))
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
-                f", which {'is' if in_group else 'isnt'} in group"
+                f", which {'is' if in_group else 'isn''t'} in group"
             )
             if self._moves[group_id] and len(self._moves[group_id]) == 0:
                 log.error(
                     f"Python bug proven if check {bool(not self._moves[group_id])} len check {len(self._moves[group_id]) == 0}"
                 )
             if not self._moves[group_id]:
-                log.debug(
-                    f"Move group {group_id + self._start_at_index} has completed."
-                )
+                log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
         except KeyError:
             log.warning(

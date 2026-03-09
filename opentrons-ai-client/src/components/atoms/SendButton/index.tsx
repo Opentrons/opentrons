@@ -28,30 +28,25 @@ export function SendButton({
   const [buttonText, setButtonText] = useState(progressTexts[0])
   const [, setProgressIndex] = useState(0)
 
-  useEffect(
-    () => {
-      if (isLoading) {
-        const interval = setInterval(() => {
-          setProgressIndex(prevIndex => {
-            let newIndex = prevIndex + 1
-            if (newIndex > progressTexts.length - 1) {
-              newIndex = progressTexts.length - 1
-            }
-            return newIndex
-          })
-        }, 10000)
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setProgressIndex(prevIndex => {
+          let newIndex = prevIndex + 1
+          if (newIndex > progressTexts.length - 1) {
+            newIndex = progressTexts.length - 1
+          }
+          return newIndex
+        })
+      }, 10000)
 
-        return () => {
-          setProgressIndex(0)
-          setButtonText(progressTexts[0])
-          clearInterval(interval)
-        }
+      return () => {
+        setProgressIndex(0)
+        setButtonText(progressTexts[0])
+        clearInterval(interval)
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLoading]
-  )
+    }
+  }, [isLoading])
 
   return (
     <button

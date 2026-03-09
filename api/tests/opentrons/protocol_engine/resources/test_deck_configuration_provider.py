@@ -7,31 +7,33 @@ from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
 )
-from opentrons_shared_data.module.types import ModuleOrientation
+
+from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.errors import (
-    AddressableAreaDoesNotExistError,
-    CutoutDoesNotExistError,
     FixtureDoesNotExistError,
+    CutoutDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
-from opentrons.protocol_engine.resources import deck_configuration_provider as subject
 from opentrons.protocol_engine.types import (
     AddressableArea,
-    AddressableOffsetVector,
     AreaType,
+    PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
-    PotentialCutoutFixture,
+    AddressableOffsetVector,
 )
 from opentrons.protocols.api_support.deck_type import (
     SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
-from opentrons.types import DeckSlotName
+
+from opentrons.protocol_engine.resources import deck_configuration_provider as subject
 
 
 @pytest.fixture(scope="session")

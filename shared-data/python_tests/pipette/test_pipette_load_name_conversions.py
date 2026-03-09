@@ -1,21 +1,17 @@
-from typing import Union
-
 import pytest
 
-from opentrons_shared_data.pipette import (
-    pipette_definition as pc,
-)
-from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as ps,
-)
+from typing import Union
 from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
-    PipetteGenerationType,
-    PipetteModel,
     PipetteModelType,
-    PipetteName,
-    PipetteOEMType,
     PipetteVersionType,
+    PipetteGenerationType,
+    PipetteOEMType,
+)
+from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
+from opentrons_shared_data.pipette import (
+    pipette_definition as pc,
+    pipette_load_name_conversions as ps,
 )
 
 

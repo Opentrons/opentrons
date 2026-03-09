@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { join } from 'path'
-import flatten from 'lodash/flatten'
+import { flatten } from 'lodash'
 
 import {
   robotMassStorageDeviceAdded,

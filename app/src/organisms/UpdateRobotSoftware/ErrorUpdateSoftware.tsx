@@ -47,16 +47,13 @@ export function ErrorUpdateSoftware({
           alignItems={ALIGN_CENTER}
         >
           <LegacyStyledText
-            forwardedAs="h2"
+            as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('software_update_error')}
           </LegacyStyledText>
-          <LegacyStyledText
-            forwardedAs="h3"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
+          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {errorMessage}
           </LegacyStyledText>
         </Flex>

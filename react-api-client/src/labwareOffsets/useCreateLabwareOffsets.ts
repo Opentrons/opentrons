@@ -7,6 +7,7 @@ import { useHost } from '../api'
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
   CreateLabwareOffsetData,
+  HostConfig,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
 
@@ -31,7 +32,7 @@ export function useCreateLabwareOffsetsMutation(): UseCreateLabwareOffsetsMutati
     unknown,
     CreateLabwareOffsetData
   >(data =>
-    createLabwareOffsets(host!, data).then(response => {
+    createLabwareOffsets(host as HostConfig, data).then(response => {
       queryClient
         .invalidateQueries([host, 'labwareOffsets'])
         .catch((e: Error) => {

@@ -1,22 +1,23 @@
 import asyncio
 import contextlib
+from dataclasses import replace
+from functools import partial
 import logging
 import pathlib
 from collections import OrderedDict
-from dataclasses import replace
-from functools import partial
 from typing import (
-    Any,
     Callable,
     Dict,
+    Union,
     List,
-    Mapping,
     Optional,
+    Tuple,
     Sequence,
     Set,
-    Tuple,
+    Any,
     TypeVar,
-    Union,
+    Mapping,
+    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import (
@@ -27,30 +28,21 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.types import PipetteName
+from opentrons_shared_data.robot.types import RobotType
+from opentrons import types as top_types
+from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
-from . import modules
-from .backends import Controller, Simulator
-from .execution_manager import ExecutionManagerProvider
-from .instruments.ot2.instrument_calibration import load_pipette_offset
+from .util import use_or_initialize_loop, check_motion_bounds, ot2_axis_to_string
 from .instruments.ot2.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
 )
-from .instruments.ot2.pipette_handler import PipetteHandlerProvider
-from .module_control import AttachedModulesControl
-from .motion_utilities import (
-    deck_from_machine,
-    machine_from_deck,
-    target_position_from_absolute,
-    target_position_from_plunger,
-    target_position_from_relative,
-)
+from .backends import Controller, Simulator
+from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
-from .protocols import HardwareControlInterface
-from .robot_calibration import (
-    RobotCalibration,
-    RobotCalibrationProvider,
-)
+from .module_control import AttachedModulesControl
 from .types import (
     AsynchronousModuleErrorNotification,
     Axis,
@@ -58,34 +50,41 @@ from .types import (
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
-    EstopState,
+    HardwareEventHandler,
     HardwareAction,
     HardwareEvent,
-    HardwareEventHandler,
-    HardwareFeatureFlags,
     MotionChecks,
     PauseType,
     StatusBarState,
+    EstopState,
     SubSystem,
     SubSystemState,
+    HardwareFeatureFlags,
     TipScrapeType,
 )
-from .util import check_motion_bounds, ot2_axis_to_string, use_or_initialize_loop
-from opentrons import types as top_types
-from opentrons.config import robot_configs
-from opentrons.config.types import OT3Config, RobotConfig
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from . import modules
+from .robot_calibration import (
+    RobotCalibrationProvider,
+    RobotCalibration,
+)
+from .protocols import HardwareControlInterface
+from .instruments.ot2.pipette_handler import PipetteHandlerProvider
+from .instruments.ot2.instrument_calibration import load_pipette_offset
+from .motion_utilities import (
+    target_position_from_absolute,
+    target_position_from_relative,
+    target_position_from_plunger,
+    deck_from_machine,
+    machine_from_deck,
+)
+
 
 mod_log = logging.getLogger(__name__)
 
 AttachedModuleSpec = Dict[str, List[Union[str, Tuple[str, str]]]]
 
 
-# TODO(sfoster,1/9/2026): it looks like we did not fully migrate everything away
-# from the typevariable mount definition, and this now means that we can get grippers
-# out of this API and things are bad. we should fix this but it's going to take some
-# surgery.
-class API(  # type: ignore[misc]
+class API(
     ExecutionManagerProvider,
     RobotCalibrationProvider,
     PipetteHandlerProvider[top_types.Mount],
@@ -192,7 +191,7 @@ class API(  # type: ignore[misc]
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=top_types.Point(0, 0, 0),
-            robot_type="OT-2 Standard",
+            robot_type=cast(RobotType, "OT-2 Standard"),
         )
 
     @classmethod
@@ -904,7 +903,7 @@ class API(  # type: ignore[misc]
                 deck_pos=target_position,
                 attitude=self._robot_calibration.deck_calibration.attitude,
                 offset=top_types.Point(0, 0, 0),
-                robot_type="OT-2 Standard",
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
         )
 
@@ -1327,9 +1326,9 @@ class API(  # type: ignore[misc]
         model: modules.types.ModuleModel,
     ) -> modules.AbstractModule:
         """Get a simulating module hardware API interface for the given model."""
-        assert self.is_simulator, (
-            "Cannot build simulating module from non-simulating hardware control API"
-        )
+        assert (
+            self.is_simulator
+        ), "Cannot build simulating module from non-simulating hardware control API"
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(
@@ -1354,7 +1353,7 @@ class API(  # type: ignore[misc]
 
     @staticmethod
     def _axis_map_from_string_map(
-        input_map: Dict[str, "API.MapPayload"],
+        input_map: Dict[str, "API.MapPayload"]
     ) -> Dict[Axis, "API.MapPayload"]:
         return {Axis[k]: v for k, v in input_map.items()}
 

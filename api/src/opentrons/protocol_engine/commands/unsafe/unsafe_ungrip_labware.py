@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-from typing import Optional, Type
-
-from pydantic import BaseModel
-from typing_extensions import Literal
-
-from ...errors.error_occurrence import ErrorOccurrence
-from ...resources import ensure_ot3_hardware
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis
 from opentrons.protocol_engine.errors.exceptions import GripperNotAttachedError
+from pydantic import BaseModel
+from typing import Optional, Type
+from typing_extensions import Literal
+
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
+from ...resources import ensure_ot3_hardware
+
+from opentrons.hardware_control import HardwareControlAPI
+
 
 UnsafeUngripLabwareCommandType = Literal["unsafe/ungripLabware"]
 
@@ -62,9 +63,9 @@ class UnsafeUngripLabware(
     params: UnsafeUngripLabwareParams
     result: Optional[UnsafeUngripLabwareResult] = None
 
-    _ImplementationCls: Type[UnsafeUngripLabwareImplementation] = (
+    _ImplementationCls: Type[
         UnsafeUngripLabwareImplementation
-    )
+    ] = UnsafeUngripLabwareImplementation
 
 
 class UnsafeUngripLabwareCreate(BaseCommandCreate[UnsafeUngripLabwareParams]):

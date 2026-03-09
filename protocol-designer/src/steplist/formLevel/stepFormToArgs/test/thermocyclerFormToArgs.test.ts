@@ -41,6 +41,13 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        // @ts-expect-error - See comment above.
+        blockTargetTempHold: null,
+        // @ts-expect-error - See comment above.
+        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -71,6 +78,11 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: 0,
+        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -107,6 +119,13 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        // @ts-expect-error - See comment above.
+        blockTargetTempHold: null,
+        // @ts-expect-error - See comment above.
+        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -137,6 +156,11 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: 0,
+        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -209,23 +233,35 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
+        blockIsActiveHold: true,
+        // @ts-expect-error - See comment above.
+        // blockTargetTemp and blockTargetTempHold can never be null according to their castValue,
+        // but that might be unintentional. thermocyclerFormToArgs() does try to handle the null case
+        // and emit null blockTargetTempHold / blockTargetTemp. We need to clarify what's intended
+        // and possibly fix these fields' castValue.
+        blockTargetTempHold: null,
+        lidIsActiveHold: true,
+        // @ts-expect-error - See comment above.
+        lidTargetTempHold: '5',
+        lidOpenHold: true,
         blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         moduleId: tcModuleId,
         description: 'mock details',
-        profileElements: [
+        blockTargetTempHold: null,
+        lidOpenHold: true,
+        lidTargetTempHold: 5,
+        profileSteps: [
           // top-level step
-          { celsius: 5, holdSeconds: 50 },
-          {
-            // cycle
-            steps: [
-              { celsius: 12, holdSeconds: 62 },
-              { celsius: 99, holdSeconds: 45 },
-            ],
-            repetitions: 2,
-          },
+          { temperature: 5, holdTime: 50 },
+          // cycle rep 1
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
+          // cycle rep 2
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,
@@ -317,23 +353,30 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
+        blockIsActiveHold: true,
+        blockTargetTempHold: 0,
+        lidIsActiveHold: true,
+        lidTargetTempHold: 5,
+        lidOpenHold: true,
         blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         moduleId: tcModuleId,
         description: 'mock details',
-        profileElements: [
+        // todo(mm, 2025-10-09): See comments above about blockTargetTemp and blockTargetTempHold nullability.
+        blockTargetTempHold: 0,
+        lidOpenHold: true,
+        lidTargetTempHold: 5,
+        profileSteps: [
           // top-level step
-          { celsius: 5, holdSeconds: 50 },
-          // cycle
-          {
-            steps: [
-              { celsius: 12, holdSeconds: 62 },
-              { celsius: 99, holdSeconds: 45 },
-            ],
-            repetitions: 2,
-          },
+          { temperature: 5, holdTime: 50 },
+          // cycle rep 1
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
+          // cycle rep 2
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,

@@ -13,7 +13,6 @@ import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import { ACTIONS } from './constants'
 import { checkLiquidClassCompatibility } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
@@ -57,7 +56,7 @@ export function SelectLiquidClass({
   const handleClickNext = (): void => {
     if (selectedLiquidClass != null) {
       dispatch({
-        type: ACTIONS.SET_LIQUID_CLASS,
+        type: 'SET_LIQUID_CLASS',
         liquidClassName: selectedLiquidClass.liquidClassName as LiquidClassType,
       })
     }

@@ -113,16 +113,11 @@ export const DisconnectModal = ({
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
 
-  useEffect(
-    () => {
-      if (isDisconnected) {
-        dispatch(clearWifiStatus(robotName))
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isDisconnected]
-  )
+  useEffect(() => {
+    if (isDisconnected) {
+      dispatch(clearWifiStatus(robotName))
+    }
+  }, [isDisconnected])
 
   return (
     <Modal
@@ -136,7 +131,7 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
             {requestState != null &&
             'error' in requestState &&
             'message' in requestState?.error
@@ -144,11 +139,11 @@ export const DisconnectModal = ({
               : t('shared:unknown_error')}
           </LegacyStyledText>
         ) : null}
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
         </LegacyStyledText>
         {isError ? (
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
             {t('branded:general_error_message')}
           </LegacyStyledText>
         ) : null}

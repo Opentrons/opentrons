@@ -1,5 +1,4 @@
 """Protocol engine utility types for model components."""
-
 from dataclasses import dataclass
 
 from pydantic import BaseModel

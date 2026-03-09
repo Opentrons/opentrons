@@ -3,24 +3,25 @@
 import json
 from dataclasses import dataclass
 
-import pytest
 from decoy import Decoy
+import pytest
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocol_reader.file_identifier import (
-    FileIdentificationError,
-    FileIdentifier,
-    IdentifiedJsonMain,
-    IdentifiedLabwareDefinition,
-    IdentifiedPythonMain,
-)
-from opentrons.protocol_reader.file_reader_writer import BufferedFile
-from opentrons.protocol_reader.protocol_source import Metadata
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
+
+from opentrons.protocol_reader.file_identifier import (
+    FileIdentifier,
+    FileIdentificationError,
+    IdentifiedJsonMain,
+    IdentifiedPythonMain,
+    IdentifiedLabwareDefinition,
+)
+from opentrons.protocol_reader.file_reader_writer import BufferedFile
+from opentrons.protocol_reader.protocol_source import Metadata
 
 
 # TODO(mm, 2023-08-08): Make this autouse=True (apply to all test functions) when

@@ -275,18 +275,15 @@ export function TipPositionModal(
       ? utils.getIsZValueAtBottom(zValue, wellDepthMm, reference)
       : false
 
-  const titleText =
-    prefix === 'aspirate' || prefix === 'dispense' || prefix === 'mix'
-      ? t('shared:tip_position', { prefix: MoveLiquidPrefixToAction[prefix] })
-      : t('shared:start_point', { prefix: MoveLiquidPrefixToAction[prefix] })
-
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={titleText}
+      title={t('shared:tip_position', {
+        prefix: MoveLiquidPrefixToAction[prefix],
+      })}
       onClose={handleCancel}
       footer={
         <Flex
@@ -350,7 +347,6 @@ export function TipPositionModal(
               }
               error={xErrorText}
               id="TipPositionModal_x_custom_input"
-              data-testid="TipPositionModal_x_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setXValue)
               }}
@@ -370,7 +366,6 @@ export function TipPositionModal(
               }
               error={yErrorText}
               id="TipPositionModal_y_custom_input"
-              data-testid="TipPositionModal_y_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setYValue)
               }}
@@ -389,7 +384,6 @@ export function TipPositionModal(
               }
               error={zErrorText}
               id="TipPositionModal_z_custom_input"
-              data-testid="TipPositionModal_z_custom_input"
               isIndeterminate={zValue === null && isIndeterminate}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setZValue)

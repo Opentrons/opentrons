@@ -1,9 +1,8 @@
 import logging
 from typing import TYPE_CHECKING
-
-from .execute_json_v3 import _get_well
-from opentrons.protocols.execution.types import Instruments, LoadedLabware
 from opentrons.types import Point
+from opentrons.protocols.execution.types import LoadedLabware, Instruments
+from .execute_json_v3 import _get_well
 
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.types import MoveToWellParams

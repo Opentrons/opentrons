@@ -6,22 +6,23 @@ tested together, treating AddressableAreaState as a private implementation detai
 """
 
 import inspect
-from typing import Dict, Optional, Set, cast
 from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
+from typing import Dict, Set, Optional, cast
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.types import LocatingFeatures
-from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.module.types import ModuleOrientation
+from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
-    AddressableAreaDoesNotExistError,
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
     SlotDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -30,14 +31,13 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
-    AddressableOffsetVector,
     AreaType,
     DeckConfigurationType,
-    DeckPoint,
-    Dimensions,
     PotentialCutoutFixture,
+    Dimensions,
+    DeckPoint,
+    AddressableOffsetVector,
 )
-from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture(autouse=True)

@@ -1,22 +1,20 @@
 """A simple script to create a motion plan."""
-
-import argparse
+import os
 import json
 import logging
-import os
 from logging.config import dictConfig
-from typing import Any, Dict, List, cast
-
+import argparse
 import numpy as np
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
-    Coordinates,
-    MoveTarget,
     SystemConstraints,
+    MoveTarget,
     vectorize,
+    Coordinates,
 )
+from typing import Dict, Any, List, cast
 
 AXIS_NAMES = ["X", "Y", "Z", "A", "B", "C"]
 

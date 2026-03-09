@@ -60,7 +60,7 @@ export function RobotDashboard(): JSX.Element {
     contents = (
       <>
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
         >

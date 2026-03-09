@@ -48,7 +48,7 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { TFunction } from 'i18next'
-import type { CutoutId, VISUAL_SLOTS } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -68,8 +68,6 @@ export function DeviceDetailsDeckConfiguration({
   const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
     useState<boolean>(false)
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const deckConfig =
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
@@ -153,8 +151,7 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
-                    addressableAreaId
+                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
                 )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
@@ -308,7 +305,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <LegacyStyledText forwardedAs="p" color={COLORS.grey40}>
+            <LegacyStyledText as="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </LegacyStyledText>
           </Flex>

@@ -1,13 +1,10 @@
-from typing import Dict
-
 import pytest
-
-from opentrons.hardware_control.types import Axis
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.legacy.deck import Deck
+from typing import Dict
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.types import Point, Location, Mount
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
-from opentrons.protocol_api.protocol_context import ProtocolContext
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -15,7 +12,8 @@ from opentrons.protocols.api_support.util import (
     build_edges,
     find_value_for_api_version,
 )
-from opentrons.types import Location, Mount, Point
+from opentrons.hardware_control.types import Axis
+from opentrons.protocol_api.protocol_context import ProtocolContext
 
 
 def test_max_speeds_userdict() -> None:

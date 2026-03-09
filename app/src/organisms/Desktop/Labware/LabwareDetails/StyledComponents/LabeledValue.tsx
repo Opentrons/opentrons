@@ -21,10 +21,10 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       paddingY={SPACING.spacing8}
     >
-      <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
+      <LegacyStyledText as="h6" color={COLORS.grey60}>
         {label}
       </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">{value}</LegacyStyledText>
+      <LegacyStyledText as="p">{value}</LegacyStyledText>
     </Flex>
   )
 }

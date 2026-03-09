@@ -1,21 +1,20 @@
 """Tests for run module."""
-
 import os
 from pathlib import Path
-from typing import Dict, Iterator
+from typing import Iterator, Dict
 
 import mock
 import pytest
 from mock import AsyncMock, MagicMock
 
-from opentrons_hardware.firmware_bindings import FirmwareTarget, NodeId
+from opentrons_hardware.firmware_bindings import NodeId, FirmwareTarget
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
 from opentrons_hardware.firmware_update import (
+    FirmwareUpdateInitiator,
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
-    FirmwareUpdateInitiator,
     HexRecordProcessor,
     RunUpdate,
 )

@@ -33,14 +33,14 @@ export function PreventRobotCaching(): JSX.Element {
         >
           {t('prevent_robot_caching')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="prevent_robot_caching_description"
             components={{
               strong: (
                 <LegacyStyledText
-                  forwardedAs="span"
+                  as="span"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 />
               ),

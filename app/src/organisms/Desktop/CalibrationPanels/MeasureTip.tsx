@@ -139,10 +139,10 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {titleText}
             </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
+            <LegacyStyledText as="p">
               {calBlock != null
                 ? t('jog_nozzle_to_block', { slotName: calBlock.slot })
                 : t('jog_nozzle_to_trash')}

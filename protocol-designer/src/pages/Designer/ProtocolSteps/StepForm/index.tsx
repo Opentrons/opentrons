@@ -1,29 +1,23 @@
 import { useState } from 'react'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
-import { flexStackerStateGetter } from '@opentrons/step-generation'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
+  AutoAddPauseUntilTempStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '/protocol-designer/components/organisms'
-import { FLEX_STACKER_FILL } from '/protocol-designer/constants'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
-import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
 } from '/protocol-designer/step-forms'
-import { createLabwareAndQueueForHopper } from '/protocol-designer/step-forms/actions/thunks'
-import {
-  getInvariantContext,
-  getSavedStepForms,
-} from '/protocol-designer/step-forms/selectors'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { actions as stepsActions } from '/protocol-designer/ui/steps'
 
 import { StepFormToolbox } from './StepFormToolbox'
@@ -39,20 +33,18 @@ interface StateProps {
   canSave: boolean
   formHasChanges: boolean
   isNewStep: boolean
+  isPristineSetTempForm: boolean
+  isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
   allLabwareDefs: LabwareDefByDefURI
   enableConcurrentModuleActions: boolean
   formData?: FormData | null
 }
 interface DispatchProps {
-  cancelStepForm: () => void
-  saveStepForm: (options?: { userWantsBonusStep?: boolean }) => void
-  createdLabwareForQueue: (
-    moduleId: string,
-    fillLabwareIds: string[],
-    isLidConfigured: boolean
-  ) => void
-  deleteLabwares: (labwareIds: string[]) => void
+  handleClose: () => void
+  saveSetTempFormWithAddedPauseUntilTemp: () => void
+  saveHeaterShakerFormWithAddedPauseUntilTemp: () => void
+  saveStepForm: () => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -61,22 +53,21 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     canSave,
     formData,
     formHasChanges,
-    cancelStepForm,
+    handleClose,
     isNewStep,
+    isPristineSetTempForm,
+    isPristineSetHeaterShakerTempForm,
+    saveSetTempFormWithAddedPauseUntilTemp,
+    saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
     invariantContext,
     allLabwareDefs,
-    createdLabwareForQueue,
-    deleteLabwares,
+    enableConcurrentModuleActions,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(() =>
+  const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-  const savedStepForms = useSelector(getSavedStepForms)
-  const robotState = useSelector(getRobotStateAtActiveItem)
-  const savedStepForm = formData != null ? savedStepForms[formData.id] : null
-
   const handleBlur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
@@ -88,13 +79,25 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       return prevDirtyFields
     })
   }
-
   const {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
     cancel: cancelClose,
-  } = useConditionalConfirm(cancelStepForm, isNewStep || formHasChanges)
-
+  } = useConditionalConfirm(handleClose, isNewStep || formHasChanges)
+  const {
+    confirm: confirmAddPauseUntilTempStep,
+    showConfirmation: showAddPauseUntilTempStepModal,
+  } = useConditionalConfirm(
+    saveSetTempFormWithAddedPauseUntilTemp,
+    isPristineSetTempForm
+  )
+  const {
+    confirm: confirmAddPauseUntilHeaterShakerTempStep,
+    showConfirmation: showAddPauseUntilHeaterShakerTempStepModal,
+  } = useConditionalConfirm(
+    saveHeaterShakerFormWithAddedPauseUntilTemp,
+    isPristineSetHeaterShakerTempForm
+  )
   // no form selected
   if (formData == null) {
     return null
@@ -110,65 +113,14 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     focus: setFocusedField,
     blur: handleBlur,
   }
-
-  const handleSave = (): void => {
-    // No dialog to show. Just save the step directly.
-    saveStepForm()
-    if (
-      hydratedForm.stepType === 'flexStacker' &&
-      hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
-    ) {
-      const moduleState =
-        robotState != null
-          ? flexStackerStateGetter(robotState, hydratedForm.moduleId)
-          : null
-      const isLidConfigured =
-        moduleState?.storedLabwareDetails?.lidLabwareURI != null
-
-      // logic for editing a fill step form
-      if (savedStepForm != null) {
-        const initialLabwareIds =
-          (savedStepForm.fillLabwareIds as string[] | null) ?? []
-        const oldFillQuantity = initialLabwareIds.length
-
-        // if new fill quantity is less than the preivously saved quantity, delete the extraneous labware
-        if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
-          const extraneousLabwareIds = initialLabwareIds.slice(
-            hydratedForm.fillLabwareIds.length,
-            oldFillQuantity
-          )
-          deleteLabwares(extraneousLabwareIds)
-        }
-        // if new fill quantity is greater than the preivously saved quantity, create the new labware
-        else if (oldFillQuantity < hydratedForm.fillLabwareIds.length) {
-          const newLabwareIds = hydratedForm.fillLabwareIds.slice(
-            oldFillQuantity,
-            hydratedForm.fillLabwareIds.length
-          )
-          createdLabwareForQueue(
-            hydratedForm.moduleId,
-            newLabwareIds,
-            isLidConfigured
-          )
-        }
-      } else {
-        // if no saved step form exists, create all the new labware
-        createdLabwareForQueue(
-          hydratedForm.moduleId,
-          hydratedForm.fillLabwareIds,
-          isLidConfigured
-        )
-      }
-    } else if (
-      hydratedForm.stepType === 'flexStacker' &&
-      savedStepForm?.flexStackerFormType === FLEX_STACKER_FILL &&
-      hydratedForm.flexStackerFormType !== FLEX_STACKER_FILL
-    ) {
-      // logic for deleting fill labware if the stacker form type changes from fill to something else
-      const fillLabwareIds =
-        (savedStepForm.fillLabwareIds as string[] | null) ?? []
-      deleteLabwares(fillLabwareIds)
-    }
+  let handleSave = saveStepForm
+  if (isPristineSetTempForm) {
+    handleSave = confirmAddPauseUntilTempStep
+  } else if (
+    isPristineSetHeaterShakerTempForm &&
+    formData.heaterShakerSetTimer !== true
+  ) {
+    handleSave = confirmAddPauseUntilHeaterShakerTempStep
   }
 
   return (
@@ -182,7 +134,52 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           onContinueClick={confirmClose}
         />
       )}
-
+      {showAddPauseUntilTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <AutoAddPauseUntilTempStepModal
+            modalType="temperatureModule"
+            displayTemperature={formData?.targetTemperature ?? '?'}
+            handleAddPauseClick={handleSave}
+            handleSkipPauseClick={saveStepForm}
+          />
+        ) : (
+          <AutoAddPauseUntilTempStepModal
+            modalType="legacy"
+            displayTemperature={formData?.targetTemperature ?? '?'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
+      {showAddPauseUntilHeaterShakerTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <AutoAddPauseUntilTempStepModal
+            modalType="heaterShaker"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ) : (
+          <AutoAddPauseUntilTempStepModal
+            modalType="legacy"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
       <StepFormToolbox
         {...{
           canSave,
@@ -205,6 +202,10 @@ const mapStateToProps = (state: BaseState): StateProps => {
     formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
+    isPristineSetHeaterShakerTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(state),
+    isPristineSetTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineSetTempForm(state),
     invariantContext: getInvariantContext(state),
     allLabwareDefs: labwareDefSelectors.getLabwareDefsByURI(state),
     enableConcurrentModuleActions: getEnableConcurrentModuleActions(state),
@@ -212,39 +213,18 @@ const mapStateToProps = (state: BaseState): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
-  const cancelStepForm = (): void => {
-    dispatch(actions.cancelStepForm())
-  }
-
-  const saveStepForm = (): void => {
-    dispatch(stepsActions.saveStepForm())
-  }
-
-  const createdLabwareForQueue = (
-    moduleId: string,
-    fillLabwareIds: string[],
-    isLidConfigured: boolean
-  ): void => {
-    dispatch(
-      createLabwareAndQueueForHopper({
-        moduleId,
-        fillLabwareIds,
-        isLidConfigured,
-      })
-    )
-  }
-
-  const deleteLabwares = (labwareIds: string[]): void => {
-    for (const labwareId of labwareIds) {
-      dispatch(deleteContainer({ labwareId }))
-    }
-  }
+  const handleClose = (): void => dispatch(actions.cancelStepForm())
+  const saveHeaterShakerFormWithAddedPauseUntilTemp = (): void =>
+    dispatch(stepsActions.saveHeaterShakerFormWithAddedPauseUntilTemp())
+  const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+  const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
   return {
-    cancelStepForm,
+    handleClose,
+    saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,
-    createdLabwareForQueue,
-    deleteLabwares,
+    saveHeaterShakerFormWithAddedPauseUntilTemp,
   }
 }
 

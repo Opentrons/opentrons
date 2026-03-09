@@ -112,30 +112,26 @@ export function Labware(): JSX.Element {
       setShowSortByMenu(false)
     },
   })
-  useEffect(
-    () => {
-      if (labwareFailureMessage != null) {
-        setShowAddLabwareSlideout(false)
-        makeToast(labwareFailureMessage, ERROR_TOAST, {
+  useEffect(() => {
+    if (labwareFailureMessage != null) {
+      setShowAddLabwareSlideout(false)
+      makeToast(labwareFailureMessage, ERROR_TOAST, {
+        closeButton: true,
+        onClose: clearLabwareFailure,
+      })
+    } else if (newLabwareName != null) {
+      setShowAddLabwareSlideout(false)
+      makeToast(
+        t('imported', { filename: newLabwareName }) as string,
+        SUCCESS_TOAST,
+        {
           closeButton: true,
-          onClose: clearLabwareFailure,
-        })
-      } else if (newLabwareName != null) {
-        setShowAddLabwareSlideout(false)
-        makeToast(
-          t('imported', { filename: newLabwareName }) as string,
-          SUCCESS_TOAST,
-          {
-            closeButton: true,
-            onClose: clearLabwareName,
-          }
-        )
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+          onClose: clearLabwareName,
+        }
+      )
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [labwareFailureMessage, newLabwareName]
-  )
+  }, [labwareFailureMessage, newLabwareName])
 
   return (
     <>
@@ -158,7 +154,7 @@ export function Labware(): JSX.Element {
           paddingBottom={SPACING.spacing24}
         >
           <LegacyStyledText
-            forwardedAs="h1"
+            as="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
@@ -276,7 +272,7 @@ export function Labware(): JSX.Element {
           marginTop={SPACING.spacing32}
         >
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >

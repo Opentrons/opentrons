@@ -1,15 +1,13 @@
 from __future__ import annotations
-
-import enum
-
 from typing_extensions import Final
+import enum
 
 
 # Implemented with an enum to support type narrowing via `== OFF_DECK`.
 class OffDeckType(enum.Enum):
-    """The type of the [`OFF_DECK`][opentrons.protocol_api.OFF_DECK] constant.
+    """The type of the :py:obj:`OFF_DECK` constant.
 
-    Do not use directly, except in type annotations and `isinstance` calls.
+    Do not use directly, except in type annotations and ``isinstance`` calls.
     """
 
     OFF_DECK = "off-deck"
@@ -17,11 +15,15 @@ class OffDeckType(enum.Enum):
 
 
 OFF_DECK: Final = OffDeckType.OFF_DECK
-"""A special location value, indicating that a labware is not currently on the robot's deck.
-
-See [The Off-Deck Location][the-off-deck-location] for details on using `OFF_DECK` with [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware].
-"""
 WASTE_CHUTE: Final = OffDeckType.WASTE_CHUTE
+
+# Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
+# the constant definition, Sphinx has trouble picking it up.
+OFF_DECK.__doc__ = """\
+A special location value, indicating that a labware is not currently on the robot's deck.
+
+See :ref:`off-deck-location` for details on using ``OFF_DECK`` with :py:obj:`ProtocolContext.move_labware()`.
+"""
 
 
 class PlungerPositionTypes(enum.Enum):

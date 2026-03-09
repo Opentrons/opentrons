@@ -5,7 +5,10 @@ import { getErrorRecoveryPolicy } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { ErrorRecoveryPolicyResponse } from '@opentrons/api-client'
+import type {
+  ErrorRecoveryPolicyResponse,
+  HostConfig,
+} from '@opentrons/api-client'
 
 export function useErrorRecoveryPolicy(
   runId: string,
@@ -16,7 +19,7 @@ export function useErrorRecoveryPolicy(
   const query = useQuery<ErrorRecoveryPolicyResponse, Error>(
     [host, 'runs', runId, 'errorRecoveryPolicy'],
     () =>
-      getErrorRecoveryPolicy(host!, runId)
+      getErrorRecoveryPolicy(host as HostConfig, runId)
         .then(response => response.data)
         .catch(e => {
           throw e

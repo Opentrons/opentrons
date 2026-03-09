@@ -1,5 +1,4 @@
 """Tests for the protocol engine's ActionDispatcher."""
-
 from decoy import Decoy
 
 from opentrons.protocol_engine.actions import (

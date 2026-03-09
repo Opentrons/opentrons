@@ -41,22 +41,16 @@ export function useImageGalleryData({
 
   const currentCommand = currentCommandDetails?.data
   const previousCommand = previousCommandDetails?.data
-  const currentCommandAnalysis = protocolAnalysis?.commands.find(
-    c => c.key === currentCommand?.key
-  )
-  const previousCommandAnalysis = protocolAnalysis?.commands.find(
-    c => c.key === previousCommand?.key
-  )
 
   const currentCommandString = useCommandTextString({
-    command: currentCommandAnalysis ?? null,
+    command: currentCommand ?? null,
     allRunDefs,
     commandTextData: protocolAnalysis,
     robotType,
   })
 
   const previousCommandString = useCommandTextString({
-    command: previousCommandAnalysis ?? null,
+    command: previousCommand ?? null,
     allRunDefs,
     commandTextData: protocolAnalysis,
     robotType,

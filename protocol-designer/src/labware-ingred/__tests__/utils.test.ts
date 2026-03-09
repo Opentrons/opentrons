@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMigratedLabwareId, getNextNickname } from '../utils'
+import { getNextNickname } from '../utils'
 
 describe('getNextNickname', () => {
   const testCases = [
@@ -64,13 +64,5 @@ describe('getNextNickname', () => {
       const result = getNextNickname(allNicknames, proposed)
       expect(result).toEqual(expected)
     })
-  })
-})
-
-describe('getMigratedLabwareId', () => {
-  it('should return the same labware id for additional equipment wasteChute', () => {
-    const labwareId = '123:wasteChute'
-    const result = getMigratedLabwareId(labwareId, {}, {}, {})
-    expect(result).toEqual(labwareId)
   })
 })

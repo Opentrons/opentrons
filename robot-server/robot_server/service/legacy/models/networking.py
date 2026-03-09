@@ -1,19 +1,18 @@
 import typing
+from enum import Enum
 
 from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    SecretStr,
     field_validator,
     model_validator,
+    ConfigDict,
+    BaseModel,
+    Field,
+    SecretStr,
 )
-
 from opentrons.system import wifi
-from opentrons_shared_data.util import StrEnum
 
 
-class ConnectivityStatus(StrEnum):
+class ConnectivityStatus(str, Enum):
     full = "full"
     limited = "limited"
     none = "none"
@@ -21,7 +20,7 @@ class ConnectivityStatus(StrEnum):
     unknown = "unknown"
 
 
-class ConnectionType(StrEnum):
+class ConnectionType(str, Enum):
     wifi = "wifi"
     ethernet = "ethernet"
 
@@ -86,7 +85,7 @@ class NetworkingStatus(BaseModel):
     )
 
 
-class NetworkingSecurityType(StrEnum):
+class NetworkingSecurityType(str, Enum):
     """Top-level type of network security"""
 
     wpa_eap = "wpa-eap"
@@ -298,7 +297,7 @@ class WifiKeyFiles(BaseModel):
     )
 
 
-class EapConfigOptionType(StrEnum):
+class EapConfigOptionType(str, Enum):
     string = "string"
     password = "password"
     file = "file"
@@ -309,11 +308,12 @@ class EapConfigOption(BaseModel):
 
     name: str = Field(..., description="The name of the config option")
     displayName: str = Field(
-        ..., description="A human-readable and nicely formatted name for the option"
+        ..., description="A human-readable and nicely formatted name for " "the option"
     )
     required: bool = Field(
         ...,
-        description="Whether the option is required for this EAP variant or optional",
+        description="Whether the option is required for this EAP variant"
+        " or optional",
     )
     type: EapConfigOptionType = Field(
         ...,
@@ -330,7 +330,7 @@ class EapVariant(BaseModel):
 
     name: str = Field(..., description="The identifier for the EAP variant")
     displayName: str = Field(
-        ..., description="A human-readable formatted name for the EAP variant"
+        ..., description="A human-readable formatted name for the EAP " "variant"
     )
     options: typing.List[EapConfigOption] = Field(
         ...,

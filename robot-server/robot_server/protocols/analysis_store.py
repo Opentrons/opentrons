@@ -1,43 +1,42 @@
 """Protocol analysis storage."""
-
 from __future__ import annotations
 
+import sqlalchemy
 from logging import getLogger
 from typing import Dict, List, Optional
-
-import sqlalchemy
 from typing_extensions import Final
 
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    CSVParameter,
+    CommandAnnotation,
+    CommandPreconditions,
+)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
-    Liquid,
-    LiquidClassRecordWithId,
+    LoadedPipette,
     LoadedLabware,
     LoadedModule,
-    LoadedPipette,
+    Liquid,
+    LiquidClassRecordWithId,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.types import (
-    CommandAnnotation,
-    CommandPreconditions,
-    CSVParameter,
-    RunTimeParameter,
-)
-from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.robot.types import RobotType
 
-from .analysis_memcache import MemoryCache
 from .analysis_models import (
+    AnalysisSummary,
+    ProtocolAnalysis,
+    PendingAnalysis,
+    CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
-    AnalysisSummary,
-    CompletedAnalysis,
-    PendingAnalysis,
-    ProtocolAnalysis,
 )
-from .completed_analysis_store import CompletedAnalysisResource, CompletedAnalysisStore
-from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
+
+from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
+from .analysis_memcache import MemoryCache
+from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
 
 _log = getLogger(__name__)
 
@@ -136,7 +135,6 @@ class AnalysisStore:
                 a pending analysis.
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
-            run_time_parameters: Run time parameters to analyze with.
 
         Returns:
             A summary of the just-added analysis.
@@ -184,9 +182,9 @@ class AnalysisStore:
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
-        assert protocol_id is not None, (
-            "Analysis ID to update must be for a valid pending analysis."
-        )
+        assert (
+            protocol_id is not None
+        ), "Analysis ID to update must be for a valid pending analysis."
 
         if len(errors) > 0:
             if any(
@@ -427,9 +425,7 @@ class AnalysisStore:
         ) + list(csv_rtps_in_last_analysis.keys())
         assert set(param.variableName for param in new_parameters) == set(
             total_params_in_last_analysis
-        ), (
-            "Mismatch in parameters found in the current request vs. last saved parameters."
-        )  # Indicates internal bug
+        ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug
         for param in new_parameters:
             if isinstance(param, CSVParameter):
                 new_file_id = param.file.id if param.file else None
@@ -462,9 +458,9 @@ class _PendingAnalysisStore:
         run_time_parameters: List[RunTimeParameter],
     ) -> None:
         """Add a new pending analysis and associate it with the given protocol."""
-        assert protocol_id not in self._analysis_ids_by_protocol_id, (
-            "Protocol must not already have a pending analysis."
-        )
+        assert (
+            protocol_id not in self._analysis_ids_by_protocol_id
+        ), "Protocol must not already have a pending analysis."
 
         new_pending_analysis = PendingAnalysis.model_construct(
             id=analysis_id,

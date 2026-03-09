@@ -2,13 +2,13 @@
 
 import logging
 import select
-from typing import Any, List, Optional
-
+from typing import Optional, List, Any
 import serial  # type: ignore[import-untyped]
 
-from . import tcp_conn, usb_config, usb_monitor
+from . import usb_config, usb_monitor, tcp_conn
+
 from .default_config import DEFAULT_IP, DEFAULT_PORT
-from .serial_thread import QUEUE_MAX_ITEMS, QUEUE_TYPE
+from .serial_thread import QUEUE_TYPE, QUEUE_MAX_ITEMS
 
 LOG = logging.getLogger(__name__)
 

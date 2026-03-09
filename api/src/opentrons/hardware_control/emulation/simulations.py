@@ -69,6 +69,7 @@ class RPM(Simulation):
         self._target: Optional[float] = None
 
     def tick(self) -> None:
+
         if self._target is None:
             target = 0.0
         else:

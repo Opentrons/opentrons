@@ -15,8 +15,6 @@ import { WellSelection } from '/app/organisms/WellSelection'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
 
-import { ACTIONS } from './constants'
-
 import type { ComponentProps, Dispatch, MouseEvent } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -52,7 +50,7 @@ export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
 
   const handleClickNext = (): void => {
     dispatch({
-      type: ACTIONS.SET_SOURCE_WELLS,
+      type: 'SET_SOURCE_WELLS',
       wells: Object.keys(selectedWells),
     })
     const duration = new Date().getTime() - startingTimeStamp?.getTime()

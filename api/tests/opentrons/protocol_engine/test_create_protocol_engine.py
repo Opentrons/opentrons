@@ -1,5 +1,4 @@
 """Smoke tests for the ProtocolEngine creation factory."""
-
 import pytest
 from pytest_lazy_fixtures import lf as lazy_fixture
 
@@ -12,21 +11,21 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
-    Config as EngineConfig,
-)
-from opentrons.protocol_engine import (
-    DeckType,
     ProtocolEngine,
+    Config as EngineConfig,
+    DeckType,
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
+from opentrons.types import DeckSlotName
+
 from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
+    SHORT_TRASH_DECK,
     STANDARD_OT3_DECK,
 )
-from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(scope="session")

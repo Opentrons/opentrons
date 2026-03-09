@@ -1,5 +1,4 @@
 """Tests for the `DiskMonitor` class."""
-
 import os
 import sys
 from pathlib import Path
@@ -8,8 +7,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from robot_server.disk_monitor.monitor import (
-    _FALLBACK_DEFAULT_DISK_SPACE_MB,
     DiskMonitor,
+    _FALLBACK_DEFAULT_DISK_SPACE_MB,
 )
 from robot_server.settings import RobotServerSettings
 

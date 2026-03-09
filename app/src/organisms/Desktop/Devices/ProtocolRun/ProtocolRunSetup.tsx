@@ -218,8 +218,7 @@ export function ProtocolRunSetup({
   const ot2DeckHardwareDescription = hasModules
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
-  const modulesOrFixturesReady =
-    calibrationStatusModules.complete && !isMissingModule && !isFixtureMismatch
+
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
   const isCameraConfirmed =
@@ -231,20 +230,15 @@ export function ProtocolRunSetup({
     robotType: robotType,
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
-  useEffect(
-    () => {
-      if (storageInfo.isImageStorageLow) {
-        reportPhotoAccessUsage({
-          ...baseProps,
-          transactionId: runId,
-          action: 'storageWarning',
-        })
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [storageInfo.isImageStorageLow !== null]
-  )
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        ...baseProps,
+        transactionId: runId,
+        action: 'storageWarning',
+      })
+    }
+  }, [storageInfo.isImageStorageLow !== null])
   // A separate app can apply camera settings.
   // We need to update the missing steps as a side effect.
   useEffect(() => {
@@ -258,18 +252,6 @@ export function ProtocolRunSetup({
   if (robot == null) {
     return null
   }
-  const applicableSteps: StepKey[] = (() => {
-    const [firstStep, ...restSteps] = orderedApplicableSteps
-
-    return !modulesOrFixturesReady
-      ? ([firstStep, MODULE_SETUP_STEP_KEY, ...restSteps] as StepKey[])
-      : [...orderedApplicableSteps]
-  })()
-
-  const filteredNextStep =
-    applicableSteps[
-      applicableSteps.findIndex(step => step === ROBOT_CALIBRATION_STEP_KEY) + 1
-    ]
 
   const StepDetailMap: Record<
     StepKey,
@@ -285,7 +267,13 @@ export function ProtocolRunSetup({
         <SetupRobotCalibration
           robotName={robotName}
           runId={runId}
-          nextStep={filteredNextStep}
+          nextStep={
+            orderedApplicableSteps[
+              orderedApplicableSteps.findIndex(
+                v => v === ROBOT_CALIBRATION_STEP_KEY
+              ) + 1
+            ]
+          }
           expandStep={setExpandedStepKey}
           calibrationStatus={calibrationStatusRobot}
         />
@@ -326,7 +314,10 @@ export function ProtocolRunSetup({
       descriptionElement: null,
       rightElProps: {
         stepKey: MODULE_SETUP_STEP_KEY,
-        complete: modulesOrFixturesReady,
+        complete:
+          calibrationStatusModules.complete &&
+          !isMissingModule &&
+          !isFixtureMismatch,
         completeText: isFlex
           ? t('modules_and_fixtures_ready')
           : t('modules_ready'),
@@ -405,7 +396,7 @@ export function ProtocolRunSetup({
             css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
             id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
-            whiteSpace={NO_WRAP}
+            whitespace={NO_WRAP}
           >
             {t('check_locations_and_volumes')}
           </StyledText>
@@ -594,7 +585,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
                 : COLORS.grey60
           }
           marginRight={SPACING.spacing8}
-          name="ot-alert"
+          name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
@@ -622,7 +613,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           size="1rem"
           color={COLORS.grey60}
           marginRight={SPACING.spacing8}
-          name="ot-alert"
+          name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText

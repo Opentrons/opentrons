@@ -1,15 +1,14 @@
-"""Test the InstrumentContext class and its functions"""
-
-from typing import Any, Callable, Dict
-from unittest import mock
-
+""" Test the InstrumentContext class and its functions """
 import pytest
+from unittest import mock
+from typing import Any, Callable, Dict
 
-import opentrons.protocol_api as papi
-from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.types import Mount
 from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import Mount
+from opentrons.hardware_control import ThreadManagedHardware
+
+import opentrons.protocol_api as papi
 
 pytestmark = pytest.mark.ot2_only
 
@@ -55,7 +54,7 @@ def test_blowout_location_unsupported_version(
 
 
 @pytest.mark.parametrize(
-    argnames="liquid_handling_command,blowout_location,expected_error_match,",
+    argnames="liquid_handling_command," "blowout_location," "expected_error_match,",
     argvalues=[
         ["transfer", "some invalid location", "blowout location should be either"],
         [
@@ -81,13 +80,14 @@ def test_blowout_location_invalid(
     lw1 = context_and_labware["lw1"]
     instr = context_and_labware["instr"]
     with pytest.raises(ValueError, match=expected_error_match):
+
         getattr(instr, liquid_handling_command)(
             100, lw1["A1"], lw1["A2"], blowout_location=blowout_location
         )
 
 
 @pytest.mark.parametrize(
-    argnames="liquid_handling_command,blowout_location,expected_strat,",
+    argnames="liquid_handling_command," "blowout_location," "expected_strat,",
     argvalues=[
         ["transfer", "destination well", v1_transfer.BlowOutStrategy.DEST],
         ["transfer", "source well", v1_transfer.BlowOutStrategy.SOURCE],

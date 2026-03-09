@@ -99,7 +99,7 @@ export function TipLengthCalibrationItems({
         {tipLengthCalibrations.map((calibration, index) => (
           <StyledTableRow key={index}>
             <StyledTableCell>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {calibration.tiprackDefURI &&
                   getDisplayNameForTipRack(
                     calibration.tiprackDefURI,
@@ -108,15 +108,15 @@ export function TipLengthCalibrationItems({
               </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {calibration.modelName}
               </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {calibration.serialNumber}
               </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <LegacyStyledText forwardedAs="p">
+              <LegacyStyledText as="p">
                 {calibration.lastCalibrated !== undefined
                   ? formatLastCalibrated(calibration.lastCalibrated)
                   : 'Not calibrated'}

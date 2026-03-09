@@ -1,25 +1,27 @@
 """Temperature Module protocol commands."""
 
-from .deactivate import (
-    DeactivateTemperature,
-    DeactivateTemperatureCommandType,
-    DeactivateTemperatureCreate,
-    DeactivateTemperatureParams,
-    DeactivateTemperatureResult,
-)
 from .set_target_temperature import (
     SetTargetTemperature,
-    SetTargetTemperatureCommandType,
     SetTargetTemperatureCreate,
     SetTargetTemperatureParams,
     SetTargetTemperatureResult,
+    SetTargetTemperatureCommandType,
 )
+
 from .wait_for_temperature import (
     WaitForTemperature,
-    WaitForTemperatureCommandType,
     WaitForTemperatureCreate,
     WaitForTemperatureParams,
     WaitForTemperatureResult,
+    WaitForTemperatureCommandType,
+)
+
+from .deactivate import (
+    DeactivateTemperature,
+    DeactivateTemperatureCreate,
+    DeactivateTemperatureParams,
+    DeactivateTemperatureResult,
+    DeactivateTemperatureCommandType,
 )
 
 __all__ = [

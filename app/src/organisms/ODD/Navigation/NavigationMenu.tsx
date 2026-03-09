@@ -71,7 +71,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               size="2.5rem"
             />
             <LegacyStyledText
-              forwardedAs="h4"
+              as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
@@ -88,7 +88,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               aria-label="restart_icon"
             />
             <LegacyStyledText
-              forwardedAs="h4"
+              as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
@@ -105,7 +105,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
             <LegacyStyledText
-              forwardedAs="h4"
+              as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
@@ -122,7 +122,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               aria-label="light_icon"
             />
             <LegacyStyledText
-              forwardedAs="h4"
+              as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >

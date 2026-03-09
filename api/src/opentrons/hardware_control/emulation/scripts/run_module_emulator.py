@@ -1,21 +1,21 @@
 """Script for starting up a python module emulator."""
-
-import asyncio
 import logging
+import asyncio
 from argparse import ArgumentParser
-from typing import Callable, Dict
-
+from typing import Dict, Callable
 from typing_extensions import Final
 
 from opentrons.hardware_control.emulation.abstract_emulator import AbstractEmulator
 from opentrons.hardware_control.emulation.heater_shaker import HeaterShakerEmulator
+from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.parser import Parser
-from opentrons.hardware_control.emulation.run_emulator import run_emulator_client
-from opentrons.hardware_control.emulation.settings import ProxySettings, Settings
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
-from opentrons.hardware_control.emulation.types import ModuleType
+
+
+from opentrons.hardware_control.emulation.run_emulator import run_emulator_client
+from opentrons.hardware_control.emulation.settings import Settings, ProxySettings
 
 emulator_builder: Final[Dict[str, Callable[[Settings], AbstractEmulator]]] = {
     ModuleType.Magnetic.value: lambda s: MagDeckEmulator(Parser(), s.magdeck),

@@ -88,19 +88,14 @@ const QuickTransferHeader = ({
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
-  useEffect(
-    () => {
-      trackEventWithRobotSerial({
-        name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
-        properties: {
-          name: title,
-        },
-      })
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    trackEventWithRobotSerial({
+      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+      properties: {
+        name: title,
+      },
+    })
+  }, [])
 
   return (
     <Flex
@@ -147,7 +142,7 @@ const QuickTransferHeader = ({
           </Flex>
           {!isTransferFetching ? (
             <LegacyStyledText
-              forwardedAs="h2"
+              as="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -231,7 +226,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
       paddingBottom={SPACING.spacing24}
     >
       <LegacyStyledText
-        forwardedAs="p"
+        as="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description}
@@ -243,7 +238,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
         }`}</LegacyStyledText>
       </Flex>

@@ -11,7 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
-from abr_testing.protocols.helpers import run_helpers, background_helpers
+from abr_testing.protocols import helpers
 
 
 metadata = {
@@ -21,7 +21,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.27",
+    "apiLevel": "2.26",
 }
 
 
@@ -66,18 +66,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Use temperature module in protocol",
         default=True,
     )
-    run_helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
-    protocol.capture_image(filename="start_of_run")
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
-
-    run_helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "02")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
@@ -208,7 +201,7 @@ def run(protocol: ProtocolContext) -> None:
     p50_flow_rate_dispense_default = 50
     p50_flow_rate_blow_out_default = 100
     if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # ================================ LISTS ================================
@@ -2060,11 +2053,10 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_TAGSTOP, repetitions=1, block_max_volume=100
                     )
-                    block_task = thermocycler.start_set_block_temperature(62)
+                    thermocycler.set_block_temperature(62)
                     if HYBRID_PAUSE:
                         protocol.comment("HYBRIDIZATION PAUSED")
-                    protocol.wait_for_tasks([block_task])
-                    thermocycler.start_set_block_temperature(10)
+                    thermocycler.set_block_temperature(10)
                 thermocycler.open_lid()
             else:
                 protocol.comment(
@@ -2079,9 +2071,8 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
                 if ONDECK_THERMO:
-                    tc_block_task = thermocycler.start_set_block_temperature(58)
-                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
-                    protocol.wait_for_tasks([tc_block_task, tc_lid_task])
+                    thermocycler.set_block_temperature(58)
+                    thermocycler.set_lid_temperature(58)
             # ============================================================================================
             protocol.comment("MOVING: tiprack_50_X = SCP_Position --> D4")
             protocol.move_labware(
@@ -2552,9 +2543,8 @@ def run(protocol: ProtocolContext) -> None:
             if ONDECK_THERMO:
                 if DRYRUN is False:
                     protocol.comment("SETTING THERMO to Room Temp")
-                    tc_block_task = thermocycler.start_set_block_temperature(4)
-                    tc_lid_task = thermocycler.start_set_lid_temperature(100)
-                    protocol.wait_for_tasks([tc_block_task, tc_lid_task])
+                    thermocycler.set_block_temperature(4)
+                    thermocycler.set_lid_temperature(100)
                 thermocycler.close_lid()
                 if DRYRUN is False:
                     profile_PCR_1: List[ThermocyclerStep] = [
@@ -2890,14 +2880,12 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=True,
                 )
                 stacker_50_2.store()
-        protocol.capture_image(filename="end_of_run")
+
         if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
+            slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

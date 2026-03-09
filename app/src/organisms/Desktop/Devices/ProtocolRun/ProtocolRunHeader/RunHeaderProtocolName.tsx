@@ -24,7 +24,7 @@ export function RunHeaderProtocolName({
       {protocolKey != null ? (
         <Link to={`/protocols/${protocolKey}`}>
           <LegacyStyledText
-            forwardedAs="h2"
+            as="h2"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.blue50}
           >
@@ -32,10 +32,7 @@ export function RunHeaderProtocolName({
           </LegacyStyledText>
         </Link>
       ) : (
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {displayName}
         </LegacyStyledText>
       )}

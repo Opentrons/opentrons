@@ -1,4 +1,4 @@
-@import url('@opentrons/components/styles');
+@import '@opentrons/components/styles';
 
 .warning_title {
   margin-bottom: 0.5rem;

@@ -30,12 +30,6 @@ export interface CloseLabwareSelectorAction {
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
 export const closeLabwareSelector: () => CloseLabwareSelectorAction =
   createAction('CLOSE_LABWARE_SELECTOR')
-// ===== Open and close multiple Ingredient Selector modal ====
-export interface MultipleIngredientsSelectorAction {
-  type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'
-  payload: string[]
-}
-
 // ===== Open and close Ingredient Selector modal ====
 export interface OpenIngredientSelectorAction {
   type: 'OPEN_INGREDIENT_SELECTOR'
@@ -48,13 +42,6 @@ export const openIngredientSelector: (
 export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
 }
-// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
-export const multipleIngredientsSelector: (
-  payload: string[]
-) => MultipleIngredientsSelectorAction = createAction(
-  'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'
-)
-
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
 export const closeIngredientSelector: () => CloseIngredientSelectorAction =
   createAction('CLOSE_INGREDIENT_SELECTOR')
@@ -78,10 +65,7 @@ export interface CreateContainerArgs {
   labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
-  updateSelectedLabwareId?: boolean
-  uuids?: string[]
 }
-
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
   payload: {
@@ -131,7 +115,7 @@ export interface DuplicateLabwareAction {
 export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
-    labwareId: string | string[]
+    labwareId: string
     liquidGroupId?: string
     wells: string[]
   }
@@ -194,7 +178,7 @@ export const deleteLiquidGroup: (
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export interface SetWellContentsPayload {
   liquidGroupId: string
-  labwareId: string | string[]
+  labwareId: string
   wells: string[]
   // NOTE: order should not be meaningful
   volume: number

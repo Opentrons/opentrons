@@ -1,15 +1,29 @@
 """Dispense command request, result, and implementation models."""
 
 from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, Type, Union, Any
+from typing_extensions import Literal
 
-from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal
 
 from ..state.update_types import CLEAR, StateUpdate
 from ..types import DeckPoint
+from .pipetting_common import (
+    PipetteIdMixin,
+    DispenseVolumeMixin,
+    FlowRateMixin,
+    BaseLiquidHandlingResult,
+    OverpressureError,
+    dispense_while_tracking,
+)
+from .movement_common import (
+    DynamicLiquidHandlingWellLocationMixin,
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -17,23 +31,9 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from .movement_common import (
-    DestinationPositionResult,
-    DynamicLiquidHandlingWellLocationMixin,
-    StallOrCollisionError,
-    move_to_well,
-)
-from .pipetting_common import (
-    BaseLiquidHandlingResult,
-    DispenseVolumeMixin,
-    FlowRateMixin,
-    OverpressureError,
-    PipetteIdMixin,
-    dispense_while_tracking,
-)
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, MovementHandler, PipettingHandler
+    from ..execution import PipettingHandler, GantryMover, MovementHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
 
@@ -220,9 +220,9 @@ class DispenseWhileTracking(
     params: DispenseWhileTrackingParams
     result: Optional[DispenseWhileTrackingResult] = None
 
-    _ImplementationCls: Type[DispenseWhileTrackingImplementation] = (
+    _ImplementationCls: Type[
         DispenseWhileTrackingImplementation
-    )
+    ] = DispenseWhileTrackingImplementation
 
 
 class DispenseWhileTrackingCreate(BaseCommandCreate[DispenseWhileTrackingParams]):

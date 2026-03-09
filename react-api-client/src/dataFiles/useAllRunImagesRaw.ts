@@ -5,7 +5,10 @@ import { getAllRunImages } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { DownloadedImageFileResponse } from '@opentrons/api-client'
+import type {
+  DownloadedImageFileResponse,
+  HostConfig,
+} from '@opentrons/api-client'
 
 export function useAllRunImagesRaw(
   runId: string,
@@ -19,7 +22,10 @@ export function useAllRunImagesRaw(
 
   const query = useQuery<DownloadedImageFileResponse>(
     [host, 'dataFiles', runId, 'images', 'download'],
-    () => getAllRunImages(host!, runId).then(response => response.data),
+    () =>
+      getAllRunImages(host as HostConfig, runId).then(
+        response => response.data
+      ),
     allOptions
   )
   return query

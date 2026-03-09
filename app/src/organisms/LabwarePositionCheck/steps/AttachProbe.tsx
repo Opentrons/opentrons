@@ -72,7 +72,7 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
               t={t}
               i18nKey={probei18nString()}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <LegacyStyledText as="p" />,
                 bold: <strong />,
               }}
             />

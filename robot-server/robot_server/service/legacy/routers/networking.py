@@ -4,30 +4,29 @@ import re
 import subprocess
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, File, HTTPException, Path, Query, Response, UploadFile
 from starlette import status
 from starlette.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query, Response
 
-from opentrons.system import nmcli, wifi
 from opentrons_shared_data.errors import ErrorCodes
-
+from opentrons.system import nmcli, wifi
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
-    AddWifiKeyFileResponse,
-    ConnectivityStatus,
-    EapConfigOption,
-    EapConfigOptionType,
-    EapOptions,
-    EapVariant,
     NetworkingStatus,
+    WifiNetworks,
+    WifiNetwork,
     WifiConfiguration,
     WifiConfigurationResponse,
-    WifiKeyFile,
     WifiKeyFiles,
-    WifiNetwork,
+    WifiKeyFile,
+    EapOptions,
+    EapVariant,
+    EapConfigOption,
+    EapConfigOptionType,
     WifiNetworkFull,
-    WifiNetworks,
+    AddWifiKeyFileResponse,
+    ConnectivityStatus,
 )
 
 log = logging.getLogger(__name__)
@@ -108,7 +107,9 @@ def _massage_nmcli_error(error_string: str) -> str:
 @router.post(
     path="/wifi/configure",
     summary="Configure the robot's Wi-Fi",
-    description=("Configures the wireless network interface to connect to a network"),
+    description=(
+        "Configures the wireless network interface to " "connect to a network"
+    ),
     status_code=status.HTTP_201_CREATED,
     response_model=WifiConfigurationResponse,
     responses={
@@ -232,7 +233,7 @@ async def delete_wifi_key(
 @router.get(
     "/wifi/eap-options",
     summary="Get EAP options",
-    description="Get the supported EAP variants and their configuration parameters",
+    description="Get the supported EAP variants and their " "configuration parameters",
     response_model=EapOptions,
 )
 async def get_eap_options() -> EapOptions:
@@ -247,7 +248,7 @@ async def get_eap_options() -> EapOptions:
                     name=o.get("name"),  # type: ignore[arg-type]
                     displayName=o.get("displayName"),  # type: ignore[arg-type]
                     required=o.get("required"),  # type: ignore[arg-type]
-                    type=EapConfigOptionType(o.get("type")),  # type: ignore[arg-type]
+                    type=EapConfigOptionType(o.get("type")),
                 )
                 for o in m.args()
             ],

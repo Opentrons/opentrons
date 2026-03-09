@@ -1,7 +1,7 @@
 # makefile for system_server for opentrons robots
 
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
@@ -31,19 +31,10 @@ ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
-
-
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -58,21 +49,21 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
-	$(pytest) $(test_opts) $(tests)
+	$(python) -m pytest $(test_opts) $(tests)
 
 .PHONY: lint
 lint:
 	$(python) -m mypy system_server tests
-	$(ruff) check system_server tests
+	$(python) -m black --check ./system_server ./tests
+	$(python) -m flake8 system_server tests
 
 .PHONY: format
 format:
-	$(ruff) format system_server tests
-	$(ruff) check --select I --fix system_server tests
+	$(python) -m black system_server tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -97,5 +88,10 @@ push-ot3: wheel
 .PHONY: dev
 dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(python) -m system_server --reload --log-level=debug
+	$(pipenv) run python -m system_server --reload --log-level=debug
 
+.PHONY: docs
+docs: settings_schema.json
+
+settings_schema.json: system_server/settings/settings.py
+	$(python) -m scripts.settings_schema $@

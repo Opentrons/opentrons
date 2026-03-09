@@ -10,6 +10,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
+
 ClientData = dict[str, object]
 
 

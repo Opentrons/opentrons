@@ -29,6 +29,7 @@ import {
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
 
@@ -97,6 +98,7 @@ describe('DeckSetupToolbox', () => {
       bakeToast: vi.fn(),
       eatToast: vi.fn(),
     })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({})
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
@@ -129,6 +131,9 @@ describe('DeckSetupToolbox', () => {
     )
   })
   it('should clear the slot from all items when the clear cta is called', () => {
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labId: 'mock nickName',
+    })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: 'mockUri',
       selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
@@ -171,6 +176,7 @@ describe('DeckSetupToolbox', () => {
       },
     })
     render(props)
+    screen.getAllByText('mock nickName')
     screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')

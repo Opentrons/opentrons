@@ -1,42 +1,26 @@
 """Tests for the move scheduler."""
-
-from typing import Any, List
-
 import pytest
-from mock import AsyncMock, MagicMock, call, patch
-from numpy import float32, float64, int32
+from typing import List, Any
+from numpy import float64, float32, int32
+from mock import AsyncMock, call, MagicMock, patch
 from opentrons_shared_data.errors.exceptions import (
-    EnumeratedError,
-    EStopActivatedError,
-    MotionFailedError,
     MoveConditionNotMetError,
-)
-
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    MessageListenerCallback,
+    EnumeratedError,
+    MotionFailedError,
+    EStopActivatedError,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
+
 from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
     ErrorCode,
     ErrorSeverity,
-    MotorDriverErrorCode,
-    MoveAckId,
-    NodeId,
     PipetteTipActionType,
+    MoveAckId,
+    MotorDriverErrorCode,
 )
-from opentrons_hardware.firmware_bindings.messages import (
-    MessageDefinition,
-)
-from opentrons_hardware.firmware_bindings.messages import (
-    message_definitions as md,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    ErrorCodeField,
-    ErrorSeverityField,
-    GearMotorIdField,
-    MotorPositionFlagsField,
-    MoveStopConditionField,
-    PipetteTipActionTypeField,
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
@@ -44,19 +28,22 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    AddLinearMoveRequestPayload,
     EmptyPayload,
-    ErrorMessagePayload,
+    AddLinearMoveRequestPayload,
+    MoveCompletedPayload,
+    TipActionResponsePayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
-    MoveCompletedPayload,
+    ErrorMessagePayload,
     ReadMotorDriverErrorStatusResponsePayload,
-    TipActionResponsePayload,
 )
-from opentrons_hardware.firmware_bindings.utils import (
-    Int32Field,
-    UInt8Field,
-    UInt32Field,
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    MoveStopConditionField,
+    ErrorSeverityField,
+    ErrorCodeField,
+    GearMotorIdField,
+    PipetteTipActionTypeField,
 )
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
@@ -66,18 +53,28 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
     MoveGroupTipActionStep,
-    MoveStopCondition,
     MoveType,
+    MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
     _CompletionPacket,
 )
+
 from opentrons_hardware.hardware_control.types import (
+    NodeMap,
     MotorPositionStatus,
     MoveCompleteAck,
-    NodeMap,
+)
+from opentrons_hardware.firmware_bindings.messages import (
+    message_definitions as md,
+    MessageDefinition,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    Int32Field,
+    UInt32Field,
 )
 
 

@@ -27,9 +27,9 @@ const getBackgroundColorByChipType = (chip: ChipType): string => {
     case 'neutral':
       return `${COLORS.black90}${COLORS.opacity20HexCode}`
     case 'info':
-      return `${COLORS.blue30}`
+      return `${COLORS.blue35}`
     case 'warning':
-      return `${COLORS.yellow30}`
+      return `${COLORS.yellow35}`
     default:
       return ''
   }

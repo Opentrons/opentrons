@@ -37,8 +37,9 @@ export function UpdatedChannel(): JSX.Element {
     const { label, value } = option
     return (
       <LegacyStyledText
-        forwardedAs="p"
+        as="p"
         textTransform={TYPOGRAPHY.textTransformCapitalize}
+        id={index}
       >
         {value === 'latest' ? label : value}
       </LegacyStyledText>
@@ -59,7 +60,7 @@ export function UpdatedChannel(): JSX.Element {
         >
           {t('update_channel')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('update_description')}
         </LegacyStyledText>
       </Flex>

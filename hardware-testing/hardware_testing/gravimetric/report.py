@@ -80,7 +80,8 @@ class EnvironmentReportState(str, Enum):
 
 def create_csv_test_report(
     volumes: List[float],
-    pipette_channels: List[int],
+    pipette_channels: int,
+    increment: bool,
     trials: int,
     name: str,
     run_id: str,
@@ -92,6 +93,10 @@ def create_csv_test_report(
         runtime_parameters = []
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
+    if pipette_channels == 8 and not increment:
+        pip_channels_tested = 8
+    else:
+        pip_channels_tested = 1
     meas_vols = [
         (
             None,  # volume
@@ -107,7 +112,7 @@ def create_csv_test_report(
                 channel,
                 trial,
             )
-            for channel in pipette_channels
+            for channel in range(pip_channels_tested)
             for trial in range(trials)
         ]
 
@@ -115,7 +120,7 @@ def create_csv_test_report(
     # and "trial_1" through trial count
     volume_stat_type = (
         ["channel_all"]
-        + [f"channel_{c+1}" for c in pipette_channels]
+        + [f"channel_{c+1}" for c in range(pip_channels_tested)]
         + [f"trial_{t+1}" for t in range(trials)]
     )
 
@@ -175,7 +180,7 @@ def create_csv_test_report(
                         f"trial-{t + 1}-{m}-{round(v, 2)}-ul-channel_{c + 1}", [float]
                     )
                     for v in volumes
-                    for c in pipette_channels
+                    for c in range(pip_channels_tested)
                     for t in range(trials)
                     for m in ["aspirate", "dispense", "liquid_height"]
                 ],
@@ -218,7 +223,7 @@ def create_csv_test_report(
                         [float],
                     )
                     for v in volumes
-                    for c in pipette_channels
+                    for c in range(pip_channels_tested)
                     for t in range(trials)
                     for i in ["start", "end"]
                     for d in ["target", "encoder", "drift"]

@@ -1,5 +1,4 @@
 """Tests for protocol geometry planning module."""
-
 from opentrons.motion_planning import MoveType
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.geometry.planning import get_move_type

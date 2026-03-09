@@ -1,22 +1,25 @@
-import asyncio
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+import asyncio
+
+from fastapi import APIRouter, Query, Depends
 from starlette import status
 
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import (
-    HardwareControlAPI,
-    ThreadedAsyncForbidden,
     ThreadedAsyncLock,
+    ThreadedAsyncForbidden,
 )
 from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control import HardwareControlAPI
+
 from opentrons.types import Mount, Point
-from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import LegacyErrorResponse
-from robot_server.hardware import get_hardware
 from robot_server.service.dependencies import get_motion_lock
-from robot_server.service.legacy.models import V1BasicResponse, control
+from robot_server.hardware import get_hardware
+from robot_server.service.legacy.models import V1BasicResponse
+from robot_server.service.legacy.models import control
 
 router = APIRouter()
 

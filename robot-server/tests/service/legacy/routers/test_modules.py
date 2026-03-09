@@ -1,21 +1,18 @@
-import asyncio
 from pathlib import Path
+from mock import patch, PropertyMock, MagicMock
 
 import pytest
-from mock import MagicMock, PropertyMock, patch
-
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+import asyncio
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
-    BundledFirmware,
-    HeaterShaker,
-    MagDeck,
     ModuleType,
-    TempDeck,
+    MagDeck,
     Thermocycler,
-    UpdateError,
-    utils,
+    TempDeck,
+    HeaterShaker,
 )
+from opentrons.hardware_control.modules import utils, UpdateError, BundledFirmware
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 
 @pytest.fixture

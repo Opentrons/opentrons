@@ -302,9 +302,8 @@ const ODDStyleMap = {
 
 export interface Props extends ComponentProps<typeof Text> {
   oddStyle?: ODDStyles
-  desktopStyle?: HelixStyles // ToDo (kk 9/14/25): may need to change the name
+  desktopStyle?: HelixStyles
   children?: ReactNode
-  htmlFor?: string
 }
 export const ODD_STYLES = Object.keys(ODDStyleMap)
 export const HELIX_STYLES = Object.keys(helixProductStyleMap)
@@ -318,24 +317,11 @@ function styleForDesktopName(name?: HelixStyles): FlattenSimpleInterpolation {
 function styleForODDName(name?: ODDStyles): FlattenSimpleInterpolation {
   return name ? ODDStyleMap[name].style : css``
 }
-const customProps = ['oddStyle', 'desktopStyle'] as const
-// Note (kk 9/14/25): the following is to follow the styled-components's shouldForwardProp
+
 const DesktopStyledText: (props: Props) => JSX.Element = styled(
   Text
 ).withConfig({
-  shouldForwardProp: (
-    prop: string | number,
-    defaultValidatorFn: (prop: string | number) => boolean
-  ) => {
-    if (typeof prop === 'number') {
-      return defaultValidatorFn(prop)
-    }
-
-    return (
-      !customProps.includes(prop as (typeof customProps)[number]) &&
-      defaultValidatorFn(prop)
-    )
-  },
+  shouldForwardProp: p => p !== 'oddStyle' && p !== 'desktopStyle',
 })`
   ${(props: Props) => styleForDesktopName(props.desktopStyle)}
 `

@@ -1,23 +1,21 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-
-import json
-from typing import TYPE_CHECKING, Dict, List, NamedTuple, cast, overload
-
+from typing import Dict, List, NamedTuple, cast, overload, TYPE_CHECKING
 from typing_extensions import Final
+import json
 
 from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
     from .types import (
+        DeckSchema,
         DeckDefinition,
         DeckDefinitionV3,
-        DeckDefinitionV4,
-        DeckDefinitionV5,
-        DeckSchema,
         DeckSchemaVersion3,
+        DeckDefinitionV4,
         DeckSchemaVersion4,
+        DeckDefinitionV5,
         DeckSchemaVersion5,
     )
 
@@ -43,19 +41,23 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5": ...
+def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5":
+    ...
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4": ...
+def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":
+    ...
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3": ...
+def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
+    ...
 
 
 @overload
-def load(name: str) -> "DeckDefinitionV5": ...
+def load(name: str) -> "DeckDefinitionV5":
+    ...
 
 
 def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> "DeckDefinition":

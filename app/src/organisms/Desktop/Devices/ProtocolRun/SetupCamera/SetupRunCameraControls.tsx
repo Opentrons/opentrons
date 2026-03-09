@@ -9,17 +9,10 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import styles from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/setupcamera.module.css'
 
-export interface SetupRunCameraControlsProps {
-  cameraConfirmed: boolean
-  runId: string
-}
-
-export function SetupRunCameraControls({
-  cameraConfirmed,
-  runId,
-}: SetupRunCameraControlsProps): JSX.Element {
+export function SetupRunCameraControls(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
+
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -38,7 +31,7 @@ export function SetupRunCameraControls({
             {t('configure_camera_settings')}
           </StyledText>
         </div>
-        <TertiaryButton onClick={toggleControls} disabled={cameraConfirmed}>
+        <TertiaryButton onClick={toggleControls}>
           <StyledText desktopStyle="captionSemiBold">
             {t('edit_settings')}
           </StyledText>
@@ -46,7 +39,7 @@ export function SetupRunCameraControls({
       </div>
       {showControls &&
         createPortal(
-          <CameraControls onClose={toggleControls} runId={runId} />,
+          <CameraControls onClose={toggleControls} />,
           getTopPortalEl()
         )}
     </div>

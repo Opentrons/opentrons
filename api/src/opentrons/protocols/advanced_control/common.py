@@ -1,5 +1,4 @@
 """Common resources for all advanced control functions."""
-
 import enum
 from typing import NamedTuple, Optional
 

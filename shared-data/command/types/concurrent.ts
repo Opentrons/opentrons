@@ -22,7 +22,8 @@ export interface CreateTimerResult {
 }
 
 export interface CreateTimerRunTimeCommand
-  extends CommonCommandRunTimeInfo, CreateTimerCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    CreateTimerCreateCommand {
   result?: CreateTimerResult | null
 }
 
@@ -40,6 +41,7 @@ export interface WaitForTasksResult {
 }
 
 export interface WaitForTasksRunTimeCommand
-  extends CommonCommandRunTimeInfo, WaitForTasksCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    WaitForTasksCreateCommand {
   result?: WaitForTasksResult | null
 }

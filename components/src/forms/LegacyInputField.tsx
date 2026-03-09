@@ -25,7 +25,7 @@ export interface LegacyInputFieldProps {
   /** inline label text. DEPRECATED */
   label?: string
   /** classes to apply to inner label text div */
-  labelTextClassName?: string | null
+  labelTextClassName?: string | null | undefined
   /** name of field in form */
   name?: string
   /** optional ID of <input> element */
@@ -35,13 +35,13 @@ export interface LegacyInputFieldProps {
   /** optional suffix component, appears to the right of input text */
   units?: ReactNode // TODO: Ian 2018-10-30 rename to 'suffix'
   /** current value of text in box, defaults to '' */
-  value?: string | null
+  value?: string | null | undefined
   /** if included, InputField will use error style and display error instead of caption */
-  error?: string | null
+  error?: string | null | undefined
   /** optional caption. hidden when `error` is given */
-  caption?: string | null
+  caption?: string | null | undefined
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string | null
+  secondaryCaption?: string | null | undefined
   /** optional input type (default "text") */
   type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD
   /** mouse click handler */

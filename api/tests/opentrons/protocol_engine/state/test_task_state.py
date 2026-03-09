@@ -1,17 +1,14 @@
 """Tests for TaskState+TaskStore+TaskView trifecta."""
-
-import asyncio
-from datetime import datetime
-
 import pytest
-
+from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
+from opentrons.protocol_engine.types import Task, FinishedTask
+from datetime import datetime
+import asyncio
 from opentrons.protocol_engine.actions.actions import (
-    FinishTaskAction,
     StartTaskAction,
+    FinishTaskAction,
 )
 from opentrons.protocol_engine.errors import ErrorOccurrence
-from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
-from opentrons.protocol_engine.types import FinishedTask, Task
 
 
 @pytest.fixture

@@ -1,37 +1,36 @@
 """Pressure Dispense-in-place command request, result, and implementation models."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type, Union
-
 from typing_extensions import Literal
 
-from ..errors import ProtocolEngineError
-from ..state.update_types import StateUpdate
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-    DefinedErrorData,
-    SuccessData,
+from .pipetting_common import (
+    PipetteIdMixin,
+    FlowRateMixin,
+    DispenseVolumeMixin,
+    BaseLiquidHandlingResult,
+    dispense_in_place,
+    increase_evo_disp_count,
+    DEFAULT_CORRECTION_VOLUME,
 )
 from .movement_common import (
     LiquidHandlingWellLocationMixin,
     StallOrCollisionError,
     move_to_well,
 )
-from .pipetting_common import (
-    DEFAULT_CORRECTION_VOLUME,
-    BaseLiquidHandlingResult,
-    DispenseVolumeMixin,
-    FlowRateMixin,
-    PipetteIdMixin,
-    dispense_in_place,
-    increase_evo_disp_count,
+
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+    DefinedErrorData,
 )
+from ..state.update_types import StateUpdate
+from ..errors import ProtocolEngineError
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, MovementHandler, PipettingHandler
+    from ..execution import PipettingHandler, GantryMover, MovementHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
 
@@ -142,9 +141,9 @@ class PressureDispense(
     params: PressureDispenseParams
     result: Optional[PressureDispenseResult] = None
 
-    _ImplementationCls: Type[PressureDispenseImplementation] = (
+    _ImplementationCls: Type[
         PressureDispenseImplementation
-    )
+    ] = PressureDispenseImplementation
 
 
 class PressureDispenseCreate(BaseCommandCreate[PressureDispenseParams]):

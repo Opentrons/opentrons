@@ -46,7 +46,7 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('branded:setup_instructions_description')}
           </LegacyStyledText>
           <Flex
@@ -54,10 +54,7 @@ export function SetupInstructionsModal({
             borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
-              forwardedAs="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
+            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {INSTRUCTIONS_URL}
             </LegacyStyledText>
           </Flex>

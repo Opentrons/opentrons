@@ -50,7 +50,7 @@ export function UseOlderAspirateBehavior({
         >
           {t('use_older_aspirate')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('use_older_aspirate_description')}
         </LegacyStyledText>
       </Box>

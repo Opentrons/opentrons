@@ -40,7 +40,7 @@ export function FeatureFlags(): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <LegacyStyledText
-              forwardedAs="h3"
+              as="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               id={`FeatureFlags_${flag}_text`}
             >

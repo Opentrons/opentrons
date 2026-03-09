@@ -16,7 +16,6 @@ import { TimelineEditHardware } from '../TimelineEditHardware'
 vi.mock('/protocol-designer/components/organisms/FlexHardware')
 vi.mock('/protocol-designer/components/organisms/Ot2Modules')
 vi.mock('/protocol-designer/file-data/selectors')
-
 const render = () => {
   return renderWithProviders(<TimelineEditHardware />, {
     i18nInstance: i18n,

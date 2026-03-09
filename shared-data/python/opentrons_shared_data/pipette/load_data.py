@@ -1,28 +1,30 @@
 import json
-from functools import lru_cache
-from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union
+from logging import getLogger
 
+from typing import Dict, Any, Union, Optional, List, Iterator
 from typing_extensions import Literal
+from functools import lru_cache
 
-from .. import get_shared_data_root, load_shared_data
-from .model_constants import _MAP_KEY_TO_V2, MOUNT_CONFIG_LOOKUP_TABLE
+from .. import load_shared_data, get_shared_data_root
+
 from .pipette_definition import (
     PipetteConfigurations,
     PipetteLiquidPropertiesDefinition,
     ValidNozzleMaps,
 )
+from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
 from .types import (
-    LiquidClasses,
     PipetteChannelType,
+    PipetteModelType,
     PipetteGenerationType,
+    PipetteVersionType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
-    PipetteModelType,
+    LiquidClasses,
     PipetteOEMType,
-    PipetteVersionType,
 )
+
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 

@@ -1,21 +1,19 @@
 """Tests that validate the built-in liquid class definitions."""
-
-from typing import Any, Dict, List
-
 import pytest
+from typing import List, Dict, Any
 
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.liquid_classes import load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    AspirateProperties,
-    BlowoutLocation,
-    BlowoutProperties,
     DelayProperties,
     MixProperties,
-    MultiDispenseProperties,
+    TouchTipProperties,
+    BlowoutProperties,
+    BlowoutLocation,
+    AspirateProperties,
     PositionReference,
     SingleDispenseProperties,
-    TouchTipProperties,
+    MultiDispenseProperties,
     TransferProperties,
 )
 
@@ -131,37 +129,6 @@ def test_validate_blowout_properties_dict() -> None:
                 "params": {"foo": "bar"},
             }
         )
-
-    with pytest.raises(ValueError):
-        BlowoutProperties.model_validate(
-            {
-                "enable": True,
-                "location": "source",
-                "flow_rate": 3,
-                "foo": "bar",  # It should not allow unknown parameters
-            }
-        )
-
-    # Test Blowout position validation
-    obj2 = BlowoutProperties.model_validate(
-        {
-            "enable": True,
-            "location": "source",
-            "flow_rate": 3,
-            "blowout_position": {
-                "position_reference": "well-bottom",
-                "offset": {"x": 10, "y": 20, "z": 30},
-            },
-        }
-    )
-    assert isinstance(obj2, BlowoutProperties)
-    assert obj2.enable is True
-    assert obj2.params is not None
-    assert obj2.params.location == BlowoutLocation.SOURCE
-    assert (
-        obj2.params.blowoutPosition.positionReference == PositionReference.WELL_BOTTOM  # type: ignore[union-attr]
-    )
-    assert obj2.params.blowoutPosition.offset.y == 20  # type: ignore[union-attr]
 
 
 def test_validate_aspirate_properties_dict(

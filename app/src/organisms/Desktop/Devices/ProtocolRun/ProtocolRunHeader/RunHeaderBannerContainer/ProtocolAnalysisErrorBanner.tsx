@@ -45,17 +45,18 @@ export function ProtocolAnalysisErrorBanner(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('protocol_analysis_failed')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="view_analysis_error_details"
             components={{
               errorLink: (
                 <Btn
-                  // forwardedAs="a"
+                  as="a"
+                  role="button"
                   aria-label="error_link"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleToggleDetails}
@@ -73,7 +74,7 @@ export function ProtocolAnalysisErrorBanner(
               onClose={handleToggleDetails}
             >
               {errors.map((error, index) => (
-                <LegacyStyledText forwardedAs="p" key={index}>
+                <LegacyStyledText as="p" key={index}>
                   {error?.detail}
                 </LegacyStyledText>
               ))}

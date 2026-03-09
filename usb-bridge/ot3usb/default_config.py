@@ -1,5 +1,4 @@
 """Provides default configuration options for the OT3 Serial Gadget."""
-
 from .usb_config import SerialGadgetConfig
 
 DEFAULT_NAME = "ot3_usb"

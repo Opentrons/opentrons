@@ -1,5 +1,4 @@
 import pytest
-
 from opentrons.drivers.types import Temperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.types import TemperatureStatus

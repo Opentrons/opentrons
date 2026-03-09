@@ -28,9 +28,8 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-interface ListTableStoryProps extends ComponentProps<
-  typeof ListTableComponent
-> {
+interface ListTableStoryProps
+  extends ComponentProps<typeof ListTableComponent> {
   tagCount: number
 }
 

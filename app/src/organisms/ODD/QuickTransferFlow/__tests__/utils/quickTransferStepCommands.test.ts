@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  A1_NOZZLE,
-  ALL,
   fixture96Plate,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
@@ -127,7 +125,6 @@ describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
       stepNumber: 1,
-      primaryNozzle: A1_NOZZLE,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -163,7 +160,7 @@ describe('quickTransferStepCommands', () => {
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
-      nozzles: ALL,
+      nozzles: null,
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,
@@ -285,7 +282,6 @@ pipette.drop_tip()`.trimStart()
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
       stepNumber: 1,
-      primaryNozzle: A1_NOZZLE,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -321,7 +317,7 @@ pipette.drop_tip()`.trimStart()
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
-      nozzles: ALL,
+      nozzles: null,
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,
@@ -443,7 +439,6 @@ pipette.drop_tip()`.trimStart()
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
       stepNumber: 1,
-      primaryNozzle: A1_NOZZLE,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
@@ -479,7 +474,7 @@ pipette.drop_tip()`.trimStart()
       mixBeforeAspirate: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
-      nozzles: ALL,
+      nozzles: null,
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,

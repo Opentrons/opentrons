@@ -1,14 +1,14 @@
 """Prepare the server's images directory."""
 
-from logging import getLogger
 from pathlib import Path
-from shutil import rmtree
+from logging import getLogger
 from tempfile import mkdtemp
+from shutil import rmtree
 from typing import Optional
-
-from anyio import Path as AsyncPath
-from anyio import to_thread
 from typing_extensions import Final
+
+from anyio import Path as AsyncPath, to_thread
+
 
 _log = getLogger(__name__)
 

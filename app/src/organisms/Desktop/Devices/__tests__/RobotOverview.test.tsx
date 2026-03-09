@@ -5,6 +5,8 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { useAuthorization } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
@@ -13,10 +15,14 @@ import {
   useRobot,
 } from '/app/redux-resources/robots'
 import { getConfig, useFeatureFlag } from '/app/redux/config'
-import { getRobotModelByName } from '/app/redux/discovery'
+import {
+  getRobotAddressesByName,
+  getRobotModelByName,
+} from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   HEALTH_STATUS_OK,
+  OPENTRONS_USB,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
@@ -29,7 +35,7 @@ import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from '../ErrorRecoveryBanner'
-import { useCalibrationTaskList, useUSBRegistration } from '../hooks'
+import { useCalibrationTaskList } from '../hooks'
 import {
   expectedBadDeckAndPipetteOffsetTaskList,
   expectedBadDeckTaskList,
@@ -45,9 +51,18 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ComponentProps } from 'react'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { Config } from '/app/redux/config/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useAuthorization: vi.fn(),
+  }
+})
 vi.mock('/app/redux/robot-controls')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/config')
@@ -141,9 +156,22 @@ describe('RobotOverview', () => {
     when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('OT-2')
+    when(getRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .thenReturn([])
     vi.mocked(getConfig).mockReturnValue({
       userInfo: { userId: 'opentrons-robot-user' },
     } as Config)
+    when(useAuthorization)
+      .calledWith({
+        subject: 'Opentrons',
+        agent: 'com.opentrons.app',
+        agentId: 'opentrons-robot-user',
+      })
+      .thenReturn({
+        authorizationToken: { token: 'my.authorization.jwt' },
+        registrationToken: { token: 'my.registration.jwt' },
+      })
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(ErrorRecoveryBanner).mockReturnValue(
       <div>MOCK_RECOVERY_BANNER</div>
@@ -344,9 +372,16 @@ describe('RobotOverview', () => {
     screen.getByText('mock RobotOverviewOverflowMenu')
   })
 
-  it('registers the USB connection to the robot', () => {
+  it('requests a usb registration token if connected by usb', () => {
+    when(getRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .thenReturn([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
     render(props)
-    expect(useUSBRegistration).toBeCalledWith(mockConnectableRobot)
+    expect(useAuthorization).toBeCalledWith({
+      subject: 'Opentrons',
+      agent: 'com.opentrons.app.usb',
+      agentId: 'opentrons-robot-user',
+    })
   })
 
   it('renders the error recovery banner when another user is performing error recovery', () => {

@@ -1,6 +1,5 @@
 ---
 title: "Plate Reader: Product Specifications"
-description: "Dimensions, weight, optical specs, and included parts for the plate reader."
 ---
 
 ![Module parts with labels](images/plate-reader-labeled.svg)

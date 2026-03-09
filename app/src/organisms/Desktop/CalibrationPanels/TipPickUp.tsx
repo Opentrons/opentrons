@@ -64,7 +64,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {t('position_pipette_over_tip')}
             </LegacyStyledText>
             <Trans
@@ -72,10 +72,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
               i18nKey="tip_pick_up_instructions"
               components={{
                 block: (
-                  <LegacyStyledText
-                    forwardedAs="p"
-                    marginBottom={SPACING.spacing8}
-                  />
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
                 ),
               }}
             />

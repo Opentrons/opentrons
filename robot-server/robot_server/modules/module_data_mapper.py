@@ -1,47 +1,42 @@
 """Module identification and response data mapping."""
-
-from typing import Annotated, Optional, Type, cast
-
+from typing import Annotated, List, Type, cast, Optional
 from fastapi import Depends
-from opentrons_hardware.hardware_control.types import PCBARevision
 
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
-    HeaterShakerLabwareLatchStatus,
-    ThermocyclerLidStatus,
-)
+from opentrons.hardware_control.types import SubSystem
+from opentrons_hardware.hardware_control.types import PCBARevision
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.module import load_definition
+
 from opentrons.hardware_control.modules import (
-    AbsorbanceReaderStatus,
-    FlexStackerStatus,
-    HeaterShakerStatus,
     LiveData,
-    MagneticStatus,
     ModuleDataValidator,
     ModuleType,
-    PlatformState,
-    SpeedStatus,
+    MagneticStatus,
     TemperatureStatus,
-    VacuumModuleStatus,
+    HeaterShakerStatus,
+    SpeedStatus,
+    AbsorbanceReaderStatus,
+    PlatformState,
+    FlexStackerStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
+from opentrons.drivers.types import (
+    ThermocyclerLidStatus,
+    HeaterShakerLabwareLatchStatus,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+)
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
-from opentrons.hardware_control.types import SubSystem
-from opentrons.protocol_engine import DeckType, ModuleModel
-from opentrons_shared_data.module import load_definition
+from opentrons.protocol_engine import ModuleModel, DeckType
 
 from .module_identifier import ModuleIdentity
 from .module_models import (
-    AbsorbanceReaderModule,
-    AbsorbanceReaderModuleData,
     AttachedModule,
     AttachedModuleData,
     FlexStackerModule,
     FlexStackerModuleData,
-    HeaterShakerModule,
-    HeaterShakerModuleData,
     MagneticModule,
     MagneticModuleData,
     ModuleCalibrationData,
@@ -49,10 +44,13 @@ from .module_models import (
     TemperatureModuleData,
     ThermocyclerModule,
     ThermocyclerModuleData,
+    HeaterShakerModule,
+    HeaterShakerModuleData,
+    AbsorbanceReaderModule,
+    AbsorbanceReaderModuleData,
     UsbPort,
-    VacuumModule,
-    VacuumModuleData,
 )
+
 from robot_server.hardware import get_deck_type, get_hardware
 
 
@@ -92,9 +90,9 @@ class ModuleDataMapper:
             module_cls = MagneticModule
             assert ModuleDataValidator.is_magnetic_module_data(live_data["data"])
             live_data_height = live_data["data"].get("height")
-            assert isinstance(live_data_height, (int, float)), (
-                f"Expected magnetic module height, got {live_data_height}"
-            )
+            assert isinstance(
+                live_data_height, (int, float)
+            ), f"Expected magnetic module height, got {live_data_height}"
 
             # Origin of height reported by hardware API is the magnet home
             # Origin we report to the user should be labware bottom
@@ -105,7 +103,7 @@ class ModuleDataMapper:
 
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
-                engaged=live_data["data"].get("engaged"),
+                engaged=cast(bool, live_data["data"].get("engaged")),
                 height=height_from_base,
             )
 
@@ -114,8 +112,8 @@ class ModuleDataMapper:
             assert ModuleDataValidator.is_temperature_module_data(live_data["data"])
             module_data = TemperatureModuleData(
                 status=TemperatureStatus(live_data["status"]),
-                targetTemperature=live_data["data"].get("targetTemp"),
-                currentTemperature=live_data["data"].get("currentTemp"),
+                targetTemperature=cast(float, live_data["data"].get("targetTemp")),
+                currentTemperature=cast(float, live_data["data"].get("currentTemp")),
             )
 
         elif module_type == ModuleType.THERMOCYCLER:
@@ -129,7 +127,7 @@ class ModuleDataMapper:
                 lidTemperatureStatus=cast(
                     TemperatureStatus, live_data["data"].get("lidTempStatus")
                 ),
-                lidTemperature=live_data["data"].get("lidTemp"),
+                lidTemperature=cast(float, live_data["data"].get("lidTemp")),
                 lidTargetTemperature=cast(float, live_data["data"].get("lidTarget")),
                 holdTime=cast(float, live_data["data"].get("holdTime")),
                 rampRate=cast(float, live_data["data"].get("rampRate")),
@@ -149,14 +147,14 @@ class ModuleDataMapper:
                     live_data["data"].get("labwareLatchStatus"),
                 ),
                 speedStatus=cast(SpeedStatus, live_data["data"].get("speedStatus")),
-                currentSpeed=live_data["data"].get("currentSpeed"),
+                currentSpeed=cast(int, live_data["data"].get("currentSpeed")),
                 targetSpeed=cast(int, live_data["data"].get("targetSpeed")),
                 temperatureStatus=cast(
                     TemperatureStatus, live_data["data"].get("temperatureStatus")
                 ),
-                currentTemperature=live_data["data"].get("currentTemp"),
-                targetTemperature=live_data["data"].get("targetTemp"),
-                errorDetails=live_data["data"].get("errorDetails"),
+                currentTemperature=cast(float, live_data["data"].get("currentTemp")),
+                targetTemperature=cast(float, live_data["data"].get("targetTemp")),
+                errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         elif module_type == ModuleType.ABSORBANCE_READER:
             assert ModuleDataValidator.is_absorbance_reader_data(live_data["data"])
@@ -170,9 +168,13 @@ class ModuleDataMapper:
                     AbsorbanceReaderPlatePresence,
                     live_data["data"].get("platePresence"),
                 ),
-                measureMode=live_data["data"].get("measureMode"),
-                sampleWavelengths=live_data["data"].get("sampleWavelengths"),
-                referenceWavelength=live_data["data"].get("referenceWavelength"),
+                measureMode=cast(str, live_data["data"].get("measureMode")),
+                sampleWavelengths=cast(
+                    List[int], live_data["data"].get("sampleWavelengths")
+                ),
+                referenceWavelength=cast(
+                    int, live_data["data"].get("referenceWavelength")
+                ),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         elif module_type == ModuleType.FLEX_STACKER:
@@ -187,7 +189,7 @@ class ModuleDataMapper:
                 hopperDoorState=cast(
                     HopperDoorState, live_data["data"].get("hopperDoorState")
                 ),
-                installDetected=live_data["data"].get("installDetected"),
+                installDetected=cast(bool, live_data["data"].get("installDetected")),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
 
@@ -201,13 +203,6 @@ class ModuleDataMapper:
                 if rear_panel is not None:
                     rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
                     compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
-        elif module_type == ModuleType.VACUUM_MODULE:
-            module_cls = VacuumModule
-            assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])
-            module_data = VacuumModuleData(
-                status=VacuumModuleStatus(live_data["status"]),
-                errorDetails=cast(str, live_data["data"].get("errorDetails")),
-            )
         else:
             assert False, f"Invalid module type {module_type}"
 

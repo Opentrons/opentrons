@@ -82,7 +82,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       components={{
         bold: (
           <LegacyStyledText
-            forwardedAs="span"
+            as="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />
         ),

@@ -164,24 +164,22 @@ class AsairSensor(AsairSensorBase):
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
-            self._th_sensor.flushInput()  # type: ignore[attr-defined]
-            self._th_sensor.flushOutput()  # type: ignore[attr-defined]
-
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
             self._th_sensor.write(command_bytes)
             time.sleep(0.1)
 
-            length = self._th_sensor.inWaiting()  # type: ignore[attr-defined]
+            length = self._th_sensor.inWaiting()
             res = self._th_sensor.read(length)
-            log.debug(f"received {res!r}")
+            log.debug(f"received {res}")
 
-            res_hex = codecs.encode(res, "hex").decode("ascii")
-            relative_hum_str = res_hex[6:10]
-            temp_str = res_hex[10:14]
-            log.info(f"Temp: {temp_str!r}, RelativeHum: {relative_hum_str!r}")
+            res = codecs.encode(res, "hex")
+            relative_hum = res[6:10]
+            temp = res[10:14]
+            log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
 
-            temp = float(int(temp_str, 16)) / 10
-            relative_hum = float(int(relative_hum_str, 16)) / 10
-
+            temp = float(int(temp, 16)) / 10
+            relative_hum = float(int(relative_hum, 16)) / 10
             return Reading(temperature=temp, relative_humidity=relative_hum)
 
         except (IndexError, ValueError) as e:
@@ -204,15 +202,15 @@ class AsairSensor(AsairSensorBase):
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
-            self._th_sensor.flushInput()  # type: ignore[attr-defined]
-            self._th_sensor.flushOutput()  # type: ignore[attr-defined]
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
             self._th_sensor.write(command_bytes)
             time.sleep(0.1)
 
-            length = self._th_sensor.inWaiting()  # type: ignore[attr-defined]
+            length = self._th_sensor.inWaiting()
             res = self._th_sensor.read(length)
             res = codecs.encode(res, "hex")
-            log.debug(f"received {res!r}")
+            log.debug(f"received {res}")
             dev_id = res[6:14]
             return dev_id.decode()
 

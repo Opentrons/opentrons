@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useUpdateCamera } from '@opentrons/react-api-client'
-
-import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
+import { useCamera, useUpdateCamera } from '@opentrons/react-api-client'
 
 const CAMERA_POLLING_INTERVAL_MS = 5000
 
@@ -19,7 +17,7 @@ export interface UseCameraUsageSettingsResult {
 
 // general camera usage settings. intended for out of run setup use only.
 export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
-  const { data: cameraData } = useNotifyCamera({
+  const { data: cameraData } = useCamera({
     refetchInterval: CAMERA_POLLING_INTERVAL_MS,
   })
   const { mutateAsync: updateCamera } = useUpdateCamera()

@@ -3,11 +3,7 @@ import dns from 'dns'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 import electronDebug from 'electron-debug'
-import {
-  installExtension,
-  REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
-} from 'electron-devtools-installer'
+import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
@@ -27,7 +23,6 @@ import {
   closeSecondaryWindows,
   registerCameraStream,
 } from './secondary-windows'
-import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
@@ -52,10 +47,8 @@ log.debug('App config', {
   overrides: getOverrides(),
 })
 
-// Initialize Sentry before the app is ready.
-initializeSentry(getStore().analytics.optedIn)
-
 if (config.devtools) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   electronDebug({ isEnabled: true, showDevTools: true })
 }
 
@@ -70,20 +63,11 @@ interface HandlerSet {
 // Handler caching using window ID as key
 const handlerSets = new Map<string, HandlerSet>()
 
-app
-  .whenReady()
-  .then(async () => {
-    startUp()
-
-    if (config.devtools) {
-      await installDevtools()
-
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.openDevTools({ mode: 'detach' })
-      }
-    }
-  })
-  .catch(err => log.error('Startup failed', { err }))
+// prepended listener is important here to work around Electron issue
+// https://github.com/electron/electron/issues/19468#issuecomment-623529556
+app.prependOnceListener('ready', startUp)
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
@@ -183,13 +167,6 @@ function startUp(): void {
 
   initializeMenu()
 
-  ipcMain.on('secondary-window:close-self', event => {
-    const senderWindow = BrowserWindow.fromWebContents(event.sender)
-    if (senderWindow != null && !senderWindow.isDestroyed()) {
-      senderWindow.close()
-    }
-  })
-
   ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })
 
@@ -226,23 +203,36 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-async function installDevtools(): Promise<void> {
-  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
+function installDevtools(): Promise<Logger> {
+  const extensions = [
+    electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
+    electronDevtoolsInstaller.REDUX_DEVTOOLS,
+  ]
+  // @ts-expect-error the types for electron-devtools-installer are not correct
+  // when importing the default export via commmon JS. the installer is actually nested in
+  // another default object
+  const install = electronDevtoolsInstaller.default?.default
+  const forceReinstall = config.reinstallDevtools
 
-  log.debug('Installing devtools with v4 API')
+  log.debug('Installing devtools')
 
-  try {
-    await installExtension(extensions, {
+  if (typeof install === 'function') {
+    return install(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
-      forceDownload: config.reinstallDevtools,
+      forceDownload: forceReinstall,
     })
-
-    log.debug('Devtools extensions installed')
-  } catch (error) {
-    log.warn('Failed to install devtools extensions', {
-      forceReinstall: config.reinstallDevtools,
-      error,
-    })
+      .then(() => log.debug('Devtools extensions installed'))
+      .catch((error: unknown) => {
+        log.warn('Failed to install devtools extensions', {
+          forceReinstall,
+          error,
+        })
+      })
+  } else {
+    log.warn('could not resolve electron dev tools installer')
+    return Promise.reject(
+      new Error('could not resolve electron dev tools installer')
+    )
   }
 }
 

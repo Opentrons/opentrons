@@ -113,14 +113,10 @@ export function AvailableRobotOption(
     iconName = 'usb'
   }
 
-  useEffect(
-    () => {
-      dispatch(fetchStatus(robotName))
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  useEffect(() => {
+    dispatch(fetchStatus(robotName))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  }, [])
 
   return showIdleOnly && isBusy ? null : (
     <>
@@ -137,7 +133,6 @@ export function AvailableRobotOption(
             width: 4rem;
             height: 3.5625rem;
           `}
-          alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -145,15 +140,12 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
         >
-          <LegacyStyledText
-            forwardedAs="h6"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
+          <LegacyStyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotModel}
           </LegacyStyledText>
           <Box maxWidth="9.5rem">
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
@@ -174,13 +166,14 @@ export function AvailableRobotOption(
         isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon name="ot-alert" size="1.25rem" color={COLORS.red50} />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.red50} />
           </>
         ) : null}
       </MiniCard>
+
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <LegacyStyledText
-          forwardedAs="label"
+          as="label"
           color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`

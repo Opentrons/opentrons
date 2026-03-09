@@ -265,10 +265,10 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <LegacyStyledText as="p" />,
             bold: (
               <LegacyStyledText
-                forwardedAs="p"
+                as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               />
             ),
@@ -280,7 +280,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}
-      bodyText={<LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>}
+      bodyText={<LegacyStyledText as="p">{body}</LegacyStyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
@@ -219,7 +220,7 @@ const getNoLiquidClassValues = (
       : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
     disposalVolumeDispenseSettings: {
-      volume: pipette.liquids.default.minVolume,
+      volume: 0,
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,

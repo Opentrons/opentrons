@@ -7,32 +7,33 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.dispense_while_tracking import (
-    DispenseWhileTrackingImplementation,
-    DispenseWhileTrackingParams,
-    DispenseWhileTrackingResult,
-)
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.types import Point
 from opentrons.protocol_engine.execution import (
+    PipettingHandler,
     GantryMover,
     MovementHandler,
-    PipettingHandler,
 )
+
+from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.dispense_while_tracking import (
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingResult,
+    DispenseWhileTrackingImplementation,
+)
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
     CurrentWell,
+    CurrentPipetteLocation,
+    CurrentAddressableArea,
+    LiquidHandlingWellLocation,
+    WellOrigin,
+    WellOffset,
     DeckPoint,
     LabwareWellId,
-    LiquidHandlingWellLocation,
-    WellOffset,
-    WellOrigin,
 )
-from opentrons.types import Point
+from opentrons.protocol_engine.state import update_types
 
 
 @pytest.fixture
@@ -201,6 +202,7 @@ async def test_dispense_while_tracking_implementation(
             ),
         )
     else:
+
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=42,

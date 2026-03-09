@@ -1,8 +1,7 @@
 """Common functions between v1 transfer and liquid-class-based transfer."""
-
 import enum
 import math
-from typing import Generator, Iterable, List, Literal, Tuple, TypeVar, Union
+from typing import Iterable, Generator, Tuple, TypeVar, Literal, List, Union
 
 from opentrons.protocol_api._liquid_properties import (
     LiquidHandlingPropertyByVolume,

@@ -1,33 +1,31 @@
 """Move to well command request, result, and implementation models."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type
-
 from typing_extensions import Literal
 
+from .pipetting_common import (
+    PipetteIdMixin,
+)
+from .movement_common import (
+    LiquidHandlingWellLocationMixin,
+    MovementMixin,
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    LiquidHandlingWellLocationMixin,
-    MovementMixin,
-    StallOrCollisionError,
-    move_to_well,
-)
-from .pipetting_common import (
-    PipetteIdMixin,
+    DefinedErrorData,
 )
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..resources.model_utils import ModelUtils
     from ..state.state import StateView
+    from ..resources.model_utils import ModelUtils
 
 MoveToWellCommandType = Literal["moveToWell"]
 

@@ -1,11 +1,9 @@
 """Factory for building drivers and messengers."""
-
+from .bin_serial import SerialUsbDriver
+from .binary_messenger import BinaryMessenger
 import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
-
-from .bin_serial import SerialUsbDriver
-from .binary_messenger import BinaryMessenger
 
 RP_VID = 0x04D8
 RP_PID = 0xEF01

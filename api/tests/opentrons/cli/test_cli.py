@@ -1,16 +1,17 @@
 """Test cli execution."""
 
+
 import json
 import tempfile
 import textwrap
+
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
+from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-
-from opentrons.cli.analyze import AnalysisResult, analyze
+from opentrons.cli.analyze import analyze, AnalysisResult
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:

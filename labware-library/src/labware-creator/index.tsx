@@ -290,6 +290,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
               messages: validateLabwareSchema2.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     ajvError.message
                   }. (${JSON.stringify(ajvError.params)})`
               ),
@@ -324,8 +325,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
         reader.readAsText(file)
       }
     },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [scrollToForm, proceed, setLastUploaded, setImportError]
   )
 
@@ -449,15 +448,15 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
-            values.labwareType === 'reservoir' ||
-            values.labwareType === 'tipRack' ||
-            (values.labwareType === 'tubeRack' &&
-              values.tubeRackInsertLoadName) ||
-            (values.labwareType === 'aluminumBlock' &&
-              values.aluminumBlockType === '24well') ||
-            (values.labwareType === 'aluminumBlock' &&
-              values.aluminumBlockType === '96well' &&
-              values.aluminumBlockChildType)
+              values.labwareType === 'reservoir' ||
+              values.labwareType === 'tipRack' ||
+              (values.labwareType === 'tubeRack' &&
+                values.tubeRackInsertLoadName) ||
+              (values.labwareType === 'aluminumBlock' &&
+                values.aluminumBlockType === '24well') ||
+              (values.labwareType === 'aluminumBlock' &&
+                values.aluminumBlockType === '96well' &&
+                values.aluminumBlockChildType)
           )
 
           const labwareTypeChildFields = (

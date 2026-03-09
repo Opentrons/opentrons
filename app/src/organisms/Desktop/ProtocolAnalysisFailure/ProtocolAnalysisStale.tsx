@@ -44,17 +44,18 @@ export function ProtocolAnalysisStale(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('protocol_analysis_outdated')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="reanalyze_to_view"
             components={{
               analysisLink: (
                 <Btn
-                  // forwardedAs="a"
+                  as="a"
+                  role="button"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickReanalyze}
                 />

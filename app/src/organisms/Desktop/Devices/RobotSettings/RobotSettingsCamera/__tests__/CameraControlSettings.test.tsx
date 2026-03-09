@@ -11,7 +11,7 @@ import { RobotSettingsCameraControls } from '../RobotSettingsCameraControls'
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 
 const render = () => {
-  return renderWithProviders(<RobotSettingsCameraControls disabled={false} />, {
+  return renderWithProviders(<RobotSettingsCameraControls />, {
     i18nInstance: i18n,
   })
 }

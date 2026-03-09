@@ -2,8 +2,6 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -12,11 +10,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
-  useNotifyRunQuery,
-  useRunHasStarted,
-} from '/app/resources/runs'
+import { useRunHasStarted } from '/app/resources/runs'
 
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
@@ -79,17 +73,6 @@ describe('SetupRobotCalibration', () => {
     })
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
-      .thenReturn({
-        data: {
-          data: {
-            id: RUN_ID,
-            status: RUN_STATUS_STOPPED,
-            errors: [],
-          },
-        },
-      } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -112,14 +95,12 @@ describe('SetupRobotCalibration', () => {
 
   it('changes Proceed CTA copy based on next step', () => {
     render({ nextStep: 'labware_liquids_setup_step' })
-    screen.getByRole('button', { name: 'Proceed to labware & liquids' })
+    screen.getByRole('button', { name: 'Proceed to labware' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
     render()
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Proceed to deck hardware' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Proceed to modules' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
@@ -129,9 +110,7 @@ describe('SetupRobotCalibration', () => {
 
   it('does not call the expandStep function on click if calibration is not complete', () => {
     render({ calibrationStatus: { complete: false } })
-    const button = screen.getByRole('button', {
-      name: 'Proceed to deck hardware',
-    })
+    const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
@@ -140,9 +119,7 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if run has started', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
-    const button = screen.getByRole('button', {
-      name: 'Proceed to deck hardware',
-    })
+    const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()

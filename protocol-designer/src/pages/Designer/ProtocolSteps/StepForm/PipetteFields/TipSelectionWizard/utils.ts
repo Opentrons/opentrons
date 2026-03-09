@@ -1,7 +1,9 @@
 import {
   ALL,
+  COLUMN,
   getIsTiprack,
   getPositionFromSlotId,
+  SINGLE,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
@@ -10,23 +12,12 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
-import {
-  LABEL_BORDER_WIDTH_PX,
-  LABEL_PLACEMENT_BOTTOM,
-  LABEL_PLACEMENT_LEFT,
-  LABEL_PLACEMENT_RIGHT,
-  LABEL_PLACEMENT_TOP,
-} from './constants'
-
-import type { Channels } from '@opentrons/components'
 import type {
   DeckDefinition,
   LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
-  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -37,16 +28,10 @@ import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
 } from '../../../../../../step-forms'
-import type { AccessibilityStatus, LabelPlacement } from './types'
 
 // arbitrary constant to show slots surrounding the selected tiprack
 // TODO: confirm this padding with Design
 const PADDING_MM_X = 50
-const BASE_OFFSET_X = 15
-const BASE_OFFSET_Y = 15
-
-// additional offset to account for irregular OT-2 8-channel pipette geometry (right "hump")
-const OFFSET_OT2_8_CHANNEL = 10
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
@@ -75,14 +60,14 @@ export const getViewboxFromSelectedLabware = (
 }
 
 export const getHoveredOffsetFromWell = (args: {
-  selectedLabwareId: string
+  selectedTiprackId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   wellName: string | null
   pipetteSpec: PipetteV2Specs
-  primaryNozzle: PrimaryNozzleConfigurationStyle
+  primaryNozzle: string
 }): { x: number; y: number } => {
   const {
-    selectedLabwareId,
+    selectedTiprackId,
     labwareState,
     wellName,
     pipetteSpec,
@@ -96,38 +81,29 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
-  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null || labware.def.wells[wellName] == null) {
+  if (wellName == null) {
     return {
       x: 0,
       y: 0,
     }
   }
+  const labware = labwareState[selectedTiprackId ?? '']
   const well = labware.def.wells[wellName]
   return {
-    x: well.x + xOffset,
-    y: well.y + yOffset,
+    x:
+      well.x +
+      xOffset -
+      (well.shape === 'circular' ? well.diameter : well.xDimension) / 2,
+    y:
+      well.y +
+      yOffset -
+      (well.shape === 'circular' ? well.diameter : well.yDimension) / 2,
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string => {
-  const match = wellName.match(/^[A-Za-z]+(\d+)/)
-  if (match && match.length > 1) {
-    return match[1]
-  }
-  console.error('No column found for well name', wellName)
-  return ''
-}
-
-export const getRowFromWellName = (wellName: string): string => {
-  const rowLetter = wellName.match(/^[A-Za-z]+/)?.[0]
-  if (rowLetter) {
-    return rowLetter
-  }
-  console.error('No row found for well name', wellName)
-  return ''
-}
+export const getColumnFromWellName = (wellName: string): string =>
+  wellName.slice(1, wellName.length)
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
@@ -191,23 +167,24 @@ export const getAllWellsInColumn = (
   )
 }
 
-export const getAllWellsInRow = (
-  wellName: string,
+export const getAffectedWells = (args: {
+  wellName: string | null
   labwareDef: LabwareDefinition
-): string[] => {
-  const rowLetter = getRowFromWellName(wellName)
-  const wellOrdering = labwareDef.ordering
-  if (rowLetter === null) {
+  channels: number
+  nozzles: NozzleConfigurationStyle
+}): string[] => {
+  const { wellName, labwareDef, channels, nozzles } = args
+  if (wellName == null) {
     return []
   }
-  const firstRow = wellOrdering[0]
-  const colIndex = firstRow.findIndex(well => well.startsWith(rowLetter))
-
-  if (colIndex === -1) {
-    return []
+  if (channels === 1 || nozzles === SINGLE) {
+    return [wellName]
+  } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+    return getAllWellsInColumn(wellName, labwareDef)
+  } else if (channels === 96) {
+    return Object.keys(labwareDef.wells)
   }
-
-  return wellOrdering.map(row => row[colIndex])
+  return []
 }
 
 export const getValidTiprackIds = (args: {
@@ -215,10 +192,10 @@ export const getValidTiprackIds = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
   numPickups: number
-  primaryNozzle: PrimaryNozzleConfigurationStyle
+  primaryNozzle: string
   invariantContext: InvariantContext
   robotState: TimelineFrame | null
-  tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
+  tipAccessibilityStatus: Record<string, Record<string, boolean>>
 }): string[] => {
   const {
     pipetteId,
@@ -278,13 +255,12 @@ export const getValidTiprackIds = (args: {
                 })
               : true
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
-            const allAffectedWells = getEntireWellSelection(
+            const allAffectedWells = getAffectedWells({
               wellName,
-              tiprackDef.ordering,
+              labwareDef: tiprackDef,
+              channels,
               nozzles,
-              primaryNozzle,
-              channels
-            )
+            })
             addedWells.push(...allAffectedWells)
             foundSafePickup = true
             break // Found a safe pickup for this iteration, move to next pickup
@@ -303,95 +279,4 @@ export const getValidTiprackIds = (args: {
     []
   )
   return validTiprackIds
-}
-
-export const getPlacementByViewboxAndPipetteSpec = (args: {
-  enclosingViewbox: string | null
-  x: number
-  y: number
-  width: number
-  height: number
-  channels: Channels
-}): LabelPlacement => {
-  const { enclosingViewbox, x, y, width, height, channels } = args
-  if (enclosingViewbox == null) {
-    console.warn('No enclosing viewbox found')
-    return LABEL_PLACEMENT_BOTTOM
-  }
-  const viewBoxSplit = enclosingViewbox.split(' ').map(val => Number(val))
-  if (viewBoxSplit.length !== 4) {
-    console.warn(`Invalid viewbox value: ${enclosingViewbox}`)
-    return LABEL_PLACEMENT_BOTTOM
-  }
-  const leftBound = viewBoxSplit[0]
-  const bottomBound = viewBoxSplit[1]
-  const rightBound = viewBoxSplit[2] + leftBound
-  const topBound = viewBoxSplit[3] + bottomBound
-
-  // pipette is left of viewbox
-  if (channels === 96) {
-    if (x < leftBound - BASE_OFFSET_X) {
-      return LABEL_PLACEMENT_RIGHT
-    }
-    // pipette is right of viewbox
-    if (x + width > rightBound) {
-      return LABEL_PLACEMENT_LEFT
-    }
-    // pipette is above viewbox
-    if (y < bottomBound) {
-      return LABEL_PLACEMENT_TOP
-    }
-    // pipette is below viewbox
-    if (y + height > topBound) {
-      return LABEL_PLACEMENT_BOTTOM
-    }
-    return LABEL_PLACEMENT_BOTTOM
-  }
-  // 1- or 8-channel pipette
-  const distanceFromLeft = x - leftBound
-  const distanceFromRight = rightBound - (x + width)
-  const isCloserToLeft = distanceFromLeft < distanceFromRight
-  return isCloserToLeft ? LABEL_PLACEMENT_RIGHT : LABEL_PLACEMENT_LEFT
-}
-
-// TODO (nd: 2025/11/06): extend to top-right, top-left, etc. once different nozzle configurations are supported
-export const getLabelOffsetByPlacement = (args: {
-  labelPlacement: LabelPlacement
-  labelWidth: number
-  labelHeight: number
-  shadowWidth: number
-  shadowHeight: number
-  isOt2EightChannel: boolean
-}): {
-  x: number
-  y: number
-} => {
-  const {
-    labelPlacement,
-    labelWidth,
-    labelHeight,
-    shadowWidth,
-    shadowHeight,
-    isOt2EightChannel,
-  } = args
-  let labelOffsetX: number = 0
-  let labelOffsetY: number = 0
-  if (labelPlacement === LABEL_PLACEMENT_BOTTOM) {
-    labelOffsetX = BASE_OFFSET_X
-    labelOffsetY = -labelHeight + 2 * LABEL_BORDER_WIDTH_PX
-  } else if (labelPlacement === LABEL_PLACEMENT_TOP) {
-    labelOffsetX = BASE_OFFSET_X
-    labelOffsetY = shadowHeight - 2 * LABEL_BORDER_WIDTH_PX
-  } else if (labelPlacement === LABEL_PLACEMENT_LEFT) {
-    labelOffsetY = BASE_OFFSET_Y
-    labelOffsetX = -labelWidth
-  } else if (labelPlacement === LABEL_PLACEMENT_RIGHT) {
-    labelOffsetY =
-      BASE_OFFSET_Y + (isOt2EightChannel ? OFFSET_OT2_8_CHANNEL : 0)
-    labelOffsetX = shadowWidth - LABEL_BORDER_WIDTH_PX
-  }
-  return {
-    x: labelOffsetX,
-    y: labelOffsetY,
-  }
 }

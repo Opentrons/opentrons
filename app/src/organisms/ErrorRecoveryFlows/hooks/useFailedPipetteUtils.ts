@@ -10,7 +10,8 @@ import type {
 } from '@opentrons/api-client'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
-export interface UseFailedPipetteUtilsParams extends UseFailedCommandPipetteInfoProps {
+export interface UseFailedPipetteUtilsParams
+  extends UseFailedCommandPipetteInfoProps {
   runId: string
 }
 

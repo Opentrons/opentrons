@@ -135,10 +135,9 @@ describe('MaterialsListModal', () => {
         model: 'thermocyclerModuleV1',
         moduleState: {
           type: 'thermocyclerModuleType',
-          currentBlockActivity: { type: 'blockDeactivated' as const },
+          blockTargetTemp: null,
           lidTargetTemp: null,
           lidOpen: false,
-          numProfilesStarted: 0,
         },
         slot: '7',
         type: 'thermocyclerModuleType',

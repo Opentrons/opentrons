@@ -1,5 +1,5 @@
 import {
-  AlignToModuleChildSlot,
+  AlignControlToModule,
   BaseDeck,
   Box,
   DIRECTION_COLUMN,
@@ -70,7 +70,7 @@ export const SetupModulesMap = ({
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.slotName },
       moduleChildren: (
-        <AlignToModuleChildSlot
+        <AlignControlToModule
           deckId={deckDef.otId}
           slotId={module.slotName}
           moduleDefinition={module.moduleDef}
@@ -81,7 +81,7 @@ export const SetupModulesMap = ({
             physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
             runId={runId}
           />
-        </AlignToModuleChildSlot>
+        </AlignControlToModule>
       ),
     })
   )

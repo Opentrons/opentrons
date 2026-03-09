@@ -1,5 +1,4 @@
 """Abstract interfaces for engine plugins."""
-
 from abc import ABC, abstractmethod
 
 from .actions import Action

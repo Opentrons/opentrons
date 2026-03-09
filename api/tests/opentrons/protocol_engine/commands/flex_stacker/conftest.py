@@ -1,6 +1,7 @@
 """Test fixtures for stacker tests."""
 
 import pytest
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import FlexStacker

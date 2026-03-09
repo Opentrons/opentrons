@@ -1,10 +1,9 @@
 """Utilities for doing coverage math on wells."""
 
 from typing import Iterator
-
 from opentrons_shared_data.errors.exceptions import (
-    InvalidProtocolData,
     InvalidStoredData,
+    InvalidProtocolData,
 )
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap

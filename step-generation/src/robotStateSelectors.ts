@@ -2,35 +2,24 @@
 import min from 'lodash/min'
 
 import {
-  A1_NOZZLE,
-  A12_NOZZLE,
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
-  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
-  H1_NOZZLE,
-  H12_NOZZLE,
   orderWells,
-  PARTIAL_COLUMN,
-  ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
-import { getDefaultPrimaryNozzle, getSlotInLocationStack } from './utils'
+import { getSlotInLocationStack } from './utils'
 
-import type {
-  NozzleConfigurationStyle,
-  PrimaryNozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
-  FlexStackerModuleState,
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
@@ -70,119 +59,39 @@ export function _getNextTip(args: {
   tiprackId: string
   invariantContext: InvariantContext
   robotState: RobotState
-  primaryNozzle: PrimaryNozzleConfigurationStyle | null
-  nozzles: NozzleConfigurationStyle
+  nozzles?: NozzleConfigurationStyle
 }): string | null {
-  const {
-    pipetteId,
-    tiprackId,
-    invariantContext,
-    robotState,
-    nozzles,
-    primaryNozzle,
-  } = args
+  // return the well name of the next available tip for a pipette (or null)
+  const { pipetteId, tiprackId, invariantContext, robotState, nozzles } = args
   const pipetteChannels =
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
-  const confirmedPrimaryNozzle =
-    primaryNozzle ??
-    getDefaultPrimaryNozzle({ nozzles, channels: pipetteChannels })
-  const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
-  if (!pipetteChannels || !tiprackDef || !tiprackWellsState) {
-    console.assert(
-      false,
-      `Pipette ${pipetteId} missing channels/spec or tiprack definition`
-    )
-    return null
+  const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
+
+  const hasCleanTip = (wellName: string): boolean =>
+    tiprackWellsState[wellName] === CLEAN
+
+  const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
+  if (pipetteChannels === 1 || nozzles === SINGLE) {
+    const well = orderedWells.find(hasCleanTip)
+    return well || null
   }
 
-  const hasCleanTip = (well: string): boolean =>
-    tiprackWellsState[well] === CLEAN
-
-  const orderedWellsT2B = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-  const orderedWellsB2T = orderWells(tiprackDef.ordering, 'b2t', 'l2r')
-
-  const firstClean = (wells: string[]): string | null =>
-    wells.find(hasCleanTip) ?? null
-
-  const firstCleanReversed = (wells: string[]): string | null =>
-    [...wells].reverse().find(hasCleanTip) ?? null
-
-  const firstFullGroup = (groups: string[][]): string[] | null =>
-    groups.find(group => group.every(hasCleanTip)) ?? null
-
-  const firstFullGroupReversed = (groups: string[][]): string[] | null =>
-    [...groups].reverse().find(group => group.every(hasCleanTip)) ?? null
-  const is8ch1Nozzle = pipetteChannels === 8 && nozzles === SINGLE
-  const is8ch1NozzleFront = is8ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is8ch1NozzleBack = is8ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
-
-  const is96ch1Nozzle = pipetteChannels === 96 && nozzles === SINGLE
-  const is96ch1NozzleFrontRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H12_NOZZLE
-  const is96ch1NozzleBackRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A12_NOZZLE
-  const is96ch1NozzleFrontLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is96ch1NozzleBackLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
-
-  if (pipetteChannels === 1 || is8ch1NozzleFront || is96ch1NozzleFrontRight) {
-    return firstClean(orderedWellsT2B)
+  if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
+    // return first well in the column (for 96-well format, the 'A' row)
+    const tiprackColumns = tiprackDef.ordering
+    const fullColumn = tiprackColumns.find(col => col.every(hasCleanTip))
+    return fullColumn != null ? fullColumn[0] : null
   }
-  if (is8ch1NozzleBack) {
-    return firstClean(orderedWellsB2T)
-  }
-  if (nozzles === PARTIAL_COLUMN) {
-    const first = firstClean(orderedWellsT2B)
-    if (!first) {
-      return null
-    }
-    const idx = orderedWellsT2B.indexOf(first)
-    return orderedWellsT2B[idx] ?? null
+  if (pipetteChannels === 96 && nozzles === ALL) {
+    const allWellsHaveTip = orderedWells.every(hasCleanTip)
+    return allWellsHaveTip ? orderedWells[0] : null
   }
 
-  if (nozzles === ALL && pipetteChannels === 8) {
-    const column = firstFullGroup(tiprackDef.ordering)
-    return column?.[0] ?? null
-  }
-
-  if (is96ch1NozzleBackLeft) {
-    return firstCleanReversed(orderedWellsT2B)
-  }
-  if (is96ch1NozzleBackRight) {
-    return firstClean(orderedWellsB2T)
-  }
-  if (is96ch1NozzleFrontLeft) {
-    return firstCleanReversed(orderedWellsB2T)
-  }
-
-  if (nozzles === COLUMN) {
-    const columns = tiprackDef.ordering
-    const column =
-      confirmedPrimaryNozzle === A1_NOZZLE
-        ? firstFullGroupReversed(columns)
-        : firstFullGroup(columns)
-    return column?.[0] ?? null
-  }
-
-  if (nozzles === ROW) {
-    const columns = tiprackDef.ordering
-    const rows = columns[0].map((_, i) => columns.map(col => col[i]))
-
-    const row =
-      confirmedPrimaryNozzle === A1_NOZZLE
-        ? firstFullGroupReversed(rows)
-        : firstFullGroup(rows)
-
-    return row?.[0] ?? null
-  }
-
-  if (nozzles === ALL && pipetteChannels === 96) {
-    return orderedWellsT2B.every(hasCleanTip) ? orderedWellsT2B[0] : null
-  }
-
-  console.assert(false, `Unhandled _getNextTip case for pipette ${pipetteId}`)
+  console.assert(
+    false,
+    `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`
+  )
   return null
 }
 interface NextTiprackInfo {
@@ -202,8 +111,7 @@ export function getNextTiprack(
   tipRackUri: string,
   invariantContext: InvariantContext,
   robotState: RobotState,
-  primaryNozzle: PrimaryNozzleConfigurationStyle,
-  nozzles: NozzleConfigurationStyle
+  nozzles?: NozzleConfigurationStyle
 ): NextTiprackInfo {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
@@ -211,11 +119,13 @@ export function getNextTiprack(
     If there are no available tipracks, returns null.
   */
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
+
   if (!pipetteEntity) {
     throw new Error(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
   }
+
   // filter out unmounted or non-compatible tiprack models
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
@@ -266,25 +176,26 @@ export function getNextTiprack(
     }
     return locationHasLid == null
   })
-  let firstAvailableTiprack: string | null = null
-  let nextTip: string | null = null
 
-  for (const tiprackId of filteredSortedTiprackIds) {
-    const candidateTip = _getNextTip({
+  const firstAvailableTiprack = filteredSortedTiprackIds.find(tiprackId =>
+    _getNextTip({
       pipetteId,
       tiprackId,
       nozzles,
       invariantContext,
       robotState,
-      primaryNozzle,
     })
-
-    if (candidateTip) {
-      firstAvailableTiprack = tiprackId
-      nextTip = candidateTip
-      break
-    }
-  }
+  )
+  // TODO Ian 2018-02-12: avoid calling _getNextTip twice
+  const nextTip =
+    firstAvailableTiprack &&
+    _getNextTip({
+      pipetteId,
+      tiprackId: firstAvailableTiprack,
+      nozzles,
+      invariantContext,
+      robotState,
+    })
 
   if (firstAvailableTiprack && nextTip) {
     return {
@@ -345,15 +256,15 @@ export function getPipetteWithTipMaxVol(
 }
 export function getModuleState(
   robotState: RobotState,
-  moduleId: string
+  module: string
 ): ModuleTemporalProperties['moduleState'] {
-  if (!(moduleId in robotState.modules)) {
+  if (!(module in robotState.modules)) {
     console.warn(
-      `getModuleState expected module id "${moduleId}" to be in robot state`
+      `getModuleState expected module id "${module}" to be in robot state`
     )
   }
 
-  return robotState.modules[moduleId]?.moduleState
+  return robotState.modules[module]?.moduleState
 }
 export const thermocyclerStateGetter = (
   robotState: RobotState,
@@ -372,16 +283,6 @@ export const absorbanceReaderStateGetter = (
 ): AbsorbanceReaderState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === ABSORBANCE_READER_TYPE
-    ? hardwareModule
-    : null
-}
-
-export const flexStackerStateGetter = (
-  robotState: RobotState,
-  moduleId: string
-): FlexStackerModuleState | null => {
-  const hardwareModule = robotState.modules[moduleId]?.moduleState
-  return hardwareModule && hardwareModule.type === FLEX_STACKER_MODULE_TYPE
     ? hardwareModule
     : null
 }

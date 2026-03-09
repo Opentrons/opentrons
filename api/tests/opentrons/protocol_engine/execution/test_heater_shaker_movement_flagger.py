@@ -1,39 +1,38 @@
 """Tests for heater_shaker_movement_flagger."""
 
-from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, NamedTuple
-
 import pytest
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Any, NamedTuple
 from decoy import Decoy
-
-from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules.heater_shaker import (
     HeaterShaker as HardwareHeaterShaker,
 )
+
+from opentrons.protocol_engine.types import (
+    HeaterShakerMovementRestrictors,
+    HeaterShakerLatchStatus,
+    ModuleLocation,
+    DeckSlotLocation,
+)
 from opentrons.protocol_engine.errors import (
+    PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
     HeaterShakerLabwareLatchStatusUnknown,
-    PipetteMovementRestrictedByHeaterShakerError,
     WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.module_substates.heater_shaker_module_substate import (
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
 )
-from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    HeaterShakerLatchStatus,
-    HeaterShakerMovementRestrictors,
-    ModuleLocation,
-)
 from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.types import RobotType
 
 
 @pytest.fixture

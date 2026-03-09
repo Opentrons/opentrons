@@ -2,7 +2,6 @@ import { useSelector } from 'react-redux'
 
 import { DIRECTION_ROW, Flex, POSITION_FIXED } from '@opentrons/components'
 
-import { initializeSentry } from '/app/App/sentry'
 import { GlobalStyle } from '/app/atoms/GlobalStyle'
 import { getConfig } from '/app/redux/config'
 
@@ -19,16 +18,11 @@ const stopEvent = (event: MouseEvent): void => {
 }
 
 export const App = (): JSX.Element | null => {
-  const config = useSelector(getConfig)
+  const hasConfigLoaded = useSelector(getConfig) != null
   const windowType = useWindowType()
 
-  // initialize renderer sentry
-  if (config != null) {
-    initializeSentry(config.analytics.optedIn)
-  }
-
   // render null until both config and window type are loaded
-  if (config == null || windowType === null) {
+  if (!hasConfigLoaded || windowType === null) {
     return null
   }
 

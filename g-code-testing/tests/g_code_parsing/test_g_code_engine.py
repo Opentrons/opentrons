@@ -1,18 +1,19 @@
+import pytest
 import os
 
-import pytest
+from opentrons import APIVersion
 
 from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
-from g_code_parsing.utils import get_configuration_dir
-from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import (
-    PipetteSettings,
     Settings,
     SmoothieSettings,
+    PipetteSettings,
 )
+
+from g_code_parsing.utils import get_configuration_dir
 
 CONFIG = Settings(
     smoothie=SmoothieSettings(

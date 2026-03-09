@@ -1,7 +1,5 @@
 from typing import Dict, Union
-
-from typing_extensions import Literal, TypedDict
-
+from typing_extensions import TypedDict, Literal
 from opentrons.types import Point
 
 from .constants import DeckCalibrationState

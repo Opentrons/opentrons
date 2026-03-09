@@ -20,7 +20,7 @@ export function Loading(): JSX.Element {
       gridGap={SPACING.spacing16}
       height="100vh"
     >
-      <LegacyStyledText forwardedAs="h3">{t('loading')}</LegacyStyledText>
+      <LegacyStyledText as="h3">{t('loading')}</LegacyStyledText>
       <Icon name="ot-spinner" size="3rem" spin />
     </Flex>
   )

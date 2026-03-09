@@ -1,66 +1,62 @@
 """Hardware API wrapper module for initialization and management."""
-
 import asyncio
 import logging
-from contextlib import contextmanager, suppress
 from pathlib import Path
-from traceback import TracebackException, format_exception_only
+from fastapi import Depends, status
 from typing import (
     TYPE_CHECKING,
+    cast,
     Annotated,
     Awaitable,
     Callable,
-    Iterable,
     Iterator,
+    Iterable,
     Optional,
     Tuple,
-    cast,
 )
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
+from traceback import format_exception_only, TracebackException
+from contextlib import contextmanager, suppress
 
-from fastapi import Depends, status
+from opentrons_shared_data import deck
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
-from opentrons import initialize as initialize_api
-from opentrons import should_use_ot3
+from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import (
-    ARCHITECTURE,
     IS_ROBOT,
+    ARCHITECTURE,
     SystemArchitecture,
-)
-from opentrons.config import (
     feature_flags as ff,
 )
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadManagedHardware
+from opentrons.util.helpers import utc_now
+from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI, API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import StatusBarState
-from opentrons.protocol_engine import DeckType
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons.util.helpers import utc_now
-from opentrons_shared_data import deck
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
-from server_utils import systemd_utils
+from opentrons.protocol_engine import DeckType
+
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-
 from .errors.robot_errors import (
-    HardwareFailedToInitialize,
-    HardwareNotYetInitialized,
-    NotSupportedOnFlex,
     NotSupportedOnOT2,
+    NotSupportedOnFlex,
+    HardwareNotYetInitialized,
+    HardwareFailedToInitialize,
 )
-from .robot.control.estop_handler import EstopHandler
-from .service.task_runner import TaskRunner, get_task_runner
-from .settings import RobotServerSettings, get_settings
+from .settings import get_settings, RobotServerSettings
 from .subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     UpdateProcessHandle,
 )
 from .subsystems.models import SubSystem
+from .service.task_runner import TaskRunner, get_task_runner
+
+from .robot.control.estop_handler import EstopHandler
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -507,6 +503,16 @@ def _postinit_done_handler(task: "asyncio.Task[None]") -> None:
         log.info("Postinit task complete")
 
 
+def _systemd_notify(systemd_available: bool) -> None:
+    if systemd_available:
+        try:
+            import systemd.daemon  # type: ignore
+
+            systemd.daemon.notify("READY=1")
+        except ImportError:
+            pass
+
+
 async def _wrap_postinit(postinit: Awaitable[None]) -> None:
     try:
         return await postinit
@@ -566,7 +572,7 @@ async def _initialize_hardware_api(
         # - systemd timeouts might need to be increased to allow for DB migration time
         # - There might be UI implications for loading states on the Flex's on-device display,
         #   because it polls for the server's systemd status.
-        systemd_utils.notify_up()
+        _systemd_notify(systemd_available)
 
         if should_use_ot3():
             postinit_task = asyncio.create_task(

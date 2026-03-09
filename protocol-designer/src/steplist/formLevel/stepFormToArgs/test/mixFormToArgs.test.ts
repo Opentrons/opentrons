@@ -3,21 +3,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
-  POSITION_REFERENCE_CENTER,
 } from '@opentrons/shared-data'
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
-import { getOrderedWells } from '/protocol-designer/steplist/utils/getOrderedWells'
 
+import { getOrderedWells } from '../../../utils'
 import { mixFormToArgs } from '../mixFormToArgs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMixFormData } from '/protocol-designer/form-types'
 import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
-vi.mock('../../../utils/getOrderedWells')
+vi.mock('../../../utils')
 
 let castForm: GetCastFormData<HydratedMixFormData>
 const labwareDef = fixture_96_plate as LabwareDefinition2
@@ -53,7 +52,6 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
-    mix_position_reference: POSITION_REFERENCE_CENTER,
     tipRack: { tiprackDefURI: 'mockTiprack', ...tiprackLabwareDef },
     pipette: {
       id: 'pipetteId',
@@ -105,16 +103,15 @@ describe('mix step form -> command creator args', () => {
       aspirateFlowRateUlSec: 5, // make sure flow rates are numbers instead of strings
       dispenseFlowRateUlSec: 4,
       blowoutFlowRateUlSec: 1000,
+      offsetFromBottomMm: 0.5,
       blowoutOffsetFromTopMm: 0,
       aspirateDelaySeconds: null,
       tipRack: 'mockTiprack',
       dispenseDelaySeconds: null,
       dropTipLocation: undefined,
       nozzles: undefined,
-      positionReference: POSITION_REFERENCE_CENTER,
       xOffset: 0,
       yOffset: 0,
-      zOffset: 0.5,
       tipTracking: AUTOMATIC,
       tipsSelected: [],
       tiprackSelected: null,

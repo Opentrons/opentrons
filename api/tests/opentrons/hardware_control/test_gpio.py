@@ -1,5 +1,4 @@
 from unittest.mock import MagicMock
-
 import pytest
 
 from opentrons import hardware_control as hc

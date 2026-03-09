@@ -14,10 +14,11 @@ export type Options<T extends string = never> = Array<{
   children: ReactNode
 }>
 
-export interface RecoveryRadioGroupProps<T extends string> extends Omit<
-  ComponentProps<typeof RadioGroup>,
-  'labelTextClassName' | 'options' | 'onchange'
-> {
+export interface RecoveryRadioGroupProps<T extends string>
+  extends Omit<
+    ComponentProps<typeof RadioGroup>,
+    'labelTextClassName' | 'options' | 'onchange'
+  > {
   options: Options<T>
   onChange: ChangeEventHandler<Target<T>>
 }

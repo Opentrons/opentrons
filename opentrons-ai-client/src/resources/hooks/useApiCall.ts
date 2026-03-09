@@ -3,34 +3,28 @@ import axios from 'axios'
 import { useAtom } from 'jotai'
 
 import { featureFlagsAtom } from '../atoms'
-import { isApiErrorResponse } from '../utils'
 
-import type { AxiosError, AxiosRequestConfig } from 'axios'
-import type { ApiErrorResponse } from '../types'
+import type { AxiosRequestConfig } from 'axios'
 
 interface UseApiCallResult<T> {
   data: T | null
-  error: ApiErrorResponse | null
+  error: string | null
   isLoading: boolean
-  clearError: () => void
-  callApi: (config?: AxiosRequestConfig) => Promise<void>
+  callApi: (data: any, config?: AxiosRequestConfig) => Promise<void>
 }
 
 export const useApiCall = <T>(): UseApiCallResult<T> => {
   const [data, setData] = useState<T | null>(null)
-  const [error, setError] = useState<ApiErrorResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [featureFlags] = useAtom(featureFlagsAtom)
-
-  const clearError = (): void => {
-    setError(null)
-  }
 
   const callApi = async (config?: AxiosRequestConfig): Promise<void> => {
     setIsLoading(true)
     setError(null)
 
     try {
+      // Add analytics header based on feature flags
       const enableAnalytics = featureFlags.enableAnalytics ?? true
       const analyticsHeaders = {
         'x-enable-analytics': enableAnalytics.toString(),
@@ -44,29 +38,12 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
         },
       })
       setData(response.data)
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const axiosError = err as AxiosError<unknown>
-        const responseData = axiosError.response?.data
-        if (isApiErrorResponse(responseData)) {
-          setError(responseData)
-        } else {
-          setError({
-            message: axiosError.message,
-            error_type: 'network_error',
-          })
-        }
-      } else {
-        setError({
-          message:
-            err instanceof Error ? err.message : 'An unexpected error occurred',
-          error_type: 'unknown',
-        })
-      }
+    } catch (err: any) {
+      setError(err.message as string)
     } finally {
       setIsLoading(false)
     }
   }
 
-  return { data, error, isLoading, clearError, callApi }
+  return { data, error, isLoading, callApi }
 }

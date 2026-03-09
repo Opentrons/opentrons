@@ -1,6 +1,5 @@
 ---
 title: "Plate Reader: Additional Product Information"
-description: "Warranty, support, app download, and WEEE policy for the plate reader."
 ---
 
 ## Warranty

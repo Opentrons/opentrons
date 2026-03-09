@@ -39,7 +39,7 @@ export function DownloadCsvFileLink(
       }}
     >
       <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-        <LegacyStyledText forwardedAs="p">{t('download')}</LegacyStyledText>
+        <LegacyStyledText as="p">{t('download')}</LegacyStyledText>
         <Icon name="download" size="1rem" />
       </Flex>
     </Link>

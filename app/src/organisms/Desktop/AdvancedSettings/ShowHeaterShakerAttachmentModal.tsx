@@ -40,7 +40,7 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
         >
           {t('heater_shaker_attach_visible')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('heater_shaker_attach_description')}
         </LegacyStyledText>
       </Box>

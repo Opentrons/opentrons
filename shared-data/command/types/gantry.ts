@@ -13,7 +13,8 @@ export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   params: MoveToSlotParams
 }
 export interface MoveToSlotRunTimeCommand
-  extends CommonCommandRunTimeInfo, MoveToSlotCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToSlotCreateCommand {
   result?: {}
 }
 export interface MoveToWellCreateCommand extends CommonCommandCreateInfo {
@@ -21,15 +22,18 @@ export interface MoveToWellCreateCommand extends CommonCommandCreateInfo {
   params: MoveToWellParams
 }
 export interface MoveToWellRunTimeCommand
-  extends CommonCommandRunTimeInfo, MoveToWellCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToWellCreateCommand {
   result?: {}
 }
-export interface MoveToCoordinatesCreateCommand extends CommonCommandCreateInfo {
+export interface MoveToCoordinatesCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'moveToCoordinates'
   params: MoveToCoordinatesParams
 }
 export interface MoveToCoordinatesRunTimeCommand
-  extends CommonCommandRunTimeInfo, MoveToCoordinatesCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToCoordinatesCreateCommand {
   result?: {}
 }
 export interface MoveRelativeCreateCommand extends CommonCommandCreateInfo {
@@ -37,7 +41,8 @@ export interface MoveRelativeCreateCommand extends CommonCommandCreateInfo {
   params: MoveRelativeParams
 }
 export interface MoveRelativeRunTimeCommand
-  extends CommonCommandRunTimeInfo, MoveRelativeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveRelativeCreateCommand {
   result?: {
     position: Vector3D
   }
@@ -47,7 +52,8 @@ export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
   params: SavePositionParams
 }
 export interface SavePositionRunTimeCommand
-  extends CommonCommandRunTimeInfo, SavePositionCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    SavePositionCreateCommand {
   result?: {
     positionId: string
     position: Vector3D
@@ -58,7 +64,8 @@ export interface HomeCreateCommand extends CommonCommandCreateInfo {
   params: HomeParams
 }
 export interface HomeRunTimeCommand
-  extends CommonCommandRunTimeInfo, HomeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    HomeCreateCommand {
   result?: {}
 }
 
@@ -67,16 +74,19 @@ export interface RetractAxisCreateCommand extends CommonCommandCreateInfo {
   params: RetractAxisParams
 }
 export interface RetractAxisRunTimeCommand
-  extends CommonCommandRunTimeInfo, RetractAxisCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RetractAxisCreateCommand {
   result?: {}
 }
 
-export interface MoveToAddressableAreaCreateCommand extends CommonCommandCreateInfo {
+export interface MoveToAddressableAreaCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'moveToAddressableArea'
   params: MoveToAddressableAreaParams
 }
 export interface MoveToAddressableAreaRunTimeCommand
-  extends CommonCommandRunTimeInfo, MoveToAddressableAreaCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToAddressableAreaCreateCommand {
   //  TODO(jr, 11/6/23): add to result type
   result?: {}
 }

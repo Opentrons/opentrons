@@ -1,18 +1,14 @@
+import { cameraReducer } from '/app/redux/protocol-runs/reducer/camera'
+
 import * as Constants from '../constants'
 import { LPCReducer } from './lpc'
 import { setupReducer } from './setup'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../../types'
-import type { CameraState, ProtocolRunState } from '../types'
+import type { ProtocolRunState } from '../types'
 
 const INITIAL_STATE: ProtocolRunState = {}
-
-export const INITIAL_CAMERA_STATE: CameraState = {
-  enabled: false,
-  liveStreamEnabled: false,
-  recoveryEnabled: false,
-}
 
 export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
   state = INITIAL_STATE,
@@ -20,8 +16,7 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
 ) => {
   switch (action.type) {
     case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
-    case Constants.CAMERA_SETUP_STEP_KEY: {
+    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED: {
       const runId = action.payload.runId
       const currentRunState = state[runId]
 
@@ -33,6 +28,20 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
         },
       }
     }
+
+    case Constants.CAMERA_ENABLEMENT:
+    case Constants.CAMERA_STREAM_ENABLEMENT:
+    case Constants.CAMERA_RECOVERY_ENABLEMENT:
+      const runId = action.payload.runId
+      const currentRunState = state[runId]
+
+      return {
+        ...state,
+        [runId]: {
+          ...currentRunState,
+          camera: cameraReducer(currentRunState?.camera, action),
+        },
+      }
 
     case Constants.UPDATE_LPC:
     case Constants.UPDATE_LPC_DECK:

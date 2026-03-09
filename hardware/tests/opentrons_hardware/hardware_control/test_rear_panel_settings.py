@@ -1,27 +1,26 @@
 """Test rear panel integration."""
-
 from __future__ import annotations
-
-import asyncio
 from asyncio import Queue
-from typing import AsyncGenerator
-
 import pytest
 from mock import AsyncMock
+import asyncio
+from typing import AsyncGenerator
 
-from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
+
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    BinaryMessageDefinition,
     Ack,
     AckFailed,
-    BinaryMessageDefinition,
-    DoorSwitchStateInfo,
-    DoorSwitchStateRequest,
-    GetDeckLightRequest,
     GetDeckLightResponse,
     SetDeckLightRequest,
+    GetDeckLightRequest,
+    DoorSwitchStateInfo,
+    DoorSwitchStateRequest,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
+
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_deck_light_state,
     get_door_state,

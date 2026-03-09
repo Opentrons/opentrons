@@ -24,8 +24,8 @@ import { useAttachedModules } from '/app/resources/modules'
 import {
   useChainLiveCommands,
   useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
   useRunCalibrationStatus,
+  useRunStatus,
 } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -41,21 +41,13 @@ import { getUnmatchedModulesForProtocol } from '../utils'
 
 import type { UseQueryResult } from 'react-query'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import type * as ProtocolSetupUtils from '../utils'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/modules')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/transformations/analysis')
-// Only mock getUnmatchedModulesForProtocol so ModuleTableItem's getDoesModuleRequireCalibration stays real
-vi.mock('../utils', async importOriginal => {
-  const actual = await importOriginal<typeof ProtocolSetupUtils>()
-  return {
-    ...actual,
-    getUnmatchedModulesForProtocol: vi.fn(),
-  }
-})
+vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
@@ -140,9 +132,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       chainLiveCommands: mockChainLiveCommands,
     } as any)
     vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_IDLE } },
-    } as any)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {

@@ -1,10 +1,7 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, cast
+from typing import Dict, cast
 
-if TYPE_CHECKING:
-    from opentrons.config.types import AxisDict
+from opentrons.config.types import AxisDict
 
 AxisSettingType = Dict[str, float]
 

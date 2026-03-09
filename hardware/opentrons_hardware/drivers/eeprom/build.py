@@ -1,13 +1,14 @@
 """Factory for building the eeprom driver."""
 
-from contextlib import contextmanager
+from typing import Optional, Iterator
 from pathlib import Path
-from typing import Iterator, Optional
+from contextlib import contextmanager
 
 from ..gpio import OT3GPIO
 from .eeprom import (
     EEPROMDriver,
 )
+
 
 DEFAULT_EEPROM_PATH = Path("/sys/bus/i2c/devices/3-0050/eeprom")
 

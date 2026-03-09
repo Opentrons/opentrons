@@ -29,6 +29,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     targetTemperature,
     rpm,
   } = args
+  console.log('from step-gen', timerHours, timerMinutes, timerSeconds)
   if (args.moduleId == null) {
     return {
       errors: [errorCreators.missingModuleError()],

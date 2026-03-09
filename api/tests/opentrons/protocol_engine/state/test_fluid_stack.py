@@ -1,5 +1,4 @@
 """Test pipette internal fluid tracking."""
-
 import pytest
 
 from opentrons.protocol_engine.state.fluid_stack import FluidStack

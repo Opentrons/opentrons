@@ -1,6 +1,5 @@
 ---
 title: "HEPA/UV Module: Additional Product Information"
-description: "Warranty, support contact, and manufacturer information for the HEPA/UV Module."
 ---
 
 ## Warranty

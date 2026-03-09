@@ -2,22 +2,13 @@ import { useTranslation } from 'react-i18next'
 
 import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
 
-import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
+import { Skeleton } from '/app/atoms/Skeleton'
 
+import { usePreviewImage } from './hooks/usePreviewImage'
 import styles from './previewsettings.module.css'
 
-import type { CameraImageSettings } from '@opentrons/api-client'
-
-interface PreviewSettingsProps {
-  settings: CameraImageSettings
-  runId: string | null
-}
-
-export function PreviewSettings({
-  settings,
-  runId,
-}: PreviewSettingsProps): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings, runId)
+export function PreviewSettings(): JSX.Element {
+  const { isLoading, imgPath, takePhoto } = usePreviewImage()
 
   return (
     <div className={styles.container}>
@@ -33,9 +24,11 @@ export function PreviewSettings({
   )
 }
 
-function PreviewImage({ imgPath }: { imgPath: string | null }): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
+function PreviewImage({
+  imgPath,
+}: {
+  imgPath: string | undefined
+}): JSX.Element {
   if (imgPath != null) {
     return (
       <img
@@ -48,9 +41,7 @@ function PreviewImage({ imgPath }: { imgPath: string | null }): JSX.Element {
     return (
       <div className={styles.no_image_container}>
         <Icon name="ot-alert" className={styles.no_image_alert} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('no_image_available')}
-        </StyledText>
+        <Skeleton width="100%" height="100%" backgroundSize="47rem" />
       </div>
     )
   }
@@ -74,7 +65,7 @@ function PreviewImageBtn({
       {isLoading ? (
         <Icon name="ot-spinner" spin className={styles.icon_style} />
       ) : (
-        <Icon name="camera" className={styles.icon_style} />
+        <Icon name="photo-camera" className={styles.icon_style} />
       )}
       <StyledText>
         {hasPreviewImg ? t('retake_preview') : t('preview_image')}

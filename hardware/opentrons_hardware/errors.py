@@ -1,32 +1,32 @@
 """Module to convert message errors to exceptions."""
-
-import logging
 from typing import Dict, Optional, Tuple
+import logging
 
 from opentrons_shared_data.errors.exceptions import (
-    CommandTimedOutError,
-    EStopActivatedError,
-    HepaUVFailedError,
     InternalMessageFormatError,
-    LabwareDroppedError,
-    MotorDriverError,
-    PipetteOverpressureError,
-    PythonException,
     RoboticsControlError,
     RoboticsInteractionError,
+    CommandTimedOutError,
+    EStopActivatedError,
     StallOrCollisionDetectedError,
+    PipetteOverpressureError,
+    LabwareDroppedError,
+    PythonException,
+    HepaUVFailedError,
+    MotorDriverError,
 )
 
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import (
-    ErrorCode,
-    ErrorSeverity,
-    NodeId,
-)
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ErrorMessage,
 )
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorSeverity,
+    ErrorCode,
+    NodeId,
+)
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ def nice_name_for_error(code: ErrorCode) -> str:
 def _safe_details_from_message(
     message: ErrorMessage, arbitration_id: Optional[ArbitrationId]
 ) -> Tuple[Optional[NodeId], ErrorCode, ErrorSeverity]:
+
     detail_dict = {
         "hardware-error": str(message.payload.error_code.value),
         "hardware-severity": str(message.payload.severity.value),

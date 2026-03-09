@@ -20,7 +20,8 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDefinitionsByURIForProtocol,
-  getLabwareViewBox,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
@@ -91,7 +92,9 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
-  const labwareViewBox = getLabwareViewBox(labwareDefinition)
+  const labwareCornerOffsetFromSlot =
+    getSchema2CornerOffsetFromSlot(labwareDefinition)
+  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   return (
     <>
@@ -118,10 +121,14 @@ export function SetupLabwareStackView({
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_FLEX_START}
           alignItems={ALIGN_CENTER}
-          gap={SPACING.spacing12}
         >
           <ODDBackButton onClick={onClickBack} />
-          <StyledText oddStyle="level2HeaderBold">{t('labware_in')}</StyledText>
+          <StyledText
+            oddStyle="level2HeaderBold"
+            marginRight={SPACING.spacing16}
+          >
+            {t('labware_in')}
+          </StyledText>
           <RobotInfoLabel
             deckLabel={
               slotName === 'offDeck'
@@ -174,7 +181,7 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
+            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
           >
             <g
               onClick={() => {
@@ -186,7 +193,7 @@ export function SetupLabwareStackView({
             >
               <LabwareRender
                 definition={labwareDefinition}
-                positioningMode="passThrough"
+                positioningMode="offsetInSlot"
                 wellFill={wellFill}
               />
             </g>

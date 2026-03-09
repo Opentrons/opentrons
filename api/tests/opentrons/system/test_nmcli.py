@@ -1,7 +1,6 @@
-from typing import List, Optional, Tuple
-
 import pytest
 from pytest import MonkeyPatch
+from typing import List, Optional, Tuple
 
 from opentrons.system import nmcli
 
@@ -127,7 +126,7 @@ mock_bad_security:50:no:foobar
             "active": False,
             "security": "foobar",
             "securityType": "unsupported",
-        },
+        }
         # note entry for 'ssid': '--' is expected to be filterd out
     ]
 

@@ -50,7 +50,7 @@ export function LabwareStackContents(
       overflowY="scroll"
       height="27rem"
       width={isOnDevice ? '21.875rem' : '11.688rem'}
-      gap={SPACING.spacing8}
+      gridGap={SPACING.spacing8}
       {...styleProps}
     >
       <StyledText

@@ -27,7 +27,6 @@ describe('CameraTileSetting', () => {
       title: 'Test Setting',
       subtext: 'Test subtext description',
       returnToHomeView: vi.fn(),
-      isLoading: false,
     }
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
   })

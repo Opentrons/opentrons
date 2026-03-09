@@ -1,48 +1,46 @@
 """Command models to manually retrieve a labware from a Flex Stacker in an unsafe situation."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Literal, Union, cast
+from typing import Literal, TYPE_CHECKING, Any, Union, cast
+from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Type
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from ...errors import (
-    CannotPerformModuleAction,
-    ErrorOccurrence,
-    FlexStackerLabwarePoolNotYetDefinedError,
-    LocationIsOccupiedError,
-)
-from ...resources import ModelUtils
-from ...state import update_types
-from ...types import (
-    InStackerHopperLocation,
-    LabwareLocationSequence,
-    ModuleLocation,
-)
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
+    DefinedErrorData,
 )
 from ..flex_stacker.common import (
     FlexStackerStallOrCollisionError,
-    adapter_location_sequence,
-    build_retrieve_labware_move_updates,
     labware_locations_for_group,
-    lid_location_sequence,
+    build_retrieve_labware_move_updates,
     primary_location_sequence,
+    adapter_location_sequence,
+    lid_location_sequence,
+)
+from ...errors import (
+    ErrorOccurrence,
+    CannotPerformModuleAction,
+    LocationIsOccupiedError,
+    FlexStackerLabwarePoolNotYetDefinedError,
+)
+from ...resources import ModelUtils
+from ...state import update_types
+from ...types import (
+    ModuleLocation,
+    LabwareLocationSequence,
+    InStackerHopperLocation,
 )
 from opentrons.hardware_control.modules.types import PlatformState
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler
     from opentrons.protocol_engine.state.state import StateView
+    from opentrons.protocol_engine.execution import EquipmentHandler
 
 UnsafeFlexStackerManualRetrieveCommandType = Literal[
     "unsafe/flexStacker/manualRetrieve"
@@ -279,9 +277,9 @@ class UnsafeFlexStackerManualRetrieve(
     params: UnsafeFlexStackerManualRetrieveParams
     result: UnsafeFlexStackerManualRetrieveResult | None = None
 
-    _ImplementationCls: Type[UnsafeFlexStackerManualRetrieveImpl] = (
+    _ImplementationCls: Type[
         UnsafeFlexStackerManualRetrieveImpl
-    )
+    ] = UnsafeFlexStackerManualRetrieveImpl
 
 
 class UnsafeFlexStackerManualRetrieveCreate(

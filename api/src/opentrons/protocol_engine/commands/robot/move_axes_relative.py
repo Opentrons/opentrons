@@ -1,22 +1,22 @@
 """Command models for moving any robot axis relative."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Literal, Optional, Type
+from typing import Literal, Type, Optional, TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
-from ...errors.error_occurrence import ErrorOccurrence
+from .common import MotorAxisMapType, DestinationRobotPositionResult
+
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
     SuccessData,
 )
-from .common import DestinationRobotPositionResult, MotorAxisMapType
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.resources import ensure_ot3_hardware
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import GantryMover
@@ -87,9 +87,9 @@ class MoveAxesRelative(
     params: MoveAxesRelativeParams
     result: Optional[MoveAxesRelativeResult] = None
 
-    _ImplementationCls: Type[MoveAxesRelativeImplementation] = (
+    _ImplementationCls: Type[
         MoveAxesRelativeImplementation
-    )
+    ] = MoveAxesRelativeImplementation
 
 
 class MoveAxesRelativeCreate(BaseCommandCreate[MoveAxesRelativeParams]):

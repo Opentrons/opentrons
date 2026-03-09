@@ -18,7 +18,6 @@ function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
       return getDisabledFieldsHeaterShaker(hydratedForm)
 
     case 'comment':
-    case 'camera':
     case 'pause':
     case 'magnet':
     case 'thermocycler':

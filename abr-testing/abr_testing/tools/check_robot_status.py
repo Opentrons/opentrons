@@ -1,7 +1,5 @@
 """Check Robot(s) Current State."""
 import json
-from collections import deque
-
 import requests
 from abr_testing.automation import slack
 import configparser
@@ -33,72 +31,34 @@ def get_current_run_details_from_robot(
     slack_bot: slack.Slack,
     running_robots: List[str],
     completed_robots: List[str],
-    on_robot: bool = False,
-    past_run_status: deque = deque(),
 ) -> Tuple[List[str], List[str]]:
     """Get current run from robot."""
-    # if it's being run on the robot, do not print to terminal
-    if on_robot:
-        print_terminal = False
-    else:
-        print_terminal = True
-
     robot_name, run_list = get_robot_run_info(ip)
     if len(run_list) > 0:
         most_recent_run = run_list[-1]
         if most_recent_run["current"]:
             run_status = most_recent_run["status"]
-            if "awaiting-recovery" in run_status:
+            if run_status == "awaiting-recovery":
                 if (
                     robot_name not in completed_robots
                     and robot_name not in running_robots
                 ):
-                    _enable_print_to_terminal(
-                        print_terminal, f"Run Status of {robot_name}: {run_status}"
-                    )
+                    print(f"Run Status of {robot_name}: {run_status}")
                     message = f"⚠️ {robot_name} is in error recovery mode ⚠️"
-
-                    # Check most recent run status isn't the same as current before slack update
-                    if on_robot:
-                        past_run_status_list: list = list(past_run_status)
-
-                        if (len(past_run_status_list) == 0) or not (
-                            "awaiting-recovery" in past_run_status_list[-1]
-                        ):
-                            slack_bot.send_slack_message(message)
-                    else:
-                        slack_bot.send_slack_message(message)
-                        completed_robots.append(robot_name)
-
-                    past_run_status.append(run_status)
+                    slack_bot.send_slack_message(message)
+                    completed_robots.append(robot_name)
             elif run_status == "running":
-                _enable_print_to_terminal(
-                    print_terminal, f"Run Status of {robot_name}: {run_status}"
-                )
+                print(f"Run Status of {robot_name}: {run_status}")
                 running_robots.append(robot_name)
-                past_run_status.append(run_status)
             else:
-                _enable_print_to_terminal(
-                    print_terminal, f"Run Status of {robot_name}: {run_status}"
-                )
+                print(f"Run Status of {robot_name}: {run_status}")
                 completed_robots.append(robot_name)
-                past_run_status.append(run_status)
         else:
-            _enable_print_to_terminal(print_terminal, f"No run active on {robot_name}")
+            print(f"No run active on {robot_name}")
             completed_at = most_recent_run["completedAt"]
             completed_robots.append(robot_name)
-            _enable_print_to_terminal(
-                print_terminal, f"Last run completed at {completed_at}"
-            )
+            print(f"Last run completed at {completed_at}")
     return completed_robots, running_robots
-
-
-def _enable_print_to_terminal(bool: bool, string: str | None = None) -> None:
-    """Print to terminal if true; Nothing if false."""
-    if bool:
-        print(string)
-    else:
-        return
 
 
 if __name__ == "__main__":
@@ -124,8 +84,7 @@ if __name__ == "__main__":
     # GET IP ADDRESSES OF INTEREST
     robot_ips = [input("Enter IP of robot (type 'all' to run on all robots): ")]
     if robot_ips[0].lower() == "all":
-        storage_directory = configurations["DEFAULT"]["storage_directory"]
-        ip_file = os.path.join(storage_directory, "IPs.json")
+        ip_file = configurations["DEFAULT"]["ips"]
         with open(ip_file) as file:
             file_dict = json.load(file)
             robot_dict = file_dict.get("ip_address_list")

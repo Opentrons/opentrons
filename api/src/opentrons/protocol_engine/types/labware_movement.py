@@ -1,13 +1,13 @@
 """Protocol Engine types to do with moving labware."""
 
-from pydantic import BaseModel
+from enum import Enum
 
-from opentrons_shared_data.util import StrEnum
+from pydantic import BaseModel
 
 from .labware_offset_vector import LabwareOffsetVector
 
 
-class LabwareMovementStrategy(StrEnum):
+class LabwareMovementStrategy(str, Enum):
     """Strategy to use for labware movement."""
 
     USING_GRIPPER = "usingGripper"

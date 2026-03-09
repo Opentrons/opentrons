@@ -1,25 +1,25 @@
 """A script to test canbus loading."""
-
 import argparse
 import asyncio
 import dataclasses
 import enum
-import json
 import logging
-import time
+import json
 from logging.config import dictConfig
-from typing import Dict, Optional, Set
+from typing import Set, Optional, Dict
+import time
 
 from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
     DeviceInfoResponse,
 )
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.scripts.can_args import add_can_args
+
 
 log = logging.getLogger(__name__)
 
@@ -72,10 +72,7 @@ class BusProber:
         """Run a probe and return detected devices."""
         try:
             messenger.add_listener(self)
-            await asyncio.wait(
-                [asyncio.create_task(self._stimulate(messenger))],
-                timeout=response_timeout_s,
-            )
+            await asyncio.wait([self._stimulate(messenger)], timeout=response_timeout_s)
         except asyncio.TimeoutError:
             pass
         finally:
@@ -177,7 +174,7 @@ class BusLoader:
             if now - then > self._period:
                 if not warned:
                     log.warning(
-                        f"Sending messages took {now - then}s, cannot achieve "
+                        f"Sending messages took {now-then}s, cannot achieve "
                         f"requested period {self._period}"
                     )
                     warned = True
@@ -192,7 +189,7 @@ class BusLoader:
         )
         try:
             self._messenger.add_listener(self)
-            await asyncio.wait([asyncio.create_task(self._load_bus())], timeout=run_for)
+            await asyncio.wait([self._load_bus()], timeout=run_for)
         except asyncio.TimeoutError:
             pass
         except KeyboardInterrupt:
@@ -211,7 +208,7 @@ async def run(
 ) -> LoadResults:
     """Main entrypoint."""
     nodes = await BusProber().run(messenger)
-    log.info(f"Detected {', '.join([n.name for n in nodes])} on the bus")
+    log.info(f'Detected {", ".join([n.name for n in nodes])} on the bus')
     if mode == "individual-one" and which not in nodes:
         raise RuntimeError(f"Node {which} not detected on the bus")
     loader = BusLoader.build_from_args(mode, messenger, rate, nodes, which)

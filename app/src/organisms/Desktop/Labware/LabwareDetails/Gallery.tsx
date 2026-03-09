@@ -56,12 +56,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
     </Box>
   )
   const staticImages = labwareImages[params.loadName]?.map((src, index) => (
-    <img
-      key={index}
-      src={src}
-      width="100%"
-      alt={`Image of ${params.loadName}`}
-    />
+    <img key={index} src={src} width="100%" />
   ))
 
   const images = staticImages != null ? [render, ...staticImages] : [render]

@@ -69,9 +69,7 @@ export function ChooseDeckLocation({
             <Trans
               t={t}
               i18nKey={buildBodyText()}
-              components={{
-                block: <LegacyStyledText forwardedAs="p" />,
-              }}
+              components={{ block: <LegacyStyledText as="p" /> }}
             />
           </StyledText>
         </Flex>

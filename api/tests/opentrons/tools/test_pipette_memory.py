@@ -1,7 +1,7 @@
-import pytest
 from mock import AsyncMock
-
+import pytest
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
+
 from opentrons.tools import write_pipette_memory
 
 

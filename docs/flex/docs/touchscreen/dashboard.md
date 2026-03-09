@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Touchscreen Dashboard"
-description: "Home screen, status, and quick access to protocols and settings."
 ---
 
 <figure class="screenshot" markdown>

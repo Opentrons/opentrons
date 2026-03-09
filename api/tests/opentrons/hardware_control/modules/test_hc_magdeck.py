@@ -3,13 +3,14 @@ from typing import AsyncGenerator
 
 import pytest
 
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import ExecutionManager, modules
-from opentrons.hardware_control.modules.magdeck import MagDeck
+from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
 )
+from opentrons.drivers.rpi_drivers.types import USBPort
+
+from opentrons.hardware_control.modules.magdeck import MagDeck
 
 
 @pytest.fixture

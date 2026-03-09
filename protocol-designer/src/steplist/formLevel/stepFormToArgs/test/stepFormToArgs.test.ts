@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  A1_NOZZLE,
-  ALL,
-  POSITION_REFERENCE_BOTTOM,
-} from '@opentrons/shared-data'
+import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
 
 import { _castForm } from '../index'
 
@@ -14,7 +10,6 @@ import type {
   TipRackWithDef,
 } from '@opentrons/step-generation'
 import type {
-  HydratedCameraFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
@@ -68,10 +63,9 @@ describe('form casting', () => {
       pipette: {} as PipetteEntity,
       preWetTip: false,
       volume: 5,
-      primaryNozzle: A1_NOZZLE,
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
-      nozzles: ALL,
+      nozzles: null,
       tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
@@ -122,12 +116,11 @@ describe('form casting', () => {
       dispense_delay_seconds: 1,
       dropTip_location: 'some location',
       mix_touchTip_checkbox: false,
-      nozzles: ALL,
+      nozzles: null,
       tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
-      primaryNozzle: A1_NOZZLE,
       mix_position_reference: POSITION_REFERENCE_BOTTOM,
     }
 
@@ -159,27 +152,6 @@ describe('form casting', () => {
     expect(_castForm(input)).toEqual({
       ...input,
       pauseTemperature: 0,
-    })
-  })
-
-  it('should cast camera form fields', () => {
-    const input: HydratedCameraFormData = {
-      stepNumber: 1,
-      stepName: 'camera',
-      stepDetails: 'captured image',
-      id: 'stepId',
-      stepType: 'camera',
-      homeBefore: false,
-      fileName: 'fileName',
-      resolution: [10, 10],
-      zoom: 2,
-      contrast: 10,
-      brightness: 10,
-      saturation: 10,
-    }
-
-    expect(_castForm(input)).toEqual({
-      ...input,
     })
   })
 
@@ -233,11 +205,18 @@ describe('form casting', () => {
       profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
+      blockIsActiveHold: false,
+      blockTargetTempHold: null,
+      lidIsActiveHold: false,
+      lidTargetTempHold: null,
+      lidOpenHold: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,
       blockTargetTemp: 24,
       lidTargetTemp: 44,
+      blockTargetTempHold: 0,
+      lidTargetTempHold: 0,
     })
   })
 })

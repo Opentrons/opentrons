@@ -1,22 +1,27 @@
 import { VIEWPORT } from '@opentrons/components'
 
-import { DeckFixtureSetupInstructionsModal as DeckFixtureSetupInstructionsModalComponent } from './DeckFixtureSetupInstructionsModal'
+import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
-const meta: Meta<typeof DeckFixtureSetupInstructionsModalComponent> = {
+export default {
   title: 'ODD/Organisms/DeckFixtureSetupInstructionsModal',
-  component: DeckFixtureSetupInstructionsModalComponent,
-  parameters: VIEWPORT.touchScreenViewport,
-}
-
-export default meta
-
-type Story = StoryObj<typeof DeckFixtureSetupInstructionsModalComponent>
-
-export const Default: Story = {
-  args: {
-    setShowSetupInstructionsModal: () => {},
-    isOnDevice: true,
+  argTypes: {
+    modalSize: {
+      options: ['small', 'medium', 'large'],
+      control: { type: 'radio' },
+    },
+    onOutsideClick: { action: 'clicked' },
   },
+  parameters: VIEWPORT.touchScreenViewport,
+} as Meta
+
+const Template: Story<
+  React.ComponentProps<typeof DeckFixtureSetupInstructionsModal>
+> = args => <DeckFixtureSetupInstructionsModal {...args} />
+export const Default = Template.bind({})
+Default.args = {
+  setShowSetupInstructionsModal: () => {},
+  isOnDevice: true,
 }

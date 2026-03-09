@@ -1,0 +1,67 @@
+[flake8]
+
+extend-exclude = venv .venv
+
+# max cyclomatic complexity
+max-complexity = 9
+
+extend-ignore =
+    # defer formatting concerns to black
+    # E203: space around `:` operator
+    # E501: maximum line length
+    E203,
+    E501,
+    # do not require type annotations for self nor cls
+    ANN101,
+    ANN102
+    # do not require docstring for __init__, put them on the class
+    D107,
+    # Don't forbid the function signature from being mentioned in the first line of the
+    # docstring. It tends to raise false positives when referring to other functions.
+    D402,
+
+# configure flake8-docstrings
+# https://pypi.org/project/flake8-docstrings/
+docstring-convention = google
+
+noqa-require-code = true
+
+# TODO(mc, 2020-11-06): this config ignores type annotation and doc
+# string lints in these modules; remove entries as they are fixed
+per-file-ignores =
+    setup.py:ANN,D
+    src/opentrons/__init__.py:ANN,D
+    src/opentrons/execute.py:ANN,D
+    src/opentrons/simulate.py:ANN,D
+    src/opentrons/types.py:ANN,D
+    src/opentrons/calibration_storage/*:ANN,D
+    src/opentrons/legacy_commands/*:D
+    src/opentrons/config/*:ANN,D
+    src/opentrons/drivers/*:ANN,D
+    src/opentrons/hardware_control/*:ANN,D
+    src/opentrons/protocol_api/*:ANN,D
+    src/opentrons/protocols/*:ANN,D
+    src/opentrons/resources/*:ANN,D
+    src/opentrons/system/*:ANN,D
+    src/opentrons/tools/*:ANN,D
+    src/opentrons/util/async_helpers.py:ANN,D
+    src/opentrons/util/logging_config.py:ANN,D
+    src/opentrons/util/linal.py:ANN,D
+    src/opentrons/util/entrypoint_util.py:ANN,D
+    src/opentrons/util/helpers.py:ANN,D
+    tests/opentrons/test_init.py:ANN,D
+    tests/opentrons/test_types.py:ANN,D
+    tests/opentrons/conftest.py:ANN,D
+    tests/opentrons/calibration_storage/*:ANN,D
+    tests/opentrons/legacy_commands/*:ANN,D
+    tests/opentrons/config/*:ANN,D
+    tests/opentrons/data/*:ANN,D
+    tests/opentrons/drivers/*:ANN,D
+    tests/opentrons/hardware_control/*:ANN,D
+    tests/opentrons/protocol_api_old/*:ANN,D
+    tests/opentrons/protocols/*:ANN,D
+    tests/opentrons/system/*:ANN,D
+    tests/opentrons/tools/*:ANN,D
+    tests/opentrons/util/test_async_helpers.py:ANN,D
+    tests/opentrons/util/test_linal.py:ANN,D
+    tests/opentrons/util/test_entrypoint_util.py:ANN,D

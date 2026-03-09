@@ -1,7 +1,7 @@
 # makefile for usb-tcp bridge for OT-3
 
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
@@ -28,18 +28,10 @@ ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
-
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -54,21 +46,21 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
-	$(pytest) $(test_opts) $(tests)
+	$(python) -m pytest $(test_opts) $(tests)
 
 .PHONY: lint
 lint:
 	$(python) -m mypy ot3usb tests
-	$(ruff) check ot3usb tests
+	$(python) -m black --check ./ot3usb ./tests
+	$(python) -m flake8 ot3usb tests
 
 .PHONY: format
 format:
-	$(ruff) format ot3usb tests
-	$(ruff) check --select I --fix ot3usb tests
+	$(python) -m black ot3usb tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)

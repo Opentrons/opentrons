@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Liquids } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
-import { AssignLiquidsModalContainer } from '../../../components/organisms'
+import { AssignLiquidsModal } from '../../../components/organisms'
 import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 
@@ -40,8 +40,8 @@ describe('Liquids', () => {
     vi.mocked(labwareIngredSelectors.getSelectedLabwareId).mockReturnValue(
       'mockId'
     )
-    vi.mocked(AssignLiquidsModalContainer).mockReturnValue(
-      <div>mock AssignLiquidsModalContainer</div>
+    vi.mocked(AssignLiquidsModal).mockReturnValue(
+      <div>mock AssignLiquidsModal</div>
     )
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
@@ -55,6 +55,6 @@ describe('Liquids', () => {
 
   it('renders assign liquids modal', () => {
     render()
-    screen.getByText('mock AssignLiquidsModalContainer')
+    screen.getByText('mock AssignLiquidsModal')
   })
 })

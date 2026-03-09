@@ -1,6 +1,5 @@
 ---
 title: "Absorbance Plate Reader Module Instruction Manual"
-description: "On-deck microplate spectrophotometer for Flex with endpoint and kinetic absorbance reading."
 hide: toc
 ---
 

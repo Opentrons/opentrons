@@ -49,14 +49,14 @@ export const AboutPipetteSlideout = (
         {firmwareVersion != null && (
           <>
             <LegacyStyledText
-              forwardedAs="h6"
+              as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </LegacyStyledText>
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
@@ -65,7 +65,7 @@ export const AboutPipetteSlideout = (
           </>
         )}
         <LegacyStyledText
-          forwardedAs="h6"
+          as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
@@ -73,7 +73,7 @@ export const AboutPipetteSlideout = (
           {i18n.format(t('serial_number'), 'upperCase')}
         </LegacyStyledText>
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           paddingTop={SPACING.spacing4}
           data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
         >

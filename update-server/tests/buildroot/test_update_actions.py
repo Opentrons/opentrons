@@ -1,14 +1,13 @@
-"""tests for otupdate.buildroot.file_actions
+""" tests for otupdate.buildroot.file_actions
 
 Checks functionality and error cases for the update utility functions there
 """
-
 import binascii
 import hashlib
 import os
 import subprocess
-import zipfile
 from unittest import mock
+import zipfile
 
 import pytest
 

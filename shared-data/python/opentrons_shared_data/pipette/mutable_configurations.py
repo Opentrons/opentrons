@@ -1,38 +1,38 @@
-import json
 import logging
+import json
 import re
-from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Optional, List, Dict, Any, cast
+from enum import Enum
 
-from .file_operation_helpers import (
-    MutableConfigurationDecoder,
-    MutableConfigurationEncoder,
-)
-from .load_data import load_definition, load_serial_lookup_table
+from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
+    MUTABLE_CONFIGS_V1,
+    VALID_QUIRKS,
     _MAP_KEY_TO_V2,
     _MIN_MAX_LOOKUP,
     _TYPE_LOOKUP,
     _UNITS_LOOKUP,
-    MUTABLE_CONFIGS_V1,
-    VALID_QUIRKS,
 )
-from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
+from .load_data import load_definition, load_serial_lookup_table
+from .types import (
+    MutableConfig,
+    Quirks,
+    QuirkConfig,
+    TypeOverrides,
+    OverrideType,
+    LiquidClasses,
+)
 from .pipette_load_name_conversions import (
     convert_pipette_model,
     convert_to_pipette_name_type,
 )
-from .types import (
-    LiquidClasses,
-    MutableConfig,
-    OverrideType,
-    PipetteModel,
-    PipetteName,
-    QuirkConfig,
-    Quirks,
-    TypeOverrides,
+from .file_operation_helpers import (
+    MutableConfigurationEncoder,
+    MutableConfigurationDecoder,
 )
+from .types import PipetteModel, PipetteName
+
 
 log = logging.getLogger(__name__)
 

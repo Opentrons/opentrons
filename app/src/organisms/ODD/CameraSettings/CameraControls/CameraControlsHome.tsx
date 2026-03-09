@@ -2,46 +2,32 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Icon, ListButton, StyledText } from '@opentrons/components'
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
+// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
+import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
-import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
+// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
+import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
 export interface CameraControlsHomeProps {
   setActiveSubView: (view: ActiveControlView) => void
   toggleShowControls: () => void
-  settings: UseCameraSettingsValuesResult
-  runId: string | null
+  settings: UseStubCameraSettingsValuesResult
 }
 
 export function CameraControlsHome({
   setActiveSubView,
   toggleShowControls,
   settings,
-  runId,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const {
-    createCameraImageSettings,
-    isLoading: isCreateCameraImageSettingsLoading,
-  } = useCreateCameraImageSettings()
-  const { isLoading, imgPath, takePhoto } = usePreviewImage(
-    {
-      zoom: settings.zoom,
-      brightness: settings.brightness,
-      contrast: settings.contrast,
-      saturation: settings.saturation,
-    },
-    runId
-  )
+  const { isLoading, imgPath, takePhoto } = usePreviewImage()
 
   const [showModal, setShowModal] = useState(false)
 
@@ -55,31 +41,8 @@ export function CameraControlsHome({
     }
   }
 
-  const handleRestoreToDefault = (): void => {
-    if (runId == null) {
-      if (!isCreateCameraImageSettingsLoading) {
-        createCameraImageSettings(
-          {
-            zoom: 1,
-            brightness: 50,
-            contrast: 50,
-            saturation: 50,
-          },
-          {
-            onSuccess: () => {
-              settings.restoreToDefault()
-            },
-          }
-        )
-      }
-    } else {
-      settings.restoreToDefault()
-    }
-  }
-
   const buildZoomText = (): string => {
-    const zoomString = zoomNumberToString(settings.zoom)
-    switch (zoomString) {
+    switch (settings.zoom) {
       case '1x':
         return t('default_zoom')
       case '1.5x':
@@ -136,10 +99,7 @@ export function CameraControlsHome({
         <MediumButton
           buttonType="alert"
           buttonText={t('reset_settings_to_default')}
-          onClick={handleRestoreToDefault}
-          iconName={
-            isCreateCameraImageSettingsLoading ? 'ot-spinner' : undefined
-          }
+          onClick={settings.restoreToDefault}
         />
       </div>
     </div>

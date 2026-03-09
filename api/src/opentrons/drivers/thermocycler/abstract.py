@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Optional, Dict
 
-from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
+from opentrons.drivers.types import Temperature, ThermocyclerLidStatus, PlateTemperature
 
 
 class AbstractThermocyclerDriver(ABC):
@@ -91,7 +91,8 @@ class AbstractThermocyclerDriver(ABC):
         ...
 
     @abstractmethod
-    async def enter_programming_mode(self) -> None: ...
+    async def enter_programming_mode(self) -> None:
+        ...
 
     @abstractmethod
     async def jog_lid(self, angle: float) -> None:

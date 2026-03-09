@@ -1,9 +1,7 @@
-from textwrap import dedent
-
 import pytest
-
-from g_code_parsing.g_code import GCode
+from textwrap import dedent
 from g_code_parsing.g_code_differ import GCodeDiffer
+from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )

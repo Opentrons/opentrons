@@ -1,8 +1,6 @@
-import json
-
 import pytest
 from pydantic import ValidationError
-
+import json
 from opentrons_shared_data import gripper, load_shared_data
 from opentrons_shared_data.gripper import (
     GripperDefinition,

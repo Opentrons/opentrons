@@ -1,17 +1,16 @@
 from __future__ import annotations
-
-import random
-import signal
+from pathlib import Path
 import subprocess
+import signal
 import sys
 import tempfile
-from pathlib import Path
 from types import TracebackType
+from typing import Optional
 
 
 class DevServer:
     def __init__(
-        self, port: int | None = None, persistence_directory: Path | None = None
+        self, port: str = "32950", persistence_directory: Optional[Path] = None
     ) -> None:
         """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
@@ -20,18 +19,16 @@ class DevServer:
             if persistence_directory is not None
             else Path(tempfile.mkdtemp())
         )
-        self.port: int = (
-            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
-        )
+        self.port: str = port
 
     def __enter__(self) -> DevServer:
         return self
 
     def __exit__(
         self,
-        exc_type: BaseException | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
+        exc_type: Optional[BaseException],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ) -> None:
         self.stop()
 
@@ -64,15 +61,11 @@ class DevServer:
             stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.
             # Let it inherit our stdout and stderr so pytest captures its logs.
-            stdout=sys.stdout,
-            stderr=sys.stderr,
+            stdout=None,
+            stderr=None,
         )
 
     def stop(self) -> None:
-        """Stop the server and wait for it to clean up."""
+        """Stop the robot server."""
         self.proc.send_signal(signal.SIGTERM)
         self.proc.wait()
-
-    @property
-    def base_url(self) -> str:
-        return f"http://localhost:{self.port}"

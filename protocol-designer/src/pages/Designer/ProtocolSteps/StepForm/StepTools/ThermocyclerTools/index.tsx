@@ -132,6 +132,15 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
             propsForFields={propsForFields}
             formData={formData}
           />
+          <Divider marginY="0" />
+          <ThermocyclerState
+            title={t('step_edit_form.field.thermocyclerState.ending_hold')}
+            propsForFields={propsForFields}
+            formData={formData}
+            isHold
+            showFormErrors={showFormErrors}
+            focusedField={focusedField}
+          />
         </>
       )}
     </Flex>

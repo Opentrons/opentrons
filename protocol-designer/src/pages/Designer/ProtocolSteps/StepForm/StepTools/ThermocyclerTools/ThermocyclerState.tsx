@@ -19,13 +19,36 @@ interface ThermocyclerStateProps {
   title: string
   formData: FormData
   propsForFields: FieldPropsByName
+  isHold?: boolean
   showFormErrors?: boolean
   focusedField?: string | null
 }
 
 export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
-  const { title, propsForFields, formData } = props
+  const { title, propsForFields, formData, isHold = false } = props
   const { i18n, t } = useTranslation(['application', 'form'])
+
+  const {
+    blockFieldActive,
+    lidFieldActive,
+    blockTempField,
+    lidTempField,
+    lidPositionField,
+  } = isHold
+    ? {
+        blockFieldActive: 'blockIsActiveHold',
+        lidFieldActive: 'lidIsActiveHold',
+        blockTempField: 'blockTargetTempHold',
+        lidTempField: 'lidTargetTempHold',
+        lidPositionField: 'lidOpenHold',
+      }
+    : {
+        blockFieldActive: 'blockIsActive',
+        lidFieldActive: 'lidIsActive',
+        blockTempField: 'blockTargetTemp',
+        lidTempField: 'lidTargetTemp',
+        lidPositionField: 'lidOpen',
+      }
 
   return (
     <Flex
@@ -39,46 +62,46 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         </StyledText>
       </Flex>
       <ToggleExpandStepFormField
-        {...propsForFields.blockTargetTemp}
-        toggleValue={propsForFields.blockIsActive.value}
-        toggleUpdateValue={propsForFields.blockIsActive.updateValue}
+        {...propsForFields[blockTempField]}
+        toggleValue={propsForFields[blockFieldActive].value}
+        toggleUpdateValue={propsForFields[blockFieldActive].updateValue}
         title={t('form:step_edit_form.field.thermocyclerState.block.engage')}
         fieldTitle={i18n.format(t('stepType.temperature'), 'capitalize')}
         units={t('units.degrees')}
-        isSelected={formData.blockIsActive === true}
+        isSelected={formData[blockFieldActive] === true}
         onLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOn')}
         offLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOff')}
       />
       <ToggleExpandStepFormField
-        {...propsForFields.lidTargetTemp}
-        toggleValue={propsForFields.lidIsActive.value}
-        toggleUpdateValue={propsForFields.lidIsActive.updateValue}
+        {...propsForFields[lidTempField]}
+        toggleValue={propsForFields[lidFieldActive].value}
+        toggleUpdateValue={propsForFields[lidFieldActive].updateValue}
         title={t('form:step_edit_form.field.thermocyclerState.lid.engage')}
         fieldTitle={i18n.format(t('stepType.temperature'), 'capitalize')}
         units={t('units.degrees')}
-        isSelected={formData.lidIsActive === true}
+        isSelected={formData[lidFieldActive] === true}
         onLabel={t('form:step_edit_form.field.thermocyclerState.lid.toggleOn')}
         offLabel={t(
           'form:step_edit_form.field.thermocyclerState.lid.toggleOff'
         )}
       />
       <ToggleStepFormField
-        isDisabled={propsForFields.lidOpen.disabled}
+        isDisabled={propsForFields[lidPositionField].disabled}
         title={t(
           'form:step_edit_form.field.thermocyclerState.lidPosition.label'
         )}
-        isSelected={propsForFields.lidOpen.value === true}
+        isSelected={propsForFields[lidPositionField].value === true}
         onLabel={t(
           'form:step_edit_form.field.thermocyclerState.lidPosition.toggleOn'
         )}
         offLabel={t(
           'form:step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
         )}
-        toggleUpdateValue={propsForFields.lidOpen.updateValue}
-        toggleValue={propsForFields.lidOpen.value}
+        toggleUpdateValue={propsForFields[lidPositionField].updateValue}
+        toggleValue={propsForFields[lidPositionField].value}
         tooltipContent={
-          propsForFields.lidOpen.disabled
-            ? (propsForFields.lidOpen.tooltipContent ?? null)
+          propsForFields[lidPositionField].disabled
+            ? (propsForFields[lidPositionField].tooltipContent ?? null)
             : null
         }
       />

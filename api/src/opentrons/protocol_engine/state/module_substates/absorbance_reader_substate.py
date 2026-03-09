@@ -1,7 +1,6 @@
 """Heater-Shaker Module sub-state."""
-
 from dataclasses import dataclass
-from typing import Dict, List, NewType, Optional
+from typing import List, NewType, Optional, Dict
 
 from opentrons.protocol_engine.errors import CannotPerformModuleAction
 

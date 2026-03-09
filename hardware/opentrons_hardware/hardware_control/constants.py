@@ -1,5 +1,4 @@
 """Hardware Control Constants."""
-
 from typing_extensions import Final
 
 brushed_motor_interrupts_per_sec: Final = 32000

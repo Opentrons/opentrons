@@ -1,51 +1,47 @@
 """Router for /runs commands endpoints."""
-
 import textwrap
 from typing import Annotated, Final, Literal, Optional, Union
 
 from fastapi import Depends, Query, status
+from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.protocol_engine import (
     CommandPointer,
-)
-from opentrons.protocol_engine import (
     commands as pe_commands,
-)
-from opentrons.protocol_engine import (
     errors as pe_errors,
 )
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
-from server_utils.auth.scopes import Scope
-from server_utils.fastapi_utils.light_router import LightRouter
-from server_utils.fastapi_utils.models.json_api import (
+
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
+from robot_server.service.json_api import (
+    SimpleBody,
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
-    RequestModel,
-    SimpleBody,
     SimpleMultiBody,
+    RequestModel,
 )
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 from ..command_models import (
     CommandCollectionLinks,
     CommandLink,
     CommandLinkMeta,
 )
-from ..dependencies import (
-    get_run_data_manager,
-    get_run_orchestrator_store,
-    get_run_store,
-)
+from ..run_models import RunCommandSummary
 from ..run_data_manager import (
-    PreSerializedCommandsNotAvailableError,
     RunDataManager,
+    PreSerializedCommandsNotAvailableError,
 )
-from ..run_models import RunCommandSummary, RunNotFoundError
 from ..run_orchestrator_store import RunOrchestratorStore
 from ..run_store import CommandNotFoundError, RunStore
+from ..run_models import RunNotFoundError
+from ..dependencies import (
+    get_run_orchestrator_store,
+    get_run_data_manager,
+    get_run_store,
+)
 from .base_router import RunNotFound, RunStopped
-from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.robot.control.dependencies import require_estop_in_good_state
+
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
@@ -76,9 +72,9 @@ class CommandNotAllowed(ErrorDetails):
 class PreSerializedCommandsNotAvailable(ErrorDetails):
     """An error if one tries to fetch pre-serialized commands before they are written to the database."""
 
-    id: Literal["PreSerializedCommandsNotAvailable"] = (
+    id: Literal[
         "PreSerializedCommandsNotAvailable"
-    )
+    ] = "PreSerializedCommandsNotAvailable"
     title: str = "Pre-Serialized commands not available."
     detail: str = (
         "Pre-serialized commands are only available once a run has finished running."
@@ -158,7 +154,6 @@ async def get_current_run_from_url(
         },
         status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
@@ -336,9 +331,6 @@ async def get_run_commands(
             error=c.error,
             notes=c.notes,
             failedCommandId=c.failedCommandId,
-            commandAnnotationIds=c.commandAnnotationIds
-            if c.commandAnnotationIds
-            else None,
         )
         for c in command_slice.commands
     ]

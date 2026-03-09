@@ -1,15 +1,15 @@
 import keyword
-from typing import List, Literal, Optional, Set, Union
+from typing import List, Set, Optional, Union, Literal
 
 from .exceptions import (
+    ParameterValueError,
     ParameterDefinitionError,
     ParameterNameError,
-    ParameterValueError,
 )
 from .types import (
-    ParameterChoice,
-    ParamType,
     PrimitiveAllowedTypes,
+    ParamType,
+    ParameterChoice,
 )
 
 UNIT_MAX_LEN = 10

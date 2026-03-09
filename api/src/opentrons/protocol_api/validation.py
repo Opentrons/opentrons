@@ -1,57 +1,53 @@
 from __future__ import annotations
-
-from math import isinf, isnan
 from typing import (
-    TYPE_CHECKING,
     Any,
     Dict,
     List,
-    Mapping,
-    NamedTuple,
     Optional,
     Sequence,
-    Tuple,
     Union,
+    Tuple,
+    Mapping,
+    NamedTuple,
+    TYPE_CHECKING,
 )
-
+from math import isinf, isnan
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareRole,
 )
-from opentrons_shared_data.pipette.types import PIPETTE_API_NAMES_MAP, PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType, PIPETTE_API_NAMES_MAP
 from opentrons_shared_data.robot.types import RobotType
 
-from .disposal_locations import TrashBin, WasteChute
-from opentrons.hardware_control.modules.types import (
-    AbsorbanceReaderModel,
-    FlexStackerModuleModel,
-    HeaterShakerModuleModel,
-    MagneticBlockModel,
-    MagneticModuleModel,
-    ModuleModel,
-    TemperatureModuleModel,
-    ThermocyclerModuleModel,
-    VacuumModuleModel,
-)
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.types import (
-    AxisMapType,
-    AxisType,
-    DeckSlotName,
-    Location,
     Mount,
+    DeckSlotName,
     StagingSlotName,
+    Location,
+    AxisType,
+    AxisMapType,
     StringAxisMap,
 )
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
+    AbsorbanceReaderModel,
+    FlexStackerModuleModel,
+)
+
+from .disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .labware import Well
-    from opentrons.protocols.advanced_control.transfers.common import (
-        TransferTipPolicyV2,
-    )
 
 
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
@@ -205,10 +201,7 @@ def _check_ot2_axis_type(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
-        if any(
-            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
-            for k in axis_map_keys
-        ):
+        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys):  # type: ignore [union-attr]
             raise IncorrectAxisError(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
@@ -412,7 +405,6 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
     "absorbanceReaderV1": AbsorbanceReaderModel.ABSORBANCE_READER_V1,
     "flexStackerModuleV1": FlexStackerModuleModel.FLEX_STACKER_V1,
-    "vacuumModuleMilliporeV1": VacuumModuleModel.VACUUM_MODULE_V1,
 }
 
 
@@ -536,7 +528,7 @@ def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
 
 
 def ensure_valid_labware_offset_vector(
-    offset: Mapping[str, float],
+    offset: Mapping[str, float]
 ) -> Tuple[float, float, float]:
     if not isinstance(offset, dict):
         raise TypeError("Labware offset must be a dictionary.")
@@ -720,12 +712,8 @@ def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     return float(value[0]), float(value[1]), float(value[2])
 
 
-def ensure_new_tip_policy(value: str) -> "TransferTipPolicyV2":
+def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
     """Ensure that new_tip value is a valid TransferTipPolicy value."""
-    from opentrons.protocols.advanced_control.transfers.common import (
-        TransferTipPolicyV2,
-    )
-
     try:
         return TransferTipPolicyV2(value.lower())
     except ValueError:
@@ -774,7 +762,7 @@ def ensure_valid_flat_wells_list_for_transfer_v2(
 
 
 def ensure_valid_trash_location_for_transfer_v2(
-    trash_location: Union[Location, Well, TrashBin, WasteChute],
+    trash_location: Union[Location, Well, TrashBin, WasteChute]
 ) -> Union[Location, TrashBin, WasteChute]:
     """Ensure that the trash location is valid for v2 transfer."""
     from .labware import Well

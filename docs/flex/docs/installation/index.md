@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Installation and Relocation"
-description: "Prepare your lab, set up the robot, and relocate Flex when needed."
 ---
 
 This chapter describes how to prepare your lab for Opentrons Flex, how to set up the robot, and how to move it if necessary. 

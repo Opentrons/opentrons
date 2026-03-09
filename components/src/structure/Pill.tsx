@@ -11,15 +11,15 @@ import type { UseHoverTooltipTargetProps } from '../tooltips'
 // if no, then remove the cast to string
 export interface PillProps {
   /** background color of pill (any CSS color string) */
-  color?: string | null
+  color?: string | null | undefined
   /** text black, instead of default white */
-  invertTextColor?: boolean | null
+  invertTextColor?: boolean | null | undefined
   /** additional class name */
   className?: string
   /** contents of the pill */
   children?: ReactNode
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null
+  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null | undefined
 }
 
 /**
@@ -33,7 +33,7 @@ export function Pill(props: PillProps): JSX.Element {
 
   return (
     <span
-      style={{ backgroundColor: color! }}
+      style={{ backgroundColor: color as string }}
       className={className}
       {...hoverTooltipHandlers}
     >

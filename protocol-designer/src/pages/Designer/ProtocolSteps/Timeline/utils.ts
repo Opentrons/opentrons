@@ -2,16 +2,8 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { UAParser } from 'ua-parser-js'
 
-import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
-import { convertStepHierarchyToArray } from '/protocol-designer/steplist/utils/stepHierarchy'
-
 import type { MouseEvent } from 'react'
 import type { StepIdType } from '/protocol-designer/form-types'
-import type {
-  ModuleOnDeck,
-  SavedStepFormState,
-} from '/protocol-designer/step-forms'
-import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>
   title.replace(
@@ -44,64 +36,58 @@ export const formatPercentage = (part: number, total: number): string => {
 }
 
 export const getMetaSelectedSteps = (
-  priorMultiSelectedItemIds: StepIdType[] | null,
-  newlySelectedStepId: StepIdType,
-  priorSingleSelectedStepId: StepIdType | null
+  multiSelectItemIds: StepIdType[] | null,
+  stepId: StepIdType,
+  selectedStepId: StepIdType | null
 ): StepIdType[] => {
   let stepsToSelect: StepIdType[]
-  if (priorMultiSelectedItemIds?.length) {
+  if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
-    stepsToSelect = priorMultiSelectedItemIds.includes(newlySelectedStepId)
-      ? priorMultiSelectedItemIds.filter(id => id !== newlySelectedStepId)
-      : [...priorMultiSelectedItemIds, newlySelectedStepId]
-  } else if (
-    priorSingleSelectedStepId &&
-    priorSingleSelectedStepId === newlySelectedStepId
-  ) {
+    stepsToSelect = multiSelectItemIds.includes(stepId)
+      ? multiSelectItemIds.filter(id => id !== stepId)
+      : [...multiSelectItemIds, stepId]
+  } else if (selectedStepId && selectedStepId === stepId) {
     // meta-clicked on the selected single step
-    stepsToSelect = [priorSingleSelectedStepId]
-  } else if (priorSingleSelectedStepId) {
+    stepsToSelect = [selectedStepId]
+  } else if (selectedStepId) {
     // meta-clicked on a different step, multi-select both
-    stepsToSelect = [priorSingleSelectedStepId, newlySelectedStepId]
+    stepsToSelect = [selectedStepId, stepId]
   } else {
     // meta-clicked on a step when a terminal item was selected
-    stepsToSelect = [newlySelectedStepId]
+    stepsToSelect = [stepId]
   }
   return stepsToSelect
 }
 
 export const getShiftSelectedSteps = (
-  priorSingleSelectedStepId: StepIdType | null,
-  stepHierarchy: StepHierarchy,
-  newlySelectedStepId: StepIdType,
-  priorMultiSelectedItemIds: StepIdType[] | null,
+  selectedStepId: StepIdType | null,
+  orderedStepIds: StepIdType[],
+  stepId: StepIdType,
+  multiSelectItemIds: StepIdType[] | null,
   lastMultiSelectedStepId: StepIdType | null
 ): StepIdType[] => {
   let stepsToSelect: StepIdType[]
-  if (priorSingleSelectedStepId) {
-    stepsToSelect = getOrderedVisibleStepsInRange(
-      priorSingleSelectedStepId,
-      newlySelectedStepId,
-      stepHierarchy
+  if (selectedStepId) {
+    stepsToSelect = getOrderedStepsInRange(
+      selectedStepId,
+      stepId,
+      orderedStepIds
     )
-  } else if (priorMultiSelectedItemIds?.length && lastMultiSelectedStepId) {
-    const potentialStepsToSelect = getOrderedVisibleStepsInRange(
+  } else if (multiSelectItemIds?.length && lastMultiSelectedStepId) {
+    const potentialStepsToSelect = getOrderedStepsInRange(
       lastMultiSelectedStepId,
-      newlySelectedStepId,
-      stepHierarchy
+      stepId,
+      orderedStepIds
     )
 
     const allSelected: boolean = potentialStepsToSelect
       .slice(1)
-      .every(stepId => priorMultiSelectedItemIds.includes(stepId))
+      .every(stepId => multiSelectItemIds.includes(stepId))
 
     if (allSelected) {
       // if they're all selected, deselect them all
-      if (
-        priorMultiSelectedItemIds.length - potentialStepsToSelect.length >
-        0
-      ) {
-        stepsToSelect = priorMultiSelectedItemIds.filter(
+      if (multiSelectItemIds.length - potentialStepsToSelect.length > 0) {
+        stepsToSelect = multiSelectItemIds.filter(
           (id: StepIdType) => !potentialStepsToSelect.includes(id)
         )
       } else {
@@ -109,33 +95,25 @@ export const getShiftSelectedSteps = (
         stepsToSelect = [potentialStepsToSelect[0]]
       }
     } else {
-      stepsToSelect = uniq([
-        ...priorMultiSelectedItemIds,
-        ...potentialStepsToSelect,
-      ])
+      stepsToSelect = uniq([...multiSelectItemIds, ...potentialStepsToSelect])
     }
   } else {
-    stepsToSelect = [newlySelectedStepId]
+    stepsToSelect = [stepId]
   }
   return stepsToSelect
 }
 
-const getOrderedVisibleStepsInRange = (
+const getOrderedStepsInRange = (
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
-  stepHierarchy: StepHierarchy
+  orderedStepIds: StepIdType[]
 ): StepIdType[] => {
-  const orderedStepIds = convertStepHierarchyToArray(stepHierarchy)
-  const stepVisibilities = getStepVisibilities(stepHierarchy)
-
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)
-  const [startIndex, endIndex] = [prevIndex, currentIndex].sort((a, b) => a - b)
 
-  const orderedVisibleSteps = orderedStepIds
-    .slice(startIndex, endIndex + 1)
-    .filter(stepId => stepVisibilities[stepId].isVisibleToUser)
-  return orderedVisibleSteps
+  const [startIndex, endIndex] = [prevIndex, currentIndex].sort((a, b) => a - b)
+  const orderedSteps = orderedStepIds.slice(startIndex, endIndex + 1)
+  return orderedSteps
 }
 
 export const nonePressed = (keysPressed: boolean[]): boolean =>
@@ -152,26 +130,3 @@ export const getMouseClickKeyInfo = (
 }
 
 export const getUserOS = (): string | undefined => new UAParser().getOS().name
-
-interface FillLabwareToDeleteData {
-  labwareIds: string[]
-  module: ModuleOnDeck
-}
-
-export const getFillLabwareToDeleteData = (
-  stepIds: string[],
-  savedStepForms: SavedStepFormState,
-  deckSetupModules: Record<string, ModuleOnDeck>
-): FillLabwareToDeleteData[] => {
-  return stepIds.reduce<FillLabwareToDeleteData[]>((acc, stepId) => {
-    const formData = savedStepForms[stepId]
-    const module = Object.values(deckSetupModules).find(
-      module => formData.moduleId === module.id
-    )
-    return formData?.stepType === 'flexStacker' &&
-      formData.fillLabwareIds != null &&
-      module != null
-      ? [...acc, { labwareIds: formData.fillLabwareIds as string[], module }]
-      : acc
-  }, [])
-}

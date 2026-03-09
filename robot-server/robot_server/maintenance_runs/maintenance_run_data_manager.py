@@ -1,27 +1,29 @@
 """Manage current maintenance run data."""
 
 from datetime import datetime
-from typing import Callable, Optional, Sequence
+from typing import Optional, Callable, Sequence
 
 from opentrons.protocol_engine import (
-    Command,
-    CommandPointer,
-    CommandSlice,
     EngineStatus,
-    LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
+    LabwareOffsetCreate,
     StateSummary,
+    CommandSlice,
+    CommandPointer,
+    Command,
 )
+
+from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
+
+from opentrons.protocol_engine.types import DeckConfigurationType
+
+from robot_server.service.notifications import MaintenanceRunsPublisher
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
-from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.system import camera
-
-from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
-from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
-from robot_server.service.notifications import MaintenanceRunsPublisher
 
 
 def _build_run(
@@ -103,7 +105,6 @@ class MaintenanceRunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
-            deck_configuration: The deck config to use.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             camera_provider: Utility for accessing image capture and camera settings.
 
@@ -184,9 +185,7 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            await (
-                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-            )
+            await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.

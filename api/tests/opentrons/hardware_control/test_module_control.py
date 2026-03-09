@@ -1,21 +1,19 @@
 """Tests for opentrons.hardware_control.module_control."""
 
-from typing import Awaitable, Callable, List, Union, cast
-
 import pytest
 from decoy import Decoy, matchers
+from typing import Awaitable, Callable, cast, Union, List
 
-from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control import types
-from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
+from opentrons.hardware_control import API as HardwareAPI, types
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
     ModuleType,
     SimulatingModuleAtPort,
 )
+from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
 @pytest.fixture()

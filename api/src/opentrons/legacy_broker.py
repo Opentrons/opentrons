@@ -1,13 +1,12 @@
 # noqa: D100
 
 from __future__ import annotations
-
 import logging
 from typing import Callable, Dict, List
-
 from typing_extensions import Literal
 
 from opentrons.legacy_commands import types
+
 
 MODULE_LOG = logging.getLogger(__name__)
 

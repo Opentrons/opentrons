@@ -16,27 +16,21 @@ import {
 } from '@opentrons/api-client'
 
 import { useCurrentRunId } from '../useCurrentRunId'
-import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import { useRunStatus } from '../useRunStatus'
 import { useRunStatuses } from '../useRunStatuses'
 
 vi.mock('../useCurrentRunId')
-vi.mock('../useNotifyRunQuery')
-
-const mockRunStatus = (status: any) =>
-  vi.mocked(useNotifyRunQuery).mockReturnValue({
-    data: { data: { status } },
-  } as any)
+vi.mock('../useRunStatus')
 
 describe('useRunStatuses', () => {
   beforeEach(() => {
-    mockRunStatus(RUN_STATUS_RUNNING)
-    vi.mocked(useCurrentRunId).mockReturnValue('test_id_running')
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    vi.mocked(useCurrentRunId).mockReturnValue('123')
   })
 
   it('returns everything as false when run status is null', () => {
-    vi.mocked(useNotifyRunQuery).mockReturnValue({ data: null } as any)
+    vi.mocked(useRunStatus).mockReturnValue(null)
     const result = useRunStatuses()
-
     expect(result).toStrictEqual({
       isRunRunning: false,
       isRunStill: false,
@@ -46,7 +40,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunStill and Terminal when run status is ${RUN_STATUS_SUCCEEDED}`, () => {
-    mockRunStatus(RUN_STATUS_SUCCEEDED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_SUCCEEDED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -57,7 +51,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunStill and Terminal when run status is ${RUN_STATUS_STOPPED}`, () => {
-    mockRunStatus(RUN_STATUS_STOPPED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -68,7 +62,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunStill and Terminal when run status is ${RUN_STATUS_FAILED}`, () => {
-    mockRunStatus(RUN_STATUS_FAILED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_FAILED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -79,7 +73,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunStill and isRunIdle when run status is ${RUN_STATUS_IDLE}`, () => {
-    mockRunStatus(RUN_STATUS_IDLE)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -90,7 +84,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_RUNNING}`, () => {
-    mockRunStatus(RUN_STATUS_RUNNING)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -101,7 +95,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_PAUSED}`, () => {
-    mockRunStatus(RUN_STATUS_PAUSED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_PAUSED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -112,7 +106,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
-    mockRunStatus(RUN_STATUS_AWAITING_RECOVERY)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_AWAITING_RECOVERY)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -123,7 +117,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_AWAITING_RECOVERY_PAUSED}`, () => {
-    mockRunStatus(RUN_STATUS_AWAITING_RECOVERY_PAUSED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_AWAITING_RECOVERY_PAUSED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -134,7 +128,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_STOP_REQUESTED}`, () => {
-    mockRunStatus(RUN_STATUS_STOP_REQUESTED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -145,7 +139,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_FINISHING}`, () => {
-    mockRunStatus(RUN_STATUS_FINISHING)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_FINISHING)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -156,7 +150,7 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_BLOCKED_BY_OPEN_DOOR}`, () => {
-    mockRunStatus(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -167,7 +161,9 @@ describe('useRunStatuses', () => {
   })
 
   it(`returns true isRunRunning when status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
-    mockRunStatus(RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR)
+    vi.mocked(useRunStatus).mockReturnValue(
+      RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+    )
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,

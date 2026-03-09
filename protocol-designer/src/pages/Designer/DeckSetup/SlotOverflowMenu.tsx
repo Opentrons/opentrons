@@ -16,14 +16,9 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
-  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
-  getIsSlotAHopper,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
-
-import { getStackerModuleStateFromSlot } from '/protocol-designer/components/organisms/AssignLiquidsModal/utils'
-import { updateStackerModuleState } from '/protocol-designer/step-forms/actions'
 
 import {
   ConfirmDeleteEntityInUseModal,
@@ -43,7 +38,6 @@ import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
@@ -69,7 +63,7 @@ const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 interface SlotOverflowMenuProps {
-  //   can be off-deck id or deck slot or flexStackerAddressableArea or hopper fake slot
+  //   can be off-deck id or deck slot
   location: DeckSlotId | string
   setShowMenuList: (value: SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
@@ -106,14 +100,14 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
+
   const robotType = useSelector(getRobotType)
 
   const { makeSnackbar } = useKitchen()
 
-  const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
+  const { labware: deckSetupLabware } = deckSetup
 
   const isOffDeckLocation = deckSetupLabware[location] != null
-
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
   const labwareStackOnSlot =
     fullStackOnSlot?.filter(id => deckSetupLabware[id] != null) ?? []
@@ -144,55 +138,26 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-    dispatch(duplicateLabware(labwareStackOnSlot))
+
+    labwareStackOnSlot.forEach(labware => {
+      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
+        dispatch(duplicateLabware(deckSetupLabware[labware].id))
+      }
+    })
     setShowMenuList(false)
   }
+
   const isLabwareOnSlotInUse =
     topLabwareOnSlot != null
       ? getIsLabwareOnSlotInUse(savedSteps, topLabwareOnSlot, adapterOnSlot)
       : false
 
-  const isOnHopper = getIsSlotAHopper(location)
   const handleClear = (): void => {
-    if (isOnHopper) {
-      const slot = FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey]
-      const moduleOnSlot = Object.values(deckSetupModules).find(
-        module => module.slot === slot
-      )
-      const stackerModuleState = getStackerModuleStateFromSlot({
-        modules: deckSetupModules,
-        slot,
-      })
-      const { labwareInHopper } = stackerModuleState ?? {}
-      const labwaresToDelete =
-        labwareInHopper?.reduce<string[]>((acc, group) => {
-          return [...acc, ...Object.values(group).filter(id => id != null)]
-        }, []) ?? []
-      // delete all hopper labwares
-      labwaresToDelete.forEach(labware => {
-        dispatch(deleteContainer({ labwareId: labware }))
-      })
-      // un-set the stored labware details of the module
-      if (moduleOnSlot != null && stackerModuleState != null) {
-        dispatch(
-          updateStackerModuleState({
-            moduleId: moduleOnSlot.id,
-            moduleState: {
-              ...stackerModuleState,
-              storedLabwareDetails: null,
-              labwareInHopper: null,
-            },
-          })
-        )
-      }
-    } else {
-      labwareStackOnSlot.forEach(labware => {
-        dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
-      })
-    }
+    labwareStackOnSlot.forEach(labware => {
+      dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
+    })
   }
-  const showDuplicateBtn =
-    !isLabwareAnAdapter && labwareStackOnSlot.length > 0 && !isOnHopper
+  const showDuplicateBtn = !isLabwareAnAdapter && labwareStackOnSlot.length > 0
 
   const canRenameLabwareAndEditLiquids =
     !isLabwareAnAdapter &&

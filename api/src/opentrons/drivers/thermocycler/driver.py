@@ -2,25 +2,24 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Generic, Optional, TypeVar, Union
-
-from opentrons_shared_data.util import StrEnum
+from enum import Enum
+from typing import Optional, Dict, Union, TypeVar, Generic
 
 from opentrons.drivers import utils
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import (
+    SerialConnection,
     AsyncResponseSerialConnection,
     AsyncSerial,
-    SerialConnection,
     UnhandledGcode,
 )
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
-from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
+from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
 log = logging.getLogger(__name__)
 
 
-class GCODE(StrEnum):
+class GCODE(str, Enum):
     OPEN_LID = "M126"
     CLOSE_LID = "M127"
     PLATE_LIFT = "M128"

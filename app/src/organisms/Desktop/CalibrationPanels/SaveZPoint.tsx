@@ -100,7 +100,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
               {title}
             </LegacyStyledText>
             <Trans
@@ -108,10 +108,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
               i18nKey={bodyTranslationKey}
               components={{
                 block: (
-                  <LegacyStyledText
-                    forwardedAs="p"
-                    marginBottom={SPACING.spacing8}
-                  />
+                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
                 ),
               }}
             />

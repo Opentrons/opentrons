@@ -1,39 +1,38 @@
 """AirGap in place command request, result, and implementation models."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type, Union
-
 from typing_extensions import Literal
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from ..errors.error_occurrence import ErrorOccurrence
-from ..errors.exceptions import PipetteNotReadyToAspirateError
-from ..state.update_types import StateUpdate
-from ..types import AspiratedFluid, FluidKind
+from opentrons.hardware_control import HardwareControlAPI
+
+from .pipetting_common import (
+    PipetteIdMixin,
+    AspirateVolumeMixin,
+    FlowRateMixin,
+    BaseLiquidHandlingResult,
+    OverpressureError,
+    DEFAULT_CORRECTION_VOLUME,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
+    DefinedErrorData,
 )
-from .pipetting_common import (
-    DEFAULT_CORRECTION_VOLUME,
-    AspirateVolumeMixin,
-    BaseLiquidHandlingResult,
-    FlowRateMixin,
-    OverpressureError,
-    PipetteIdMixin,
-)
-from opentrons.hardware_control import HardwareControlAPI
+from ..errors.error_occurrence import ErrorOccurrence
+from ..errors.exceptions import PipetteNotReadyToAspirateError
+from ..state.update_types import StateUpdate
+from ..types import AspiratedFluid, FluidKind
 
 if TYPE_CHECKING:
-    from ..execution import GantryMover, PipettingHandler
-    from ..notes import CommandNoteAdder
+    from ..execution import PipettingHandler, GantryMover
     from ..resources import ModelUtils
     from ..state.state import StateView
+    from ..notes import CommandNoteAdder
 
 AirGapInPlaceCommandType = Literal["airGapInPlace"]
 

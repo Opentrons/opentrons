@@ -1,22 +1,25 @@
 # noqa: D100
 
-from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass
 from typing import Iterator, Sequence, TypedDict
-
-import sqlalchemy
-import sqlalchemy.exc
 from typing_extensions import assert_never
 
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     ModuleModel,
     OnAddressableAreaOffsetLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
 )
 
-from ._search_query_builder import build_query
+from robot_server.persistence.tables import (
+    labware_offset_table,
+    labware_offset_location_sequence_components_table,
+)
+from robot_server.service.notifications.publishers.labware_offsets_publisher import (
+    LabwareOffsetsPublisher,
+)
 from .models import (
     ANY_LOCATION,
     AnyLocation,
@@ -26,13 +29,11 @@ from .models import (
     StoredLabwareOffsetLocationSequenceComponents,
     UnknownLabwareOffsetLocationSequenceComponent,
 )
-from robot_server.persistence.tables import (
-    labware_offset_location_sequence_components_table,
-    labware_offset_table,
-)
-from robot_server.service.notifications.publishers.labware_offsets_publisher import (
-    LabwareOffsetsPublisher,
-)
+
+import sqlalchemy
+import sqlalchemy.exc
+
+from ._search_query_builder import build_query
 
 
 @dataclass
@@ -42,9 +43,9 @@ class IncomingStoredLabwareOffset:
     id: str
     createdAt: datetime
     definitionUri: str
-    locationSequence: (
-        Sequence[StoredLabwareOffsetLocationSequenceComponents] | AnyLocation
-    )
+    locationSequence: Sequence[
+        StoredLabwareOffsetLocationSequenceComponents
+    ] | AnyLocation
     vector: LabwareOffsetVector
 
 

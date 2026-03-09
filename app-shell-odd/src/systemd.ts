@@ -1,14 +1,13 @@
 import { exec } from 'child_process'
-import { readFile, stat, writeFile } from 'fs/promises'
 import { platform } from 'process'
 
 // Provide systemd when possible and a default mocked instance, used only during
 // dev workflows, when not.
 
-function promisifyProcess(command: string, quiet?: boolean): Promise<string> {
+function promisifyProcess(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
-      if (err && quiet !== true) {
+      if (err) {
         console.warn(
           `${command} failed: ${err.code}: ${err.message}: ${stderr}`
         )
@@ -17,25 +16,6 @@ function promisifyProcess(command: string, quiet?: boolean): Promise<string> {
       resolve(stdout ?? stderr)
     })
   })
-}
-
-const NEW_ODD_BRIGHTNESS_PATH =
-  '/sys/class/backlight/backlight-verdin-dsi/brightness'
-const OLD_ODD_BRIGHTNESS_PATH =
-  '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
-
-function writeBrightness(text: string): Promise<string> {
-  return stat(NEW_ODD_BRIGHTNESS_PATH)
-    .then(() =>
-      writeFile(NEW_ODD_BRIGHTNESS_PATH, text).then(() =>
-        readFile(NEW_ODD_BRIGHTNESS_PATH, 'ascii')
-      )
-    )
-    .catch(() =>
-      writeFile(OLD_ODD_BRIGHTNESS_PATH, text).then(() =>
-        readFile(OLD_ODD_BRIGHTNESS_PATH, 'ascii')
-      )
-    )
 }
 
 const verbForState = (state: boolean): string => (state ? 'start' : 'stop')
@@ -61,16 +41,17 @@ const provideExports = (): SystemD => {
             enabled
           )} opentrons-robot-app-devtools.socket`
         ),
-      getisRobotServerReady: () => {
-        return promisifyProcess(
-          '/bin/systemctl is-active opentrons-robot-server',
-          true
+      getisRobotServerReady: () =>
+        promisifyProcess(
+          '/bin/systemctl is-active opentrons-robot-server'
           // trimming string because stdout returns a new line
-        ).then(state => state.trim() === 'active')
-      },
+        ).then(state => state.trim() === 'active'),
       restartApp: () =>
         promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
-      updateBrightness: writeBrightness,
+      updateBrightness: text =>
+        promisifyProcess(
+          `echo "${text}" > /sys/class/backlight/backlight/device/backlight/backlight/brightness`
+        ),
     }
   } else {
     return {

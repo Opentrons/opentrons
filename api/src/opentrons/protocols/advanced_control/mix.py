@@ -1,16 +1,13 @@
-from typing import Literal, Tuple
+from typing import Any, Dict, Tuple
 
-from ..api_support.types import TransferArgs
-from .common import Mix, MixStrategy
+from .common import MixStrategy, Mix
 
 
-def mix_from_kwargs(top_kwargs: TransferArgs) -> Tuple[MixStrategy, Mix]:
+def mix_from_kwargs(top_kwargs: Dict[str, Any]) -> Tuple[MixStrategy, Mix]:
     """A utility function to determine mix strategy from key word arguments
     to InstrumentContext.mix"""
 
-    def _mix_requested(
-        kwargs: TransferArgs, opt: Literal["mix_before", "mix_after"]
-    ) -> bool:
+    def _mix_requested(kwargs: Dict[str, Any], opt: str) -> bool:
         """
         Helper for determining mix options from :py:meth:`transfer` kwargs
         Mixes can be ignored in kwargs by either

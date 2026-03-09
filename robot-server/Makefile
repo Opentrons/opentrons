@@ -1,7 +1,7 @@
 # opentrons robot server makefile
 
 include ../scripts/push.mk
-include ../scripts/python-uv.mk
+include ../scripts/python.mk
 
 SHX := npx shx
 REDOC := npx @redocly/cli
@@ -27,6 +27,7 @@ tests ?= tests
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
+black_opts := --extend-exclude tests/integration/persistence_snapshots/
 
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
@@ -48,42 +49,36 @@ clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
 # Uvicorn command to run the robot server in dev mode.
 #
+# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
+# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
+#
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
 #   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
-#     doesn't work because it applies the variable to the whole `uv run`
+#     doesn't work because it applies the variable to the whole `pipenv run`
 #     command, and we only want our inner server process running under dev mode,
-#     not the outer uv process.
+#     not the outer pipenv process.
 #   * Adding PYTHONDEVMODE=1 to the .env file specified by
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
-#   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --reload --reload-dir robot_server
+run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 .PHONY: all
 all: clean wheel
 
-
-
 .PHONY: setup
 setup:
-	@$(uv_sync_dev)
-	@$(UV) pip list
-
-.PHONY: setup-py
-setup-py: setup
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: setup-ot2
 setup-ot2:
-	@$(uv_sync_dev)
-	@$(UV) pip uninstall python-can
-	@$(UV) pip list
-
-.PHONY: lock
-lock:
-	$(UV) lock
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y python-can
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -92,7 +87,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf .venv
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -108,31 +103,27 @@ wheel: $(ot_sources)
 test:
 	$(pytest) $(tests) $(test_opts)
 
-.PHONY: test-unit-cov
-test-unit-cov:
-	$(pytest) $(tests) $(test_opts) -m 'not integration' $(cov_opts)
+.PHONY: test-cov
+test-cov:
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: test-integration-cov
-test-integration-cov:
-	$(pytest) tests/integration $(test_opts) $(cov_opts)
-
-.PHONY: test-fast
+.PHONT: test-fast
 test-fast:
 	$(pytest) $(tests) $(test_opts) -m 'not slow'
 
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
-	$(ruff) check .
+	$(python) -m black $(black_opts) --check .
+	$(python) -m flake8 $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
 
 .PHONY: format
 format:
-	$(ruff) format .
-	$(ruff) check --select I --fix .
+	$(python) -m black $(black_opts) .
 
 .PHONY: _dev
 _dev:
-	$(UV) run $(run_dev)
+	$(pipenv) run $(run_dev)
 
 .PHONY: dev
 dev: dev-ot2
@@ -149,18 +140,18 @@ dev-ot2: _dev
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(UV) run $(run_dev)
+	$(pipenv) run $(run_dev)
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(UV) run $(run_dev)
+	$(pipenv) run $(run_dev)
 
 
 .PHONY: local-shell
 local-shell:
-	$(UV) shell
+	$(pipenv) shell
 
 .PHONY: push
 push: wheel

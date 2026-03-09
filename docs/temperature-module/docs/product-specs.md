@@ -1,6 +1,5 @@
 ---
 title: "Temperature Module: Product Specifications"
-description: "Included parts, dimensions, temperature range, and thermal block options."
 ---
 
 ![Temperature module with labels](images/temp-mod-labeled.svg)

@@ -56,7 +56,7 @@ export const SecureLabwareModal = (
                 components={{
                   block: (
                     <LegacyStyledText
-                      forwardedAs="p"
+                      as="p"
                       marginBottom={SPACING.spacing4}
                       marginRight="3.625rem"
                     />
@@ -69,7 +69,6 @@ export const SecureLabwareModal = (
               height="100%"
               src={secureMagModBracketImage}
               style={{ marginBottom: SPACING.spacing24 }}
-              alt="Visual instructions to secure the Magnetic Module bracket"
             />
           </Flex>
         )}
@@ -78,7 +77,7 @@ export const SecureLabwareModal = (
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <LegacyStyledText forwardedAs="p" marginRight="3.625rem">
+            <LegacyStyledText as="p" marginRight="3.625rem">
               {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
             </LegacyStyledText>
             <img
@@ -86,7 +85,6 @@ export const SecureLabwareModal = (
               width="288px"
               height="100%"
               style={{ marginBottom: SPACING.spacing16 }}
-              alt="Visual instructions to secure the Thermocycler latch"
             />
           </Flex>
         )}

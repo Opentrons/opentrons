@@ -1,6 +1,6 @@
 from typing import Callable
 
-from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
+from opentrons.hardware_control import ThreadedAsyncLock, HardwareControlAPI
 
 from robot_server.service.session.models.common import IdentifierType
 

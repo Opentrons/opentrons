@@ -1,5 +1,6 @@
-from pathlib import Path
 from typing import List, Tuple
+
+from pathlib import Path
 
 
 def get_ot_defs(schema: int) -> List[Tuple[str, int]]:

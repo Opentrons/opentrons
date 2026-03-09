@@ -1,25 +1,24 @@
-from typing import Awaitable, Optional, Union, cast
-
-from opentrons.protocol_api import labware
+from typing import cast, Awaitable, Optional, Union
 from opentrons.types import Mount
 from opentrons_shared_data.labware.types import LabwareDefinition2
-
-from ..configuration import SessionConfiguration
-from ..models.session import SessionType, TipLengthCalibrationResponseAttributes
-from .base_session import BaseSession, SessionMetaData
+from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
-from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
+from robot_server.service.session.errors import (
+    SessionCreationException,
+    CommandExecutionException,
+)
 from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
-    CommandExecutor,
     CompletedCommand,
+    CommandExecutor,
 )
-from robot_server.service.session.errors import (
-    CommandExecutionException,
-    SessionCreationException,
-)
+from opentrons.protocol_api import labware
+
+from .base_session import BaseSession, SessionMetaData
+from ..configuration import SessionConfiguration
+from ..models.session import SessionType, TipLengthCalibrationResponseAttributes
 
 
 class TipLengthCalibrationCommandExecutor(CallableExecutor):
@@ -47,7 +46,7 @@ class TipLengthCalibration(BaseSession):
 
     @staticmethod
     def _verify_tip_rack(
-        tip_rack_def: Union[dict[str, object], None],
+        tip_rack_def: Union[dict[str, object], None]
     ) -> Optional[LabwareDefinition2]:
         if tip_rack_def:
             verified_definition = labware.verify_definition(tip_rack_def)
@@ -87,9 +86,9 @@ class TipLengthCalibration(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler: Optional[Awaitable[None]] = (
-                configuration.hardware.set_lights(rails=False)
-            )
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

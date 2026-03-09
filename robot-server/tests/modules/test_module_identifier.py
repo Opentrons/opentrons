@@ -1,9 +1,7 @@
 """Tests for robot_server.modules.module_identifier."""
-
-from typing import Optional
-
 import pytest
 from decoy import matchers
+from typing import Optional
 
 from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 

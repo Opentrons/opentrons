@@ -1,9 +1,8 @@
 """tool types."""
 
-from dataclasses import dataclass
 from typing import Optional
-
-from opentrons_hardware.firmware_bindings.constants import PipetteName, ToolType
+from dataclasses import dataclass
+from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 
 
 @dataclass(frozen=True)

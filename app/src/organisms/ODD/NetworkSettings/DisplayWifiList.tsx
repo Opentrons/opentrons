@@ -102,7 +102,7 @@ export function DisplayWifiList({
                 }}
               >
                 <Icon name="wifi" size="2.5rem" />
-                <LegacyStyledText forwardedAs="h4">{nw.ssid}</LegacyStyledText>
+                <LegacyStyledText as="h4">{nw.ssid}</LegacyStyledText>
               </Btn>
             ))
           : null}
@@ -120,9 +120,7 @@ export function DisplayWifiList({
           gridGap={SPACING.spacing4}
         >
           <Icon name="plus" size="2.5rem" color={COLORS.black90} />
-          <LegacyStyledText forwardedAs="h4">
-            {t('join_other_network')}
-          </LegacyStyledText>
+          <LegacyStyledText as="h4">{t('join_other_network')}</LegacyStyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
       </Flex>

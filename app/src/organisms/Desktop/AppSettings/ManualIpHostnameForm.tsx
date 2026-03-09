@@ -145,7 +145,7 @@ export function ManualIpHostnameForm({
       </FlexForm>
       {formState.errors?.ip != null && (
         <LegacyStyledText
-          forwardedAs="label"
+          as="label"
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >

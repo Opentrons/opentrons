@@ -2,25 +2,35 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
+import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SecondaryButton,
+  LegacyStyledText,
+  Link,
   SIZE_1,
   SPACING,
-  StyledText,
+  Tooltip,
+  TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
-import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   InterventionModal,
   useInterventionModal,
@@ -29,10 +39,10 @@ import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
+  useRunStatus,
 } from '/app/resources/runs'
 
 import { useDownloadRunLog } from '../Devices/hooks'
@@ -50,12 +60,13 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
+  const runStatus = useRunStatus(runId)
   const { play } = useRunControls(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
   })
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
-  const runStatus = runData?.status ?? null
 
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
     pageLength: 1,
@@ -73,11 +84,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { currentStepNumber, totalStepCount, hasRunDiverged } =
     useRunningStepCounts(runId, mostRecentCommandData)
 
-  const downloadEnabled = isTerminalRunStatus(runStatus)
+  const downloadIsDisabled =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_IDLE ||
+    runStatus === RUN_STATUS_FINISHING
 
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
-  const onDownloadClick: MouseEventHandler<HTMLButtonElement> = e => {
+  const onDownloadClick: MouseEventHandler<HTMLAnchorElement> = e => {
+    if (downloadIsDisabled) return false
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
@@ -116,23 +131,41 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <StyledText
-              color={COLORS.black90}
-              desktopStyle={'bodyDefaultSemiBold'}
+            <LegacyStyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {stepCountStr}
-            </StyledText>
+            </LegacyStyledText>
+
             {currentStepContents}
           </Flex>
-          {downloadEnabled ? (
-            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-              <SecondaryButton border-width={1} onClick={onDownloadClick}>
-                <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-                  <Icon name="download" size={SIZE_1} />
-                  {t('download_run_log')}
-                </Flex>
-              </SecondaryButton>
+          <Link
+            {...targetProps}
+            role="button"
+            css={css`
+              ${TYPOGRAPHY.darkLinkH4SemiBold}
+              &:hover {
+                color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
+              }
+              cursor: ${downloadIsDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
+            `}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={onDownloadClick}
+          >
+            <Flex
+              gridGap={SPACING.spacing2}
+              alignItems={ALIGN_CENTER}
+              color={COLORS.grey60}
+            >
+              <Icon name="download" size={SIZE_1} />
+              {t('download_run_log')}
             </Flex>
+          </Link>
+          {downloadIsDisabled ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('complete_protocol_to_download')}
+            </Tooltip>
           ) : null}
         </Flex>
         {!hasRunDiverged ? (

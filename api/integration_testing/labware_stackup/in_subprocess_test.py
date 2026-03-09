@@ -2,8 +2,8 @@
 
 from typing import Any, cast
 
-from .stackup_spec import StackupSpec
 from opentrons import protocol_api, simulate
+from .stackup_spec import StackupSpec
 
 
 def run_test_subprocess(  # noqa: C901

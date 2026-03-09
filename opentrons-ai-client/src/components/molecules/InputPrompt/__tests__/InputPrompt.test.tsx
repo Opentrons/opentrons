@@ -1,5 +1,5 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
@@ -9,33 +9,32 @@ import { InputPrompt } from '../index'
 
 import type { ReactNode } from 'react'
 
-const mockSubmitChat = vi.fn()
-const mockHandleFileSelect = vi.fn()
-const mockHandleRemoveFile = vi.fn()
+const mockTrackEvent = vi.fn()
+const mockCallApi = vi.fn().mockResolvedValue(undefined)
 
-vi.mock('/ai-client/resources/hooks', async () => {
-  const actual = await vi.importActual<object>('/ai-client/resources/hooks')
-  return {
-    ...actual,
-    useInputPromptController: vi.fn(() => ({
-      submitChat: mockSubmitChat,
-      isLoading: false,
-      errorMessage: null,
-      attachedFiles: [],
-      handleFileSelect: mockHandleFileSelect,
-      handleRemoveFile: mockHandleRemoveFile,
-    })),
-  }
-})
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
+  useTrackEvent: () => mockTrackEvent,
+}))
 
-const WrappingForm = ({ children }: { children: ReactNode }): JSX.Element => {
+vi.mock('/ai-client/resources/hooks/useApiCall', () => ({
+  useApiCall: () => ({
+    data: null,
+    error: null,
+    isLoading: false,
+    callApi: mockCallApi,
+  }),
+}))
+
+const WrappingForm = (wrappedComponent: {
+  children: ReactNode
+}): JSX.Element => {
   const methods = useForm({
     defaultValues: {
       userPrompt: '',
     },
   })
-
-  return <FormProvider {...methods}>{children}</FormProvider>
+  // eslint-disable-next-line testing-library/no-node-access
+  return <FormProvider {...methods}>{wrappedComponent.children}</FormProvider>
 }
 
 const render = () => {
@@ -52,78 +51,51 @@ describe('InputPrompt', () => {
     vi.clearAllMocks()
   })
 
-  it('should render textarea and disabled send button initially', () => {
+  it('should render textarea and disabled button', () => {
     render()
     screen.getByRole('textbox')
-    screen.getByRole('button', { name: 'Send' })
+    screen.queryByPlaceholderText('Type your prompt...')
+    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
   })
 
-  it('should enable send button when user types in textarea', () => {
+  it('should make send button not disabled when a user inputs something in textarea', () => {
     render()
     const textbox = screen.getByRole('textbox')
-    fireEvent.change(textbox, { target: { value: 'test' } })
-    expect(screen.getByRole('button', { name: 'Send' })).not.toBeDisabled()
+    fireEvent.change(textbox, { target: { value: ['test'] } })
+    const sendButton = screen.getByRole('button', { name: 'Send' })
+    expect(sendButton).not.toBeDisabled()
   })
 
-  it('should call submitChat when send button is clicked', () => {
+  // ToDo (kk:04/19/2024) add more test cases
+
+  it('should track event when send button is clicked', async () => {
     render()
     const textbox = screen.getByRole('textbox')
+    // Ensure the textbox change updates the state and enables the button
     fireEvent.change(textbox, { target: { value: 'test' } })
+
+    // Add a small wait to ensure state updates propagate
+    await waitFor(() => {
+      const sendButton = screen.getByRole('button', { name: 'Send' })
+      expect(sendButton).not.toBeDisabled()
+    })
 
     const sendButton = screen.getByRole('button', { name: 'Send' })
+    expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
-    expect(mockSubmitChat).toHaveBeenCalledTimes(1)
-  })
+    // Wait for callApi to be called first, since that happens before trackEvent
+    await waitFor(() => {
+      expect(mockCallApi).toHaveBeenCalled()
+    })
 
-  it('should show error message when errorMessage is provided', async () => {
-    const { useInputPromptController } =
-      await import('/ai-client/resources/hooks')
-    ;(useInputPromptController as any).mockImplementation(() => ({
-      submitChat: mockSubmitChat,
-      isLoading: false,
-      errorMessage: 'Something went wrong',
-      attachedFiles: [],
-      handleFileSelect: mockHandleFileSelect,
-      handleRemoveFile: mockHandleRemoveFile,
-    }))
-
-    render()
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-  })
-
-  it('should render attached files when provided by controller', async () => {
-    const { useInputPromptController } =
-      await import('/ai-client/resources/hooks')
-    ;(useInputPromptController as any).mockImplementation(() => ({
-      submitChat: mockSubmitChat,
-      isLoading: false,
-      errorMessage: null,
-      attachedFiles: [
-        new File(['hello'], 'example.txt', { type: 'text/plain' }),
-      ],
-      handleFileSelect: mockHandleFileSelect,
-      handleRemoveFile: mockHandleRemoveFile,
-    }))
-
-    render()
-    expect(screen.getByText('example.txt')).toBeInTheDocument()
-  })
-
-  it('should disable attach button when loading', async () => {
-    const { useInputPromptController } =
-      await import('/ai-client/resources/hooks')
-    ;(useInputPromptController as any).mockImplementation(() => ({
-      submitChat: mockSubmitChat,
-      isLoading: true,
-      errorMessage: null,
-      attachedFiles: [],
-      handleFileSelect: mockHandleFileSelect,
-      handleRemoveFile: mockHandleRemoveFile,
-    }))
-
-    render()
-    const attachButton = screen.getByRole('button', { name: /attach/i })
-    expect(attachButton).toBeDisabled()
+    // Then check if trackEvent was called with the expected arguments
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'chat-submitted',
+      properties: {
+        chat: 'test',
+        protocol_format: 'Python',
+      },
+    })
   })
 })

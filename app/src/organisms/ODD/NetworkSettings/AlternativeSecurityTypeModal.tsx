@@ -53,7 +53,7 @@ export function AlternativeSecurityTypeModal({
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
           >

@@ -1,48 +1,45 @@
 """Test the CompletedAnalysisStore."""
-
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional, Dict, List
 
 import pytest
-from decoy import Decoy
 from sqlalchemy.engine import Engine
+from decoy import Decoy
 
-from opentrons.protocol_reader import (
-    JsonProtocolConfig,
-    ProtocolSource,
-)
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
-
-from robot_server.data_files.data_files_store import (
-    DataFilesStore,
-)
 from robot_server.persistence.tables import (
-    analysis_csv_rtp_table,
-    analysis_primitive_type_rtp_table,
     analysis_table,
-)
-from robot_server.protocols.analysis_memcache import MemoryCache
-from robot_server.protocols.analysis_models import (
-    AnalysisResult,
-    AnalysisStatus,
-    CompletedAnalysis,
-    RunTimeParameterAnalysisData,
+    analysis_primitive_type_rtp_table,
+    analysis_csv_rtp_table,
 )
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
-    UnreadableAnalysisError,
+)
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    JsonProtocolConfig,
+)
+from robot_server.data_files.data_files_store import (
+    DataFilesStore,
+)
+from robot_server.protocols.analysis_memcache import MemoryCache
+from robot_server.protocols.analysis_models import (
+    CompletedAnalysis,
+    AnalysisResult,
+    AnalysisStatus,
+    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
-    ProtocolResource,
     ProtocolStore,
+    ProtocolResource,
 )
 from robot_server.protocols.rtp_resources import (
-    CSVParameterResource,
     PrimitiveParameterResource,
+    CSVParameterResource,
 )
 
 
@@ -254,9 +251,9 @@ async def test_get_by_protocol(
     resource_3 = _completed_analysis_resource("analysis-id-3", "protocol-id-2")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-1"))
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-2"))
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
-    decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)  # type: ignore[func-returns-value]
-    decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
+    decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)
+    decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)
     await subject.make_room_and_add(resource_1, [], [])
     await subject.make_room_and_add(resource_2, [], [])
     await subject.make_room_and_add(resource_3, [], [])
@@ -264,7 +261,7 @@ async def test_get_by_protocol(
     decoy.when(memcache.get("analysis-id-2")).then_return(resource_2)
     decoy.when(memcache.contains("analysis-id-1")).then_return(False)
     decoy.when(memcache.contains("analysis-id-2")).then_return(True)
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
     resources = await subject.get_by_protocol("protocol-id-1")
     assert resources == [resource_1, resource_2]
 
@@ -572,39 +569,3 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
     assert subject.get_csv_rtps_by_analysis_id("analysis-id-0") == {}
     assert subject.get_csv_rtps_by_analysis_id("analysis-id-1") == {"bar": None}
     assert subject.get_csv_rtps_by_analysis_id("new-analysis-id") == {"bar": "file-id"}
-
-
-async def test_raise_error_on_analysis_parsing_error(
-    subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
-    protocol_store: ProtocolStore,
-    decoy: Decoy,
-    sql_engine: Engine,
-) -> None:
-    """It should raise a ValueError when parsing a bad analysis from db."""
-    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    unparseable_analysis = '{"id": "analysis-id", "result": "ok", \
-        "status": "completed", \
-        "runTimeParameters": [], \
-        "commands": [], \
-        "errors": [], \
-        "labware": [], \
-        "liquids": [], \
-        "liquidClasses": [], \
-        "modules": [], \
-        "pipettes": [], \
-        "commandAnnotations": [{"commandKeys": ["1abc123", "2abc123"], "annotationType": "custom"}]}'
-
-    analysis_resource_blob = {
-        "id": "analysis-id",
-        "protocol_id": "protocol-id",
-        "analyzer_version": "123",
-        "completed_analysis": unparseable_analysis,
-    }
-    # Set up the database with an unparseable analysis
-    statement = analysis_table.insert().values(analysis_resource_blob)
-    with sql_engine.begin() as transaction:
-        transaction.execute(statement)
-    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
-    with pytest.raises(UnreadableAnalysisError):
-        await subject.get_by_id("analysis-id")

@@ -1,7 +1,8 @@
-from typing import AsyncGenerator
-
 import pytest
+from typing import AsyncGenerator
 from mock import MagicMock
+from opentrons.drivers.types import MoveSplit
+from opentrons.hardware_control.emulation.settings import Settings
 
 from opentrons.config.defaults_ot2 import (
     DEFAULT_GANTRY_STEPS_PER_MM,
@@ -9,8 +10,6 @@ from opentrons.config.defaults_ot2 import (
 )
 from opentrons.config.robot_configs import build_config_ot2
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
-from opentrons.drivers.types import MoveSplit
-from opentrons.hardware_control.emulation.settings import Settings
 
 
 @pytest.fixture

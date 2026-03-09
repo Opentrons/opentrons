@@ -1,5 +1,4 @@
 """Tip presence types."""
-
 import dataclasses
 from typing import Callable
 

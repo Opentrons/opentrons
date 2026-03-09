@@ -46,7 +46,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <LegacyStyledText
-          forwardedAs="p"
+          as="p"
           css={css`
             overflow: hidden;
             white-space: nowrap;
@@ -88,7 +88,7 @@ export function FileCard(props: FileCardProps): JSX.Element {
         </Flex>
       </Flex>
       {error != null ? (
-        <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+        <LegacyStyledText as="label" color={COLORS.red50}>
           {error}
         </LegacyStyledText>
       ) : null}

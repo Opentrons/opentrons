@@ -1,50 +1,48 @@
 """Tests for /instruments routes."""
-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
-
 import pytest
+from typing import TYPE_CHECKING, cast
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
+    API,
 )
 from opentrons.hardware_control.dev_types import (
-    GripperDict,
     PipetteDict,
+    GripperDict,
 )
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetSummary,
 )
-from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
-from opentrons.hardware_control.types import GripperJawState, OT3Mount, SubSystemState
-from opentrons.hardware_control.types import SubSystem as HWSubSystem
+from opentrons.hardware_control.types import GripperJawState, OT3Mount
 from opentrons.protocol_engine.types import Vec3f
-from opentrons.types import Mount, Point
+from opentrons.types import Point, Mount
 from opentrons_shared_data.gripper.gripper_definition import (
-    GripperModel,
     GripperModelStr,
+    GripperModel,
 )
-from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 
 from robot_server.instruments.instrument_models import (
-    BadGripper,
-    BadPipette,
     Gripper,
     GripperData,
-    InstrumentCalibrationData,
     Pipette,
     PipetteData,
+    InstrumentCalibrationData,
+    BadPipette,
+    BadGripper,
     PipetteState,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
 )
 from robot_server.subsystems.models import SubSystem
+from opentrons.hardware_control.types import SubSystem as HWSubSystem, SubSystemState
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -75,12 +73,10 @@ def get_sample_pipette_dict(
     return pipette_dict
 
 
+@pytest.mark.ot3_only
 @pytest.fixture
-def ot3_hardware_api(
-    decoy: Decoy, request: pytest.FixtureRequest
-) -> HardwareControlAPI:
+def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out OT3API."""
-    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
@@ -191,7 +187,7 @@ async def test_get_all_attached_instruments(
     # We use this convoluted way of testing to verify the important point that
     # cache_instruments is called before fetching attached pipette and gripper data.
     decoy.when(
-        await ot3_hardware_api.cache_instruments(skip_if_would_block=True)  # type: ignore[func-returns-value]
+        await ot3_hardware_api.cache_instruments(skip_if_would_block=True)
     ).then_do(rehearse_instrument_retrievals)
     decoy.when(ot3_hardware_api.get_instrument_offset(mount=OT3Mount.LEFT)).then_return(
         PipetteOffsetSummary(

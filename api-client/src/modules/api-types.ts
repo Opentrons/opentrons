@@ -90,15 +90,7 @@ export interface FlexStackerData {
   installDetected: boolean
   status: FlexStackerStatus
 }
-export interface VacuumModuleData {
-  currentPressure: number | null
-  targetPressure: number | null
-  currentPower: number | null
-  targetPower: number | null
-  ventStatus: 'open' | 'closed'
-  modeType: 'pressure' | 'power'
-  status: VacuumModuleStatus
-}
+
 export type TemperatureStatus =
   | 'idle'
   | 'holding at target'
@@ -134,11 +126,3 @@ export type LatchStatus =
 export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
 
 export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'
-
-export type VacuumModuleStatus =
-  | 'idle'
-  | 'ramping'
-  | 'holding'
-  | 'venting'
-  | 'complete'
-  | 'error'

@@ -1,16 +1,15 @@
 import fs from 'node:fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import lostCss from 'lost'
+import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
-import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import { defineConfig } from 'vite'
-
-import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
+import lostCss from 'lost'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
+import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
 
 const { generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'labware-library',
@@ -109,7 +108,6 @@ export default defineConfig({
     _OT_LL_MIXPANEL_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_ID),
     _OT_LL_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_DEV_ID),
     _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
-    'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
     global: 'globalThis',
   },
   resolve: {

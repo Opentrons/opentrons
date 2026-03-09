@@ -1,13 +1,10 @@
 """Protocol engine types to do with engine execution."""
-
 from enum import Enum
-
-from opentrons_shared_data.util import StrEnum
 
 
 # todo(mm, 2024-06-24): This monolithic status field is getting to be a bit much.
 # We should consider splitting this up into multiple fields.
-class EngineStatus(StrEnum):
+class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine.
 
     This is a high-level summary of what the robot is doing and what interactions are

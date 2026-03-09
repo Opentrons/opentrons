@@ -2,35 +2,36 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
-import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 
-import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
+// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
+import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
 
-const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [1, 1.5, 2]
+const ZOOM_VALUES: Array<UseStubCameraSettingsValuesResult['zoom']> = [
+  '1x',
+  '1.5x',
+  '2x',
+]
 
 export interface ZoomSettingsViewProps {
-  zoomValue: UseCameraSettingsValuesResult['zoom']
-  adjustZoom: UseCameraSettingsValuesResult['adjustZoom']
+  zoomValue: UseStubCameraSettingsValuesResult['zoom']
+  adjustZoom: UseStubCameraSettingsValuesResult['adjustZoom']
   returnToHomeView: () => void
-  isLoading: boolean
 }
 
 export function ZoomSettingsView({
   zoomValue,
   adjustZoom,
   returnToHomeView,
-  isLoading,
 }: ZoomSettingsViewProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const buildSubLabel = (
-    value: UseCameraSettingsValuesResult['zoom']
+    value: UseStubCameraSettingsValuesResult['zoom']
   ): string => {
-    const zoomString = zoomNumberToString(value)
-    switch (zoomString) {
+    switch (value) {
       case '1x':
         return t('default')
       case '1.5x':
@@ -42,31 +43,26 @@ export function ZoomSettingsView({
 
   return (
     <div className={styles.container}>
-      <ChildNavigation
-        header={t('zoom')}
-        onClickBack={returnToHomeView}
-        iconName={isLoading ? 'ot-spinner' : 'back'}
-      />
+      <ChildNavigation header={t('zoom')} onClickBack={returnToHomeView} />
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">
           {t('adjust_deck_appearance')}
         </StyledText>
         <div className={styles.zoom_btn_container}>
           {ZOOM_VALUES.map(val => {
-            const zoomString = zoomNumberToString(val)
             return (
               <RadioButton
                 key={val}
                 radioButtonType="large"
-                buttonLabel={t(zoomString)}
+                buttonLabel={t(val)}
                 buttonSubLabel={{
                   label: buildSubLabel(val),
                   align: 'vertical',
                 }}
-                buttonValue={zoomString}
+                buttonValue={val}
                 isSelected={val === zoomValue}
                 onChange={() => {
-                  adjustZoom(zoomString)
+                  adjustZoom(val)
                 }}
               />
             )

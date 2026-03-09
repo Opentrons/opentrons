@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
-import { ALL, COLUMN, getIsTiprack, ROW, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 
-import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
-import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
@@ -25,58 +25,44 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
     pipetteSpecs,
   } = props
   const { t } = useTranslation('protocol_steps')
-  const { labware } = useSelector(getDeckSetupForActiveItem)
-  const { channels } = pipetteSpecs
-  const enableAdditionalPartialTip = useSelector(
-    getEnableAdditionalPartialTipSelection
-  )
+  const deckSetup = useSelector(getInitialDeckSetup)
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
+  const is96Channel = pipetteSpecs.channels === 96
 
-  const tipracks = Object.values(labware).filter(({ def }) => getIsTiprack(def))
+  const tipracks = Object.values(deckSetup.labware).filter(
+    labware => labware.def.parameters.isTiprack
+  )
   const tipracksNotOnAdapter = tipracks.filter(
     tiprack => tiprack.stack.length === 2
   )
-  const areAllTipracksOnAdapter = tipracksNotOnAdapter.length === 0
+  const noTipracksOnAdapter = tipracksNotOnAdapter.length === 0
 
   const options: DropdownOption[] = [
     {
-      name: t('all_nozzles'),
+      name: t('all'),
       value: ALL,
     },
   ]
-  if (channels === 96) {
-    options.push(
-      ...[
-        {
-          name: t('single_nozzle'),
-          value: SINGLE,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-        {
-          name: t('single_column_of_nozzles'),
-          value: COLUMN,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-      ]
-    )
-  }
-  if (enableAdditionalPartialTip) {
+  if (is96Channel) {
     options.push({
-      name: t('single_row_of_nozzles'),
-      value: ROW,
-      disabled: areAllTipracksOnAdapter,
-      tooltipText: areAllTipracksOnAdapter
-        ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
+      name: t('column'),
+      value: COLUMN,
+      disabled: noTipracksOnAdapter,
+      tooltipText: noTipracksOnAdapter
+        ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
         : null,
     })
-  }
-  if (channels === 8) {
-    // 8-channel
+    if (enablePartialTip) {
+      options.push({
+        name: t('single_nozzle'),
+        value: SINGLE,
+        disabled: noTipracksOnAdapter,
+        tooltipText: noTipracksOnAdapter
+          ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
+          : null,
+      })
+    }
+  } else {
     options.push({
       name: t('single_nozzle'),
       value: SINGLE,
@@ -94,7 +80,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
         error={errorToShow}
         dropdownType="neutral"
         filterOptions={options}
-        title={t('pipette_nozzles_and_wells')}
+        title={t('select_nozzles')}
         currentOption={
           options.find(option => option.value === selectedValue) ?? options[0]
         }

@@ -1,27 +1,26 @@
 """Tests for the tool detector."""
 
-from typing import List, Tuple, cast
-
+from typing import cast, List, Tuple
 import pytest
 from mock import AsyncMock
-
-from tests.conftest import CanLoopback
-
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName, ToolType
+
 from opentrons_hardware.firmware_bindings.messages import (
-    MessageDefinition,
-    fields,
     message_definitions,
     payloads,
+    MessageDefinition,
+    fields,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId, ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.hardware_control.tools.detector import ToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
-    GripperInformation,
-    PipetteInformation,
     ToolDetectionResult,
+    PipetteInformation,
+    GripperInformation,
 )
+
+from tests.conftest import CanLoopback
 
 
 @pytest.fixture

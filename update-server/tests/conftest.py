@@ -1,9 +1,9 @@
 import asyncio
-import json
 import os
 import re
-import subprocess
+import json
 import sys
+import subprocess
 import zipfile
 from typing import Dict
 
@@ -11,6 +11,7 @@ import pytest
 from decoy import Decoy
 
 from otupdate.common.name_management import NameSynchronizer
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 

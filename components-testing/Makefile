@@ -1,8 +1,7 @@
 # components-testing Makefile
 # This project tests built packages of @opentrons/components and @opentrons/shared-data
 # by extracting them to a local pack directory and linking via pnpm link.
-# The link: protocol adds entries to package.json and pnpm-lock.yaml but does NOT lock versions,
-# so the lockfile won't change when linked package contents change.
+# This avoids modifying package.json or pnpm-lock.yaml.
 
 # Directory for packed .tgz files and extracted packages
 PACK_DIR := pack
@@ -16,20 +15,20 @@ COMPONENTS_DIR := $(PACK_DIR)/opentrons-components
 dev: setup
 	pnpm run dev
 
-# Complete setup: build and extract packages first, then install with frozen lockfile
+# Complete setup: install dependencies, then build and link packages
 .PHONY: setup
 setup:
-	$(MAKE) build-local-packages
-	pnpm install --frozen-lockfile
+	pnpm install
+	$(MAKE) install-local-packages
 
 # Complete teardown: remove packages and node_modules
 .PHONY: teardown
 teardown: clean-local-packages
 	rm -rf node_modules
 
-# Build and extract local packages (must run before pnpm install due to link: entries in package.json)
-.PHONY: build-local-packages
-build-local-packages:
+# Build and link local packages without modifying package.json
+.PHONY: install-local-packages
+install-local-packages:
 	@echo "Creating pack directory..."
 	@mkdir -p $(PACK_DIR)
 	@echo "Building shared-data package..."
@@ -44,7 +43,9 @@ build-local-packages:
 	@mkdir -p $(SHARED_DATA_DIR) $(COMPONENTS_DIR)
 	@tar -xzf $(SHARED_DATA_PACK) --strip-components=1 -C $(SHARED_DATA_DIR)
 	@tar -xzf $(COMPONENTS_PACK) --strip-components=1 -C $(COMPONENTS_DIR)
-	@echo "Local packages built and extracted successfully!"
+	@echo "Linking packages directly..."
+	@pnpm link $(PWD)/$(SHARED_DATA_DIR) $(PWD)/$(COMPONENTS_DIR)
+	@echo "Local packages linked successfully!"
 
 # Unlink local packages and clean up pack directory
 .PHONY: clean-local-packages
@@ -58,9 +59,10 @@ clean-local-packages:
 test:
 	pnpm playwright test --config=playwright.config.ts
 
-# Install Playwright browser dependencies (run 'make setup' first)
+# Install Playwright browser dependencies
 .PHONY: test-setup
-test-setup: setup
+test-setup:
+	pnpm install
 	pnpm exec playwright install --with-deps chromium
 
 # Update Playwright snapshots (use after intentional style changes)

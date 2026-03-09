@@ -1,11 +1,10 @@
 """Fixtures for protocol api integration tests."""
 
-from typing import Generator
-
 import pytest
 from _pytest.fixtures import SubRequest
+from typing import Generator
 
-from opentrons import protocol_api, simulate
+from opentrons import simulate, protocol_api
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 
 

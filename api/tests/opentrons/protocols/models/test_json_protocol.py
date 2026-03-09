@@ -1,6 +1,5 @@
-from typing import Callable
-
 import pytest
+from typing import Callable
 
 from opentrons.protocols.models import json_protocol
 

@@ -45,17 +45,20 @@ export interface BaseOffsetLocationSequenceComponent {
   kind: string
 }
 
-export interface OnLabwareOffsetLocationSequenceComponent extends BaseOffsetLocationSequenceComponent {
+export interface OnLabwareOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
   kind: 'onLabware'
   labwareUri: string
 }
 
-export interface OnModuleOffsetLocationSequenceComponent extends BaseOffsetLocationSequenceComponent {
+export interface OnModuleOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
   kind: 'onModule'
   moduleModel: ModuleModel
 }
 
-export interface OnAddressableAreaOffsetLocationSequenceComponent extends BaseOffsetLocationSequenceComponent {
+export interface OnAddressableAreaOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
   kind: 'onAddressableArea'
   addressableAreaName: AddressableAreaName
 }

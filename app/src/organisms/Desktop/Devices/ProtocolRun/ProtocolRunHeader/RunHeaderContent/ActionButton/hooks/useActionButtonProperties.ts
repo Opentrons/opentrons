@@ -1,18 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+} from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
-import {
-  isModuleConfirmationStatus,
-  isRunAgainStatus,
-  isRunningOrRecoveryStatus,
-  isStartRunStatus,
-  isStopRequestedStatus,
-} from '/app/local-resources/runs/utils'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   SOURCE_RUN_RECORD,
@@ -30,7 +27,11 @@ import {
 } from '/app/redux/protocol-runs'
 
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
-import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
+import {
+  isRecoveryStatus,
+  isRunAgainStatus,
+  isStartRunStatus,
+} from '../../../utils'
 
 import type { IconName } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -47,9 +48,8 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isValidRunAgain: boolean
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
-  areCameraPreferencesConfirmed: boolean
   isClosingCurrentRun: boolean
-  isCameraReadyToRun: boolean
+  areCameraPreferencesConfirmed: boolean
 }
 
 // Returns ActionButton properties.
@@ -59,12 +59,8 @@ export function useActionButtonProperties({
   robotName,
   runId,
   currentRunId,
-  isOtherRunCurrent,
-  isRobotOnWrongVersionOfSoftware,
   confirmAttachment,
   confirmMissingSteps,
-  makeHandleJumpToStep,
-  runRecord,
   robotAnalyticsData,
   robotSerialNumber,
   protocolRunControls,
@@ -73,9 +69,6 @@ export function useActionButtonProperties({
   isResetRunLoadingRef,
   isClosingCurrentRun,
   areCameraPreferencesConfirmed,
-  isValidRunAgain,
-  protocolRunHeaderRef,
-  isCameraReadyToRun,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -99,6 +92,7 @@ export function useActionButtonProperties({
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
+
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
@@ -122,28 +116,6 @@ export function useActionButtonProperties({
       recoveryCaptureEnabled: recoveryEnabled,
     })
   }
-  const isSetupComplete = !missingSetupSteps || missingSetupSteps.length === 0
-  const { makeSnackbar } = useToaster()
-  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
-    robotName,
-    runId,
-    isValidRunAgain,
-    isSetupComplete,
-    isOtherRunCurrent,
-    isProtocolNotReady,
-    isRobotOnWrongVersionOfSoftware,
-    isClosingCurrentRun,
-    makeHandleJumpToStep,
-    runRecord,
-    runStatus,
-    isResetRunLoadingRef,
-    protocolRunHeaderRef,
-    attachedModules,
-    protocolRunControls,
-    runHeaderModalContainerUtils,
-    isCameraReadyToRun,
-    numberOfAtomicCommands: 0,
-  })
 
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
@@ -151,14 +123,14 @@ export function useActionButtonProperties({
   } else if (isClosingCurrentRun) {
     buttonIconName = 'ot-spinner'
     buttonText = t('shared:robot_is_busy')
-  } else if (isRunningOrRecoveryStatus(runStatus)) {
+  } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = () => {
       pause()
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     }
-  } else if (isStopRequestedStatus(runStatus)) {
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (isStartRunStatus(runStatus)) {
@@ -166,21 +138,17 @@ export function useActionButtonProperties({
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
-      if (isDisabled && disabledReason) {
-        makeSnackbar(disabledReason)
-        return
-      }
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         runHeaderModalContainerUtils.HSRunningModalUtils.toggleModal?.()
       } else if (
         missingSetupSteps.length !== 0 &&
-        isModuleConfirmationStatus(runStatus)
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
       ) {
         confirmMissingSteps()
       } else if (
         isHeaterShakerInProtocol &&
         !isHeaterShakerShaking &&
-        isModuleConfirmationStatus(runStatus)
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
       ) {
         confirmAttachment()
       }
@@ -222,5 +190,6 @@ export function useActionButtonProperties({
       })
     }
   }
+
   return { buttonText, handleButtonClick, buttonIconName }
 }

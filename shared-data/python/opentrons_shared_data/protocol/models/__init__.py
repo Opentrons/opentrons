@@ -1,26 +1,25 @@
 """Protocol file reading interfaces."""
-
 from . import protocol_schema_v6, protocol_schema_v7, protocol_schema_v8
 from .protocol_schema_v6 import ProtocolSchemaV6
 from .protocol_schema_v7 import ProtocolSchemaV7
-from .protocol_schema_v8 import CommandSchemaId, ProtocolSchemaV8
+from .protocol_schema_v8 import ProtocolSchemaV8, CommandSchemaId
 from .shared_models import (
+    Liquid,
+    Labware,
     CommandAnnotation,
-    DesignerApplication,
+    Location,
+    ProfileStep,
+    WellLocation,
+    OffsetVector,
     Dimensions,
     GroupMetadata,
-    Labware,
-    Liquid,
-    Location,
-    Metadata,
-    Module,
-    OffsetVector,
-    Pipette,
-    ProfileStep,
-    Robot,
     Shape,
     WellDefinition,
-    WellLocation,
+    Metadata,
+    Module,
+    Pipette,
+    Robot,
+    DesignerApplication,
 )
 
 __all__ = [

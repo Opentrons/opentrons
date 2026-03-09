@@ -64,23 +64,26 @@ export function ProtocolAnalysisFailure(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           {t('protocol_analysis_failure')}
         </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="reanalyze_or_view_error"
             components={{
               errorLink: (
                 <Btn
+                  as="a"
+                  role="button"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickShowDetails}
                 />
               ),
               analysisLink: (
                 <Btn
-                  // forwardedAs="a"
+                  as="a"
+                  role="button"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickReanalyze}
                 />

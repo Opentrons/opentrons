@@ -1,67 +1,68 @@
 """Test Flex Stacker retrieve command implementation."""
 
 from datetime import datetime
-from typing import Type, Union
-from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
-
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerHopperLabwareError,
-    FlexStackerShuttleLabwareError,
-    FlexStackerShuttleMissingError,
-    FlexStackerShuttleNotEmptyError,
-    FlexStackerStallError,
-)
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-)
+from typing import Type, Union
+from unittest.mock import sentinel
 
 from opentrons.drivers.flex_stacker.types import StackerAxis
 from opentrons.hardware_control.modules import FlexStacker, PlatformState
-from opentrons.protocol_engine.commands import flex_stacker
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
-    FlexStackerShuttleError,
     FlexStackerShuttleOccupiedError,
-    FlexStackerStallOrCollisionError,
 )
-from opentrons.protocol_engine.commands.flex_stacker.retrieve import RetrieveImpl
-from opentrons.protocol_engine.errors import CannotPerformModuleAction
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerId,
-    FlexStackerSubState,
-)
+
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
-    AddressableAreaUsedUpdate,
-    BatchLabwareLocationUpdate,
-    FlexStackerStateUpdate,
     StateUpdate,
+    FlexStackerStateUpdate,
+    BatchLabwareLocationUpdate,
+    AddressableAreaUsedUpdate,
 )
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerSubState,
+    FlexStackerId,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.commands import flex_stacker
+from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.flex_stacker.retrieve import RetrieveImpl
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    InStackerHopperLocation,
-    LabwareLocationSequence,
-    LabwareOffset,
-    LabwareUri,
-    LoadedModule,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleModel,
+    LoadedModule,
+    OnModuleLocationSequenceComponent,
     OnAddressableAreaLocationSequenceComponent,
     OnCutoutFixtureLocationSequenceComponent,
-    OnLabwareLocation,
+    LabwareLocationSequence,
     OnLabwareLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnModuleLocationSequenceComponent,
     StackerStoredLabwareGroup,
+    InStackerHopperLocation,
+    LabwareUri,
+    LabwareOffset,
+    OnLabwareOffsetLocationSequenceComponent,
 )
+from opentrons.protocol_engine.errors import CannotPerformModuleAction
 from opentrons.types import DeckSlotName
+
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+)
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+    FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
+)
 
 
 def _contained_labware(
@@ -69,9 +70,9 @@ def _contained_labware(
 ) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i + 1}",
-            adapterLabwareId=f"adapter-id-{i + 1}" if with_adapter else None,
-            lidLabwareId=f"lid-id-{i + 1}" if with_lid else None,
+            primaryLabwareId=f"primary-id-{i+1}",
+            adapterLabwareId=f"adapter-id-{i+1}" if with_adapter else None,
+            lidLabwareId=f"lid-id-{i+1}" if with_lid else None,
         )
         for i in range(count)
     ]
@@ -734,7 +735,7 @@ async def test_retrieve_raises_recoverable_error(
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
     decoy.when(
-        await stacker_hardware.dispense_labware(  # type: ignore[func-returns-value]
+        await stacker_hardware.dispense_labware(
             labware_height=16,
         )
     ).then_raise(shared_data_error)

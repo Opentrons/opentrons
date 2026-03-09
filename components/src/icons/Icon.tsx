@@ -76,8 +76,6 @@ function IconComponent(props: IconProps): JSX.Element | null {
       fill="currentColor"
       viewBox={viewBox}
       className={clsx(className, { [styles.spin]: spin })}
-      // need this because this component needs to allow engineers to make some style overrides
-      // eslint-disable-next-line react/forbid-dom-props
       style={{ ...style }}
       {...svgProps}
     >

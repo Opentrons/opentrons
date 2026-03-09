@@ -15,7 +15,6 @@ import { AboutGripperSlideout } from './AboutGripperSlideout'
 import type { MouseEventHandler } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
 interface GripperCardProps {
@@ -57,7 +56,7 @@ export function GripperCard({
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.DETACH)
   }
 
-  const handleCalibrate: MouseEventHandler<HTMLAnchorElement> = () => {
+  const handleCalibrate: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
   }
   const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = useState(false)
@@ -141,7 +140,7 @@ export function GripperCard({
           }
           isGripperAttached={attachedGripper != null}
           label={t('shared:extension_mount')}
-          menuOverlayItems={menuOverlayItems as MenuOverlayItemProps[]}
+          menuOverlayItems={menuOverlayItems}
           isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}

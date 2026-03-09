@@ -220,14 +220,14 @@ export function DeviceReset({
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
                     <LegacyStyledText
-                      forwardedAs="p"
+                      as="p"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {optionText}
                     </LegacyStyledText>
                     {subText != null ? (
                       <LegacyStyledText
-                        forwardedAs="p"
+                        as="p"
                         color={isOptionSelected ? COLORS.white : COLORS.grey60}
                       >
                         {subText}
@@ -269,13 +269,13 @@ export function DeviceReset({
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText
-                forwardedAs="p"
+                as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('clear_all_stored_data')}
               </LegacyStyledText>
               <LegacyStyledText
-                forwardedAs="p"
+                as="p"
                 color={
                   isEveryOptionSelected(resetOptions)
                     ? COLORS.white
@@ -327,7 +327,7 @@ export const ConfirmClearDataModal = ({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <LegacyStyledText forwardedAs="p">
+          <LegacyStyledText as="p">
             {t('confirm_device_reset_description')}
           </LegacyStyledText>
         </Flex>

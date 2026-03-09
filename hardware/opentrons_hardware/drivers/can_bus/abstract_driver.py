@@ -1,9 +1,6 @@
 """The can bus transport."""
-
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
-
 from opentrons_hardware.firmware_bindings import CanMessage
 
 

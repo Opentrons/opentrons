@@ -6,7 +6,7 @@ import { RobotCoordsText } from '../../Deck'
 
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import type { HighlightedWellLabels } from './Wells'
+import type { HighlightedWellLabels } from './types'
 
 // magic layout numbers to make the letters close to the edges of the labware
 // evaluate values for inside/outside labware outline when needed

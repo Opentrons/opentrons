@@ -113,7 +113,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Robot System Version')
     screen.getByText('Network Settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Recovery Mode')
+    screen.getByText('Recovery mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
@@ -187,7 +187,9 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText(
+      'Disable Stacker sensors for labware detection in z-axis and x-axis'
+    )
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_stacker_sensors'

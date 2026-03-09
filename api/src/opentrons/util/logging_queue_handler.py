@@ -1,11 +1,10 @@
 # noqa: D100
 
 
-import logging
 import logging.handlers
+import logging
 from queue import Queue
 from typing import cast
-
 from typing_extensions import override
 
 
@@ -21,7 +20,7 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
     """
 
     def __init__(
-        self, queue: Queue[logging.LogRecord], extra: dict[str, object] | None = None
+        self, *, queue: Queue[logging.LogRecord], extra: dict[str, object] | None = None
     ) -> None:
         """Construct the handler.
 

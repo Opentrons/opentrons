@@ -1,5 +1,5 @@
 """Tools package."""
 
-from . import detector, errors, types
+from . import detector, types, errors
 
 __all__ = ["detector", "types", "errors"]

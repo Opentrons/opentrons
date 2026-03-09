@@ -82,32 +82,19 @@ export function ModuleWizardFlows(
     })?.data?.data ?? []
 
   // build out flow if there is a module passed in at launch
-  useEffect(
-    () => {
-      if (attachedModuleOnLaunch != null) {
-        buildFlowForSelectedModule(attachedModuleOnLaunch)
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  useEffect(() => {
+    if (attachedModuleOnLaunch != null) {
+      buildFlowForSelectedModule(attachedModuleOnLaunch)
+    }
+  }, [])
 
   // Close the modal if no new modules are attached
   const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
-  useEffect(
-    () => {
-      if (
-        newModules.length === 0 &&
-        wizardFlowBaseProps.attachedModule == null
-      ) {
-        handleCleanUpAndClose()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [newModules, wizardFlowBaseProps]
-  )
+  useEffect(() => {
+    if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
+      handleCleanUpAndClose()
+    }
+  }, [newModules, wizardFlowBaseProps])
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
@@ -177,7 +164,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <LegacyStyledText as="p" />,
               }}
             />
           }
@@ -397,10 +384,8 @@ export function ModuleWizardFlows(
   }
 }
 
-interface ModuleWizardFlowsPropsWithHost extends Omit<
-  ModuleWizardFlowsProps,
-  'closeFlow'
-> {
+interface ModuleWizardFlowsPropsWithHost
+  extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
   host: HostConfig
 }
 

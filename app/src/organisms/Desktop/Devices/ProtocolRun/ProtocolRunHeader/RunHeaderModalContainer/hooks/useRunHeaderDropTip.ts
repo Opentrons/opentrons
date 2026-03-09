@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
-import { isTerminatingOrTerminal } from '/app/local-resources/runs/utils'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import { useCurrentRunCommands, useIsRunCurrent } from '/app/resources/runs'
 
+import { isTerminalRunStatus } from '../../utils'
 import { useProtocolDropTipModal } from '../modals'
 
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -51,8 +54,6 @@ export function useRunHeaderDropTip({
   const isRunCurrent = useIsRunCurrent(runId)
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const {
@@ -104,9 +105,11 @@ export function useRunHeaderDropTip({
         }
       : { showDTWiz: false, dtWizProps: null }
   }
-  const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
+
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
+  const isRunTerminatingOrTerminal =
+    isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_STOP_REQUESTED
   const runSummaryNoFixit = useCurrentRunCommands(
     {
       includeFixitCommands: false,
@@ -116,53 +119,40 @@ export function useRunHeaderDropTip({
   )
 
   // Manage tip checking
-  useEffect(
-    () => {
-      // If a user begins a new run without navigating away from the run page, reset tip status.
-      if (robotType === FLEX_ROBOT_TYPE) {
-        if (runStatus === RUN_STATUS_IDLE) {
-          resetTipStatus()
-        }
-        // Only run tip checking if it wasn't *just* handled during Error Recovery.
-        else if (
-          runSummaryNoFixit != null &&
-          !lastRunCommandPromptedErrorRecovery(
-            runSummaryNoFixit,
-            isEREnabled
-          ) &&
-          isRunCurrent &&
-          isRunTerminatingOrTerminal
-        ) {
-          void determineTipStatus()
-        }
+  useEffect(() => {
+    // If a user begins a new run without navigating away from the run page, reset tip status.
+    if (robotType === FLEX_ROBOT_TYPE) {
+      if (runStatus === RUN_STATUS_IDLE) {
+        resetTipStatus()
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runStatus, robotType, isRunCurrent, runSummaryNoFixit, isEREnabled]
-  )
+      // Only run tip checking if it wasn't *just* handled during Error Recovery.
+      else if (
+        runSummaryNoFixit != null &&
+        !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled) &&
+        isRunCurrent &&
+        isRunTerminatingOrTerminal
+      ) {
+        void determineTipStatus()
+      }
+    }
+  }, [runStatus, robotType, isRunCurrent, runSummaryNoFixit, isEREnabled])
 
   // If the run terminates with a "stopped" status, close the run if no tips are attached after running tip check at least once.
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
-  useEffect(
-    () => {
-      if (
-        isRunTerminatingOrTerminal &&
-        isRunCurrent &&
-        (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
-      ) {
-        closeCurrentRun()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      isRunTerminatingOrTerminal,
-      isRunCurrent,
-      enteredER,
-      initialPipettesWithTipsCount,
-    ]
-  )
+  useEffect(() => {
+    if (
+      isRunTerminatingOrTerminal &&
+      isRunCurrent &&
+      (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
+    ) {
+      closeCurrentRun()
+    }
+  }, [
+    isRunTerminatingOrTerminal,
+    isRunCurrent,
+    enteredER,
+    initialPipettesWithTipsCount,
+  ])
 
   return {
     dropTipModalUtils,

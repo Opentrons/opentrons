@@ -1,23 +1,21 @@
 """Public protocol run data models."""
-
-from datetime import datetime
-from typing import List, Optional
-
 from pydantic import BaseModel, Field
+from typing import List, Optional
+from datetime import datetime
 
 from ..errors import ErrorOccurrence
-from ..resources.camera_provider import CameraSettings
 from ..types import (
     EngineStatus,
-    LabwareOffset,
-    Liquid,
-    LiquidClassRecordWithId,
     LoadedLabware,
+    LabwareOffset,
     LoadedModule,
     LoadedPipette,
-    TaskSummary,
+    Liquid,
+    LiquidClassRecordWithId,
     WellInfoSummary,
+    TaskSummary,
 )
+from ..resources.camera_provider import CameraSettings
 
 
 class StateSummary(BaseModel):

@@ -65,11 +65,13 @@ export interface ModuleSetupWizardBaseStepProps {
   isOnDevice: boolean
 }
 
-export interface ModuleSetupWizardRequiresPipetteStepProps extends ModuleSetupWizardBaseStepProps {
+export interface ModuleSetupWizardRequiresPipetteStepProps
+  extends ModuleSetupWizardBaseStepProps {
   attachedPipette: PipetteInformation
 }
 
-export interface ModuleSetupWizardMaybePipetteStepProps extends ModuleSetupWizardBaseStepProps {
+export interface ModuleSetupWizardMaybePipetteStepProps
+  extends ModuleSetupWizardBaseStepProps {
   attachedPipette: PipetteInformation | null
 }
 

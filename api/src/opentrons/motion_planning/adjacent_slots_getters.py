@@ -1,7 +1,6 @@
 """Getters for specific adjacent slots."""
-
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from typing import Optional, List, Dict, Union
 
 from opentrons_shared_data.robot.types import RobotType
 

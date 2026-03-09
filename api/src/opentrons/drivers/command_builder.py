@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterator, List, Optional
+from typing import List, Optional, Iterator
 
 
 class CommandBuilder:

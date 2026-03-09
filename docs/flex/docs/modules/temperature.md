@@ -1,6 +1,5 @@
 ---
 title: "Opentrons Flex: Temperature Module"
-description: "Temperature Module on Flex: 4–95 °C hot and cold plate; installation and use."
 ---
 
 ![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png "Temperature Module")

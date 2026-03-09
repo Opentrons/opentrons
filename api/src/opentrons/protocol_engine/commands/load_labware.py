@@ -1,8 +1,7 @@
 """Load labware command request, result, and implementation models."""
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Any
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -11,24 +10,25 @@ from typing_extensions import Literal, TypeGuard
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
-from ..errors.error_occurrence import ErrorOccurrence
-from ..resources import fixture_validation, labware_validation
-from ..state.update_types import StateUpdate
+from ..resources import labware_validation, fixture_validation
 from ..types import (
-    AddressableAreaLocation,
-    DeckSlotLocation,
     LoadableLabwareLocation,
-    LoadedModule,
     ModuleLocation,
     ModuleModel,
     OnLabwareLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+    LoadedModule,
 )
+
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .labware_handling_common import LabwarePositionResultMixin
+from ..errors.error_occurrence import ErrorOccurrence
+from ..state.update_types import StateUpdate
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
     from ..state.state import StateView
+    from ..execution import EquipmentHandler
 
 
 LoadLabwareCommandType = Literal["loadLabware"]

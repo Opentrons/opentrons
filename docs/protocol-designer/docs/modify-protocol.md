@@ -1,6 +1,5 @@
 ---
 title: "Protocol Designer: Modifying a Protocol"
-description: "Change robot, instruments, deck, or steps in an existing protocol."
 ---
 
 You can upload and edit protocols you've previously made in Protocol Designer. Click **Import** to upload an existing .py or .json file. 

@@ -1,8 +1,7 @@
 """Unique ID generation provider."""
-
 from datetime import datetime, timezone
-from typing import Optional
 from uuid import uuid4
+from typing import Optional
 
 
 class ModelUtils:

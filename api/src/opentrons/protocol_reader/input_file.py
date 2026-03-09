@@ -1,7 +1,5 @@
 """Input file value objects."""
-
 from __future__ import annotations
-
 from typing import BinaryIO, Protocol
 
 

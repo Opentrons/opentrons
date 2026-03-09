@@ -1,13 +1,12 @@
 """Test labware validation."""
-
 import pytest
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     LabwareRole,
-    Parameters2,
     Vector3D,
+    Parameters2,
 )
 
 from opentrons.protocol_engine.resources import labware_validation as subject

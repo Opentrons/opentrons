@@ -1,10 +1,9 @@
 """Tests for the TCP Connection class."""
 
+import pytest
+import mock
 import socket
 from typing import cast
-
-import mock
-import pytest
 
 from ot3usb import default_config
 from ot3usb.tcp_conn import TCPConnection

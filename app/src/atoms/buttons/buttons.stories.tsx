@@ -20,14 +20,28 @@ import {
 } from './index'
 
 import type { Meta, Story } from '@storybook/react'
-import type { ComponentProps } from 'react'
 
 export default {
   title: 'App/Atoms/Buttons',
 } as Meta
 
+const TouchControlButtonTemplate: Story<
+  React.ComponentProps<typeof TouchControlButton>
+> = args => {
+  return (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <TouchControlButton {...args} />
+    </Flex>
+  )
+}
+
+export const TouchControl = TouchControlButtonTemplate.bind({})
+TouchControl.args = {
+  children: 'touch control button',
+}
+
 const TertiaryButtonTemplate: Story<
-  ComponentProps<typeof TertiaryButton>
+  React.ComponentProps<typeof TertiaryButton>
 > = args => {
   const { children } = args
   return (
@@ -43,7 +57,7 @@ Tertiary.args = {
 }
 
 const QuaternaryButtonTemplate: Story<
-  ComponentProps<typeof QuaternaryButton>
+  React.ComponentProps<typeof QuaternaryButton>
 > = args => {
   const { children } = args
   return (
@@ -59,7 +73,7 @@ Quaternary.args = {
 }
 
 const SubmitPrimaryButtonTemplate: Story<
-  ComponentProps<typeof SubmitPrimaryButton>
+  React.ComponentProps<typeof SubmitPrimaryButton>
 > = args => {
   return (
     <Flex flexDirection={DIRECTION_ROW} width="15rem">
@@ -77,30 +91,8 @@ SubmitPrimary.args = {
   },
   disabled: false,
 }
-
-const TouchControlButtonTemplate: Story<
-  ComponentProps<typeof TouchControlButton>
-> = args => {
-  return (
-    <Flex>
-      <TouchControlButton {...args} />
-    </Flex>
-  )
-}
-
-export const TouchControl = TouchControlButtonTemplate.bind({})
-TouchControl.args = {
-  title: 'touch control button',
-  subText: 'touch control subtext',
-  isActive: true,
-  isOnDevice: false,
-  onClick: () => {
-    console.log('touch control button clicked')
-  },
-}
-
 const ToggleButtonTemplate: Story<
-  ComponentProps<typeof ToggleButton>
+  React.ComponentProps<typeof ToggleButton>
 > = args => {
   const { onClick, ...rest } = args
   const [isToggled, setIsToggled] = React.useState<boolean>(false)
@@ -121,7 +113,7 @@ Toggle.args = {
 }
 
 const LongPressButtonTemplate: Story<
-  ComponentProps<typeof PrimaryButton>
+  React.ComponentProps<typeof PrimaryButton>
 > = args => {
   const { children } = args
   const longPress = useLongPress()
@@ -162,7 +154,7 @@ LongPress.args = {
 }
 
 const TextOnlyButtonTemplate: Story<
-  ComponentProps<typeof TextOnlyButton>
+  React.ComponentProps<typeof TextOnlyButton>
 > = () => {
   const [count, setCount] = React.useState<number>(0)
   return (

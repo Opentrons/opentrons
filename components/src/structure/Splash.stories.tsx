@@ -1,24 +1,25 @@
+import { Box } from '@opentrons/components'
+
 import { Splash as SplashComponent } from './Splash'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
-const meta: Meta<typeof SplashComponent> = {
-  title: 'Helix/Molecules/Splash',
-  component: SplashComponent,
+export default {
+  title: 'Library/Molecules/Splash',
   decorators: [
     Story => (
-      <div style={{ height: '20rem', width: '100%' }}>
+      <Box height="20rem" width="100%">
         <Story />
-      </div>
+      </Box>
     ),
   ],
-}
-export default meta
+} as Meta
 
-type Story = StoryObj<typeof SplashComponent>
-
-export const Splash: Story = {
-  args: {
-    iconName: 'ot-logo',
-  },
+const Template: Story<React.ComponentProps<typeof SplashComponent>> = args => (
+  <SplashComponent {...args} />
+)
+export const Splash = Template.bind({})
+Splash.args = {
+  iconName: 'ot-logo',
 }

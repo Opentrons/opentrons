@@ -1,5 +1,4 @@
 """Smoke Test 6.0"""
-
 from typing import List, Optional
 
 from opentrons import protocol_api

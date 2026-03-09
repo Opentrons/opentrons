@@ -38,11 +38,11 @@ const ALERT_PROPS_BY_TYPE: Record<
     className: styles.success,
   },
   error: {
-    icon: { name: 'ot-alert' },
+    icon: { name: 'alert-circle' },
     className: styles.error,
   },
   warning: {
-    icon: { name: 'ot-alert' },
+    icon: { name: 'alert-circle' },
     className: styles.warning,
   },
   info: {

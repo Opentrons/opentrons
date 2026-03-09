@@ -25,10 +25,8 @@ interface CommonSettingProps {
   isMultiTransfer: boolean
 }
 
-interface SettingComponentProps extends Omit<
-  CommonSettingProps,
-  'isMultiTransfer'
-> {}
+interface SettingComponentProps
+  extends Omit<CommonSettingProps, 'isMultiTransfer'> {}
 
 interface AspirateSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
   selectedSetting: AspirateSettingOption | null

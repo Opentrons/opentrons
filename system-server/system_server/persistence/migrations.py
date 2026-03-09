@@ -14,10 +14,10 @@ Database schema versions:
 - Version 0
     - Initial schema version
 """
-
 import logging
 from datetime import datetime, timezone
-from typing import Final
+from typing import Optional
+from typing_extensions import Final
 
 import sqlalchemy
 
@@ -46,7 +46,7 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
             _mark_latest_revision(transaction)
 
 
-def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> int | None:
+def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
     """Get the starting version of the database.
 
     Returns:
@@ -58,7 +58,7 @@ def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> int | None
     )
     migration = transaction.execute(select_latest_version).first()
 
-    return migration.version if migration is not None else None
+    return migration["version"] if migration is not None else None
 
 
 def _mark_latest_revision(transaction: sqlalchemy.engine.Connection) -> None:

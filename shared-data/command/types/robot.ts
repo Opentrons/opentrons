@@ -30,7 +30,8 @@ export interface RobotMoveToCreateCommand extends CommonCommandCreateInfo {
   params: RobotMoveToParams
 }
 export interface RobotMoveToRunTimeCommand
-  extends CommonCommandRunTimeInfo, RobotMoveToCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RobotMoveToCreateCommand {
   result?: any
 }
 
@@ -46,7 +47,8 @@ export interface RobotMoveAxesToCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface RobotMoveAxesToRunTimeCommand
-  extends CommonCommandRunTimeInfo, RobotMoveAxesToCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RobotMoveAxesToCreateCommand {
   result?: {
     position: RobotMotorAxisMap
   }
@@ -57,34 +59,40 @@ export interface RobotMoveAxesRelativeParams {
   speed?: number
 }
 
-export interface RobotMoveAxesRelativeCreateCommand extends CommonCommandCreateInfo {
+export interface RobotMoveAxesRelativeCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'robot/moveAxesRelative'
   params: RobotMoveAxesRelativeParams
 }
 
 export interface RobotMoveAxesRelativeRunTimeCommand
-  extends CommonCommandRunTimeInfo, RobotMoveAxesRelativeCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RobotMoveAxesRelativeCreateCommand {
   result?: {
     position: RobotMotorAxisMap
   }
 }
 
-export interface RobotOpenGripperJawCreateCommand extends CommonCommandCreateInfo {
+export interface RobotOpenGripperJawCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'robot/openGripperJaw'
   params: {}
 }
 
 export interface RobotOpenGripperJawRunTimeCommand
-  extends CommonCommandRunTimeInfo, RobotOpenGripperJawCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RobotOpenGripperJawCreateCommand {
   result?: any
 }
 
-export interface RobotCloseGripperJawCreateCommand extends CommonCommandCreateInfo {
+export interface RobotCloseGripperJawCreateCommand
+  extends CommonCommandCreateInfo {
   commandType: 'robot/closeGripperJaw'
   params: {}
 }
 
 export interface RobotCloseGripperJawRunTimeCommand
-  extends CommonCommandRunTimeInfo, RobotCloseGripperJawCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    RobotCloseGripperJawCreateCommand {
   result?: any
 }

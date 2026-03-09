@@ -2,7 +2,7 @@
  * ensures that our protocol schemas are correct */
 import path from 'path'
 import glob from 'glob'
-import omit from 'lodash/omit'
+import { omit } from 'lodash'
 import { describe, expect, it } from 'vitest'
 
 import { validate } from '../protocols'

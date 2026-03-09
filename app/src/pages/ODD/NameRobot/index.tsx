@@ -210,7 +210,7 @@ export function NameRobot(): JSX.Element {
               </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
                 <LegacyStyledText
-                  forwardedAs="h2"
+                  as="h2"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {isUnboxingFlowOngoing
@@ -251,7 +251,7 @@ export function NameRobot(): JSX.Element {
             >
               {isUnboxingFlowOngoing ? (
                 <LegacyStyledText
-                  forwardedAs="h4"
+                  as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
@@ -279,7 +279,7 @@ export function NameRobot(): JSX.Element {
               />
             </Flex>
             <LegacyStyledText
-              forwardedAs="p"
+              as="p"
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
@@ -287,7 +287,7 @@ export function NameRobot(): JSX.Element {
             </LegacyStyledText>
             {errors.newRobotName != null ? (
               <LegacyStyledText
-                forwardedAs="p"
+                as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.red50}
               >

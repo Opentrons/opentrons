@@ -1,17 +1,17 @@
 """Command models to blow out in place while plunger positions are unknown."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type
-
-from pydantic import BaseModel
 from typing_extensions import Literal
 
-from ...errors.error_occurrence import ErrorOccurrence
-from ...resources import ensure_ot3_hardware
-from ...state import update_types
+from pydantic import BaseModel
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..pipetting_common import FlowRateMixin, PipetteIdMixin
+from ..pipetting_common import PipetteIdMixin, FlowRateMixin
+from ...resources import ensure_ot3_hardware
+from ...errors.error_occurrence import ErrorOccurrence
+from ...state import update_types
+
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis
 
@@ -86,9 +86,9 @@ class UnsafeBlowOutInPlace(
     params: UnsafeBlowOutInPlaceParams
     result: Optional[UnsafeBlowOutInPlaceResult] = None
 
-    _ImplementationCls: Type[UnsafeBlowOutInPlaceImplementation] = (
+    _ImplementationCls: Type[
         UnsafeBlowOutInPlaceImplementation
-    )
+    ] = UnsafeBlowOutInPlaceImplementation
 
 
 class UnsafeBlowOutInPlaceCreate(BaseCommandCreate[UnsafeBlowOutInPlaceParams]):

@@ -82,10 +82,10 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         onClick={(e: MouseEvent) => {
           e.stopPropagation()
         }}
-        gridGap={SPACING.spacing8}
       >
         <LegacyStyledText
-          forwardedAs="label"
+          as="label"
+          paddingRight={SPACING.spacing8}
           overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         >
           {`${truncateString(displayName, 68)}; ${i18n.format(
@@ -160,7 +160,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText
-          forwardedAs="h6"
+          as="h6"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
@@ -173,7 +173,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <RobotNameContainer isGoToRun={isGoToRun}>
               <LegacyStyledText
-                forwardedAs="h3"
+                as="h3"
                 id={`RobotStatusHeader_${String(name)}_robotName`}
                 overflow="hidden"
                 textOverflow="ellipsis"

@@ -2,27 +2,28 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Union
+from __future__ import annotations
+from typing import Literal, Union, TYPE_CHECKING
+from typing_extensions import Type
 
 from pydantic import BaseModel, Field
-from typing_extensions import Type
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
-from ...errors import ErrorOccurrence
-from ...resources import ModelUtils
+from ..flex_stacker.common import FlexStackerStallOrCollisionError
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    DefinedErrorData,
     SuccessData,
+    DefinedErrorData,
 )
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from ...errors import ErrorOccurrence
+from ...resources import ModelUtils
 
 if TYPE_CHECKING:
-    from ...execution import EquipmentHandler
     from ...state.state import StateView
+    from ...execution import EquipmentHandler
 
 UnsafeFlexStackerPrepareShuttleCommandType = Literal[
     "unsafe/flexStacker/prepareShuttle"
@@ -117,9 +118,9 @@ class UnsafeFlexStackerPrepareShuttle(
     params: UnsafeFlexStackerPrepareShuttleParams
     result: UnsafeFlexStackerPrepareShuttleResult | None = None
 
-    _ImplementationCls: Type[UnsafeFlexStackerPrepareShuttleImpl] = (
+    _ImplementationCls: Type[
         UnsafeFlexStackerPrepareShuttleImpl
-    )
+    ] = UnsafeFlexStackerPrepareShuttleImpl
 
 
 class UnsafeFlexStackerPrepareShuttleCreate(

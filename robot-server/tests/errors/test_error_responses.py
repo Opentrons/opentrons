@@ -1,12 +1,10 @@
 """Tests for API error exceptions and response model serialization."""
-
 from opentrons_shared_data.errors import ErrorCodes
-
 from robot_server.errors.error_responses import (
     ApiError,
-    ErrorBody,
-    ErrorDetails,
     ErrorSource,
+    ErrorDetails,
+    ErrorBody,
     LegacyErrorResponse,
     MultiErrorResponse,
 )

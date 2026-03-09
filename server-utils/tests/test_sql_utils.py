@@ -1,8 +1,9 @@
 """Tests for the `sql_utils` module."""
 
+
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Any, ContextManager, Generator
+from typing import Any, Generator, ContextManager
 
 import pytest
 import sqlalchemy

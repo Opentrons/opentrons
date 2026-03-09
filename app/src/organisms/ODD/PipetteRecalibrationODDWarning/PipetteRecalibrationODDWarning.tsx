@@ -31,13 +31,13 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
     >
       <Flex justifyContent={JUSTIFY_FLEX_START}>
         <Icon
-          name="ot-alert"
+          name="alert-circle"
           color={COLORS.yellow50}
           width="45px"
           marginRight={SPACING.spacing12}
-          aria-label="ot-alert_icon"
+          aria-label="alert-circle_icon"
         />
-        <LegacyStyledText forwardedAs="p">
+        <LegacyStyledText as="p">
           <Trans
             t={t}
             i18nKey="pipette_calibrations_differ"

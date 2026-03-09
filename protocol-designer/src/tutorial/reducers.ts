@@ -1,5 +1,5 @@
-import isEqual from 'lodash/isEqual'
 import pickBy from 'lodash/pickBy'
+import uniq from 'lodash/uniq'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
@@ -7,9 +7,9 @@ import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { Action } from '../types'
 import type { AddHintAction, RemoveHintAction } from './actions'
-import type { HintKey, HintParams } from './index'
+import type { HintKey } from './index'
 
-type HintReducerState = HintParams[]
+type HintReducerState = HintKey[]
 
 const hints = handleActions<HintReducerState, AddHintAction>(
   {
@@ -17,32 +17,17 @@ const hints = handleActions<HintReducerState, AddHintAction>(
     ADD_HINT: (
       state: HintReducerState,
       action: AddHintAction
-    ): HintReducerState => {
-      const newHintParams = action.payload
-      // Prevent adding exact duplicates.
-      if (
-        state.some(existingHintParams =>
-          isEqual(existingHintParams, newHintParams)
-        )
-      ) {
-        return state
-      } else {
-        return [...state, newHintParams]
-      }
-    },
+    ): HintReducerState => uniq([...state, action.payload.hintKey]),
   },
   []
 ) as Reducer<HintReducerState, Action>
-
 export type DismissedHintReducerState = Record<
   HintKey,
   {
     rememberDismissal: boolean
   }
 >
-
 const dismissedHintsInitialState = {}
-
 // @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
@@ -53,25 +38,27 @@ const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
       action: RehydratePersistedAction
     ) => {
       const persistedState = action.payload?.['tutorial.dismissedHints']
-      return persistedState ?? state
+      return persistedState !== undefined ? persistedState : state
     },
     REMOVE_HINT: (
       state: DismissedHintReducerState,
       action: RemoveHintAction
     ): DismissedHintReducerState => {
       const { hintKey, rememberDismissal } = action.payload
-      return {
-        ...state,
-        [hintKey]: {
-          rememberDismissal,
-        },
+      // TODO(IL 2020-02-24): consider using an immutable type for DismissedHintReducerState
+      // to make this copy-mutate pattern less precarious, see #5073
+      // (Flow won't let you do `return {...state, [hintKey]: spam})`) b/c it no longer
+      // allows Unions as computed properties
+      const nextState = { ...state }
+      nextState[hintKey] = {
+        rememberDismissal,
       }
+      return nextState
     },
     CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,
   },
   dismissedHintsInitialState
 )
-
 export const dismissedHintsPersist = (
   state: DismissedHintReducerState
 ): Partial<DismissedHintReducerState> => {
@@ -82,13 +69,13 @@ export const dismissedHintsPersist = (
       h && h.rememberDismissal
   )
 }
-
+const _allReducers = {
+  hints,
+  dismissedHints,
+}
 export interface RootState {
   hints: HintReducerState
   dismissedHints: DismissedHintReducerState
 }
-
-export const rootReducer: Reducer<RootState, Action> = combineReducers({
-  hints,
-  dismissedHints,
-})
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

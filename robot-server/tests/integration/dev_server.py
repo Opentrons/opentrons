@@ -1,10 +1,9 @@
 from __future__ import annotations
-
-import signal
+from pathlib import Path
 import subprocess
+import signal
 import sys
 import tempfile
-from pathlib import Path
 from types import TracebackType
 from typing import Optional
 

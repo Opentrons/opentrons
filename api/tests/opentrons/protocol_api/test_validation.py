@@ -1,51 +1,47 @@
 """Tests for Protocol API input validation."""
 
-import re
+from typing import ContextManager, List, Type, Union, Optional, Dict, Sequence, Any
 from contextlib import nullcontext as do_not_raise
-from typing import Any, ContextManager, Dict, List, Optional, Sequence, Type, Union
 
-import pytest
 from decoy import Decoy
+import pytest
+import re
 
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
-)
-from opentrons_shared_data.labware.labware_definition import (
     Parameters2 as LabwareDefinition2Parameters,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.types import (
+    Mount,
+    DeckSlotName,
+    AxisType,
+    AxisMapType,
+    StringAxisMap,
+    StagingSlotName,
+    Location,
+    Point,
+)
 from opentrons.hardware_control.modules.types import (
-    HeaterShakerModuleModel,
-    MagneticModuleModel,
     ModuleModel,
+    MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
     ThermocyclerStep,
 )
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import (
+    validation as subject,
+    Well,
     Labware,
     TrashBin,
     WasteChute,
-    Well,
-)
-from opentrons.protocol_api import (
-    validation as subject,
-)
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.types import (
-    AxisMapType,
-    AxisType,
-    DeckSlotName,
-    Location,
-    Mount,
-    Point,
-    StagingSlotName,
-    StringAxisMap,
 )
 
 

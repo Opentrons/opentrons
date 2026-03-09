@@ -52,7 +52,7 @@ export function useUpdatePipetteSettingsMutation(
   >(
     [host, 'pipettes', 'settings'],
     ({ fields }) =>
-      updatePipetteSettings(host!, pipetteId, { fields })
+      updatePipetteSettings(host as HostConfig, pipetteId, { fields })
         .then(response => {
           queryClient
             .invalidateQueries([host, 'pipettes', 'settings'])

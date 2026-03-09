@@ -70,7 +70,7 @@ function NotificationIfSpecified({
     (notificationMessage == null || notificationMessage.length === 0) ? null : (
     <InlineNotification
       type="alert"
-      heading={notificationHeader!}
+      heading={notificationHeader as string}
       message={notificationMessage}
     />
   )

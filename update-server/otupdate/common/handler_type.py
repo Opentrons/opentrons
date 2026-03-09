@@ -1,5 +1,5 @@
-from aiohttp import web
 from typing_extensions import Protocol
+from aiohttp import web
 
 
 class Handler(Protocol):
@@ -8,4 +8,5 @@ class Handler(Protocol):
     Useful for typing function decorators that operate on aiohttp request handlers.
     """
 
-    async def __call__(self, request: web.Request) -> web.Response: ...
+    async def __call__(self, request: web.Request) -> web.Response:
+        ...

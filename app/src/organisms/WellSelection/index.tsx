@@ -13,11 +13,7 @@ import {
   getWellSetForMultichannel,
 } from './utils'
 
-import type {
-  WellFillByName,
-  WellGroup,
-  WellStrokeByName,
-} from '@opentrons/components'
+import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
   LabwareDefinition,
   NozzleLayoutDetails,
@@ -152,8 +148,8 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
         )
       : selectedPrimaryWells
 
-  const wellFill: WellFillByName = {}
-  const wellStroke: WellStrokeByName = {}
+  const wellFill: WellFill = {}
+  const wellStroke: WellStroke = {}
   Object.keys(definition.wells).forEach(wellName => {
     wellFill[wellName] = COLORS.blue35
     wellStroke[wellName] = COLORS.transparent

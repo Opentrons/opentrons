@@ -54,9 +54,7 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-export interface WrapperProps extends React.ComponentProps<
-  typeof InlineNotification
-> {
+export interface WrapperProps extends React.ComponentProps<InlineNotification> {
   hasMessage: boolean
   hasLink: boolean
 }

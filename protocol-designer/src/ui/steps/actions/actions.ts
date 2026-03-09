@@ -1,4 +1,3 @@
-import capitalize from 'lodash/capitalize'
 import last from 'lodash/last'
 
 import { analyticsEvent } from '../../../analytics/actions'
@@ -10,6 +9,7 @@ import {
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { getMultiSelectLastSelected } from '../selectors'
+import { resetScrollElements } from '../utils'
 
 import type { Timeline } from '@opentrons/step-generation'
 import type { AnalyticsEventAction } from '../../../analytics/actions'
@@ -28,6 +28,7 @@ import type {
   selectDropdownItemAction,
   Selection,
   SelectMultipleStepsAction,
+  SelectMultipleStepsForGroupAction,
   SelectStepAction,
   SelectTerminalItemAction,
   SetWellSelectionLabwareKeyAction,
@@ -35,11 +36,9 @@ import type {
   ViewSubstep,
 } from './types'
 
-/**
- * adds an incremental integer ID for Step reducers.
- * NOTE: if this is an "add step" directly performed by the user,
- * addAndSelectStepWithHints is probably what you want
- */
+// adds an incremental integer ID for Step reducers.
+// NOTE: if this is an "add step" directly performed by the user,
+// addAndSelectStepWithHints is probably what you want
 export const addStep = (args: {
   stepType: StepType
   robotStateTimeline: Timeline
@@ -55,12 +54,10 @@ export const addStep = (args: {
     },
   }
 }
-
 export const hoverSelection = (args: Selection): hoverSelectionAction => ({
   type: 'HOVER_DROPDOWN_ITEM',
   payload: { id: args.id, text: args.text },
 })
-
 export const selectDropdownItem = (args: {
   selection: Selection | null
   mode: Mode
@@ -85,41 +82,35 @@ export const hoverOnSubstep = (
   type: 'HOVER_ON_SUBSTEP',
   payload: payload,
 })
-
 export const selectTerminalItem = (
   terminalId: TerminalItemId
 ): SelectTerminalItemAction => ({
   type: 'SELECT_TERMINAL_ITEM',
   payload: terminalId,
 })
-
 export const hoverOnStep = (
   stepId: StepIdType | null | undefined
 ): HoverOnStepAction => ({
   type: 'HOVER_ON_STEP',
   payload: stepId,
 })
-
 export const hoverOnTerminalItem = (
   terminalId: TerminalItemId | null | undefined
 ): HoverOnTerminalItemAction => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId,
 })
-
 export const setWellSelectionLabwareKey = (
   labwareName: string | null | undefined
 ): SetWellSelectionLabwareKeyAction => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
-
 export const clearWellSelectionLabwareKey =
   (): ClearWellSelectionLabwareKeyAction => ({
     type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
     payload: null,
   })
-
 export const resetSelectStep =
   (stepId: StepIdType): ThunkAction<any> =>
   (dispatch: ThunkDispatch<any>, getState: GetState) => {
@@ -142,6 +133,7 @@ export const resetSelectStep =
         mode: 'clear',
       },
     })
+    resetScrollElements()
   }
 
 const setSelection = (
@@ -220,21 +212,6 @@ const setSelection = (
         mode: 'add',
       },
     })
-  } else if (formData.stepType === 'flexStacker') {
-    dispatch({
-      type: 'SELECT_DROPDOWN_ITEM',
-      payload: {
-        selection: {
-          id: formData.moduleId,
-          text:
-            formData.flexStackerFormType === 'fill'
-              ? 'Refill'
-              : capitalize(String(formData.flexStackerFormType)),
-          field: '1',
-        },
-        mode: 'add',
-      },
-    })
   }
 }
 
@@ -248,8 +225,8 @@ export const populateForm =
       payload: formData,
     })
     setSelection(formData, dispatch)
+    resetScrollElements()
   }
-
 export const selectStep =
   (stepId: StepIdType): ThunkAction<any> =>
   (dispatch: ThunkDispatch<any>, getState: GetState) => {
@@ -266,7 +243,6 @@ export const selectStep =
     })
     setSelection(formData, dispatch)
   }
-
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps =
   (
@@ -283,7 +259,21 @@ export const selectMultipleSteps =
     }
     dispatch(selectStepAction)
   }
-
+export const selectMultipleStepsForGroup =
+  (
+    stepIds: StepIdType[],
+    lastSelected: StepIdType
+  ): ThunkAction<SelectMultipleStepsForGroupAction> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const selectStepAction: SelectMultipleStepsForGroupAction = {
+      type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP',
+      payload: {
+        stepIds,
+        lastSelected,
+      },
+    }
+    dispatch(selectStepAction)
+  }
 export const selectAllSteps =
   (): ThunkAction<SelectMultipleStepsAction | AnalyticsEventAction> =>
   (
@@ -291,30 +281,25 @@ export const selectAllSteps =
     getState: GetState
   ) => {
     const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
-    if (allStepIds.length > 0) {
-      const lastStepId = last(allStepIds)!
-      const selectStepAction: SelectMultipleStepsAction = {
-        type: 'SELECT_MULTIPLE_STEPS',
-        payload: {
-          stepIds: allStepIds,
-          lastSelected: lastStepId,
-        },
-      }
-      dispatch(selectStepAction)
-      // dispatch an analytics event to indicate all steps have been selected
-      // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
-      const selectAllStepsEvent: AnalyticsEvent = {
-        name: SELECT_ALL_STEPS_EVENT,
-        properties: {},
-      }
-      dispatch(analyticsEvent(selectAllStepsEvent))
+    const selectStepAction: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: {
+        stepIds: allStepIds,
+        // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
+        lastSelected: last(allStepIds),
+      },
     }
+    dispatch(selectStepAction)
+    // dispatch an analytics event to indicate all steps have been selected
+    // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
+    const selectAllStepsEvent: AnalyticsEvent = {
+      name: SELECT_ALL_STEPS_EVENT,
+      properties: {},
+    }
+    dispatch(analyticsEvent(selectAllStepsEvent))
   }
-
 export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
   'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
-
-// todo(mm, 2025-10-31): "deselectAllSteps" is a bit of a misnomer, since this also selects a step.
 export const deselectAllSteps =
   (
     meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
