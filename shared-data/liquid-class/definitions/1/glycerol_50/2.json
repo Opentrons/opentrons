@@ -262,7 +262,7 @@
           }
         },
         {
-          "tiprack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+          "tiprack": "opentrons/opentrons_flex_96_filtertiprack_20ul/1",
           "aspirate": {
             "submerge": {
               "startPosition": {
