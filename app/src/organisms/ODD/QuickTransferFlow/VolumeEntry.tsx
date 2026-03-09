@@ -5,8 +5,8 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -104,10 +104,10 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="text"
             value={volume}
-            title={textEntryCopy}
+            label={textEntryCopy}
             error={error}
             readOnly
           />

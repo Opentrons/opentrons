@@ -5,9 +5,9 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   LegacyStyledText,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -128,13 +128,13 @@ export function ChooseNumber({
           >
             {parameter.description}
           </LegacyStyledText>
-          <InputField
+          <TouchInputField
             autoFocus
             type="text"
             units={parameter.suffix}
             placeholder={parameter.default.toString()}
             value={paramValue}
-            title={parameter.displayName}
+            label={parameter.displayName}
             caption={
               parameter.type === 'int'
                 ? `${parameter.min}-${parameter.max}`

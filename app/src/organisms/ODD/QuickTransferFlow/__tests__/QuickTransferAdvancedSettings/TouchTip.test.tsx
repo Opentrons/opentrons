@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,10 +16,10 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -112,7 +112,7 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     fireEvent.click(screen.getByText('1'))
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Touch tip position from top of well (mm)',
         error: null,
@@ -149,7 +149,7 @@ describe('TouchTip', () => {
     fireEvent.click(numButton)
     const secondNumButton = screen.getByText('8')
     fireEvent.click(secondNumButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -25 to 0',
@@ -178,7 +178,7 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     const numButton = screen.getByText('1')
     fireEvent.click(numButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -100 to 0',
@@ -223,7 +223,7 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Touch tip position from top of well (mm)',
         error: null,
@@ -250,7 +250,7 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Touch tip position from top of well (mm)',
         error: null,

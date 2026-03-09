@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,10 +16,10 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -92,7 +92,7 @@ describe('FlowRate', () => {
     render(props)
     screen.getByText('Aspirate flow rate')
     screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Aspirate flow rate (µL/s)',
         error: null,
@@ -114,7 +114,7 @@ describe('FlowRate', () => {
     }
     render(props)
     screen.getByText('Dispense flow rate')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Dispense flow rate (µL/s)',
         error: null,
@@ -131,7 +131,7 @@ describe('FlowRate', () => {
     const deleteBtn = screen.getByText('del')
     fireEvent.click(deleteBtn)
     fireEvent.click(deleteBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         title: 'Aspirate flow rate (µL/s)',
         error: 'Value must be between 1 to 92',
