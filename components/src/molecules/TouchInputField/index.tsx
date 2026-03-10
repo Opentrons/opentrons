@@ -75,7 +75,10 @@ export const TouchInputField = forwardRef<
 >((props, ref): JSX.Element => {
   const {
     disabled,
+    id,
+    placeholder: rawPlaceholder,
     units,
+    value: rawValue,
     error,
     label,
     caption,
@@ -94,11 +97,11 @@ export const TouchInputField = forwardRef<
   const internalRef = useRef<HTMLInputElement>(null)
   const mergedRef = setRefs(ref, internalRef)
   const generatedId = useId()
-  const inputId = props.id ?? generatedId
+  const inputId = id ?? generatedId
 
   const hasError = error != null
-  const value = isIndeterminate ? '' : (props.value ?? '')
-  const placeHolder = isIndeterminate ? '-' : props.placeholder
+  const value = isIndeterminate ? '' : (rawValue ?? '')
+  const placeHolder = isIndeterminate ? '-' : rawPlaceholder
 
   const inputFieldStyles = {
     '--touch-input-border-radius': borderRadius ?? 'var(--border-radius-4)',
