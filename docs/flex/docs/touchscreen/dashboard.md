@@ -4,7 +4,7 @@ description: "Home screen, status, and quick access to protocols and settings."
 ---
 
 <figure class="screenshot" markdown>
-![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen-dashboard.png "Robot dashboard")
+![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen_dashboard.png "Robot dashboard")
 </figure>
 
 The dashboard is the main screen for the robot, accessible by tapping the robot's name in the top left corner of the touchscreen.
