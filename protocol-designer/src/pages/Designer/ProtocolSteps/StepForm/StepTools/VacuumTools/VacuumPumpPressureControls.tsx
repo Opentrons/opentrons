@@ -31,7 +31,7 @@ export function VacuumPumpPressureControls(
           padding="0"
           title={t('vacuum.controls.mode.pressure.label')}
           {...propsForFields.pressureMbar}
-          units={t('application:units.mbar')}
+          units={t('application:units.millibar')}
           caption={t('vacuum.controls.mode.pressure.caption', {
             min: VACUUM_MIN_PRESSURE_MBAR,
             max: VACUUM_MAX_PRESSURE_MBAR,

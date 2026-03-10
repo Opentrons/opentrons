@@ -4,6 +4,8 @@ import { COLORS } from '../../helix-design-system'
 import { StyledText } from '../StyledText'
 import styles from './slider.module.css'
 
+import type { CSSProperties } from 'react'
+
 interface SliderProps {
   /** Value of slider as percentage */
   value: number
@@ -21,7 +23,7 @@ export function Slider({
   adjustValue,
   backgroundColor,
 }: SliderProps): JSX.Element {
-  const style: React.CSSProperties & Record<string, string> = {
+  const style: CSSProperties & Record<string, string> = {
     '--value-percent': `${value}%`,
     ...(backgroundColor != null && {
       '--slider-unfilled': backgroundColor,
