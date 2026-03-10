@@ -77,6 +77,16 @@ export function FullKeyboard({
       useButtonTag={true}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
+      buttonTheme={[
+        {
+          class: 'hg-globe',
+          buttons: '{globe}',
+        },
+        {
+          class: 'hg-space-key',
+          buttons: '{space}',
+        },
+      ]}
     />
   )
 }

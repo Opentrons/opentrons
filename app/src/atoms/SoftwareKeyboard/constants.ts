@@ -14,6 +14,7 @@ export const customDisplay = {
   '{abc}': 'abc',
   '{ABC}': 'ABC',
   '{symbols}': '#+=',
+  '{globe}': '',
 }
 
 export const customDisplayForIndividual = {
@@ -41,7 +42,7 @@ export const fullKeyboardLayout = {
     'q w e r t y u i o p',
     '{numbers} a s d f g h j k l',
     '{shift} z x c v b n m {backspace}',
-    '{space}',
+    '{globe} {space}',
   ],
   shift: [
     'Q W E R T Y U I O P',
