@@ -91,7 +91,6 @@ export function useTipAttachmentStatus(
 
         const pipetteInfoById = createPipetteInfoById(runRecord, pipetteInfo)
         const pipettesWithTipsData = getPipettesWithTipsData(
-          // eslint-disable-next-line
           tipStates,
           pipetteInfoById,
           commandsData.data.data as RunCommandSummary[]

@@ -50,6 +50,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
 import type {
+  ActiveNozzleNumber,
   AddressableAreaName,
   BlowoutParams,
   CutoutFixtureId,
@@ -59,9 +60,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLidParams,
   LoadLidStackRunTimeCommand,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { HopperLocationMapKey } from '../constants'
@@ -338,7 +341,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8 | 96,
+  channels: ActiveNozzleNumber,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -598,6 +601,8 @@ interface DispenseLocationHelperArgs {
   xOffset: number
   yOffset: number
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -614,6 +619,8 @@ export const dispenseLocationHelper: CommandCreator<
     xOffset,
     yOffset,
     tipRack,
+    primaryNozzle,
+    nozzles,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -646,6 +653,8 @@ export const dispenseLocationHelper: CommandCreator<
           },
         },
         tipRack,
+        primaryNozzle,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -676,6 +685,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (

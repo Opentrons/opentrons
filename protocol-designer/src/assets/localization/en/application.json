@@ -48,7 +48,8 @@
     "profile": "Program a Thermocycler profile",
     "profile_steps": "profile steps",
     "temperature": "temperature",
-    "thermocycler": "thermocycler"
+    "thermocycler": "thermocycler",
+    "vacuum": "vacuum"
   },
   "temperature": "Temperature (°C)",
   "time": "Time",

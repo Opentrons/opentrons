@@ -218,3 +218,10 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+
+[[tool.mypy.overrides]]
+module = [
+    "Pyro5.*",
+    "serpent"
+]
+follow_untyped_imports = true

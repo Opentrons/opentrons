@@ -26,9 +26,7 @@ const repeatIngreds = (
     : ingreds
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const getFixtures = ({ isMulti }: { isMulti: boolean }) => {
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const makeIngreds = (volume: number | null, colNum: string) =>
     repeatIngreds(isMulti, colNum, volume ? { [ingred1Id]: volume } : null)
   // NOTE: these cases do not cover dynamic behavior of `activeTips` key

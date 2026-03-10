@@ -321,9 +321,11 @@ async def get_runs(
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
-        current=ResourceLink.model_construct(href=f"/runs/{current_run_id}")
-        if current_run_id is not None
-        else None
+        current=(
+            ResourceLink.model_construct(href=f"/runs/{current_run_id}")
+            if current_run_id is not None
+            else None
+        )
     )
 
     return await PydanticResponse.create(
@@ -668,12 +670,14 @@ async def get_current_state(  # noqa: C901
 
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(
-        lastCompleted=CommandLinkNoMeta.model_construct(
-            id=last_completed_command.command_id,
-            href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+        lastCompleted=(
+            CommandLinkNoMeta.model_construct(
+                id=last_completed_command.command_id,
+                href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+            )
+            if last_completed_command is not None
+            else None
         )
-        if last_completed_command is not None
-        else None
     )
 
     return await PydanticResponse.create(

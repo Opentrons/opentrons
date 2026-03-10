@@ -354,7 +354,7 @@ interface CommonArgs {
 export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
   primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
 
   sourceLabware: string
@@ -417,6 +417,11 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
 
+  /** additional blowout params if the position needs to be more refined */
+  blowoutOffsetFromTopMm: number | null
+  blowoutXPosition: number | null
+  blowoutYPosition: number | null
+  blowoutPositionReference: string | null
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
@@ -496,7 +501,7 @@ export type MixArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   labware: string
   pipette: string
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number

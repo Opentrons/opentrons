@@ -161,7 +161,7 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
                 well.set_has_tip(True)
 
     def set_empty(self) -> None:
-        assert False, "set_empty only supported in API version 2.28 & later"
+        assert False, "set_empty only supported in API version 2.29 & later"
 
     def get_next_tip(
         self,
