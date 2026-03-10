@@ -1,0 +1,32 @@
+test_name: Default settings
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /auth/settings returns default settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/settings'
+    response:
+      status_code: 200
+      json:
+        data: {}
+
+---
+test_name: PATCH updates and returns new settings
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET initial settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/settings'
+    response:
+      status_code: 200
+      json:
+        data: {}
