@@ -41,7 +41,7 @@ On first boot, this creates the database from scratch. On subsequent boots, only
 
 ### When to bump the folder version
 
-Only bump the version subdirectory (e.g., "1" to "2") when a migration would break older software — such as dropping or renaming a column. Additive changes (new columns, new tables) stay within the same folder version.
+Bump the version subdirectory (e.g., "1" to "2") when a migration is made.
 
 ### Useful commands
 
@@ -58,4 +58,4 @@ uv run alembic downgrade base     # roll back everything
 
 - Use `render_as_batch=True` (configured in env.py) for constraint and column modifications
 - Column renames are not auto-detected — replace the generated add+drop with batch_alter_table
-- Failed migrations can leave the database in a partial state — reset the temp database and re-run migrations
+- Failed migrations can leave the database in a partial updated state — reset the temp database and re-run migrations
