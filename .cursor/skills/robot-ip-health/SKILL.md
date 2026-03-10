@@ -47,8 +47,8 @@ curl -s -H "Opentrons-Version: *" "http://10.14.19.233:31950/server/update/healt
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/check_health.py` | GET `/health` (and optionally `/server/update/health`), print JSON. Supports `--usb` for Flex/OT-3 connected via USB (macOS/Linux). |
-| `scripts/update_robot.py` | Full robot system update: download from GitHub, begin session, upload file, poll status, commit, restart. |
+| `scripts/check_health.py` | GET `/health` (and optionally `/server/update/health`), print JSON. By IP or `--usb` (Flex/OT-3 on macOS/Linux). |
+| `scripts/update_robot.py` | System update: **connection** USB (`--usb`) or network (IP); **source** local `--file` or GitHub `--version`. Same flow and state tables for both. |
 
 ### check_health.py
 
@@ -72,14 +72,32 @@ python .cursor/skills/robot-ip-health/scripts/check_health.py --usb --update
 | `--usb` | Use USB serial connection (Flex/OT-3). **No network needed** — works with Wi‑Fi off. Requires `--file`. Script prints `Connection: USB (serial port ...) — no network` so you can confirm. |
 | `--version` | One or more target versions, applied in order. Optional when using `--file` (version is derived from filename, e.g. `ot3-system-8.8.1.zip`). |
 | `--port` | Default 31950 (robot server). Use 34000 for local dev server. Ignored when using `--usb`. |
-| `--wait-after-restart` | Seconds to wait for robot to come back between consecutive updates (default 300). For USB, script polls /health over serial until robot responds before printing success. |
+| `--wait-after-restart` | Seconds to wait for robot to come back between consecutive updates (default 300). For USB, script polls /health over serial until robot responds before printing success. **Caveat:** Over Wi‑Fi the connection drops when the robot restarts, so the script depends on the robot coming back on the network; over USB the link is maintained across restarts. |
 | `--timeout` | Request timeout in seconds (default 30). |
 | `--skip-download` | Use existing zip; requires `--file`. Not allowed with multiple versions. |
-| `--file` | Path to system zip. Repeat for consecutive USB updates: `--file a.zip --file b.zip`. Required for `--usb`. Over network, single file only; version derived from filename. |
+| `--file` | Path to system zip. Repeat for consecutive updates: `--file a.zip --file b.zip`. Required for `--usb`. Over network, one or more files; version derived from each filename (no download). |
 | `-y`, `--yes` | Skip the confirmation prompt (for scripts/CI). |
 | `--debug-usb` | Log exact request bytes and raw response bytes over USB (for debugging POST begin / empty response). |
 
 The script always prints the **connection method** at the start: `Connection: USB (serial port /dev/cu.usbmodem...) — no network` or `Connection: network (http://IP:port)` so you can verify it is not using Wi‑Fi when using USB.
+
+### update_robot.py — Connection and source (unified model)
+
+The same **user-facing usage** is supported; internally the script uses a single flow driven by connection and source:
+
+| Dimension | Option | How to select | Notes |
+|-----------|--------|----------------|-------|
+| **Connection** | **USB** | `--usb` (and omit IP) | Default when robot is connected only via USB. Requires `--file`. Same HTTP update API over serial. |
+| **Connection** | **Network (Wi‑Fi/Ethernet)** | Provide IP (e.g. `10.14.19.233`) | Use when robot is on the network. Optional `--port` (default 31950). |
+| **Source** | **Local file** | `--file /path/to/ot3-system-8.8.1.zip` | Version derived from filename. Required for USB. Supported for network (one or more files for consecutive updates). |
+| **Source** | **GitHub** | `--version 8.8.1` (or multiple versions) | Script downloads from GitHub releases. Network only (USB requires `--file`). |
+
+**Ready for next update (both paths):** After each restart the script verifies readiness before the next update, then prints a **per-update state table** for comparison:
+
+- **USB**: Polls GET `/health` over serial until 200, then prints *"Ready for next update."* and the state table (runs + LPC counts, pipettes serials, modules serials).
+- **Network**: Polls GET `/health`, then GET `/server/update/health`, short delay, then *"Ready for next update (health + update server OK)."* and the same state table. 502 on begin/upload is retried.
+
+**State table (same format for USB and network):** Runs (last 4) with columns id, protocolId, startedAt, completedAt, **LPCs** (labwareOffsets count); Pipettes (mount, serial); Modules (serial). Printed after each update (between consecutive updates) and at the end as **Final state** (with file uploaded, software version, calibration in the header).
 
 ### update_robot.py — Pre-flight and Flow
 
@@ -147,13 +165,13 @@ python .cursor/skills/robot-ip-health/scripts/update_robot.py --usb \
   -y
 ```
 
-After the robot comes back, the script prints a **final state** block: file uploaded, software version, pipettes (with serial numbers), modules (with serial numbers), and calibration status (`GET /calibration/status`).
+After the robot comes back, the script prints **Ready for next update.** (when doing consecutive updates) and a **state table** (runs + LPCs, pipettes serials, modules serials) in the same format as the network path. The final state block includes file uploaded, software version, calibration, and the same tables.
 
 USB device detection in the app (so the app sees the robot and other USB devices after an update) is in `app-shell/src/system-info/usb-devices.ts` and redux `app/src/redux/system-info/`. See [PR #14482](https://github.com/Opentrons/opentrons/pull/14482) for context.
 
 ### Demo: Consecutive updates (multiple versions)
 
-You can apply several versions in one run. The script runs one full update (begin → upload → done → commit → restart), then waits for the robot to come back, then runs the next version. Use `--yes` to skip the single confirmation prompt so the whole sequence is unattended.
+You can apply several versions in one run. The script runs one full update (begin → upload → done → commit → restart), then waits for the robot to come back, then runs the next version. Use `--yes` to skip the single confirmation prompt so the whole sequence is unattended. **Unified flow:** Both USB and network use the same readiness check and per-update state table. Over **network**, the script polls `/health` then `/server/update/health` and retries begin/upload on 502. Over **USB** the link is maintained across restarts so consecutive updates are often quicker. **Other methods:** Local dev server (`localhost --port 34000`) uses the same network path for testing without a real robot.
 
 **Example: cycle through three versions on a Flex robot**
 
@@ -169,7 +187,7 @@ What happens:
 1. Script GETs `/health`, shows robot and **Target versions: 9.0.0-alpha.11 → 8.8.1 → 8.7.1 (consecutive)**.
 2. You’re prompted once (or skipped with `--yes`).
 3. **Update 1/3**: Download `ot3-system-9.0.0-alpha.11.zip`, begin session, upload, poll until done, commit, restart. Robot goes down.
-4. Script waits for the robot to respond on `/health` again (default up to 300s, every 10s). Adjust with `--wait-after-restart`.
+4. Script waits for the robot to respond on `/health` again (default up to 300s, every 10s). Over network it then waits for **GET /server/update/health** to return 200 and a short delay. **Ready for next update** means both health and update server are OK. The script prints "Ready for next update (health + update server OK)." then a **per-update state table**: runs (last 4) with LPC counts (labwareOffsets), pipettes (mount + serial), modules (serial) in aligned tables for comparison. Adjust with `--wait-after-restart`.
 5. **Update 2/3**: Same flow for 8.8.1; then wait again.
 6. **Update 3/3**: Same flow for 8.7.1.
 7. Prints **All updates completed successfully!**

@@ -28,6 +28,11 @@ OPENTRONS_USB_PID = 0x4037
 USB_SERIAL_BAUD = 1_152_000
 # Pacing: robot/USB bridge can miss or corrupt if we send back-to-back too fast
 USB_DELAY_AFTER_HEALTH_S = 2.0  # wait after GET /health before starting update session
+# Network: after restart, main /health can be 200 before nginx/update-server is ready → 502 on upload
+NETWORK_DELAY_AFTER_READY_S = 2.0  # wait after update server is ready before starting next update
+NETWORK_UPDATE_SERVER_READY_TIMEOUT_S = 90  # max time to wait for GET /server/update/health after /health is up
+NETWORK_502_RETRIES = 3  # retry begin/upload this many times on 502 (Bad Gateway)
+NETWORK_502_RETRY_DELAY_S = 10  # seconds between 502 retries
 USB_DELAY_BETWEEN_REQUESTS_S = 1.0  # wait after each request/response before next
 USB_BEGIN_TIMEOUT_S = 60.0  # longer timeout for POST begin (update server may be slow)
 # Windows serial stack often needs a bit more time after write before read (consecutive request/response)
@@ -335,6 +340,8 @@ def download_system_file(
     print(f"URL: {download_url}", file=sys.stderr)
 
     with httpx.stream("GET", download_url, follow_redirects=True) as resp:
+        if resp.status_code >= 400:
+            resp.read()  # consume body so exception handler can use e.response.json()/text
         resp.raise_for_status()
         total_size = int(resp.headers.get("content-length", 0))
 
@@ -351,17 +358,31 @@ def download_system_file(
 
 
 def begin_update_session(client: httpx.Client, base_url: str) -> str:
-    """Start an update session and return the token."""
+    """Start an update session and return the token. Retries on 502 (Bad Gateway)."""
     # update-server/otupdate/common/update.py — begin(); app __fixtures__ mockUpdateBeginSuccess (201, body.token)
     print("Starting update session...", file=sys.stderr)
-    resp = client.post(f"{base_url}/server/update/begin")
-    resp.raise_for_status()
-    data = resp.json()
-    token = data.get("token")
-    if not token:
-        raise ValueError("No token in response")
-    print(f"Update session started: {token}", file=sys.stderr)
-    return token
+    last_err = None
+    for attempt in range(NETWORK_502_RETRIES):
+        resp = client.post(f"{base_url}/server/update/begin")
+        if resp.status_code == 502 and attempt < NETWORK_502_RETRIES - 1:
+            print(
+                f"  HTTP 502 Bad Gateway (attempt {attempt + 1}/{NETWORK_502_RETRIES}), "
+                f"retrying in {NETWORK_502_RETRY_DELAY_S}s...",
+                file=sys.stderr,
+            )
+            time.sleep(NETWORK_502_RETRY_DELAY_S)
+            last_err = resp
+            continue
+        resp.raise_for_status()
+        data = resp.json()
+        token = data.get("token")
+        if not token:
+            raise ValueError("No token in response")
+        print(f"Update session started: {token}", file=sys.stderr)
+        return token
+    if last_err is not None:
+        last_err.raise_for_status()
+    raise ValueError("No token in response")
 
 
 def cancel_update_session(client: httpx.Client, base_url: str) -> None:
@@ -439,15 +460,29 @@ def upload_system_file(
         file=sys.stderr,
     )
 
-    with open(file_path, "rb") as f:
-        files = {field_name: (file_path.name, f, "application/zip")}
-        resp = client.post(
-            f"{base_url}/server/update/{token}/file",
-            files=files,
-        )
+    last_resp = None
+    for attempt in range(NETWORK_502_RETRIES):
+        with open(file_path, "rb") as f:
+            files = {field_name: (file_path.name, f, "application/zip")}
+            resp = client.post(
+                f"{base_url}/server/update/{token}/file",
+                files=files,
+            )
+        last_resp = resp
+        if resp.status_code == 502 and attempt < NETWORK_502_RETRIES - 1:
+            print(
+                f"HTTP 502: Bad Gateway (attempt {attempt + 1}/{NETWORK_502_RETRIES}), "
+                f"retrying in {NETWORK_502_RETRY_DELAY_S}s...",
+                file=sys.stderr,
+            )
+            time.sleep(NETWORK_502_RETRY_DELAY_S)
+            continue
         resp.raise_for_status()
+        break
+    else:
+        last_resp.raise_for_status()
 
-    session_state = resp.json()
+    session_state = last_resp.json()
     stage = session_state.get("stage", "unknown")
     label = STAGE_LABELS.get(stage, stage)
     message = session_state.get("message", "")
@@ -586,80 +621,206 @@ def _usb_ready_summary(port_path: str, timeout: float, health_body: bytes) -> st
     return " | ".join(parts)
 
 
-def _usb_final_summary(
-    port_path: str, timeout: float, file_uploaded: Path, robot_model: str
-) -> None:
-    """Print a readable final summary: file uploaded, software version, pipettes (serials), modules (serials), calibration."""
-    lines = [f"  File uploaded:     {file_uploaded.name}"]
-    try:
-        status, raw = _serial_get(port_path, "/health", timeout=timeout)
-        if status == 200:
-            health = json.loads(raw.decode("utf-8"))
-            api_ver = health.get("api_version") or health.get("api_Version", "?")
-            lines.append(f"  Software version:  {api_ver}")
-        else:
-            lines.append("  Software version:  (health failed)")
-    except Exception:
-        lines.append("  Software version:  ?")
+def _format_last_runs(runs: List[dict]) -> List[str]:
+    """Format last 4 runs for final summary: protocolId, startedAt, completedAt, labwareOffsets (per docs.opentrons.com/runs). API returns oldest-first so we take last 4 and show newest first."""
+    lines = ["  Last 4 runs:"]
+    last_four = list(runs)[-4:] if len(runs) > 4 else list(runs)
+    last_four.reverse()  # newest first
+    for i, run in enumerate(last_four, 1):
+        protocol_id = run.get("protocolId") or "-"
+        started = run.get("startedAt")
+        started_str = str(started)[:19] if started else "-"
+        completed = run.get("completedAt")
+        completed_str = str(completed)[:19] if completed else "-"
+        offsets = run.get("labwareOffsets")
+        n_offsets = len(offsets) if isinstance(offsets, list) else 0
+        lines.append(
+            f"    [{i}] protocolId: {protocol_id}  startedAt: {started_str}  completedAt: {completed_str}  labwareOffsets: {n_offsets}"
+        )
+    return lines
 
-    # Pipettes / instruments with serial numbers
+
+# Column widths for state tables (shared USB + network)
+_STATE_TABLE_W = {"id": 12, "protocol": 24, "started": 20, "completed": 20, "lpc": 6, "mount": 8, "serial": 18}
+
+
+def _format_state_tables(
+    runs: List[dict],
+    pipettes_rows: List[Tuple[str, str]],
+    modules_serials: List[str],
+    title: str,
+    header_lines: Optional[List[str]] = None,
+) -> None:
+    """Print runs (with LPC counts), pipettes (mount, serial), modules (serial) in aligned tables.
+    Shared by USB and network paths so output format is identical."""
+    w = _STATE_TABLE_W
+    if header_lines:
+        for line in header_lines:
+            print("  " + line, file=sys.stderr)
+        print("", file=sys.stderr)
+    print("  ─── " + title + " ───", file=sys.stderr)
+
+    # Runs (last 4, newest first)
+    last_four = runs[-4:] if len(runs) > 4 else list(runs)
+    last_four = list(last_four)
+    last_four.reverse()
+    print("  Runs (last 4, newest first):", file=sys.stderr)
+    h = ("id", "protocolId", "startedAt", "completedAt", "LPCs")
+    print("    " + h[0].ljust(w["id"]) + h[1].ljust(w["protocol"]) + h[2].ljust(w["started"]) + h[3].ljust(w["completed"]) + h[4].ljust(w["lpc"]), file=sys.stderr)
+    print("    " + "-" * (w["id"] + w["protocol"] + w["started"] + w["completed"] + w["lpc"]), file=sys.stderr)
+    for run in last_four:
+        rid = (run.get("id") or "?")[: w["id"] - 1]
+        pid = (run.get("protocolId") or "-")[: w["protocol"] - 1]
+        started = run.get("startedAt")
+        s = (str(started)[:19] if started else "-")[: w["started"] - 1]
+        completed = run.get("completedAt")
+        c = (str(completed)[:19] if completed else "-")[: w["completed"] - 1]
+        offsets = run.get("labwareOffsets")
+        n_lpc = len(offsets) if isinstance(offsets, list) else 0
+        print("    " + rid.ljust(w["id"]) + pid.ljust(w["protocol"]) + s.ljust(w["started"]) + c.ljust(w["completed"]) + str(n_lpc).ljust(w["lpc"]), file=sys.stderr)
+
+    print("", file=sys.stderr)
+    print("  Pipettes (serial numbers):", file=sys.stderr)
+    print("    " + "mount".ljust(w["mount"]) + "serial", file=sys.stderr)
+    print("    " + "-" * (w["mount"] + w["serial"]), file=sys.stderr)
+    for mount, serial in pipettes_rows:
+        print("    " + mount.ljust(w["mount"]) + (serial[: w["serial"] - 1] if len(serial) > w["serial"] else serial), file=sys.stderr)
+    if not pipettes_rows:
+        print("    (none)", file=sys.stderr)
+
+    print("", file=sys.stderr)
+    print("  Modules (serial numbers):", file=sys.stderr)
+    if modules_serials:
+        for s in modules_serials:
+            print("    " + str(s), file=sys.stderr)
+    else:
+        print("    (none)", file=sys.stderr)
+    print("", file=sys.stderr)
+
+
+def _fetch_state_network(
+    client: httpx.Client,
+    base_url: str,
+    timeout: float,
+    robot_model: str,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Fetch runs, pipettes/instruments, modules over network. Returns (runs, pipettes_rows, modules_serials)."""
+    runs: List[dict] = []
+    pipettes_rows: List[Tuple[str, str]] = []
+    modules_serials: List[str] = []
+    try:
+        resp = client.get(f"{base_url}/runs?pageLength=4", timeout=timeout)
+        if resp.status_code == 200:
+            runs = (resp.json().get("data") or []) or []
+    except Exception:
+        pass
+    try:
+        path = "/instruments" if "OT-3" in robot_model else "/pipettes"
+        resp = client.get(f"{base_url}{path}", timeout=timeout)
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data.get("data"), list):
+                for item in data["data"]:
+                    pipettes_rows.append((str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?")))))
+            else:
+                for mount in ("left", "right"):
+                    v = data.get(mount)
+                    if isinstance(v, dict) and (v.get("model") or v.get("id")):
+                        pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
+    except Exception:
+        pass
+    try:
+        resp = client.get(f"{base_url}/modules", timeout=timeout)
+        if resp.status_code == 200:
+            data = resp.json()
+            mods = data.get("data", []) if isinstance(data.get("data"), list) else []
+            modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
+    except Exception:
+        pass
+    return runs, pipettes_rows, modules_serials
+
+
+def _fetch_state_usb(
+    port_path: str, timeout: float, robot_model: str
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str], str, str]:
+    """Fetch runs, pipettes, modules over USB. Returns (runs, pipettes_rows, modules_serials, api_ver, calibration)."""
+    runs: List[dict] = []
+    pipettes_rows: List[Tuple[str, str]] = []
+    modules_serials: List[str] = []
+    api_ver, calibration = "?", "?"
+    try:
+        status, raw = _serial_get(port_path, "/runs?pageLength=4", timeout=timeout)
+        if status == 200:
+            runs = (json.loads(raw.decode("utf-8")).get("data") or []) or []
+    except Exception:
+        pass
     try:
         path = "/instruments" if "OT-3" in robot_model else "/pipettes"
         status, raw = _serial_get(port_path, path, timeout=timeout)
         if status == 200:
             data = json.loads(raw.decode("utf-8"))
             if isinstance(data.get("data"), list):
-                serials = [
-                    "{} ({})".format(
-                        item.get("serialNumber", item.get("id", "?")),
-                        item.get("mount", ""),
-                    )
-                    for item in data["data"]
-                ]
-                lines.append("  Pipettes:          " + (", ".join(serials) if serials else "none"))
+                for item in data["data"]:
+                    pipettes_rows.append((str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?")))))
             else:
-                # OT-2: { "left": { "id": "...", ... }, "right": { ... } }
-                parts = []
                 for mount in ("left", "right"):
                     v = data.get(mount)
                     if isinstance(v, dict) and (v.get("model") or v.get("id")):
-                        parts.append("{} ({})".format(v.get("id", v.get("name", "?")), mount))
-                lines.append("  Pipettes:          " + (", ".join(parts) if parts else "none"))
-        else:
-            lines.append("  Pipettes:          ?")
+                        pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
     except Exception:
-        lines.append("  Pipettes:          ?")
-
-    # Modules with serial numbers
+        pass
     try:
         status, raw = _serial_get(port_path, "/modules", timeout=timeout)
         if status == 200:
             data = json.loads(raw.decode("utf-8"))
             mods = data.get("data", []) if isinstance(data.get("data"), list) else []
-            serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
-            lines.append("  Modules:           " + (", ".join(serials) if serials else "none"))
-        else:
-            lines.append("  Modules:           ?")
+            modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
     except Exception:
-        lines.append("  Modules:           ?")
-
-    # Calibration status
+        pass
+    try:
+        status, raw = _serial_get(port_path, "/health", timeout=timeout)
+        if status == 200:
+            health = json.loads(raw.decode("utf-8"))
+            api_ver = health.get("api_version") or health.get("api_Version", "?")
+    except Exception:
+        pass
     try:
         status, raw = _serial_get(port_path, "/calibration/status", timeout=timeout)
         if status == 200:
-            data = json.loads(raw.decode("utf-8"))
-            deck = (data.get("deckCalibration") or {}).get("status", "?")
-            lines.append("  Calibration:       " + str(deck))
-        else:
-            lines.append("  Calibration:       ?")
+            calibration = str((json.loads(raw.decode("utf-8")).get("deckCalibration") or {}).get("status", "?"))
     except Exception:
-        lines.append("  Calibration:       ?")
+        pass
+    return runs, pipettes_rows, modules_serials, api_ver, calibration
 
-    print("", file=sys.stderr)
-    print("  ─── Final state ───", file=sys.stderr)
-    for line in lines:
-        print(line, file=sys.stderr)
-    print("", file=sys.stderr)
+
+def _print_state_tables_network(
+    client: httpx.Client,
+    base_url: str,
+    timeout: float,
+    robot_model: str,
+    title: str,
+    header_lines: Optional[List[str]] = None,
+) -> None:
+    """Fetch state over network and print unified state tables."""
+    runs, pipettes_rows, modules_serials = _fetch_state_network(client, base_url, timeout, robot_model)
+    _format_state_tables(runs, pipettes_rows, modules_serials, title, header_lines=header_lines)
+
+
+def _usb_final_summary(
+    port_path: str, timeout: float, file_uploaded: Path, robot_model: str
+) -> None:
+    """Print final state over USB using unified state tables (same format as network)."""
+    runs, pipettes_rows, modules_serials, api_ver, calibration = _fetch_state_usb(
+        port_path, timeout, robot_model
+    )
+    header_lines = [
+        "File uploaded:     " + file_uploaded.name,
+        "Software version: " + api_ver,
+        "Calibration:       " + calibration,
+    ]
+    _format_state_tables(
+        runs, pipettes_rows, modules_serials, "Final state", header_lines=header_lines
+    )
 
 
 def wait_for_robot_ready_usb(
@@ -690,7 +851,9 @@ def wait_for_robot_ready_usb(
 def wait_for_robot_ready(
     client: httpx.Client, base_url: str, timeout: float = 300, interval: float = 10
 ) -> None:
-    """After restart, poll /health until robot responds (for consecutive updates)."""
+    """After restart, poll /health until robot responds (for consecutive updates).
+    Over Wi-Fi the server goes off during restart so the connection is lost until
+    the robot comes back on the network; over USB the link is maintained."""
     # Same GET /health as get_robot_health — robot-server health endpoint
     print("Waiting for robot to come back online...", file=sys.stderr)
     start = time.time()
@@ -705,6 +868,33 @@ def wait_for_robot_ready(
         time.sleep(interval)
     raise TimeoutError(
         f"Robot did not become reachable within {timeout:.0f}s after restart"
+    )
+
+
+def wait_for_update_server_ready(
+    client: httpx.Client,
+    base_url: str,
+    timeout: float = NETWORK_UPDATE_SERVER_READY_TIMEOUT_S,
+    interval: float = 5,
+) -> None:
+    """After /health is up, poll GET /server/update/health until 200 so the update API is ready.
+    Avoids starting the next update (begin/upload) while nginx or update-server is still coming up,
+    which can cause HTTP 502 Bad Gateway on large uploads."""
+    # update-server exposes /server/update/health — SKILL.md, update-server/otupdate/*/__init__.py
+    print("Waiting for update server to be ready...", file=sys.stderr)
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            resp = client.get(f"{base_url}/server/update/health")
+            if resp.status_code == 200:
+                print("Update server is ready.", file=sys.stderr)
+                return
+        except (httpx.ConnectError, httpx.ReadError, httpx.WriteError):
+            pass
+        time.sleep(interval)
+    raise TimeoutError(
+        f"Update server did not become ready within {timeout:.0f}s "
+        "(GET /server/update/health never returned 200)"
     )
 
 
@@ -891,7 +1081,7 @@ def main() -> int:
         "--wait-after-restart",
         type=float,
         default=300,
-        help="Seconds to wait for robot to come back after restart between consecutive updates (default: 300)",
+        help="Seconds to wait for robot to come back after restart between consecutive updates (default: 300). Over Wi-Fi the connection drops when the robot restarts; over USB the link is maintained.",
     )
     parser.add_argument(
         "--timeout",
@@ -1053,6 +1243,16 @@ def main() -> int:
                     port_path = _find_opentrons_usb_port()
                     if not port_path:
                         raise RuntimeError("Robot not found after restart. Reconnect USB and retry.")
+                    print("Ready for next update.", file=sys.stderr)
+                    runs, pipettes_rows, modules_serials, _, _ = _fetch_state_usb(
+                        port_path, args.timeout, robot_model
+                    )
+                    _format_state_tables(
+                        runs,
+                        pipettes_rows,
+                        modules_serials,
+                        "State after update {} ({})".format(idx + 1, version),
+                    )
                     ser = serial.Serial(
                         port=port_path,
                         baudrate=USB_SERIAL_BAUD,
@@ -1098,36 +1298,52 @@ def main() -> int:
         print("Error: provide an IP address, or use --usb for USB connection.", file=sys.stderr)
         return 1
 
-    # Resolve version(s): either from --version or from --file filename (update via USB / local file)
+    # Resolve version(s): either from --version or from --file filename (update via USB / local file).
+    # Network supports multiple --file (consecutive updates from local zips, same as USB).
+    local_files: Optional[List[Path]] = None  # when set, one file per version in order (no download)
     if args.file is not None and len(args.file) > 0:
-        if len(args.file) > 1:
-            print(
-                "Error: multiple --file is only supported with --usb. For network, use a single --file.",
-                file=sys.stderr,
-            )
-            return 1
-        file_path = args.file[0]
-        if not file_path.exists():
-            print(f"Error: file not found: {file_path}", file=sys.stderr)
-            return 1
+        files = list(args.file)
+        for file_path in files:
+            if not file_path.exists():
+                print(f"Error: file not found: {file_path}", file=sys.stderr)
+                return 1
         args.skip_download = True
-        if args.version and len(args.version) > 1:
-            print(
-                "Error: multiple versions are not supported with --file.",
-                file=sys.stderr,
-            )
-            return 1
-        if args.version:
-            versions = args.version
-        else:
-            derived = version_from_zip_path(file_path)
-            if derived is None:
+        if len(files) > 1:
+            # Multiple local files: versions from filenames, one file per update (no download).
+            if args.version:
                 print(
-                    "Error: could not derive version from filename. Use --version or name file ot3-system-X.Y.Z.zip (or ot2-system-X.Y.Z.zip).",
+                    "Error: do not pass --version with multiple --file; version is derived from each filename.",
                     file=sys.stderr,
                 )
                 return 1
-            versions = [derived]
+            versions = [version_from_zip_path(f) for f in files]
+            if any(not v for v in versions):
+                print(
+                    "Error: could not derive version from every filename. Use ot3-system-X.Y.Z.zip (or ot2-system-X.Y.Z.zip).",
+                    file=sys.stderr,
+                )
+                return 1
+            local_files = files
+        else:
+            # Single file
+            file_path = files[0]
+            if args.version and len(args.version) > 1:
+                print(
+                    "Error: multiple versions are not supported with a single --file.",
+                    file=sys.stderr,
+                )
+                return 1
+            if args.version:
+                versions = args.version
+            else:
+                derived = version_from_zip_path(file_path)
+                if derived is None:
+                    print(
+                        "Error: could not derive version from filename. Use --version or name file ot3-system-X.Y.Z.zip (or ot2-system-X.Y.Z.zip).",
+                        file=sys.stderr,
+                    )
+                    return 1
+                versions = [derived]
     elif args.version:
         versions = args.version
         if len(versions) > 1 and args.skip_download:
@@ -1222,12 +1438,30 @@ def main() -> int:
             print("", file=sys.stderr)
 
             for idx, version in enumerate(versions):
+                # Same as USB path: between consecutive updates, wait for robot to come back after restart (USB: wait_for_robot_ready_usb + reopen port; network: poll /health until 200).
                 if len(versions) > 1 and idx > 0:
                     wait_for_robot_ready(
                         client,
                         base_url,
                         timeout=args.wait_after_restart,
                         interval=10,
+                    )
+                    # Ensure update server is ready before begin/upload (avoids 502 Bad Gateway)
+                    wait_for_update_server_ready(
+                        client,
+                        base_url,
+                        timeout=NETWORK_UPDATE_SERVER_READY_TIMEOUT_S,
+                        interval=5,
+                    )
+                    time.sleep(NETWORK_DELAY_AFTER_READY_S)
+                    print("Ready for next update (health + update server OK).", file=sys.stderr)
+                    # Per-update comparison: runs + LPCs + serial numbers in a pretty table
+                    _print_state_tables_network(
+                        client,
+                        base_url,
+                        args.timeout,
+                        robot_model,
+                        title="State after update {} ({})".format(idx, versions[idx - 1]),
                     )
                     # Refresh health for display (robot_model unchanged)
                     health = get_robot_health(client, base_url)
@@ -1238,8 +1472,11 @@ def main() -> int:
                     file=sys.stderr,
                 )
 
-                # Download or use provided file (single-version only)
-                if args.skip_download and args.file and len(args.file) > 0 and args.file[0].exists():
+                # Use local file(s) or download from GitHub
+                if local_files is not None and idx < len(local_files):
+                    system_file = local_files[idx]
+                    cleanup_file = False
+                elif args.skip_download and args.file and len(args.file) > 0 and args.file[0].exists():
                     system_file = args.file[0]
                     cleanup_file = False
                 else:
@@ -1268,12 +1505,53 @@ def main() -> int:
                     if cleanup_file and system_file.exists():
                         system_file.unlink()
 
+            # Same as USB: wait for robot to come back after last update, then print final state.
+            wait_for_robot_ready(
+                client,
+                base_url,
+                timeout=args.wait_after_restart,
+                interval=10,
+            )
+            wait_for_update_server_ready(
+                client,
+                base_url,
+                timeout=NETWORK_UPDATE_SERVER_READY_TIMEOUT_S,
+                interval=5,
+            )
+            health = get_robot_health(client, base_url)
+            robot_model = health.get("robot_model", "OT-2 Standard")
+            last_ver = versions[-1]
+            file_uploaded_name = (
+                f"ot3-system-{last_ver}.zip"
+                if "OT-3" in robot_model
+                else f"ot2-system-{last_ver}.zip"
+            )
+            # Header lines then pretty table (runs + LPCs + serials) for end comparison
+            api_ver = health.get("api_version") or health.get("api_Version", "?")
+            header_lines = [
+                "File uploaded:     " + file_uploaded_name,
+                "Software version: " + str(api_ver),
+            ]
+            try:
+                resp = client.get(f"{base_url}/calibration/status", timeout=args.timeout)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    deck = (data.get("deckCalibration") or {}).get("status", "?")
+                    header_lines.append("Calibration:       " + str(deck))
+            except Exception:
+                header_lines.append("Calibration:       ?")
+            _print_state_tables_network(
+                client,
+                base_url,
+                args.timeout,
+                robot_model,
+                title="Final state",
+                header_lines=header_lines,
+            )
+
             print("\n✅ All updates completed successfully!", file=sys.stderr)
             if len(versions) == 1:
-                print(
-                    "The robot will restart. Wait a few minutes and check /health to verify.",
-                    file=sys.stderr,
-                )
+                print("Update complete.", file=sys.stderr)
             return 0
 
     except httpx.HTTPStatusError as e:
@@ -1285,7 +1563,10 @@ def main() -> int:
             error_body = e.response.json()
             print(json.dumps(error_body, indent=2), file=sys.stderr)
         except Exception:
-            print(e.response.text, file=sys.stderr)
+            try:
+                print(e.response.text, file=sys.stderr)
+            except Exception:
+                print("(response body not available)", file=sys.stderr)
         return 1
     except httpx.ConnectError as e:
         print(f"Connection error: {e}", file=sys.stderr)
