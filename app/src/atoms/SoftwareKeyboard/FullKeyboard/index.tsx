@@ -86,6 +86,14 @@ export function FullKeyboard({
           class: 'hg-space-key',
           buttons: '{space}',
         },
+        {
+          class: 'hg-return',
+          buttons: '{return}',
+        },
+        {
+          class: 'hg-shift-icon',
+          buttons: '{shift}',
+        },
       ]}
     />
   )
