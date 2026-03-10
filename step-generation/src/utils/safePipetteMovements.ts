@@ -5,7 +5,6 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
-  getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
   getModuleDef,
@@ -24,7 +23,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
-import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from './misc'
 
 import type {
   AddressableArea,
@@ -73,6 +75,16 @@ export interface Point {
   x: number
   y: number
   z?: number
+}
+
+export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
+  if (slotInfo.addressableArea?.areaType === 'slot') {
+    const testCutoutId = `cutoutId${slotInfo.addressableArea?.id}`
+    if (testCutoutId as CutoutId) {
+      return testCutoutId as CutoutId
+    }
+  }
+  return null
 }
 
 // return pipette bounds at a sepcific position
@@ -158,45 +170,49 @@ const getWasteChuteHeightFromDeckDefinition = (
 const getHighestZInSlot = (
   robotState: RobotState,
   invariantContext: InvariantContext,
-  slotId: string,
+  slotInfo: SlotInfo,
   robotType: RobotType
 ): number => {
   const { modules, labware } = robotState
   const { moduleEntities, labwareEntities, wasteChuteEntities } =
     invariantContext
   let totalHeight: number = 0
-  const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
-  const moduleInSlot = Object.keys(modules).find(
-    moduleId => modules[moduleId].slot === slotId
-  )
-  const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
-    wasteChute =>
-      getCutoutDisplayName(wasteChute.location as CutoutId) === slotId
-  )
-  // if slot has waste chute
-  if (wasteChuteInSlot) {
-    totalHeight += getWasteChuteHeightFromDeckDefinition(robotType)
-  }
-  //  if slot has labware, includes labware, adapters, and module
-  if (largestLabwareStack.length > 0) {
-    largestLabwareStack.forEach(item => {
-      if (modules[item] != null) {
-        totalHeight += getModuleHeightFromDeckDefinition(
-          moduleEntities[item].model,
-          robotType
-        )
-      }
-      if (labware[item] != null) {
-        totalHeight += labwareEntities[item].def.dimensions.zDimension
-      }
-    })
-    // if slot only has module
-  } else if (moduleInSlot != null) {
-    totalHeight += getModuleHeightFromDeckDefinition(
-      moduleEntities[moduleInSlot].model,
-      robotType
+  const slotId = slotInfo?.addressableArea?.id
+  if (slotId) {
+    const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
+    const moduleInSlot = Object.keys(modules).find(
+      moduleId => modules[moduleId].slot === slotId
     )
+    // TODO(RC, 3/10/2026): wasteChute location is most likely CutoutId but needs better typing to confirm
+    const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
+      wasteChute => wasteChute.location as CutoutId === getCutoutIdFromSlot(slotInfo)
+    )
+    // if slot has waste chute
+    if (wasteChuteInSlot) {
+      totalHeight += getWasteChuteHeightFromDeckDefinition(robotType)
+    }
+    //  if slot has labware, includes labware, adapters, and module
+    if (largestLabwareStack.length > 0) {
+      largestLabwareStack.forEach(item => {
+        if (modules[item] != null) {
+          totalHeight += getModuleHeightFromDeckDefinition(
+            moduleEntities[item].model,
+            robotType
+          )
+        }
+        if (labware[item] != null) {
+          totalHeight += labwareEntities[item].def.dimensions.zDimension
+        }
+      })
+      // if slot only has module
+    } else if (moduleInSlot != null) {
+      totalHeight += getModuleHeightFromDeckDefinition(
+        moduleEntities[moduleInSlot].model,
+        robotType
+      )
+    }
   }
+
   return totalHeight
 }
 
@@ -249,15 +265,12 @@ const getSlotHasPotentialCollidingObject = (
       ) &&
       pipetteBounds[0].z != null
     ) {
-      const highestZInSurroundingSlot =
-        slot.addressableArea?.id != null
-          ? getHighestZInSlot(
-              robotState,
-              invariantContext,
-              slot.addressableArea.id,
-              robotType
-            )
-          : 0
+      const highestZInSurroundingSlot = getHighestZInSlot(
+        robotState,
+        invariantContext,
+        slot,
+        robotType
+      )
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
         return true
       }
