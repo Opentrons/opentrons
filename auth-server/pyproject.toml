@@ -34,6 +34,7 @@ robot = [
     "uvicorn==0.27.0.post1",
     "sqlalchemy==1.4.51",
     "oauthlib==3.3.1",
+    "alembic==1.18.4",
 ]
 dev = [
     "ruff==0.14.10",

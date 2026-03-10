@@ -245,6 +245,7 @@ dev = [
     { name = "types-requests" },
 ]
 robot = [
+    { name = "alembic" },
     { name = "fastapi" },
     { name = "oauthlib" },
     { name = "pydantic" },
@@ -288,6 +289,7 @@ dev = [
     { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
 ]
 robot = [
+    { name = "alembic", specifier = "==1.18.4" },
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "oauthlib", specifier = "==3.3.1" },
     { name = "pydantic", specifier = "==2.11.7" },
