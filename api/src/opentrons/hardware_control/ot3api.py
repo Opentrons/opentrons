@@ -141,6 +141,10 @@ from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
+from opentrons.util.pyro_synchronous_adapter import (
+    convert_result_to_pso,
+    pyro_behavior,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -632,6 +636,7 @@ class OT3API(
             self.resume(PauseType.DELAY)
 
     @property
+    @pyro_behavior(convert_result_to_pso)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 

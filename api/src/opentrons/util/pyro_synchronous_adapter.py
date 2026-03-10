@@ -4,12 +4,37 @@ import asyncio
 import functools
 import inspect
 from types import FunctionType, MethodType
-from typing import Any, Callable, Iterator, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Iterator, List, Optional, ParamSpec, TypeVar
 
 from Pyro5 import api as pyro
 
 T = TypeVar("T")
 P = ParamSpec("P")
+
+
+def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
+    """Decorator to indicate to the PyroSynchronousObject adapter that a function must be bound with a special method.
+
+    This works by adding the `specialty_func` to the original function as metadata, to be used by the PyroSynchronousObject
+    constructor when building the alias attributes.
+
+    Params:
+        - specialty_func: The wrapper method that will be used when binding a decorated attribute of an object instance.
+    """
+
+    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+        specialty_sig = inspect.signature(specialty_func)
+        if not all(
+            item in specialty_sig.parameters.keys()
+            for item in ["core_obj", "name", "attr"]
+        ):
+            raise KeyError(
+                "Pyro Behavior Specialty Functions must contain parameters `core_obj`, `name` and `attr`."
+            )
+        func._pyro_specialty_func = specialty_func  # type: ignore
+        return func
+
+    return decorator
 
 
 def synchronous(func: Callable[P, T]) -> Callable[P, T]:
@@ -19,7 +44,6 @@ def synchronous(func: Callable[P, T]) -> Callable[P, T]:
 
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
-        # todo(chb, 2026-02-17): This is true of the OT3API, is it true elsewhere?
         self = args[0]  # Expect the instance to contain a loop
         loop: Optional[asyncio.AbstractEventLoop] = getattr(self, "_loop", None)
         coro = func(*args, **kwargs)
@@ -142,22 +166,23 @@ def PyroSynchronousObject(core_obj: Any) -> _PSO:
 
 def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
     for name, attr in inspect.getmembers(core_obj.__class__):
-        if "__" not in name:
-            if (
-                isinstance(attr, FunctionType)
-                and asyncio.iscoroutinefunction(attr)
-                and not name.startswith("_")
-            ):
+        if "__" not in name and not name.startswith("_"):
+            specialty_function = _get_specialty_behavior(attr, name)
+            if specialty_function is not None:
+                # Expose the wrapped specialty method
+                exposed = pyro.expose(specialty_function(core_obj, name, attr))
+                yield (name, exposed)
+            elif isinstance(attr, FunctionType) and asyncio.iscoroutinefunction(attr):
                 # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
                 exposed = pyro.expose(synchronous(attr))
                 bound_method = MethodType(exposed, core_obj)
                 yield (name, bound_method)
-            elif isinstance(attr, FunctionType) and not name.startswith("_"):
+            elif isinstance(attr, FunctionType):
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
                 bound_method = MethodType(exposed, core_obj)
                 yield (name, bound_method)
-            elif isinstance(attr, property) and not name.startswith("_"):
+            elif isinstance(attr, property):
                 # Bound property to the original instance and expose the bounded property
                 # Accepts the functional arguments (Callables) of a property to rebind
                 def _bound(
@@ -178,3 +203,52 @@ def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
                 )
                 exposed = pyro.expose(bound_property)  # type: ignore
                 yield (name, exposed)
+
+
+### Helpers ###
+
+
+def _get_specialty_behavior(func: Any, name: str) -> Any | None:
+    if asyncio.iscoroutinefunction(func) or isinstance(func, FunctionType):
+        if hasattr(func, "_pyro_specialty_func"):
+            return func._pyro_specialty_func
+    elif isinstance(func, property):
+        if hasattr(func.fget, "_pyro_specialty_func"):
+            return func.fget._pyro_specialty_func  # type: ignore
+    return None
+
+
+### Specialty Functions for use with the `pyro_behavior` decorator ###
+
+
+def convert_result_to_pso(core_obj: Any, name: str, attr: Callable[P, T]) -> Any:
+    """Wrapper to change the output of a function to a PyroSynchronousObject or list of PyroSynchronousObjects when called through a Pyro Proxy."""
+
+    @functools.wraps(attr)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
+        if asyncio.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            bound_method = MethodType(sync_func, core_obj)
+            result = asyncio.run(bound_method(*args, **kwargs))
+        elif isinstance(attr, FunctionType):
+            bound_method = MethodType(attr, core_obj)
+            result = asyncio.run(bound_method(*args, **kwargs))
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        # Convert the instance result to PSO(s) and return that
+        try:
+            pso_list = []
+            for r in result:
+                pso_list.append(PyroSynchronousObject(r))
+            return pso_list
+        except TypeError:
+            return PyroSynchronousObject(result)
+
+    if isinstance(attr, property):
+        # If the original attribute was a property, ensure the wrapped attribute is
+        return property(wrapper)
+    return wrapper
