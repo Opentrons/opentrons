@@ -188,7 +188,6 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         else:
             new_name = self.path_elements[1]
             dir_path = create_folder_for_test_data(new_name)
-            # print(f'{dir_path}')
             response_str = json.dumps({"name": new_name})
         self._send_response_bytes(response_str.encode("utf-8"))
 
