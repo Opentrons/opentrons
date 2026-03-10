@@ -87,4 +87,5 @@ dev = [
     "pyusb==1.2.1",
     "build~=1.2.0",
     "matplotlib==3.10.0",
+    "setuptools<82",
 ]
