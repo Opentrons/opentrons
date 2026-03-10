@@ -34,7 +34,7 @@ export const getCustomLiquidClassProperties = (
   } else if ('mixFirstAspirate' in args) {
     aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
   }
-
+  const blowoutPosition = getBlowoutWellPosition(args)
   const sharedDispenseArgs = {
     dispense_position: {
       offset: {
@@ -104,7 +104,9 @@ export const getCustomLiquidClassProperties = (
         location: getBlowoutPythonLocation(args.blowoutLocation),
         flow_rate:
           args.blowoutLocation != null ? args.blowoutFlowRateUlSec : undefined,
-        blowout_position: getBlowoutWellPosition(args),
+        ...(blowoutPosition != null
+          ? { blowout_position: blowoutPosition }
+          : {}),
       },
     },
   }
