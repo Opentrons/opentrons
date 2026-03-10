@@ -30,11 +30,11 @@ The following table explains these G-code command elements.
   <tbody>
     <tr>
       <td><span style="white-space: nowrap;"><code>MCOMMAND</code></span></td>
-      <td>This is a particular G-code command itself. For example, sending <code>M115 \n</code> to the Thermocycler returns its serial number, model, and firmware version.</td>
+      <td>This is a G-code command itself. For example, sending <code>M115 \n</code> to the Thermocycler returns its serial number, model, and firmware version.</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>ARGUMENT-KEY</code></span></td>
-      <td>This is an optional key-value pair that lets you pass variables in a G-code command.<br><br>Typically, the key is a single letter followed by the value, which is usually an integer. For example, sending <code>M140 S100 \n</code> to the Thermocycler sets the lid temperature to 100 °C. In this command, <code>S</code> is the argument key and <code>100</code> is the argument value.</td>
+      <td>This is an optional key-value pair that lets you pass variables to a module in a G-code command.<br><br>Typically, the key is a single letter followed by the value, which is usually an integer. For example, sending <code>M140 S100 \n</code> to the Thermocycler sets the lid temperature to 100 °C. In this command, <code>S</code> is the argument key and <code>100</code> is the argument value.</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>TERMINATOR</code></span></td>

@@ -6,7 +6,7 @@ description: "Lists all Thermocycler G-codes and responses."
 The Thermocycler accepts the G-code commands listed below.
 
 !!! note
-    Even though these commands rarely change, the [Thermocycler's driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/thermocycler/driver.py) on GitHub is always the ultimate source of truth.
+    These commands rarely change, but you can always check for updates in the [Thermocycler's driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/thermocycler/driver.py).
 
 <table>
   <thead>

@@ -1,12 +1,12 @@
 ---
 title: "Thermocycler Module: Error Codes"
+description: "Lists all the error codes returned by a Thermocycler"
 ---
 
-This section lists all the error codes that can be returned by the Thermocycler, including descriptions of each code.
+This section lists all the error codes that can be returned by the Thermocycler.
 
 !!! note
     These error codes are not unique to the Thermocycler and can be returned by other Opentrons modules.
-
 
 ## Error code syntax
 
