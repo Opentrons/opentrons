@@ -39,3 +39,8 @@ class AuthServerSettings(BaseSettings):
             " (effectively not persisting anything)."
         ),
     )
+    alembic_config: Path = Field(
+        default_factory=lambda: Path(__file__).resolve().parent / "alembic.ini",
+        description="Path to Alembic config file.",
+        validation_alias="ALEMBIC_CONFIG",  # read ALEMBIC_CONFIG from env (no OT_ prefix)
+    )
