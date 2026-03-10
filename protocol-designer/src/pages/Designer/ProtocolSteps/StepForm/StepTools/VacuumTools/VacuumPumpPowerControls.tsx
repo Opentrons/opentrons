@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Slider } from '@opentrons/components'
+import { COLORS, Slider } from '@opentrons/components'
 
 import { PumpDurationField } from './PumpDurationField'
 import styles from './vacuumtools.module.css'
@@ -25,7 +25,7 @@ export function VacuumPumpPowerControls(
           value={formData.powerPercent ?? 1}
           label={t('vacuum.controls.mode.power')}
           adjustValue={propsForFields.powerPercent.updateValue}
-          // backgroundColor={COLORS.grey35}
+          backgroundColor={COLORS.grey35}
         />
         <PumpDurationField
           formData={formData}

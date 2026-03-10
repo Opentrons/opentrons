@@ -32,7 +32,7 @@ export const maskToTime = (rawValue: unknown): string => {
   return rawTimeValue
 }
 export const maskToTimeMMSS = (rawValue: unknown): string => {
-  if (rawValue == null) {
+  if (rawValue == null || rawValue === '') {
     return ''
   }
 
@@ -46,10 +46,10 @@ export const maskToTimeMMSS = (rawValue: unknown): string => {
   const minutes = parts[0].slice(0, 2)
   const seconds = parts[1]?.slice(0, 2)
 
-  return seconds !== undefined ? `${minutes}:${seconds}` : minutes
+  return seconds != null ? `${minutes}:${seconds}` : minutes
 }
 export const maskToSignedDecimal = (rawValue: unknown): string => {
-  if (rawValue == null) {
+  if (rawValue == null || rawValue === '') {
     return ''
   }
   const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
