@@ -249,9 +249,7 @@ window.addEventListener('load', function (evt) {
     );
     oReq.send();
   }
-
-  // window.addEventListener('resize', _onScreenSizeUpdate)
-  // _onScreenSizeUpdate(evt)
+  
   window.addEventListener('resize', _onScreenSizeUpdate);
   _onScreenSizeUpdate(evt);
   _getTestNameFromServer();
