@@ -41,7 +41,7 @@ The Thermocycler accepts the G-code commands listed below.
         <strong>Arguments:</strong>
         <ul>
           <li><code>S</code>: set temperature</li>
-          <li><code>H</code>: hold time (optional)</li>
+          <li><code>H</code>: hold time in seconds (optional)</li>
           <li><code>V</code>: liquid volume (optional)</li>
           <li><code>R</code>: ramp rate (optional)</li>
         </ul>
@@ -163,7 +163,7 @@ The Thermocycler accepts the G-code commands listed below.
       <td><code>M566</code></td>
       <td>
         <strong>Command:</strong> set ramp rate in °C/s<br>
-        <strong>Arguments:</strong> <code>S</code> sets the temperature ramp rate in °C/s. This parameter is optional. If not defined, the temperature ramp rate will be infinite (as fast as possible).<br>
+        <strong>Arguments:</strong> <code>S</code> sets the temperature ramp rate in °C/s (optional). If not defined, the module tries to increase the temperature as fast as possible.<br>
         <strong>Example:</strong> <code>M566 S25</code> sets the ramp rate to 25 °C/s.<br>
         <strong>Response:</strong> <code>OK</code> (acknowledge only or error)
       </td>

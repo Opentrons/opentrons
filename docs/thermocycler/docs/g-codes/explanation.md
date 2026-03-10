@@ -14,10 +14,10 @@ G-codes are machine-readable instructions used to control hardware directly. Whi
 
 ## G-Code command syntax
 
-A Thermocycler G-code command is an alphanumeric string that starts with the letter "M" followed by an integer. If a command accepts arguments, those are formatted as a letter-number combination. Each command ends with a new line termination character. Opentrons modules only accept one G-code for each line of text. You cannot pass multiple commands on a single line.
+A Thermocycler G-code command is an alphanumeric string that starts with the letter "M" followed by an integer. If a command accepts arguments, those are formatted as letter-number combinations without a separator. Each command must end with a new line termination character because Opentrons modules do not support multiple commands on a single line.
 
 - **Syntax:** `MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR \n`
-- **Example:** `M104 S95 \n`
+- **Examples:** `M115 \n` or `M104 S95 H120 \n`
 
 The following table explains these G-code command elements.
 
@@ -31,11 +31,11 @@ The following table explains these G-code command elements.
   <tbody>
     <tr>
       <td><span style="white-space: nowrap;"><code>MCOMMAND</code></span></td>
-      <td>This is a G-code command itself. For example, sending <code>M115 \n</code> to the Thermocycler returns its serial number, model, and firmware version.</td>
+      <td>This is a G-code command itself. For example, sending a simple looking command like <code>M115 \n</code> to the Thermocycler returns its serial number, model, and firmware version.</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>ARGUMENT-KEY</code></span></td>
-      <td>This is an optional key-value pair that lets you pass variables to a module in a G-code command.<br><br>Typically, the key is a single letter followed by the value, which is usually an integer. For example, sending <code>M140 S95 \n</code> to the Thermocycler sets the lid temperature to 100 °C. In this command, <code>S</code> is the argument key and <code>100</code> is the argument value.</td>
+      <td>This is an optional key-value pair that lets you pass argument variables in commands that use them.<br><br>Typically, the key is a single, capital letter followed by the value, which is usually an integer. For example, sending <code>M104 S95 H120 \n</code> to the Thermocycler sets the lid temperature to 95 °C and holds that temperature for 120 seconds. In this command, <code>S</code> and <code>H</code> are the argument keys for "set temperature" and "hold time." The integers <code>95</code> and <code>120</code> are the argument values for temperature (in °C) and hold time (in seconds).</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>TERMINATOR</code></span></td>
