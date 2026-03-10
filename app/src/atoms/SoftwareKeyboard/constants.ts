@@ -21,6 +21,10 @@ export const customDisplayForIndividual = {
   '{backspace}': 'del',
 }
 
+export const customDisplayForIndividual = {
+  '{backspace}': 'del',
+}
+
 // keyboard layout for Alphanumeric Keyboard
 export const alphanumericKeyboardLayout = {
   default: [
