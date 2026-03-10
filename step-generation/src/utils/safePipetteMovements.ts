@@ -23,10 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
-import {
-  getFullStackFromLabwares,
-  getSlotInLocationStack,
-} from './misc'
+import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
 import type {
   AddressableArea,
@@ -183,9 +180,8 @@ const getHighestZInSlot = (
     const moduleInSlot = Object.keys(modules).find(
       moduleId => modules[moduleId].slot === slotId
     )
-    // TODO(RC, 3/10/2026): wasteChute location is most likely CutoutId but needs better typing to confirm
     const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
-      wasteChute => wasteChute.location as CutoutId === getCutoutIdFromSlot(slotInfo)
+      wasteChute => wasteChute.location === getCutoutIdFromSlot(slotInfo)
     )
     // if slot has waste chute
     if (wasteChuteInSlot) {
