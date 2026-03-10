@@ -102,13 +102,12 @@ describe('getShiftSelectedSteps', () => {
 describe('getConsolidatedStacks', () => {
   it('should return an array of stacks with no duplicates', () => {
     const labwareAtLastState = {
-      labware1: { stack: ['lid', 'labware1', 'slotC1'] },
-      labware2: { stack: ['labware1', 'slotC1'] },
-      labware3: { stack: ['labware3'] },
+      labware1: { stack: ['labware1', 'C1'] },
+      labware2: { stack: ['labware2', 'labware1', 'C1'] },
+      labware3: { stack: ['labware3', 'labware2', 'labware1', 'C1'] },
     }
     expect(getConsolidatedStacks(labwareAtLastState)).toStrictEqual([
-      ['lid', 'labware1', 'slotC1'],
-      ['labware3'],
+      ['labware3', 'labware2', 'labware1', 'C1'],
     ])
   })
 })

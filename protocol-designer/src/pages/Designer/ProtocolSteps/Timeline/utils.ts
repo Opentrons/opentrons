@@ -181,14 +181,21 @@ export const getConsolidatedStacks = (
   labwareAtLastState: Record<string, LabwareTemporalProperties>
 ): string[][] => {
   const stacks = Object.values(labwareAtLastState).map(labware => labware.stack)
+  // Only returns stacks that are not subsets of other stacks
   return stacks.filter(
     stack =>
       !stacks.some(
-        other =>
-          other !== stack &&
-          other.length > stack.length &&
+        previousStack =>
+          // Skip comparing the stack to itself
+          previousStack !== stack &&
+          // Only consider stacks that are longer than the current stack
+          previousStack.length > stack.length &&
+          // Check if the current stack exists at the end of the longer stack
+          // We align the end of both stacks and compare element-by-element
           stack.every(
-            (item, i) => other[i + (other.length - stack.length)] === item
+            (labware, index) =>
+              previousStack[index + (previousStack.length - stack.length)] ===
+              labware
           )
       )
   )
