@@ -22,8 +22,8 @@
     "A1": {
       "depth": 26.85,
       "shape": "rectangular",
-      "xDimension": 106.8,
-      "yDimension": 71.2,
+      "xDimension": 107.3,
+      "yDimension": 71.3,
       "totalLiquidVolume": 195000,
       "x": 63.88,
       "y": 42.74,
@@ -43,11 +43,15 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "quirks": [
+      "centerMultichannelOnWells",
+      "touchTipDisabled",
+      "offsetPipetteFor96GridSubwells"
+    ],
     "loadName": "nest_1_reservoir_195ml"
   },
   "namespace": "opentrons",
-  "version": 3,
+  "version": 5,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -59,10 +63,10 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 71.3,
-          "topYDimension": 107.3,
-          "bottomXDimension": 70.6,
-          "bottomYDimension": 106.8,
+          "topXDimension": 107.3,
+          "topYDimension": 71.3,
+          "bottomXDimension": 106.8,
+          "bottomYDimension": 70.6,
           "topHeight": 26.85,
           "bottomHeight": 2.0
         },
