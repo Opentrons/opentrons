@@ -103,10 +103,13 @@ export const TouchInputField = forwardRef<
   const value = isIndeterminate ? '' : (rawValue ?? '')
   const placeHolder = isIndeterminate ? '-' : rawPlaceholder
 
-  const inputFieldStyles = {
+  const inputFieldStyles: CSSProperties & {
+    '--touch-input-border-radius': string
+    '--touch-input-padding': string
+  } = {
     '--touch-input-border-radius': borderRadius ?? 'var(--border-radius-4)',
     '--touch-input-padding': padding ?? 'var(--spacing-16) var(--spacing-24)',
-  } as CSSProperties
+  }
 
   return (
     <div
