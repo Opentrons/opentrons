@@ -104,6 +104,7 @@ export const getCustomLiquidClassProperties = (
         location: getBlowoutPythonLocation(args.blowoutLocation),
         flow_rate:
           args.blowoutLocation != null ? args.blowoutFlowRateUlSec : undefined,
+        blowout_position: getBlowoutWellPosition(args),
       },
     },
   }
@@ -263,6 +264,28 @@ const getBlowoutPythonLocation = (
     return 'destination'
   } else {
     return 'trash'
+  }
+}
+
+const getBlowoutWellPosition = (
+  args: TransferArgs | ConsolidateArgs | DistributeArgs
+): {} | null => {
+  if (
+    args.blowoutXPosition &&
+    args.blowoutYPosition &&
+    args.blowoutOffsetFromTopMm &&
+    args.blowoutPositionReference
+  ) {
+    return {
+      offset: {
+        x: args.blowoutXPosition,
+        y: args.blowoutYPosition,
+        z: args.blowoutOffsetFromTopMm,
+      },
+      position_reference: args.blowoutPositionReference,
+    }
+  } else {
+    return null
   }
 }
 
