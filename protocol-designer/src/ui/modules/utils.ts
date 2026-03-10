@@ -80,9 +80,7 @@ export const getModuleShortNames = (type: ModuleType): string => {
   }
 }
 
-const getModuleDisplayLocation = (
-  moduleOnDeck: ModuleOnDeck
-): string => {
+const getModuleDisplayLocation = (moduleOnDeck: ModuleOnDeck): string => {
   const { type, slot } = moduleOnDeck
   if (type === VACUUM_MODULE_TYPE) {
     return VACUUM_MODULE_LOCATION
