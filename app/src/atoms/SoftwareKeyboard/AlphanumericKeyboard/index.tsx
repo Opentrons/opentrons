@@ -12,6 +12,7 @@ import {
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { LayoutName } from '../types'
 
 import '../index.css'
 import './index.css'
@@ -28,22 +29,35 @@ export function AlphanumericKeyboard({
   keyboardRef,
   debug = false, // If true, <ENTER> will input a \n
 }: AlphanumericKeyboardProps): JSX.Element {
-  const [layoutName, setLayoutName] = useState<string>('default')
+  const [layoutName, setLayoutName] = useState<LayoutName>('default')
   const appLanguage = useSelector(getAppLanguage)
+
   const onKeyPress = (button: string): void => {
-    if (button === '{ABC}') handleShift()
-    if (button === '{numbers}') handleNumber()
-    if (button === '{abc}') handleUnShift()
+    switch (button) {
+      case '{ABC}':
+        handleShift()
+        break
+      case '{numbers}':
+        handleNumber()
+        break
+      case '{abc}':
+        handleUnShift()
+        break
+      default:
+        break
+    }
   }
 
   const handleShift = (): void => {
-    setLayoutName(layoutName === 'default' ? 'shift' : 'default')
+    setLayoutName(prev => (prev === 'default' ? 'shift' : 'default'))
   }
 
   const handleNumber = (): void => {
-    setLayoutName(
-      layoutName === 'default' || layoutName === 'shift' ? 'numbers' : 'default'
-    )
+    setLayoutName(prev => {
+      if (prev === 'default' || prev === 'shift') return 'numbers'
+      if (prev === 'numbers') return 'default'
+      return 'default'
+    })
   }
 
   const handleUnShift = (): void => {
@@ -52,7 +66,9 @@ export function AlphanumericKeyboard({
 
   return (
     <Keyboard
-      keyboardRef={r => (keyboardRef.current = r)}
+      keyboardRef={r => {
+        keyboardRef.current = r
+      }}
       theme="hg-theme-default oddTheme1 alphanumericKeyboard"
       onChange={onChange}
       onKeyPress={onKeyPress}
