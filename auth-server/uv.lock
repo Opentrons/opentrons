@@ -269,7 +269,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "alembic", marker = "python_full_version >= '3.11'", specifier = ">=1.18.4" },
+    { name = "alembic", marker = "python_full_version >= '3.11'", specifier = "==1.18.4" },
     { name = "build", marker = "python_full_version >= '3.11'", specifier = "~=1.2.0" },
     { name = "decoy", marker = "python_full_version >= '3.11'", specifier = ">=2.2.0,<3" },
     { name = "httpx", marker = "python_full_version >= '3.11'", specifier = "==0.26.0" },
