@@ -1,5 +1,6 @@
 ---
 title: "Thermocycler Module: Thermocycler Module G-Codes"
+description: "Lists all Thermocycler G-codes and responses."
 ---
 
 The Thermocycler accepts the G-code commands listed below.
