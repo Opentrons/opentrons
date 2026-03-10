@@ -1,6 +1,6 @@
 ---
 title: "Thermocycler Module: Error Codes"
-description: "Lists all the error codes returned by a Thermocycler"
+description: "Lists all the error codes returned by a Thermocycler."
 ---
 
 This section lists all the error codes that can be returned by the Thermocycler.
@@ -58,7 +58,7 @@ The following table lists the Thermocycler error codes. The descriptions include
 | `ERR405` | Indicates the module cannot control its lid heater. |
 | `ERR406` | Indicates the PID controller is reporting that the set of numbers defining how the thermal control loop should behave are invalid or outside the device's acceptable limits. |
 | `ERR407` | Indicates an invalid target temperature. |
-| `ERR408` | Indicates a thermal drift of more than 4°C. This can happen when the thermistors read values that are different from each other by more than 4°C. |
+| `ERR408` | Indicates a thermal drift of more than 4 °C. This can happen when the thermistors read values that are different from each other by more than 4 °C. |
 | `ERR501` | Indicates the lid motor is busy executing a command that cannot be interrupted. |
 | `ERR502` | Indicates a lid motor fault as reported by the lid's motor driver. |
 | `ERR503` | Indicates a seal peripheral interface error. This can happen when communication with the seal motor driver fails. |
