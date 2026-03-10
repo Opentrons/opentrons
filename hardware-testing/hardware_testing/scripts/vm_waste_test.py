@@ -26,13 +26,17 @@ VM_idProduct = 61248
 st = time.perf_counter()
 current_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%y_%m_%d_%H_%M_%S")
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='/data/testing_data/test.log',
-    filemode='a'
+    handlers=[
+        logging.FileHandler('/data/testing_data/' + 'test.log'),
+        logging.StreamHandler()
+    ]
 )
+
+logger = logging.getLogger(__name__)
+logger.info(f"continuous read error: {12}")
 
 async def find_port_by_id(vendorId, productId):
     ports = serial.tools.list_ports.comports()
