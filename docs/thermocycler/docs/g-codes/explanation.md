@@ -35,7 +35,15 @@ The following table explains these G-code command elements.
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>ARGUMENT-KEY</code></span></td>
-      <td>This is an optional key-value pair that lets you pass argument variables in commands that use them.<br><br>Typically, the key is a single, capital letter followed by the value, which is usually an integer. For example, sending <code>M104 S95 H120 \n</code> to the Thermocycler sets the lid temperature to 95 °C and holds that temperature for 120 seconds. In this command, <code>S</code> and <code>H</code> are the argument keys for "set temperature" and "hold time." The integers <code>95</code> and <code>120</code> are the argument values for temperature (in °C) and hold time (in seconds).</td>
+      <td>
+        An optional key-value pair used to pass parameters to a command.
+        <br><br>
+        Typically, the key is a single, uppercase letter followed by its value (usually an integer). For example, sending <code>M104 S95 H120 \n</code> sets the Thermocycler temperature to 95 °C and holds it for 120 seconds. In this command:
+        <ul>
+          <li><code>S</code> and <code>H</code> are the keys for "set temperature" and "hold time."</li>
+          <li><code>95</code> and <code>120</code> are the values for °C and seconds.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>TERMINATOR</code></span></td>
