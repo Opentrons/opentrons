@@ -14,9 +14,10 @@ G-codes are machine-readable instructions used to control hardware directly. Whi
 
 ## G-Code command syntax
 
-Opentrons modules only accept one G-code for each line of text. You cannot pass multiple commands on a single line. A typical G-code command string uses this syntax:
+A Thermocycler G-code command is an alphanumeric string that starts with the letter "M" followed by an integer. If a command accepts arguments, those are formatted as a letter-number combination. Each command ends with a new line termination character. Opentrons modules only accept one G-code for each line of text. You cannot pass multiple commands on a single line.
 
-`MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR`
+- **Syntax:** `MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR \n`
+- **Example:** `M104 S95 \n`
 
 The following table explains these G-code command elements.
 
@@ -34,7 +35,7 @@ The following table explains these G-code command elements.
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>ARGUMENT-KEY</code></span></td>
-      <td>This is an optional key-value pair that lets you pass variables to a module in a G-code command.<br><br>Typically, the key is a single letter followed by the value, which is usually an integer. For example, sending <code>M140 S100 \n</code> to the Thermocycler sets the lid temperature to 100 °C. In this command, <code>S</code> is the argument key and <code>100</code> is the argument value.</td>
+      <td>This is an optional key-value pair that lets you pass variables to a module in a G-code command.<br><br>Typically, the key is a single letter followed by the value, which is usually an integer. For example, sending <code>M140 S95 \n</code> to the Thermocycler sets the lid temperature to 100 °C. In this command, <code>S</code> is the argument key and <code>100</code> is the argument value.</td>
     </tr>
     <tr>
       <td><span style="white-space: nowrap;"><code>TERMINATOR</code></span></td>
