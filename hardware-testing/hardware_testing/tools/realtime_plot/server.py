@@ -146,7 +146,6 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         result: dict = {"name": str(file_path.stem)}
         with open(file_path, "r") as f:
             csv_data = f.readlines()
-            # print(f'csv_data ({file_path.name}): {csv_data}')
         if not csv_data:
             return result
         header = csv_data[0].strip().split(",")
@@ -175,10 +174,8 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         response_data: dict = {
             "directory": str(self.plot_directory.resolve()),
         }
-        # print(f'Dir: {response_data}')
         for pattern in file_patterns:
             path_list = self._list_file_paths_in_directory(self.plot_directory, pattern)
-            # print(f"Pattern '{pattern}': found {len(path_list)} files")
             if path_list:
                 response_data[pattern] = self._parse_csv_file(path_list[0])
             else:
@@ -195,7 +192,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             response_str = json.dumps({"name": str(self.plot_directory.stem)})
         else:
             new_name = self.path_elements[1]
-            dir_path = create_folder_for_test_data(new_name)
+            create_folder_for_test_data(new_name)
             response_str = json.dumps({"name": new_name})
         self._send_response_bytes(response_str.encode("utf-8"))
 
