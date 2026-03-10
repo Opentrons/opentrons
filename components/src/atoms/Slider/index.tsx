@@ -15,8 +15,6 @@ interface SliderProps {
   label?: string
   /** Optional color for the unfilled (right) track. Defaults to blue-20. */
   backgroundColor?: string
-  /** Gap between label and slider: "large" (8px) or "small" (4px). Defaults to "large". */
-  type?: 'small' | 'large'
 }
 
 export function Slider({
@@ -24,7 +22,6 @@ export function Slider({
   label,
   adjustValue,
   backgroundColor,
-  type = 'large',
 }: SliderProps): JSX.Element {
   const style: CSSProperties & Record<string, string> = {
     '--value-percent': `${value}%`,
@@ -52,19 +49,18 @@ export function Slider({
           {value}%
         </StyledText>
       </div>
-      <div className={styles.slider_track_wrapper} style={style}>
-        <input
-          type="range"
-          min="1"
-          max="100"
-          value={value}
-          onChange={e => {
-            adjustValue(Number(e.target.value))
-          }}
-          className={styles.slider}
-          aria-label={label}
-        />
-      </div>
+      <input
+        type="range"
+        min="1"
+        max="100"
+        value={value}
+        onChange={e => {
+          adjustValue(Number(e.target.value))
+        }}
+        className={styles.slider}
+        style={style}
+        aria-label={label}
+      />
     </div>
   )
 }
