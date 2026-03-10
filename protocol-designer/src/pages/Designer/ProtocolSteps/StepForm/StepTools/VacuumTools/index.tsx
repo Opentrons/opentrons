@@ -13,9 +13,15 @@ import { VacuumControls } from './VacuumControls'
 import { VacuumModuleState } from './VacuumModuleState'
 import styles from './vacuumtools.module.css'
 
-import type { StepFormProps } from '../../types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FieldPropsByName } from '../../types'
 
-export function VacuumTools(props: StepFormProps): JSX.Element {
+interface VacuumToolsProps {
+  formData: FormData
+  propsForFields: FieldPropsByName
+}
+
+export function VacuumTools(props: VacuumToolsProps): JSX.Element {
   const { formData, propsForFields } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'protocol_steps'])

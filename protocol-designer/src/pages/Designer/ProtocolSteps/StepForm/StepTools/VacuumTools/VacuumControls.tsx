@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
+import { Divider } from '@opentrons/components'
 import {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
@@ -18,6 +18,7 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 
 import { VacuumControlsGroup } from './VacuumControlsGroup'
 import { VacuumPumpControls } from './VacuumPumpControls'
+import styles from './vacuumtools.module.css'
 
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
@@ -63,7 +64,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
       : VACUUM_VENT_SET_OPEN
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+    <div className={styles.vacuum_controls_root}>
       {/* State / Profile selection */}
       <VacuumControlsGroup
         title={t('vacuum.controls.label')}
@@ -136,6 +137,6 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
       )}
       {formData.programType === VACUUM_PROGRAM_PROFILE &&
         'TODO: ADD PROFILE CONTENT'}
-    </Flex>
+    </div>
   )
 }

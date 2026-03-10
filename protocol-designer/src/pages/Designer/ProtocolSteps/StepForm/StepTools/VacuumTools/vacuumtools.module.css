@@ -9,6 +9,13 @@
   margin: 0;
 }
 
+/* VacuumControls root (state/profile/mode selection + pump controls) */
+.vacuum_controls_root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
 .vacuum_state_container {
   display: flex;
   flex-direction: column;

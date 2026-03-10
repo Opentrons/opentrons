@@ -17,7 +17,7 @@ interface VacuumControlsGroupOption<T extends string> {
   label: string
   description?: string
 }
-export interface VacuumControlsGroupProps<T extends string> {
+interface VacuumControlsGroupProps<T extends string> {
   title: string
   options: Array<VacuumControlsGroupOption<T>>
   selectedValue: T
