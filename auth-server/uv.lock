@@ -213,6 +213,7 @@ wheels = [
 name = "auth-server"
 source = { editable = "." }
 dependencies = [
+    { name = "alembic" },
     { name = "fastapi" },
     { name = "oauthlib" },
     { name = "pwdlib", extra = ["argon2", "bcrypt"] },
@@ -226,7 +227,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "alembic" },
     { name = "build" },
     { name = "decoy" },
     { name = "httpx" },
@@ -256,6 +256,7 @@ robot = [
 
 [package.metadata]
 requires-dist = [
+    { name = "alembic", specifier = "==1.18.4" },
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "oauthlib", specifier = ">=3.3.1,<4" },
     { name = "pwdlib", extras = ["argon2", "bcrypt"], specifier = "==0.3.0" },
@@ -269,7 +270,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "alembic", marker = "python_full_version >= '3.11'", specifier = "==1.18.4" },
     { name = "build", marker = "python_full_version >= '3.11'", specifier = "~=1.2.0" },
     { name = "decoy", marker = "python_full_version >= '3.11'", specifier = ">=2.2.0,<3" },
     { name = "httpx", marker = "python_full_version >= '3.11'", specifier = "==0.26.0" },
