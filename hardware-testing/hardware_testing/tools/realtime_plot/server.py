@@ -6,6 +6,7 @@ from time import time
 from typing import List, Any, Union
 import os
 import sys
+
 # from hardware_testing.data import create_folder_for_test_data
 
 IS_WIN = sys.platform.startswith("win")
@@ -17,6 +18,8 @@ IS_ROBOT = bool(
     IS_LINUX
     and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN"))
 )
+
+
 def infer_config_base_dir() -> Path:
     """Return the directory to store data in.
 
@@ -45,6 +48,7 @@ def infer_config_base_dir() -> Path:
         else:
             return search[-1]
 
+
 def get_testing_data_directory() -> Path:
     """Get testing_data directory."""
     if "TESTING_DATA_DIR" in os.environ:
@@ -52,14 +56,17 @@ def get_testing_data_directory() -> Path:
     print(infer_config_base_dir() / "testing_data")
     return infer_config_base_dir() / "testing_data"
 
+
 def _initialize_testing_data_base_dir() -> Path:
     base = get_testing_data_directory()
     base.mkdir(parents=True, exist_ok=True)
     return base
 
+
 def create_test_name_from_file(f: str) -> str:
     """Create test name from file name."""
     return os.path.basename(f).replace("_", "-").replace(".py", "")
+
 
 def create_folder_for_test_data(test_name: Union[str, Path]) -> Path:
     """Create a folder for test data."""
@@ -67,6 +74,7 @@ def create_folder_for_test_data(test_name: Union[str, Path]) -> Path:
     test_path = base / test_name
     test_path.mkdir(parents=False, exist_ok=True)
     return test_path
+
 
 class PlotRequestHandler(BaseHTTPRequestHandler):
     """Plot Request Handler."""
@@ -161,7 +169,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             raise NotImplementedError(f"unable to process command: {req_cmd}")
 
         # File patterns to search for - each becomes a key in the response
-        #---------------------Add file names that needs to be search----------------------------------
+        # ---------------------Add file names that needs to be search----------------------------------
         file_patterns = ["PressureData", "FlowrateData"]
 
         response_data: dict = {
@@ -169,14 +177,15 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         }
         # print(f'Dir: {response_data}')
         for pattern in file_patterns:
-            path_list = self._list_file_paths_in_directory(
-                self.plot_directory, pattern
-            )
+            path_list = self._list_file_paths_in_directory(self.plot_directory, pattern)
             # print(f"Pattern '{pattern}': found {len(path_list)} files")
             if path_list:
                 response_data[pattern] = self._parse_csv_file(path_list[0])
             else:
-                response_data[pattern] = {"name": "", "error": f"No {pattern} file found"}
+                response_data[pattern] = {
+                    "name": "",
+                    "error": f"No {pattern} file found",
+                }
 
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
@@ -215,7 +224,7 @@ class PlotServer(HTTPServer):
 def run(test_name: str, http_port: int) -> None:
     """Run a Plot Server Instance."""
     dir_path = create_folder_for_test_data(test_name)
-    print(f'dir: {dir_path}')
+    print(f"dir: {dir_path}")
     server = PlotServer(dir_path, ("0.0.0.0", http_port), PlotRequestHandler)
     print(f"Plot server running on port: {http_port}")
     try:
