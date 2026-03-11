@@ -9,6 +9,7 @@ import {
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  SINGLE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -114,6 +115,38 @@ describe('getIsSafePipetteMovement', () => {
       nozzleConfiguration: ALL,
     })
     expect(result).toEqual(true)
+  })
+  it('returns false when 96ch single tip pick up will overlap with waste chute', () => {
+    const result = getIsSafePipetteMovement({
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: SINGLE,
+            primaryNozzle: A1_NOZZLE,
+          },
+        },
+      },
+      invariantContext: {
+        ...mockInvariantProperties,
+        wasteChuteEntities: {
+          id: {
+            id: 'id',
+            location: 'cutoutD3',
+            pythonName: 'waste_chute',
+          },
+        },
+      },
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: -12, y: -100, z: 20 },
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: SINGLE,
+    })
+    expect(result).toEqual(false)
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement({
