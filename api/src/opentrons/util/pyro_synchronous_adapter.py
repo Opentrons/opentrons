@@ -4,12 +4,52 @@ import asyncio
 import functools
 import inspect
 from types import FunctionType, MethodType
-from typing import Any, Callable, Iterator, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
 from Pyro5 import api as pyro
 
 T = TypeVar("T")
 P = ParamSpec("P")
+
+
+class DaemonUtility:
+    """Class to represent the Pyro Daemon Utility used by Opentrons Entry Processes.
+
+    This class manages the lifecycle of PyroSynchronousObjects that are generated for a resource
+    and served on a Pyro Daemon.
+    """
+
+    def __init__(
+        self,
+        daemon: pyro.Daemon,
+    ) -> None:
+        self._PyroSynchronousObjects: Dict[pyro.URI, Any] = {}
+        self._daemon = daemon
+
+    def add_PSO(self, new_pso: Any) -> None:
+        """Add a new PyroSynchronousObject to the list of objects managed by this Daemon Utility."""
+        uri = self._daemon.register(new_pso)  # type: ignore
+        self._PyroSynchronousObjects[uri] = new_pso
+
+    def remove_PSO(self, pso: Any) -> None:
+        """Remove specified PyroSynchronousObject from the list of objects managed by this Daemon Utility."""
+        uri = self._daemon.uriFor(pso)  # type: ignore
+        if uri in self._PyroSynchronousObjects:
+            self._daemon.unregister(self._PyroSynchronousObjects[uri])  # type: ignore
+            del self._PyroSynchronousObjects[uri]
+
+    def find_PSO(self, core_obj: Any) -> Any | None:
+        """Find a managed PyroSynchronousObject based on the core object it aliases."""
+        for uri in self._PyroSynchronousObjects.keys():
+            if self._PyroSynchronousObjects[uri]._core_obj is core_obj:
+                return self._PyroSynchronousObjects[uri]
+        return None
+
+    def proxy_for(self, pso: Any) -> pyro.Proxy:
+        """Return a Pyro5 Proxy for an already-registered PyroSynchronousObject."""
+        # todo(chb, 2025-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
+        # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
+        return self._daemon.proxyFor(pso)
 
 
 def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
@@ -26,10 +66,10 @@ def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
         specialty_sig = inspect.signature(specialty_func)
         if not all(
             item in specialty_sig.parameters.keys()
-            for item in ["core_obj", "name", "attr"]
+            for item in ["utility", "core_obj", "name", "attr"]
         ):
             raise KeyError(
-                "Pyro Behavior Specialty Functions must contain parameters `core_obj`, `name` and `attr`."
+                "Pyro Behavior Specialty Functions must contain parameters `utility`, `core_obj`, `name` and `attr`."
             )
         func._pyro_specialty_func = specialty_func  # type: ignore
         return func
@@ -39,7 +79,7 @@ def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
 
 def synchronous(func: Callable[P, T]) -> Callable[P, T]:
     """Decorator that makes an async function callable synchronously."""
-    if not asyncio.iscoroutinefunction(func):
+    if not inspect.iscoroutinefunction(func):
         return func  # no-op for non-async functions
 
     @functools.wraps(func)
@@ -79,7 +119,7 @@ class _PSO:
     pass
 
 
-def PyroSynchronousObject(core_obj: Any) -> _PSO:
+def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
     """A Pyro-ready class generator.
 
     It takes the base object (such as an OT3API); makes an object wrapper with a
@@ -159,20 +199,22 @@ def PyroSynchronousObject(core_obj: Any) -> _PSO:
     SyncCls = type(
         f"PyroSynchronousObject_{core_obj.__class__.__name__}_{id(core_obj)}",
         (_PSO,),
-        dict(_build_classdict(core_obj)),
+        dict(_build_classdict(core_obj, utility)),
     )
     return SyncCls()  # type: ignore
 
 
-def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
+def _build_classdict(
+    core_obj: Any, utility: DaemonUtility
+) -> Iterator[tuple[str, Any]]:
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_function = _get_specialty_behavior(attr, name)
             if specialty_function is not None:
                 # Expose the wrapped specialty method
-                exposed = pyro.expose(specialty_function(core_obj, name, attr))
+                exposed = pyro.expose(specialty_function(utility, core_obj, name, attr))
                 yield (name, exposed)
-            elif isinstance(attr, FunctionType) and asyncio.iscoroutinefunction(attr):
+            elif isinstance(attr, FunctionType) and inspect.iscoroutinefunction(attr):
                 # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
                 exposed = pyro.expose(synchronous(attr))
                 bound_method = MethodType(exposed, core_obj)
@@ -203,13 +245,15 @@ def _build_classdict(core_obj: Any) -> Iterator[tuple[str, Any]]:
                 )
                 exposed = pyro.expose(bound_property)  # type: ignore
                 yield (name, exposed)
+    # Attach the `core_obj` instance as a private member for internal tracking
+    yield ("_core_obj", core_obj)
 
 
 ### Helpers ###
 
 
 def _get_specialty_behavior(func: Any, name: str) -> Any | None:
-    if asyncio.iscoroutinefunction(func) or isinstance(func, FunctionType):
+    if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
         if hasattr(func, "_pyro_specialty_func"):
             return func._pyro_specialty_func
     elif isinstance(func, property):
@@ -221,12 +265,14 @@ def _get_specialty_behavior(func: Any, name: str) -> Any | None:
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
 
 
-def convert_result_to_pso(core_obj: Any, name: str, attr: Callable[P, T]) -> Any:
+def convert_result_to_pso(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Any:
     """Wrapper to change the output of a function to a PyroSynchronousObject or list of PyroSynchronousObjects when called through a Pyro Proxy."""
 
     @functools.wraps(attr)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
-        if asyncio.iscoroutinefunction(attr):
+        if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
             result = asyncio.run(bound_method(*args, **kwargs))
@@ -241,12 +287,16 @@ def convert_result_to_pso(core_obj: Any, name: str, attr: Callable[P, T]) -> Any
             )
         # Convert the instance result to PSO(s) and return that
         try:
-            pso_list = []
+            proxy_list = []
             for r in result:
-                pso_list.append(PyroSynchronousObject(r))
-            return pso_list
+                new_pyro_synchronous_obj = PyroSynchronousObject(r, utility)
+                utility.add_PSO(new_pyro_synchronous_obj)
+                proxy_list.append(utility.proxy_for(new_pyro_synchronous_obj))
+            return proxy_list
         except TypeError:
-            return PyroSynchronousObject(result)
+            new_pyro_synchronous_obj = PyroSynchronousObject(result, utility)
+            utility.add_PSO(new_pyro_synchronous_obj)
+            return utility.proxy_for(new_pyro_synchronous_obj)
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is

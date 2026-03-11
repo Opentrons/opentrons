@@ -2,12 +2,12 @@
 
 import logging
 import socket
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from Pyro5 import api as pyro
 from Pyro5 import errors
 
-from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
+from opentrons.util.pyro_synchronous_adapter import DaemonUtility, PyroSynchronousObject
 
 log = logging.getLogger(__name__)
 
@@ -23,23 +23,22 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     log.info(f"Running Pyro type registry for {pyroname}.")
     registry()
 
-    # Create a guaranteed synchronous adapted alias to the resource
-    pyro_object = PyroSynchronousObject(resource)
-
     # Handle Pyro registration and publication of our synchronized object
     pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
     with pyro.Daemon() as daemon:  # type: ignore
+        utility = DaemonUtility(daemon)
+        # Create a guaranteed synchronous adapted alias to the resource
+        pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
+        utility.add_PSO(pyro_object)
         try:
-            pyro_uri = daemon.register(pyro_object)
-
             # Find the currently running nameserver
             try:
                 with pyro.locate_ns() as ns:
                     # Register our objects URI with the system nameserver
                     try:
-                        ns.register(pyroname, pyro_uri)
+                        ns.register(pyroname, daemon.uriFor(pyro_object))
                         log.info(
-                            f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}"
+                            f"Pyro5 Dameon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
                         )
 
                         # Maintain a request loop to handle requests on our resource instance from remote processes
@@ -51,5 +50,6 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
                     f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
                 )
         finally:
-            daemon.unregister(pyro_object)
+            utility.remove_PSO(pyro_object)
+            # daemon.unregister(pyro_object)
             daemon.close()
