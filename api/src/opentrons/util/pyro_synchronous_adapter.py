@@ -4,7 +4,7 @@ import asyncio
 import functools
 import inspect
 from types import FunctionType, MethodType
-from typing import Any, Callable, Iterator, List, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Iterator, Optional, ParamSpec, TypeVar
 
 from Pyro5 import api as pyro
 
