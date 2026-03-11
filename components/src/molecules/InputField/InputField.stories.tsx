@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { InputField as InputFieldComponent } from './index'
 import { TouchInputField as TouchInputFieldComponent } from '../TouchInputField/TouchInputField'
+import { InputField as InputFieldComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
