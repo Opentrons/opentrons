@@ -163,7 +163,6 @@ export type StepType =
   | 'absorbanceReader'
   | 'camera'
   | 'comment'
-  | 'flexStacker'
   | 'heaterShaker'
   | 'magnet'
   | 'manualIntervention'
@@ -171,15 +170,15 @@ export type StepType =
   | 'moveLabware'
   | 'moveLiquid'
   | 'pause'
+  | 'stacker'
   | 'temperature'
   | 'thermocycler'
-  | 'flexStacker'
   | 'vacuum'
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
   camera: 'camera',
   comment: 'comment',
-  flexStacker: 'ot-flex-stacker',
+  stacker: 'ot-flex-stacker',
   heaterShaker: 'ot-heater-shaker',
   magnet: 'ot-magnet-v2',
   manualIntervention: 'pause-circle',
@@ -533,7 +532,7 @@ export type FlexStackerFormType =
   | typeof FLEX_STACKER_EMPTY
 
 export interface HydratedFlexStackerFormData extends AnnotationFields {
-  stepType: 'flexStacker'
+  stepType: 'stacker'
   id: string
   fillLabwareUri: string | null
   fillLabwareIds: string[]

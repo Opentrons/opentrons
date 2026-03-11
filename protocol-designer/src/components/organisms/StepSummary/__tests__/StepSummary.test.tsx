@@ -52,7 +52,7 @@ describe('StepSummary', () => {
     baseStackerProps = {
       currentStep: {
         id: 'retrieve',
-        stepType: 'flexStacker',
+        stepType: 'stacker',
         flexStackerFormType: 'retrieve',
         fillLabwareUri: 'mockUri',
         fillLabwareIds: ['mock1', 'mock2', 'mock3'],
@@ -213,7 +213,7 @@ describe('StepSummary', () => {
         ...baseStackerProps.currentStep,
         id: 'store',
         flexStackerFormType: 'store',
-        stepType: 'flexStacker',
+        stepType: 'stacker',
       },
     })
     screen.getByText('Storing')
@@ -228,7 +228,7 @@ describe('StepSummary', () => {
         ...baseStackerProps.currentStep,
         id: 'fill',
         flexStackerFormType: 'fill',
-        stepType: 'flexStacker',
+        stepType: 'stacker',
       },
     })
     screen.getByText('Refilling stacker with Quantity:')
@@ -244,7 +244,7 @@ describe('StepSummary', () => {
         ...baseStackerProps.currentStep,
         id: 'empty',
         flexStackerFormType: 'empty',
-        stepType: 'flexStacker',
+        stepType: 'stacker',
       },
     })
     screen.getByText('Emptying stacker of all labware')

@@ -133,13 +133,13 @@ describe('getFillLabwareToDeleteData', () => {
   const savedStepForms = {
     step1: {
       id: 'step1',
-      stepType: 'flexStacker',
+      stepType: 'stacker',
       fillLabwareIds: ['labware1', 'labware2'],
       moduleId: 'moduleId1',
     },
     step2: {
       id: 'step2',
-      stepType: 'flexStacker',
+      stepType: 'stacker',
       fillLabwareIds: ['labware3'],
       moduleId: 'moduleId2',
     },
@@ -151,13 +151,13 @@ describe('getFillLabwareToDeleteData', () => {
     },
     step4: {
       id: 'step4',
-      stepType: 'flexStacker',
+      stepType: 'stacker',
       fillLabwareIds: null,
       moduleId: 'moduleId1',
     },
     step5: {
       id: 'step5',
-      stepType: 'flexStacker',
+      stepType: 'stacker',
       fillLabwareIds: ['labware5'],
       moduleId: 'doesNotExist',
     },
@@ -174,7 +174,7 @@ describe('getFillLabwareToDeleteData', () => {
     ])
   })
 
-  it('returns correct data for multiple steps, filtering for flexStacker with valid module and non-null fillLabwareIds', () => {
+  it('returns correct data for multiple steps, filtering for stacker with valid module and non-null fillLabwareIds', () => {
     const result = getFillLabwareToDeleteData(
       ['step1', 'step2'],
       savedStepForms,
@@ -186,7 +186,7 @@ describe('getFillLabwareToDeleteData', () => {
     ])
   })
 
-  it('does not include steps that are not flexStacker', () => {
+  it('does not include steps that are not stacker', () => {
     const result = getFillLabwareToDeleteData(
       ['step3'],
       savedStepForms,

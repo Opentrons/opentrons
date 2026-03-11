@@ -220,7 +220,7 @@ const setSelection = (
         mode: 'add',
       },
     })
-  } else if (formData.stepType === 'flexStacker') {
+  } else if (formData.stepType === 'stacker') {
     dispatch({
       type: 'SELECT_DROPDOWN_ITEM',
       payload: {

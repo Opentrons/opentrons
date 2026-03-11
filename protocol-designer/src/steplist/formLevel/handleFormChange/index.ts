@@ -71,7 +71,7 @@ export function handleFormChange(
     )
     return { ...patch, ...dependentFieldsPatch }
   }
-  if (rawForm.stepType === 'flexStacker') {
+  if (rawForm.stepType === 'stacker') {
     const dependentFieldsPatch = dependentFieldsUpdateFlexStacker(
       patch,
       rawForm

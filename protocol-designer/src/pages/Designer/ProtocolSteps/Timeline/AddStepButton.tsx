@@ -149,7 +149,7 @@ export function AddStepButton({
     'magnet',
     'temperature',
     'thermocycler',
-    'flexStacker',
+    'stacker',
     'vacuum',
   ]
   const enableVacuumModule = useSelector(getEnableVacuumModule)
@@ -168,7 +168,7 @@ export function AddStepButton({
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
     absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
-    flexStacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
+    stacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
     vacuum:
       enableVacuumModule && getIsModuleOnDeck(modules, VACUUM_MODULE_TYPE),
   }

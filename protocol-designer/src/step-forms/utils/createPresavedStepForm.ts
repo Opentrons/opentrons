@@ -331,7 +331,7 @@ const _patchFlexStackerModuleId =
       Object.values(initialDeckSetup.modules).filter(
         module => module.type === FLEX_STACKER_MODULE_TYPE
       )?.length ?? 1
-    const hasFlexStackerModuleId = stepType === 'flexStacker'
+    const hasFlexStackerModuleId = stepType === 'stacker'
     // pre-select form type if module is set
     if (hasFlexStackerModuleId && numOfModules === 1) {
       const moduleId =

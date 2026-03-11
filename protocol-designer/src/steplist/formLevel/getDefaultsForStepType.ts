@@ -254,7 +254,7 @@ export function getDefaultsForStepType(
         referenceWavelengthActive: false,
         wavelengths: [Object.keys(ABSORBANCE_READER_COLOR_BY_WAVELENGTH)[0]], // default to first known wavelength
       }
-    case 'flexStacker':
+    case 'stacker':
       return {
         fillLabwareUri: null,
         fillLabwareIds: null,

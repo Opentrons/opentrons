@@ -115,7 +115,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     // No dialog to show. Just save the step directly.
     saveStepForm()
     if (
-      hydratedForm.stepType === 'flexStacker' &&
+      hydratedForm.stepType === 'stacker' &&
       hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
     ) {
       const moduleState =
@@ -160,7 +160,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
         )
       }
     } else if (
-      hydratedForm.stepType === 'flexStacker' &&
+      hydratedForm.stepType === 'stacker' &&
       savedStepForm?.flexStackerFormType === FLEX_STACKER_FILL &&
       hydratedForm.flexStackerFormType !== FLEX_STACKER_FILL
     ) {

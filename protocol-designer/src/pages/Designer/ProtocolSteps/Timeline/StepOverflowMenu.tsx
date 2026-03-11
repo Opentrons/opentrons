@@ -86,7 +86,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   }
 
   const isStackerFillStep =
-    savedStepFormData.stepType === 'flexStacker' &&
+    savedStepFormData.stepType === 'stacker' &&
     savedStepFormData.flexStackerFormType === 'fill'
   return (
     <>

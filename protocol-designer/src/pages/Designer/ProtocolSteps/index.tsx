@@ -141,7 +141,7 @@ export function ProtocolSteps({
       },
     })
   let currentStep: FormData | null
-  if (formData?.stepType === 'flexStacker') {
+  if (formData?.stepType === 'stacker') {
     currentStep = formData
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]

@@ -86,7 +86,7 @@ export const stepFormToArgs = (
       stepArgs = absorbanceReaderFormToArgs(_castForm(hydratedForm))
       break
     }
-    case 'flexStacker': {
+    case 'stacker': {
       stepArgs = flexStackerFormToArgs(_castForm(hydratedForm))
     }
   }
