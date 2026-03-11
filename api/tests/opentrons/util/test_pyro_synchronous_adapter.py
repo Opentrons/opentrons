@@ -18,7 +18,7 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
 from opentrons.util.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
-from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
+from opentrons.util.pyro_synchronous_adapter import DaemonUtility, PyroSynchronousObject
 
 
 @pytest.fixture
@@ -31,7 +31,8 @@ def managed_obj(ot3_hardware: ThreadManager[OT3API]) -> OT3API:
 
 def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
     """Test that the PyroSynchronousObject creates a fully adapted class of OT3API public methods and properties."""
-    pyro_object = PyroSynchronousObject(managed_obj)
+    utility = DaemonUtility(daemon=pyro.Daemon())  # type: ignore
+    pyro_object = PyroSynchronousObject(managed_obj, utility)
     pyro_object_members = [name for name, attr in inspect.getmembers(pyro_object)]
 
     # The PyroSynchronousObject should only adapt public properties, functions and async functions from a base class.

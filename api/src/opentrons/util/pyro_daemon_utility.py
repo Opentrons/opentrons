@@ -2,7 +2,7 @@
 
 import logging
 import socket
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 from Pyro5 import api as pyro
 from Pyro5 import errors

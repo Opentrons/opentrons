@@ -27,7 +27,7 @@ class DaemonUtility:
         self,
         daemon: pyro.Daemon,
     ) -> None:
-        self._PyroSynchronousObjects: Dict[pyro.URI, Any] = {}
+        self._PyroSynchronousObjects: Dict[pyro.URI, _PSO] = {}
         self._daemon = daemon
 
     def add_PSO(self, new_pso: Any) -> None:
@@ -45,7 +45,7 @@ class DaemonUtility:
     def find_PSO(self, core_obj: Any) -> _PSO | None:
         """Find a managed PyroSynchronousObject based on the core object it aliases."""
         for uri in self._PyroSynchronousObjects.keys():
-            if self._PyroSynchronousObjects[uri]._core_obj is core_obj:
+            if self._PyroSynchronousObjects[uri]._core_obj is core_obj:  # type: ignore
                 return self._PyroSynchronousObjects[uri]
         return None
 
@@ -53,7 +53,7 @@ class DaemonUtility:
         """Return a Pyro5 Proxy for an already-registered PyroSynchronousObject."""
         # todo(chb, 2025-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
-        return self._daemon.proxyFor(pso)
+        return self._daemon.proxyFor(pso)  # type: ignore
 
 
 def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
@@ -265,10 +265,15 @@ def _get_specialty_behavior(func: Any, name: str) -> Any | None:
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
 
 
-def convert_result_to_proxy(
+def convert_result_to_proxy(  # noqa: C901
     utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
-) -> Any:
-    """Wrapper to change the output of a function to a PyroSynchronousObject or list of PyroSynchronousObjects when called through a Pyro Proxy."""
+) -> Callable[P, T]:
+    """Wrapper to change the output of a function to a PyroSynchronousObject or list of PyroSynchronousObjects.
+
+    This function is intended for use with `pyro_behavior` and is executed when called through a Pyro Proxy.
+    The result(s) will be newly instanced Proxy object(s) on the Daemon. This is particularly useful for instances
+    that contain other instances, such as an OT3API with internal module instances like Thermocycler.
+    """
 
     @functools.wraps(attr)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
