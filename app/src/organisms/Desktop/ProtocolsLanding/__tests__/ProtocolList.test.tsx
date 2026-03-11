@@ -10,9 +10,9 @@ import {
   storedProtocolData,
   storedProtocolDataTwo,
 } from '/app/redux/protocol-storage/__fixtures__'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { EmptyStateLinks } from '../EmptyStateLinks'
-import { useSortedProtocols } from '../hooks'
 import { ProtocolCard } from '../ProtocolCard'
 import { ProtocolList } from '../ProtocolList'
 

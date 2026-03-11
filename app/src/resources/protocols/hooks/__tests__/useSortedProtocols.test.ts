@@ -1,17 +1,12 @@
-import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useSortedProtocols } from '../hooks'
+import { useSortedProtocols } from '../useSortedProtocols'
 
-import type { Store } from 'redux'
-import type { FunctionComponent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { State } from '/app/redux/types'
 
 const mockStoredProtocolData = [
   {
@@ -285,22 +280,9 @@ const mockStoredProtocolData = [
 ] as StoredProtocolData[]
 
 describe('useSortedProtocols', () => {
-  const store: Store<State> = legacy_createStore(vi.fn(), {})
-  beforeEach(() => {
-    store.dispatch = vi.fn()
-  })
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it('should return an object with protocols sorted alphabetically', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('alphabetical', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('alphabetical', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -318,13 +300,8 @@ describe('useSortedProtocols', () => {
   })
 
   it('should return an object with protocols sorted reverse alphabetically', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('reverse', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('reverse', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -342,13 +319,8 @@ describe('useSortedProtocols', () => {
   })
 
   it('should return an object with protocols sorted by most recent modified data', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('recent', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('recent', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -366,13 +338,8 @@ describe('useSortedProtocols', () => {
   })
 
   it('should return an object with protocols sorted by oldest modified data', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('oldest', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('oldest', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -390,13 +357,8 @@ describe('useSortedProtocols', () => {
   })
 
   it('should return an object with protocols sorted by flex then ot-2', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('flex', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('flex', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -413,13 +375,8 @@ describe('useSortedProtocols', () => {
     )
   })
   it('should return an object with protocols sorted by ot-2 then flex', () => {
-    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Provider store={store}>{children}</Provider>
-
-    const { result } = renderHook(
-      () => useSortedProtocols('ot2', mockStoredProtocolData),
-      { wrapper }
+    const { result } = renderHook(() =>
+      useSortedProtocols('ot2', mockStoredProtocolData)
     )
     const firstProtocol = result.current[0]
     const secondProtocol = result.current[1]
@@ -433,6 +390,16 @@ describe('useSortedProtocols', () => {
     )
     expect(thirdProtocol.protocolKey).toBe(
       '26ed5a82-502f-4074-8981-57cdda1d066d'
+    )
+  })
+
+  it('should not mutate the input protocol data', () => {
+    const originalOrder = mockStoredProtocolData.map(p => p.protocolKey)
+
+    renderHook(() => useSortedProtocols('recent', mockStoredProtocolData))
+
+    expect(mockStoredProtocolData.map(p => p.protocolKey)).toEqual(
+      originalOrder
     )
   })
 })
