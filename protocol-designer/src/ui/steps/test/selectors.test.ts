@@ -602,6 +602,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        blowout_mmFromBottom: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_position_reference: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_x_position: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_y_position: {
+          value: undefined,
+          isIndeterminate: false,
+        },
         changeTip: {
           isIndeterminate: false,
           value: 'always',
@@ -997,6 +1013,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_location: {
           isIndeterminate: false,
           value: 'fixedTrash',
+        },
+        blowout_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         aspirate_wells: {
           isIndeterminate: true,

@@ -102,6 +102,10 @@ export function getDefaultsForStepType(
         blowout_checkbox: false,
         blowout_flowRate: null,
         blowout_location: null,
+        blowout_mmFromBottom: null,
+        blowout_x_position: null,
+        blowout_y_position: null,
+        blowout_position_reference: 'well-top',
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         conditioning_checkbox: false,
         conditioning_volume: null,
@@ -261,6 +265,14 @@ export function getDefaultsForStepType(
     case 'vacuum':
       return {
         moduleId: null,
+        programType: null, // state | profile
+        stateType: null, // vent | pump
+        modeType: null, // pressure | power
+        pressureMbar: null,
+        powerPercent: null,
+        pumpDurationCheckbox: null,
+        pumpDurationTime: null,
+        endingHoldVentCheckbox: null,
       }
     default:
       return {}

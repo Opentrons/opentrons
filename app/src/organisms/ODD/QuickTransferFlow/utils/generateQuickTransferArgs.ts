@@ -460,6 +460,10 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
+    blowoutOffsetFromTopMm: null,
+    blowoutXPosition: null,
+    blowoutYPosition: null,
+    blowoutPositionReference: null,
     blowoutFlowRateUlSec:
       quickTransferState.path === 'multiDispense'
         ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
