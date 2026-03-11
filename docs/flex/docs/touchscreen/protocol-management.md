@@ -25,7 +25,7 @@ Regardless of which section a protocol is in, its card or list entry includes in
 Long press on a protocol and tap **Pin protocol** to move it to the pinned protocols section. Conversely, long press a pinned protocol and tap **Unpin protocol** to remove it from the section.
 
 <figure class="screenshot" markdown>
-![The protocol long-press menu, with three options: Run protocol, Pin protocol, and Delete protocol.](../images/touchscreen-protocol-menu.png "Protocol menu")
+![The protocol long-press menu, with three options: Run protocol, Pin protocol, and Delete protocol.](../images/touchscreen_protocol_menu.png "Protocol menu")
 </figure>
 
 You can pin up to eight protocols. When you hit the maximum, you'll need to unpin a protocol before pinning another one.
@@ -41,7 +41,7 @@ Tap once to sort protocols in ascending order (A to Z for names, oldest to newes
 Long press on a protocol and tap **Delete protocol** to delete it directly from the All Protocols screen. Flex will prompt you for confirmation that you want to delete the protocol file and all of its run history.
 
 <figure class="screenshot" markdown>
-![Modal confirming whether to delete a protocol.](../images/touchscreen-delete-protocol.png "Deleting a protocol")
+![Modal confirming whether to delete a protocol.](../images/touchscreen_delete_protocol.png "Deleting a protocol")
 </figure>
 
 !!! warning

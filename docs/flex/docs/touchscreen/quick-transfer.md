@@ -13,21 +13,16 @@ Quick transfer is a touchscreen-only feature that lets you create, save, and run
 
 - Move culture to growth media or to prepare it for long-term storage.
 
-There are two sections of the quick transfer screen:
-
-- **Pinned transfers**: Large cards on a horizontal carousel. You can pin 8 cards, maximum.
-
-- **Saved transfers**: A vertical list at the bottom of the screen. Flex can save a maximum of 20 quick transfers. You have to delete older quick transfers to maintain this limit.
+To get started, tap **+Quick transfer** in the Protocols tab.
 
 <figure class="screenshot" markdown>
-![Quick transfer screen with two pinned quick transfers at the top and a longer list of quick transfers at the bottom.](../images/quick-transfer-list.png "Quick transfers")
+![Protocols screen with purple button to add a quick transfer.](../images/touchscreen_all_protocols.png)
 </figure>
+
+Tapping **+Quick transfer** starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 The remainder of this section goes through quick transfer features in detail.
 
-## Creating a quick transfer
-
-From the Quick Transfer tab on the touchscreen, tap **+ Quick transfer.** This starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 ## Deck slots and hardware requirements
 
@@ -103,6 +98,6 @@ Click **Create Transfer** when you're satisfied with your transfer settings. Aft
 - Long press a pinned transfer to run it, un-pin it (returns it to the saved list), or delete it.
 
 <figure class="screenshot" markdown>
-![Menu with options to run, pin, or delete a quick transfer.](../images/quick-transfer-menu.png "Quick transfer menu")
+![Menu with options to run, pin, or delete a quick transfer.](../images/touchscreen_protocol_menu.png "Quick transfer menu")
 </figure>
 
