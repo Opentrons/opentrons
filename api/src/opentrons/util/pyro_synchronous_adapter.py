@@ -12,6 +12,10 @@ T = TypeVar("T")
 P = ParamSpec("P")
 
 
+class _PSO:
+    pass
+
+
 class DaemonUtility:
     """Class to represent the Pyro Daemon Utility used by Opentrons Entry Processes.
 
@@ -38,7 +42,7 @@ class DaemonUtility:
             self._daemon.unregister(self._PyroSynchronousObjects[uri])  # type: ignore
             del self._PyroSynchronousObjects[uri]
 
-    def find_PSO(self, core_obj: Any) -> Any | None:
+    def find_PSO(self, core_obj: Any) -> _PSO | None:
         """Find a managed PyroSynchronousObject based on the core object it aliases."""
         for uri in self._PyroSynchronousObjects.keys():
             if self._PyroSynchronousObjects[uri]._core_obj is core_obj:
@@ -113,10 +117,6 @@ def synchronous(func: Callable[P, T]) -> Callable[P, T]:
             raise RuntimeError("Instance event loop is not running.")
 
     return wrapper
-
-
-class _PSO:
-    pass
 
 
 def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
@@ -265,7 +265,7 @@ def _get_specialty_behavior(func: Any, name: str) -> Any | None:
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
 
 
-def convert_result_to_pso(
+def convert_result_to_proxy(
     utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
 ) -> Any:
     """Wrapper to change the output of a function to a PyroSynchronousObject or list of PyroSynchronousObjects when called through a Pyro Proxy."""
@@ -285,18 +285,22 @@ def convert_result_to_pso(
             raise ValueError(
                 "Provided base attribute must be a Property, a Method or an Async method."
             )
-        # Convert the instance result to PSO(s) and return that
+        # Convert the instance result to PSO(s) and return the Proxy objects
         try:
             proxy_list = []
             for r in result:
-                new_pyro_synchronous_obj = PyroSynchronousObject(r, utility)
-                utility.add_PSO(new_pyro_synchronous_obj)
-                proxy_list.append(utility.proxy_for(new_pyro_synchronous_obj))
+                pyro_synchronous_obj = utility.find_PSO(r)
+                if pyro_synchronous_obj is None:
+                    pyro_synchronous_obj = PyroSynchronousObject(r, utility)
+                    utility.add_PSO(pyro_synchronous_obj)
+                proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
             return proxy_list
         except TypeError:
-            new_pyro_synchronous_obj = PyroSynchronousObject(result, utility)
-            utility.add_PSO(new_pyro_synchronous_obj)
-            return utility.proxy_for(new_pyro_synchronous_obj)
+            pyro_synchronous_obj = utility.find_PSO(result)
+            if pyro_synchronous_obj is None:
+                pyro_synchronous_obj = PyroSynchronousObject(result, utility)
+                utility.add_PSO(pyro_synchronous_obj)
+            return utility.proxy_for(pyro_synchronous_obj)
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is

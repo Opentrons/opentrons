@@ -51,5 +51,4 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
                 )
         finally:
             utility.remove_PSO(pyro_object)
-            # daemon.unregister(pyro_object)
             daemon.close()

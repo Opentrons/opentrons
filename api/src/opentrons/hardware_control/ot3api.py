@@ -142,7 +142,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro_synchronous_adapter import (
-    convert_result_to_pso,
+    convert_result_to_proxy,
     pyro_behavior,
 )
 
@@ -636,7 +636,7 @@ class OT3API(
             self.resume(PauseType.DELAY)
 
     @property
-    @pyro_behavior(convert_result_to_pso)
+    @pyro_behavior(convert_result_to_proxy)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 
