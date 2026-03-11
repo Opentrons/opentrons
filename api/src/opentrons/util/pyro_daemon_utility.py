@@ -31,24 +31,22 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
         pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
         utility.add_PSO(pyro_object)
         try:
-            # Find the currently running nameserver
-            try:
-                with pyro.locate_ns() as ns:
-                    # Register our objects URI with the system nameserver
-                    try:
-                        ns.register(pyroname, daemon.uriFor(pyro_object))
-                        log.info(
-                            f"Pyro5 Dameon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
-                        )
+            with pyro.locate_ns() as ns:
+                # Register our objects URI with the system nameserver
+                try:
+                    ns.register(pyroname, daemon.uriFor(pyro_object))
+                    log.info(
+                        f"Pyro5 Dameon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
+                    )
 
-                        # Maintain a request loop to handle requests on our resource instance from remote processes
-                        daemon.requestLoop()
-                    finally:
-                        ns.remove(name=pyroname)
-            except (errors.NamingError, errors.CommunicationError, socket.timeout):
-                raise errors.CommunicationError(
-                    f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
-                )
+                    # Maintain a request loop to handle requests on our resource instance from remote processes
+                    daemon.requestLoop()
+                finally:
+                    ns.remove(name=pyroname)
+        except (errors.NamingError, errors.CommunicationError, socket.timeout):
+            raise errors.CommunicationError(
+                f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
+            )
         finally:
             utility.remove_PSO(pyro_object)
             daemon.close()
