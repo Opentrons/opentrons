@@ -48,6 +48,7 @@ export function ExtendedPartialTipField(
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
+  console.log('aspirate labware', propsForFields.dispense_labware)
   switch (stepType) {
     case 'mix':
       aspWells = propsForFields.wells
