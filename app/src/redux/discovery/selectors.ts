@@ -84,11 +84,16 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
+const isOT2Robot = (robot: DiscoveredRobot): boolean => {
+  const robotModelName = robot.robotModel?.split(/\s/)[0] ?? null
+  return robotModelName !== null && robotModelName === 'OT-2'
+}
+
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
     state => state.discovery.robotsByName,
     robotsMap => {
-      return Object.keys(robotsMap).map((robotName: string) => {
+      const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
         const { health, serverHealth } = robotState
@@ -149,6 +154,7 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
           status: UNREACHABLE,
         }
       })
+      return robots.filter(robot => isOT2Robot(robot))
     }
   )
 

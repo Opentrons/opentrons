@@ -192,24 +192,6 @@ const EXPECTED_BAZ = {
   robotModel: ROBOT_MODEL_OT2,
 }
 
-// qux is reachable because it was recently seen, even though primary IP is
-// not currently responding in any way. Cached health responses have no model
-// data, but the MDNS data says it's an OT-3.
-const EXPECTED_QUX = {
-  name: 'qux',
-  displayName: 'qux',
-  status: REACHABLE,
-  local: false,
-  seen: true,
-  health: mockOT3HealthResponse,
-  serverHealth: mockOT3ServerHealthResponse,
-  healthStatus: HEALTH_STATUS_UNREACHABLE,
-  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
-  ip: '10.0.0.4',
-  port: 31950,
-  robotModel: ROBOT_MODEL_OT3,
-}
-
 // fizz is unreachable because IP is unreachable and we haven't seen any of
 // this robot's IP addresses recently. Cached health responses indicate it's
 // an OT-2.
@@ -245,22 +227,6 @@ const EXPECTED_BUZZ = {
   robotModel: ROBOT_MODEL_OT2,
 }
 
-// fizzbuzz is as foo and therefore connectable, but is an OT-3
-const EXPECTED_FIZZBUZZ = {
-  name: 'fizzbuzz',
-  displayName: 'fizzbuzz',
-  status: CONNECTABLE,
-  local: false,
-  seen: true,
-  health: mockOT3HealthResponse,
-  serverHealth: mockOT3ServerHealthResponse,
-  healthStatus: HEALTH_STATUS_OK,
-  serverHealthStatus: HEALTH_STATUS_OK,
-  ip: '10.0.0.2',
-  port: 31950,
-  robotModel: ROBOT_MODEL_OT3,
-}
-
 describe('discovery selectors', () => {
   const SPECS: Array<{
     name: string
@@ -282,30 +248,28 @@ describe('discovery selectors', () => {
       expected: false,
     },
     {
-      name: 'getDiscoveredRobots assigns status based on healthStatus and serverHealthStatus',
+      name: 'getDiscoveredRobots assigns status based on healthStatus and serverHealthStatus and filters out OT-3 robots',
       selector: discovery.getDiscoveredRobots,
       state: MOCK_STATE,
       expected: [
         EXPECTED_FOO,
         EXPECTED_BAR,
         EXPECTED_BAZ,
-        EXPECTED_QUX,
         EXPECTED_FIZZ,
         EXPECTED_BUZZ,
-        EXPECTED_FIZZBUZZ,
       ],
     },
     {
       name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_BAR, EXPECTED_FIZZBUZZ, EXPECTED_FOO],
+      expected: [EXPECTED_BAR, EXPECTED_FOO],
     },
     {
       name: 'getReachableRobots grabs robots with reachable status',
       selector: discovery.getReachableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_BAZ, EXPECTED_QUX],
+      expected: [EXPECTED_BAZ],
     },
     {
       name: 'getUnreachableRobots grabs robots with unreachable status',
@@ -407,13 +371,7 @@ describe('discovery selectors', () => {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
-      expected: [
-        EXPECTED_BAR,
-        EXPECTED_BAZ,
-        EXPECTED_FIZZBUZZ,
-        EXPECTED_FOO,
-        EXPECTED_QUX,
-      ],
+      expected: [EXPECTED_BAR, EXPECTED_BAZ, EXPECTED_FOO],
     },
     {
       name: 'getRobotApiVersion returns health.apiServerVersion',
@@ -583,13 +541,6 @@ describe('discovery selectors', () => {
       expected: EXPECTED_BAZ.health.api_version,
     },
     {
-      name: 'getRobotType returns type of a connectable OT-3',
-      selector: discovery.getRobotModelByName,
-      state: MOCK_STATE,
-      args: ['fizzbuzz'],
-      expected: 'Opentrons Flex',
-    },
-    {
       name: 'getRobotType returns type of a connectable OT-2',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
@@ -602,13 +553,6 @@ describe('discovery selectors', () => {
       state: MOCK_STATE,
       args: ['baz'],
       expected: 'OT-2',
-    },
-    {
-      name: 'getRobotType returns OT-2 by default for an unreachable robot',
-      selector: discovery.getRobotModelByName,
-      state: MOCK_STATE,
-      args: ['qux'],
-      expected: 'Opentrons Flex',
     },
     {
       name: 'getRobotAddressesByName returns addresses by name',
