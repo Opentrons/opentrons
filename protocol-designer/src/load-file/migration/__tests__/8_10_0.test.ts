@@ -18,7 +18,7 @@ import type { FormData } from '/protocol-designer/form-types'
 type LegacyFormData = FormData
 
 describe('v8.10.0 migration', () => {
-  it('should add the default primary nozzle based on the existing nozzle configuration', () => {
+  it('should add the default primary nozzle based on the existing nozzle configuration and null blowout args', () => {
     const mockLabwareEntity = {
       id: 'labware',
       labwareDefUri: 'labware-def',
@@ -54,7 +54,8 @@ describe('v8.10.0 migration', () => {
       aspirate_wellOrder_first: 'l2r',
       aspirate_wellOrder_second: 'l2r',
       aspirate_wells: ['A1', 'A2'],
-      blowout_checkbox: false,
+      blowout_checkbox: true,
+      blowout_location: 'source',
       changeTip: 'once',
       dispense_airGap_checkbox: true,
       dispense_delay_checkbox: true,
@@ -112,7 +113,8 @@ describe('v8.10.0 migration', () => {
       aspirate_wellOrder_first: 'l2r',
       aspirate_wellOrder_second: 'l2r',
       aspirate_wells: ['A1', 'A2'],
-      blowout_checkbox: false,
+      blowout_checkbox: true,
+      blowout_location: 'source',
       changeTip: 'once',
       dispense_airGap_checkbox: true,
       dispense_delay_checkbox: true,
@@ -133,6 +135,10 @@ describe('v8.10.0 migration', () => {
       volume: 10,
       pushOut_volume: 1,
       pushOut_checkbox: false,
+      blowout_mmFromBottom: 1,
+      blowout_x_position: 0,
+      blowout_y_position: 0,
+      blowout_position_reference: POSITION_REFERENCE_TOP,
       aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
       aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
       aspirate_position_reference: POSITION_REFERENCE_TOP,

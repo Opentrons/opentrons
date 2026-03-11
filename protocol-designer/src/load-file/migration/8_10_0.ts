@@ -1,4 +1,8 @@
-import { ALL, getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  ALL,
+  getPipetteNameSpecs,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -18,9 +22,20 @@ export const migrateFile = (
     (acc, form) => {
       const { stepType, id } = form
       if (stepType === 'moveLiquid' || stepType === 'mix') {
-        const { pipette, nozzles } = form
+        const { pipette, nozzles, blowout_checkbox, blowout_location } = form
+        const blowoutInLabware =
+          blowout_location === 'source' || blowout_location === 'destination'
         const confirmedNozzles = nozzles ?? ALL
         const pipetteSpecs = getPipetteNameSpecs(pipettes[pipette].pipetteName)
+        let blowoutForm = {}
+        if (stepType === 'moveLiquid' && blowout_checkbox && blowoutInLabware) {
+          blowoutForm = {
+            blowout_mmFromBottom: 1,
+            blowout_x_position: 0,
+            blowout_y_position: 0,
+            blowout_position_reference: POSITION_REFERENCE_TOP,
+          }
+        }
         if (pipetteSpecs) {
           const primaryNozzle = getDefaultPrimaryNozzle({
             nozzles: confirmedNozzles,
@@ -32,6 +47,7 @@ export const migrateFile = (
               ...form,
               primaryNozzle: primaryNozzle,
               nozzles: confirmedNozzles,
+              ...blowoutForm,
             },
           }
         }
