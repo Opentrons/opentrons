@@ -8,6 +8,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '../../step-forms/selectors'
@@ -112,6 +113,20 @@ export const getFlexStackerLabwareOptions: Selector<DropdownOption[]> =
         FLEX_STACKER_MODULE_TYPE
       )
       return flexStackerModuleOptions
+    }
+  )
+
+export const getVacuumLabwareOptions: Selector<DropdownOption[]> =
+  createSelector(
+    getInitialDeckSetup,
+    getLabwareNicknamesById,
+    (initialDeckSetup, nicknamesById) => {
+      const vacuumModuleOptions = getModuleLabwareOptions(
+        initialDeckSetup,
+        nicknamesById,
+        VACUUM_MODULE_TYPE
+      )
+      return vacuumModuleOptions
     }
   )
 

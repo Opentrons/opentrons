@@ -31,6 +31,35 @@ export const maskToTime = (rawValue: unknown): string => {
       : String(rawValue)
   return rawTimeValue
 }
+export const maskToTimeMMSS = (rawValue: unknown): string => {
+  if (rawValue == null || rawValue === '') {
+    return ''
+  }
+
+  const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
+
+  // remove invalid characters
+  const sanitized = value.replace(/[^\d:]/g, '')
+
+  // allow only one colon
+  const parts = sanitized.split(':')
+  const minutes = parts[0].slice(0, 2)
+  const seconds = parts[1]?.slice(0, 2)
+
+  return seconds != null ? `${minutes}:${seconds}` : minutes
+}
+export const maskToSignedDecimal = (rawValue: unknown): string => {
+  if (rawValue == null || rawValue === '') {
+    return ''
+  }
+  const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
+  const sanitized = value.replace(/[^\d.-]/g, '').replace(/(?!^)-/g, '')
+  const parts = sanitized.split('.')
+  if (parts.length > 2) {
+    return `${parts[0]}.${parts.slice(1).join('')}`
+  }
+  return sanitized
+}
 const DEFAULT_DECIMAL_PLACES: number = 1
 export const maskToFloat = (rawValue: unknown): string =>
   typeof rawValue === 'string'

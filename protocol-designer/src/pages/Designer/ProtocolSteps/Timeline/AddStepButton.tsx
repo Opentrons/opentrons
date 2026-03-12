@@ -65,6 +65,7 @@ import {
 import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { AddStepOverflowButton } from './AddStepOverflowButton'
+import { getConsolidatedStacks } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { MouseEvent } from 'react'
@@ -112,9 +113,9 @@ export function AddStepButton({
     timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
   const labwareAtLastState = lastTimelineFrame?.labware ?? {}
   const moduleAtLastState = lastTimelineFrame?.modules ?? {}
-  const isLabwarePresentForLiquidHandling = Object.entries(
-    labwareAtLastState
-  ).some(([labwareId, { stack }]) => {
+  const consolidatedStacks = getConsolidatedStacks(labwareAtLastState)
+  const isLabwarePresentForLiquidHandling = consolidatedStacks.some(stack => {
+    const labwareId = stack[0]
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
     const isInaccessible = slot === SYSTEM_LOCATION
