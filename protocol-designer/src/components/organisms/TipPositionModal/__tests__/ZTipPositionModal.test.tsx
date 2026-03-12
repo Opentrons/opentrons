@@ -43,7 +43,7 @@ describe('ZTipPositionModal', () => {
   })
   it('renders the custom option, caption, and visual', () => {
     render(props)
-    expect(screen.getAllByRole('textbox', { name: '' })).toHaveLength(1)
+    expect(screen.getByRole('textbox', { name: 'Z position' })).toBeVisible()
     screen.getByText('Must be between -30 and 0')
     screen.getByText('mock TipPositionZOnlyView')
   })
