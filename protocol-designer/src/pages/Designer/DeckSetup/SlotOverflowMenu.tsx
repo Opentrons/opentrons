@@ -111,7 +111,10 @@ export function SlotOverflowMenu(
   const { makeSnackbar } = useKitchen()
 
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
-
+  const allLabwareNotLids = Object.values(deckSetupLabware).filter(
+    lbw => !lbw.def.allowedRoles?.includes('lid')
+  )
+  const topLabwareThatIsNotALid = allLabwareNotLids[0]
   const isOffDeckLocation = deckSetupLabware[location] != null
 
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
@@ -210,7 +213,7 @@ export function SlotOverflowMenu(
       : TOP_SLOT_Y_POSITION_2_BUTTONS
   }
 
-  let nickNameId = topLabwareOnSlot?.id
+  let nickNameId = topLabwareThatIsNotALid?.id
   if (isOffDeckLocation) {
     nickNameId = location
   }

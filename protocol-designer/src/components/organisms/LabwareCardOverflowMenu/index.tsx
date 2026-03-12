@@ -80,7 +80,13 @@ export function LabwareCardOverflowMenu(
       }
     },
   })
-  const topLabwareId = labwareIds[0]
+  const stackOnlyHasLids =
+    labwareIds.filter(
+      id =>
+        id !== lidId && !deckSetup.labware[id].def.allowedRoles?.includes('lid')
+    ).length === 0
+
+  const topLabwareId = labwareIds.filter(id => id !== lidId)[0]
   const isAdapter =
     deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter')
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
@@ -105,6 +111,7 @@ export function LabwareCardOverflowMenu(
   const disallowNickname =
     isAdapter ||
     deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
+    stackOnlyHasLids ||
     deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
       'tiprackAdapterFor96Channel'
     ) ||
