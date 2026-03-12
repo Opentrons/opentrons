@@ -108,6 +108,63 @@ _HIGHER_ORDER_COMMAND_TYPES = {
 }
 
 
+def _state_update_for_legacy_command(
+    completed_command: pe_commands.Command,
+    command: legacy_command_types.CommandMessage,
+) -> StateUpdate:
+    """Build a StateUpdate for legacy PickUpTip/DropTip so tip tracking and stream get updates."""
+    if isinstance(completed_command, pe_commands.PickUpTip) and (
+        completed_command.result is not None
+    ):
+        result = completed_command.result
+        params = completed_command.params
+        location = command.get("payload", {}).get("location")
+        tip_diameter = (
+            getattr(location, "diameter", 0.0) if location is not None else 0.0
+        )
+        tip_geometry = pe_types.TipGeometry(
+            length=result.tipLength,
+            diameter=tip_diameter,
+            volume=result.tipVolume,
+        )
+        return (
+            StateUpdate()
+            .update_pipette_tip_state(
+                pipette_id=params.pipetteId,
+                tip_geometry=tip_geometry,
+                tip_source=pe_types.LabwareWellId(
+                    labware_id=params.labwareId, well_name=params.wellName
+                ),
+            )
+            .update_tip_rack_well_state(
+                tip_state=pe_types.TipRackWellState.EMPTY,
+                labware_id=params.labwareId,
+                well_names=[params.wellName],
+            )
+            .set_fluid_empty(pipette_id=params.pipetteId, clean_tip=True)
+            .set_pipette_ready_to_aspirate(
+                pipette_id=params.pipetteId, ready_to_aspirate=True
+            )
+        )
+    if isinstance(completed_command, pe_commands.DropTip):
+        params = completed_command.params
+        return (
+            StateUpdate()
+            .update_pipette_tip_state(
+                pipette_id=params.pipetteId,
+                tip_geometry=None,
+                tip_source=None,
+            )
+            .update_tip_rack_well_state(
+                tip_state=pe_types.TipRackWellState.USED,
+                labware_id=params.labwareId,
+                well_names=[params.wellName],
+            )
+            .set_fluid_unknown(pipette_id=params.pipetteId)
+        )
+    return StateUpdate()
+
+
 class LegacyCommandMapper:
     """Map broker commands to protocol engine commands.
 
@@ -290,10 +347,13 @@ class LegacyCommandMapper:
                             "notes": [],
                         }
                     )
+                state_update = _state_update_for_legacy_command(
+                    completed_command, command
+                )
                 results.append(
                     pe_actions.SucceedCommandAction(
                         completed_command,
-                        state_update=StateUpdate(),
+                        state_update=state_update,
                     )
                 )
 

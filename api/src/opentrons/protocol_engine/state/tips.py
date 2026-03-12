@@ -99,6 +99,20 @@ class TipView:
         """
         self._state = state
 
+    def get_tip_state_by_labware(self) -> Dict[str, Dict[str, str]]:
+        """Return tip rack well state per labware for analysis/serialization.
+
+        Returns:
+            Map of labware_id to { well_name: "clean"|"used"|"empty" }.
+        """
+        return {
+            labware_id: {
+                well_name: well_state.value
+                for well_name, well_state in wells.items()
+            }
+            for labware_id, wells in self._state.tips_by_labware_id.items()
+        }
+
     def get_next_tip(  # noqa: C901
         self,
         labware_id: str,

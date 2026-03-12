@@ -16,6 +16,7 @@ from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .state.config import Config
 from .state.state import StateStore
+from .state_change_stream import StateChangeStreamHandler
 from .types import DeckConfigurationType, PostRunHardwareState
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
@@ -40,6 +41,7 @@ async def create_protocol_engine(
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    state_change_queue: typing.Optional[asyncio.Queue[typing.Any]] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -53,6 +55,7 @@ async def create_protocol_engine(
         file_provider: Provides access to robot server file writing procedures for protocol output.
         camera_provider: Provides access to camera interface with image capture and callbacks.
         notify_publishers: Notifies robot server publishers of internal state change.
+        state_change_queue: If provided, state change events are put on this queue during execution.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
@@ -79,6 +82,10 @@ async def create_protocol_engine(
     )
     action_dispatcher = ActionDispatcher(state_store)
     action_dispatcher.add_handler(hardware_state_synchronizer)
+    if state_change_queue is not None:
+        action_dispatcher.add_handler(
+            StateChangeStreamHandler(queue=state_change_queue)
+        )
     plugin_starter = PluginStarter(state_store, action_dispatcher)
     model_utils = ModelUtils()
     hardware_stopper = HardwareStopper(hardware_api, state_store)
