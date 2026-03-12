@@ -19,7 +19,7 @@
   "configureNozzleLayout": "Configure",
   "createCSV": "Create CSV",
   "createTimer": "Create timer",
-  "csvWriteRow": "Write row",
+  "csvWriteRow": "Write CSV row",
   "custom": "Custom",
   "delay": "Wait",
   "dispense": "Dispense",
