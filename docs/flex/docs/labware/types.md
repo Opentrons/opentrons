@@ -70,24 +70,29 @@ Unfiltered and filtered tips are bundled into a rack that consists of a reusable
 
 To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
-<figure markdown>
-![test](../images/tip-rack-with-labels.png){ width="80%" }
-</figure>
-
-!!! tip
+!!! note
     Opentrons recommends using sealed tips within three years from the production date.
+
+<font color="red">PLACEHOLDER FOR NEW TIPRACK IMAGE</font>
 
 When ordering or reordering, tips and racks come in two different packaged configurations: 
 
 - **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse. 
 - **Refills:** Consist of one complete tip rack (base plate, mid plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
 
-### Tip-pipette combinations
+### Tip-pipette compatibility
 
-You can attach any Flex pipette tip to any Flex pipette, regardless of tip size. However, to help ensure optimal accuracy and prevent damage to the pipette, always select a tip based on transfer volume and the pipette's volume range. When selecting a tip and pipette combination:
+Flex pipette tips are designed for the Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
 
-- **Do not exceed tip capacity**: To prevent liquid entering the pipette body, never aspirate a volume larger than the tip's rated capacity.
-- **Match tip to volume**: For best performance, use the smallest tip and pipette that can hold your target volume. For example, using a 1000 µL tip to move 5 µL of liquid may not give you the best results.
+Flex pipettes only accept tips with capacities less than or equal to the pipette capacity.
+
+| Pipette capacity | Compatible tips             |
+| :--------------- | :-------------------------- |
+| 1–50 µL          | 20 µL, 50 µL tips             |
+| 1–200 µL         | 20 µL, 50 µL, 200 µL tips |
+| 5–1000 µL        | 50 µL, 200 µL, and 1000 µL tips |
+
+Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes.
 
 ### Tip rack adapter 
 
