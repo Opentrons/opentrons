@@ -5,10 +5,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,7 +47,7 @@ export function SetWifiSsid({
         >
           {t('enter_network_name')}
         </LegacyStyledText>
-        <InputField
+        <TouchInputField
           aria-label="wifi_ssid"
           value={inputSsid}
           id="wifiSsid"
