@@ -268,7 +268,7 @@ describe('FullKeyboard', () => {
       .find(button => button.className.includes('hg-globe'))
 
     expect(globeKey).toBeDefined()
-    fireEvent.click(globeKey as HTMLElement)
+    fireEvent.click(globeKey!)
 
     expect(screen.getByRole('button', { name: 'english (us)' })).toBeDefined()
     expect(
