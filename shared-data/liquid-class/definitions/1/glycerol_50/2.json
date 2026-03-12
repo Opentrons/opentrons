@@ -1135,7 +1135,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 25.0
+                  "flowRate": 10.0
                 }
               },
               "touchTip": {
