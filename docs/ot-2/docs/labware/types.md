@@ -50,14 +50,18 @@ Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create
 
 ## Tips and tip racks { #tips-and-tip-racks-ot2 }
 
-OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, sterile polypropylene tips that are available with or without filters.
-
-OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes, and Flex tips cannot be used on OT-2 pipettes. Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons OT-2 tips with OT-2 pipettes.
+OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 200 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, polypropylene tips that are available with or without filters. See the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of the Opentrons website if you need tips for your OT-2 pipettes.
 
 !!! tip
     For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
 
-See the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of the Opentrons website if you need tips for your OT-2 pipettes.
+### Tip compatibility
+
+OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes, and Flex tips cannot be used on OT-2 pipettes. Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use OT-2 tips with OT-2 pipettes.
+
+### Tip sterility
+
+OT-2 tips are sterilized by e-beam irradiation and are free of DNase, protease, and pyrogens.
 
 ## Tubes and tube racks
 
