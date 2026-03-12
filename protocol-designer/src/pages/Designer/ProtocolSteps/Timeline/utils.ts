@@ -169,7 +169,7 @@ export const getFillLabwareToDeleteData = (
     const module = Object.values(deckSetupModules).find(
       module => formData.moduleId === module.id
     )
-    return formData?.stepType === 'stacker' &&
+    return formData?.stepType === 'flexStacker' &&
       formData.fillLabwareIds != null &&
       module != null
       ? [...acc, { labwareIds: formData.fillLabwareIds as string[], module }]

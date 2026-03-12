@@ -65,7 +65,7 @@
   "edit_step": "Edit step",
   "ending_deck": "Ending deck",
   "engage_height": "Engage height",
-  "stacker": "Stacker",
+  "flexStacker": "Stacker",
   "flex_stacker": {
     "empty": "Emptying stacker of all labware",
     "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",

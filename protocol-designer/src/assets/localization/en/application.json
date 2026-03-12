@@ -38,7 +38,7 @@
     "absorbanceReader": "absorbance plate reader",
     "camera": "camera",
     "comment": "comment",
-    "stacker": "stacker",
+    "flexStacker": "flex stacker",
     "heaterShaker": "heater-shaker",
     "magnet": "magnet",
     "mix": "mix",

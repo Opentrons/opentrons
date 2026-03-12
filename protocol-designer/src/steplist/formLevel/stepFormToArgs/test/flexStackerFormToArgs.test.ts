@@ -12,7 +12,7 @@ describe('flexStackerFormToArgs', () => {
   let baseFormData: GetCastFormData<HydratedFlexStackerFormData>
   beforeEach(() => {
     baseFormData = {
-      stepType: 'stacker',
+      stepType: 'flexStacker',
       id: 'stacker-id',
       fillLabwareUri: 'mock uri',
       fillLabwareIds: [],

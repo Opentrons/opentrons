@@ -7,7 +7,7 @@ import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
-  pick(getDefaultsForStepType('stacker'), fields)
+  pick(getDefaultsForStepType('flexStacker'), fields)
 
 const updatePatchOnFlexStackerFormType = (
   patch: FormPatch,

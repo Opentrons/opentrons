@@ -136,7 +136,7 @@ interface StepFormDataMap {
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
   camera: HydratedCameraFormData
-  stacker: HydratedFlexStackerFormData
+  flexStacker: HydratedFlexStackerFormData
   vacuum: HydratedVacuumFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
@@ -287,7 +287,7 @@ const stepFormHelperMap: {
   camera: {
     getErrors: composeErrors(),
   },
-  stacker: {
+  flexStacker: {
     getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
   },
   vacuum: {
@@ -383,7 +383,7 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
-    case 'stacker':
+    case 'flexStacker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedFlexStackerFormData,
         moduleEntities,

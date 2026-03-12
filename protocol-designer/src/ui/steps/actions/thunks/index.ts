@@ -156,7 +156,7 @@ export const addAndSelectStep: (arg: {
         })
       )
     }
-  } else if (payload.stepType === 'stacker') {
+  } else if (payload.stepType === 'flexStacker') {
     const flexStackerModules = Object.entries(modules).filter(
       ([key, module]) => module.type === FLEX_STACKER_MODULE_TYPE
     )

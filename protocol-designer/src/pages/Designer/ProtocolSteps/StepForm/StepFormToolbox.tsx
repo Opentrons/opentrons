@@ -115,7 +115,7 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
-  stacker: FlexStackerTools,
+  flexStacker: FlexStackerTools,
   vacuum: VacuumTools,
 }
 
@@ -573,7 +573,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               style={{ WebkitLineClamp: 2 }}
             >
               {/* TODO: use  module object from form.json instead */}
-              {formData.stepType === 'stacker'
+              {formData.stepType === 'flexStacker'
                 ? t(`protocol_steps:${formData.stepType}`)
                 : capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>

@@ -332,7 +332,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       )
       break
     }
-    case 'stacker': {
+    case 'flexStacker': {
       stepSummaryContent = (
         <FlexStackerSummary
           currentStep={currentStep}

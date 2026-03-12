@@ -23,7 +23,6 @@ function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
     case 'magnet':
     case 'thermocycler':
     case 'moveLabware':
-    case 'stacker':
       return new Set()
 
     // nothing to disabled
