@@ -43,6 +43,7 @@ import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/
 
 import { getStackerModuleStateFromSlot } from '../AssignLiquidsModal/utils'
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
+import { getAllLabwareWithoutLids } from '../utils'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
@@ -81,10 +82,7 @@ export function LabwareCardOverflowMenu(
     },
   })
   const stackOnlyHasLids =
-    labwareIds.filter(
-      id =>
-        id !== lidId && !deckSetup.labware[id].def.allowedRoles?.includes('lid')
-    ).length === 0
+    getAllLabwareWithoutLids(deckSetup, labwareIds).length === 0
 
   const topLabwareId = labwareIds.filter(id => id !== lidId)[0]
   const isAdapter =
@@ -93,7 +91,8 @@ export function LabwareCardOverflowMenu(
   const fullStack = getFullStackFromLabwares(
     deckSetupLabware,
     slotName,
-    topLabwareId
+    topLabwareId,
+    true
   )
   const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
   const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null

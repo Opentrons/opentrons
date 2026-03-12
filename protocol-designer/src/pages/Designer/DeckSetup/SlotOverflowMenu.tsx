@@ -29,6 +29,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
+  getAllLabwareWithoutLids,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
@@ -111,10 +112,8 @@ export function SlotOverflowMenu(
   const { makeSnackbar } = useKitchen()
 
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
-  const allLabwareNotLids = Object.values(deckSetupLabware).filter(
-    lbw => !lbw.def.allowedRoles?.includes('lid')
-  )
-  const topLabwareThatIsNotALid = allLabwareNotLids[0]
+  const allLabwareNotLids = getAllLabwareWithoutLids(deckSetup)
+  const topLabwareThatIsNotALid = deckSetupLabware[allLabwareNotLids[0]]
   const isOffDeckLocation = deckSetupLabware[location] != null
 
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
