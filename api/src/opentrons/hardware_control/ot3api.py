@@ -636,7 +636,7 @@ class OT3API(
             self.resume(PauseType.DELAY)
 
     @property
-    @pyro_behavior(convert_result_to_proxy)
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 

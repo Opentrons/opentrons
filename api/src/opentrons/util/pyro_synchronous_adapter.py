@@ -41,6 +41,7 @@ class DaemonUtility:
         if uri in self._PyroSynchronousObjects:
             self._daemon.unregister(self._PyroSynchronousObjects[uri])  # type: ignore
             del self._PyroSynchronousObjects[uri]
+        print(f"PSO LIST LEN: {len(self._PyroSynchronousObjects)}")
 
     def find_PSO(self, core_obj: Any) -> _PSO | None:
         """Find a managed PyroSynchronousObject based on the core object it aliases."""
@@ -51,23 +52,28 @@ class DaemonUtility:
 
     def proxy_for(self, pso: Any) -> pyro.Proxy:
         """Return a Pyro5 Proxy for an already-registered PyroSynchronousObject."""
-        # todo(chb, 2025-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
+        # todo(chb, 2026-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
         return self._daemon.proxyFor(pso)  # type: ignore
 
 
-def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
+def pyro_behavior(
+    specialty_func: Callable[P, T], apply_local: bool
+) -> Callable[[Any], Any]:
     """Decorator to indicate to the PyroSynchronousObject adapter that a function must be bound with a special method.
 
     This works by adding the `specialty_func` to the original function as metadata, to be used by the PyroSynchronousObject
     constructor when building the alias attributes.
 
     Params:
-        - specialty_func: The wrapper method that will be used when binding a decorated attribute of an object instance.
+        specialty_func: The wrapper method that will be used when binding a decorated attribute of an object instance.
+        apply_local: Boolean to determine if this specialty function should wrap the attribute on the PyroSynchronousObject or
+                     on the original object instance. Setting to True applies the specialty function to the original instance.
     """
 
     def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
         specialty_sig = inspect.signature(specialty_func)
+        # todo(chb, 2026-03-11): need a better way of enforcing specialty function shape
         if not all(
             item in specialty_sig.parameters.keys()
             for item in ["utility", "core_obj", "name", "attr"]
@@ -76,6 +82,7 @@ def pyro_behavior(specialty_func: Callable[P, T]) -> Callable[[Any], Any]:
                 "Pyro Behavior Specialty Functions must contain parameters `utility`, `core_obj`, `name` and `attr`."
             )
         func._pyro_specialty_func = specialty_func  # type: ignore
+        func._pyro_apply_local = apply_local  # type: ignore
         return func
 
     return decorator
@@ -210,9 +217,19 @@ def _build_classdict(
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_function = _get_specialty_behavior(attr, name)
-            if specialty_function is not None:
-                # Expose the wrapped specialty method
-                exposed = pyro.expose(specialty_function(utility, core_obj, name, attr))
+            # Handle core object modifications
+            if specialty_function is not None and specialty_function[1] is True:
+                # Wrap the attribute on the original core object and set the wrapped attribute as the new attribute
+                print(f"WRAPPING ATTRIBUTE {name} ON OBJECT {core_obj}")
+                wrapped_attr = specialty_function[0](utility, core_obj, name, attr)
+                setattr(core_obj, name, wrapped_attr)
+
+            # Handle PyroSynchronousObject attribute construction
+            if specialty_function is not None and specialty_function[1] is False:
+                # Apply the specialty function to the attribute on this PSO instance and expose the wrapped specialty method
+                exposed = pyro.expose(
+                    specialty_function[0](utility, core_obj, name, attr)
+                )
                 yield (name, exposed)
             elif isinstance(attr, FunctionType) and inspect.iscoroutinefunction(attr):
                 # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
@@ -252,17 +269,21 @@ def _build_classdict(
 ### Helpers ###
 
 
-def _get_specialty_behavior(func: Any, name: str) -> Any | None:
+def _get_specialty_behavior(func: Any, name: str) -> tuple[Any, bool] | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
-        if hasattr(func, "_pyro_specialty_func"):
-            return func._pyro_specialty_func
+        if hasattr(func, "_pyro_specialty_func") and hasattr(func, "_pyro_apply_local"):
+            return (func._pyro_specialty_func, func._pyro_apply_local)
     elif isinstance(func, property):
-        if hasattr(func.fget, "_pyro_specialty_func"):
-            return func.fget._pyro_specialty_func  # type: ignore
+        if hasattr(func.fget, "_pyro_specialty_func") and hasattr(
+            func.fget, "_pyro_apply_local"
+        ):
+            return (func.fget._pyro_specialty_func, func.fget._pyro_apply_local)  # type: ignore
     return None
 
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
+
+## Alias Specialty Functions - Used to wrap attributes on the PyroSynchronousObject instance
 
 
 def convert_result_to_proxy(  # noqa: C901
@@ -310,4 +331,36 @@ def convert_result_to_proxy(  # noqa: C901
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
         return property(wrapper)
+    return wrapper
+
+
+## Local Specialty Functions - Used to wrap attributes on the original instance
+
+
+def remove_pyro_synchronous_object(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper to remove a PyroSynchronousObject from it's DaemonUtility, and unregister its Proxy object.
+
+    This function is intended for use with `pyro_behavior` and is executed when the local attribute of the original
+    core_obj instance is called. The original core_obj attribute is wrapped and will still execute, but the attached
+    logic will handle cleanup of the PyroSynchronousObject related to that core_obj instance.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
+        print("IN THE WRAPPED CALL ON THE LOCAL ATTRIBUTE")
+        if isinstance(attr, FunctionType) and not inspect.iscoroutinefunction(attr):
+            active_pso = utility.find_PSO(core_obj=core_obj)
+            if active_pso is not None:
+                print(f"REMOVING PSO: {active_pso}")
+                # Remove the PSO from the dictionary of managed PSOs, and unregister it from the daemon
+                utility.remove_PSO(active_pso)
+                result = asyncio.run(attr(*args, **kwargs))
+                return result
+        else:
+            raise ValueError(
+                "Wrapped base attribute must be a Method, not a Property or Async method."
+            )
+
     return wrapper
