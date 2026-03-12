@@ -67,8 +67,6 @@ export interface TouchInputFieldProps {
   padding?: string
   /** optional input type */
   type?: 'text' | 'password' | 'number'
-  /** optional props for data-testid */
-  testId?: string
 }
 
 export const TouchInputField = forwardRef<
@@ -93,7 +91,6 @@ export const TouchInputField = forwardRef<
     borderRadius,
     padding,
     type,
-    testId,
     ...inputProps
   } = props
 
@@ -164,7 +161,7 @@ export const TouchInputField = forwardRef<
             <input
               {...inputProps}
               id={inputId}
-              data-testid={testId}
+              data-testid={inputId} // ToDo remove or switch to testId
               className={clsx(
                 styles.input,
                 size === 'small' ? styles.input_small : styles.input_medium,

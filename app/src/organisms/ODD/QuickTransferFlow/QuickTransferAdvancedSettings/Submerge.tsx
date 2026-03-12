@@ -286,9 +286,6 @@ function SubmergeSettingComponent({
             value={speed}
             label={t('speed')}
             readOnly
-            onBlur={e => {
-              e.target.focus()
-            }}
           />
         </Flex>
         <Flex

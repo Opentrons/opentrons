@@ -121,7 +121,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       hasBackgroundError = false,
       borderRadius,
       padding,
-      testId,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
@@ -261,7 +260,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               <StyledInput
                 {...inputProps}
                 id={inputId}
-                data-testid={testId}
+                data-testid={inputId} //
                 value={value}
                 placeholder={placeHolder}
                 onWheel={event => {

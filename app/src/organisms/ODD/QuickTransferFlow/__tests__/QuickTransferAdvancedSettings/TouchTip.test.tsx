@@ -112,8 +112,8 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     fireEvent.click(screen.getByText('1'))
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
@@ -150,8 +150,8 @@ describe('TouchTip', () => {
     fireEvent.click(numButton)
     const secondNumButton = screen.getByText('8')
     fireEvent.click(secondNumButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -25 to 0',
         readOnly: true,
@@ -180,8 +180,8 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     const numButton = screen.getByText('1')
     fireEvent.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -100 to 0',
         readOnly: true,
@@ -226,8 +226,8 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
@@ -254,8 +254,8 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
