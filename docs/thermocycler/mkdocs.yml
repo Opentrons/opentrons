@@ -24,9 +24,9 @@ nav:
   - Thermocycler Lid Seals: lid-seals.md
   - Maintenance and Cleaning: maintenance.md
   - Thermocycler G-Codes:
-      - Thermocycler G-Code Essentials: g-codes/explanation.md
-      - Thermocycler G-Codes: g-codes/thermocycler-g-codes.md
-      - Thermocycler Error Codes: g-codes/thermocycler-error-codes.md
+      - Thermocycler G-Code Concepts: g-code-concepts.md
+      - Thermocycler G-Codes: g-codes.md
+      - Thermocycler Error Codes: error-codes.md
   - Additional Product Information: additional-info.md
 
 plugins:
