@@ -133,8 +133,7 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
-    "error::sqlalchemy.exc.RemovedIn20Warning",
-    "error::sqlalchemy.exc.RemovedIn20Warning",
+    "error::sqlalchemy.exc.RemovedIn20Warning"
 ]
 
 [tool.mypy]
