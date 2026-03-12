@@ -131,7 +131,9 @@ export function FullKeyboard({
       layoutName={layoutName}
       layout={fullKeyboardLayout}
       layoutCandidates={
-        appLanguage != null ? layoutCandidates[appLanguage] : undefined
+        keyboardLanguage != null
+          ? layoutCandidates[keyboardLanguage]
+          : undefined
       }
       display={display}
       mergeDisplay={true}
