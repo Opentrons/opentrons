@@ -48,16 +48,16 @@ def test_mix_step_configuration_workflow(page: Page, pd_base_url: str) -> None:
     mix_form.select_labware(LABWARE_OPTION)
 
     for label in [
-        "Select wells",
+        "Pipette nozzles and wells",
         "Volume per well",
         "Mix repetitions",
     ]:
         mix_form.expect_text(label)
 
-    mix_form.open_well_selector()
-    mix_form.expect_well_selector_modal()
+    mix_form.open_nozzle_and_well_selector()
+    mix_form.select_nozzles()
+    mix_form.expect_well_modal()
     mix_form.select_wells(["A1", "A2"])
-    mix_form.save_modal()
     mix_form.enter_volume("100")
     mix_form.enter_mix_repetitions("5")
     mix_form.click_continue()
