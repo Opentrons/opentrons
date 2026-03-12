@@ -1048,7 +1048,7 @@ export const getModuleIdFromRobotStateStack = (
  * @param labware - The labware object containing all labware entities
  * @param slot - The slot to get the full stack from
  * @param offDeckOverrideId - Labware ID for an offDeck stack
- * @returns The full stack from the labware object
+ * @returns The top full stack from the labware object
  */
 export const getFullStackFromLabwares = (
   labware: {
@@ -1075,7 +1075,8 @@ export const getFullStackFromLabwares = (
           (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
           lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
       )
-      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+      .sort((a, b) => a.stack.length - b.stack.length)
+      .at(-1)?.stack ?? []
   )
 }
 
