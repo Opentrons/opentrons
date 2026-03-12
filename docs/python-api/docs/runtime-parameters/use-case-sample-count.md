@@ -1,5 +1,6 @@
 ---
 title: "Python API: Runtime Parameters for Sample Count"
+description: "Use a parameter to let users set the number of samples per run."
 ---
 
 Choosing how many samples to process is important for efficient automation. This use case explores how a single parameter for sample count can have pervasive effects throughout a protocol. The examples are adapted from an actual parameterized protocol for DNA prep. The sample code will use 8-channel pipettes to process 8, 16, 24, or 32 samples.

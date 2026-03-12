@@ -1,5 +1,6 @@
 ---
 title: "Plate Reader: Installation"
+description: "How to attach the plate reader in a deck slot and connect to Opentrons Flex."
 hide: toc
 ---
 

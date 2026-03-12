@@ -43,6 +43,7 @@ const updatePatchOnLabwareChange = (
     wells: getDefaultWells({
       labwareId: appliedPatch.labware,
       pipetteId,
+      nozzleConfiguration: patch.nozzles as NozzleConfigurationStyle,
       labwareEntities,
       pipetteEntities,
     }),
@@ -82,6 +83,7 @@ const updatePatchOnPipetteChannelChange = (
       wells: getDefaultWells({
         labwareId: appliedPatch.labware,
         pipetteId,
+        nozzleConfiguration: patch.nozzles as NozzleConfigurationStyle,
         labwareEntities,
         pipetteEntities,
       }),

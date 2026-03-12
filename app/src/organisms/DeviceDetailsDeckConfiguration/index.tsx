@@ -68,6 +68,8 @@ export function DeviceDetailsDeckConfiguration({
   const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
     useState<boolean>(false)
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const deckConfig =
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,

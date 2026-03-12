@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Temperature Module"
+description: "Temperature Module features, thermal blocks, and temperature range (4–95 °C)."
 ---
 
 ![Temperature Module](../images/temperature-module.png)

@@ -43,11 +43,16 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   })
 
   // Clean up state on LPC close.
-  useEffect(() => {
-    return () => {
-      dispatch(closeLPC(props.runId))
-    }
-  }, [])
+  useEffect(
+    () => {
+      return () => {
+        dispatch(closeLPC(props.runId))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const headerCommands = useLPCHeaderCommands({
     ...props,

@@ -275,6 +275,64 @@
   "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
+  "vacuum": {
+    "controls": {
+      "duration": {
+        "label": "Time at pressure",
+        "title": "Duration"
+      },
+      "ending_hold_vent": { "title": "Ending hold", "label": "Vent" },
+      "label": "Module controls",
+      "mode": {
+        "label": "Select mode type",
+        "options": {
+          "power": {
+            "description": "Set vacuum pressure based on a percentage of total pump power",
+            "label": "Pump power (%)"
+          },
+          "pressure": {
+            "description": "Set a specific vacuum pressure value",
+            "label": "Gauge pressure (mbar)"
+          }
+        },
+        "power": "Pump power",
+        "pressure": {
+          "caption": "Valid range between {{min}}-{{max}}",
+          "label": "Gauge pressure"
+        },
+        "tooltip": "Specifies the method used to apply vacuum."
+      },
+      "options": {
+        "profile": "Program a Vacuum profile",
+        "state": "Change Vacuum state"
+      },
+      "state": {
+        "label": "Select the state to change",
+        "options": {
+          "pump": "Turn on Vacuum pump",
+          "vent": {
+            "close": "Close vent",
+            "open": "Open vent"
+          }
+        }
+      },
+      "vacuum_pump_settings": "Vacuum pump settings"
+    },
+    "previous_state": {
+      "last_module_state": "Last module state",
+      "pump": {
+        "label": "Pump",
+        "off": "Off",
+        "power": "{{power}}%",
+        "pressure": "{{pressure}} mbar"
+      },
+      "vent": {
+        "closed": "Closed",
+        "label": "Vent",
+        "open": "Open"
+      }
+    }
+  },
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": {

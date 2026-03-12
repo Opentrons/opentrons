@@ -7,6 +7,8 @@ import { getInitialRouteAndStep, useDropTipRouting } from '../useDropTipRouting'
 
 describe('useDropTipRouting', () => {
   it('should initialize with the correct default values', () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     expect(result.current.currentRoute).toBe(DT_ROUTES.BEFORE_BEGINNING)
@@ -15,6 +17,8 @@ describe('useDropTipRouting', () => {
   })
 
   it('should move to the next step when proceed is called', async () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     await act(async () => {
@@ -31,6 +35,8 @@ describe('useDropTipRouting', () => {
   })
 
   it('should move to the previous step when goBack is called', async () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     await act(async () => {
@@ -51,6 +57,8 @@ describe('useDropTipRouting', () => {
   })
 
   it('should reset to the first step of the BEFORE_BEGINNING route when proceeding from the last step', async () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     await act(async () => {
@@ -65,6 +73,8 @@ describe('useDropTipRouting', () => {
   })
 
   it('should reset to the first step of the BEFORE_BEGINNING route when going back from the first step', async () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     await act(async () => {
@@ -76,6 +86,8 @@ describe('useDropTipRouting', () => {
   })
 
   it('should proceed to the specified route when proceedToRouteAndStep is called', async () => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { result } = renderHook(() => useDropTipRouting())
 
     await act(async () => {

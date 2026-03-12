@@ -112,7 +112,6 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
           const head = pollQueue.shift()!
           // take the head of the queue out and put it back in at the end
           pollQueue.push(head)
-          // eslint-disable-next-line no-void
           void pollAndNotify(head)
         }
       }

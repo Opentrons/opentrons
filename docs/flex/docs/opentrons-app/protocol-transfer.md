@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Transferring Protocols"
+description: "Import, analyze, and transfer protocols to Flex from your computer."
 ---
 
 Every protocol will begin as a file on your computer, regardless of what method of [protocol development](../protocols/index.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.

@@ -65,11 +65,15 @@ function useFlexLPCLabwareInfo({
         protocolData,
         robotType,
       }),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareDefs?.length, protocolData?.commands.length, robotType]
   )
 
   const searchLwOffsetsParams = useMemo(
     () => getLPCSearchParams(lwLocationCombos),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [lwLocationCombos.length]
   )
 

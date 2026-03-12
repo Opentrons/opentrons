@@ -1,5 +1,6 @@
 ---
 title: Opentrons Modules
+description: "Overview of Opentrons hardware modules and links to each module manual."
 ---
 
 # Modules

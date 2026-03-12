@@ -26,6 +26,8 @@ module.exports = {
     'jsx-a11y',
   ],
 
+  reportUnusedDisableDirectives: true,
+
   rules: {
     camelcase: 'off',
     'no-var': 'error',
@@ -33,7 +35,7 @@ module.exports = {
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': [
-      'warn',
+      'error',
       {
         additionalHooks: '(useDrag|useDrop)',
       },
