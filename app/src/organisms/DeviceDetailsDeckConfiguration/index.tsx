@@ -48,9 +48,10 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { TFunction } from 'i18next'
-import type { CutoutId, VISUAL_SLOTS } from '@opentrons/shared-data'
+import type { CutoutId, DeckConfiguration, VISUAL_SLOTS } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
+const DECK_CONFIG_EXPORT_VERSION = 1
 const RUN_REFETCH_INTERVAL = 5000
 
 interface DeviceDetailsDeckConfigurationProps {
@@ -59,6 +60,31 @@ interface DeviceDetailsDeckConfigurationProps {
 
 function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
   return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
+}
+
+function getDeckConfigFilename(robotName: string): string {
+  const safeName = robotName.replace(/[^a-zA-Z0-9-_]/g, '_')
+  const date = new Date().toISOString().slice(0, 10)
+  return `deck-config-${safeName}-${date}.json`
+}
+
+function downloadDeckConfiguration(
+  robotName: string,
+  deckConfig: DeckConfiguration
+): void {
+  const payload = {
+    version: DECK_CONFIG_EXPORT_VERSION,
+    deckConfiguration: deckConfig,
+  }
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = getDeckConfigFilename(robotName)
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 export function DeviceDetailsDeckConfiguration({
@@ -193,15 +219,33 @@ export function DeviceDetailsDeckConfiguration({
           <StyledText desktopStyle="bodyLargeSemiBold">
             {t('deck_configuration')}
           </StyledText>
-          <Link
-            role="button"
-            css={TYPOGRAPHY.linkPSemiBold}
-            onClick={() => {
-              setShowSetupInstructionsModal(true)
-            }}
-          >
-            {t('setup_instructions')}
-          </Link>
+          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+            <Link
+              role="button"
+              css={TYPOGRAPHY.linkPSemiBold}
+              onClick={() => {
+                downloadDeckConfiguration(robotName, deckConfig)
+              }}
+              style={
+                isRobotViewable &&
+                !isRunRunning &&
+                !isMaintenanceRunExisting
+                  ? undefined
+                  : { pointerEvents: 'none', opacity: 0.5 }
+              }
+            >
+              {t('download_deck_configuration')}
+            </Link>
+            <Link
+              role="button"
+              css={TYPOGRAPHY.linkPSemiBold}
+              onClick={() => {
+                setShowSetupInstructionsModal(true)
+              }}
+            >
+              {t('setup_instructions')}
+            </Link>
+          </Flex>
         </Flex>
         {isRobotViewable ? (
           <Flex
