@@ -6,6 +6,13 @@ from typing import Annotated, Literal
 import pydantic
 
 
+class PasswordComplexity(pydantic.BaseModel):
+    """The complexity of the password."""
+
+    minimum_length: int
+    special_characters: bool
+
+
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
 
@@ -46,3 +53,57 @@ class PatchSettingsRequestData(_StrictBaseModel):
             )
         ),
     ]
+    max_number_of_login_attempts: Annotated[
+        int | None,
+        pydantic.Field(
+            description="Max number of login attempts before account deactivation."
+        ),
+    ] = 5
+    password_reset_time: Annotated[
+        int | None,
+        pydantic.Field(description="Length of time until password must be changed."),
+    ]
+    password_complexity: Annotated[
+        PasswordComplexity | None,
+        pydantic.Field(description="Password complexity level."),
+    ]
+    time_for_no_activity_lockout: Annotated[
+        int | None,
+        pydantic.Field(
+            description="Length of time until account is locked due to inactivity."
+        ),
+    ] = 3
+    require_admin_creds_when_updating_robot_software: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when updating robot settings."
+        ),
+    ] = True
+    require_admin_creds_when_sending_protocol_to_robot: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when sending protocol to robot."
+        ),
+    ] = True
+    require_admin_creds_for_signoff_protocol: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when sending protocol to robot."
+        ),
+    ] = False
+    require_signoff_for_protocol_log: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when sending protocol to robot."
+        ),
+    ] = True
+    require_reason_for_interaction: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when sending protocol to robot."
+        ),
+    ] = True
+    min_length_of_reason_for_interaction: Annotated[
+        int | None,
+        pydantic.Field(description="Minimum length of reason for interaction."),
+    ] = 20
