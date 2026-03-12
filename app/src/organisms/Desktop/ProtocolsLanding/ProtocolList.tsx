@@ -29,10 +29,10 @@ import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { useSortedProtocols } from '/app/resources/protocols/hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
