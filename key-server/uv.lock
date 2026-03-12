@@ -631,7 +631,6 @@ dev = [
     { name = "pytest-lazy-fixtures" },
     { name = "pytest-xdist" },
     { name = "ruff" },
-    { name = "sqlalchemy2-stubs" },
     { name = "tavern" },
     { name = "types-requests" },
 ]
@@ -667,7 +666,6 @@ dev = [
     { name = "pytest-lazy-fixtures", marker = "python_full_version >= '3.11'", specifier = ">=1.1.4,<2" },
     { name = "pytest-xdist", marker = "python_full_version >= '3.11'", specifier = "~=2.5.0" },
     { name = "ruff", marker = "python_full_version >= '3.11'", specifier = "==0.14.10" },
-    { name = "sqlalchemy2-stubs", marker = "python_full_version >= '3.11'", specifier = "==0.0.2a21" },
     { name = "tavern", marker = "python_full_version >= '3.11'", specifier = ">=3.0.2" },
     { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
 ]
@@ -1547,18 +1545,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9f/cf/429adece33702ed3d78a7705469439722adf1c0bc0ca0b644de7391e638a/SQLAlchemy-1.4.51-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:245c67c88e63f1523e9216cad6ba3107dea2d3ee19adc359597a628afcabfbcb", size = 1627860, upload-time = "2024-01-03T04:25:30.939Z" },
     { url = "https://files.pythonhosted.org/packages/39/ad/9b88cb1ea1324e48b9933b4314c8686c14f146697a6b461e97c8cfb9d4aa/SQLAlchemy-1.4.51-cp312-cp312-win32.whl", hash = "sha256:8e702e7489f39375601c7ea5a0bef207256828a2bc5986c65cb15cd0cf097a87", size = 1589871, upload-time = "2024-01-11T19:31:34.296Z" },
     { url = "https://files.pythonhosted.org/packages/8a/b2/2129557c438c8394377015338c939685cc3bc702b2a8711b18f135b286c3/SQLAlchemy-1.4.51-cp312-cp312-win_amd64.whl", hash = "sha256:0525c4905b4b52d8ccc3c203c9d7ab2a80329ffa077d4bacf31aefda7604dc65", size = 1591823, upload-time = "2024-01-11T19:30:32.118Z" },
-]
-
-[[package]]
-name = "sqlalchemy2-stubs"
-version = "0.0.2a21"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/6d/aee7dc3e25ad23977cdcfb35a384c5719028967a5ca086fbbe4e23f8092e/sqlalchemy2-stubs-0.0.2a21.tar.gz", hash = "sha256:207e3d8a36fc032d325f4eec89e0c6760efe81d07e978513d8c9b14f108dcd0c", size = 122573, upload-time = "2022-03-22T20:49:56.942Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/c0/75fda3b97536917f060490eb521ff7bd00e2befe6c7fd3938824e7411530/sqlalchemy2_stubs-0.0.2a21-py3-none-any.whl", hash = "sha256:bd4a3d5ca7ff9d01b2245e1b26304d6b2ec4daf43a01faf40db9e09245679433", size = 190441, upload-time = "2022-03-22T20:49:55.24Z" },
 ]
 
 [[package]]

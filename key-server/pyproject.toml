@@ -3,7 +3,7 @@ name = "key_server"
 dynamic = ["version"]
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
-keyors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
     "Private :: Do Not Upload"  # PyPI should reject this if we accidentally try to upload it.
 ]
@@ -43,7 +43,6 @@ dev = [
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
     "types-requests==2.27.1",
-    "sqlalchemy2-stubs==0.0.2a21",
     "tavern>=3.0.2",
 ]
 
