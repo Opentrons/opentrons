@@ -6,11 +6,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
   StyledText,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -62,7 +62,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          <InputField
+          <TouchInputField
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}

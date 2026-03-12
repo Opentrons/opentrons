@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,10 +16,10 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -100,9 +100,9 @@ describe('Mix', () => {
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -130,9 +130,9 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     const oneButton = screen.getByText('0')
     fireEvent.click(oneButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: 'Value must be between 1 to 200',
         readOnly: true,
         type: 'number',
@@ -156,9 +156,9 @@ describe('Mix', () => {
     fireEvent.click(nextBtn)
     const zeroButton = screen.getByText('0')
     fireEvent.click(zeroButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: 'Value must be between 1 to 999',
         readOnly: true,
         type: 'number',
@@ -202,9 +202,9 @@ describe('Mix', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -213,9 +213,9 @@ describe('Mix', () => {
       {}
     )
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: null,
         readOnly: true,
         type: 'number',
@@ -240,9 +240,9 @@ describe('Mix', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix volume (µL)',
+        label: 'Mix volume (µL)',
         error: null,
         readOnly: true,
         type: 'number',
@@ -251,9 +251,9 @@ describe('Mix', () => {
       {}
     )
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Mix repetitions',
+        label: 'Mix repetitions',
         error: null,
         readOnly: true,
         type: 'number',
