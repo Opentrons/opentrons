@@ -49,7 +49,9 @@ class TransferPage(BasePage):
         modal.locator('label:has-text("All nozzles (recommended)")').click()
         modal.get_by_role("button", name="Continue").click()
 
-    def wells_select(self, location: locations, wells: Union[str, List[str]], rect: bool = True) -> None:
+    def wells_select(
+        self, location: locations, labwareName: str, wells: Union[str, List[str]], rect: bool = True
+    ) -> None:
         """
         Select source wells.
         Args:
@@ -58,13 +60,9 @@ class TransferPage(BasePage):
         """
         modal = self._modal_area()
         if location == "Source":
-            self.wait_for_visible(
-                modal.get_by_text("Select wells to aspirate liquid from Opentrons Tough 300 mL 1 Well Reservoir")
-            )
+            self.wait_for_visible(modal.get_by_text(f"Select wells to aspirate liquid from {labwareName}"))
         elif location == "Destination":
-            self.wait_for_visible(
-                modal.get_by_text("Select wells to dispense liquid into in Greiner 384 Well Plate 240 µL")
-            )
+            self.wait_for_visible(modal.get_by_text(f"Select wells to dispense liquid into in {labwareName}"))
 
         # 2. Convert single string to list for uniform processing
         well_list = [wells] if isinstance(wells, str) else wells
