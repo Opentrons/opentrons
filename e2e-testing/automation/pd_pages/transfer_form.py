@@ -49,9 +49,7 @@ class TransferPage(BasePage):
         modal.locator('label:has-text("All nozzles (recommended)")').click()
         modal.get_by_role("button", name="Continue").click()
 
-    def wells_select(
-        self, location: locations, labwareName: str, wells: Union[str, List[str]], rect: bool = True
-    ) -> None:
+    def wells_select(self, location: locations, labwareName: str, wells: Union[str, List[str]]) -> None:
         """
         Select source wells.
         Args:

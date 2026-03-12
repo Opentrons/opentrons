@@ -26,7 +26,7 @@ def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
     editor.add_step()
     transfer_page = TransferPage(page)
     transfer_page.source_labware_select(SOURCE_LABWARE)
-    transfer_page.destination_labware_select()
+    transfer_page.destination_labware_select(DESTINATION_LABWARE)
     transfer_page.open_nozzle_and_well_selector()
     transfer_page.select_nozzles()
     transfer_page.wells_select("Source", SOURCE_LABWARE, [])
