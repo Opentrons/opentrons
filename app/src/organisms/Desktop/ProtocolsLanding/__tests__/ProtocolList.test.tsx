@@ -18,7 +18,7 @@ import { ProtocolList } from '../ProtocolList'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../hooks')
+vi.mock('/app/resources/protocols/hooks')
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/redux/config')
 vi.mock('../EmptyStateLinks')
