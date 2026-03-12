@@ -90,7 +90,6 @@ test-cov:
 lint:
 	$(python) -m mypy $(SRC_PATH) $(TESTS_PATH)
 	$(ruff) check .
-	$(ruff) format --check .
 
 .PHONY: format
 format:

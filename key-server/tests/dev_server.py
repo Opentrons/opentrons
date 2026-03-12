@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import signal
 import subprocess
 import sys
@@ -10,9 +11,11 @@ from typing import Optional
 class DevServer:
     """An instance of the server, running as a background process."""
 
-    def __init__(self, port: int) -> None:
+    def __init__(self, port: int | None = None) -> None:
         """Initialize a dev server."""
-        self.port: int = port
+        self.port: int = (
+            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
+        )
 
     def __enter__(self) -> DevServer:
         return self

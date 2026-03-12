@@ -179,6 +179,7 @@ push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart-ot3
 	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
+	$(MAKE) -C $(KEY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
 	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
