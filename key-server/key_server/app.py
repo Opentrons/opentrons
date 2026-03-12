@@ -7,8 +7,8 @@ from fastapi import FastAPI
 
 from server_utils import systemd_utils
 
-from key_server.secure_volume.manager import (
-    SecureVolumeManager,
+from key_server.secure_volume.dependency import (
+    build_secure_volume_manager,
     install_secure_volume_manager,
 )
 from key_server.settings.router import router as settings_router
@@ -19,7 +19,7 @@ from key_server.settings.store import SettingsStore, install_settings_store
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     settings_store = SettingsStore()
     install_settings_store(app.state, settings_store)
-    secure_volume_manager = SecureVolumeManager()
+    secure_volume_manager = build_secure_volume_manager(settings_store)
     install_secure_volume_manager(app.state, secure_volume_manager)
     await secure_volume_manager.mount()
     systemd_utils.notify_up()
