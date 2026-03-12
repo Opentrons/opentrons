@@ -5,6 +5,7 @@ import type { WizardFormState } from '../../components/organisms'
 export interface WizardTileProps extends UseFormReturn<WizardFormState> {
   proceed: (stepsForward?: number) => void
   goBack: (stepsBack?: number) => void
+  setCurrentStepIndex?: (index: number) => void
 }
 
 export type PipetteType = 'single' | 'multi' | '96'

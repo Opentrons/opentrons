@@ -6,8 +6,12 @@ import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
+  getAddedMissingThermocyclerFixtures,
   getComboFixtureFromFixtureIds,
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
+  getEmptyDeckConfiguration,
   getMainAAForAFixture,
   getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
@@ -18,6 +22,7 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -36,6 +41,7 @@ import type { UseFormSetValue } from 'react-hook-form'
 import type {
   AddressableAreaName,
   AddressableAreaNamesWithFakes,
+  CutoutConfig,
   CutoutConfigMap,
   CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
@@ -45,7 +51,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { FormModules } from '/protocol-designer/step-forms'
+import type { FormModule, FormModules } from '/protocol-designer/step-forms'
 import type { FixtureName, Fixtures, WizardFormState } from '../types'
 import type { InitialDeckStateModules, OptionStage } from './AddFixtureModal'
 
@@ -565,4 +571,65 @@ export function mergeToComboFixtures(
     remainingModuleConfig,
     remainingAdditionalEquipmentConfig,
   }
+}
+
+/**
+ * Build DeckConfiguration from onboarding form state (modules + fixtures).
+ * Used when creating a new protocol so the deck config persists to overview/designer.
+ */
+export function getDeckConfigurationFromFormState(
+  modules: FormModules,
+  fixtures: Fixtures,
+  deckDef: DeckDefinition
+): DeckConfiguration {
+  const emptyDeckConfiguration = getEmptyDeckConfiguration(deckDef)
+  const simpleDeckConfig: DeckConfiguration = emptyDeckConfiguration.filter(
+    ({ cutoutId }) => {
+      const hasModule = Object.values(modules).some(
+        (module: FormModule) =>
+          getCutoutIdFromAddressableArea(module.slot as string, deckDef) ===
+          cutoutId
+      )
+      const hasTCAndCutoutA1 =
+        Object.values(modules).some(
+          (module: FormModule) => module.type === THERMOCYCLER_MODULE_TYPE
+        ) && cutoutId === 'cutoutA1'
+      const hasFixture = Object.values(fixtures).some(
+        fixture => fixture.cutoutId === cutoutId
+      )
+      return !hasModule && !hasFixture && !hasTCAndCutoutA1
+    }
+  )
+  const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
+    (module: FormModule): CutoutConfigMap[] => {
+      const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
+      const cutoutId =
+        module.cutoutId ?? getCutoutIdFromAddressableArea(module.slot, deckDef)!
+      const defaultModuleConfig: CutoutConfigMap = {
+        cutoutId,
+        cutoutFixtureId: fixtureModule,
+        addressableAreaId: module.slot as AddressableAreaNamesWithFakes,
+      }
+      return getAddedMissingThermocyclerFixtures([defaultModuleConfig], deckDef)
+    }
+  )
+  const additionalEquipmentConfig: DeckConfiguration = Object.values(
+    fixtures
+  ).map(
+    (ae): CutoutConfig => ({
+      cutoutId: ae.cutoutId as CutoutId,
+      cutoutFixtureId: ae.cutoutFixtureId,
+    })
+  )
+  const {
+    comboFixtures,
+    remainingModuleConfig,
+    remainingAdditionalEquipmentConfig,
+  } = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
+  return [
+    ...simpleDeckConfig,
+    ...remainingModuleConfig,
+    ...remainingAdditionalEquipmentConfig,
+    ...comboFixtures,
+  ] as DeckConfiguration
 }

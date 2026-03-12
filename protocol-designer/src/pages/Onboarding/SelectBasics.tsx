@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   EmptySelectorButton,
+  ERROR_TOAST,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
@@ -29,15 +30,22 @@ import { uuid } from '@opentrons/step-generation'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { BasicsButtons } from '../../components/molecules'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
+import {
+  deckConfigToOnboardingForm,
+  parseDeckConfigFilePayload,
+} from '../../utils/deckConfigToOnboardingForm'
 import { WizardBody } from './WizardBody'
 
+import type { ChangeEvent } from 'react'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { Fixtures } from '../../components/organisms'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
-  const { setValue, proceed, watch } = props
+  const { setValue, proceed, watch, setCurrentStepIndex } = props
   const { t } = useTranslation(['onboarding', 'shared'])
+  const { bakeToast } = useKitchen()
   const [mount, setMount] = useState<PipetteMount>('left')
   const [pipetteModal, openPipetteModal] = useState<boolean>(false)
   const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
@@ -47,6 +55,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   )
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
   const ref = useRef<HTMLDivElement | null>(null)
+  const deckConfigFileInputRef = useRef<HTMLInputElement | null>(null)
 
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
@@ -106,6 +115,50 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
         block: 'end',
       })
     }
+  }
+
+  const handleImportDeckConfigFile = (
+    event: ChangeEvent<HTMLInputElement>
+  ): void => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (file == null) return
+    const reader = new FileReader()
+    reader.onload = (readEvent: ProgressEvent<FileReader>) => {
+      const result = (readEvent.target as FileReader | null)?.result
+      if (typeof result !== 'string') return
+      try {
+        const parsed = JSON.parse(result) as unknown
+        const deckConfig = parseDeckConfigFilePayload(parsed)
+        if (deckConfig == null) {
+          bakeToast(t('import_deck_config_invalid_file'), ERROR_TOAST, {
+            closeButton: true,
+          })
+          return
+        }
+        const {
+          modules: formModules,
+          fixtures: formFixtures,
+          hasWasteChute: hasChute,
+          hasThermocycler: hasTC,
+        } = deckConfigToOnboardingForm(deckConfig)
+        setValue('fields.robotType', FLEX_ROBOT_TYPE)
+        setValue('modules', formModules)
+        setValue(
+          'fixtures',
+          Object.keys(formFixtures).length > 0 ? formFixtures : flexTrashFixture
+        )
+        setValue('hasWasteChute', hasChute)
+        setValue('hasThermocycler', hasTC)
+        setValue('hasGripper', false)
+        setCurrentStepIndex?.(1)
+      } catch {
+        bakeToast(t('import_deck_config_invalid_file'), ERROR_TOAST, {
+          closeButton: true,
+        })
+      }
+    }
+    reader.readAsText(file)
   }
 
   useEffect(() => {
@@ -286,6 +339,31 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 isSelected={robotType === OT2_ROBOT_TYPE}
               />
             </Flex>
+            {robotType === FLEX_ROBOT_TYPE ? (
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <label>
+                  <input
+                    ref={deckConfigFileInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={handleImportDeckConfigFile}
+                    style={{ display: 'none' }}
+                    aria-hidden
+                  />
+                  <Btn
+                    type="button"
+                    css={LINK_BUTTON_STYLE}
+                    onClick={() => {
+                      deckConfigFileInputRef.current?.click()
+                    }}
+                  >
+                    <StyledText desktopStyle="captionSemiBold">
+                      {t('import_deck_configuration')}
+                    </StyledText>
+                  </Btn>
+                </label>
+              </Flex>
+            ) : null}
           </Flex>
           {robotType != null ? (
             <>

@@ -48,7 +48,11 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { TFunction } from 'i18next'
-import type { CutoutId, DeckConfiguration, VISUAL_SLOTS } from '@opentrons/shared-data'
+import type {
+  CutoutId,
+  DeckConfiguration,
+  VISUAL_SLOTS,
+} from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const DECK_CONFIG_EXPORT_VERSION = 1
@@ -227,9 +231,7 @@ export function DeviceDetailsDeckConfiguration({
                 downloadDeckConfiguration(robotName, deckConfig)
               }}
               style={
-                isRobotViewable &&
-                !isRunRunning &&
-                !isMaintenanceRunExisting
+                isRobotViewable && !isRunRunning && !isMaintenanceRunExisting
                   ? undefined
                   : { pointerEvents: 'none', opacity: 0.5 }
               }

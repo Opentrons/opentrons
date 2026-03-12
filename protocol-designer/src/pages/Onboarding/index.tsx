@@ -14,6 +14,7 @@ import {
   FLEX_96_CHANNEL_PIPETTES,
   FLEX_ROBOT_TYPE,
   getAreSlotsAdjacent,
+  getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -23,6 +24,7 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { getDeckConfigurationFromFormState } from '../../components/organisms/HardwareConfigurator/utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as labwareDefActions from '../../labware-defs/actions'
 import * as labwareDefSelectors from '../../labware-defs/selectors'
@@ -30,6 +32,7 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { actions as fileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import { actions as stepFormActions } from '../../step-forms'
+import { editDeckConfiguration } from '../../step-forms/actions'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
@@ -266,6 +269,17 @@ export function Onboarding(): JSX.Element | null {
       return dispatch(stepFormActions.createModule(moduleArgs))
     })
 
+    // persist deck configuration to Redux so overview/designer show the correct deck
+    if (values.fields.robotType === FLEX_ROBOT_TYPE) {
+      const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+      const deckConfig = getDeckConfigurationFromFormState(
+        values.modules ?? {},
+        values.fixtures ?? {},
+        deckDef
+      )
+      dispatch(editDeckConfiguration({ deckConfig }))
+    }
+
     // add gripper
     if (values.hasGripper) {
       dispatch(toggleIsGripperRequired())
@@ -387,7 +401,11 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       {(() => {
         switch (currentWizardStep) {
           case 'basics':
-            return <SelectBasics {...{ ...formProps, proceed, goBack }} />
+            return (
+              <SelectBasics
+                {...{ ...formProps, proceed, goBack, setCurrentStepIndex }}
+              />
+            )
           case 'modules':
             return robotType === OT2_ROBOT_TYPE ? (
               <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />

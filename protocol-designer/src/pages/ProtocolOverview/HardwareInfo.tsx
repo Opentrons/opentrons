@@ -18,12 +18,16 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getModuleDisplayName,
+  getSlotDisplayNameFromAAWithFakes,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { ModuleOnDeck } from '../../step-forms'
 
@@ -78,7 +82,11 @@ export function HardwareInfo({
                     >
                       {module.type === THERMOCYCLER_MODULE_TYPE
                         ? tCSlot
-                        : module.slot}
+                        : isFlex
+                          ? getSlotDisplayNameFromAAWithFakes(
+                              module.slot as AddressableAreaNamesWithFakes
+                            )
+                          : module.slot}
                     </StyledText>
                   </Flex>
                 }

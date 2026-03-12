@@ -20,6 +20,8 @@
   "fixtures_added": "Fixtures added",
   "fixtures_replace": "Fixtures replace standard deck slots and let you add functionality to your Flex.",
   "incompatible_tip_body": "Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.",
+  "import_deck_config_invalid_file": "Invalid deck configuration file. Use a JSON file exported from the Opentrons App.",
+  "import_deck_configuration": "Import deck configuration from file",
   "incompatible_tips": "Incompatible tips",
   "labware_name": "Labware name",
   "left_right": "Left + Right",

@@ -379,14 +379,34 @@ export function getPositionFromSlotId(
   //  the hopper doesn't have its own AddressableAreaName
   hopperAdjustedOffset?: number
 ): CoordinateTuple | null {
-  const cutoutWithSlot =
+  let cutoutWithSlot: string | undefined =
     deckDef.robot.model === FLEX_ROBOT_TYPE
       ? FLEX_CUTOUT_BY_SLOT_ID[slotId]
       : OT2_CUTOUT_BY_SLOT_ID[slotId]
 
+  // Flex: slotId may be an addressable area id (e.g. temperatureModuleV2D1); resolve to cutout
+  if (
+    cutoutWithSlot == null &&
+    deckDef.robot.model === FLEX_ROBOT_TYPE &&
+    deckDef.cutoutFixtures != null
+  ) {
+    for (const cutoutFixture of deckDef.cutoutFixtures) {
+      const entry = Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) =>
+          providedAAs.includes(slotId as AddressableAreaName)
+      )
+      if (entry != null) {
+        cutoutWithSlot = entry[0]
+        break
+      }
+    }
+  }
+
   const cutoutPosition =
-    deckDef.locations.cutouts.find(cutout => cutout.id === cutoutWithSlot)
-      ?.position ?? null
+    cutoutWithSlot != null
+      ? (deckDef.locations.cutouts.find(cutout => cutout.id === cutoutWithSlot)
+          ?.position ?? null)
+      : null
 
   // adjust for offset from cutout
   const offsetFromCutoutFixture = getAddressableAreaFromSlotId(slotId, deckDef)
