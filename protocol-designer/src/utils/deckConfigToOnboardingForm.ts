@@ -14,6 +14,7 @@ import {
   getDeckDefFromRobotType,
   getModuleModelFromFixtureId,
   getModuleType,
+  getSlotDisplayNameFromAAWithFakes,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
@@ -22,6 +23,7 @@ import { uuid } from '@opentrons/step-generation'
 import { mapFixtureIdToFixtureName } from '../components/organisms/FlexHardware/util'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutFixtureIdsWithFakes,
   FlexModuleCutoutFixtureId,
@@ -101,15 +103,22 @@ export function deckConfigToOnboardingForm(
       const model = getModuleModelFromFixtureId(fid as CutoutFixtureId)
       if (model != null) {
         if (fid === THERMOCYCLER_V2_REAR_FIXTURE) continue
-        const slot = getSlotForCutoutFixture(
+        const slotFromFixture = getSlotForCutoutFixture(
           cutoutId as CutoutId,
           fid as CutoutFixtureId,
           deckDef
         )
-        if (slot == null) continue
+        if (slotFromFixture == null) continue
         if (getModuleType(model) === THERMOCYCLER_MODULE_TYPE) {
           hasThermocycler = true
         }
+        // Use display slots (e.g. D1, A4, B1) to match manual deck setup
+        const slot =
+          getModuleType(model) === THERMOCYCLER_MODULE_TYPE
+            ? 'B1'
+            : getSlotDisplayNameFromAAWithFakes(
+                slotFromFixture as AddressableAreaNamesWithFakes
+              )
         modules[moduleIndex] = {
           model,
           type: getModuleType(model),
