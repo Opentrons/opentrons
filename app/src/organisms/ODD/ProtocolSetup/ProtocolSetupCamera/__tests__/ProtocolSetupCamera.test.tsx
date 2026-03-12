@@ -164,6 +164,7 @@ describe('ProtocolSetupCamera', () => {
       recoveryEnabled: false,
       liveStreamEnabled: false,
     })
+    mockConfirmCamera.mockResolvedValue(undefined)
     const propsWithCameraNotRequired = {
       ...mockProps,
       isCameraRequired: false,
