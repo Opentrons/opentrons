@@ -68,7 +68,7 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
 
-To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labelled based on the maximum rated volume for each tip type.
+To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
 <figure markdown>
 ![test](../images/tip-rack-with-labels.png){ width="80%" }
