@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { TouchInputField as TouchInputFieldComponent } from '../TouchInputField/TouchInputField'
 import { InputField as InputFieldComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -68,94 +67,6 @@ export const InputFieldWithError: Story = args => {
 InputFieldWithError.args = {
   value: 300,
   type: 'number',
-  max: 200,
-  min: 10,
-  error: 'input is not in the range',
-}
-
-export const TouchInputField: Story = args => {
-  const [value, setValue] = React.useState(args.value)
-  return (
-    <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing4 }}>
-      <TouchInputFieldComponent
-        id={args.id}
-        value={value}
-        type={args.type}
-        max={args.max}
-        min={args.min}
-        placeholder={args.placeholder}
-        disabled={args.disabled}
-        caption={args.caption}
-        error={args.error}
-        autoFocus={args.autoFocus}
-        readOnly={args.readOnly}
-        tabIndex={args.tabIndex}
-        textAlign={args.textAlign}
-        size={args.size}
-        borderRadius={args.borderRadius}
-        padding={args.padding}
-        hasBackgroundError={args.hasBackgroundError}
-        label={args.title}
-        onBlur={args.onBlur}
-        onFocus={args.onFocus}
-        onClick={args.onClick}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setValue(e.target.value)
-        }}
-        units={args.units ? 'rem' : undefined}
-      />
-    </div>
-  )
-}
-
-TouchInputField.args = {
-  value: 200,
-  type: 'number',
-  title: 'example label',
-  caption: 'example caption',
-  max: 200,
-  min: 10,
-}
-
-export const TouchInputFieldWithError: Story = args => {
-  const [value, setValue] = React.useState(args.value)
-  return (
-    <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing4 }}>
-      <TouchInputFieldComponent
-        id={args.id}
-        value={value}
-        type={args.type}
-        max={args.max}
-        min={args.min}
-        placeholder={args.placeholder}
-        disabled={args.disabled}
-        caption={args.caption}
-        error={args.error}
-        autoFocus={args.autoFocus}
-        readOnly={args.readOnly}
-        tabIndex={args.tabIndex}
-        textAlign={args.textAlign}
-        size={args.size}
-        borderRadius={args.borderRadius}
-        padding={args.padding}
-        hasBackgroundError={args.hasBackgroundError}
-        label={args.title}
-        onBlur={args.onBlur}
-        onFocus={args.onFocus}
-        onClick={args.onClick}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setValue(e.target.value)
-        }}
-        units={args.type !== 'number' ? undefined : args.units}
-      />
-    </div>
-  )
-}
-
-TouchInputFieldWithError.args = {
-  value: 300,
-  type: 'number',
-  title: 'example label',
   max: 200,
   min: 10,
   error: 'input is not in the range',
