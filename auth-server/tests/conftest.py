@@ -11,10 +11,16 @@ _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
 @pytest.fixture
-def all_scopes() -> str:
-    """All OAuth 2 scopes the server supports, as a sorted space-separated string, as returned for admin tokens."""
+def admin_scopes_str() -> str:
+    """All the OAuth 2 scopes that an admin should have, as a space-separated string."""
     all_scopes = set(Scope)
     return serialize_scopes(all_scopes)
+
+
+@pytest.fixture
+def admin_scopes_list() -> list[str]:
+    """All the OAuth 2 scopes that an admin should have, as a list."""
+    return sorted(scope.api_name for scope in Scope)
 
 
 @pytest.fixture

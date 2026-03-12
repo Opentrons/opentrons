@@ -3,7 +3,7 @@ test_name: Successful OAuth 2 flow
 marks:
   - usefixtures:
       - run_server
-      - all_scopes
+      - admin_scopes_str
 
 stages:
   - name: Exchange a username and password for an access token and refresh token
@@ -22,7 +22,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: &returned_scope '{all_scopes}'
+        scope: &returned_scope '{admin_scopes_str}'
       save:
         json:
           initial_access_token: access_token
@@ -173,7 +173,7 @@ test_name: The client should be able to request scopes narrower than what the us
 marks:
   - usefixtures:
       - run_server
-      - all_scopes
+      - admin_scopes_str
 
 stages:
   - name: Send a password authorization request with narrower-than-default scope
@@ -211,7 +211,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: '{all_scopes}'
+        scope: '{admin_scopes_str}'
       save:
         json:
           refresh_token: refresh_token

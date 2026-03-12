@@ -80,5 +80,5 @@ class UserResponse(BaseModel):
             userName=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            scopes=[scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]],
+            scopes=sorted(scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]),
         )
