@@ -40,9 +40,9 @@ def sql_engine(tmpdir: Path) -> Generator[SQLEngine, None, None]:
 
 
 @pytest.fixture
-def run_server() -> Generator[DevServer, None, None]:
+def run_server(unused_tcp_port: int) -> Generator[DevServer, None, None]:
     """Run the system server as a subprocess."""
-    with DevServer() as dev_server:
+    with DevServer(port=unused_tcp_port) as dev_server:
         print("Starting server")
         dev_server.start()
         base_url = f"http://localhost:{dev_server.port}"

@@ -29,10 +29,10 @@ import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { useSortedProtocols } from './hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
@@ -272,15 +272,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols != null &&
-          sortedStoredProtocols.map(storedProtocol => (
-            <ProtocolCard
-              key={storedProtocol.protocolKey}
-              handleRunProtocol={handleRunProtocol}
-              handleSendProtocolToFlex={handleSendProtocolToFlex}
-              storedProtocolData={storedProtocol}
-            />
-          ))}
+        {sortedStoredProtocols?.map(storedProtocol => (
+          <ProtocolCard
+            key={storedProtocol.protocolKey}
+            handleRunProtocol={handleRunProtocol}
+            handleSendProtocolToFlex={handleSendProtocolToFlex}
+            storedProtocolData={storedProtocol}
+          />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

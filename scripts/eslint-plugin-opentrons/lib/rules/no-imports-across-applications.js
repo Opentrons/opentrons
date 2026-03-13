@@ -1,3 +1,5 @@
+const path = require('path')
+
 const UI_PATH_FRAGMENTS = [
   '/organisms/',
   '/molecules/',
@@ -7,11 +9,24 @@ const UI_PATH_FRAGMENTS = [
   '/DesignTokens/',
 ]
 
-const isUI = path =>
+const isUI = pathStr =>
   UI_PATH_FRAGMENTS.reduce(
-    (isUI, pathFragment) => (isUI |= path.includes(pathFragment)),
+    (isUI, pathFragment) => (isUI |= pathStr.includes(pathFragment)),
     false
   )
+
+/**
+ * The path of the file relative to eslint's cwd.
+ *
+ * eslint's cwd is normally the monorepo root, so this should return something like
+ * app/src/.../foo.ts.
+ */
+function getRelativePath(context) {
+  const cwd = context.getCwd()
+  const physicalFilename = context.physicalFilename
+  const relative = path.relative(cwd, physicalFilename)
+  return relative;
+}
 
 module.exports = {
   meta: {
@@ -30,9 +45,10 @@ module.exports = {
   },
   create: context => ({
     ImportDeclaration: node => {
+      const relativePath = getRelativePath(context)
       if (
-        context.physicalFilename.includes('/ODD/') ||
-        context.physicalFilename.includes('OnDeviceDisplayApp')
+        relativePath.includes('/ODD/') ||
+        relativePath.includes('OnDeviceDisplayApp')
       ) {
         if (node.source.value.includes('/Desktop/')) {
           context.report({
@@ -41,8 +57,8 @@ module.exports = {
           })
         }
       } else if (
-        context.physicalFilename.includes('/Desktop/') ||
-        context.physicalFilename.includes('DesktopApp')
+        relativePath.includes('/Desktop/') ||
+        relativePath.includes('DesktopApp')
       ) {
         if (node.source.value.includes('/ODD/')) {
           context.report({
@@ -50,11 +66,11 @@ module.exports = {
             node,
           })
         }
-      } else if (!isUI(context.physicalFilename)) {
+      } else if (!isUI(relativePath)) {
         if (isUI(node.source.value)) {
           context.report({ messageId: 'avoidImportingUIFromUtils', node })
         }
-      } else if (isUI(context.physicalFilename)) {
+      } else if (isUI(relativePath)) {
         if (node.source.value.includes('/Desktop/')) {
           context.report({ messageId: 'avoidImportingDesktopFromShared', node })
         } else if (node.source.value.includes('/ODD/')) {
