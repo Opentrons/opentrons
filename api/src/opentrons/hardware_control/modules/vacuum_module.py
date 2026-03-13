@@ -297,18 +297,46 @@ class VacuumModule(mod_abc.AbstractModule):
         """Reset persistent data on the module that should not exist outside of a run."""
         self.set_statusbar_identify(False)
 
+    # maybe make two separate functions in the papi layer so callers can open and close the vent without worrying about true/false or an enum value
+    async def set_vent_state(self, vent_state: VentState) -> None:
+        await self._driver.set_vent_state(state=bool(vent_state.value))
+
+    async def set_vacuum_state(
+        self,
+        enable_vacuum: bool,
+        guage_pressure_mbar: Optional[float] = None,
+        duration: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        await self._driver.set_vacuum_state(
+            enable_vacuum=enable_vacuum,
+            guage_pressure_mbar=guage_pressure_mbar,
+            duration=duration,
+            rate=rate,
+            vent_after=vent_after,
+        )
+
+    async def set_pump_state(
+        self,
+        start_pump: bool,
+        target_rpm: Optional[int] = None,
+        duty_cycle: Optional[int] = None,
+    ) -> None:
+        await self._driver.set_pump_state(
+            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+        )
+
+    async def set_serial_number(self, sn: str) -> None:
+        await self._driver.set_serial_number(sn=sn)
+
 
 class VacuumModuleReader(Reader):
     error: Optional[str]
 
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
-        self._driver = driver
-        self.initialized = False
-        self._refresh_state = False
-        self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
-        self._error_callback: Optional[Callable[[Exception], None]] = None
-        self._vacuum_state: PressureState = PressureState(
+        self.vacuum_state: PressureState = PressureState(
             target_guage_pressure=0,
             current_guage_pressure=0,
             pressure_abs_a=0,
@@ -317,7 +345,7 @@ class VacuumModuleReader(Reader):
             vacuum_enabled=False,
             vent_state=VentState.CLOSED,
         )
-        self._pump_state: PumpState = PumpState(
+        self.pump_state: PumpState = PumpState(
             target_rpm=0,
             current_rpm=0,
             target_pwm=0,
@@ -325,6 +353,11 @@ class VacuumModuleReader(Reader):
             pump_running=False,
             manual_control=False,
         )
+        self._driver = driver
+        self.initialized = False
+        self._refresh_state = False
+        self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
+        self._error_callback: Optional[Callable[[Exception], None]] = None
 
     def set_initialized_callback(
         self, callback: Callable[[], Awaitable[None]]
@@ -377,40 +410,10 @@ class VacuumModuleReader(Reader):
             except Exception:
                 self.error = repr(exception)
 
-    async def set_vacuum_state(
-        self,
-        enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
-        rate: Optional[float] = None,
-        vent_after: Optional[bool] = None,
-    ) -> None:
-        await self._driver.set_vacuum_state(
-            enable_vacuum=enable_vacuum,
-        )
-
     async def update_vacuum_state(self) -> None:
         """Get latest vacuum state from driver and save updated values."""
-        self._vacuum_state = await self._driver.get_vacuum_state()
-
-    async def set_pump_state(
-        self,
-        start_pump: bool,
-        target_rpm: Optional[int] = None,
-        duty_cycle: Optional[int] = None,
-    ) -> None:
-        await self._driver.set_pump_state(
-            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
-        )
+        self.vacuum_state = await self._driver.get_vacuum_state()
 
     async def update_pump_state(self) -> None:
         """Get latest pump state from driver and save updated values."""
-        self._pump_state = await self._driver.get_pump_state()
-
-    # maybe make two separate functions in the papi layer so callers can open and close the vent without worrying about true/false or an enum value
-    async def set_vent_state(self, vent_state: VentState) -> None:
-        await self._driver.set_vent_state(state=bool(vent_state.value))
-        # might want to leave driver.set_vent_state as taking in an int so you can still interface directly w the driver but check
-
-    async def set_serial_number(self, sn: str) -> None:
-        await self._driver.set_serial_number(sn=sn)
+        self.pump_state = await self._driver.get_pump_state()
