@@ -34,6 +34,9 @@ def build_mock_path(decoy: Decoy) -> Path:
     mock_path.is_dir = decoy.mock(func=mock_path.is_dir)
     mock_path.unlink = decoy.mock(func=mock_path.unlink)
     mock_path.read_bytes = decoy.mock(func=mock_path.read_bytes)
+    mock_path.is_dir = decoy.mock(func=mock_path.is_dir)
+    mock_path.mkdir = decoy.mock(func=mock_path.mkdir)
+    mock_path.iterdir = decoy.mock(func=mock_path.iterdir)
     return mock_path
 
 
@@ -72,40 +75,24 @@ def mock_image_path(decoy: Decoy, mock_base_directory: Path, monkeypatch: Any) -
     return mip
 
 
-async def test_create_happypath_with_clears(
-    decoy: Decoy,
-    mock_asyncio_subprocess: AsyncioCSE,
-    mock_base_directory: Path,
-    mock_mount_path: Path,
-    mock_keyblob_path: Path,
-    mock_image_path: Path,
-    monkeypatch: Any,
-) -> None:
-    subject = CAAMSecureVolume(
-        image_mount_point=mock_mount_path,
-        base_directory=mock_base_directory,
-        volume_size_mb=64,
-    )
-    decoy.when(mock_keyblob_path.exists()).then_return(True)
-    decoy.when(
-        await mock_asyncio_subprocess(
-            "/usr/bin/caam_keygen",
-            "create",
-            CAAMSecureVolume.SECURE_STORAGE_KEY_NAME,
-            "ccm",
-            "-s",
-            "24",
-        )
-    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
-    decoy.when(
-        await mock_asyncio_subprocess(
-            "/usr/bin/dd", "if=/dev/zero", "of=mock image path", "bs=1M", "count=64"
-        )
-    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
+@pytest.fixture
+def mock_keyfile(decoy: Decoy, monkeypatch: Any, mock_base_directory: Path) -> Path:
     mock_key = mock_subdir(
         decoy, mock_base_directory, CAAMSecureVolume.SECURE_STORAGE_KEY_NAME
     )
     mock_str(decoy, mock_key, "mock key", monkeypatch)
+    return mock_key
+
+
+@pytest.fixture
+async def rehearse_load_key(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_image_path: Path,
+    mock_keyfile: Path,
+    subject: CAAMSecureVolume,
+) -> str:
+    """Fixture for importing a key into KKRS. Gives the key ID."""
     decoy.when(
         await mock_asyncio_subprocess(
             "/usr/bin/caam_keygen",
@@ -115,17 +102,29 @@ async def test_create_happypath_with_clears(
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(mock_image_path.exists()).then_return(True)
-    decoy.when(mock_key.read_bytes()).then_return(b"key data")
+    decoy.when(mock_keyfile.read_bytes()).then_return(b"key data")
     mock_keyring_add = decoy.mock(cls=AsyncioSubprocess)
     decoy.when(await mock_keyring_add.wait()).then_return(0)
+    mock_keyid = "1234"
     decoy.when(await mock_keyring_add.communicate(input=b"key data")).then_return(
-        ("1234", "")
+        (mock_keyid, "")
     )
     decoy.when(
         await mock_asyncio_subprocess(
             "/usr/bin/keyctl", "padd", "logon", f"ot-secure-storage:{id(subject)}", "@p"
         )
     ).then_return(mock_keyring_add)
+    return mock_keyid
+
+
+@pytest.fixture
+async def rehearse_losetup(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_image_path: Path,
+    mock_keyfile: Path,
+    subject: CAAMSecureVolume,
+) -> None:
     decoy.when(
         await mock_asyncio_subprocess("/usr/sbin/losetup", "-f", "mock image path")
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
@@ -154,6 +153,76 @@ async def test_create_happypath_with_clears(
             f"0 131072 crypt capi:tk(cbc(aes))-plain :36:logon:ot-secure-storage:{id(subject)} 0 mock loopback 0 1 sector_size:512",
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+def subject(
+    mock_base_directory: Path,
+    mock_mount_path: Path,
+) -> CAAMSecureVolume:
+    return CAAMSecureVolume(
+        image_mount_point=mock_mount_path,
+        base_directory=mock_base_directory,
+        volume_size_mb=64,
+    )
+
+
+@pytest.mark.parametrize(
+    "blob_exists,image_exists,result",
+    [
+        (True, True, False),
+        (True, False, True),
+        (False, True, True),
+        (False, False, True),
+    ],
+)
+async def test_must_create(
+    blob_exists: bool,
+    image_exists: bool,
+    result: bool,
+    mock_keyblob_path: Path,
+    mock_image_path: Path,
+    decoy: Decoy,
+    subject: CAAMSecureVolume,
+) -> None:
+    """It should check if the image needs creation."""
+    decoy.when(mock_keyblob_path.exists()).then_return(blob_exists)
+    decoy.when(mock_image_path.exists()).then_return(image_exists)
+
+    assert await subject.must_create() == result
+
+
+async def test_create_happypath_with_clears(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_base_directory: Path,
+    mock_mount_path: Path,
+    mock_keyblob_path: Path,
+    mock_image_path: Path,
+    monkeypatch: Any,
+    subject: CAAMSecureVolume,
+    rehearse_load_key: str,
+    rehearse_losetup: str,
+    mock_keyfile: Path,
+) -> None:
+    """It should create the image and remove previous keys."""
+    decoy.when(mock_keyblob_path.exists()).then_return(True)
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/caam_keygen",
+            "create",
+            CAAMSecureVolume.SECURE_STORAGE_KEY_NAME,
+            "ccm",
+            "-s",
+            "24",
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/dd", "if=/dev/zero", "of=mock image path", "bs=1M", "count=64"
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
+
     decoy.when(
         await mock_asyncio_subprocess(
             "/usr/sbin/mkfs.ext4", "/dev/mapper/ot-secure-storage"
@@ -162,4 +231,84 @@ async def test_create_happypath_with_clears(
     await subject.create()
     decoy.verify(mock_keyblob_path.unlink())
     decoy.verify(mock_image_path.unlink())
-    decoy.verify(mock_key.unlink())
+    decoy.verify(mock_keyfile.unlink())
+
+
+async def test_mount_happypath_when_created(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_base_directory: Path,
+    mock_mount_path: Path,
+    mock_keyblob_path: Path,
+    mock_image_path: Path,
+    monkeypatch: Any,
+    rehearse_load_key: str,
+    rehearse_losetup: None,
+    subject: CAAMSecureVolume,
+) -> None:
+    """It should mount the image if it's already created."""
+    decoy.when(mock_keyblob_path.exists()).then_return(True)
+    decoy.when(mock_image_path.exists()).then_return(True)
+    decoy.when(mock_mount_path.is_dir()).then_return(False)
+    decoy.when(mock_mount_path.exists()).then_return(False)
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/mount", "/dev/mapper/ot-secure-storage", "mock mount path"
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+    with pytest.raises(RuntimeError):
+        subject.path
+    await subject.mount()
+    assert subject.path == mock_mount_path
+    decoy.verify(mock_mount_path.mkdir())
+
+
+async def test_mount_creates_if_necessary(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_base_directory: Path,
+    mock_mount_path: Path,
+    mock_keyblob_path: Path,
+    mock_image_path: Path,
+    monkeypatch: Any,
+    rehearse_load_key: str,
+    rehearse_losetup: None,
+    subject: CAAMSecureVolume,
+) -> None:
+    """It should call create() if necessary."""
+    decoy.when(mock_keyblob_path.exists()).then_return(False)
+    decoy.when(mock_image_path.exists()).then_return(True)
+    decoy.when(mock_keyblob_path.exists()).then_return(False)
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/caam_keygen",
+            "create",
+            CAAMSecureVolume.SECURE_STORAGE_KEY_NAME,
+            "ccm",
+            "-s",
+            "24",
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/dd", "if=/dev/zero", "of=mock image path", "bs=1M", "count=64"
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
+
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/mkfs.ext4", "/dev/mapper/ot-secure-storage"
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+    decoy.when(mock_mount_path.is_dir()).then_return(False)
+    decoy.when(mock_mount_path.exists()).then_return(False)
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/mount", "/dev/mapper/ot-secure-storage", "mock mount path"
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+    with pytest.raises(RuntimeError):
+        subject.path
+    await subject.mount()
+    assert subject.path == mock_mount_path
+    decoy.verify(mock_mount_path.mkdir())

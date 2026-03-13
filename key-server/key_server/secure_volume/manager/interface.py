@@ -8,8 +8,12 @@ class SecureVolumeManager(Protocol):
     async def create(self) -> None:
         """Create the secure volume if it has not yet been initialized.
 
-        This should rarely need to be called, as mount() should create the volume if necessary.
+        Should be called automatically be mount() if necessary.
         """
+        pass
+
+    async def must_create(self) -> bool:
+        """True if the secure volume is created; False otherwise."""
         pass
 
     async def destroy(self) -> None:
@@ -20,7 +24,7 @@ class SecureVolumeManager(Protocol):
         pass
 
     async def mount(self) -> None:
-        """Mount an existing secure volume, creating it if necessary.
+        """Mount an existing secure volume. Automatically creates if necessary.
 
         Must be called before path will work.
         """

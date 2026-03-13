@@ -42,6 +42,14 @@ class CAAMSecureVolume(SecureVolumeManager):
     def _keyname(self) -> str:
         return f"{self.SECURE_STORAGE_KEYCTL_PREFIX}:{id(self)}"
 
+    async def must_create(self) -> bool:
+        """Check if the volume is created (by seeing if the image and keyblob exist)."""
+        if not self._keyblob().exists():
+            return True
+        if not self._image().exists():
+            return True
+        return False
+
     async def create(self) -> None:
         """Creates the secure volume by initializing a new CAAM black key and building a backing store."""
         if self._keyblob().exists():
@@ -174,7 +182,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             LOG.error(f"Non-empty mount path at {mount_path}")
             # this is most likely because it was already mounted; unmount it
             await self._unmount()
-        elif not mount_path.is_dir():
+        elif mount_path.exists():
             LOG.warning(f"File at mount path {mount_path}")
             mount_path.unlink()
             mount_path.mkdir()
@@ -235,7 +243,7 @@ class CAAMSecureVolume(SecureVolumeManager):
 
         If the keyblob does not exist (i.e. because of a previous call to destroy()), initializes a new one.
         """
-        if not self._keyblob().exists():
+        if await self.must_create():
             await self.create()
         await self._load_key()
         await self._loopback_setup()
@@ -266,6 +274,6 @@ class CAAMSecureVolume(SecureVolumeManager):
     @property
     def path(self) -> Path:
         """Get the path of the mounted secure volume. Raise if not mounted."""
-        if not self._path or not self._path.is_dir():
+        if not self._path:
             raise RuntimeError("Secure volume has not been mounted")
         return self._path
