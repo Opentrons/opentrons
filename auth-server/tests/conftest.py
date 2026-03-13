@@ -11,6 +11,19 @@ _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
 @pytest.fixture
+def admin_scopes_str() -> str:
+    """All the OAuth 2 scopes that an admin should have, as a space-separated string."""
+    all_scopes = set(Scope)
+    return serialize_scopes(all_scopes)
+
+
+@pytest.fixture
+def admin_scopes_list() -> list[str]:
+    """All the OAuth 2 scopes that an admin should have, as a list."""
+    return sorted(scope.api_name for scope in Scope)
+
+
+@pytest.fixture
 def run_server(unused_tcp_port: int) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test."""
     with DevServer(port=unused_tcp_port) as dev_server:
