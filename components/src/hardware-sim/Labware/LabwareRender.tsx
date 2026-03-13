@@ -226,8 +226,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             />
           ))
         : null}
-      {highlightedWells != null &&
-      !Object.values(highlightedWells).every(value => value === null) ? (
+      {highlightedWells != null ? (
         <StyledWells
           wellContents="highlightedWell"
           definition={definition}
