@@ -7,7 +7,6 @@ import {
   ListItem,
 } from '@opentrons/components'
 
-import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { maskToPositiveInteger } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import { PROFILE_CYCLE } from './constants'
@@ -47,7 +46,6 @@ export function PresavedVacuumCycle(
     mode,
   } = props
   const { t } = useTranslation('protocol_steps')
-  const { makeSnackbar } = useKitchen()
 
   const {
     localOrderedProfileStepIds,
@@ -70,9 +68,6 @@ export function PresavedVacuumCycle(
     repetitions,
     mode,
     onSaveCycle: handleSaveCycle,
-    onRepetitionsError: () => {
-      makeSnackbar(t('vacuum.controls.profile.repetitions_error') as string)
-    },
     handleAddCycleStep,
   })
 

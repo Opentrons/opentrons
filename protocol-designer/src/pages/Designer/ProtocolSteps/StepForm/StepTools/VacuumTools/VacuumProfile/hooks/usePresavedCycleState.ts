@@ -18,7 +18,6 @@ export interface UsePresavedCycleStateArgs {
   repetitions: number
   mode: VacuumMode | undefined
   onSaveCycle: (data: PresavedVacuumCycleSavePayload) => void
-  onRepetitionsError?: () => void
   handleAddCycleStep?: (stepId: string) => void
 }
 
@@ -47,7 +46,6 @@ export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
     repetitions,
     mode,
     onSaveCycle,
-    onRepetitionsError,
     handleAddCycleStep,
   } = args
 
@@ -129,7 +127,6 @@ export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
     }
     if (isRepetitionError) {
       setShowRepetitionErrors(true)
-      onRepetitionsError?.()
       return
     }
     setShowCycleErrors(false)
