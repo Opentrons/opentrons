@@ -8,6 +8,8 @@ from opentrons.hardware_control import HardwareControlAPI, modules
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
@@ -75,6 +77,7 @@ async def get_modules(
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
     deprecated=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_serial_command(
     command: SerialCommand,
@@ -142,6 +145,7 @@ async def post_serial_command(
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.UPDATES_WRITE))],
 )
 async def post_serial_update(
     serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
