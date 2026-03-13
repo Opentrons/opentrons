@@ -64,6 +64,7 @@ export type DeckConfigExportPipette = {
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const DECK_CONFIG_EXPORT_VERSION = 1
 const RUN_REFETCH_INTERVAL = 5000
+const PROTOCOL_DESIGNER_DEV_URL = 'http://localhost:5178'
 
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
@@ -77,6 +78,22 @@ function getDeckConfigFilename(robotName: string): string {
   const safeName = robotName.replace(/[^a-zA-Z0-9-_]/g, '_')
   const date = new Date().toISOString().slice(0, 10)
   return `deck-config-${safeName}-${date}.json`
+}
+
+function openInProtocolDesigner(
+  deckConfig: DeckConfiguration,
+  pipettes: DeckConfigExportPipette[]
+): void {
+  const payload = {
+    version: DECK_CONFIG_EXPORT_VERSION,
+    deckConfiguration: deckConfig,
+    pipettes,
+  }
+  const encoded = btoa(JSON.stringify(payload))
+  window.open(
+    `${PROTOCOL_DESIGNER_DEV_URL}/#/createNew?deckConfig=${encoded}`,
+    '_blank'
+  )
 }
 
 function downloadDeckConfiguration(
@@ -261,6 +278,20 @@ export function DeviceDetailsDeckConfiguration({
               }
             >
               {t('download_deck_configuration')}
+            </Link>
+            <Link
+              role="button"
+              css={TYPOGRAPHY.linkPSemiBold}
+              onClick={() => {
+                openInProtocolDesigner(deckConfig, pipettesForExport)
+              }}
+              style={
+                isRobotViewable && !isRunRunning && !isMaintenanceRunExisting
+                  ? undefined
+                  : { pointerEvents: 'none', opacity: 0.5 }
+              }
+            >
+              {t('open_in_protocol_designer')}
             </Link>
             <Link
               role="button"

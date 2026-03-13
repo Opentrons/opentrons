@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -43,8 +44,9 @@ import { getValidTiprackURIsForImport } from './utils'
 import { WizardBody } from './WizardBody'
 
 import type { ChangeEvent } from 'react'
-import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
+import type { DeckConfiguration, PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { Fixtures } from '../../components/organisms'
+import type { DeckConfigExportPipette } from '../../utils/deckConfigToOnboardingForm'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
@@ -62,6 +64,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const ref = useRef<HTMLDivElement | null>(null)
   const deckConfigFileInputRef = useRef<HTMLInputElement | null>(null)
   const labwareDefs = useSelector(getLabwareDefsByURI)
+  const { search } = useLocation()
 
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
@@ -123,6 +126,54 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     }
   }
 
+  const flexTrashFixture: Fixtures = {
+    [uuid()]: {
+      cutoutId: 'cutoutA3',
+      name: 'trashBin',
+      cutoutFixtureId: 'trashBinAdapter',
+    },
+  }
+  const ot2TrashFixture: Fixtures = {
+    [uuid()]: {
+      cutoutId: 'cutout12',
+      name: 'trashBin',
+      cutoutFixtureId: 'fixedTrashSlot',
+    },
+  }
+
+  const applyDeckConfigToForm = (
+    deckConfiguration: DeckConfiguration,
+    pipettes?: DeckConfigExportPipette[]
+  ): void => {
+    const {
+      modules: formModules,
+      fixtures: formFixtures,
+      hasWasteChute: hasChute,
+      hasThermocycler: hasTC,
+    } = deckConfigToOnboardingForm(deckConfiguration)
+    setValue('fields.robotType', FLEX_ROBOT_TYPE)
+    setValue('modules', formModules)
+    setValue(
+      'fixtures',
+      Object.keys(formFixtures).length > 0 ? formFixtures : flexTrashFixture
+    )
+    setValue('hasWasteChute', hasChute)
+    setValue('hasThermocycler', hasTC)
+    setValue('hasGripper', false)
+    for (const p of pipettes ?? []) {
+      const tiprackURIs = getValidTiprackURIsForImport(
+        p.instrumentName as PipetteName,
+        labwareDefs
+      )
+      setValue(`pipettesByMount.${p.mount}.pipetteName`, p.instrumentName)
+      setValue(
+        `pipettesByMount.${p.mount}.tiprackDefURI`,
+        tiprackURIs ?? undefined
+      )
+    }
+    setCurrentStepIndex?.(1)
+  }
+
   const handleImportDeckConfigFile = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
@@ -142,36 +193,10 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
           })
           return
         }
-        const {
-          modules: formModules,
-          fixtures: formFixtures,
-          hasWasteChute: hasChute,
-          hasThermocycler: hasTC,
-        } = deckConfigToOnboardingForm(deckConfig)
-        setValue('fields.robotType', FLEX_ROBOT_TYPE)
-        setValue('modules', formModules)
-        setValue(
-          'fixtures',
-          Object.keys(formFixtures).length > 0 ? formFixtures : flexTrashFixture
+        applyDeckConfigToForm(
+          deckConfig,
+          getPipettesFromDeckConfigPayload(parsed) ?? undefined
         )
-        setValue('hasWasteChute', hasChute)
-        setValue('hasThermocycler', hasTC)
-        setValue('hasGripper', false)
-        const pipettesFromFile = getPipettesFromDeckConfigPayload(parsed)
-        if (pipettesFromFile != null) {
-          for (const p of pipettesFromFile) {
-            const tiprackURIs = getValidTiprackURIsForImport(
-              p.instrumentName as PipetteName,
-              labwareDefs
-            )
-            setValue(`pipettesByMount.${p.mount}.pipetteName`, p.instrumentName)
-            setValue(
-              `pipettesByMount.${p.mount}.tiprackDefURI`,
-              tiprackURIs ?? undefined
-            )
-          }
-        }
-        setCurrentStepIndex?.(1)
       } catch {
         bakeToast(t('import_deck_config_invalid_file'), ERROR_TOAST, {
           closeButton: true,
@@ -180,6 +205,24 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     }
     reader.readAsText(file)
   }
+
+  // Apply deck config sent via URL param when opened from the desktop app.
+  useEffect(() => {
+    const encoded = new URLSearchParams(search).get('deckConfig')
+    if (encoded == null) return
+    try {
+      const parsed = JSON.parse(atob(encoded)) as unknown
+      const deckConfig = parseDeckConfigFilePayload(parsed)
+      if (deckConfig == null) return
+      applyDeckConfigToForm(
+        deckConfig,
+        getPipettesFromDeckConfigPayload(parsed) ?? undefined
+      )
+    } catch {
+      // malformed param — silently ignore, user can configure manually
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     handleScrollToBottom()
@@ -201,21 +244,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.right.pipetteName', leftPipetteName)
     setValue('pipettesByMount.left.tiprackDefURI', rightTiprackDefURI)
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
-  }
-
-  const flexTrashFixture: Fixtures = {
-    [uuid()]: {
-      cutoutId: 'cutoutA3',
-      name: 'trashBin',
-      cutoutFixtureId: 'trashBinAdapter',
-    },
-  }
-  const ot2TrashFixture: Fixtures = {
-    [uuid()]: {
-      cutoutId: 'cutout12',
-      name: 'trashBin',
-      cutoutFixtureId: 'fixedTrashSlot',
-    },
   }
 
   const handlSelectWasteChute = (value: boolean): void => {
