@@ -131,8 +131,8 @@ LAYOUT_TO_START: Dict[str, Optional[str]] = {
 LAYOUT_TO_END: Dict[str, Optional[str]] = {
     "SingleA1": None,
     "SingleH1": None,
-    "SingleA12": "A12",
-    "SingleH12": "H12",
+    "SingleA12": None,
+    "SingleH12": None,
     "Column1": "H1",
     "Column12": "H12",
     "RowA": "A12",
