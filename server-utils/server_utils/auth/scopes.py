@@ -31,12 +31,15 @@ class Scope(enum.Enum):
 
     ROBOT_CONTROL_WRITE = (
         "robot_control.write",
-        "Run a protocol, or otherwise control the device in its capacity as a liquid-handling robot.",
+        (
+            "Run a protocol, move pipettes, control hardware modules,"
+            " or otherwise make the robot do something physical."
+        ),
     )
 
     ROBOT_SETTINGS_WRITE = (
         "robot_settings.write",
-        "Edit general robot settings."
+        "Edit robot settings for which there is no more specific scope.",
     )
 
     # We actually want access control mode to totally disable SSH, so this scope is
@@ -50,7 +53,7 @@ class Scope(enum.Enum):
 
     UPDATES_WRITE = (
         "updates.write",
-        "Perform system updates (begin, cancel, upload, commit).",
+        "Update the robot's software.",
     )
 
     USERS_READ = (
