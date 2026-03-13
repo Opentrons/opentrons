@@ -12,12 +12,15 @@ import {
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
-import type { LayoutName } from '../types'
+import type { KeyboardLanguage, LayoutName } from '../types'
 
 import '../index.css'
 import './index.css'
 
 const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']
+const PREVIEW_LABEL_RENDERING_DURATION_MS = 800
+const PREVIEW_LABEL_EN = 'english (us)'
+const PREVIEW_LABEL_CH = '简体拼音'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
@@ -34,6 +37,26 @@ export function FullKeyboard({
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)
+  const [keyboardLanguage, setKeyboardLanguage] = useState<KeyboardLanguage>(
+    appLanguage === 'zh-CN' ? 'zh-CN' : 'en-US'
+  )
+  const [spacePreviewLabel, setSpacePreviewLabel] = useState<string | null>(
+    null
+  )
+  const languageTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    setKeyboardLanguage(appLanguage === 'zh-CN' ? 'zh-CN' : 'en-US')
+  }, [appLanguage])
+
+  useEffect(() => {
+    return () => {
+      if (languageTimerRef.current != null) {
+        window.clearTimeout(languageTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleLayoutChange = (button: string): void => {
     switch (button) {
       case '{shift}':
@@ -53,10 +76,25 @@ export function FullKeyboard({
     }
   }
 
-  const onKeyPress = (button: string): void => {
-    if (SPECIAL_LAYOUT_KEYS.includes(button)) {
-      handleLayoutChange(button)
+  const handleLanguageToggle = (): void => {
+    if (languageTimerRef.current != null) {
+      window.clearTimeout(languageTimerRef.current)
     }
+
+    setKeyboardLanguage(prev => {
+      const nextLanguage: KeyboardLanguage =
+        prev === 'en-US' ? 'zh-CN' : 'en-US'
+
+      setSpacePreviewLabel(
+        nextLanguage === 'zh-CN' ? PREVIEW_LABEL_CH : PREVIEW_LABEL_EN
+      )
+
+      languageTimerRef.current = window.setTimeout(() => {
+        setSpacePreviewLabel(null)
+      }, PREVIEW_LABEL_RENDERING_DURATION_MS)
+
+      return nextLanguage
+    })
   }
 
   const onKeyPress = (button: string): void => {
