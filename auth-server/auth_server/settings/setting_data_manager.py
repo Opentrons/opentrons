@@ -13,8 +13,8 @@ from .models import PatchSettingsRequestData, SettingsResponseData
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
 
 
-class SettingsStore:
-    """Stores and retrieves the current authorization and authentication settings."""
+class SettingDataManager:
+    """Manages the current authorization and authentication settings."""
 
     def __init__(self) -> None:
         self._settings = _DEFAULT_SETTINGS
@@ -25,13 +25,11 @@ class SettingsStore:
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
-        new_settings = self._settings.model_copy()
-
-        # Pydantic will already have validated that `patch.accessControlEnabled` is
-        # `True | None`, not `False`, so this is a one-way latch.
-        if patch.accessControlEnabled is not None:
-            new_settings.accessControlEnabled = patch.accessControlEnabled
-
+        print(patch)
+        new_settings = self._settings.model_copy(
+            update=patch.model_dump(exclude_none=True)
+        )
+        print(new_settings)
         self._settings = new_settings
         return self.get()
 
@@ -44,20 +42,22 @@ class SettingsStore:
         return self.get()
 
 
-_accessor = AppStateAccessor[SettingsStore]("settings_store")
+_accessor = AppStateAccessor[SettingDataManager]("setting_data_manager")
 
 
-def install_settings_store(app_state: AppState, settings_store: SettingsStore) -> None:
+def install_setting_data_manager(
+    app_state: AppState, setting_data_manager: SettingDataManager
+) -> None:
     """Place the server's singleton SettingsStore in server state, for later retrieval by get_settings_store()."""
-    _accessor.set_on(app_state, settings_store)
+    _accessor.set_on(app_state, setting_data_manager)
 
 
-def get_settings_store(
+def get_setting_data_manager(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-) -> SettingsStore:
+) -> SettingDataManager:
     """Return the server's singleton SettingsStore."""
-    settings_store = _accessor.get_from(app_state)
-    if settings_store is None:
-        settings_store = SettingsStore()
-        _accessor.set_on(app_state, settings_store)
-    return settings_store
+    setting_data_manager = _accessor.get_from(app_state)
+    if setting_data_manager is None:
+        setting_data_manager = SettingDataManager()
+        _accessor.set_on(app_state, setting_data_manager)
+    return setting_data_manager

@@ -31,7 +31,10 @@ from auth_server.persistence.persistence_directory import (
 )
 from auth_server.server_settings import AuthServerSettings, get_settings
 from auth_server.settings.router import router as settings_router
-from auth_server.settings.store import SettingsStore, install_settings_store
+from auth_server.settings.setting_data_manager import (
+    SettingDataManager,
+    install_setting_data_manager,
+)
 from auth_server.users.router import router as users_router
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import UserDataManager
@@ -48,8 +51,8 @@ def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Pa
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    settings_store = SettingsStore()
-    install_settings_store(app.state, settings_store)
+    setting_data_manager = SettingDataManager()
+    install_setting_data_manager(app.state, setting_data_manager)
 
     settings = get_settings()
     persistence_directory_root = _get_persistence_directory_root(settings)
@@ -68,11 +71,11 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         user_service = UserDataManager(user_store=user_store)
         user_service.seed_initial_users()
 
-        settings_store = SettingsStore()
-        install_settings_store(app.state, settings_store)
+        setting_data_manager = SettingDataManager()
+        install_setting_data_manager(app.state, setting_data_manager)
 
         authorization_checker = build_authorization_checker(
-            settings_store, oauth2_backend
+            setting_data_manager, oauth2_backend
         )
         install_authorization_checker(app.state, authorization_checker)
 
