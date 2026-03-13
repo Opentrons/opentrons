@@ -37,21 +37,21 @@ from server_utils.auth.resource_server.authorization_checker import (
 
 from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
-from auth_server.settings.setting_data_manager import (
-    SettingDataManager,
-    get_setting_data_manager,
+from auth_server.settings.settings_data_manager import (
+    SettingsDataManager,
+    get_settings_data_manager,
 )
 
 
 def build_authorization_checker(
-    setting_data_manager: Annotated[
-        SettingDataManager, fastapi.Depends(get_setting_data_manager)
+    settings_data_manager: Annotated[
+        SettingsDataManager, fastapi.Depends(get_settings_data_manager)
     ],
     oauth2_backend: Annotated[OAuth2Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> AuthorizationChecker:
     """Construct the server's singleton `AuthorizationChecker`."""
     return AuthServerAuthorizationChecker(
-        client=_SelfClient(setting_data_manager, oauth2_backend)
+        client=_SelfClient(settings_data_manager, oauth2_backend)
     )
 
 
@@ -60,17 +60,17 @@ class _SelfClient(Client):
 
     def __init__(
         self,
-        setting_data_manager: SettingDataManager,
+        settings_data_manager: SettingsDataManager,
         oauth2_backend: OAuth2Backend,
     ) -> None:
-        self._setting_data_manager = setting_data_manager
+        self._settings_data_manager = settings_data_manager
         self._oauth2_backend = oauth2_backend
 
     @override
     async def get_auth_settings(self) -> AuthSettingsResponse:
         # Mimic an HTTP response body from our own /auth/settings endpoint.
         response_body = {
-            "data": self._setting_data_manager.get().model_dump(
+            "data": self._settings_data_manager.get().model_dump(
                 mode="json", by_alias=True
             )
         }

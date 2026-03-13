@@ -13,7 +13,7 @@ from .models import PatchSettingsRequestData, SettingsResponseData
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
 
 
-class SettingDataManager:
+class SettingsDataManager:
     """Manages the current authorization and authentication settings."""
 
     def __init__(self) -> None:
@@ -42,22 +42,22 @@ class SettingDataManager:
         return self.get()
 
 
-_accessor = AppStateAccessor[SettingDataManager]("setting_data_manager")
+_accessor = AppStateAccessor[SettingsDataManager]("settings_data_manager")
 
 
-def install_setting_data_manager(
-    app_state: AppState, setting_data_manager: SettingDataManager
+def install_settings_data_manager(
+    app_state: AppState, settings_data_manager: SettingsDataManager
 ) -> None:
     """Place the server's singleton SettingsStore in server state, for later retrieval by get_settings_store()."""
-    _accessor.set_on(app_state, setting_data_manager)
+    _accessor.set_on(app_state, settings_data_manager)
 
 
-def get_setting_data_manager(
+def get_settings_data_manager(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-) -> SettingDataManager:
+) -> SettingsDataManager:
     """Return the server's singleton SettingsStore."""
-    setting_data_manager = _accessor.get_from(app_state)
-    if setting_data_manager is None:
-        setting_data_manager = SettingDataManager()
-        _accessor.set_on(app_state, setting_data_manager)
-    return setting_data_manager
+    settings_data_manager = _accessor.get_from(app_state)
+    if settings_data_manager is None:
+        settings_data_manager = SettingsDataManager()
+        _accessor.set_on(app_state, settings_data_manager)
+    return settings_data_manager
