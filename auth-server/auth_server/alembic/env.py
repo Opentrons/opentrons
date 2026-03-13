@@ -4,6 +4,8 @@ from pathlib import Path
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from server_utils import sql_utils
+
 from auth_server.persistence import orm_models as _orm_models  # noqa: F401
 from auth_server.persistence.database import Base
 from auth_server.persistence.file_and_directory_names import (
@@ -87,6 +89,9 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             render_as_batch=True,
         )
+
+        sql_utils.enable_foreign_key_constraints(connectable)
+        sql_utils.fix_transactions(connectable)
 
         with context.begin_transaction():
             context.run_migrations()
