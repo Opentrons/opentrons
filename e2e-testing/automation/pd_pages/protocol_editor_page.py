@@ -163,8 +163,8 @@ class ProtocolEditorPage(BasePage):
 
         target.click()
         if stacker:
-            self.page.get_by_test_id("CustomizeExpandButton_inputField").click()
-            self.page.get_by_test_id("CustomizeExpandButton_inputField").fill(str(fill_num))
+            self.page.get_by_test_id("customize-expand-button-input-field").click()
+            self.page.get_by_test_id("customize-expand-button-input-field").fill(str(fill_num))
         if lid:
             self._add_lid("Opentrons Flex 96 Tip Rack 50", "CheckboxField_icon")
         self.click_test_id("SelectLabwareModal_confirm")

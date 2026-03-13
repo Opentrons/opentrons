@@ -173,9 +173,9 @@ class MixStepForm(BasePage):
         """Configure mix tip X/Y/Z positions."""
 
         modal = self._modal_area()
-        modal.locator('[data-testid="TipPositionModal_x_custom_input"]').fill(x)
-        modal.locator('[data-testid="TipPositionModal_y_custom_input"]').fill(y)
-        modal.locator('[data-testid="TipPositionModal_z_custom_input"]').fill(z)
+        modal.locator('[data-testid="tip-position-modal-x-custom-input"]').fill(x)
+        modal.locator('[data-testid="tip-position-modal-y-custom-input"]').fill(y)
+        modal.locator('[data-testid="tip-position-modal-z-custom-input"]').fill(z)
 
     def toggle_checkbox(self, index: int = 0) -> None:
         """Toggle a checkbox-like control by index among visible controls."""
