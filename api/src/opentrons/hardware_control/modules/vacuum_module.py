@@ -297,8 +297,8 @@ class VacuumModule(mod_abc.AbstractModule):
         """Reset persistent data on the module that should not exist outside of a run."""
         self.set_statusbar_identify(False)
 
-    # maybe make two separate functions in the papi layer so callers can open and close the vent without worrying about true/false or an enum value
     async def set_vent_state(self, vent_state: VentState) -> None:
+        """Open or close the vent."""
         await self._driver.set_vent_state(state=bool(vent_state.value))
 
     async def set_vacuum_state(
@@ -309,6 +309,7 @@ class VacuumModule(mod_abc.AbstractModule):
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
+        """Handler for internal pressure controls."""
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
             guage_pressure_mbar=guage_pressure_mbar,
@@ -323,11 +324,13 @@ class VacuumModule(mod_abc.AbstractModule):
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
     ) -> None:
+        """Control the pump agnostically to the internal pressure"""
         await self._driver.set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
         )
 
     async def set_serial_number(self, sn: str) -> None:
+        """Set the serial number."""
         await self._driver.set_serial_number(sn=sn)
 
 

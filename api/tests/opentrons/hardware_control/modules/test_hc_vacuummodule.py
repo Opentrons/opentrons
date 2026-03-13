@@ -184,6 +184,7 @@ async def test_set_vent_state(
     vent_state: VentState,
     vent_state_bool: bool,
 ) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
     vent_state
     await subject.set_vent_state(vent_state=vent_state)
     decoy.verify(await mock_driver.set_vent_state(state=vent_state_bool))
@@ -206,7 +207,7 @@ async def test_set_vacuum_state(
     vent_after: Optional[bool],
     decoy: Decoy,
 ) -> None:
-    """Ensure that the hardwar controller calls the driver method w the correct arguments."""
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_vacuum_state(
         enable_vacuum=enable_vacuum,
         guage_pressure_mbar=guage_pressure_mbar,
@@ -236,6 +237,7 @@ async def test_set_pump_state(
     target_rpm: int,
     duty_cycle: int,
 ) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_pump_state(
         start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
     )
@@ -253,6 +255,7 @@ async def test_set_serial_number(
     decoy: Decoy,
     serial_number: str,
 ) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_serial_number(sn=serial_number)
     decoy.verify(await mock_driver.set_serial_number(sn=serial_number))
 
@@ -276,6 +279,7 @@ async def test_update_pump_state(
     decoy: Decoy,
     pump_state: PumpState,
 ) -> None:
+    """Ensure that the module pump state gets update with the value the driver returns."""
     decoy.when(await mock_driver.get_pump_state()).then_return(pump_state)
 
     await subject._reader.update_pump_state()
@@ -302,6 +306,7 @@ async def test_update_vacuum_state(
     decoy: Decoy,
     vacuum_state: PressureState,
 ) -> None:
+    """Ensure that the module vacuum state gets update with the value the driver returns."""
     decoy.when(await mock_driver.get_vacuum_state()).then_return(vacuum_state)
 
     await subject._reader.update_vacuum_state()
