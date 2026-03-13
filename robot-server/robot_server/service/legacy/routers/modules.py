@@ -99,7 +99,7 @@ async def post_serial_command(
         ).as_error(status.HTTP_404_NOT_FOUND)
 
     # Search for the module
-    matching_mod = find_matching_module(serial, attached_modules)
+    matching_mod = _find_matching_module(serial, attached_modules)
 
     if not matching_mod:
         raise LegacyErrorResponse.from_exc(
@@ -149,7 +149,7 @@ async def post_serial_update(
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules
-    matching_module = find_matching_module(serial, attached_modules)
+    matching_module = _find_matching_module(serial, attached_modules)
 
     if not matching_module:
         raise LegacyErrorResponse.from_exc(
@@ -183,7 +183,7 @@ async def post_serial_update(
     ).as_error(status_code)
 
 
-def find_matching_module(
+def _find_matching_module(
     serial: str, attached_modules: typing.List[AbstractModule]
 ) -> typing.Optional[AbstractModule]:
     """
