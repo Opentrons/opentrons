@@ -81,4 +81,22 @@ describe('SlotInformation', () => {
     screen.getByText('Thermocycler Module Gen2')
     screen.getByText('Heater-Shaker Module')
   })
+
+  it('should display STACKER A/B/C/D for hopper locations by row', () => {
+    props = { ...props, location: 'hopperA4' }
+    render(props)
+    screen.getByText('STACKER A')
+
+    props = { ...props, location: 'hopperB4' }
+    render(props)
+    screen.getByText('STACKER B')
+
+    props = { ...props, location: 'hopperC4' }
+    render(props)
+    screen.getByText('STACKER C')
+
+    props = { ...props, location: 'hopperD4' }
+    render(props)
+    screen.getByText('STACKER D')
+  })
 })

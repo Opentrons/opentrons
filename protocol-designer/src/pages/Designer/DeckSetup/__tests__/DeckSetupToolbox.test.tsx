@@ -113,6 +113,31 @@ describe('DeckSetupToolbox', () => {
     fireEvent.click(screen.getByText('Add labware'))
     screen.getByText('mock SelectLabwareModal')
   })
+
+  it('should display STACKER A/B/C/D in title when selected slot is a stacker hopper', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedFixture: null,
+      selectedModuleModel: null,
+      selectedSlot: { slot: 'hopperA4', cutout: 'cutoutA4' },
+    })
+    render(props)
+    screen.getByText('STACKER A')
+    screen.getByText('Edit labware')
+
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedFixture: null,
+      selectedModuleModel: null,
+      selectedSlot: { slot: 'hopperD4', cutout: 'cutoutD4' },
+    })
+    render(props)
+    screen.getByText('STACKER D')
+  })
   it('renders correct copy for adding a labware onto a plate reader', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: null,
