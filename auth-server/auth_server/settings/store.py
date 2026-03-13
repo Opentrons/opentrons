@@ -3,6 +3,8 @@
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
+from .models import PatchSettingsRequestData
+
 
 class SettingsStore:
     """Manages settings CRUD operations against the database."""
@@ -29,11 +31,8 @@ class SettingsStore:
     def add(
         self,
         username: str,
-        hashed_password: str,
-        full_name: str,
-        account_type: str,
     ) -> None:
-        """Create a user, persist it, and return it."""
+        """Create a user's settings, persist it, and return it."""
         pass  # TODO: Implement
         # new_user = User(
         #     username=username,
@@ -47,23 +46,20 @@ class SettingsStore:
         #     session.expunge(new_user)
         # return new_user
 
-    def remove(self, username: str) -> None:
-        """Delete a user by username.
+    def reset(self, username: str) -> None:
+        """Reset the settings to their defaults.
 
-        Raises ``ValueError`` if the user does not exist.
+        Raises ``ValueError`` if the username does not exist.
         """
         pass  # TODO: Implement
-        # with self._session() as session:
-        #     user = session.query(User).filter(User.username == username).first()
-        #     if user is None:
-        #         raise ValueError(f"User {username!r} not found")
-        #     session.delete(user)
-        #     session.commit()
 
     def update(
         self,
+        username: str,
+        # TODO: Extract to args
+        settings: PatchSettingsRequestData | None = None,
     ) -> None:
-        """Update a user's fields and return the updated User.
+        """Update a settings's fields and return the updated Settings.
 
         Raises ``ValueError`` if the user does not exist.
         """

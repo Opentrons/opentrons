@@ -9,6 +9,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from .models import PatchSettingsRequestData, SettingsResponseData
+from .store import SettingsStore
 
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
 
@@ -16,30 +17,23 @@ _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=Fa
 class SettingsDataManager:
     """Manages the current authorization and authentication settings."""
 
-    def __init__(self) -> None:
+    def __init__(self, settings_store: SettingsStore) -> None:
+        self._settings_store = settings_store
         self._settings = _DEFAULT_SETTINGS
 
     def get(self) -> SettingsResponseData:
         """Get the current settings."""
-        return self._settings
+        return self._settings_store.get(username="username") or _DEFAULT_SETTINGS
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
-        print(patch)
-        new_settings = self._settings.model_copy(
-            update=patch.model_dump(exclude_none=True)
-        )
-        print(new_settings)
-        self._settings = new_settings
-        return self.get()
+        self._settings_store.update(username="username", settings=patch)
+        return self._settings_store.get(username="username")
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
-        new_settings = _DEFAULT_SETTINGS.model_copy()
-        # accessControlEnabled is special and is excluded from the reset.
-        new_settings.accessControlEnabled = self._settings.accessControlEnabled
-        self._settings = new_settings
-        return self.get()
+        self._settings_store.reset(username="username")
+        return self._settings_store.get(username="username")
 
 
 _accessor = AppStateAccessor[SettingsDataManager]("settings_data_manager")
