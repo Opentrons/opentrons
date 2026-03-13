@@ -8,10 +8,12 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   CheckboxField,
+  COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
+  Icon,
   InfoScreen,
   InlineNotification,
   InputField,
@@ -415,11 +417,18 @@ export function SelectLabwareModal(
             }}
             placeholder={t('search_labware')}
             size="medium"
-            leftIcon="search"
-            showDeleteIcon
-            onDelete={() => {
-              setSearchTerm('')
-            }}
+            leftElement={
+              <Icon name="search" size="1.25rem" color={COLORS.grey60} />
+            }
+            rightElement={
+              <Icon
+                name="close"
+                size="1.75rem"
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+              />
+            }
           />
           {moduleType != null ||
           (isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE) ? (

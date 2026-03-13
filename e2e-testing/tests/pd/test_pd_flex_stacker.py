@@ -170,7 +170,7 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
         eyes.check(checkpoint_name="Fully configured deck with 2 Stackers and all Modules, Fixtures, and Labware")
 
     ## Begin Flex Stacker step tests
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.retrieve_stacker("D4 Flex Stacker")
     plate_reader_page.button_selection("Save")
     print("✓ Retrieve command successful")
@@ -181,12 +181,12 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     protocol_editor.move_labware("A2 Opentrons Flex 96 Tip Rack", "D4")
     print("✓ Move labware from and back to stacker")
 
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.store_stacker("D4 Flex Stacker")
     plate_reader_page.button_selection("Save")
     print("✓ Store command successful")
 
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.retrieve_stacker("D4 Flex Stacker")
     plate_reader_page.button_selection("Save")
     protocol_editor.add_step("Move")
@@ -203,7 +203,7 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     plate_reader_page.button_selection("Save")
 
     ## Stacker commands for well plate
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.retrieve_stacker("C4 Flex Stacker")
     plate_reader_page.button_selection("Save")
     protocol_editor.add_step("Move")
@@ -233,14 +233,14 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     plate_reader_page.button_selection("Save")
     print("✓ Transfer from Reservoir to plate")
 
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.empty_stacker("C4 Flex Stacker", "Empty message test")
     plate_reader_page.button_selection("Save")
     print("✓ Empty command successful")
 
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("D2 Opentrons Flex 96 Tip Rack", "D3 Waste Chute in D3")
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.refill_stacker("D4 Flex Stacker", 1, "Refill message test")
     plate_reader_page.button_selection("Save")
     print("✓ Refill command successful")
@@ -249,7 +249,7 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     protocol_editor.move_labware("A2 Opentrons Flex 96 Tip Rack", "D4")
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("C2 Opentrons Tough 96 Well", "C4")
-    protocol_editor.add_step("Flex Stacker")
+    protocol_editor.add_step("Stacker")
     flex_stacker_page.store_stacker("C4 Flex Stacker")
     plate_reader_page.button_selection("Save")
 

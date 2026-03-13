@@ -8,11 +8,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -395,10 +395,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="text"
               value={String(speed ?? '')}
-              title={t('blow_out_speed')}
+              label={t('blow_out_speed')}
               error={speedError}
               readOnly
             />

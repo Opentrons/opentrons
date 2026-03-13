@@ -7,9 +7,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -129,10 +129,10 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="text"
             value={tipPosition}
-            title={textEntryCopy}
+            label={textEntryCopy}
             error={error}
             readOnly
           />
