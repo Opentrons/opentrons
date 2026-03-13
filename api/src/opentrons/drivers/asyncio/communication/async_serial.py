@@ -163,6 +163,18 @@ class AsyncSerial:
         """Reset the output buffer"""
         self._serial.reset_output_buffer()
 
+    async def set_timeout(
+        self, timeout_property: TimeoutProperties, timeout: Optional[float]
+    ) -> None:
+        """Permanently set timeout for this connection."""
+        default_timeout = getattr(self._serial, timeout_property)
+        override = timeout is not None and default_timeout != timeout
+        if override:
+            await self._loop.run_in_executor(
+                executor=self._executor,
+                func=lambda: setattr(self._serial, timeout_property, timeout),
+            )
+
     @contextlib.asynccontextmanager
     async def timeout_override(
         self, timeout_property: TimeoutProperties, timeout: Optional[float]

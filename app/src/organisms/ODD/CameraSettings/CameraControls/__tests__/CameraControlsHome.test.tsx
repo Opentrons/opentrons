@@ -4,13 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import { CameraControlsHome } from '../CameraControlsHome'
 import { ImagePreviewModal } from '../ImagePreviewModal'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { CameraControlsHomeProps } from '../CameraControlsHome'
 

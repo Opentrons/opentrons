@@ -163,6 +163,7 @@ const updatePatchOnLabwareChange = (
           pipetteId,
           labwareEntities,
           pipetteEntities,
+          nozzleConfiguration: ALL,
         }),
       }
     : {}
@@ -179,6 +180,7 @@ const updatePatchOnLabwareChange = (
           pipetteId,
           labwareEntities,
           pipetteEntities,
+          nozzleConfiguration: ALL,
         }),
       }
     : {}
@@ -540,6 +542,7 @@ const updatePatchOnPipetteChannelChange = (
                 pipetteId,
                 labwareEntities,
                 pipetteEntities,
+                nozzleConfiguration: ALL,
               })
             : getAllWellsFromPrimaryWells(
                 appliedPatch.dispense_wells as string[],

@@ -9,6 +9,7 @@ from datetime import datetime
 
 from typing_extensions import Self
 
+from opentrons_shared_data.data_files.types import DataFileInfo
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -405,6 +406,14 @@ class FilesAddedUpdate:
 
 
 @dataclasses.dataclass
+class CSVFileUpdate:
+    """Info to track a csv file during a protocol."""
+
+    file_info: DataFileInfo
+    columns: int
+
+
+@dataclasses.dataclass
 class PreconditionUpdate:
     """An update that changes command preconditions flags."""
 
@@ -482,6 +491,8 @@ class StateUpdate:
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 
     files_added: FilesAddedUpdate | NoChangeType = NO_CHANGE
+
+    csv_file_updated: CSVFileUpdate | NoChangeType = NO_CHANGE
 
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
 
@@ -920,4 +931,9 @@ class StateUpdate:
         self.ready_to_aspirate = PipetteAspirateReadyUpdate(
             pipette_id=pipette_id, ready_to_aspirate=ready_to_aspirate
         )
+        return self
+
+    def update_csv(self, file_info: DataFileInfo, columns: int) -> Self:
+        """Set a csv file updated."""
+        self.csv_file_updated = CSVFileUpdate(file_info=file_info, columns=columns)
         return self

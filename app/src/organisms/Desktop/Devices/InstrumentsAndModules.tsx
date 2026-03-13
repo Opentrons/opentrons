@@ -42,7 +42,6 @@ import type {
 const EQUIPMENT_POLL_MS = 5000
 
 // stubbed vacuum module for testing
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean

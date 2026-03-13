@@ -18,6 +18,7 @@ dependencies = [
     "sqlalchemy==1.4.51",
     "oauthlib>=3.3.1,<4",
     "pwdlib[argon2,bcrypt]==0.3.0",
+    "alembic==1.18.4",
 ]
 
 [tool.uv.dependency-groups]
@@ -33,6 +34,7 @@ robot = [
     "uvicorn==0.27.0.post1",
     "sqlalchemy==1.4.51",
     "oauthlib==3.3.1",
+    "alembic==1.18.4",
 ]
 dev = [
     "ruff==0.14.10",
@@ -131,7 +133,7 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
-    "error::sqlalchemy.exc.RemovedIn20Warning",
+    "error::sqlalchemy.exc.RemovedIn20Warning"
 ]
 
 [tool.mypy]

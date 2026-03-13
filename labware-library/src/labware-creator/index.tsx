@@ -290,7 +290,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
               messages: validateLabwareSchema2.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     ajvError.message
                   }. (${JSON.stringify(ajvError.params)})`
               ),

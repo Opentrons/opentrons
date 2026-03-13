@@ -10,6 +10,8 @@ import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_LOCATION,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -68,12 +70,22 @@ export const getModuleShortNames = (type: ModuleType): string => {
       return 'Absorbance Plate Reader'
     case FLEX_STACKER_MODULE_TYPE:
       return 'Flex Stacker'
+    case VACUUM_MODULE_TYPE:
+      return 'Vacuum Module'
     default:
       console.warn(
         `unsupported module ${type} - need to add to getModuleShortNames`
       )
       return 'unsupported module'
   }
+}
+
+const getModuleDisplayLocation = (moduleOnDeck: ModuleOnDeck): string => {
+  const { type, slot } = moduleOnDeck
+  if (type === VACUUM_MODULE_TYPE) {
+    return VACUUM_MODULE_LOCATION
+  }
+  return slot
 }
 
 export function getModuleLabwareOptions(
@@ -92,17 +104,18 @@ export function getModuleLabwareOptions(
         moduleOnDeck.id,
         Object.values(labwares)
       )
+      const moduleDisplayLocation = getModuleDisplayLocation(moduleOnDeck)
       if (topMostId != null) {
         return {
           name: nicknamesById[topMostId],
-          deckLabel: moduleOnDeck.slot,
+          deckLabel: moduleDisplayLocation,
           subtext: module,
           value: moduleOnDeck.id,
         }
       } else {
         return {
           name: module,
-          deckLabel: moduleOnDeck.slot,
+          deckLabel: moduleDisplayLocation,
           value: moduleOnDeck.id,
         }
       }

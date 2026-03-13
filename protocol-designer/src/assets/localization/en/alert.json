@@ -322,7 +322,7 @@
         "title": "Gripper movement with tips attached"
       },
       "POSSIBLE_PIPETTE_COLLISION": {
-        "body": "There is a possibility that the pipette will collide with the adjacent labware or module for partial tip pick up.",
+        "body": "There is a possibility that the pipette will collide with the adjacent labware, modules, or trash fixtures for partial tip pick up.",
         "title": "Pipette collisions likely"
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {

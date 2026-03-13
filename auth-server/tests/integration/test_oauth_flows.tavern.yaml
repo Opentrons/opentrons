@@ -3,6 +3,7 @@ test_name: Successful OAuth 2 flow
 marks:
   - usefixtures:
       - run_server
+      - admin_scopes_str
 
 stages:
   - name: Exchange a username and password for an access token and refresh token
@@ -21,7 +22,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: &default_scope auth_settings.write robot_settings.write runs.write users.read users.write
+        scope: &returned_scope '{admin_scopes_str}'
       save:
         json:
           initial_access_token: access_token
@@ -39,7 +40,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: *returned_scope
 
   - name: Introspect the refresh token to confirm that it's active
     request:
@@ -53,7 +54,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: *returned_scope
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -70,7 +71,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: *default_scope
+        scope: *returned_scope
       save:
         json:
           refreshed_access_token: access_token
@@ -88,7 +89,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: *returned_scope
 
   - name: Introspect the new refresh token to confirm that it's active
     request:
@@ -102,7 +103,7 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: *default_scope
+        scope: *returned_scope
 
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
@@ -172,6 +173,7 @@ test_name: The client should be able to request scopes narrower than what the us
 marks:
   - usefixtures:
       - run_server
+      - admin_scopes_str
 
 stages:
   - name: Send a password authorization request with narrower-than-default scope
@@ -209,7 +211,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: auth_settings.write robot_settings.write runs.write users.read users.write
+        scope: '{admin_scopes_str}'
       save:
         json:
           refresh_token: refresh_token

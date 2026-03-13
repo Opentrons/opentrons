@@ -1,8 +1,7 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
-
+import { getActiveNozzleAmount } from '../utils/getActiveNozzleAmount'
 import {
   getLocationTotalVolume,
   getWellsForTips,
@@ -47,12 +46,13 @@ export function dispenseUpdateLiquidState(
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
-  let channels = pipetteSpec.channels
-  if (nozzles === COLUMN) {
-    channels = 8
-  } else if (nozzles === SINGLE) {
-    channels = 1
-  }
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+  const activeChannels = getActiveNozzleAmount({
+    pipetteSpec,
+    nozzles,
+    primaryNozzle,
+  })
 
   const well = wellName ?? null
 
@@ -71,7 +71,7 @@ export function dispenseUpdateLiquidState(
   )
   const { wellsForTips, allWellsShared } =
     labwareDef != null && wellName != null
-      ? getWellsForTips(channels, labwareDef, wellName)
+      ? getWellsForTips(activeChannels, labwareDef, wellName)
       : { wellsForTips: null, allWellsShared: true }
 
   const liquidLabware =

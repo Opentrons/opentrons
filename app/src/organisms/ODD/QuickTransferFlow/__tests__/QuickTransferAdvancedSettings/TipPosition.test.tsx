@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,10 +16,10 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -89,9 +89,9 @@ describe('TipPosition', () => {
     render(props)
     screen.getByText('Aspirate tip position')
     screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -111,9 +111,9 @@ describe('TipPosition', () => {
     }
     render(props)
     screen.getByText('Dispense tip position')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
@@ -128,9 +128,9 @@ describe('TipPosition', () => {
     const deleteBtn = screen.getByText('del')
     fireEvent.click(deleteBtn)
     fireEvent.click(deleteBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 52',
         readOnly: true,
         type: 'text',
@@ -151,9 +151,9 @@ describe('TipPosition', () => {
     const deleteBtn = screen.getByText('del')
     fireEvent.click(deleteBtn)
     fireEvent.click(deleteBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Distance from bottom of well (mm)',
+        label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 202',
         readOnly: true,
         type: 'text',
