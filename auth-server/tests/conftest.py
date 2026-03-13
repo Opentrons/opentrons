@@ -24,9 +24,9 @@ def admin_scopes_list() -> list[str]:
 
 
 @pytest.fixture
-def run_server() -> Generator[DevServer, None, None]:
+def run_server(unused_tcp_port: int) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test."""
-    with DevServer() as dev_server:
+    with DevServer(port=unused_tcp_port) as dev_server:
         dev_server.start()
         base_url = f"http://localhost:{dev_server.port}"
         _wait_until_ready(base_url)

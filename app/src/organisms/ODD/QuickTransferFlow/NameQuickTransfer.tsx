@@ -22,6 +22,8 @@ interface NameQuickTransferProps {
   onSave: (protocolName: string) => void
 }
 
+const MAX_CHARACTERS = 60
+
 export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const { onSave } = props
   const { t } = useTranslation('quick_transfer')
@@ -30,7 +32,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const [isSaving, setIsSaving] = useState<boolean>(false)
 
   let error: string | null = null
-  if (name.length > 60) {
+  if (name.length > MAX_CHARACTERS) {
     error = t('character_limit_error')
   }
 
