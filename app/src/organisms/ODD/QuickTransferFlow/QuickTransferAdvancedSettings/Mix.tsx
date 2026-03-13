@@ -224,6 +224,9 @@ export function Mix(props: MixProps): JSX.Element {
               label={t('mix_volume_µL')}
               error={volumeError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex
@@ -265,6 +268,9 @@ export function Mix(props: MixProps): JSX.Element {
               error={repititionError}
               label={t('mix_repetitions')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex

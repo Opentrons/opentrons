@@ -135,6 +135,9 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             label={textEntryCopy}
             error={error}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex

@@ -79,6 +79,7 @@ describe('VolumeEntry', () => {
         readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -102,6 +103,7 @@ describe('VolumeEntry', () => {
         readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -125,6 +127,7 @@ describe('VolumeEntry', () => {
         readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -166,6 +169,7 @@ describe('VolumeEntry', () => {
         readOnly: true,
         type: 'text',
         value: '90',
+        onBlur: expect.any(Function),
       },
       {}
     )

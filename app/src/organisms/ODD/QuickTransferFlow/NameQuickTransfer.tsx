@@ -68,6 +68,9 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
           <StyledText
             oddStyle="bodyTextRegular"

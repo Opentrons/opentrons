@@ -239,6 +239,9 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               value={String(speed ?? '')}
               label={t('speed')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex
@@ -280,6 +283,9 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               label={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('touch_tip_from_top', {
