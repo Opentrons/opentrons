@@ -2,13 +2,11 @@
 
 import asyncio
 import json
-import os
 from logging import getLogger
 from pathlib import Path
 from typing import Final, cast
 
 from .interface import SecureVolumeManager
-from key_server.config import get_config
 
 LOG = getLogger(__name__)
 
@@ -21,7 +19,9 @@ class CAAMSecureVolume(SecureVolumeManager):
     SECURE_STORAGE_KEYCTL_PREFIX: Final = "ot-secure-storage"
     SECURE_STORAGE_DEVMAPPER_NAME: Final = "ot-secure-storage"
 
-    def __init__(self) -> None:
+    def __init__(
+        self, image_mount_point: Path, base_directory: Path, volume_size_mb: int
+    ) -> None:
         """Build a SecureVolumeManager.
 
         Building one of these objects does very little on its own, because all the things it does need
@@ -29,28 +29,15 @@ class CAAMSecureVolume(SecureVolumeManager):
         """
         self._keyid = 0
         self._path: Path | None = None
-
-    def _mountpoint(self) -> Path:
-        directory = get_config().image_mount_point
-        if directory == "automatically_make_temporary":
-            raise RuntimeError(
-                "CAAM secure volume cannot mount to a temporary directory"
-            )
-        return directory
-
-    def _basedir(self) -> Path:
-        directory = get_config().base_directory
-        if directory == "automatically_make_temporary":
-            raise RuntimeError(
-                "CAAM secure volume cannot operate in a temporary directory"
-            )
-        return directory
+        self._base_directory = base_directory
+        self._image_mount_point = image_mount_point
+        self._volume_size_mb = volume_size_mb
 
     def _keyblob(self) -> Path:
-        return self._basedir() / f"{self.SECURE_STORAGE_KEY_NAME}.bb"
+        return self._base_directory / f"{self.SECURE_STORAGE_KEY_NAME}.bb"
 
     def _image(self) -> Path:
-        return self._basedir() / self.SECURE_STORAGE_IMAGE_NAME
+        return self._base_directory / self.SECURE_STORAGE_IMAGE_NAME
 
     def _keyname(self) -> str:
         return f"{self.SECURE_STORAGE_KEYCTL_PREFIX}:{id(self)}"
@@ -58,7 +45,7 @@ class CAAMSecureVolume(SecureVolumeManager):
     async def create(self) -> None:
         """Creates the secure volume by initializing a new CAAM black key and building a backing store."""
         if self._keyblob().exists():
-            os.unlink(self._keyblob())
+            self._keyblob().unlink()
         create_bk = await asyncio.create_subprocess_exec(
             "/usr/bin/caam_keygen",
             "create",
@@ -75,17 +62,17 @@ class CAAMSecureVolume(SecureVolumeManager):
         # this actual key, but we'd have to have a special codepath, so we delete it
         # so we can use the codepath that we use during boot when we have a keyblob
         # but no loaded key yet.
-        os.unlink(self._basedir() / self.SECURE_STORAGE_KEY_NAME)
+        (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
         # the secure storage is stored on disk as an encrypted blob; create a zeroed
         # file for it
         if self._image().exists():
-            os.unlink(self._image())
+            self._image().unlink()
         create_backing_store = await asyncio.create_subprocess_exec(
             "/usr/bin/dd",
             "if=/dev/zero",
-            f"of={self._image()}",
+            f"of={str(self._image())}",
             "bs=1M",
-            f"count={get_config().secure_volume_size_mb}",
+            f"count={self._volume_size_mb}",
         )
         if await create_backing_store.wait() != 0:
             LOG.error(
@@ -116,20 +103,20 @@ class CAAMSecureVolume(SecureVolumeManager):
         import_key = await asyncio.create_subprocess_exec(
             "/usr/bin/caam_keygen",
             "import",
-            self._keyblob(),
-            self._basedir() / self.SECURE_STORAGE_KEY_NAME,
+            str(self._keyblob()),
+            str(self._base_directory / self.SECURE_STORAGE_KEY_NAME),
         )
         if await import_key.wait() != 0:
             LOG.error(
                 f"Failed to import key: ({import_key.returncode}): stdout={import_key.stdout}, stderr={import_key.stderr}"
             )
-        key_data = open(self._basedir() / self.SECURE_STORAGE_KEY_NAME, "rb").read()
+        key_data = (self._base_directory / self.SECURE_STORAGE_KEY_NAME).read_bytes()
 
         keyring_add = await asyncio.create_subprocess_exec(
             "/usr/bin/keyctl",
             "padd",
             "logon",
-            self._keyname(),
+            str(self._keyname()),
             "@p",
         )
         (stdout, stderr) = await keyring_add.communicate(input=key_data)
@@ -143,7 +130,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             self._keyid = int(stdout.strip())
 
         # we always want to delete the key after moving it to KKRS so we can run this again if we want
-        (self._basedir() / self.SECURE_STORAGE_KEY_NAME).unlink()
+        (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
 
     async def _loopback_setup(self) -> None:
         """Set up the encrypted loopback device that makes the mount available to the key server."""
@@ -167,7 +154,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         # - optional parameter count (1)
         # - the optional parameter of the encryption sector size (512)
         SECTOR_SIZE_B = 512
-        dmsetup_table = f"0 {get_config().secure_volume_size_mb * 1024 * 1024 / SECTOR_SIZE_B} crypt capi:tk(cbc(aes))-plain :36:logon:{self._keyname()} 0 {losetup_device} 0 1 sector_size:{SECTOR_SIZE_B}"
+        dmsetup_table = f"0 {self._volume_size_mb * 1024 * 1024 // SECTOR_SIZE_B} crypt capi:tk(cbc(aes))-plain :36:logon:{self._keyname()} 0 {losetup_device} 0 1 sector_size:{SECTOR_SIZE_B}"
         dmsetup = await asyncio.create_subprocess_exec(
             "/usr/bin/dmsetup",
             "create",
@@ -182,7 +169,7 @@ class CAAMSecureVolume(SecureVolumeManager):
 
     async def _mount(self) -> None:
         """Mount a created loopback device."""
-        mount_path = self._mountpoint()
+        mount_path = self._image_mount_point
         if mount_path.is_dir() and len(list(mount_path.iterdir())) != 0:
             LOG.error(f"Non-empty mount path at {mount_path}")
             # this is most likely because it was already mounted; unmount it
@@ -205,7 +192,7 @@ class CAAMSecureVolume(SecureVolumeManager):
 
     async def _unmount(self) -> None:
         """Unmount a created loopback device."""
-        mount_path = self._mountpoint()
+        mount_path = self._image_mount_point
         unmount = await asyncio.create_subprocess_exec("/usr/sbin/unmount", mount_path)
         # we don't care if this fails, really; it would only do so if the mount wasn't mounted
         await unmount.wait()
@@ -228,18 +215,18 @@ class CAAMSecureVolume(SecureVolumeManager):
         losetup_list = await asyncio.create_subprocess_exec(
             "/usr/sbin/losetup", "--list", "--json"
         )
-        stdout, stderr = await losetup_list.communicate()
-        if losetup_list.returncode != 0:
+        if await losetup_list.wait() != 0:
             LOG.error(
                 f"losetup list failed ({losetup_list.returncode}): stdout={losetup_list.stdout}, stderr={losetup_list.stderr}"
             )
-        losetup_list_res = json.loads(stdout.decode().strip())
+        assert losetup_list.stdout  # safe because we've called wait()
+        losetup_list_res = json.loads((await losetup_list.stdout.read()).strip())
         devlist = losetup_list_res.get("loopdevices")
         for loopback_dev in devlist:
             if loopback_dev.get("backfile", "") == str(self._image()):
                 return cast(str, loopback_dev.get("name", ""))
         LOG.error(
-            f"Could not find loopback device for {str(self._image())} in losetup result {stdout!r}"
+            f"Could not find loopback device for {str(self._image())} in losetup result {losetup_list.stdout}"
         )
         return ""
 
@@ -253,7 +240,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         await self._load_key()
         await self._loopback_setup()
         await self._mount()
-        self._path = self._mountpoint()
+        self._path = self._image_mount_point
 
     async def unmount(self) -> None:
         """Unmounts a currently-mounted secure volume and tears down dm-crypto and key setup (though the keyblob is preserved)."""

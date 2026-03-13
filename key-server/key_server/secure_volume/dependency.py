@@ -22,7 +22,22 @@ _accessor = AppStateAccessor[SecureVolumeManager]("secure_volume_manager")
 def build_secure_volume_manager(settings: SettingsStore) -> SecureVolumeManager:
     """Build the appropriate secure volume manager based on the server config."""
     if get_config().secure_storage_implementation == "caam":
-        return CAAMSecureVolume()
+        base_directory = get_config().base_directory
+        if base_directory == "automatically_make_temporary":
+            raise RuntimeError(
+                "CAAM secure volume cannot mount to a temporary directory"
+            )
+        image_mount_point = get_config().image_mount_point
+        if image_mount_point == "automatically_make_temporary":
+            raise RuntimeError(
+                "CAAM secure volume cannot mount to a temporary directory"
+            )
+
+        return CAAMSecureVolume(
+            image_mount_point=image_mount_point,
+            base_directory=base_directory,
+            volume_size_mb=get_config().secure_volume_size_mb,
+        )
     else:
         return DevSecureVolume()
 
