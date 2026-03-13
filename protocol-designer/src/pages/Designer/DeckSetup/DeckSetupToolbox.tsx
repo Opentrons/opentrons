@@ -29,7 +29,7 @@ import {
   getIsSlotAHopper,
 } from '@opentrons/step-generation'
 
-import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
+import { getRowFromSlotName } from '/protocol-designer/components/organisms/SlotDetailModal/utils'
 
 import {
   LINK_BUTTON_STYLE,
@@ -262,7 +262,11 @@ export function DeckSetupToolbox(
     }
   }
   const displaySlot = getIsSlotAHopper(slot)
-    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
+    ? t('shared:stacker', {
+        slot: getRowFromSlotName(
+          FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+        ),
+      }).toUpperCase()
     : slot
   return (
     <>

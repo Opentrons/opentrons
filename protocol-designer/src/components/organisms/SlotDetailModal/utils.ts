@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next'
 
-const getRowFromSlotName = (slotName: string): string => slotName.slice(0, 1)
+export const getRowFromSlotName = (slotName: string): string => slotName.slice(0, 1)
 
 export function getDeckLabel(
   slotName: string,
