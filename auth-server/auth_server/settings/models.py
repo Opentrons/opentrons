@@ -62,11 +62,11 @@ class PatchSettingsRequestData(_StrictBaseModel):
     password_reset_time: Annotated[
         int | None,
         pydantic.Field(description="Length of time until password must be changed."),
-    ]
+    ] = None
     password_complexity: Annotated[
         PasswordComplexity | None,
         pydantic.Field(description="Password complexity level."),
-    ]
+    ] = None
     time_for_no_activity_lockout: Annotated[
         int | None,
         pydantic.Field(
@@ -103,7 +103,8 @@ class PatchSettingsRequestData(_StrictBaseModel):
             description="Require admin credentials when sending protocol to robot."
         ),
     ] = True
+    # TODO: Add validation for this field,
     min_length_of_reason_for_interaction: Annotated[
         int | None,
         pydantic.Field(description="Minimum length of reason for interaction."),
-    ] = 20
+    ] = None
