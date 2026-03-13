@@ -6,6 +6,7 @@ import inspect
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
+from pydantic import BaseModel
 from Pyro5 import api as pyro
 
 T = TypeVar("T")
@@ -41,7 +42,6 @@ class DaemonUtility:
         if uri in self._PyroSynchronousObjects:
             self._daemon.unregister(self._PyroSynchronousObjects[uri])  # type: ignore
             del self._PyroSynchronousObjects[uri]
-        print(f"PSO LIST LEN: {len(self._PyroSynchronousObjects)}")
 
     def find_PSO(self, core_obj: Any) -> _PSO | None:
         """Find a managed PyroSynchronousObject based on the core object it aliases."""
@@ -55,6 +55,11 @@ class DaemonUtility:
         # todo(chb, 2026-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
         return self._daemon.proxyFor(pso)  # type: ignore
+
+
+class _PyroSpecialBehavior(BaseModel):
+    specialty_function: Callable[[DaemonUtility, Any, str, Any], Any]
+    apply_local: bool
 
 
 def pyro_behavior(
@@ -72,17 +77,10 @@ def pyro_behavior(
     """
 
     def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
-        specialty_sig = inspect.signature(specialty_func)
-        # todo(chb, 2026-03-11): need a better way of enforcing specialty function shape
-        if not all(
-            item in specialty_sig.parameters.keys()
-            for item in ["utility", "core_obj", "name", "attr"]
-        ):
-            raise KeyError(
-                "Pyro Behavior Specialty Functions must contain parameters `utility`, `core_obj`, `name` and `attr`."
-            )
-        func._pyro_specialty_func = specialty_func  # type: ignore
-        func._pyro_apply_local = apply_local  # type: ignore
+        func._pyro_specialty_behavior = _PyroSpecialBehavior(  # type: ignore
+            specialty_function=specialty_func,  # type: ignore
+            apply_local=apply_local,
+        )
         return func
 
     return decorator
@@ -211,24 +209,38 @@ def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
     return SyncCls()  # type: ignore
 
 
-def _build_classdict(
+def _build_classdict(  # noqa: C901
     core_obj: Any, utility: DaemonUtility
 ) -> Iterator[tuple[str, Any]]:
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
-            specialty_function = _get_specialty_behavior(attr, name)
+            specialty_behavior = _get_specialty_behavior(attr, name)
             # Handle core object modifications
-            if specialty_function is not None and specialty_function[1] is True:
-                # Wrap the attribute on the original core object and set the wrapped attribute as the new attribute
-                print(f"WRAPPING ATTRIBUTE {name} ON OBJECT {core_obj}")
-                wrapped_attr = specialty_function[0](utility, core_obj, name, attr)
-                setattr(core_obj, name, wrapped_attr)
+            if (
+                specialty_behavior is not None
+                and specialty_behavior.apply_local is True
+            ):
+                # If the `core_obj` contains a weakref then it is actually a wrapped instance, like a CallerBridge or a ThreadManager
+                try:
+                    # Grab the inner instance of the core object to modify
+                    local_obj = core_obj.__weakref__()
+                except TypeError:
+                    # Otherwise, just use the object passed in as-is
+                    local_obj = core_obj
+                wrapped_attr = specialty_behavior.specialty_function(
+                    utility, local_obj, name, attr
+                )
+                bound_method = MethodType(wrapped_attr, local_obj)
+                setattr(local_obj, name, bound_method)
 
             # Handle PyroSynchronousObject attribute construction
-            if specialty_function is not None and specialty_function[1] is False:
+            if (
+                specialty_behavior is not None
+                and specialty_behavior.apply_local is False
+            ):
                 # Apply the specialty function to the attribute on this PSO instance and expose the wrapped specialty method
                 exposed = pyro.expose(
-                    specialty_function[0](utility, core_obj, name, attr)
+                    specialty_behavior.specialty_function(utility, core_obj, name, attr)
                 )
                 yield (name, exposed)
             elif isinstance(attr, FunctionType) and inspect.iscoroutinefunction(attr):
@@ -263,21 +275,24 @@ def _build_classdict(
                 exposed = pyro.expose(bound_property)  # type: ignore
                 yield (name, exposed)
     # Attach the `core_obj` instance as a private member for internal tracking
-    yield ("_core_obj", core_obj)
+    try:
+        # If the `core_obj` contains a weakref then it is actually a wrapped instance, for tracking we yield the inner instance
+        yield ("_core_obj", core_obj.__weakref__())
+    except TypeError:
+        yield ("_core_obj", core_obj)
 
 
 ### Helpers ###
 
 
-def _get_specialty_behavior(func: Any, name: str) -> tuple[Any, bool] | None:
+def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
-        if hasattr(func, "_pyro_specialty_func") and hasattr(func, "_pyro_apply_local"):
-            return (func._pyro_specialty_func, func._pyro_apply_local)
+        if hasattr(func, "_pyro_specialty_behavior"):
+            return func._pyro_specialty_behavior  # type: ignore
+            # return (func._pyro_specialty_func, func._pyro_apply_local)
     elif isinstance(func, property):
-        if hasattr(func.fget, "_pyro_specialty_func") and hasattr(
-            func.fget, "_pyro_apply_local"
-        ):
-            return (func.fget._pyro_specialty_func, func.fget._pyro_apply_local)  # type: ignore
+        if hasattr(func.fget, "_pyro_specialty_behavior"):
+            return func.fget._pyro_specialty_behavior  # type: ignore
     return None
 
 
@@ -349,18 +364,20 @@ def remove_pyro_synchronous_object(
 
     @functools.wraps(attr)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
-        print("IN THE WRAPPED CALL ON THE LOCAL ATTRIBUTE")
-        if isinstance(attr, FunctionType) and not inspect.iscoroutinefunction(attr):
+        if isinstance(attr, FunctionType):
             active_pso = utility.find_PSO(core_obj=core_obj)
+            # Remove a PSO, if found, and unregister it from the daemon
             if active_pso is not None:
-                print(f"REMOVING PSO: {active_pso}")
-                # Remove the PSO from the dictionary of managed PSOs, and unregister it from the daemon
                 utility.remove_PSO(active_pso)
-                result = asyncio.run(attr(*args, **kwargs))
+                # Forward result of the wrapped call
+                if inspect.iscoroutinefunction(attr):
+                    sync_func = synchronous(attr)
+                    bound_method = MethodType(sync_func, core_obj)
+                    result = asyncio.run(bound_method(*args, **kwargs))
+                else:
+                    result = asyncio.run(attr(*args, **kwargs))
                 return result
         else:
-            raise ValueError(
-                "Wrapped base attribute must be a Method, not a Property or Async method."
-            )
+            raise ValueError("Wrapped base attribute must be a Method, not a Property.")
 
     return wrapper
