@@ -4,9 +4,23 @@ from typing import Generator
 import pytest
 import requests
 
+from server_utils.auth.scopes import Scope, serialize_scopes
 from tests.dev_server import DevServer
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
+
+
+@pytest.fixture
+def admin_scopes_str() -> str:
+    """All the OAuth 2 scopes that an admin should have, as a space-separated string."""
+    all_scopes = set(Scope)
+    return serialize_scopes(all_scopes)
+
+
+@pytest.fixture
+def admin_scopes_list() -> list[str]:
+    """All the OAuth 2 scopes that an admin should have, as a list."""
+    return sorted(scope.api_name for scope in Scope)
 
 
 @pytest.fixture

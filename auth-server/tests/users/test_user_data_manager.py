@@ -171,7 +171,7 @@ def test_get_user_returns_existing(
     result = manager.get_user("admin")
     assert result.userName == "admin"
     assert result.accountType == AccountType.ADMIN
-    assert result.scopes == [scope.api_name for scope in Scope]
+    assert result.scopes == sorted(scope.api_name for scope in Scope)
 
 
 def test_get_user_not_found_raises(

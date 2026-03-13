@@ -6,6 +6,10 @@ from unittest.mock import MagicMock
 import pytest
 from aiohttp.test_utils import TestClient
 
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+)
+
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 from otupdate.openembedded.update_actions import (
@@ -42,6 +46,7 @@ async def test_cli(
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
+        authorization_checker=AlwaysAllowedAuthorizationChecker(),
     )
     client = await aiohttp_client(app)
     return client
