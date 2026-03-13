@@ -81,18 +81,14 @@ Following these practices helps reviewers focus on substance rather than cleanup
 
 ### Before Marking a PR "Ready for Review"
 
-- **Proofread the code.** Present a best-effort, functional solution. Audit for obvious dead code, stray `console.log` calls, outdated or irrelevant comments, and other artifacts that distract from the change.
-- **Add appropriate tests.** Include tests as appropriate for the scope of the PR. This may mean unit tests, integration tests, or other coverage depending on the nature of the change.
-- **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended. What "enough" means depends on the change. A UI tweak may need a quick visual check; a protocol change may need a run on a robot or simulator.
+- **Proofread the code.** Present a best-effort, functional solution.
+- **Add appropriate tests.** Include tests as appropriate for the scope of the PR.
+- **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
 
 ### While Opening a PR
 
-- **Complete the Overview section.** For bug fixes, include a clear statement of the cause and the solution. For features and bugs, supportive screenshots, images, or short videos are helpful.
-- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc., so the PR's intent is clear at a glance. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
-- **Document architectural trade-offs.** If the change involves design choices, document the alternatives considered and the rationale for the chosen approach in the Overview.
-- **Reference an associated ticket.** Link the PR to the relevant issue or ticket when applicable.
-- **Fill out the Test Plan.** Outline the smoke test steps you performed. Include supportive material (e.g., a minimal protocol, sample data, or repro steps) so others can recreate and verify the solution.
-- **Complete the Risk Assessment.** Provide an honest evaluation of which parts of the codebase the changes could affect. Describe steps taken to mitigate risk.
+- **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
+- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
 
 ### After Receiving PR Approval
 
