@@ -1,5 +1,5 @@
 [project]
-name = "auth_server"
+name = "key_server"
 dynamic = ["version"]
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
@@ -15,10 +15,6 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==1.4.51",
-    "oauthlib>=3.3.1,<4",
-    "pwdlib[argon2,bcrypt]==0.3.0",
-    "alembic==1.18.4",
 ]
 
 [tool.uv.dependency-groups]
@@ -31,10 +27,8 @@ robot = [
     "fastapi==0.100.0",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
+    "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==1.4.51",
-    "oauthlib==3.3.1",
-    "alembic==1.18.4",
 ]
 dev = [
     "ruff==0.14.10",
@@ -48,11 +42,8 @@ dev = [
     "pytest-cov==4.1.0",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
-    "requests==2.27.1",
     "types-requests==2.27.1",
     "tavern>=3.0.2",
-    "types-oauthlib==3.3.0.20250822",
-    "sqlalchemy2-stubs==0.0.2a21",
 ]
 
 [tool.ruff.lint]
@@ -61,10 +52,10 @@ ignore = ["E203", "E501", "E741", "ANN401", "D100", "D104", "D107", "D402", "D41
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D"]
-"auth_server/_version.py" = ["I"]
+"key_server/_version.py" = ["I"]
 
 [tool.ruff.lint.isort]
-known-local-folder = ["auth_server"]
+known-local-folder = ["key_server"]
 known-first-party = ["server_utils"]
 
 [tool.ruff.lint.pydocstyle]
@@ -100,7 +91,7 @@ override-versions-of = ["server-utils"]
 
 # --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
-version-file = "auth_server/_version.py"
+version-file = "key_server/_version.py"
 tag-pattern = "v(?P<version>.*)"
 fallback_version = "0.0.0-dev"
 
@@ -116,28 +107,27 @@ local_scheme = "no-local-version"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "auth_server",
+    "key_server",
     "LICENSE",
     "tests",
     "uv.lock",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["auth_server"]
+packages = ["key_server"]
 
 [tool.hatch.build.targets.wheel.force_include]
-"LICENSE" = "auth_server/LICENSE"
+"LICENSE" = "key_server/LICENSE"
 
 [tool.pytest]
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
-    "error::sqlalchemy.exc.RemovedIn20Warning"
 ]
 
 [tool.mypy]
-plugins = ["pydantic.mypy", "decoy.mypy", "sqlalchemy.ext.mypy.plugin"]
+plugins = ["pydantic.mypy", "decoy.mypy"]
 show_error_codes = true
 strict = true
 

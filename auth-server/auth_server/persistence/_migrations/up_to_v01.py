@@ -2,15 +2,21 @@
 
 from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
+
 from server_utils.persistence.folder_migrator import Migration
 
-from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.persistence.file_and_directory_names import DB_FILE
 
+# Get the path to the auth-server directory and the alembic.ini file bc this is not the default location
+_AUTH_SERVER_DIR = Path(__file__).resolve().parent.parent.parent
+_ALEMBIC_INI_FILE = _AUTH_SERVER_DIR / "alembic.ini"
 
-class MigrationUpTo1(Migration):  # noqa: D101
+
+class MigrationUpTo1(Migration):
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-        """Create a fresh database with the v1 schema."""
         dest_db_file = dest_dir / DB_FILE
-        with sql_engine_ctx(dest_db_file) as engine:
-            create_schema(engine)
+        alembic_cfg = Config(str(_ALEMBIC_INI_FILE))
+        alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{dest_db_file}")
+        command.upgrade(alembic_cfg, "head")

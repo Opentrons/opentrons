@@ -38,6 +38,7 @@ nav:
       - Installing the App: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
+      - Resetting the Robot: opentrons-app/reset.md
       - Downloading OT-2 Log Files: opentrons-app/log-files.md
       - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
