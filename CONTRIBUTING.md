@@ -4,6 +4,7 @@ Thanks for your interest in contributing to the Opentrons platform! This Contrib
 
 - [Opening Issues](#opening-issues)
 - [Opening Pull Requests](#opening-pull-requests)
+- [PR Etiquette](#pr-etiquette)
 - [Commit Guidelines](#commit-guidelines)
 - [Project and Repository Structure](#project-and-repository-structure)
 - [Development Setup](#development-setup)
@@ -73,6 +74,30 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 ### Deciding What to Work On
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
+
+## PR Etiquette
+
+Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?**
+
+### Before Marking a PR "Ready for Review"
+
+- **Proofread the code.** Present a best-effort, functional solution. Audit for obvious dead code, stray `console.log` calls, outdated or irrelevant comments, and other artifacts that distract from the change.
+- **Add appropriate tests.** Include tests as appropriate for the scope of the PR. This may mean unit tests, integration tests, or other coverage depending on the nature of the change.
+- **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended. What "enough" means depends on the change. A UI tweak may need a quick visual check; a protocol change may need a run on a robot or simulator.
+
+### While Opening a PR
+
+- **Complete the Overview section.** For bug fixes, include a clear statement of the cause and the solution. For features and bugs, supportive screenshots, images, or short videos are helpful.
+- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc., so the PR's intent is clear at a glance. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
+- **Document architectural trade-offs.** If the change involves design choices, document the alternatives considered and the rationale for the chosen approach in the Overview.
+- **Reference an associated ticket.** Link the PR to the relevant issue or ticket when applicable.
+- **Fill out the Test Plan.** Outline the smoke test steps you performed. Include supportive material (e.g., a minimal protocol, sample data, or repro steps) so others can recreate and verify the solution.
+- **Complete the Risk Assessment.** Provide an honest evaluation of which parts of the codebase the changes could affect. Describe steps taken to mitigate risk.
+
+### After Receiving PR Approval
+
+- **Perform a final smoke test** before merging, to confirm nothing regressed after approval.
+- **Truncate the commit message before merging.** Keep only the ticket reference and a concise Overview snippet—avoid long, unwieldy merge messages.
 
 ## Commit Guidelines
 
