@@ -25,7 +25,7 @@ function getRelativePath(context) {
   const cwd = context.getCwd()
   const physicalFilename = context.physicalFilename
   const relative = path.relative(cwd, physicalFilename)
-  return path.sep === '\\' ? relative.split(path.sep).join('/') : relative
+  return relative;
 }
 
 module.exports = {
