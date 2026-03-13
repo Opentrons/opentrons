@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -10,6 +12,14 @@ import type { WizardTileProps } from './types'
 
 export function SelectHardware(props: WizardTileProps): JSX.Element | null {
   const { goBack, proceed, watch, setValue } = props
+  const { search } = useLocation()
+
+  useEffect(() => {
+    if (new URLSearchParams(search).get('deckConfig') != null) {
+      proceed(1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const fixtures = watch('fixtures')
   const modules = watch('modules')
   const hasGripper = watch('hasGripper')

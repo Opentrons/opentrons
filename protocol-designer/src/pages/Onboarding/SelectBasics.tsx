@@ -171,7 +171,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
         tiprackURIs ?? undefined
       )
     }
-    setCurrentStepIndex?.(1)
   }
 
   const handleImportDeckConfigFile = (
@@ -197,6 +196,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
           deckConfig,
           getPipettesFromDeckConfigPayload(parsed) ?? undefined
         )
+        setCurrentStepIndex?.(1)
       } catch {
         bakeToast(t('import_deck_config_invalid_file'), ERROR_TOAST, {
           closeButton: true,
@@ -218,6 +218,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
         deckConfig,
         getPipettesFromDeckConfigPayload(parsed) ?? undefined
       )
+      setCurrentStepIndex?.(1)
     } catch {
       // malformed param — silently ignore, user can configure manually
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { clsx } from 'clsx'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
@@ -76,10 +76,14 @@ export function ProtocolOverview(): JSX.Element {
     'modules',
   ])
   const navigate = useNavigate()
+  const location = useLocation()
   const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
     useState<boolean>(false)
   const [showEditMetadataModal, setShowEditMetadataModal] =
-    useState<boolean>(false)
+    useState<boolean>(
+      (location.state as { openMetadataModal?: boolean } | null)
+        ?.openMetadataModal === true
+    )
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)

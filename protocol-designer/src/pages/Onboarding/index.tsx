@@ -144,8 +144,11 @@ export function Onboarding(): JSX.Element | null {
 
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
-  const createProtocolFile = (values: WizardFormState): void => {
-    navigate('/overview')
+  const createProtocolFile = (
+    values: WizardFormState,
+    openMetadataModal = false
+  ): void => {
+    navigate('/overview', openMetadataModal ? { state: { openMetadataModal: true } } : {})
 
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
@@ -356,12 +359,13 @@ export function Onboarding(): JSX.Element | null {
 
 interface CreateFileFormProps {
   currentWizardStep: WizardStep
-  createProtocolFile: (values: WizardFormState) => void
+  createProtocolFile: (values: WizardFormState, openMetadataModal?: boolean) => void
   goBack: () => void
   proceed: () => void
   analyticsStartTime: Date
   setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
+
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
   const {
@@ -396,6 +400,8 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     [location.state?.modalResetKey]
   )
 
+  const isFromApp = new URLSearchParams(location.search).get('deckConfig') != null
+
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>
       {(() => {
@@ -417,7 +423,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
               <AddMetadata
                 {...formProps}
                 proceed={() => {
-                  createProtocolFile(formProps.getValues())
+                  createProtocolFile(formProps.getValues(), isFromApp)
                 }}
                 goBack={goBack}
                 analyticsStartTime={analyticsStartTime}

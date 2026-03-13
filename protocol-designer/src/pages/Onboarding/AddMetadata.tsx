@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
 import {
   COLORS,
@@ -29,6 +31,14 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   const fields = watch('fields')
   const dispatch = useDispatch()
   const robotType = fields.robotType
+  const { search } = useLocation()
+
+  useEffect(() => {
+    if (new URLSearchParams(search).get('deckConfig') != null) {
+      proceed(1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleProceed = (): void => {
     const duration = new Date().getTime() - analyticsStartTime.getTime()
