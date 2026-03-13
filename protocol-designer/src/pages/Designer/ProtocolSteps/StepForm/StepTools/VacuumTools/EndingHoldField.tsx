@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Check, COLORS, StyledText } from '@opentrons/components'
+import { VACUUM_PROGRAM_STATE } from '@opentrons/step-generation'
 
 import styles from './vacuumtools.module.css'
 
@@ -18,12 +19,15 @@ export function EndingHoldField(
   const { formData, propsForFields } = props
   const { t } = useTranslation('protocol_steps')
 
-  if (formData.pumpDurationCheckbox !== true) {
+  if (
+    formData.programType === VACUUM_PROGRAM_STATE &&
+    formData.pumpDurationCheckbox !== true
+  ) {
     return null
   }
 
   return (
-    <div className={styles.ending_hold_section}>
+    <div className={styles.ending_hold_section} style={{ width: '100%' }}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('vacuum.controls.ending_hold_vent.title')}
       </StyledText>

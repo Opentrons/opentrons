@@ -1,0 +1,164 @@
+.saved_vacuum_step_row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.presaved_vacuum_cycle_container {
+  width: 100%;
+}
+
+.presaved_vacuum_cycle_content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.presaved_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12);
+  box-sizing: border-box;
+}
+
+.saved_vacuum_cycle_content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.saved_vacuum_cycle_header {
+  padding: var(--spacing-12);
+  box-sizing: border-box;
+}
+
+.saved_vacuum_cycle_header_row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.saved_vacuum_cycle_steps_container {
+  padding: var(--spacing-12) var(--spacing-12) var(--spacing-12)
+    var(--spacing-60);
+  box-sizing: border-box;
+}
+
+.delete_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.delete_button:hover {
+  background-color: var(--grey-35);
+}
+
+.delete_button:active {
+  background-color: var(--grey-40);
+}
+
+.presaved_vacuum_step_content {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.presaved_vacuum_step_form_row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-12);
+  align-items: flex-start;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cycle_steps_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.flex_row_gap_8 {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+  align-items: center;
+}
+
+.flex_row_gap_24 {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-24);
+  align-items: center;
+}
+
+/* Header and content sections each own their 12px padding; no gap between them */
+.presaved_vacuum_header {
+  padding: var(--spacing-12);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.flex_fill {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.presaved_vacuum_cycle_add_step_row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.empty_selector_button_container {
+  width: max-content;
+}
+
+.vacuum_profile_modal_actions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+  justify-content: flex-end;
+}
+
+.vacuum_profile_modal_footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-self: flex-end;
+  gap: var(--spacing-8);
+  padding: var(--spacing-24);
+}
+
+.vacuum_profile_modal_body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  gap: var(--spacing-24);
+}
+
+.vacuum_profile_modal_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
