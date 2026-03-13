@@ -62,3 +62,25 @@ export function getTiprackOptions(
 
   return tiprackOptionsMap
 }
+
+/**
+ * Return tiprack URIs valid for PD (present in labwareDefs) for a pipette when
+ * importing deck config. Prefers pipette default tipracks that exist; otherwise
+ * the first compatible Flex tiprack in labwareDefs.
+ */
+export function getValidTiprackURIsForImport(
+  pipetteName: PipetteName,
+  labwareDefs: LabwareDef2ByDefURI
+): string[] | undefined {
+  const options = getTiprackOptions({
+    allLabware: labwareDefs,
+    allowAllTipracks: false,
+    selectedPipetteName: pipetteName,
+  })
+  const validUris = Object.keys(options)
+  if (validUris.length === 0) return undefined
+  const defaultTipracks =
+    getPipetteSpecsV2(pipetteName)?.liquids?.default?.defaultTipracks ?? []
+  const preferred = defaultTipracks.find(uri => validUris.includes(uri))
+  return preferred != null ? [preferred] : [validUris[0]]
+}

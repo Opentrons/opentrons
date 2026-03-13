@@ -36,6 +36,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
   useDeckConfigurationEditingTools,
@@ -47,12 +48,18 @@ import { useRunStatuses } from '/app/resources/runs'
 
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
+import type { PipetteData } from '@opentrons/api-client'
 import type { TFunction } from 'i18next'
 import type {
   CutoutId,
   DeckConfiguration,
   VISUAL_SLOTS,
 } from '@opentrons/shared-data'
+
+export type DeckConfigExportPipette = {
+  mount: 'left' | 'right'
+  instrumentName: string
+}
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const DECK_CONFIG_EXPORT_VERSION = 1
@@ -74,11 +81,13 @@ function getDeckConfigFilename(robotName: string): string {
 
 function downloadDeckConfiguration(
   robotName: string,
-  deckConfig: DeckConfiguration
+  deckConfig: DeckConfiguration,
+  pipettes: DeckConfigExportPipette[]
 ): void {
   const payload = {
     version: DECK_CONFIG_EXPORT_VERSION,
     deckConfiguration: deckConfig,
+    pipettes,
   }
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: 'application/json',
@@ -109,6 +118,17 @@ export function DeviceDetailsDeckConfiguration({
     () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
     [deckConfig]
   )
+  const { data: instrumentsData } = useInstrumentsQuery()
+  const pipettesForExport: DeckConfigExportPipette[] = useMemo(() => {
+    const instruments = instrumentsData?.data ?? []
+    return instruments
+      .filter(
+        (i): i is PipetteData =>
+          i.instrumentType === 'pipette' && 'ok' in i && i.ok === true
+      )
+      .filter((i): i is PipetteData => i.mount === 'left' || i.mount === 'right')
+      .map(i => ({ mount: i.mount, instrumentName: i.instrumentName }))
+  }, [instrumentsData?.data])
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -228,7 +248,11 @@ export function DeviceDetailsDeckConfiguration({
               role="button"
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => {
-                downloadDeckConfiguration(robotName, deckConfig)
+                downloadDeckConfiguration(
+                  robotName,
+                  deckConfig,
+                  pipettesForExport
+                )
               }}
               style={
                 isRobotViewable && !isRunRunning && !isMaintenanceRunExisting

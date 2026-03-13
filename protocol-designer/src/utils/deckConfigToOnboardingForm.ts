@@ -33,9 +33,45 @@ import type { FormModule, FormModules } from '../step-forms'
 
 export const DECK_CONFIG_IMPORT_VERSION = 1
 
+export interface DeckConfigExportPipette {
+  mount: 'left' | 'right'
+  instrumentName: string
+}
+
 export interface DeckConfigExportPayload {
   version?: number
   deckConfiguration: DeckConfiguration
+  pipettes?: DeckConfigExportPipette[]
+}
+
+/**
+ * Extract pipettes array from a parsed deck config file payload.
+ * Returns undefined if payload is not an object or has no valid pipettes array.
+ */
+export function getPipettesFromDeckConfigPayload(
+  parsed: unknown
+): DeckConfigExportPipette[] | undefined {
+  if (parsed == null || typeof parsed !== 'object') return undefined
+  const raw = (parsed as Record<string, unknown>).pipettes
+  if (!Array.isArray(raw)) return undefined
+  const result: DeckConfigExportPipette[] = []
+  for (const item of raw) {
+    if (
+      item != null &&
+      typeof item === 'object' &&
+      'mount' in item &&
+      'instrumentName' in item &&
+      (item.mount === 'left' || item.mount === 'right') &&
+      typeof item.instrumentName === 'string' &&
+      item.instrumentName.length > 0
+    ) {
+      result.push({
+        mount: item.mount,
+        instrumentName: item.instrumentName,
+      })
+    }
+  }
+  return result.length > 0 ? result : undefined
 }
 
 /**

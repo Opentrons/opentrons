@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -20,6 +21,7 @@ import {
 import {
   FLEX_96_CHANNEL_PIPETTES,
   FLEX_ROBOT_TYPE,
+  getPipetteSpecsV2,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -30,11 +32,14 @@ import { uuid } from '@opentrons/step-generation'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { BasicsButtons } from '../../components/molecules'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
+import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import {
   deckConfigToOnboardingForm,
+  getPipettesFromDeckConfigPayload,
   parseDeckConfigFilePayload,
 } from '../../utils/deckConfigToOnboardingForm'
+import { getValidTiprackURIsForImport } from './utils'
 import { WizardBody } from './WizardBody'
 
 import type { ChangeEvent } from 'react'
@@ -56,6 +61,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
   const ref = useRef<HTMLDivElement | null>(null)
   const deckConfigFileInputRef = useRef<HTMLInputElement | null>(null)
+  const labwareDefs = useSelector(getLabwareDefsByURI)
 
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
@@ -151,6 +157,20 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
         setValue('hasWasteChute', hasChute)
         setValue('hasThermocycler', hasTC)
         setValue('hasGripper', false)
+        const pipettesFromFile = getPipettesFromDeckConfigPayload(parsed)
+        if (pipettesFromFile != null) {
+          for (const p of pipettesFromFile) {
+            const tiprackURIs = getValidTiprackURIsForImport(
+              p.instrumentName as PipetteName,
+              labwareDefs
+            )
+            setValue(`pipettesByMount.${p.mount}.pipetteName`, p.instrumentName)
+            setValue(
+              `pipettesByMount.${p.mount}.tiprackDefURI`,
+              tiprackURIs ?? undefined
+            )
+          }
+        }
         setCurrentStepIndex?.(1)
       } catch {
         bakeToast(t('import_deck_config_invalid_file'), ERROR_TOAST, {
