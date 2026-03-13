@@ -1,6 +1,4 @@
-import range from 'lodash/range'
-
-import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
+import { AIR } from '../utils'
 import { getActiveNozzleAmount } from '../utils/getActiveNozzleAmount'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
@@ -25,14 +23,25 @@ export function forDispense(
     'wellName' in params
       ? params.wellName
       : (robotState.pipettes[pipetteId].wellName ?? '')
+
   const pipetteState = robotState.liquidState.pipettes[pipetteId]
   const firstTipState = Object.values(pipetteState)[0] // airGap volume is the same for each tip
-  const airGapVolume = firstTipState?.[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
+  const airGapVolume = firstTipState?.[AIR]?.volume ?? 0
   const primaryNozzle =
     robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
 
   // NOTE: (ja, 1/10/26): if airGapVolume is not null, assume that the dispense command
   // is for dispensing the air gap - NOTE: this is only used for PV right now
+  dispenseUpdateLiquidState({
+    invariantContext,
+    entityId,
+    pipetteId,
+    prevLiquidState: robotState.liquidState,
+    useFullVolume: false,
+    volume,
+    wellName,
+    robotStateAndWarnings,
+  })
   if (airGapVolume > 0) {
     const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
     const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -41,25 +50,13 @@ export function forDispense(
       nozzles,
       primaryNozzle,
     })
-
-    range(activeChannels).forEach((tipIndex): void => {
-      const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}
-
-      robotState.liquidState.pipettes[pipetteId][tipIndex] = {
+    const tipKeys = Object.keys(pipetteState).slice(0, activeChannels)
+    tipKeys.forEach((tipIndex): void => {
+      const prev = pipetteState[tipIndex] ?? {}
+      pipetteState[tipIndex] = {
         ...prev,
-        [AIR_GAP_LIQUID_STATE_CONST]: { volume: 0 },
+        [AIR]: { volume: 0 },
       }
-    })
-  } else {
-    dispenseUpdateLiquidState({
-      invariantContext,
-      entityId,
-      pipetteId,
-      prevLiquidState: robotState.liquidState,
-      useFullVolume: false,
-      volume,
-      wellName,
-      robotStateAndWarnings,
     })
   }
   // set the entityId for dispense if it was not previously set in the previous moveToWell

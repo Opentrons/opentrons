@@ -162,8 +162,6 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   D4: 'hopperD4',
 }
 
-export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'
-
 export const VACUUM_VENT_OPEN: 'open' = 'open'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
 
