@@ -117,22 +117,24 @@ const getClippedFlowRateForMoveLiquid = (args: {
       path === 'multiDispense'
         ? (tipLiquidSpecs.multiDispense?.disposalByVolume ?? [])
         : []
-
     const { referenceVolumes } = getTransferPlanAndReferenceVolumes({
       pipetteSpecs,
       tiprackDefinition: tiprackDef,
       volume,
       path,
       numAspirateWells:
-        'aspirate_wells' in formData ? formData.aspirate_wells : formData.wells,
+        'aspirate_wells' in formData
+          ? formData.aspirate_wells.length
+          : formData.wells.length,
       numDispenseWells:
-        'dispense_wells' in formData ? formData.dispense_wells : formData.wells,
+        'dispense_wells' in formData
+          ? formData.dispense_wells.length
+          : formData.wells.length,
       aspirateAirGapByVolume: tipLiquidSpecs.aspirate.retract
         .airGapByVolume as Array<[number, number]>,
       conditioningByVolume: conditioningByVolume as Array<[number, number]>,
       disposalByVolume: disposalByVolume as Array<[number, number]>,
     })
-
     correctionVolume =
       linearInterpolate(
         referenceVolumes.correction[flowRateType],
