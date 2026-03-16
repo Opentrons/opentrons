@@ -28,8 +28,8 @@ import type {
 export interface PresavedVacuumCycleProps extends VacuumCycleBaseProps {
   repetitions: number
   handleSaveCycle: (data: PresavedVacuumCycleSavePayload) => void
+  mode: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER
   handleAddCycleStep?: (stepId: string) => void
-  mode?: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER
 }
 
 export function PresavedVacuumCycle(
@@ -98,7 +98,6 @@ export function PresavedVacuumCycle(
                       key={id}
                       displayIndex={`${displayIndex}.${stepIndex + 1}`}
                       stepData={stepData}
-                      onSaveSuccess={() => {}}
                       onDelete={() => {
                         handleDeleteStep(id)
                       }}
@@ -129,7 +128,7 @@ export function PresavedVacuumCycle(
               <div className={styles.presaved_vacuum_cycle_add_step_row}>
                 <BasicButton onClick={handleAddStep}>
                   {t('vacuum.controls.profile.add_cycle_step')}
-                </BasicButton>{' '}
+                </BasicButton>
               </div>
             </div>
           </ListItem>

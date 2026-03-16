@@ -79,7 +79,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
 
   const sections: ReactNode[] = []
 
-  // 1. State / Profile selection (always)
+  // State / Profile
   sections.push(
     <VacuumControlsGroup
       key="program-type"
@@ -99,7 +99,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     />
   )
 
-  // 2. Pump / Vent selection (when State program)
+  // Pump / Vent
   if (formData.programType === VACUUM_PROGRAM_STATE) {
     sections.push(
       <VacuumControlsGroup
@@ -121,7 +121,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     )
   }
 
-  // 4. Pressure / Power mode selection (when Pump state or Profile program)
+  // Pressure / Power
   if (
     formData.stateType === VACUUM_STATE_PUMP ||
     formData.programType === VACUUM_PROGRAM_PROFILE
@@ -149,7 +149,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     )
   }
 
-  // 3. Pump controls (when State + Pump)
+  // Pump controls
   if (
     formData.programType === VACUUM_PROGRAM_STATE &&
     formData.stateType === VACUUM_STATE_PUMP
@@ -163,7 +163,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     )
   }
 
-  // 5. Profile steps (when Profile program + mode selected)
+  // Profile steps
   if (
     formData.programType === VACUUM_PROGRAM_PROFILE &&
     formData.modeType != null

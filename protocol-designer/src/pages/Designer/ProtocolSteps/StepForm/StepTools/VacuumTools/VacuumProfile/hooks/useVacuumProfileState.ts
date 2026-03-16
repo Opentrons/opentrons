@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { uuid } from '/protocol-designer/utils'
 
 import { PROFILE_CYCLE, PROFILE_STEP } from '../constants'
-import { getDefaultStepData } from '../utils'
+import { getDefaultStepData, getFormattedTime } from '../utils'
 
 import type {
   PresavedVacuumCycleSavePayload,
@@ -159,16 +159,30 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
     cycleItem: ProfileCycleItem,
     data: PresavedVacuumCycleSavePayload
   ): void => {
-    setItemsById(prev => ({
-      ...prev,
-      [cycleId]: {
-        ...cycleItem,
-        orderedProfileStepIds: data.orderedProfileStepIds,
-        profileStepItemsById: data.profileStepItemsById,
-        repetitions: data.repetitions,
-        isPresaved: false,
-      },
-    }))
+    setItemsById(prev => {
+      // ensure all cycle items have formatted time when saving cycle
+      const updatedProfileStepItemsById = Object.entries(
+        data.profileStepItemsById
+      ).reduce((acc, [key, value]) => {
+        return {
+          ...acc,
+          [key]: {
+            ...value,
+            time: getFormattedTime(value.time),
+          },
+        }
+      }, {})
+      return {
+        ...prev,
+        [cycleId]: {
+          ...cycleItem,
+          orderedProfileStepIds: data.orderedProfileStepIds,
+          profileStepItemsById: updatedProfileStepItemsById,
+          repetitions: data.repetitions,
+          isPresaved: false,
+        },
+      }
+    })
   }
 
   const hasUnsavedPresavedItems = Object.values(itemsById).some(

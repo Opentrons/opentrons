@@ -16,9 +16,7 @@ import type {
 
 export type VacuumMode = typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER
 
-export function getDefaultStepData(
-  mode: VacuumMode | undefined
-): VacuumStepData {
+export function getDefaultStepData(mode: VacuumMode): VacuumStepData {
   const baseData = {
     id: '',
     time: '',

@@ -16,7 +16,7 @@ export interface UsePresavedCycleStateArgs {
   orderedProfileStepIds: string[]
   profileStepItemsById: Record<string, ProfileStepItem>
   repetitions: number
-  mode: VacuumMode | undefined
+  mode: VacuumMode
   onSaveCycle: (data: PresavedVacuumCycleSavePayload) => void
   handleAddCycleStep?: (stepId: string) => void
 }

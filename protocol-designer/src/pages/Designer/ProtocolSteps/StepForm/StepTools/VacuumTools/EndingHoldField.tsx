@@ -27,7 +27,7 @@ export function EndingHoldField(
   }
 
   return (
-    <div className={styles.ending_hold_section} style={{ width: '100%' }}>
+    <div className={styles.ending_hold_section}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('vacuum.controls.ending_hold_vent.title')}
       </StyledText>

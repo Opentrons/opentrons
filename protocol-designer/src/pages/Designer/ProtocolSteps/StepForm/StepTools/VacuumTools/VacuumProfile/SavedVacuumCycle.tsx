@@ -61,7 +61,9 @@ export function SavedVacuumCycle(props: SavedVacuumCycleProps): JSX.Element {
           <div className={styles.cycle_steps_list}>
             {orderedProfileStepIds.map((stepId: string, stepIndex: number) => {
               const stepData = profileStepItemsById[stepId]
-              if (stepData == null) return null
+              if (stepData == null) {
+                return null
+              }
               const { id } = stepData
               return (
                 <SavedVacuumStep

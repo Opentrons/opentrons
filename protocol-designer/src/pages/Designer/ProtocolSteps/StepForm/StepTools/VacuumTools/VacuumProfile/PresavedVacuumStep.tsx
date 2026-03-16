@@ -32,8 +32,9 @@ import type {
 } from './types'
 
 export interface PresavedVacuumStepProps extends VacuumStepBaseProps {
-  onSaveSuccess: (stepData: VacuumStepData) => void
   onStepChange: (stepId: string, patch: Partial<VacuumStepData>) => void
+  /** Not required when nested, since save behavior is handled by parent cycle */
+  onSaveSuccess?: (stepData: VacuumStepData) => void
   /** When true, show validation errors on this step (e.g. when cycle Save is blocked). */
   forceShowErrors?: boolean
 }
@@ -93,7 +94,7 @@ export function PresavedVacuumStep(
       return
     }
     const formattedTime = getFormattedTime(time)
-    onSaveSuccess({
+    onSaveSuccess?.({
       ...stepData,
       time: formattedTime,
     })
