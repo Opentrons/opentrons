@@ -16,9 +16,9 @@
   display: grid;
   align-items: flex-start;
   align-self: stretch;
-  grid-template-columns: 18.625rem 1fr;
   padding: 0 var(--spacing-16);
   column-gap: var(--spacing-40);
+  grid-template-columns: 18.625rem 1fr;
 }
 
 .devices_rows {
@@ -32,10 +32,10 @@
   min-height: 2.5rem;
   align-items: center;
   padding: var(--spacing-16) var(--spacing-20);
-  grid-template-columns: 18.625rem 1fr;
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
   column-gap: var(--spacing-40);
+  grid-template-columns: 18.625rem 1fr;
 }
 
 .location_cell {
