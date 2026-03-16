@@ -1,3 +1,4 @@
+import asyncio
 import json
 from pathlib import Path
 from subprocess import PIPE
@@ -7,7 +8,7 @@ from unittest.mock import MagicMock
 import pytest
 from decoy import Decoy
 
-from .util import AsyncioCSE, AsyncioSubprocess, build_subproc_result
+from .util import AsyncioCSE, build_subproc_result
 from key_server.secure_volume.manager.caam import CAAMSecureVolume
 
 
@@ -106,11 +107,11 @@ async def rehearse_load_key(
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(mock_image_path.exists()).then_return(True)
     decoy.when(mock_keyfile.read_bytes()).then_return(b"key data")
-    mock_keyring_add = decoy.mock(cls=AsyncioSubprocess)
+    mock_keyring_add = decoy.mock(cls=asyncio.subprocess.Process)
     decoy.when(await mock_keyring_add.wait()).then_return(0)
-    mock_keyid = "1234"
+    mock_keyid = b"1234"
     decoy.when(await mock_keyring_add.communicate(input=b"key data")).then_return(
-        (mock_keyid, "")
+        (mock_keyid, b"")
     )
     decoy.when(
         await mock_asyncio_subprocess(
@@ -124,7 +125,7 @@ async def rehearse_load_key(
             stdin=PIPE,
         )
     ).then_return(mock_keyring_add)
-    return mock_keyid
+    return mock_keyid.decode()
 
 
 @pytest.fixture

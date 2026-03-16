@@ -12,6 +12,27 @@ from .interface import SecureVolumeManager
 LOG = getLogger(__name__)
 
 
+async def _stringify_process(
+    proc: asyncio.subprocess.Process,
+    override_stdout: str | None = None,
+    override_stderr: str | None = None,
+) -> str:
+    """Provide a helpful stringification of processes for e.g. logs."""
+    if override_stdout is not None:
+        stdout_data = override_stdout
+    elif proc.stdout is None:
+        stdout_data = "<not captured>"
+    else:
+        stdout_data = (await proc.stdout.read()).decode()
+    if override_stderr is not None:
+        stderr_data = override_stderr
+    elif proc.stderr is None:
+        stderr_data = "<not captured>"
+    else:
+        stderr_data = (await proc.stderr.read()).decode()
+    return f"subprocess {proc.pid}: returncode {proc.returncode} stdout={stdout_data} stderr={stderr_data}"
+
+
 class CAAMSecureVolume(SecureVolumeManager):
     """Creates, modifies, and destroys the CAAM secure volume."""
 
@@ -67,7 +88,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await create_bk.wait() != 0:
             LOG.error(
-                f"Failed to create CAAM black key ({create_bk.returncode}): stdout={create_bk.stdout}, stderr={create_bk.stderr}"
+                f"Failed to create CAAM black key: {await _stringify_process(create_bk)}"
             )
         # the command above creates a keyblob and also the actual key. we could use
         # this actual key, but we'd have to have a special codepath, so we delete it
@@ -89,7 +110,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await create_backing_store.wait() != 0:
             LOG.error(
-                f"Failed to create backing store ({create_backing_store.returncode}): stdout={create_backing_store.returncode}, stderr={create_backing_store.stderr}"
+                f"Failed to create backing store: {await _stringify_process(create_backing_store)}"
             )
         await self._load_key()
         await self._loopback_setup()
@@ -101,7 +122,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await mkfs.wait() != 0:
             LOG.error(
-                f"Failed to mkfs on the encrypted volume ({mkfs.returncode}): stdout={mkfs.stdout}, stderr={mkfs.stderr}"
+                f"Failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
             )
 
     async def _load_key(self) -> None:
@@ -125,9 +146,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         if await import_key.wait() != 0:
-            LOG.error(
-                f"Failed to import key: ({import_key.returncode}): stdout={import_key.stdout}, stderr={import_key.stderr}"
-            )
+            LOG.error(f"Failed to import key: {await _stringify_process(import_key)}")
         key_data = (self._base_directory / self.SECURE_STORAGE_KEY_NAME).read_bytes()
 
         keyring_add = await asyncio.create_subprocess_exec(
@@ -140,15 +159,22 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
             stdin=PIPE,
         )
-        (stdout, stderr) = await keyring_add.communicate(input=key_data)
+        (stdout_b, stderr_b) = await keyring_add.communicate(input=key_data)
+        stdout = stdout_b.decode()
+        stderr = stderr_b.decode()
         if await keyring_add.wait() != 0:
             LOG.error(
-                f"Failed to add key to KKRS ({keyring_add.returncode}): stdout={keyring_add.stdout}, stderr={keyring_add.stderr}"
+                f"Failed to add key to KKRS: {await _stringify_process(keyring_add, override_stdout=stdout, override_stderr=stderr)}"
             )
             self._keyid = 0
         else:
-            LOG.info(f"added key to KKRS at {stdout!r}")
-            self._keyid = int(stdout.strip())
+            LOG.info(f"added key to KKRS at {stdout}")
+            try:
+                self._keyid = int(stdout)
+            except ValueError:
+                LOG.error(
+                    f"Invalid key number from KKRS: {stdout} cannot be parsed as an int"
+                )
 
         # we always want to delete the key after moving it to KKRS so we can run this again if we want
         (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
@@ -159,9 +185,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             "/usr/sbin/losetup", "-f", str(self._image()), stdout=PIPE, stderr=PIPE
         )
         if await losetup.wait() != 0:
-            LOG.error(
-                f"losetup failed ({losetup.returncode}): stdout={losetup.stdout}, stderr={losetup.stderr}"
-            )
+            LOG.error(f"losetup failed: {_stringify_process(losetup)}")
         losetup_device = await self._find_loopback_device()
         # this lovely magic string is a dmsetup table entry. in order the fields are
         # - offset to start the map (0)
@@ -186,9 +210,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         if await dmsetup.wait() != 0:
-            LOG.error(
-                f"dmsetup failed ({dmsetup.returncode}): stdout={dmsetup.stdout}, stderr={dmsetup.stderr}"
-            )
+            LOG.error(f"dmsetup failed: {await _stringify_process(dmsetup)}")
 
     async def _mount(self) -> None:
         """Mount a created loopback device."""
@@ -213,7 +235,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await mount.wait() != 0:
             LOG.error(
-                f"Failed to mount secure storage ({mount.returncode}): stdout={mount.stdout}, stderr={mount.stderr}"
+                f"Failed to mount secure storage: {await _stringify_process(mount)}"
             )
 
     async def _unmount(self) -> None:
@@ -238,7 +260,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await dmsetup_remove.wait() != 0:
             LOG.warning(
-                f"dmsetup remove failed ({dmsetup_remove.returncode}): stdout={dmsetup_remove.stdout}, stderr={dmsetup_remove.stderr}"
+                f"dmsetup remove failed: {await _stringify_process(dmsetup_remove)}"
             )
 
     async def _find_loopback_device(self) -> str:
@@ -250,17 +272,16 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         if await losetup_list.wait() != 0:
-            LOG.error(
-                f"losetup list failed ({losetup_list.returncode}): stdout={losetup_list.stdout}, stderr={losetup_list.stderr}"
-            )
-        assert losetup_list.stdout  # safe because we've called wait()
-        losetup_list_res = json.loads((await losetup_list.stdout.read()).strip())
+            LOG.error(f"losetup list failed: {await _stringify_process(losetup_list)} ")
+        assert losetup_list.stdout
+        losetup_stdout_data = (await losetup_list.stdout.read()).decode().strip()
+        losetup_list_res = json.loads(losetup_stdout_data)
         devlist = losetup_list_res.get("loopdevices")
         for loopback_dev in devlist:
             if loopback_dev.get("backfile", "") == str(self._image()):
                 return cast(str, loopback_dev.get("name", ""))
         LOG.error(
-            f"Could not find loopback device for {str(self._image())} in losetup result {losetup_list.stdout}"
+            f"Could not find loopback device for {str(self._image())} in losetup result {losetup_stdout_data}"
         )
         return ""
 
@@ -292,9 +313,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         if await timeout.wait() != 0:
-            LOG.warning(
-                f"key timeout failed ({timeout.returncode}): stdout={timeout.stdout}, stderr={timeout.stderr}"
-            )
+            LOG.warning(f"key timeout failed: {await _stringify_process(timeout)}")
 
     async def destroy(self) -> None:
         """Destroys a secure volume by removing the CAAM keyblob."""
