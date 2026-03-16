@@ -1,6 +1,5 @@
 ---
 title: "Python API: Choosing Runtime Parameters"
-description: "When to use runtime parameters and how to choose parameter types."
 ---
 
 The first decision you need to make when adding parameters to your protocol is "What should be parameterized?" Your goals in adding parameters should be:

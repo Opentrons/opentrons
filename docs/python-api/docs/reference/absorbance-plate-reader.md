@@ -1,6 +1,5 @@
 ---
 title: "Python API Reference: Absorbance Plate Reader"
-description: "Absorbance Plate Reader Module class reference for the Python API."
 ---
 
 ::: opentrons.protocol_api.AbsorbanceReaderContext
