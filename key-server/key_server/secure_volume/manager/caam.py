@@ -74,8 +74,11 @@ class CAAMSecureVolume(SecureVolumeManager):
 
     async def create(self) -> None:
         """Creates the secure volume by initializing a new CAAM black key and building a backing store."""
+        LOG.info("Creating secure volume: beginning")
         if self._keyblob().exists():
+            LOG.info("Creating secure volume: removing existing CAAM keyblob")
             self._keyblob().unlink()
+        LOG.info("Creating secure volume: creating CAAM keyblob")
         create_bk = await asyncio.create_subprocess_exec(
             "/usr/bin/caam-keygen",
             "create",
@@ -98,7 +101,9 @@ class CAAMSecureVolume(SecureVolumeManager):
         # the secure storage is stored on disk as an encrypted blob; create a zeroed
         # file for it
         if self._image().exists():
+            LOG.info("Creating secure volume: removing old secure volume image")
             self._image().unlink()
+        LOG.info("Creating secure volume: making new secure volume image")
         create_backing_store = await asyncio.create_subprocess_exec(
             "/usr/bin/dd",
             "if=/dev/zero",
@@ -110,8 +115,10 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await create_backing_store.wait() != 0:
             LOG.error(
-                f"Failed to create backing store: {await _stringify_process(create_backing_store)}"
+                f"Creating secure volume: failed to create backing store: {await _stringify_process(create_backing_store)}"
             )
+        else:
+            LOG.info("Creating secure volume: made secure volume image")
         await self._load_key()
         await self._loopback_setup()
         mkfs = await asyncio.create_subprocess_exec(
@@ -122,8 +129,10 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await mkfs.wait() != 0:
             LOG.error(
-                f"Failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
+                f"Creating secure volume: failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
             )
+        else:
+            LOG.info("Creating secure volume: made fs on encrypted volume")
 
     async def _load_key(self) -> None:
         """Load the CAAM key from its state at boot - an encrypted, tagged blob - to the kernel key retention service.
@@ -147,8 +156,9 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await import_key.wait() != 0:
             LOG.error(f"Failed to import key: {await _stringify_process(import_key)}")
+        else:
+            LOG.error("Imported key from CAAM")
         key_data = (self._base_directory / self.SECURE_STORAGE_KEY_NAME).read_bytes()
-
         keyring_add = await asyncio.create_subprocess_exec(
             "/usr/bin/keyctl",
             "padd",
@@ -175,9 +185,9 @@ class CAAMSecureVolume(SecureVolumeManager):
                 LOG.error(
                     f"Invalid key number from KKRS: {stdout} cannot be parsed as an int"
                 )
-
         # we always want to delete the key after moving it to KKRS so we can run this again if we want
         (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
+        LOG.info("Removed key storage")
 
     async def _loopback_setup(self) -> None:
         """Set up the encrypted loopback device that makes the mount available to the key server."""
@@ -187,6 +197,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         if await losetup.wait() != 0:
             LOG.error(f"losetup failed: {_stringify_process(losetup)}")
         losetup_device = await self._find_loopback_device()
+        LOG.info(f"Using loopback device for secure volume image at {losetup_device}")
         # this lovely magic string is a dmsetup table entry. in order the fields are
         # - offset to start the map (0)
         # - the size of the mapped file (what we passed to dd), in 512 byte sectors
@@ -211,6 +222,8 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await dmsetup.wait() != 0:
             LOG.error(f"dmsetup failed: {await _stringify_process(dmsetup)}")
+        else:
+            LOG.info("Diskmapper bind created")
 
     async def _mount(self) -> None:
         """Mount a created loopback device."""
@@ -225,6 +238,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             mount_path.unlink()
             mount_path.mkdir()
         elif not mount_path.exists():
+            LOG.info("Creating mount path")
             mount_path.mkdir()
         mount = await asyncio.create_subprocess_exec(
             "/usr/bin/mount",
@@ -237,6 +251,8 @@ class CAAMSecureVolume(SecureVolumeManager):
             LOG.error(
                 f"Failed to mount secure storage: {await _stringify_process(mount)}"
             )
+        else:
+            LOG.info("Mounted secure volume")
 
     async def _unmount(self) -> None:
         """Unmount a created loopback device."""
@@ -246,6 +262,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         # we don't care if this fails, really; it would only do so if the mount wasn't mounted
         await unmount.wait()
+        LOG.info("Unmounted secure volume")
 
     async def _unmap(self) -> None:
         """Unmap a created loopback device."""
@@ -262,6 +279,8 @@ class CAAMSecureVolume(SecureVolumeManager):
             LOG.warning(
                 f"dmsetup remove failed: {await _stringify_process(dmsetup_remove)}"
             )
+        else:
+            LOG.info("Removed diskmapper bind")
 
     async def _find_loopback_device(self) -> str:
         losetup_list = await asyncio.create_subprocess_exec(
@@ -290,18 +309,28 @@ class CAAMSecureVolume(SecureVolumeManager):
 
         If the keyblob does not exist (i.e. because of a previous call to destroy()), initializes a new one.
         """
+        LOG.info("Mounting secure volume: beginning")
         if await self.must_create():
+            LOG.info("Mounting secure volume: creating volume")
             await self.create()
+        LOG.info("Mounting secure volume: loading key")
         await self._load_key()
+        LOG.info("Mounting secure volume: setting up loopback device")
         await self._loopback_setup()
+        LOG.info("Mounting secure volume: mounting loopback device")
         await self._mount()
         self._path = self._image_mount_point
+        LOG.info("Mounting secure volume: complete")
 
     async def unmount(self) -> None:
         """Unmounts a currently-mounted secure volume and tears down dm-crypto and key setup (though the keyblob is preserved)."""
+        LOG.info("Unmounting secure volume: beginning")
         self._path = None
+        LOG.info("Unmounting secure volume: unmounting loopback device")
         await self._unmount()
+        LOG.info("Unmounting secure volume: unmapping disk mapper")
         await self._unmap()
+        LOG.info("Unmounting secure volume: timing out key from KKRS")
         # the only way to delete a key from KKRS, as far as I'm aware, is to set a short timeout and then...
         # wait for a timeout
         timeout = await asyncio.create_subprocess_exec(
@@ -314,12 +343,16 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await timeout.wait() != 0:
             LOG.warning(f"key timeout failed: {await _stringify_process(timeout)}")
+        LOG.info("Unmounting secure volume: complete")
 
     async def destroy(self) -> None:
         """Destroys a secure volume by removing the CAAM keyblob."""
+        LOG.info("Destroying secure volume: beginning")
         await self.unmount()
         if self._keyblob().exists():
+            LOG.info("Destroying secure volume: removing keyblob")
             self._keyblob().unlink()
+        LOG.info("Destroying secure volume: Complete")
 
     @property
     def path(self) -> Path:
