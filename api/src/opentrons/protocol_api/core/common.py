@@ -1,24 +1,23 @@
 """Common APIs for protocol core interfaces."""
 
 # TODO(mc, 2022-08-22): move to __init__ when dependency cycles are resolved
-from .csv import AbstractCSV
 from .instrument import AbstractInstrument
 from .labware import AbstractLabware
 from .module import (
-    AbstractAbsorbanceReaderCore,
-    AbstractFlexStackerCore,
-    AbstractHeaterShakerCore,
-    AbstractMagneticBlockCore,
-    AbstractMagneticModuleCore,
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
-    AbstractVacuumModuleCore,
+    AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
+    AbstractFlexStackerCore,
 )
 from .protocol import AbstractProtocol
+from .well import AbstractWellCore
 from .robot import AbstractRobot
 from .tasks import AbstractTaskCore
-from .well import AbstractWellCore
+
 
 WellCore = AbstractWellCore
 LabwareCore = AbstractLabware[WellCore]
@@ -31,8 +30,6 @@ HeaterShakerCore = AbstractHeaterShakerCore[LabwareCore]
 MagneticBlockCore = AbstractMagneticBlockCore[LabwareCore]
 AbsorbanceReaderCore = AbstractAbsorbanceReaderCore[LabwareCore]
 FlexStackerCore = AbstractFlexStackerCore[LabwareCore]
-VacuumModuleCore = AbstractVacuumModuleCore[LabwareCore]
 RobotCore = AbstractRobot
 TaskCore = AbstractTaskCore
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore, TaskCore]
-CSVCore = AbstractCSV

@@ -1,67 +1,29 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, Union
-
 from numpy import interp
-from pydantic import ValidationError
+from typing import Optional, Dict, Sequence, Tuple, List, Union
 
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    AspirateProperties as SharedDataAspirateProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    BlowoutLocation,
-    Coordinate,
-    PositionReference,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    BlowoutParams as SharedDataBlowoutParams,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    BlowoutProperties as SharedDataBlowoutProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    ByTipTypeSetting as SharedByTipTypeSetting,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    DelayParams as SharedDataDelayParams,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    DelayProperties as SharedDataDelayProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassTouchTipParams as SharedDataTouchTipParams,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    MixParams as SharedDataMixParams,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    MixProperties as SharedDataMixProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    MultiDispenseProperties as SharedDataMultiDispenseProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    RetractAspirate as SharedDataRetractAspirate,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    RetractDispense as SharedDataRetractDispense,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    SingleDispenseProperties as SharedDataSingleDispenseProperties,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    Submerge as SharedDataSubmerge,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    TipPosition as SharedDataTipPosition,
-)
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    TouchTipProperties as SharedDataTouchTipProperties,
-)
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedDataTransferProperties,
+    AspirateProperties as SharedDataAspirateProperties,
+    SingleDispenseProperties as SharedDataSingleDispenseProperties,
+    MultiDispenseProperties as SharedDataMultiDispenseProperties,
+    TipPosition as SharedDataTipPosition,
+    DelayProperties as SharedDataDelayProperties,
+    DelayParams as SharedDataDelayParams,
+    TouchTipProperties as SharedDataTouchTipProperties,
+    LiquidClassTouchTipParams as SharedDataTouchTipParams,
+    MixProperties as SharedDataMixProperties,
+    MixParams as SharedDataMixParams,
+    BlowoutProperties as SharedDataBlowoutProperties,
+    BlowoutParams as SharedDataBlowoutParams,
+    ByTipTypeSetting as SharedByTipTypeSetting,
+    Submerge as SharedDataSubmerge,
+    RetractAspirate as SharedDataRetractAspirate,
+    RetractDispense as SharedDataRetractDispense,
+    BlowoutLocation,
+    PositionReference,
+    Coordinate,
 )
-from opentrons_shared_data.liquid_classes.types import TipPositionDict
-
 from . import validation
 
 
@@ -144,6 +106,7 @@ class LiquidHandlingPropertyByVolume:
 # values will cause the protocol to fail analysis, rather than silently passing.
 @dataclass(slots=True)
 class TipPosition:
+
     _position_reference: PositionReference
     _offset: Coordinate
 
@@ -185,6 +148,7 @@ class TipPosition:
 
 @dataclass(slots=True)
 class DelayProperties:
+
     _enabled: bool
     _duration: Optional[float]
 
@@ -219,6 +183,7 @@ class DelayProperties:
 
 @dataclass(slots=True)
 class TouchTipProperties:
+
     _enabled: bool
     _z_offset: Optional[float]
     _mm_from_edge: Optional[float]
@@ -290,6 +255,7 @@ class TouchTipProperties:
 
 @dataclass(slots=True)
 class MixProperties:
+
     _enabled: bool
     _repetitions: Optional[int]
     _volume: Optional[float]
@@ -342,10 +308,10 @@ class MixProperties:
 
 @dataclass(slots=True)
 class BlowoutProperties:
+
     _enabled: bool
     _location: Optional[BlowoutLocation]
     _flow_rate: Optional[float]
-    _blowout_position: Optional[TipPosition]
 
     @property
     def enabled(self) -> bool:
@@ -377,28 +343,12 @@ class BlowoutProperties:
         validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
-    @property
-    def blowout_position(self) -> Optional[TipPosition]:
-        return self._blowout_position
-
-    @blowout_position.setter
-    def blowout_position(
-        self, new_position: Union[TipPosition, TipPositionDict, None]
-    ) -> None:
-        if new_position is None:
-            self._blowout_position = None
-        else:
-            self._blowout_position = _ensure_validated_tip_position(new_position)
-
     def _get_shared_data_params(self) -> Optional[SharedDataBlowoutParams]:
         """Get the mix params in schema v1 shape."""
         if self._location is not None and self._flow_rate is not None:
             return SharedDataBlowoutParams(
                 location=self._location,
                 flowRate=self._flow_rate,
-                blowoutPosition=self._blowout_position.as_shared_data_model()
-                if self._blowout_position is not None
-                else None,
             )
         else:
             return None
@@ -412,6 +362,7 @@ class BlowoutProperties:
 
 @dataclass(slots=True)
 class _SubmergeRetractCommon:
+
     _speed: float
     _delay: DelayProperties
 
@@ -431,15 +382,12 @@ class _SubmergeRetractCommon:
 
 @dataclass(slots=True)
 class Submerge(_SubmergeRetractCommon):
+
     _start_position: TipPosition
 
     @property
     def start_position(self) -> TipPosition:
         return self._start_position
-
-    @start_position.setter
-    def start_position(self, new_position: TipPosition) -> None:
-        self._start_position = _ensure_validated_tip_position(new_position)
 
     def as_shared_data_model(self) -> SharedDataSubmerge:
         return SharedDataSubmerge(
@@ -451,6 +399,7 @@ class Submerge(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class RetractAspirate(_SubmergeRetractCommon):
+
     _end_position: TipPosition
     _air_gap_by_volume: LiquidHandlingPropertyByVolume
     _touch_tip: TouchTipProperties
@@ -458,10 +407,6 @@ class RetractAspirate(_SubmergeRetractCommon):
     @property
     def end_position(self) -> TipPosition:
         return self._end_position
-
-    @end_position.setter
-    def end_position(self, new_position: TipPosition) -> None:
-        self._end_position = _ensure_validated_tip_position(new_position)
 
     @property
     def air_gap_by_volume(self) -> LiquidHandlingPropertyByVolume:
@@ -492,10 +437,6 @@ class RetractDispense(_SubmergeRetractCommon):
     def end_position(self) -> TipPosition:
         return self._end_position
 
-    @end_position.setter
-    def end_position(self, new_position: TipPosition) -> None:
-        self._end_position = _ensure_validated_tip_position(new_position)
-
     @property
     def air_gap_by_volume(self) -> LiquidHandlingPropertyByVolume:
         return self._air_gap_by_volume
@@ -521,6 +462,7 @@ class RetractDispense(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class _BaseLiquidHandlingProperties:
+
     _submerge: Submerge
     _flow_rate_by_volume: LiquidHandlingPropertyByVolume
     _correction_by_volume: LiquidHandlingPropertyByVolume
@@ -545,6 +487,7 @@ class _BaseLiquidHandlingProperties:
 
 @dataclass(slots=True)
 class AspirateProperties(_BaseLiquidHandlingProperties):
+
     _aspirate_position: TipPosition
     _retract: RetractAspirate
     _pre_wet: bool
@@ -553,10 +496,6 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
     @property
     def aspirate_position(self) -> TipPosition:
         return self._aspirate_position
-
-    @aspirate_position.setter
-    def aspirate_position(self, new_position: TipPosition) -> None:
-        self._aspirate_position = _ensure_validated_tip_position(new_position)
 
     @property
     def pre_wet(self) -> bool:
@@ -590,6 +529,7 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
+
     _dispense_position: TipPosition
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
@@ -598,10 +538,6 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
     @property
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
-
-    @dispense_position.setter
-    def dispense_position(self, new_position: TipPosition) -> None:
-        self._dispense_position = _ensure_validated_tip_position(new_position)
 
     @property
     def push_out_by_volume(self) -> LiquidHandlingPropertyByVolume:
@@ -630,6 +566,7 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
+
     _dispense_position: TipPosition
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume
@@ -638,10 +575,6 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
     @property
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
-
-    @dispense_position.setter
-    def dispense_position(self, new_position: TipPosition) -> None:
-        self._dispense_position = _ensure_validated_tip_position(new_position)
 
     @property
     def retract(self) -> RetractDispense:
@@ -688,24 +621,6 @@ class TransferProperties:
     def multi_dispense(self) -> Optional[MultiDispenseProperties]:
         """Multi dispense properties."""
         return self._multi_dispense
-
-
-def _ensure_validated_tip_position(
-    tip_position: Union[TipPosition, TipPositionDict],
-) -> TipPosition:
-    """Given tip position in valid shapes, return an object of TipPosition type."""
-    if isinstance(tip_position, TipPosition):
-        return tip_position
-    elif isinstance(tip_position, dict):
-        try:
-            pos = SharedDataTipPosition.model_validate(tip_position)
-        except ValidationError as e:
-            raise ValueError(f"Invalid tip position: {e}") from e
-        return _build_tip_position(pos)
-    else:
-        raise TypeError(
-            f"Tip position should be an instance of `TipPosition` or of type `TipPositionDict`, but got {tip_position}"
-        )
 
 
 def _build_tip_position(tip_position: SharedDataTipPosition) -> TipPosition:
@@ -763,18 +678,11 @@ def _build_blowout_properties(
     if blowout_properties.params is not None:
         location = blowout_properties.params.location
         flow_rate = blowout_properties.params.flowRate
-        blowout_position = blowout_properties.params.blowoutPosition
     else:
         location = None
         flow_rate = None
-        blowout_position = None
     return BlowoutProperties(
-        _enabled=blowout_properties.enable,
-        _location=location,
-        _flow_rate=flow_rate,
-        _blowout_position=_build_tip_position(blowout_position)
-        if blowout_position is not None
-        else None,
+        _enabled=blowout_properties.enable, _location=location, _flow_rate=flow_rate
     )
 
 

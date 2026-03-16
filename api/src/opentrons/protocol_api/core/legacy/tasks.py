@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from ..tasks import AbstractTaskCore
+from datetime import datetime
 
 
 class LegacyTaskCore(AbstractTaskCore):

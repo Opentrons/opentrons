@@ -1,10 +1,8 @@
 """Data for concurrent protocol tasks."""
-
-from datetime import datetime
 from typing import TYPE_CHECKING
-
-from opentrons.protocols.api_support.types import APIVersion
+from datetime import datetime
 from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from .core.common import TaskCore
@@ -13,7 +11,7 @@ if TYPE_CHECKING:
 class Task:
     """A concurrent protocol task created by a protocol API function.
 
-    *New in version 2.27*
+    .. versionadded:: 2.27
     """
 
     def __init__(self, core: "TaskCore", api_version: APIVersion) -> None:
@@ -30,13 +28,13 @@ class Task:
     @property
     @requires_version(2, 27)
     def done(self) -> bool:
-        """Returns `True` if the task is done."""
+        """Returns ``True`` if the task is done."""
         return self._core.is_done()
 
     @property
     @requires_version(2, 27)
     def started(self) -> bool:
-        """Returns `True` if the task has started."""
+        """Returns ``True`` if the task has started."""
         return self._core.is_started()
         ...
 
@@ -45,6 +43,6 @@ class Task:
     def finished_at(self) -> datetime | None:
         """The timestamp of the when the task finished.
 
-        Returns `None` if the task hasn't finished yet.
+        Returns ``None`` if the task hasn't finished yet.
         """
         return self._core.get_finished_at_timestamp()

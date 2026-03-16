@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Union
+from typing import List, Union, Sequence, Optional
 
-from . import validation
-from .disposal_locations import TrashBin, WasteChute
-from .labware import Labware, Well
+from opentrons.types import Location, NozzleMapInterface
+from opentrons.protocols.api_support import instrument
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_liquid_utils,
 )
@@ -11,12 +10,15 @@ from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
-from opentrons.protocols.api_support import instrument
-from opentrons.types import Location, NozzleMapInterface
+
+from .disposal_locations import TrashBin, WasteChute
+from .labware import Labware, Well
+from . import validation
 
 
 @dataclass
 class TransferInfo:
+
     source: List[Well]
     dest: Union[List[Well], TrashBin, WasteChute]
     tip_policy: TransferTipPolicyV2

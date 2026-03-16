@@ -1,38 +1,38 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
 
 from __future__ import annotations
-
 import itertools
 import logging
 from typing import (
-    TYPE_CHECKING,
     Collection,
     Dict,
     Optional,
     Tuple,
-    Union,
     overload,
+    Union,
+    TYPE_CHECKING,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
-from ...disposal_locations import TrashBin, WasteChute
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
+
 from opentrons.protocol_engine import (
-    OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
-    WASTE_CHUTE_LOCATION,
-    AddressableAreaLocation,
+    StateView,
     DeckSlotLocation,
-    InStackerHopperLocation,
     ModuleLocation,
     OnLabwareLocation,
-    StateView,
+    AddressableAreaLocation,
+    InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
+    OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, Point, StagingSlotName
+from opentrons.types import DeckSlotName, StagingSlotName, Point
+from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -79,7 +79,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_labware_id: str,
-) -> bool:
+) -> None:
     pass
 
 
@@ -91,7 +91,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_module_id: str,
-) -> bool:
+) -> None:
     pass
 
 
@@ -103,7 +103,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_trash_bin: TrashBin,
-) -> bool:
+) -> None:
     pass
 
 
@@ -120,7 +120,7 @@ def check(
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
     new_trash_bin: Optional[TrashBin] = None,
-) -> bool:
+) -> None:
     """Check for conflicts between items on the deck.
 
     This is a Protocol-Engine-friendly wrapper around
@@ -138,9 +138,6 @@ def check(
     Raises:
         opentrons.motion_planning.deck_conflict.DeckConflictError:
             If the newly-added item conflicts with one of the existing items.
-
-    Returns:
-        True if there are no conflicts (it raises rather than return False).
     """
 
     if new_labware_id is not None:
@@ -152,7 +149,7 @@ def check(
 
     if new_location_and_item is None:
         # The new item should be excluded from deck conflict checking. Nothing to do.
-        return True
+        return
 
     new_location, new_item = new_location_and_item
 
@@ -187,7 +184,7 @@ def check(
                 existing_items[existing_location], existing_item, existing_location
             )
 
-    return wrapped_deck_conflict.check(
+    wrapped_deck_conflict.check(
         existing_items=existing_items,
         new_item=new_item,
         new_location=new_location,
