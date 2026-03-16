@@ -50,7 +50,6 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS'
   | 'OT_PD_ENABLE_BY_VOLUME_BUILDER'
   | 'OT_PD_ENABLE_CAMERA_SUPPORT'
-  | 'OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION'
   | 'OT_PD_ENABLE_VACUUM_MODULE'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
