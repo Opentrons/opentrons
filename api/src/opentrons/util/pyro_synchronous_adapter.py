@@ -351,7 +351,7 @@ def convert_result_to_proxy(  # noqa: C901
 
 def remove_pyro_synchronous_object(
     utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
-) -> Callable[P, T]:
+) -> Any:
     """Wrapper to remove a PyroSynchronousObject from it's DaemonUtility, and unregister its Proxy object.
 
     This function is intended for use with `pyro_behavior` and is executed when the local attribute of the original
@@ -361,20 +361,23 @@ def remove_pyro_synchronous_object(
 
     @functools.wraps(attr)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
-        if isinstance(attr, FunctionType):
-            active_pso = utility.find_PSO(core_obj=core_obj)
-            # Remove a PSO, if found, and unregister it from the daemon
-            if active_pso is not None:
-                utility.remove_PSO(active_pso)
-                # Forward result of the wrapped call
-                if inspect.iscoroutinefunction(attr):
-                    sync_func = synchronous(attr)
-                    bound_method = MethodType(sync_func, core_obj)
-                    result = asyncio.run(bound_method(*args, **kwargs))
-                else:
-                    result = asyncio.run(attr(*args, **kwargs))
-                return result
-        else:
-            raise ValueError("Wrapped base attribute must be a Method, not a Property.")
+        active_pso = utility.find_PSO(core_obj=core_obj)
+        # Remove a PSO, if found, and unregister it from the daemon
+        if active_pso is not None:
+            utility.remove_PSO(active_pso)
+        return attr(*args, **kwargs)
 
-    return wrapper
+    @functools.wraps(attr)
+    async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
+        active_pso = utility.find_PSO(core_obj=core_obj)
+        # Remove a PSO, if found, and unregister it from the daemon
+        if active_pso is not None:
+            utility.remove_PSO(active_pso)
+        return await attr(*args, **kwargs)  # type: ignore
+
+    if inspect.iscoroutinefunction(attr):
+        return async_wrapper
+    elif isinstance(attr, FunctionType):
+        return wrapper
+    else:
+        raise ValueError("Wrapped base attribute must be a Method, not a Property.")

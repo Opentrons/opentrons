@@ -90,7 +90,7 @@ def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     # Client-side requests below
     register_hardware_types()
-    uri = pyro.resolve("PYRONAME:OT3API")
+    uri = pyro.resolve(uri="PYRONAME:OT3API", delay_time=5)
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
 
     # Access property, method and async method, assert expected response between client and server
