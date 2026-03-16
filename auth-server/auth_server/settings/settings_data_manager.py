@@ -7,9 +7,10 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+from server_utils.persistence.sql_engine import SQLEngine
 
 from .models import PatchSettingsRequestData, SettingsResponseData
-from .store import SettingsStore, SQLEngine
+from .store import SettingsStore
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
 
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)

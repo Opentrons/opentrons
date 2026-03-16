@@ -59,15 +59,17 @@ class PatchSettingsRequestData(_StrictBaseModel):
             description="Max number of login attempts before account deactivation."
         ),
     ] = 5
-    password_reset_time: Annotated[
+    password_reset_time_in_days: Annotated[
         int | None,
-        pydantic.Field(description="Length of time until password must be changed."),
+        pydantic.Field(
+            description="Length of time in days until password must be changed."
+        ),
     ] = None
     password_complexity: Annotated[
         PasswordComplexity | None,
         pydantic.Field(description="Password complexity level."),
     ] = None
-    time_for_no_activity_lockout: Annotated[
+    idle_lockout_in_minutes: Annotated[
         int | None,
         pydantic.Field(
             description="Length of time until account is locked due to inactivity."
@@ -93,18 +95,26 @@ class PatchSettingsRequestData(_StrictBaseModel):
     ] = False
     require_signoff_for_protocol_log: Annotated[
         bool | None,
-        pydantic.Field(
-            description="Require admin credentials when sending protocol to robot."
-        ),
+        pydantic.Field(description="Require signoff for protocol log."),
     ] = True
     require_reason_for_interaction: Annotated[
         bool | None,
-        pydantic.Field(
-            description="Require admin credentials when sending protocol to robot."
-        ),
+        pydantic.Field(description="Require reason for interaction."),
     ] = True
     # TODO: Add validation for this field,
     min_length_of_reason_for_interaction: Annotated[
         int | None,
         pydantic.Field(description="Minimum length of reason for interaction."),
     ] = None
+    require_logs_to_be_saved_in_app: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require logs to be saved in app. Path should be configured in the app."
+        ),
+    ] = True
+    delete_over_max_on_disk_protocols: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Automatically delete protocol run logs on the robot when there are 20 protocol run records."
+        ),
+    ] = True
