@@ -306,6 +306,40 @@
         "profile": "Program a Vacuum profile",
         "state": "Change Vacuum state"
       },
+      "profile": {
+        "add_cycle": "Add cycle",
+        "add_cycle_step": "Add a cycle step",
+        "add_step": "Add step",
+        "cancel": "Cancel",
+        "cycle": "Cycle",
+        "delete": "Delete",
+        "edit": "Edit",
+        "errors": {
+          "name": "Enter a valid step name",
+          "pumpData": "Enter a valid pressure value",
+          "repetitions": "Enter a valid number of cycles",
+          "time": "Enter a valid time"
+        },
+        "gauge_pressure": "Gauge pressure",
+        "name": "Name",
+        "no_profile_defined": "No profile defined",
+        "no_steps_defined": "No steps defined",
+        "number_of_cycles": "Number of cycles",
+        "profile_steps": "Profile steps",
+        "profile_defined_single": "{{numSteps}} profile step defined",
+        "profile_defined_multiple": "{{numSteps}} profile steps defined",
+        "pump_power": "Pump power",
+        "repetitions": "Number of cycles",
+        "save": "Save",
+        "step": "Step",
+        "step_detail": {
+          "power": "{{power}}% power",
+          "pressure": "{{pressure}} mbar"
+        },
+        "time": "Time",
+        "title": "Edit Vacuum profile steps",
+        "unsaved_changes": "You have unsaved changes to the profile. Please save or discard them before closing."
+      },
       "state": {
         "label": "Select the state to change",
         "options": {
