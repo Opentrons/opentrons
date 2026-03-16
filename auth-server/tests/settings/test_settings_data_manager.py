@@ -1,11 +1,17 @@
 import pytest
 from decoy import Decoy
 
-from auth_server.settings.models import PatchSettingsRequestData
+from auth_server.settings.models import (
+    PasswordComplexity,
+    PatchSettingsRequestData,
+    SettingsResponseData,
+)
 from auth_server.settings.settings_data_manager import (
     SettingsDataManager,
 )
 from auth_server.settings.store import SettingsStore
+
+_DEFAULT_SETTINGS = SettingsResponseData.model_construct()
 
 
 @pytest.fixture()
@@ -20,15 +26,19 @@ def manager(mock_store: SettingsStore) -> SettingsDataManager:
     return SettingsDataManager(settings_store=mock_store)
 
 
-# ── create_settings ─────────────────────────────────────────────────────
-
-
 def test_patch_settings(
     decoy: Decoy, mock_store: SettingsStore, manager: SettingsDataManager
 ) -> None:
     manager.patch(
         PatchSettingsRequestData(
             accessControlEnabled=True,
+            max_number_of_login_attempts=10,
+            password_reset_time=3600,
+            password_complexity=PasswordComplexity.STANDARD,
+            time_for_no_activity_lockout=300,
+            require_admin_creds_when_updating_robot_software=True,
+            require_admin_creds_when_sending_protocol_to_robot=True,
+            require_admin_creds_for_signoff_protocol=False,
         )
     )
     decoy.verify(
@@ -36,19 +46,35 @@ def test_patch_settings(
             PatchSettingsRequestData(accessControlEnabled=True),
         )
     )
-
-
-def test_create_will_not_duplicate_settings(
-    decoy: Decoy, mock_store: SettingsStore, manager: SettingsDataManager
-) -> None:
     manager.patch(
         PatchSettingsRequestData(
-            accessControlEnabled=True,
+            accessControlEnabled=False,
+            max_number_of_login_attempts=15,
         )
     )
     decoy.verify(
         mock_store.update(
-            settings=PatchSettingsRequestData(accessControlEnabled=True),
-        ),
-        times=0,
+            PatchSettingsRequestData(
+                accessControlEnabled=False, max_number_of_login_attempts=15
+            ),
+        )
     )
+
+
+def test_reset_settings(
+    decoy: Decoy, mock_store: SettingsStore, manager: SettingsDataManager
+) -> None:
+    manager.reset()
+    decoy.verify(mock_store.reset())
+    assert manager.get() == _DEFAULT_SETTINGS
+
+
+def test_get_settings(
+    decoy: Decoy, mock_store: SettingsStore, manager: SettingsDataManager
+) -> None:
+    decoy.when(mock_store.get()).then_return(
+        SettingsResponseData.model_construct(accessControlEnabled=True)
+    )
+    result = manager.get()
+    decoy.verify(mock_store.get())
+    assert result == SettingsResponseData.model_construct(accessControlEnabled=True)
