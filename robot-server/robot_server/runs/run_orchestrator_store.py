@@ -318,6 +318,10 @@ class RunOrchestratorStore:
         self._run_orchestrator = orchestrator
         return summary
 
+    async def create_pyro(self) -> None:
+        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
+        pass
+
     async def clear(self) -> RunResult:
         """Remove the current run orchestrator.
 
