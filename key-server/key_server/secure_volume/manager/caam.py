@@ -4,6 +4,7 @@ import asyncio
 import json
 from logging import getLogger
 from pathlib import Path
+from subprocess import PIPE
 from typing import Final, cast
 
 from .interface import SecureVolumeManager
@@ -57,10 +58,12 @@ class CAAMSecureVolume(SecureVolumeManager):
         create_bk = await asyncio.create_subprocess_exec(
             "/usr/bin/caam-keygen",
             "create",
-            self.SECURE_STORAGE_KEY_NAME,
+            str(self.SECURE_STORAGE_KEY_NAME),
             "ccm",
             "-s",
             "24",
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await create_bk.wait() != 0:
             LOG.error(
@@ -81,6 +84,8 @@ class CAAMSecureVolume(SecureVolumeManager):
             f"of={str(self._image())}",
             "bs=1M",
             f"count={self._volume_size_mb}",
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await create_backing_store.wait() != 0:
             LOG.error(
@@ -89,7 +94,10 @@ class CAAMSecureVolume(SecureVolumeManager):
         await self._load_key()
         await self._loopback_setup()
         mkfs = await asyncio.create_subprocess_exec(
-            "/usr/sbin/mkfs.ext4", f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}"
+            "/usr/sbin/mkfs.ext4",
+            f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}",
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await mkfs.wait() != 0:
             LOG.error(
@@ -112,7 +120,9 @@ class CAAMSecureVolume(SecureVolumeManager):
             "/usr/bin/caam-keygen",
             "import",
             str(self._keyblob()),
-            str(self.SECURE_STORAGE_KEY_NAME)
+            str(self.SECURE_STORAGE_KEY_NAME),
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await import_key.wait() != 0:
             LOG.error(
@@ -126,6 +136,9 @@ class CAAMSecureVolume(SecureVolumeManager):
             "logon",
             str(self._keyname()),
             "@p",
+            stdout=PIPE,
+            stderr=PIPE,
+            stdin=PIPE,
         )
         (stdout, stderr) = await keyring_add.communicate(input=key_data)
         if await keyring_add.wait() != 0:
@@ -143,7 +156,7 @@ class CAAMSecureVolume(SecureVolumeManager):
     async def _loopback_setup(self) -> None:
         """Set up the encrypted loopback device that makes the mount available to the key server."""
         losetup = await asyncio.create_subprocess_exec(
-            "/usr/sbin/losetup", "-f", str(self._image())
+            "/usr/sbin/losetup", "-f", str(self._image()), stdout=PIPE, stderr=PIPE
         )
         if await losetup.wait() != 0:
             LOG.error(
@@ -164,11 +177,13 @@ class CAAMSecureVolume(SecureVolumeManager):
         SECTOR_SIZE_B = 512
         dmsetup_table = f"0 {self._volume_size_mb * 1024 * 1024 // SECTOR_SIZE_B} crypt capi:tk(cbc(aes))-plain :36:logon:{self._keyname()} 0 {losetup_device} 0 1 sector_size:{SECTOR_SIZE_B}"
         dmsetup = await asyncio.create_subprocess_exec(
-            "/usr/bin/dmsetup",
+            "/usr/sbin/dmsetup",
             "create",
             self.SECURE_STORAGE_DEVMAPPER_NAME,
             "--table",
             dmsetup_table,
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await dmsetup.wait() != 0:
             LOG.error(
@@ -182,16 +197,19 @@ class CAAMSecureVolume(SecureVolumeManager):
             LOG.error(f"Non-empty mount path at {mount_path}")
             # this is most likely because it was already mounted; unmount it
             await self._unmount()
-        elif mount_path.exists():
+        elif mount_path.exists() and not mount_path.is_dir():
+            # file, link, special, etc. delete it
             LOG.warning(f"File at mount path {mount_path}")
             mount_path.unlink()
             mount_path.mkdir()
         elif not mount_path.exists():
             mount_path.mkdir()
         mount = await asyncio.create_subprocess_exec(
-            "/usr/sbin/mount",
+            "/usr/bin/mount",
             f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}",
             str(mount_path),
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await mount.wait() != 0:
             LOG.error(
@@ -201,18 +219,22 @@ class CAAMSecureVolume(SecureVolumeManager):
     async def _unmount(self) -> None:
         """Unmount a created loopback device."""
         mount_path = self._image_mount_point
-        unmount = await asyncio.create_subprocess_exec("/usr/sbin/unmount", mount_path)
+        unmount = await asyncio.create_subprocess_exec(
+            "/usr/bin/umount", mount_path, stdout=PIPE, stderr=PIPE
+        )
         # we don't care if this fails, really; it would only do so if the mount wasn't mounted
         await unmount.wait()
 
     async def _unmap(self) -> None:
         """Unmap a created loopback device."""
         dmsetup_remove = await asyncio.create_subprocess_exec(
-            "/usr/bin/dmsetup",
+            "/usr/sbin/dmsetup",
             "remove",
             "--force",
             "--retry",
             self.SECURE_STORAGE_DEVMAPPER_NAME,
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await dmsetup_remove.wait() != 0:
             LOG.warning(
@@ -221,7 +243,11 @@ class CAAMSecureVolume(SecureVolumeManager):
 
     async def _find_loopback_device(self) -> str:
         losetup_list = await asyncio.create_subprocess_exec(
-            "/usr/sbin/losetup", "--list", "--json"
+            "/usr/sbin/losetup",
+            "--list",
+            "--json",
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await losetup_list.wait() != 0:
             LOG.error(
@@ -258,7 +284,12 @@ class CAAMSecureVolume(SecureVolumeManager):
         # the only way to delete a key from KKRS, as far as I'm aware, is to set a short timeout and then...
         # wait for a timeout
         timeout = await asyncio.create_subprocess_exec(
-            "/usr/bin/keyctl", "timeout", str(self._keyid), "1"
+            "/usr/bin/keyctl",
+            "timeout",
+            str(self._keyid),
+            "1",
+            stdout=PIPE,
+            stderr=PIPE,
         )
         if await timeout.wait() != 0:
             LOG.warning(

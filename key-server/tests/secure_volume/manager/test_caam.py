@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from subprocess import PIPE
 from typing import Any
 from unittest.mock import MagicMock
 
@@ -99,6 +100,8 @@ async def rehearse_load_key(
             "import",
             "mock keyblob path",
             "ot-secure-storage-key",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(mock_image_path.exists()).then_return(True)
@@ -111,7 +114,14 @@ async def rehearse_load_key(
     )
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/keyctl", "padd", "logon", f"ot-secure-storage:{id(subject)}", "@p"
+            "/usr/bin/keyctl",
+            "padd",
+            "logon",
+            f"ot-secure-storage:{id(subject)}",
+            "@p",
+            stdout=PIPE,
+            stderr=PIPE,
+            stdin=PIPE,
         )
     ).then_return(mock_keyring_add)
     return mock_keyid
@@ -126,10 +136,14 @@ async def rehearse_losetup(
     subject: CAAMSecureVolume,
 ) -> None:
     decoy.when(
-        await mock_asyncio_subprocess("/usr/sbin/losetup", "-f", "mock image path")
+        await mock_asyncio_subprocess(
+            "/usr/sbin/losetup", "-f", "mock image path", stdout=PIPE, stderr=PIPE
+        )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
     decoy.when(
-        await mock_asyncio_subprocess("/usr/sbin/losetup", "--list", "--json")
+        await mock_asyncio_subprocess(
+            "/usr/sbin/losetup", "--list", "--json", stdout=PIPE, stderr=PIPE
+        )
     ).then_return(
         await build_subproc_result(
             decoy,
@@ -146,11 +160,13 @@ async def rehearse_losetup(
     )
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/dmsetup",
+            "/usr/sbin/dmsetup",
             "create",
             "ot-secure-storage",
             "--table",
             f"0 131072 crypt capi:tk(cbc(aes))-plain :36:logon:ot-secure-storage:{id(subject)} 0 mock loopback 0 1 sector_size:512",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
 
@@ -215,17 +231,28 @@ async def test_create_happypath_with_clears(
             "ccm",
             "-s",
             "24",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/dd", "if=/dev/zero", "of=mock image path", "bs=1M", "count=64"
+            "/usr/bin/dd",
+            "if=/dev/zero",
+            "of=mock image path",
+            "bs=1M",
+            "count=64",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
 
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/sbin/mkfs.ext4", "/dev/mapper/ot-secure-storage"
+            "/usr/sbin/mkfs.ext4",
+            "/dev/mapper/ot-secure-storage",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
     await subject.create()
@@ -253,7 +280,11 @@ async def test_mount_happypath_when_created(
     decoy.when(mock_mount_path.exists()).then_return(False)
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/sbin/mount", "/dev/mapper/ot-secure-storage", "mock mount path"
+            "/usr/bin/mount",
+            "/dev/mapper/ot-secure-storage",
+            "mock mount path",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
     with pytest.raises(RuntimeError):
@@ -287,24 +318,39 @@ async def test_mount_creates_if_necessary(
             "ccm",
             "-s",
             "24",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/dd", "if=/dev/zero", "of=mock image path", "bs=1M", "count=64"
+            "/usr/bin/dd",
+            "if=/dev/zero",
+            "of=mock image path",
+            "bs=1M",
+            "count=64",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
 
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/sbin/mkfs.ext4", "/dev/mapper/ot-secure-storage"
+            "/usr/sbin/mkfs.ext4",
+            "/dev/mapper/ot-secure-storage",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
     decoy.when(mock_mount_path.is_dir()).then_return(False)
     decoy.when(mock_mount_path.exists()).then_return(False)
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/sbin/mount", "/dev/mapper/ot-secure-storage", "mock mount path"
+            "/usr/bin/mount",
+            "/dev/mapper/ot-secure-storage",
+            "mock mount path",
+            stdout=PIPE,
+            stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
     with pytest.raises(RuntimeError):
