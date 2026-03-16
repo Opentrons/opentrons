@@ -286,6 +286,9 @@ function RetractSettingComponent({
             value={speed}
             label={t('speed')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex
@@ -321,6 +324,9 @@ function RetractSettingComponent({
             value={delayDuration}
             label={t('delay_duration_s')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex

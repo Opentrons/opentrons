@@ -107,6 +107,7 @@ describe('Delay', () => {
         readOnly: true,
         type: 'number',
         value: null,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -137,6 +138,7 @@ describe('Delay', () => {
         readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -182,6 +184,7 @@ describe('Delay', () => {
         readOnly: true,
         type: 'number',
         value: 15,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -208,6 +211,7 @@ describe('Delay', () => {
         readOnly: true,
         type: 'number',
         value: 20,
+        onBlur: expect.any(Function),
       },
       {}
     )

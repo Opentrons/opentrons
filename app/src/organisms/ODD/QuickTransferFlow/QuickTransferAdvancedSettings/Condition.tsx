@@ -190,6 +190,9 @@ export function Condition(props: DelayProps): JSX.Element {
               label={t('condition_volume')}
               error={volumeError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('condition_max_volume', { max: maxConditioningVolume })}
