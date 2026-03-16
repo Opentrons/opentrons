@@ -7,6 +7,7 @@ import enum
 import typing
 from datetime import datetime
 
+from pydantic import BaseModel, ConfigDict, model_serializer
 from typing_extensions import Self
 
 from opentrons_shared_data.data_files.types import DataFileInfo
@@ -438,9 +439,66 @@ class LoadModuleUpdate:
     serial_number: typing.Optional[str]
 
 
-@dataclasses.dataclass
-class StateUpdate:
+def _serialize_value(val: typing.Any) -> typing.Any:
+    """Recursively convert a value to a JSON-serializable form."""
+    if val is None or isinstance(val, (str, int, float, bool)):
+        return val
+    if isinstance(val, datetime):
+        return val.isoformat()
+    if isinstance(val, list):
+        return [_serialize_value(v) for v in val]
+    if isinstance(val, dict):
+        return {
+            str(k): _serialize_value(v)
+            for k, v in val.items()
+            if str(k) not in _SERIALIZE_SKIP_FIELDS
+        }
+    if isinstance(val, BaseModel):
+        return val.model_dump(mode="json")
+    if dataclasses.is_dataclass(val) and not isinstance(val, type):
+        return _serialize_dataclass(val)
+    if isinstance(val, enum.Enum):
+        return val.value
+    return str(val)
+
+
+# Field names to omit from serialized state (e.g. action store output).
+# We never need full labware/module definitions in the action stream.
+_SERIALIZE_SKIP_FIELDS: typing.FrozenSet[str] = frozenset({"definition"})
+
+
+def _serialize_dataclass(val: typing.Any) -> typing.Any:
+    """Serialize a dataclass, with special handling for opaque complex types."""
+    result: dict[str, typing.Any] = {}
+    for f in dataclasses.fields(val):
+        if f.name in _SERIALIZE_SKIP_FIELDS:
+            continue
+        field_val = getattr(val, f.name)
+        if isinstance(field_val, pipette_data_provider.LoadedStaticPipetteData):
+            result[f.name] = {
+                "model": field_val.model,
+                "display_name": field_val.display_name,
+                "min_volume": field_val.min_volume,
+                "max_volume": field_val.max_volume,
+                "channels": field_val.channels,
+            }
+        elif isinstance(field_val, NozzleMap):
+            result[f.name] = {
+                "starting_nozzle": field_val.starting_nozzle,
+                "valid_map_key": field_val.valid_map_key,
+                "configuration": field_val.configuration.value
+                if hasattr(field_val.configuration, "value")
+                else str(field_val.configuration),
+            }
+        else:
+            result[f.name] = _serialize_value(field_val)
+    return result
+
+
+class StateUpdate(BaseModel):
     """Represents an update to perform on engine state."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
@@ -500,17 +558,27 @@ class StateUpdate:
 
     precondition_update: PreconditionUpdate | NoChangeType = NO_CHANGE
 
+    @model_serializer
+    def _serialize_excluding_no_change(self) -> dict[str, typing.Any]:
+        """Serialize only fields that have changed (are not NO_CHANGE/CLEAR)."""
+        out: dict[str, typing.Any] = {}
+        for name in StateUpdate.model_fields:
+            val = getattr(self, name)
+            if val is NO_CHANGE or val is CLEAR:
+                continue
+            out[name] = _serialize_value(val)
+        return out
+
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
 
         This object is mutated in-place, taking values from `other`.
         If an attribute in `other` is `NO_CHANGE`, the value in this object is kept.
         """
-        fields = dataclasses.fields(other)
-        for field in fields:
-            other_value = other.__dict__[field.name]
+        for field_name in StateUpdate.model_fields:
+            other_value = getattr(other, field_name)
             if other_value != NO_CHANGE:
-                self.__dict__[field.name] = other_value
+                setattr(self, field_name, other_value)
         return self
 
     @classmethod
@@ -526,7 +594,7 @@ class StateUpdate:
         return accumulator
 
     # These convenience functions let the caller avoid the boilerplate of constructing a
-    # complicated dataclass tree, and allow chaining.
+    # complicated dataclass/model tree, and allow chaining.
 
     @typing.overload
     def set_pipette_location(

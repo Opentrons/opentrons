@@ -48,6 +48,7 @@ from .execution import (
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
+from .state.action_store import ActionStore
 from .state.state import StateStore, StateView
 from .state.update_types import StateUpdate
 from .types import (
@@ -101,6 +102,7 @@ class ProtocolEngine:
         file_provider: FileProvider,
         camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
+        action_store: Optional[ActionStore] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -120,6 +122,7 @@ class ProtocolEngine:
         self._door_watcher = door_watcher
         self._module_data_provider = module_data_provider
         self._queue_worker = queue_worker
+        self._action_store = action_store
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()
@@ -128,6 +131,11 @@ class ProtocolEngine:
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
+
+    @property
+    def action_store(self) -> Optional[ActionStore]:
+        """Get the action store if one was configured."""
+        return self._action_store
 
     @property
     def _get_queue_worker(self) -> QueueWorker:

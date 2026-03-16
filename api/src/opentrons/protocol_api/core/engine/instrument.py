@@ -2579,7 +2579,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             pipette_id=self.pipette_id
         )
         if lld_settings:
-            lld_min_height_for_tip_attached = lld_settings[f"t{tip_volume}"][
+            lld_min_height_for_tip_attached = lld_settings[f"t{int(tip_volume)}"][
                 "minHeight"
             ]
             return lld_min_height_for_tip_attached

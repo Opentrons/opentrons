@@ -1,6 +1,5 @@
 """Opentrons analyze CLI."""
 
-import asyncio
 import gc
 import json
 import logging
@@ -47,11 +46,6 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.state_change_stream import (
-    StateChangeEvent,
-    make_json_serializable,
-    state_change_event_to_json_dict,
-)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -143,12 +137,6 @@ class _Output:
     default="{}",
     type=str,
 )
-@click.option(
-    "--state-changes-json",
-    help="Write protocol engine state change events to a JSON file (one object per action with state updates).",
-    type=click.Path(path_type=Path, writable=True),
-    default=None,
-)
 def analyze(
     files: Sequence[Path],
     rtp_values: str,
@@ -160,7 +148,6 @@ def analyze(
     check: bool,
     leaks: bool,
     leaks_debug: bool,
-    state_changes_json: Optional[Path] = None,
 ) -> int:
     """Analyze a protocol.
 
@@ -168,9 +155,9 @@ def analyze(
     equipment and commands.
     """
     outputs = _get_outputs(json=json_output, human_json=human_json_output)
-    if not outputs and not check and state_changes_json is None:
+    if not outputs and not check:
         raise click.UsageError(
-            message="Please specify at least --check, one of the output options, or --state-changes-json."
+            message="Please specify at least --check or one of the output options."
         )
 
     try:
@@ -185,7 +172,6 @@ def analyze(
                     check,
                     leaks or leaks_debug,
                     leaks_debug,
-                    state_changes_json,
                 )
             )
     except click.ClickException:
@@ -335,15 +321,10 @@ async def _do_analyze(
     protocol_source: ProtocolSource,
     rtp_values: PrimitiveRunTimeParamValuesType,
     rtp_paths: CSVRuntimeParamPaths,
-    state_changes_path: Optional[Path] = None,
 ) -> RunResult:
-    state_change_queue: Optional[asyncio.Queue[object]] = (
-        asyncio.Queue() if state_changes_path is not None else None
-    )
     orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type,
         protocol_config=protocol_source.config,
-        state_change_queue=state_change_queue,
     )
     try:
         await orchestrator.load(
@@ -387,57 +368,7 @@ async def _do_analyze(
             command_preconditions=None,
         )
         return analysis
-    initial_state: Optional[Dict[str, Any]] = None
-    if state_changes_path is not None:
-        state_view = orchestrator._protocol_engine.state_view
-        summary = state_view.get_summary()
-        initial_state = make_json_serializable({
-            "state_summary": summary.model_dump(mode="json"),
-            "addressable_area_names": state_view.addressable_areas.get_all(),
-            "tip_tracking": state_view.tips.get_tip_state_by_labware(),
-        })
-    result = await orchestrator.run(deck_configuration=[])
-    final_state: Optional[Dict[str, Any]] = None
-    if state_changes_path is not None:
-        state_view = orchestrator._protocol_engine.state_view
-        final_summary = state_view.get_summary()
-        final_state = make_json_serializable({
-            "state_summary": final_summary.model_dump(mode="json"),
-            "addressable_area_names": state_view.addressable_areas.get_all(),
-            "tip_tracking": state_view.tips.get_tip_state_by_labware(),
-        })
-    if state_changes_path is not None and state_change_queue is not None:
-        events_list: List[object] = []
-        while not state_change_queue.empty():
-            events_list.append(state_change_queue.get_nowait())
-        payload = [
-            state_change_event_to_json_dict(e, i)
-            for i, e in enumerate(events_list)
-            if isinstance(e, StateChangeEvent)
-        ]
-        command_id_to_analysis: Dict[str, Dict[str, Any]] = {
-            cmd.id: {
-                "analysis_command_index": i,
-                "command_type": cmd.commandType,
-            }
-            for i, cmd in enumerate(result.commands)
-        }
-        for ev in payload:
-            cmd_id = ev.get("action", {}).get("command_id")
-            if cmd_id and cmd_id in command_id_to_analysis:
-                ev["analysis_command_index"] = command_id_to_analysis[cmd_id][
-                    "analysis_command_index"
-                ]
-                ev["command_type"] = command_id_to_analysis[cmd_id]["command_type"]
-        out_path = state_changes_path.resolve()
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        output = make_json_serializable({
-            "initial_state": initial_state if initial_state is not None else {},
-            "final_state": final_state if final_state is not None else {},
-            "events": payload,
-        })
-        out_path.write_text(json.dumps(output, indent=2))
-    return result
+    return await orchestrator.run(deck_configuration=[])
 
 
 async def _analyze(  # noqa: C901
@@ -448,7 +379,6 @@ async def _analyze(  # noqa: C901
     check: bool,
     fail_on_leak: bool,
     debug_on_leak: bool,
-    state_changes_json: Optional[Path] = None,
 ) -> int:
     input_files = _get_input_files(files_and_dirs)
     parsed_rtp_values = _get_runtime_parameter_values(rtp_values)
@@ -466,7 +396,6 @@ async def _analyze(  # noqa: C901
         protocol_source,
         parsed_rtp_values,
         rtp_paths,
-        state_changes_path=state_changes_json,
     )
     return_code = _get_return_code(analysis)
 
@@ -540,6 +469,7 @@ async def _analyze(  # noqa: C901
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
+        actions=analysis.actions,
     )
 
     _call_for_output_of_kind(
@@ -631,3 +561,4 @@ class AnalyzeResults(BaseModel):
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
+    actions: List[Any] = []  # List[ActionRecord], typed as Any for serialization

@@ -1,11 +1,11 @@
 """Protocol Engine types to deal with tips."""
 
-from dataclasses import dataclass
 from enum import Enum
 
+from pydantic import BaseModel, ConfigDict
 
-@dataclass(frozen=True)
-class TipGeometry:
+
+class TipGeometry(BaseModel):
     """Tip geometry data.
 
     Props:
@@ -13,6 +13,8 @@ class TipGeometry:
         diameter: Tip diameter in mm.
         volume: Maximum volume in µL.
     """
+
+    model_config = ConfigDict(frozen=True)
 
     length: float
     diameter: float

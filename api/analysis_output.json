@@ -1,5 +1,5 @@
 {
-    "createdAt": "2026-03-12T22:08:44.018578Z",
+    "createdAt": "2026-03-16T14:21:30.460714Z",
     "files": [
         {
             "name": "testosaur_v2.py",
@@ -25,21 +25,21 @@
     "runTimeParameters": [],
     "commands": [
         {
-            "id": "1a2b4079-de59-46ed-939f-4552261b899e",
-            "createdAt": "2026-03-12T22:08:44.006132Z",
+            "id": "6849d8da-028d-4562-bd4c-c706c850805b",
+            "createdAt": "2026-03-16T14:21:30.454093Z",
             "commandType": "home",
             "key": "50c7ae73a4e3f7129874f39dfb514803",
             "status": "succeeded",
             "params": {},
             "result": {},
-            "startedAt": "2026-03-12T22:08:44.006327Z",
-            "completedAt": "2026-03-12T22:08:44.006404Z",
+            "startedAt": "2026-03-16T14:21:30.454187Z",
+            "completedAt": "2026-03-16T14:21:30.454244Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "commands.LOAD_LABWARE-0",
-            "createdAt": "2026-03-12T22:08:44.007749Z",
+            "createdAt": "2026-03-16T14:21:30.455083Z",
             "commandType": "loadLabware",
             "key": "commands.LOAD_LABWARE-0",
             "status": "succeeded",
@@ -1191,14 +1191,14 @@
                     "gripperOffsets": {}
                 }
             },
-            "startedAt": "2026-03-12T22:08:44.007749Z",
-            "completedAt": "2026-03-12T22:08:44.007749Z",
+            "startedAt": "2026-03-16T14:21:30.455083Z",
+            "completedAt": "2026-03-16T14:21:30.455083Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "commands.LOAD_PIPETTE-0",
-            "createdAt": "2026-03-12T22:08:44.009716Z",
+            "createdAt": "2026-03-16T14:21:30.456758Z",
             "commandType": "loadPipette",
             "key": "commands.LOAD_PIPETTE-0",
             "status": "succeeded",
@@ -1209,14 +1209,14 @@
             "result": {
                 "pipetteId": "pipette-0"
             },
-            "startedAt": "2026-03-12T22:08:44.009716Z",
-            "completedAt": "2026-03-12T22:08:44.009716Z",
+            "startedAt": "2026-03-16T14:21:30.456758Z",
+            "completedAt": "2026-03-16T14:21:30.456758Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "commands.LOAD_LABWARE-1",
-            "createdAt": "2026-03-12T22:08:44.010765Z",
+            "createdAt": "2026-03-16T14:21:30.457782Z",
             "commandType": "loadLabware",
             "key": "commands.LOAD_LABWARE-1",
             "status": "succeeded",
@@ -2398,14 +2398,14 @@
                     "gripperOffsets": {}
                 }
             },
-            "startedAt": "2026-03-12T22:08:44.010765Z",
-            "completedAt": "2026-03-12T22:08:44.010765Z",
+            "startedAt": "2026-03-16T14:21:30.457782Z",
+            "completedAt": "2026-03-16T14:21:30.457782Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "command.PICK_UP_TIP-0",
-            "createdAt": "2026-03-12T22:08:44.011724Z",
+            "createdAt": "2026-03-16T14:21:30.458273Z",
             "commandType": "pickUpTip",
             "key": "command.PICK_UP_TIP-0",
             "status": "succeeded",
@@ -2432,14 +2432,14 @@
                 "tipLength": 80.05,
                 "tipDiameter": 0.0
             },
-            "startedAt": "2026-03-12T22:08:44.011724Z",
-            "completedAt": "2026-03-12T22:08:44.012148Z",
+            "startedAt": "2026-03-16T14:21:30.458273Z",
+            "completedAt": "2026-03-16T14:21:30.458655Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "command.ASPIRATE-0",
-            "createdAt": "2026-03-12T22:08:44.012444Z",
+            "createdAt": "2026-03-16T14:21:30.458853Z",
             "commandType": "aspirate",
             "key": "command.ASPIRATE-0",
             "status": "succeeded",
@@ -2467,14 +2467,14 @@
                 },
                 "volume": 100.0
             },
-            "startedAt": "2026-03-12T22:08:44.012444Z",
-            "completedAt": "2026-03-12T22:08:44.012972Z",
+            "startedAt": "2026-03-16T14:21:30.458853Z",
+            "completedAt": "2026-03-16T14:21:30.459178Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "command.DISPENSE-0",
-            "createdAt": "2026-03-12T22:08:44.013158Z",
+            "createdAt": "2026-03-16T14:21:30.459324Z",
             "commandType": "dispense",
             "key": "command.DISPENSE-0",
             "status": "succeeded",
@@ -2502,14 +2502,14 @@
                 },
                 "volume": 100.0
             },
-            "startedAt": "2026-03-12T22:08:44.013158Z",
-            "completedAt": "2026-03-12T22:08:44.013542Z",
+            "startedAt": "2026-03-16T14:21:30.459324Z",
+            "completedAt": "2026-03-16T14:21:30.459612Z",
             "notes": [],
             "commandAnnotationIds": []
         },
         {
             "id": "command.DROP_TIP-0",
-            "createdAt": "2026-03-12T22:08:44.013744Z",
+            "createdAt": "2026-03-16T14:21:30.459741Z",
             "commandType": "dropTip",
             "key": "command.DROP_TIP-0",
             "status": "succeeded",
@@ -2535,8 +2535,8 @@
                     "z": 0.0
                 }
             },
-            "startedAt": "2026-03-12T22:08:44.013744Z",
-            "completedAt": "2026-03-12T22:08:44.014115Z",
+            "startedAt": "2026-03-16T14:21:30.459741Z",
+            "completedAt": "2026-03-16T14:21:30.460053Z",
             "notes": [],
             "commandAnnotationIds": []
         }
@@ -2581,5 +2581,229 @@
     "commandAnnotations": [],
     "commandPreconditions": {
         "isCameraUsed": false
-    }
+    },
+    "actions": [
+        {
+            "action_type": "addLabwareDefinition",
+            "definition_uri": "opentrons/opentrons_flex_lid_absorbance_plate_reader_module/1"
+        },
+        {
+            "action_type": "setDeckConfiguration"
+        },
+        {
+            "action_type": "play",
+            "requested_at": "2026-03-16T14:21:30.453825Z"
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.454093Z",
+            "action_type": "queueCommand",
+            "command_id": "6849d8da-028d-4562-bd4c-c706c850805b",
+            "request_hash": "50c7ae73a4e3f7129874f39dfb514803"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "6849d8da-028d-4562-bd4c-c706c850805b",
+            "started_at": "2026-03-16T14:21:30.454187Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "6849d8da-028d-4562-bd4c-c706c850805b",
+            "state_update": {}
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.455083Z",
+            "action_type": "queueCommand",
+            "command_id": "commands.LOAD_LABWARE-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "commands.LOAD_LABWARE-0",
+            "started_at": "2026-03-16T14:21:30.455083Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "commands.LOAD_LABWARE-0",
+            "state_update": {
+                "loaded_labware": {
+                    "labware_id": "labware-0",
+                    "new_location": {
+                        "slotName": "1"
+                    },
+                    "offset_id": null,
+                    "display_name": null
+                }
+            }
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.456758Z",
+            "action_type": "queueCommand",
+            "command_id": "commands.LOAD_PIPETTE-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "commands.LOAD_PIPETTE-0",
+            "started_at": "2026-03-16T14:21:30.456758Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "commands.LOAD_PIPETTE-0",
+            "state_update": {
+                "loaded_pipette": {
+                    "pipette_id": "pipette-0",
+                    "pipette_name": "p1000_single",
+                    "mount": "right",
+                    "liquid_presence_detection": null
+                },
+                "pipette_config": {
+                    "pipette_id": "pipette-0",
+                    "serial_number": "",
+                    "config": {
+                        "model": "p1000_single_v1.5",
+                        "display_name": "P1000 Single-Channel GEN1",
+                        "min_volume": 100.0,
+                        "max_volume": 1000,
+                        "channels": 1
+                    }
+                }
+            }
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.457782Z",
+            "action_type": "queueCommand",
+            "command_id": "commands.LOAD_LABWARE-1"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "commands.LOAD_LABWARE-1",
+            "started_at": "2026-03-16T14:21:30.457782Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "commands.LOAD_LABWARE-1",
+            "state_update": {
+                "loaded_labware": {
+                    "labware_id": "labware-1",
+                    "new_location": {
+                        "slotName": "2"
+                    },
+                    "offset_id": null,
+                    "display_name": null
+                }
+            }
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.458273Z",
+            "action_type": "queueCommand",
+            "command_id": "command.PICK_UP_TIP-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "command.PICK_UP_TIP-0",
+            "started_at": "2026-03-16T14:21:30.458273Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "command.PICK_UP_TIP-0",
+            "state_update": {
+                "pipette_tip_state": {
+                    "pipette_id": "pipette-0",
+                    "tip_geometry": {
+                        "length": 80.05,
+                        "diameter": 7.23,
+                        "volume": 1000.0
+                    },
+                    "tip_source": {
+                        "labware_id": "labware-0",
+                        "well_name": "A1"
+                    }
+                },
+                "pipette_aspirated_fluid": {
+                    "pipette_id": "pipette-0",
+                    "clean_tip": true,
+                    "type": "empty"
+                },
+                "tips_state": {
+                    "tip_state": "empty",
+                    "labware_id": "labware-0",
+                    "well_names": [
+                        "A1"
+                    ]
+                },
+                "ready_to_aspirate": {
+                    "pipette_id": "pipette-0",
+                    "ready_to_aspirate": true
+                }
+            }
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.458853Z",
+            "action_type": "queueCommand",
+            "command_id": "command.ASPIRATE-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "command.ASPIRATE-0",
+            "started_at": "2026-03-16T14:21:30.458853Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "command.ASPIRATE-0",
+            "state_update": {}
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.459324Z",
+            "action_type": "queueCommand",
+            "command_id": "command.DISPENSE-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "command.DISPENSE-0",
+            "started_at": "2026-03-16T14:21:30.459324Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "command.DISPENSE-0",
+            "state_update": {}
+        },
+        {
+            "created_at": "2026-03-16T14:21:30.459741Z",
+            "action_type": "queueCommand",
+            "command_id": "command.DROP_TIP-0"
+        },
+        {
+            "action_type": "runCommand",
+            "command_id": "command.DROP_TIP-0",
+            "started_at": "2026-03-16T14:21:30.459741Z"
+        },
+        {
+            "action_type": "succeedCommand",
+            "command_id": "command.DROP_TIP-0",
+            "state_update": {
+                "pipette_tip_state": {
+                    "pipette_id": "pipette-0",
+                    "tip_geometry": null,
+                    "tip_source": null
+                },
+                "pipette_aspirated_fluid": {
+                    "pipette_id": "pipette-0",
+                    "type": "unknown"
+                },
+                "tips_state": {
+                    "tip_state": "used",
+                    "labware_id": "labware-0",
+                    "well_names": [
+                        "H12"
+                    ]
+                }
+            }
+        },
+        {
+            "action_type": "finish",
+            "set_run_status": true
+        },
+        {
+            "action_type": "hardwareStopped",
+            "completed_at": "2026-03-16T14:21:30.460624Z"
+        }
+    ]
 }

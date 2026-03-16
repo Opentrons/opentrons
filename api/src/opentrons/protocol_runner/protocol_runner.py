@@ -2,7 +2,7 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 import anyio
 
@@ -67,6 +67,7 @@ class RunResult(NamedTuple):
         CommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
+    actions: List[Any] = []
 
 
 class AbstractRunner(ABC):
@@ -299,12 +300,15 @@ class PythonAndLegacyRunner(AbstractRunner):
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
+        action_store = self._protocol_engine.action_store
+        actions = action_store.get_all() if action_store is not None else []
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
             command_annotations=command_annotations,
             command_preconditions=preconditions,
+            actions=actions,
         )
 
 
@@ -452,12 +456,15 @@ class JsonRunner(AbstractRunner):
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
+        action_store = self._protocol_engine.action_store
+        actions = action_store.get_all() if action_store is not None else []
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=self._command_annotations,
             command_preconditions=preconditions,
+            actions=actions,
         )
 
     async def _add_and_execute_commands(self) -> None:
@@ -532,12 +539,15 @@ class LiveRunner(AbstractRunner):
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
+        action_store = self._protocol_engine.action_store
+        actions = action_store.get_all() if action_store is not None else []
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=[],
             command_preconditions=preconditions,
+            actions=actions,
         )
 
 

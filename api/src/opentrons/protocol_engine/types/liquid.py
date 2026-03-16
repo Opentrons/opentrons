@@ -1,9 +1,8 @@
 """Protocol engine types to do with liquids."""
 
-from dataclasses import dataclass
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 from opentrons_shared_data.util import StrEnum
 
@@ -34,9 +33,10 @@ class FluidKind(StrEnum):
     AIR = "AIR"
 
 
-@dataclass(frozen=True)
-class AspiratedFluid:
+class AspiratedFluid(BaseModel):
     """Fluid inside a pipette."""
+
+    model_config = ConfigDict(frozen=True)
 
     kind: FluidKind
     volume: float

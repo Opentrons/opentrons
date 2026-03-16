@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-from typing import Optional
-
 from opentrons_shared_data.robot.types import RobotType
 
 from ..protocol_engine.types import (
@@ -55,7 +52,6 @@ class SimulatingRunOrchestrator(RunOrchestrator):
 async def create_simulating_orchestrator(
     robot_type: RobotType,
     protocol_config: ProtocolConfig,
-    state_change_queue: Optional[asyncio.Queue[object]] = None,
 ) -> SimulatingRunOrchestrator:
     """Create a RunOrchestrator wired to a simulating HardwareControlAPI.
 
@@ -103,7 +99,6 @@ async def create_simulating_orchestrator(
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=should_load_fixed_trash(protocol_config),
-        state_change_queue=state_change_queue,
     )
 
     simulating_context_creator = SimulatingContextCreator(
@@ -141,8 +136,6 @@ async def create_simulating_orchestrator(
         fixit_runner=fixit_runner,
         protocol_live_runner=protocol_live_runner,
     )
-    if state_change_queue is not None:
-        orchestrator.state_change_queue = state_change_queue
     return orchestrator
 
 

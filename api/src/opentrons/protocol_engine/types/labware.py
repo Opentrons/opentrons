@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .labware_offset_location import (
     LabwareOffsetLocationSequence,
@@ -120,9 +120,10 @@ class LoadedLabware(BaseModel):
     )
 
 
-@dataclass(frozen=True)
-class LabwareWellId:
+class LabwareWellId(BaseModel):
     """Designates a well in a labware."""
+
+    model_config = ConfigDict(frozen=True)
 
     labware_id: str
     well_name: str
