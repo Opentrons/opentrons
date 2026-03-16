@@ -147,20 +147,20 @@ def _state_update_for_legacy_command(
             )
         )
     if isinstance(completed_command, pe_commands.DropTip):
-        params = completed_command.params
+        drop_params = completed_command.params
         return (
             StateUpdate()
             .update_pipette_tip_state(
-                pipette_id=params.pipetteId,
+                pipette_id=drop_params.pipetteId,
                 tip_geometry=None,
                 tip_source=None,
             )
             .update_tip_rack_well_state(
                 tip_state=pe_types.TipRackWellState.USED,
-                labware_id=params.labwareId,
-                well_names=[params.wellName],
+                labware_id=drop_params.labwareId,
+                well_names=[drop_params.wellName],
             )
-            .set_fluid_unknown(pipette_id=params.pipetteId)
+            .set_fluid_unknown(pipette_id=drop_params.pipetteId)
         )
     return StateUpdate()
 
