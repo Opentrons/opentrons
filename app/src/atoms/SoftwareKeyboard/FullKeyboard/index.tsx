@@ -12,14 +12,17 @@ import {
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { LayoutName } from '../types'
 
 import '../index.css'
 import './index.css'
 
+const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']
+
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
   onChange: (input: string) => void
-  keyboardRef: MutableRefObject<KeyboardReactInterface | any>
+  keyboardRef: MutableRefObject<KeyboardReactInterface | null>
   debug?: boolean
 }
 
@@ -28,12 +31,13 @@ export function FullKeyboard({
   keyboardRef,
   debug = false,
 }: FullKeyboardProps): JSX.Element {
-  const [layoutName, setLayoutName] = useState<string>('default')
+  const [layoutName, setLayoutName] = useState<LayoutName>('default')
+
   const appLanguage = useSelector(getAppLanguage)
-  const handleShift = (button: string): void => {
+  const handleLayoutChange = (button: string): void => {
     switch (button) {
       case '{shift}':
-        setLayoutName(layoutName === 'default' ? 'shift' : 'default')
+        setLayoutName(prev => (prev === 'default' ? 'shift' : 'default'))
         break
       case '{numbers}':
         setLayoutName('numbers')
@@ -50,18 +54,16 @@ export function FullKeyboard({
   }
 
   const onKeyPress = (button: string): void => {
-    if (
-      button === '{numbers}' ||
-      button === '{abc}' ||
-      button === '{shift}' ||
-      button === '{symbols}'
-    )
-      handleShift(button)
+    if (SPECIAL_LAYOUT_KEYS.includes(button)) {
+      handleLayoutChange(button)
+    }
   }
 
   return (
     <Keyboard
-      keyboardRef={r => (keyboardRef.current = r)}
+      keyboardRef={r => {
+        keyboardRef.current = r
+      }}
       theme="hg-theme-default oddTheme1"
       onChange={onChange}
       onKeyPress={onKeyPress}

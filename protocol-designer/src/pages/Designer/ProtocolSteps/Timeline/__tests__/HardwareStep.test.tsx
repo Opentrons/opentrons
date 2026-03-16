@@ -19,6 +19,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/protocol-designer/ui/steps')
 vi.mock('/protocol-designer/ui/steps/actions/actions')
+
 const render = (props: ComponentProps<typeof HardwareStep>) => {
   return renderWithProviders(<HardwareStep {...props} />, {
     i18nInstance: i18n,

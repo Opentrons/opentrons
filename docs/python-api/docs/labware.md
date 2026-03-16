@@ -1,5 +1,6 @@
 ---
 title: "Python API: Labware"
+description: "Load and use labware in Python protocols; definitions and custom labware."
 ---
 
 Labware are the durable or consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. Items such as pipette tips, well plates, tubes, and reservoirs are all examples of labware. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods when creating a protocol for your robot.

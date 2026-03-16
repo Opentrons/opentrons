@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Labware Definitions"
+description: "Labware definitions, Custom Labware Creator, and JSON for custom labware."
 ---
 
 Every labware you use on Flex requires a _labware definition_ that contains all the information Flex needs to work with the labware. This includes information about the physical shape of the labware, how pipettes and the gripper should interact with it, and what the labware should be called on the touchscreen and in the Opentrons App.

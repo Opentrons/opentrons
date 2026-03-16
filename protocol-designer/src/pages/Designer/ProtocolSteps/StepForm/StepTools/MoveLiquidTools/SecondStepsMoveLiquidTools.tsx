@@ -22,8 +22,10 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
+  DEST_WELL_BLOWOUT_DESTINATION,
   getPipetteWithTipMaxVol,
   getTrashOrLabware,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
 import {
@@ -164,7 +166,16 @@ export const SecondStepsMoveLiquidTools = ({
       isDestinationTrash ? 'dispense_mix_checkbox' : 'dispense_mix_checkbox_2'
     }`
   )
-
+  const blowoutLocation = propsForFields.blowout_location.value ?? null
+  const isBlowoutLocationSource =
+    blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationDestination =
+    blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationLabware =
+    isBlowoutLocationSource || isBlowoutLocationDestination
+  const blowOutLabwareId = isBlowoutLocationSource
+    ? (propsForFields.aspirate_labware.value as string)
+    : ((propsForFields.dispense_labware.value as string) ?? null)
   const aspirateTab = {
     text: t('aspirate'),
     isActive: tab === 'aspirate',
@@ -571,6 +582,20 @@ export const SecondStepsMoveLiquidTools = ({
                       padding="0"
                       formData={formData}
                     />
+                    {isBlowoutLocationLabware && blowOutLabwareId ? (
+                      <PositionField
+                        formData={formData}
+                        padding="0"
+                        prefix="blowout"
+                        propsForFields={propsForFields}
+                        zField="blowout_mmFromBottom"
+                        xField="blowout_x_position"
+                        yField="blowout_y_position"
+                        labwareId={blowOutLabwareId}
+                        referenceField="blowout_position_reference"
+                        isNested={true}
+                      />
+                    ) : null}
                   </Flex>
                 ) : null}
               </CheckboxExpandStepFormField>

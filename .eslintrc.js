@@ -26,6 +26,8 @@ module.exports = {
     'jsx-a11y',
   ],
 
+  reportUnusedDisableDirectives: true,
+
   rules: {
     camelcase: 'off',
     'no-var': 'error',

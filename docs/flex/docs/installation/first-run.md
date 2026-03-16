@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: First Run"
+description: "Power on, connect to network, and complete initial Flex setup."
 ---
 
 Perform basic setup on the touchscreen before connecting any other hardware to your Flex. The robot will guide you through connecting to your lab network, updating to the latest software, and personalizing Flex by giving it a name.

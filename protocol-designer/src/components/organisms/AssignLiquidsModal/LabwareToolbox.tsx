@@ -115,13 +115,11 @@ export function LabwareStackToolbox({
   }
 
   // select the top labware in the stack if no selected labware ids are provided
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // FIXME(2026-03-03): Investigate this error about the useEffect firing on every render.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const selectedLabware =
     selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
 
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (selectedLabware[0] != null) {
       dispatch(openIngredientSelector(selectedLabware[0]))

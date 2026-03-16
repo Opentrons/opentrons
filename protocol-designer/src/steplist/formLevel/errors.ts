@@ -623,13 +623,14 @@ export type FormErrorChecker = (
 export const incompatibleLabware = (
   fields: HydratedMixFormData
 ): FormError | null => {
-  const { labware, pipette } = fields
+  const { labware, pipette, nozzles } = fields
   if (!labware || !pipette) {
     return null
   }
   //  trashBin and wasteChute cannot mix into a labware
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     labware.def as LabwareDefinition2
   )
     ? INCOMPATIBLE_LABWARE
@@ -638,12 +639,13 @@ export const incompatibleLabware = (
 export const incompatibleDispenseLabware = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { dispense_labware, pipette } = fields
+  const { dispense_labware, pipette, nozzles } = fields
   if (!dispense_labware || !pipette) {
     return null
   }
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     'def' in dispense_labware
       ? (dispense_labware.def as LabwareDefinition2)
       : undefined,
@@ -655,13 +657,14 @@ export const incompatibleDispenseLabware = (
 export const incompatibleAspirateLabware = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { aspirate_labware, pipette } = fields
+  const { aspirate_labware, pipette, nozzles } = fields
   if (!aspirate_labware || !pipette) {
     return null
   }
   //  trashBin and wasteChute cannot aspirate into a labware
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     aspirate_labware.def as LabwareDefinition2
   )
     ? INCOMPATIBLE_ASPIRATE_LABWARE

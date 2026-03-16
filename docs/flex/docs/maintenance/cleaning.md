@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Cleaning"
+description: "How to clean the Flex frame, deck, and modules, including approved cleaning solutions."
 ---
 
 Routine cleaning helps keep Flex free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. You should review this section for information, instructions, and resources about how to clean your Flex, pipettes, gripper, modules, and other hardware.

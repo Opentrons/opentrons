@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Robot and Instruments"
+description: "Select robot, pipettes, tip racks, and gripper when creating a protocol."
 ---
 
 Click **Create a protocol** on the Protocol Designer homepage or click **Create new** in the header at any time to get started building a protocol. First, select the robot you'll use. You can use Protocol Designer to create protocols that run on either the Opentrons Flex or the OT-2. 

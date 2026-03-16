@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
+import { COLUMN, PARTIAL_COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
 import {
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
@@ -10,6 +11,7 @@ import { OFFDECK } from '/protocol-designer/constants'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
+import { getEntireWellSelection } from '../../NozzleAndWellSelectionModal/utils'
 import {
   INACCESSIBLE_COLLISION,
   INACCESSIBLE_INCOMPLETE,
@@ -22,6 +24,23 @@ import type {
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { AccessibilityStatus, InaccessibleReason } from '../types'
+
+export const getWellsToCheck = (
+  nozzles: NozzleConfigurationStyle,
+  wellOrdering: string[][]
+): string[] => {
+  switch (nozzles) {
+    case ROW:
+      return wellOrdering[0]
+    case COLUMN:
+      return wellOrdering.map(row => row[0])
+
+    case SINGLE:
+    case PARTIAL_COLUMN:
+      return wellOrdering.flat()
+  }
+  return []
+}
 
 /**
  * Returns a record of tip accessibility status by  tiprack id and well name.
@@ -76,13 +95,15 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
         if (tipState == null) {
           return acc
         }
+        const pipetteChannels = pipetteSpecs.channels
+        const wellNamesToCheck = getWellsToCheck(nozzles, def.ordering)
         return {
           ...acc,
-          [id]: Object.keys(def.wells).reduce((acc, wellName) => {
+          [id]: wellNamesToCheck.reduce((acc, wellName) => {
             const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
               tipState,
               primaryNozzle,
-              channels: pipetteSpecs.channels,
+              channels: pipetteChannels,
               nozzleConfiguration: nozzles,
               wellName,
               tiprackDef: def,
@@ -106,12 +127,26 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
             } else if (!isComplete) {
               inaccessibleReason = INACCESSIBLE_INCOMPLETE
             }
+            const wellGroup = getEntireWellSelection(
+              wellName,
+              def.ordering,
+              nozzles,
+              primaryNozzle,
+              pipetteChannels
+            )
+            const groupEntries = Object.fromEntries(
+              wellGroup.map(well => [
+                well,
+                {
+                  isAccessible,
+                  ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
+                },
+              ])
+            )
+
             return {
               ...acc,
-              [wellName]: {
-                isAccessible,
-                ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
-              },
+              ...groupEntries,
             }
           }, {}),
         }

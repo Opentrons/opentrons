@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Labware Concepts"
+description: "Physical labware, Opentrons-verified definitions, and custom labware concepts."
 ---
 
 Labware encompasses more than just the objects placed on the deck and used in a protocol. For the OT-2, labware includes:

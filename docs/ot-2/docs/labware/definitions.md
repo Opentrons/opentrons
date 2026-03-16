@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2: Labware Definitions"
+description: "Labware definitions, Custom Labware Creator, and JSON schema for custom labware."
 ---
 
 Every piece of labware you use on an OT-2 requires a _labware definition_. Each definition contains all the information your robot needs to work with a piece of labware. This includes information about the physical shape of the labware, what pipettes can interact with it, and what the labware should be called in the Opentrons App. The OT-2 robot software and the Opentrons App include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/).

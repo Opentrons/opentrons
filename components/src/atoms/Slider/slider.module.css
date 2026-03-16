@@ -24,8 +24,8 @@
     to right,
     var(--blue-50) 0%,
     var(--blue-50) var(--value-percent),
-    var(--blue-20) var(--value-percent),
-    var(--blue-20) 100%
+    var(--slider-unfilled, var(--blue-20)) var(--value-percent),
+    var(--slider-unfilled, var(--blue-20)) 100%
   );
   cursor: pointer;
 }
