@@ -58,7 +58,7 @@ def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
             assert name not in pyro_object_members
 
 
-def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
+async def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
     """Test the daemon utility using a nameserver against client requests."""
     sock = socket.socket()
     sock.bind(("localhost", 0))
@@ -90,7 +90,19 @@ def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     # Client-side requests below
     register_hardware_types()
-    uri = pyro.resolve(uri="PYRONAME:OT3API", delay_time=5)
+    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    ns = pyro.locate_ns()
+
+    retries_counter = 0
+    while ns.count() < 2:
+        # Wait and try again, the resource isnt registered yet
+        await asyncio.sleep(0.01)
+        retries_counter += 1
+        if retries_counter > 10:
+            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
+    uri = pyro.resolve(uri="PYRONAME:OT3API")
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
 
     # Access property, method and async method, assert expected response between client and server
