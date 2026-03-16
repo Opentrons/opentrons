@@ -121,6 +121,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             LOG.info("Creating secure volume: made secure volume image")
         await self._load_key()
         await self._loopback_setup()
+        await self._map()
         mkfs = await asyncio.create_subprocess_exec(
             "/usr/sbin/mkfs.ext4",
             f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}",
@@ -133,6 +134,13 @@ class CAAMSecureVolume(SecureVolumeManager):
             )
         else:
             LOG.info("Creating secure volume: made fs on encrypted volume")
+        LOG.info("Creating secure volume: unmapping device-mapper")
+        await self._unmap()
+        LOG.info("Creating secure volume: removing loopback")
+        await self._loopback_remove()
+        LOG.info("Creating secure volume: unloading key")
+        await self._unload_key()
+        LOG.info("Creating secure volume: done")
 
     async def _load_key(self) -> None:
         """Load the CAAM key from its state at boot - an encrypted, tagged blob - to the kernel key retention service.
@@ -196,6 +204,11 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         if await losetup.wait() != 0:
             LOG.error(f"losetup failed: {_stringify_process(losetup)}")
+        else:
+            LOG.info("Set up loopback device")
+
+    async def _map(self) -> None:
+        """Set up a device-mapper map for the loopback."""
         losetup_device = await self._find_loopback_device()
         LOG.info(f"Using loopback device for secure volume image at {losetup_device}")
         # this lovely magic string is a dmsetup table entry. in order the fields are
@@ -210,7 +223,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         # - optional parameter count (1)
         # - the optional parameter of the encryption sector size (512)
         SECTOR_SIZE_B = 512
-        dmsetup_table = f"0 {self._volume_size_mb * 1024 * 1024 // SECTOR_SIZE_B} crypt capi:tk(cbc(aes))-plain :36:logon:{self._keyname()} 0 {losetup_device} 0 1 sector_size:{SECTOR_SIZE_B}"
+        dmsetup_table = f"0 {self._volume_size_mb * 1024 * 1024 // SECTOR_SIZE_B} crypt capi:tk(cbc(aes))-plain :56:logon:{self._keyname()} 0 {losetup_device} 0 1 sector_size:{SECTOR_SIZE_B}"
         dmsetup = await asyncio.create_subprocess_exec(
             "/usr/sbin/dmsetup",
             "create",
@@ -221,9 +234,11 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         if await dmsetup.wait() != 0:
-            LOG.error(f"dmsetup failed: {await _stringify_process(dmsetup)}")
+            LOG.error(
+                f"dmsetup failed with table {dmsetup_table}: {await _stringify_process(dmsetup)}"
+            )
         else:
-            LOG.info("Diskmapper bind created")
+            LOG.info("device-mapper map created")
 
     async def _mount(self) -> None:
         """Mount a created loopback device."""
@@ -282,6 +297,35 @@ class CAAMSecureVolume(SecureVolumeManager):
         else:
             LOG.info("Removed diskmapper bind")
 
+    async def _loopback_remove(self) -> None:
+        """Remove a loopback bind."""
+        loopback_device = await self._find_loopback_device()
+        losetup_remove = await asyncio.create_subprocess_exec(
+            "/usr/sbin/losetup", "-d", loopback_device, stdout=PIPE, stderr=PIPE
+        )
+        if (await losetup_remove.wait()) != 0:
+            LOG.error(f"losetup remove failed: {_stringify_process(losetup_remove)}")
+        else:
+            LOG.info(f"Removed loopback device {loopback_device}")
+
+    async def _unload_key(self) -> None:
+        """Unload a key from KKRS."""
+        # the only way to delete a key from KKRS, as far as I'm aware, is to set a short timeout and then...
+        # wait for a timeout
+        timeout = await asyncio.create_subprocess_exec(
+            "/usr/bin/keyctl",
+            "timeout",
+            str(self._keyid),
+            "1",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        self._keyid = 0
+        if await timeout.wait() != 0:
+            LOG.warning(f"key timeout failed: {await _stringify_process(timeout)}")
+        else:
+            LOG.info("set key timeout from kkrs")
+
     async def _find_loopback_device(self) -> str:
         losetup_list = await asyncio.create_subprocess_exec(
             "/usr/sbin/losetup",
@@ -317,6 +361,8 @@ class CAAMSecureVolume(SecureVolumeManager):
         await self._load_key()
         LOG.info("Mounting secure volume: setting up loopback device")
         await self._loopback_setup()
+        LOG.info("Mounting secure volume: creating device-map")
+        await self._map()
         LOG.info("Mounting secure volume: mounting loopback device")
         await self._mount()
         self._path = self._image_mount_point
@@ -330,19 +376,10 @@ class CAAMSecureVolume(SecureVolumeManager):
         await self._unmount()
         LOG.info("Unmounting secure volume: unmapping disk mapper")
         await self._unmap()
+        LOG.info("Unmounting secure volume: removing loopback device")
+        await self._loopback_remove()
         LOG.info("Unmounting secure volume: timing out key from KKRS")
-        # the only way to delete a key from KKRS, as far as I'm aware, is to set a short timeout and then...
-        # wait for a timeout
-        timeout = await asyncio.create_subprocess_exec(
-            "/usr/bin/keyctl",
-            "timeout",
-            str(self._keyid),
-            "1",
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        if await timeout.wait() != 0:
-            LOG.warning(f"key timeout failed: {await _stringify_process(timeout)}")
+        await self._unload_key()
         LOG.info("Unmounting secure volume: complete")
 
     async def destroy(self) -> None:

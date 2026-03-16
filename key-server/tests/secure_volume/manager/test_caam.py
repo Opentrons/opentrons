@@ -133,7 +133,6 @@ async def rehearse_losetup(
     decoy: Decoy,
     mock_asyncio_subprocess: AsyncioCSE,
     mock_image_path: Path,
-    mock_keyfile: Path,
     subject: CAAMSecureVolume,
 ) -> None:
     decoy.when(
@@ -141,6 +140,67 @@ async def rehearse_losetup(
             "/usr/sbin/losetup", "-f", "mock image path", stdout=PIPE, stderr=PIPE
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+async def rehearse_map(
+    decoy: Decoy, mock_asyncio_subprocess: AsyncioCSE, subject: CAAMSecureVolume
+) -> None:
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/losetup", "--list", "--json", stdout=PIPE, stderr=PIPE
+        )
+    ).then_return(
+        await build_subproc_result(
+            decoy,
+            0,
+            json.dumps(
+                {
+                    "loopdevices": [
+                        {"back-file": "mock image path", "name": "mock loopback"}
+                    ]
+                }
+            ),
+            "",
+        )
+    )
+
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/dmsetup",
+            "create",
+            "ot-secure-storage",
+            "--table",
+            f"0 131072 crypt capi:tk(cbc(aes))-plain :56:logon:ot-secure-storage:{id(subject)} 0 mock loopback 0 1 sector_size:512",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+async def rehearse_unmap(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+) -> None:
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/sbin/dmsetup",
+            "remove",
+            "--force",
+            "--retry",
+            "ot-secure-storage",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+async def rehearse_losetup_teardown(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+) -> None:
     decoy.when(
         await mock_asyncio_subprocess(
             "/usr/sbin/losetup", "--list", "--json", stdout=PIPE, stderr=PIPE
@@ -161,11 +221,26 @@ async def rehearse_losetup(
     )
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/sbin/dmsetup",
-            "create",
-            "ot-secure-storage",
-            "--table",
-            f"0 131072 crypt capi:tk(cbc(aes))-plain :36:logon:ot-secure-storage:{id(subject)} 0 mock loopback 0 1 sector_size:512",
+            "/usr/sbin/losetup", "-d", "mock loopback", stdout=PIPE, stderr=PIPE
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+async def rehearse_remove_key(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_image_path: Path,
+    mock_keyfile: Path,
+    subject: CAAMSecureVolume,
+) -> None:
+    """Fixture for removing a key from KKRS. Gives the key ID."""
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/keyctl",
+            "timeout",
+            "1234",
+            "1",
             stdout=PIPE,
             stderr=PIPE,
         )
@@ -219,7 +294,11 @@ async def test_create_happypath_with_clears(
     monkeypatch: Any,
     subject: CAAMSecureVolume,
     rehearse_load_key: str,
-    rehearse_losetup: str,
+    rehearse_losetup: None,
+    rehearse_map: None,
+    rehearse_unmap: None,
+    rehearse_losetup_teardown: None,
+    rehearse_remove_key: None,
     mock_keyfile: Path,
 ) -> None:
     """It should create the image and remove previous keys."""
@@ -271,6 +350,7 @@ async def test_mount_happypath_when_created(
     mock_image_path: Path,
     monkeypatch: Any,
     rehearse_load_key: str,
+    rehearse_map: None,
     rehearse_losetup: None,
     subject: CAAMSecureVolume,
 ) -> None:
@@ -305,6 +385,10 @@ async def test_mount_creates_if_necessary(
     monkeypatch: Any,
     rehearse_load_key: str,
     rehearse_losetup: None,
+    rehearse_map: None,
+    rehearse_unmap: None,
+    rehearse_losetup_teardown: None,
+    rehearse_remove_key: None,
     subject: CAAMSecureVolume,
 ) -> None:
     """It should call create() if necessary."""
