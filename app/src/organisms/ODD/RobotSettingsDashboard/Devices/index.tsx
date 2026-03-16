@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { RobotInfoLabel, StyledText } from '@opentrons/components'
 
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -66,11 +66,7 @@ export function Devices({
                     {row.device}
                   </StyledText>
                   <div className={styles.location_cell}>
-                    <div className={styles.location_pill}>
-                      <StyledText oddStyle="bodyTextSemiBold">
-                        {row.location}
-                      </StyledText>
-                    </div>
+                    <RobotInfoLabel deckLabel={row.location} />
                   </div>
                 </div>
               ))}
