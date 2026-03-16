@@ -1,18 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, cast
-
-from opentrons_shared_data.labware.types import (
-    CircularWellDefinition2 as CircularWellDefinition,
-)
-from opentrons_shared_data.labware.types import (
-    RectangularWellDefinition2 as RectangularWellDefinition,
-)
-from opentrons_shared_data.labware.types import (
-    WellDefinition2 as WellDefinition,
-)
+from typing import Optional, cast, TYPE_CHECKING
 
 from opentrons.types import Point
+from opentrons_shared_data.labware.types import (
+    WellDefinition2 as WellDefinition,
+    CircularWellDefinition2 as CircularWellDefinition,
+    RectangularWellDefinition2 as RectangularWellDefinition,
+)
 
 if TYPE_CHECKING:
     from .legacy_labware_core import LegacyLabwareCore

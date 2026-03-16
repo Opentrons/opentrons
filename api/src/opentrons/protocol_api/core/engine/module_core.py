@@ -1,57 +1,58 @@
 """Protocol API module implementation logic."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, overload
+from typing import Optional, List, Dict, Union, Sequence, TYPE_CHECKING, overload
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
-from ... import validation
-from ..module import (
-    AbstractAbsorbanceReaderCore,
-    AbstractFlexStackerCore,
-    AbstractHeaterShakerCore,
-    AbstractMagneticBlockCore,
-    AbstractMagneticModuleCore,
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractThermocyclerCore,
-    AbstractVacuumModuleCore,
+from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    TemperatureStatus,
+    MagneticStatus,
+    SpeedStatus,
+    module_model_from_string,
 )
-from . import load_labware_params
-from .exceptions import InvalidMagnetEngageHeightError
-from .labware import LabwareCore
-from .tasks import EngineTaskCore
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control import modules as hw_modules
-from opentrons.hardware_control.modules.types import (
-    MagneticStatus,
-    ModuleModel,
-    SpeedStatus,
-    TemperatureStatus,
-    module_model_from_string,
-)
+
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors.exceptions import (
-    CannotPerformModuleAction,
-    FlexStackerLabwarePoolNotYetDefinedError,
-    LabwareNotLoadedOnModuleError,
-    NoMagnetEngageHeightError,
-)
 from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     StackerFillEmptyStrategy,
-    StackerLabwareMovementStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.types import DeckSlotName
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+    CannotPerformModuleAction,
+    FlexStackerLabwarePoolNotYetDefinedError,
+)
+
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+
+from ... import validation
+from ..module import (
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+    AbstractThermocyclerCore,
+    AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
+    AbstractFlexStackerCore,
+)
+from .exceptions import InvalidMagnetEngageHeightError
+
+from .labware import LabwareCore
+from .tasks import EngineTaskCore
+from . import load_labware_params
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -180,8 +181,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         result = self._engine_client.execute_command_without_recovery(
             cmd.temperature_module.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         temperature_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -196,15 +196,13 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         self._engine_client.execute_command(
             cmd.temperature_module.WaitForTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def deactivate(self) -> None:
         """Deactivate the Temperature Module."""
         self._engine_client.execute_command(
-            cmd.temperature_module.DeactivateTemperatureParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.temperature_module.DeactivateTemperatureParams(moduleId=self.module_id)
         )
 
     def get_current_temperature(self) -> float:
@@ -240,18 +238,17 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         # This core will only be used in apiLevels >=2.14, where
         # MagneticModuleContext.engage(height=...) is no longer available.
         # So these asserts should always pass.
-        assert height_from_home is None, (
-            "Expected engage height to be specified from base."
-        )
-        assert height_from_base is not None, (
-            "Expected engage height to be specified from base."
-        )
+        assert (
+            height_from_home is None
+        ), "Expected engage height to be specified from base."
+        assert (
+            height_from_base is not None
+        ), "Expected engage height to be specified from base."
 
         self._engine_client.execute_command(
             cmd.magnetic_module.EngageParams(
                 moduleId=self._module_id, height=height_from_base
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def engage_to_labware(
@@ -287,15 +284,13 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.magnetic_module.EngageParams(
                 moduleId=self.module_id, height=default_height
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
         self._engine_client.execute_command(
-            cmd.magnetic_module.DisengageParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.magnetic_module.DisengageParams(moduleId=self.module_id)
         )
 
     def get_status(self) -> MagneticStatus:
@@ -313,16 +308,14 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
         self._engine_client.execute_command(
-            cmd.thermocycler.OpenLidParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.OpenLidParams(moduleId=self.module_id)
         )
         return ThermocyclerLidStatus.OPEN
 
     def close_lid(self) -> ThermocyclerLidStatus:
         """Close the Thermocycler's lid."""
         self._engine_client.execute_command(
-            cmd.thermocycler.CloseLidParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.CloseLidParams(moduleId=self.module_id)
         )
         return ThermocyclerLidStatus.CLOSED
 
@@ -341,8 +334,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 blockMaxVolumeUl=block_max_volume,
                 holdTimeSeconds=hold_time_seconds,
                 ramp_rate=ramp_rate,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def start_set_target_block_temperature(
@@ -358,8 +350,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
                 ramp_rate=ramp_rate,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         block_temperature_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -369,8 +360,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
         self._engine_client.execute_command(
-            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id)
         )
 
     def set_target_lid_temperature(self, celsius: float) -> None:
@@ -378,8 +368,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def start_set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
@@ -387,8 +376,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         result = self._engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         lid_temperature_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -398,8 +386,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
         self._engine_client.execute_command(
-            cmd.thermocycler.WaitForLidTemperatureParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.WaitForLidTemperatureParams(moduleId=self.module_id)
         )
 
     def _execute_profile_pre_221(
@@ -423,8 +410,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 moduleId=self.module_id,
                 profile=repeated_engine_steps,
                 blockMaxVolumeUl=block_max_volume,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def _execute_profile_post_221(
@@ -454,8 +440,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 moduleId=self.module_id,
                 profileElements=engine_steps,
                 blockMaxVolumeUl=block_max_volume,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def execute_profile(
@@ -501,8 +486,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 moduleId=self.module_id,
                 profileElements=engine_steps,
                 blockMaxVolumeUl=block_max_volume,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         start_execute_profile_result = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -512,16 +496,14 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
         self._engine_client.execute_command(
-            cmd.thermocycler.DeactivateLidParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.DeactivateLidParams(moduleId=self.module_id)
         )
 
     def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
         self._clear_cycle_counters()
         self._engine_client.execute_command(
-            cmd.thermocycler.DeactivateBlockParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.thermocycler.DeactivateBlockParams(moduleId=self.module_id)
         )
 
     def deactivate(self) -> None:
@@ -607,8 +589,7 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
         result = self._engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         temperature_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -618,8 +599,7 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
         self._engine_client.execute_command(
-            cmd.heater_shaker.WaitForTemperatureParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.WaitForTemperatureParams(moduleId=self.module_id)
         )
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
@@ -627,15 +607,13 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
                 moduleId=self.module_id, rpm=rpm
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def set_shake_speed(self, rpm: int) -> EngineTaskCore:
         """Set the shaker's target shake speed and wait for it to spin up."""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.heater_shaker.SetShakeSpeedParams(moduleId=self.module_id, rpm=rpm),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId=self.module_id, rpm=rpm)
         )
         shake_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.taskId
@@ -645,29 +623,25 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
         self._engine_client.execute_command(
-            cmd.heater_shaker.OpenLabwareLatchParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.OpenLabwareLatchParams(moduleId=self.module_id)
         )
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
         self._engine_client.execute_command(
-            cmd.heater_shaker.CloseLabwareLatchParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.CloseLabwareLatchParams(moduleId=self.module_id)
         )
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
         self._engine_client.execute_command(
-            cmd.heater_shaker.DeactivateShakerParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.DeactivateShakerParams(moduleId=self.module_id)
         )
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
         self._engine_client.execute_command(
-            cmd.heater_shaker.DeactivateHeaterParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
+            cmd.heater_shaker.DeactivateHeaterParams(moduleId=self.module_id)
         )
 
     def get_current_temperature(self) -> float:
@@ -762,7 +736,6 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore[LabwareCore]
                 sampleWavelengths=wavelengths,
                 referenceWavelength=reference_wavelength,
             ),
-            command_annotations=self._protocol_core.annotation_ids,
         )
         self._initialized_value = wavelengths
 
@@ -779,8 +752,7 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore[LabwareCore]
             self._engine_client.execute_command(
                 cmd.absorbance_reader.ReadAbsorbanceParams(
                     moduleId=self.module_id, fileName=filename
-                ),
-                command_annotations=self._protocol_core.annotation_ids,
+                )
             )
         if not self._engine_client.state.config.use_virtual_modules:
             read_result = (
@@ -812,8 +784,7 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore[LabwareCore]
         self._engine_client.execute_command(
             cmd.absorbance_reader.CloseLidParams(
                 moduleId=self.module_id,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         self._ready_to_initialize = True
 
@@ -822,8 +793,7 @@ class AbsorbanceReaderCore(ModuleCore, AbstractAbsorbanceReaderCore[LabwareCore]
         self._engine_client.execute_command(
             cmd.absorbance_reader.OpenLidParams(
                 moduleId=self.module_id,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def is_lid_on(self) -> bool:
@@ -854,8 +824,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.flex_stacker.RetrieveParams(
                 moduleId=self.module_id,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
         base = self._protocol_core.get_labware_on_module(self)
         assert base, "Retrieve failed to provide a labware"
@@ -871,8 +840,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
             cmd.flex_stacker.StoreParams(
                 moduleId=self.module_id,
                 strategy=StackerLabwareMovementStrategy.AUTOMATIC,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def fill(self, count: int | None, message: str | None) -> None:
@@ -883,8 +851,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
                 message=message,
                 count=count,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def _core_groups_from_primary_core(self, labware: LabwareCore) -> _CoreTrio:
@@ -921,8 +888,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 message=message,
                 labwareToStore=groups,
                 count=None,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def empty(self, message: str | None) -> None:
@@ -933,8 +899,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
                 message=message,
                 count=0,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def get_max_storable_labware(self) -> int:
@@ -1034,10 +999,12 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     @overload
     def _ssld_from_core(
         self, core: LabwareCore
-    ) -> cmd.flex_stacker.StackerStoredLabwareDetails: ...
+    ) -> cmd.flex_stacker.StackerStoredLabwareDetails:
+        ...
 
     @overload
-    def _ssld_from_core(self, core: None) -> None: ...
+    def _ssld_from_core(self, core: None) -> None:
+        ...
 
     def _ssld_from_core(
         self, core: LabwareCore | None
@@ -1075,8 +1042,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 lidLabware=self._ssld_from_core(core_groups[0].lid),
                 adapterLabware=self._ssld_from_core(core_groups[0].adapter),
                 poolOverlapOverride=stacking_offset_z,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def set_stored_labware(
@@ -1148,12 +1114,5 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 lidLabware=lid_labware,
                 adapterLabware=adapter_labware,
                 poolOverlapOverride=stacking_offset_z,
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
-
-
-class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
-    """Vacuum Module core logic implementation for Python protocols."""
-
-    _sync_module_hardware: SynchronousAdapter[hw_modules.VacuumModule]

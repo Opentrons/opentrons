@@ -1,5 +1,4 @@
 """Well grid information."""
-
 import collections
 from dataclasses import dataclass
 from typing import Dict, List
@@ -32,9 +31,9 @@ def create(columns: List[List[str]]) -> WellGrid:
         for well_name in column:
             well_name_match = WELL_NAME_PATTERN.match(well_name)
 
-            assert well_name_match is not None, (
-                "Well name did not match required pattern; please check labware definition."
-            )
+            assert (
+                well_name_match is not None
+            ), "Well name did not match required pattern; please check labware definition."
 
             row_name, column_name = well_name_match.group(1, 2)
             rows_by_name[row_name].append(well_name)

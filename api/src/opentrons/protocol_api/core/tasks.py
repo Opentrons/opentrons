@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 from datetime import datetime
 from typing import TypeVar
 
