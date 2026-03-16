@@ -26,22 +26,20 @@ export function Devices({
 }: DevicesProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   // ToDo replace dummy data with the actual data
-  // const dummyDeviceRows = [
-  //   {
-  //     device: 'External keyboard',
-  //     location: 'USB-1',
-  //   },
-  //   {
-  //     device: 'USB drive',
-  //     location: 'USB-1',
-  //   },
-  //   {
-  //     device: 'Rear panel',
-  //     location: 'INTERNAL',
-  //   },
-  // ] as const
-
-  const dummyDeviceRows: DeviceInformation[] = []
+  const dummyDeviceRows = [
+    {
+      device: 'External keyboard',
+      location: 'USB-1',
+    },
+    {
+      device: 'USB drive',
+      location: 'USB-2',
+    },
+    {
+      device: 'Rear panel',
+      location: 'INTERNAL',
+    },
+  ] as const
 
   return (
     <div className={styles.devices_contaienr}>
