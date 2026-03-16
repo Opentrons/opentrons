@@ -183,20 +183,18 @@ def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
     -------
     .. code-block::
     >>> from Pyro5 import api as pyro
-    >>> # ... This example assumes instances of OT3API and Thermocycler ...
+    >>> # ... This example assumes an instance of OT3API ...
     >>> pyro_ot3api = PyroSynchronousObject(ot3api)
-    >>> pyro_thermocycler = PyroSynchronousObject(thermocycler_attached_module)
     >>> # Serve to clients
     >>> pyro.serve({"OT3API" : pyro_ot3api})
-    >>> pyro.serve({"THERMOCYCLER" : pyro_thermocycler})
 
     Client-side Example
     -------
     .. code-block::
     >>> ot3_proxy_uri = pyro.resolve("PYRONAME:OT3API")
     >>> ot3_proxy = pyro.Proxy(ot3_proxy_uri)
-    >>> thermocycler_proxy_uri = pyro.resolve("PYRONAME:THERMOCYCLER")
-    >>> thermocycler_proxy = pyro.Proxy(thermocycler_proxy_uri)
+    >>> # Attributes with a pyro_behavior that forwards proxies will return usable ones immediately
+    >>> thermocycler_proxy = ot3_proxy.attached_modules[0]
     >>> # The proxy object can now call the original instance running on the server-process
     >>> ot3_proxy.home()
     >>> thermocycler_proxy.open_lid()
@@ -215,12 +213,12 @@ def _build_classdict(  # noqa: C901
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_behavior = _get_specialty_behavior(attr, name)
-            # Handle core object modifications
+            # Handle Core Object modifications
             if (
                 specialty_behavior is not None
                 and specialty_behavior.apply_local is True
             ):
-                # If the `core_obj` contains a weakref then it is actually a wrapped instance, like a CallerBridge or a ThreadManager
+                # If the `core_obj` contains a weakref then use the inner instance, like a Module inside a CallerBridge
                 try:
                     # Grab the inner instance of the core object to modify
                     local_obj = core_obj.__weakref__()
@@ -276,7 +274,7 @@ def _build_classdict(  # noqa: C901
                 yield (name, exposed)
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
-        # If the `core_obj` contains a weakref then it is actually a wrapped instance, for tracking we yield the inner instance
+        # If the `core_obj` contains a weakref then for tracking we yield the inner instance
         yield ("_core_obj", core_obj.__weakref__())
     except TypeError:
         yield ("_core_obj", core_obj)
@@ -289,7 +287,6 @@ def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
         if hasattr(func, "_pyro_specialty_behavior"):
             return func._pyro_specialty_behavior  # type: ignore
-            # return (func._pyro_specialty_func, func._pyro_apply_local)
     elif isinstance(func, property):
         if hasattr(func.fget, "_pyro_specialty_behavior"):
             return func.fget._pyro_specialty_behavior  # type: ignore
