@@ -98,7 +98,7 @@ async def rehearse_load_key(
             "/usr/bin/caam-keygen",
             "import",
             "mock keyblob path",
-            "mock key",
+            "ot-secure-storage-key",
         )
     ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
     decoy.when(mock_image_path.exists()).then_return(True)

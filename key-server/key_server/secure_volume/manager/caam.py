@@ -112,7 +112,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             "/usr/bin/caam-keygen",
             "import",
             str(self._keyblob()),
-            str(self._base_directory / self.SECURE_STORAGE_KEY_NAME),
+            str(self.SECURE_STORAGE_KEY_NAME)
         )
         if await import_key.wait() != 0:
             LOG.error(
