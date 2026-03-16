@@ -17,21 +17,24 @@ import {
 
 import {
   maskToSignedDecimal,
-  maskToTimeWithPlaceholders,
+  maskToTimeMMSS,
 } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import { PROFILE_STEP } from './constants'
 import { PresavedVacuumHeader } from './PresavedVacuumHeader'
-import { getStepErrors } from './utils'
+import { getFormattedTime, getStepErrors } from './utils'
 import styles from './vacuumprofile.module.css'
 
-import type { VacuumProfileStep } from '/protocol-designer/form-types'
-import type { VacuumPumpData, VacuumStepBaseProps } from './types'
+import type {
+  VacuumPumpData,
+  VacuumStepBaseProps,
+  VacuumStepData,
+} from './types'
 
 export interface PresavedVacuumStepProps extends VacuumStepBaseProps {
-  onStepChange: (stepId: string, patch: Partial<VacuumProfileStep>) => void
+  onStepChange: (stepId: string, patch: Partial<VacuumStepData>) => void
   /** Not required when nested, since save behavior is handled by parent cycle */
-  onSaveSuccess?: (stepData: VacuumProfileStep) => void
+  onSaveSuccess?: (stepData: VacuumStepData) => void
   /** When true, show validation errors on this step (e.g. when cycle Save is blocked). */
   forceShowErrors?: boolean
 }
@@ -52,10 +55,10 @@ export function PresavedVacuumStep(
   const [showErrors, setShowErrors] = useState<boolean>(false)
   const { t } = useTranslation('protocol_steps')
 
-  const { title, pumpData, time } = stepData
+  const { name, time, pumpData } = stepData
 
   const updateField = (
-    field: 'title' | 'time' | 'pumpData',
+    field: 'name' | 'time' | 'pumpData',
     value: string | Partial<VacuumPumpData>
   ): void => {
     if (field === 'pumpData') {
@@ -90,7 +93,11 @@ export function PresavedVacuumStep(
       setShowErrors(true)
       return
     }
-    onSaveSuccess?.(stepData)
+    const formattedTime = getFormattedTime(time)
+    onSaveSuccess?.({
+      ...stepData,
+      time: formattedTime,
+    })
   }
 
   return (
@@ -113,14 +120,14 @@ export function PresavedVacuumStep(
           <div className={styles.presaved_vacuum_step_form_row}>
             <div className={styles.flex_fill}>
               <InputField
-                title={t('vacuum.controls.profile.step_title')}
-                value={title}
+                title={t('vacuum.controls.profile.name')}
+                value={name}
                 onChange={e => {
-                  updateField('title', e.currentTarget.value)
+                  updateField('name', e.currentTarget.value)
                 }}
                 error={
-                  showValidationErrors && errors.title
-                    ? t('vacuum.controls.profile.errors.title')
+                  showValidationErrors && errors.name
+                    ? t('vacuum.controls.profile.errors.name')
                     : null
                 }
               />
@@ -164,10 +171,7 @@ export function PresavedVacuumStep(
                 title={t('vacuum.controls.profile.time')}
                 value={time}
                 onChange={e => {
-                  const maskedTime = maskToTimeWithPlaceholders(
-                    e.currentTarget.value,
-                    'mmss'
-                  )
+                  const maskedTime = maskToTimeMMSS(e.currentTarget.value)
                   updateField('time', maskedTime)
                 }}
                 units={t('application:units.time')}

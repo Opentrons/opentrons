@@ -1,66 +1,73 @@
 import type {
-  VacuumPowerData,
-  VacuumPressureData,
-  VacuumProfileCycle,
-  VacuumProfileStep,
-} from '/protocol-designer/form-types'
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+} from '@opentrons/step-generation'
 import type { PROFILE_CYCLE, PROFILE_STEP } from './constants'
+
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  powerPercent: number
+}
 
 export type VacuumPumpData = VacuumPressureData | VacuumPowerData
 
-export interface ProfileItemBaseProps {
-  isPresaved: boolean
+export interface VacuumStepData<T extends VacuumPumpData = VacuumPumpData> {
+  id: string
+  time: string
+  name: string
+  type: typeof PROFILE_STEP
+  pumpData: T
 }
 
-/** Step row props; isPresaved is derived from stepData when stepData is VacuumProfileStepItem. */
 export interface VacuumStepBaseProps {
-  stepData: VacuumProfileStep
+  stepData: VacuumStepData
   displayIndex: string
   onDelete: () => void
   isNested?: boolean
   allowDelete?: boolean
 }
 
-/** Shared props for both saved and presaved cycle components (no isPresaved prop). */
-export interface VacuumCyclePropsBase {
+export interface VacuumCycleBaseProps {
   orderedProfileStepIds: string[]
+  profileStepItemsById: Record<string, ProfileStepItem>
   displayIndex: string
   type: typeof PROFILE_CYCLE
   onDelete: () => void
 }
 
-export interface VacuumCycleBaseProps extends VacuumCyclePropsBase {
-  profileStepItemsById: Record<string, VacuumProfileStep>
+export interface PresavedVacuumCycleSavePayload {
+  orderedProfileStepIds: string[]
+  profileStepItemsById: Record<string, ProfileStepItem>
+  repetitions: number
 }
 
-/** Presaved cycle props: steps are VacuumProfileStepItem (include isPresaved). */
-export interface PresavedVacuumCycleBaseProps extends VacuumCyclePropsBase {
-  profileStepItemsById: Record<string, VacuumProfileStepItem>
+export interface ProfileStepBaseProps {
+  id: string
+  isPresaved: boolean
 }
 
-export interface VacuumProfileStepItem
-  extends VacuumProfileStep, ProfileItemBaseProps {
+export interface ProfileStepItem extends VacuumStepData, ProfileStepBaseProps {
   type: typeof PROFILE_STEP
 }
 
-export interface PresavedVacuumCycleSavePayload {
+export interface ProfileCycleItem extends ProfileStepBaseProps {
+  id: string
+  isPresaved: boolean
   orderedProfileStepIds: string[]
-  profileStepItemsById: Record<string, VacuumProfileStepItem>
-  repetitions: string
-}
-
-export interface VacuumProfileCycleItem
-  extends VacuumProfileCycle, ProfileItemBaseProps {
-  orderedProfileStepIds: string[]
-  profileStepItemsById: Record<string, VacuumProfileStepItem>
-  repetitions: string
+  profileStepItemsById: Record<string, ProfileStepItem>
+  repetitions: number
   type: typeof PROFILE_CYCLE
 }
 
-export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
+export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
 export interface VacuumStepErrors {
-  title: boolean
+  name: boolean
   time: boolean
   pumpData: boolean
 }
