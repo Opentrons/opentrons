@@ -1,0 +1,52 @@
+from pathlib import Path
+from typing import Generator
+
+import pytest
+
+from auth_server.persistence.database import create_schema, sql_engine_ctx
+from auth_server.settings.settings_data_manager import SettingsDataManager
+from auth_server.settings.store import SettingsStore
+from auth_server.users.models import AccountType
+
+
+@pytest.fixture()
+def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
+    """Provide a UserStore backed by a fresh SQLite DB with seed users."""
+    db_path = tmp_path / "test_auth.db"
+    with sql_engine_ctx(db_path) as engine:
+        create_schema(engine)
+        store = SettingsStore(sql_engine=engine)
+        # service = SettingsDataManager(settings_store=store)
+        yield store
+
+
+def test_add_and_get_settings(settings_store: SettingsStore) -> None:
+    """add should persist the user so get can find it."""
+    settings_store.add(
+        access_control_enabled=True,
+        max_number_of_login_attempts=10,
+        password_reset_time_in_days=30,
+        idle_lockout_in_minutes=300,
+        require_admin_creds_when_updating_robot_software=True,
+        require_admin_creds_when_sending_protocol_to_robot=True,
+        require_admin_creds_for_signoff_protocol=False,
+        require_signoff_for_protocol_log=True,
+        require_reason_for_interaction=True,
+        min_length_of_reason_for_interaction=10,
+        require_logs_to_be_saved_in_app=True,
+        delete_over_max_on_disk_protocols=True,
+    )
+    fetched = settings_store.get()
+    assert fetched is not None
+    assert fetched.access_control_enabled == True
+    assert fetched.max_number_of_login_attempts == 10
+    assert fetched.password_reset_time_in_days == 30
+    assert fetched.idle_lockout_in_minutes == 300
+    assert fetched.require_admin_creds_when_updating_robot_software == True
+    assert fetched.require_admin_creds_when_sending_protocol_to_robot == True
+    assert fetched.require_admin_creds_for_signoff_protocol == False
+    assert fetched.require_signoff_for_protocol_log == True
+    assert fetched.require_reason_for_interaction == True
+    assert fetched.min_length_of_reason_for_interaction == 10
+    assert fetched.require_logs_to_be_saved_in_app == True
+    assert fetched.delete_over_max_on_disk_protocols == True

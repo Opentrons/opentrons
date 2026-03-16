@@ -4,6 +4,7 @@ from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
 from .models import PatchSettingsRequestData
+from auth_server.persistence.orm_models import Settings
 
 
 class SettingsStore:
@@ -20,31 +21,50 @@ class SettingsStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    def get(self) -> None:
+    def get(self) -> Settings | None:
         """Look up a setting by username. Returns the Setting or None."""
-        # with self._session() as session:
-        #     user = session.query(User).filter(User.username == username).first()
-        #     if user is not None:
-        #         session.expunge(user)
-        #     return user
+        with self._session() as session:
+            settings = session.query(Settings).first()
+            if settings is not None:
+                session.expunge(settings)
+            return settings
 
     def add(
         self,
-        username: str,
-    ) -> None:
+        access_control_enabled: bool,
+        max_number_of_login_attempts: int,
+        password_reset_time_in_days: int,
+        idle_lockout_in_minutes: int,
+        require_admin_creds_when_updating_robot_software: bool,
+        require_admin_creds_when_sending_protocol_to_robot: bool,
+        require_admin_creds_for_signoff_protocol: bool,
+        require_signoff_for_protocol_log: bool,
+        require_reason_for_interaction: bool,
+        min_length_of_reason_for_interaction: int,
+        require_logs_to_be_saved_in_app: bool,
+        delete_over_max_on_disk_protocols: bool,
+    ) -> Settings:
         """Create a user's settings, persist it, and return it."""
-        pass  # TODO: Implement
-        # new_user = User(
-        #     username=username,
-        #     hashed_password=hashed_password,
-        #     full_name=full_name,
-        #     account_type=AccountType(account_type),
-        # )
-        # with self._session() as session:
-        #     session.add(new_user)
-        #     session.commit()
-        #     session.expunge(new_user)
-        # return new_user
+        # should the defaults exist in the pydantic or the db?
+        new_settings = Settings(
+            access_control_enabled=access_control_enabled,
+            max_number_of_login_attempts=max_number_of_login_attempts,
+            password_reset_time_in_days=password_reset_time_in_days,
+            idle_lockout_in_minutes=idle_lockout_in_minutes,
+            require_admin_creds_when_updating_robot_software=require_admin_creds_when_updating_robot_software,
+            require_admin_creds_when_sending_protocol_to_robot=require_admin_creds_when_sending_protocol_to_robot,
+            require_admin_creds_for_signoff_protocol=require_admin_creds_for_signoff_protocol,
+            require_signoff_for_protocol_log=require_signoff_for_protocol_log,
+            require_reason_for_interaction=require_reason_for_interaction,
+            min_length_of_reason_for_interaction=min_length_of_reason_for_interaction,
+            require_logs_to_be_saved_in_app=require_logs_to_be_saved_in_app,
+            delete_over_max_on_disk_protocols=delete_over_max_on_disk_protocols,
+        )
+        with self._session() as session:
+            session.add(new_settings)
+            session.commit()
+            session.expunge(new_settings)
+        return new_settings
 
     def reset(self) -> None:
         """Reset the settings to their defaults.
