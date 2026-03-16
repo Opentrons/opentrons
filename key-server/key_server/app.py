@@ -1,5 +1,6 @@
 """The server's ASGI app object."""
 
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -7,6 +8,7 @@ from fastapi import FastAPI
 
 from server_utils import systemd_utils
 
+from key_server.logging_config import configure_logging
 from key_server.secure_volume.dependency import (
     build_secure_volume_manager,
     install_secure_volume_manager,
@@ -17,6 +19,10 @@ from key_server.settings.store import SettingsStore, install_settings_store
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    try:
+        configure_logging(logging.INFO)
+    except BaseException as be:
+        print(f'Logging configuration failed: {be}')
     settings_store = SettingsStore()
     install_settings_store(app.state, settings_store)
     secure_volume_manager = build_secure_volume_manager(settings_store)
