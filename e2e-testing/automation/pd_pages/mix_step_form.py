@@ -84,23 +84,34 @@ class MixStepForm(BasePage):
         print(f"Selecting tiprack option: {option_text}")
         self._select_dropdown_option("Tiprack", option_text)
 
-    def open_well_selector(self) -> None:
+    def open_nozzle_and_well_selector(self) -> None:
         """Open the well selector modal."""
 
-        self.page.locator('[name="wells"]').first.click()
+        self.page.get_by_test_id("nozzle_and_well_modal").click()
 
-    def expect_well_selector_modal(self) -> None:
-        """Verify the well selector modal content is present."""
-
+    def select_nozzles(self) -> None:
         modal = self._modal_area()
-        self.wait_for_visible(modal.get_by_text("Select wells", exact=False).first)
-        self.wait_for_visible(modal.get_by_role("button", name="Save"))
+        self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
+        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
+        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.get_by_role("button", name="Continue").click()
+
+    def expect_well_modal(self) -> None:
+        modal = self._modal_area()
+        self.wait_for_visible(
+            modal.get_by_text(
+                "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
+            ).first
+        )
+        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
 
     def select_wells(self, wells: Iterable[str]) -> None:
         """Select each well in the provided iterable."""
 
         for well in wells:
-            self.page.locator(f'circle[data-wellname="{well}"]').click()
+            self.page.locator(f"#{well}").click()
+        modal = self._modal_area()
+        modal.get_by_role("button", name="Continue").click()
 
     def save_modal(self) -> None:
         """Click the Save button within the currently open modal."""

@@ -362,6 +362,12 @@
     "value": null,
     "tooltipContent": "Partial pickup requires a tip rack directly on the deck. Full rack pickup requires the Flex 96 Tip Rack Adapter."
   },
+  "primaryNozzle": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "primaryNozzle",
+    "value": "A1"
+  },
   "path": {
     "disabled": false,
     "errorToShow": null,
