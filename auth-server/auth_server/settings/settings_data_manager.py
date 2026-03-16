@@ -23,17 +23,17 @@ class SettingsDataManager:
 
     def get(self) -> SettingsResponseData:
         """Get the current settings."""
-        return self._settings_store.get(username="username") or _DEFAULT_SETTINGS
+        return self._settings_store.get() or _DEFAULT_SETTINGS
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
-        self._settings_store.update(username="username", settings=patch)
-        return self._settings_store.get(username="username")
+        self._settings_store.update(settings=patch)
+        return self._settings_store.get()
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
-        self._settings_store.reset(username="username")
-        return self._settings_store.get(username="username")
+        self._settings_store.reset()
+        return self._settings_store.get()
 
 
 _accessor = AppStateAccessor[SettingsDataManager]("settings_data_manager")

@@ -33,8 +33,7 @@ def test_patch_settings(
     )
     decoy.verify(
         mock_store.update(
-            username="username",
-            settings=PatchSettingsRequestData(accessControlEnabled=True),
+            PatchSettingsRequestData(accessControlEnabled=True),
         )
     )
 
@@ -49,7 +48,6 @@ def test_create_will_not_duplicate_settings(
     )
     decoy.verify(
         mock_store.update(
-            username="username",
             settings=PatchSettingsRequestData(accessControlEnabled=True),
         ),
         times=0,

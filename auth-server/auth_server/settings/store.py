@@ -20,7 +20,7 @@ class SettingsStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    def get(self, username: str) -> None:
+    def get(self) -> None:
         """Look up a setting by username. Returns the Setting or None."""
         # with self._session() as session:
         #     user = session.query(User).filter(User.username == username).first()
@@ -46,7 +46,7 @@ class SettingsStore:
         #     session.expunge(new_user)
         # return new_user
 
-    def reset(self, username: str) -> None:
+    def reset(self) -> None:
         """Reset the settings to their defaults.
 
         Raises ``ValueError`` if the username does not exist.
@@ -55,7 +55,6 @@ class SettingsStore:
 
     def update(
         self,
-        username: str,
         # TODO: Extract to args
         settings: PatchSettingsRequestData | None = None,
     ) -> None:
