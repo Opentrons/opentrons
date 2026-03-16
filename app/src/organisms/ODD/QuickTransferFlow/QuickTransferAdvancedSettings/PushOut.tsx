@@ -7,11 +7,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import { getMaxPushOutVolume } from '@opentrons/shared-data'
 
@@ -175,11 +175,11 @@ export function PushOut(props: PushOutProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="number"
               value={volume}
               error={volumeError}
-              title={t('push_out_volume')}
+              label={t('push_out_volume')}
               readOnly
             />
           </Flex>

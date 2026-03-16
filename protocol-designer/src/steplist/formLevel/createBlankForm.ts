@@ -33,6 +33,9 @@ const getStepType = (stepType: StepType): string => {
     case 'temperature': {
       return 'temperature'
     }
+    case 'flexStacker': {
+      return 'stacker'
+    }
     default: {
       return stepType
     }
