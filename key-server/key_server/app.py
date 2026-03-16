@@ -22,7 +22,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         configure_logging(logging.INFO)
     except BaseException as be:
-        print(f'Logging configuration failed: {be}')
+        # needs to be a print because logging doesn't work yet!
+        print(f"Logging configuration failed: {be}")  # noqa: T201
     settings_store = SettingsStore()
     install_settings_store(app.state, settings_store)
     secure_volume_manager = build_secure_volume_manager(settings_store)
