@@ -177,9 +177,9 @@ class TransferPage(BasePage):
             y: Y coordinate (mm).
             z: Z coordinate (mm).
         """
-        self.page.get_by_test_id("TipPositionModal_x_custom_input").fill(str(xyz[0]))
-        self.page.get_by_test_id("TipPositionModal_y_custom_input").fill(str(xyz[1]))
-        self.page.get_by_test_id("TipPositionModal_z_custom_input").fill(str(xyz[2]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[0]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[1]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[2]))
 
     def tip_position_asp_disp(self, aspirate: bool, xyz: tuple[float, float, float]) -> None:
         """

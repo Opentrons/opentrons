@@ -184,9 +184,9 @@ class MixStepForm(BasePage):
         """Configure mix tip X/Y/Z positions."""
 
         modal = self._modal_area()
-        modal.locator('[data-testid="TipPositionModal_x_custom_input"]').fill(x)
-        modal.locator('[data-testid="TipPositionModal_y_custom_input"]').fill(y)
-        modal.locator('[data-testid="TipPositionModal_z_custom_input"]').fill(z)
+        modal.locator('[data-testid="tip-position-modal-x-custom-input"]').fill(x)
+        modal.locator('[data-testid="tip-position-modal-y-custom-input"]').fill(y)
+        modal.locator('[data-testid="tip-position-modal-z-custom-input"]').fill(z)
 
     def toggle_checkbox(self, index: int = 0) -> None:
         """Toggle a checkbox-like control by index among visible controls."""
@@ -332,13 +332,13 @@ class MixStepForm(BasePage):
     def open_blowout_position_modal(self) -> None:
         """Open the blowout position modal."""
 
-        self.page.locator("[data-testid='TipPositionField_blowout_z_offset']").click()
+        self.page.locator("[data-testid='tip-position-field-blowout_z_offset']").click()
 
     def set_blowout_position(self, value: str) -> None:
         """Adjust the blowout Z offset inside the modal."""
 
         modal = self._modal_area()
-        modal.locator('[data-testid="TipPositionModal_custom_input"]').fill(value)
+        modal.locator('[data-testid="tip-position-modal-custom-input"]').fill(value)
 
     def rename_step(self, name: str, notes: str) -> None:
         """Rename the Mix step and set notes."""
