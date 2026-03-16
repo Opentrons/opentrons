@@ -1,6 +1,5 @@
 ---
 title: "Python API: Temperature Module"
-description: "Control the Temperature Module: set temperature, wait, and hold in protocols."
 ---
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.

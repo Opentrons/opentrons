@@ -1,6 +1,5 @@
 ---
 title: "Python API: Deck Slots"
-description: "Deck slot layout and naming for OT-2 and Flex in the Python API."
 ---
 
 <style>

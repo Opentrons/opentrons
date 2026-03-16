@@ -1,6 +1,5 @@
 ---
 title: "Python API: Using Runtime Parameters"
-description: "Read and use runtime parameter values inside your protocol."
 ---
 
 Once you've [defined parameters](defining.md), their values are accessible anywhere within the `run()` function of your protocol.

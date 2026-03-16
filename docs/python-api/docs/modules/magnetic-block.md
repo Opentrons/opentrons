@@ -1,6 +1,5 @@
 ---
 title: "Python API: Magnetic Block"
-description: "Use the Magnetic Block with the Flex Gripper in protocols."
 ---
 
 !!! note "Flex only"

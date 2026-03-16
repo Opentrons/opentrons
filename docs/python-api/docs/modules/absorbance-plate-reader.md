@@ -1,6 +1,5 @@
 ---
 title: "Python API: Absorbance Plate Reader"
-description: "Initialize and read data from the Absorbance Plate Reader in Python protocols."
 ---
 
 The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex robot only. The module uses light absorbance to determine sample concentrations in 96-well plates.

@@ -1,6 +1,5 @@
 ---
 title: "Python API: Defining Runtime Parameters"
-description: "Define parameters by type and specify default values."
 ---
 
 To use parameters, you need to define them in [a separate function][the-add_parameters-function] within your protocol. Each parameter definition has two main purposes: to specify acceptable values, and to inform the protocol user what the parameter does.

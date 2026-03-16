@@ -1,6 +1,5 @@
 ---
 title: "Python API: Pipette Characteristics"
-description: "Pipette specs, channels, and volume ranges in the Python API."
 ---
 
 Each Opentrons pipette has different capabilities, which you'll want to take advantage of in your protocols. This page covers some fundamental pipette characteristics.
@@ -174,7 +173,7 @@ These flow rates will remain in effect until you change the `flow_rate` attribut
 
 ### Flex pipette flow rates
 
-The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for Flex pipettes. Default flow rates for each pipette-tip combination are the same across all three actions, except where noted.
+The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for Flex pipettes. Default flow rates for each pipette-tip combination are the same across all three actions.
 
 <table>
     <thead>
@@ -204,7 +203,7 @@ The following table provides data on the default aspirate, dispense, and blowout
             <td>716</td>
         </tr>
         <tr>
-            <td rowspan="3">96-channel (1000 µL)</td>
+            <td rowspan="3">96-channel (5-1000 µL)</td>
             <td>50</td>
             <td>6</td>
         </tr>
@@ -216,24 +215,12 @@ The following table provides data on the default aspirate, dispense, and blowout
             <td>1000</td>
             <td>160</td>
         </tr>
-        <tr>
-            <td rowspan="2">96-channel (200 µL)</td>
-            <td>50</td>
-            <td>22</td>
-        </tr>
-        <tr>
-            <td>200</td>
-            <td>
-                <p>15 (aspirate and dispense)</p>
-                <p>10 (blowout)</p>
-            </td>
-        </tr>
     </tbody>
 </table>
 
 Additionally:
 
-- Do not use tips with a higher capacity than the pipette maximum volume.
+- When using a 50 µL pipette, you should only use 50 µL tips.
 - All Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
 ### OT-2 pipette flow rates
