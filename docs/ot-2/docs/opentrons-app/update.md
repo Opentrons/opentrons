@@ -1,27 +1,20 @@
 ---
 title: "Opentrons OT-2: Updating the Robot"
-description: "Instructions on how to download and install software updates."
+description: "How to download and install software updates."
 ---
 
-Start here for step-by-step instructions for downloading and updating the latest software for an OT-2 robot.
+Follow these instructions to download and install the latest software on an OT-2. Updating the robot software gives you access to new features and bug fixes released since your OT-2 was manufactured.
 
-## Purpose
-
-Updating the software on an OT-2 allows you to take advantage of the latest features and bug fixes that have been released since your robot was manufactured.
-
-Also, OT-2 robot software is versioned and packaged separately from the Opentrons App. This means the software that powers your OT-2 is not automatically updated when you [update the Opentrons App](./installation.md#app-software-updates). And, you can't run protocols on an OT-2 if its software version doesn't match the app. 
-
-Bug fixes, features, and software synchronization and a few good reasons to keep your OT-2 and app software up to date.
-
-## Steps
-
-Follow these instructions to update the software on an OT-2.
+!!! note
+    OT-2 robot software is versioned and packaged separately from the Opentrons App. This means the software that powers your OT-2 is not automatically updated when you [update the Opentrons App](./installation.md#app-software-updates). You cannot run protocols if the app and robot software versions do not match.
 
 <div class="instruction-list" markdown>
 
-1. From the Opentrons App, click the **Devices** tab.
+To update the OT-2 robot software:
 
-2. Look for the the software update warning banner.
+1. Click the **Devices** tab in the Opentrons App.
+
+2. Look for an OT-2 that shows the software update warning banner.
 
     <figure class="screenshot" markdown>
     ![Opentrons App showing an OT-2 with an update warning banner](../images/robot-software-update-banner.png)
