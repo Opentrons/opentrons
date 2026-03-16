@@ -161,13 +161,13 @@ def offset_for_channel(channel: int, layout: str) -> Point:
         return Point(0, 0, 0)
     elif layout in ["Column1", "RowA", "Full"]:
         # channel 0 is the critical point
-        return Point(x=column * 9, y=row * 9, z=0)
+        return Point(x=column * -9, y=row * 9, z=0)
     elif layout in ["Column12"]:
         # channel 11 is the critical point
         return Point(x=0, y=row * 9, z=0)
     elif layout in ["RowH"]:
         # channel 84 is the critical point
-        return Point(x=column * 9, y=0, z=0)
+        return Point(x=column * -9, y=0, z=0)
     else:
         raise RuntimeError("unknown layout")
 
@@ -182,8 +182,11 @@ def run(ctx: ProtocolContext) -> None:
         assert dial is not None, "could not find dial"
     ctx.load_trash_bin("A3")
     tipracks = []
+    adapter: Optional[str] = None
+    if ctx.params.layout == "Full":
+        adapter = "opentrons_flex_96_tiprack_adapter"  # type: ignore [attr-defined]
     for slot in LAYOUT_TO_RACK_SLOTS[ctx.params.layout]:  # type: ignore [attr-defined]
-        tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter="opentrons_flex_96_tiprack_adapter"))  # type: ignore [attr-defined]
+        tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter=adapter))  # type: ignore [attr-defined]
     pipette = ctx.load_instrument(
         f"flex_96channel_{ctx.params.pipette_volume}", "left", tip_racks=tipracks  # type: ignore [attr-defined]
     )
