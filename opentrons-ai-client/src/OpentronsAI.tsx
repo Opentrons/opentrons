@@ -28,6 +28,9 @@ import {
   mixpanelAtom,
 } from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
+import {
+  isEmailVerifiedFromUser,
+} from './resources/emailVerifiedClaim'
 import { useGetAccessToken } from './resources/hooks/useGetAccessToken'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
@@ -72,9 +75,9 @@ function OpentronsAIApp(): JSX.Element | null {
 
   useEffect(() => {
     if (isAuthenticated) {
-      setEmailVerified(user?.email_verified ?? false)
+      setEmailVerified(isEmailVerifiedFromUser(user ?? undefined))
     }
-  }, [isAuthenticated, user?.email_verified, setEmailVerified])
+  }, [isAuthenticated, user, setEmailVerified])
 
   useEffect(
     () => {
@@ -110,6 +113,10 @@ function OpentronsAIApp(): JSX.Element | null {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  if (emailVerified === null) {
+    return <Loading />
   }
 
   if (emailVerified === false) {

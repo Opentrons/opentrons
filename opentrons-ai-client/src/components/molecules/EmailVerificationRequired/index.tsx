@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { emailVerifiedAtom } from '/ai-client/resources/atoms'
+import { isEmailVerifiedFromClaims } from '/ai-client/resources/emailVerifiedClaim'
 import { useGetAccessToken } from '/ai-client/resources/hooks'
 
 export function EmailVerificationRequired(): JSX.Element {
@@ -37,7 +38,7 @@ export function EmailVerificationRequired(): JSX.Element {
       // Post-Login Action, which injects the current email_verified value.
       await getAccessToken(true)
       const claims = await getIdTokenClaims()
-      if (claims?.email_verified === true) {
+      if (isEmailVerifiedFromClaims(claims ?? undefined)) {
         setEmailVerified(true)
       } else {
         setShowNotVerified(true)
