@@ -95,7 +95,7 @@ async def rehearse_load_key(
     """Fixture for importing a key into KKRS. Gives the key ID."""
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/caam_keygen",
+            "/usr/bin/caam-keygen",
             "import",
             "mock keyblob path",
             "mock key",
@@ -209,7 +209,7 @@ async def test_create_happypath_with_clears(
     decoy.when(mock_keyblob_path.exists()).then_return(True)
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/caam_keygen",
+            "/usr/bin/caam-keygen",
             "create",
             CAAMSecureVolume.SECURE_STORAGE_KEY_NAME,
             "ccm",
@@ -281,7 +281,7 @@ async def test_mount_creates_if_necessary(
     decoy.when(mock_keyblob_path.exists()).then_return(False)
     decoy.when(
         await mock_asyncio_subprocess(
-            "/usr/bin/caam_keygen",
+            "/usr/bin/caam-keygen",
             "create",
             CAAMSecureVolume.SECURE_STORAGE_KEY_NAME,
             "ccm",

@@ -55,7 +55,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         if self._keyblob().exists():
             self._keyblob().unlink()
         create_bk = await asyncio.create_subprocess_exec(
-            "/usr/bin/caam_keygen",
+            "/usr/bin/caam-keygen",
             "create",
             self.SECURE_STORAGE_KEY_NAME,
             "ccm",
@@ -109,7 +109,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         lifetime of the keyserver, so we try and have the mount be the lifetime of the keyserver.
         """
         import_key = await asyncio.create_subprocess_exec(
-            "/usr/bin/caam_keygen",
+            "/usr/bin/caam-keygen",
             "import",
             str(self._keyblob()),
             str(self._base_directory / self.SECURE_STORAGE_KEY_NAME),
