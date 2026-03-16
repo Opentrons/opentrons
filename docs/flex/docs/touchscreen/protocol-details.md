@@ -17,7 +17,7 @@ The Summary tab shows:
 
 - **Author:** Who created the protocol.
 
-- **Description:** For protocols with long descriptions, scroll to read the full text. The protocol description also tells you if your protocol is a quick transfer.
+- **Description:** Scroll to read the full text. Also identifies quick transfer protocols.
 
 - **Date added:** Timestamp when Flex received the protocol file.
 

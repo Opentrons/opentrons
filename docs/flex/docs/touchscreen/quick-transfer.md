@@ -91,13 +91,17 @@ If your quick transfer will apply liquid class settings, values for your chosen 
 
 Click **Create Transfer** when you're satisfied with your transfer settings. After creating a quick transfer, you can run, save, or delete it.
 
-- Flex saves a maximum of 20 transfers in a vertical list under the Quick Transfer tab.
+You can find all your quick transfer protocols in the Protocols tab. 
 
-- Long press a saved transfer to run it, pin it, or delete it. Flex pins a maximum of 8 quick transfers.
+!!! note
+    Flex can store a maximum of 20 unique protocols, including quick transfers. It automatically deletes older protocols to maintain this limit.  
+
+
+- Long press a saved quick transfer to run it, pin it, or delete it. Flex pins a maximum of 8 protocols, including quick transfers.
 
 - Long press a pinned transfer to run it, un-pin it (returns it to the saved list), or delete it.
 
 <figure class="screenshot" markdown>
-![Menu with options to run, pin, or delete a quick transfer.](../images/touchscreen_protocol_menu.png "Quick transfer menu")
+![Menu with options to run, pin, or delete a quick transfer.](../images/touchscreen-protocol-menu.png "Quick transfer menu")
 </figure>
 
