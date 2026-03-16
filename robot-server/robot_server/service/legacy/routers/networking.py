@@ -16,7 +16,6 @@ from fastapi import (
 )
 from starlette import status
 from starlette.responses import JSONResponse
-from starlette.types import Scope
 
 from opentrons.system import nmcli, wifi
 from opentrons_shared_data.errors import ErrorCodes
