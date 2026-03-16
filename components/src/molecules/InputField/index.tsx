@@ -90,7 +90,7 @@ export interface InputFieldProps {
   borderRadius?: string
   /** optional prop to override input field padding */
   padding?: string
-  /** optional props to set data-testid */
+  /** optional props for data-testid */
   testId?: string
 }
 

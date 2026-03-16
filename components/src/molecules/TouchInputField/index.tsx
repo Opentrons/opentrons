@@ -67,7 +67,7 @@ export interface TouchInputFieldProps {
   padding?: string
   /** optional input type */
   type?: 'text' | 'password' | 'number'
-  /** optional props to set data-testid */
+  /** optional props for data-testid */
   testId?: string
 }
 
