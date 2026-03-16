@@ -1,5 +1,6 @@
 ---
 title: "Opentrons OT-2 Instruction Manual"
+description: "Official instruction manual for the Opentrons OT-2 liquid handling robot."
 ---
 
 <style>

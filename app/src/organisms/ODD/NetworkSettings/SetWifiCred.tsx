@@ -10,11 +10,11 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  InputField,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,7 +35,7 @@ export function SetWifiCred({
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const MemoizedInput = memo(InputField)
+  const MemoizedInput = memo(TouchInputField)
   const handleBlur = (): void => {
     if (inputRef.current != null) inputRef.current?.focus()
   }

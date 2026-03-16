@@ -149,17 +149,22 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       o.initialPosition != null
   )?.initialPosition
 
-  useEffect(() => {
-    if (initialPosition == null && modulePrepCommands.length > 0) {
-      chainRunCommands(modulePrepCommands, false)
-        .then(() => {})
-        .catch((e: Error) => {
-          setFatalError(
-            `CheckItem module prep commands failed with message: ${e?.message}`
-          )
-        })
-    }
-  }, [moduleId])
+  useEffect(
+    () => {
+      if (initialPosition == null && modulePrepCommands.length > 0) {
+        chainRunCommands(modulePrepCommands, false)
+          .then(() => {})
+          .catch((e: Error) => {
+            setFatalError(
+              `CheckItem module prep commands failed with message: ${e?.message}`
+            )
+          })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [moduleId]
+  )
 
   if (pipetteName == null || labwareDef == null || pipetteMount == null)
     return null

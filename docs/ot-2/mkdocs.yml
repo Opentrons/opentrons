@@ -38,6 +38,8 @@ nav:
       - Installing the App: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
+      - Resetting the Robot: opentrons-app/reset.md
+      - Downloading OT-2 Log Files: opentrons-app/log-files.md
       - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
       - Maintenance: maintenance/index.md
@@ -93,4 +95,4 @@ extra_css:
   - ../shared/opentrons-theme.css
   - ../shared/print-pdf.css
 
-copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
+copyright: '© Opentrons 2026. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

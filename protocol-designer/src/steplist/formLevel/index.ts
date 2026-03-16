@@ -104,6 +104,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  HydratedVacuumFormData,
   StepType,
 } from '../../form-types'
 import type { FormError } from './errors'
@@ -136,6 +137,7 @@ interface StepFormDataMap {
   comment: HydratedCommentFormData
   camera: HydratedCameraFormData
   flexStacker: HydratedFlexStackerFormData
+  vacuum: HydratedVacuumFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -288,6 +290,9 @@ const stepFormHelperMap: {
   flexStacker: {
     getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
   },
+  vacuum: {
+    getErrors: composeErrors(),
+  },
 }
 
 export const getFormErrors = (
@@ -381,6 +386,12 @@ export const getFormErrors = (
     case 'flexStacker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedFlexStackerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'vacuum':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedVacuumFormData,
         moduleEntities,
         labwareEntities
       )

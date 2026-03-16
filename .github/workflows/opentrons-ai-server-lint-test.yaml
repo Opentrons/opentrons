@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'opentrons-ai-server/**'
+      - '.github/workflows/opentrons-ai-server-lint-test.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

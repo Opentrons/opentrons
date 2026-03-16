@@ -35,6 +35,7 @@ import {
   SYSTEM_LOCATION,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
@@ -44,7 +45,10 @@ import {
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
 import { OFFDECK } from '/protocol-designer/constants'
-import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
+import {
+  getEnableComment,
+  getEnableVacuumModule,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
@@ -61,6 +65,7 @@ import {
 import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { AddStepOverflowButton } from './AddStepOverflowButton'
+import { getConsolidatedStacks } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { MouseEvent } from 'react'
@@ -108,9 +113,9 @@ export function AddStepButton({
     timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
   const labwareAtLastState = lastTimelineFrame?.labware ?? {}
   const moduleAtLastState = lastTimelineFrame?.modules ?? {}
-  const isLabwarePresentForLiquidHandling = Object.entries(
-    labwareAtLastState
-  ).some(([labwareId, { stack }]) => {
+  const consolidatedStacks = getConsolidatedStacks(labwareAtLastState)
+  const isLabwarePresentForLiquidHandling = consolidatedStacks.some(stack => {
+    const labwareId = stack[0]
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
     const isInaccessible = slot === SYSTEM_LOCATION
@@ -145,7 +150,9 @@ export function AddStepButton({
     'temperature',
     'thermocycler',
     'flexStacker',
+    'vacuum',
   ]
+  const enableVacuumModule = useSelector(getEnableVacuumModule)
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
     boolean
@@ -162,6 +169,8 @@ export function AddStepButton({
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
     absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
     flexStacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
+    vacuum:
+      enableVacuumModule && getIsModuleOnDeck(modules, VACUUM_MODULE_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>

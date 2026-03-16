@@ -35,7 +35,13 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.fastapi_utils.app_state import AppState, get_app_state
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+    AuthorizationChecker,
+)
+from server_utils.auth.resource_server.fastapi_dependencies import (
+    get_authorization_checker,
+)
 
 from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
@@ -47,7 +53,7 @@ from robot_server.runs.dependencies import get_run_data_manager
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.service.notifications.notification_client import (
     NotificationClient,
-    _notification_client_accessor,
+    get_notification_client,
 )
 from robot_server.service.session.manager import SessionManager
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
@@ -211,20 +217,30 @@ def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_app_state_with_notification_client(decoy: Decoy) -> Iterator[None]:
+def _override_notification_client_with_mock(decoy: Decoy) -> Iterator[None]:
     """Override app_state to include a mocked notification client."""
-    mock_app_state = AppState()
     mock_notification_client = decoy.mock(cls=NotificationClient)
 
-    _notification_client_accessor.set_on(mock_app_state, mock_notification_client)
+    async def get_notification_client_override() -> NotificationClient:
+        return mock_notification_client
 
-    async def get_app_state_override() -> AppState:
-        """Override for get_app_state."""
-        return mock_app_state
-
-    app.dependency_overrides[get_app_state] = get_app_state_override
+    app.dependency_overrides[get_notification_client] = get_notification_client_override
     yield
-    del app.dependency_overrides[get_app_state]
+    del app.dependency_overrides[get_notification_client]
+
+
+@pytest.fixture
+def _override_authorization_checker_with_always_allowed(decoy: Decoy) -> Iterator[None]:
+    authorization_checker = AlwaysAllowedAuthorizationChecker()
+
+    async def get_authorization_checker_override() -> AuthorizationChecker:
+        return authorization_checker
+
+    app.dependency_overrides[get_authorization_checker] = (
+        get_authorization_checker_override
+    )
+    yield
+    del app.dependency_overrides[get_authorization_checker]
 
 
 @pytest.fixture
@@ -233,7 +249,8 @@ def api_client(
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
-    _override_app_state_with_notification_client: None,
+    _override_notification_client_with_mock: None,
+    _override_authorization_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -249,7 +266,8 @@ def api_client_camera_overrides(
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
-    _override_app_state_with_notification_client: None,
+    _override_notification_client_with_mock: None,
+    _override_authorization_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

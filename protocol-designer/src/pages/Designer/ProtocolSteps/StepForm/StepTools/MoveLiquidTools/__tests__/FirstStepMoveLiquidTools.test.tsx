@@ -9,6 +9,7 @@ import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import {
   getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
   getLabwareEntities,
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
@@ -23,18 +24,21 @@ import {
   TiprackField,
   TipWellSelectionField,
   VolumeField,
-  WellSelectionField,
 } from '../../../PipetteFields'
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../../PipetteFields')
 vi.mock('/protocol-designer/feature-flags/selectors')
 
-const labwareId = 'mockLabwareId'
+const labwareId =
+  '4d7e45e2-b962-45ca-8ace-8a5a683591d5:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2'
+const dispenseLabwareId =
+  '83a383e5-6a5a-4dae-9da4-5c21bd3835dc:opentrons/nest_96_wellplate_2ml_deep/2'
 const pipetteId = 'mockPipetteId'
 
 const render = (props: ComponentProps<typeof FirstStepMoveLiquidTools>) => {
@@ -50,7 +54,27 @@ describe('FirstStepMoveLiquidTools', () => {
       propsForFields: propsForFieldsForSingleStep as any,
       formData: formDataForSingleStep as any,
     }
-
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {},
+      labware: {
+        [labwareId]: {
+          id: labwareId,
+          labwareDefURI: 'mockUri',
+          pythonName: 'aspirate_labware',
+          def: fixture96Plate as LabwareDefinition2,
+          stack: ['labware', '8'],
+        },
+        [dispenseLabwareId]: {
+          id: dispenseLabwareId,
+          labwareDefURI: 'mockUri',
+          pythonName: 'aspirate_labware',
+          def: fixture96Plate as LabwareDefinition2,
+          stack: ['labware', '7'],
+        },
+      },
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    } as AllTemporalPropertiesForTimelineFrame)
     vi.mocked(getLabwareEntities).mockReturnValue({
       labwareId: {
         id: labwareId,
@@ -75,9 +99,6 @@ describe('FirstStepMoveLiquidTools', () => {
     vi.mocked(PipetteField).mockReturnValue(<div>mock PipetteField</div>)
     vi.mocked(TiprackField).mockReturnValue(<div>mock TiprackField</div>)
     vi.mocked(LabwareField).mockReturnValue(<div>mock LabwareField</div>)
-    vi.mocked(WellSelectionField).mockReturnValue(
-      <div>mock WellSelectionField</div>
-    )
     vi.mocked(VolumeField).mockReturnValue(<div>mock VolumeField</div>)
     vi.mocked(PathField).mockReturnValue(<div>mock PathField</div>)
     vi.mocked(ChangeTipField).mockReturnValue(<div>mock ChangeTipField</div>)
@@ -93,7 +114,6 @@ describe('FirstStepMoveLiquidTools', () => {
     screen.getByText('mock PipetteField')
     screen.getByText('mock TiprackField')
     screen.getAllByText('mock LabwareField')
-    screen.getAllByText('mock WellSelectionField')
     screen.getByText('mock VolumeField')
     screen.getByText('mock PathField')
   })

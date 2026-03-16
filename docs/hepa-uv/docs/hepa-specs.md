@@ -1,5 +1,6 @@
 ---
 title: "HEPA/UV Module: HEPA Specifications"
+description: "Two-stage filtration, H14 HEPA filter, pre-filter, and ISO-5 clean bench standards."
 ---
 
 The Flex HEPA/UV Module uses a two-stage filtration system to purify air pulled into the enclosure. This system includes a reusable pre-filter and a disposable H14 HEPA main filter. The pre-filter traps large particles while the HEPA filter captures up to 99.99% of airborne particulate matter at ≥ 0.3 microns (µm). Vertical air flow from the HEPA filter creates a positive-pressure environment within the enclosure. This air boundary helps protect samples inside the Flex from external contamination. The air cleaning system of the Flex HEPA/UV Module meets ISO-5 clean bench standards.

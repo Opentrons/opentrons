@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
-import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS, Icon, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
 import { AttachedFileItem } from '/ai-client/components/atoms/AttachedFileItem'
 import { AttachFileButton } from '/ai-client/components/atoms/AttachFileButton'
@@ -22,6 +22,7 @@ export function InputPrompt(): JSX.Element {
     submitChat,
     isLoading,
     errorMessage,
+    dismissError,
     attachedFiles,
     handleFileSelect,
     handleRemoveFile,
@@ -40,13 +41,24 @@ export function InputPrompt(): JSX.Element {
       {/* Error message */}
       {errorMessage != null && errorMessage !== '' && (
         <div className={styles.error_container}>
-          <StyledText
-            color={COLORS.red50}
-            fontSize={TYPOGRAPHY.fontSizeH3}
-            lineHeight={TYPOGRAPHY.lineHeight20}
+          <Icon name="alert" className={styles.error_icon} size="1rem" />
+          <div className={styles.error_text_wrapper}>
+            <StyledText
+              color={COLORS.red50}
+              fontSize={TYPOGRAPHY.fontSizeH3}
+              lineHeight={TYPOGRAPHY.lineHeight20}
+            >
+              {errorMessage}
+            </StyledText>
+          </div>
+          <button
+            type="button"
+            className={styles.error_dismiss}
+            onClick={dismissError}
+            aria-label={t('error_dismiss')}
           >
-            {errorMessage}
-          </StyledText>
+            <Icon name="close" color={COLORS.red50} size="1rem" />
+          </button>
         </div>
       )}
 

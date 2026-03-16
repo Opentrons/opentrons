@@ -1,5 +1,6 @@
 ---
 title: "Python API: Runtime Parameters for Cherrypicking"
+description: "Use parameters to select source and destination wells at runtime."
 ---
 
 A common liquid handling task is *cherrypicking*: pipetting liquid from only certain wells on a source plate and placing them in order on a destination plate. This use case demonstrates how to use a CSV runtime parameter to automate this process and to customize it on every run—without having to modify the Python protocol itself.

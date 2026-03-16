@@ -133,11 +133,16 @@ export function RunSummary(): JSX.Element {
   const { reportRecoveredRunResult } = useRecoveryAnalytics()
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  useEffect(() => {
-    if (isRunCurrent && typeof enteredER === 'boolean') {
-      reportRecoveredRunResult(runStatus, enteredER)
-    }
-  }, [isRunCurrent, enteredER])
+  useEffect(
+    () => {
+      if (isRunCurrent && typeof enteredER === 'boolean') {
+        reportRecoveredRunResult(runStatus, enteredER)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunCurrent, enteredER]
+  )
 
   const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
@@ -234,15 +239,20 @@ export function RunSummary(): JSX.Element {
     pageLength: 1,
   })
 
-  useEffect(() => {
-    // Only run tip checking if it wasn't *just* handled during Error Recovery.
-    if (
-      runSummaryNoFixit != null &&
-      !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
-    ) {
-      void determineTipStatus()
-    }
-  }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
+  useEffect(
+    () => {
+      // Only run tip checking if it wasn't *just* handled during Error Recovery.
+      if (
+        runSummaryNoFixit != null &&
+        !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
+      ) {
+        void determineTipStatus()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isRunCurrent, runSummaryNoFixit, isEREnabled]
+  )
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {

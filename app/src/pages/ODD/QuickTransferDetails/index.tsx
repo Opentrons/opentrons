@@ -88,14 +88,19 @@ const QuickTransferHeader = ({
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
-      properties: {
-        name: title,
-      },
-    })
-  }, [])
+  useEffect(
+    () => {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+        properties: {
+          name: title,
+        },
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <Flex

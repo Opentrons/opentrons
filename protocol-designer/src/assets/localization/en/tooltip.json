@@ -45,6 +45,7 @@
       "blowout_checkbox": "Blow extra air through the tip",
       "blowout_flowRate": "Blowout speed",
       "blowout_location": "Where to dispose of remaining volume in tip",
+      "blowout_mmFromBottom": "Adjust tip position for blowout",
       "blowout_z_offset": "The height at which blowout occurs from the top of the well",
       "changeTip": "Choose when the robot picks up fresh tips",
       "conditioning_checkbox": "First aspirate and dispense liquid into the source well to ensure a more accurate first multi-dispense",

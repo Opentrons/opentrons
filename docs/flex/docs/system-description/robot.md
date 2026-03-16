@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Robot Components"
+description: "Frame, gantry, deck, working area, and visual indicators of the Flex."
 ---
 
 <figure markdown>

@@ -42,15 +42,20 @@ export function useConfirmPosition(
     setIsRobotPipetteMoving(!isRobotPipetteMoving)
   }
 
-  useEffect(() => {
-    if (
-      isRobotPipetteMoving &&
-      currentStep !== CONFIRM_POSITION &&
-      currentStep !== CHOOSE_LOCATION_OPTION
-    ) {
-      toggleIsRobotPipetteMoving()
-    }
-  }, [currentStep, isRobotPipetteMoving])
+  useEffect(
+    () => {
+      if (
+        isRobotPipetteMoving &&
+        currentStep !== CONFIRM_POSITION &&
+        currentStep !== CHOOSE_LOCATION_OPTION
+      ) {
+        toggleIsRobotPipetteMoving()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentStep, isRobotPipetteMoving]
+  )
 
   return {
     toggleIsRobotPipetteMoving,

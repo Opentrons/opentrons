@@ -1,5 +1,6 @@
 ---
 title: "Python API Reference: Useful Types"
+description: "Type definitions used in the Python Protocol API."
 ---
 
 ::: opentrons.types

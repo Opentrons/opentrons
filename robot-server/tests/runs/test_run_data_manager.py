@@ -131,9 +131,6 @@ def engine_state_summary() -> StateSummary:
         ],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(id="some-command-annotation-id")  # type: ignore[call-arg]
-        ],
     )
 
 
@@ -165,13 +162,15 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 
 
 @pytest.fixture
-def legacy_command_annotations() -> List[pe_types.LegacyCommandAnnotation]:
-    """Get a LegacyCommandAnnotation list."""
+def command_annotations() -> List[pe_types.CommandAnnotation]:
+    """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotationLegacy(
-            commandKeys=["abc"],
-            params={"abc": "123"},
-            machineReadableName="hello world",
+        pe_types.CommandAnnotation(
+            id="annotation-id",
+            source="userCommand",
+            name="My command annotation",
+            description="This is a command annotation",
+            params={},
         )
     ]
 
@@ -600,11 +599,6 @@ async def test_get_all_runs(
         ],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(  # type: ignore[call-arg]
-                id="current-command-annotation-id"
-            )
-        ],
     )
     current_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -626,11 +620,6 @@ async def test_get_all_runs(
         liquids=[],
         liquidClasses=[],
         wells=[],
-        commandAnnotations=[
-            CommandAnnotation.model_construct(  # type: ignore[call-arg]
-                id="old-command-annotation-id"
-            )
-        ],
     )
     historical_run_time_parameters: List[pe_types.RunTimeParameter] = [
         pe_types.BooleanParameter(
@@ -754,7 +743,7 @@ async def test_update_current(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
+    command_annotations: List[pe_types.CommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -772,7 +761,7 @@ async def test_update_current(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=legacy_command_annotations,
+            command_annotations=command_annotations,
             command_preconditions=command_preconditions,
         )
     )
@@ -782,6 +771,7 @@ async def test_update_current(
             run_id=run_id,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     ).then_return(run_resource)
@@ -856,6 +846,7 @@ async def test_update_current_noop(
             run_id=run_id,
             summary=matchers.Anything(),
             commands=matchers.Anything(),
+            command_annotations=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -903,7 +894,7 @@ async def test_create_archives_existing(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
-    legacy_command_annotations: List[pe_types.LegacyCommandAnnotation],
+    command_annotations: List[pe_types.CommandAnnotation],
     command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
@@ -924,7 +915,7 @@ async def test_create_archives_existing(
             commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
-            command_annotations=legacy_command_annotations,
+            command_annotations=command_annotations,
             command_preconditions=command_preconditions,
         )
     )
@@ -980,6 +971,7 @@ async def test_create_archives_existing(
             run_id=run_id_old,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     )
@@ -1386,6 +1378,62 @@ def test_get_command_annotation_from_current_run(
         mock_run_orchestrator_store.get_command_annotation("annotation-id")
     ).then_return(cmd_annotation)
     result = subject.get_command_annotation("run-id", "annotation-id")
+    assert result == cmd_annotation
+
+
+def test_get_command_annotations_slice_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should get the specified slice of command annotations."""
+    annotations_slice = CommandAnnotationsSlice(
+        command_annotations=[
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
+                description="user-specified-description",
+                params={},
+            ),
+        ],
+        cursor=2,
+        total_length=200,
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-id")
+    decoy.when(
+        mock_run_store.get_command_annotations_slice(
+            run_id="not-current-id", cursor=1, length=10
+        )
+    ).then_return(annotations_slice)
+    result = subject.get_command_annotations_slice(
+        run_id="not-current-id", cursor=1, length=10
+    )
+    assert result == annotations_slice
+
+
+def test_get_command_annotation_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """Should get the command annotation by id from run store."""
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
+        description="user-specified-description",
+        params={},
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_run_store.get_command_annotation(
+            run_id="not-current-run-id", command_annotation_id="annotation-id"
+        )
+    ).then_return(cmd_annotation)
+    result = subject.get_command_annotation("not-current-run-id", "annotation-id")
     assert result == cmd_annotation
 
 

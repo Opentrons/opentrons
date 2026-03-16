@@ -113,21 +113,29 @@ export const LabwareControls = (
         canDrop: monitor.canDrop(),
       }),
     }),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareOnDeck, swapBlocked]
   )
 
+  // todo(mm, 2026-03-06): Is this ref+useEffect doing anything? Can we just use canDrop on its own?
   useEffect(() => {
     canDropRef.current = canDrop
   }, [canDrop])
 
-  useEffect(() => {
-    if (draggedLabware != null) {
-      setDraggedLabware(draggedLabware?.labwareOnDeck)
-    } else {
-      setHoveredLabware(null)
-      setDraggedLabware(null)
-    }
-  }, [draggedLabware])
+  useEffect(
+    () => {
+      if (draggedLabware != null) {
+        setDraggedLabware(draggedLabware?.labwareOnDeck)
+      } else {
+        setHoveredLabware(null)
+        setDraggedLabware(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [draggedLabware]
+  )
 
   const isBeingDragged =
     draggedLabware?.labwareOnDeck?.stack != null &&
