@@ -152,7 +152,7 @@ async def rehearse_losetup(
             json.dumps(
                 {
                     "loopdevices": [
-                        {"backfile": "mock image path", "name": "mock loopback"}
+                        {"back-file": "mock image path", "name": "mock loopback"}
                     ]
                 }
             ),

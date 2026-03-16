@@ -278,7 +278,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         losetup_list_res = json.loads(losetup_stdout_data)
         devlist = losetup_list_res.get("loopdevices")
         for loopback_dev in devlist:
-            if loopback_dev.get("backfile", "") == str(self._image()):
+            if loopback_dev.get("back-file", "") == str(self._image()):
                 return cast(str, loopback_dev.get("name", ""))
         LOG.error(
             f"Could not find loopback device for {str(self._image())} in losetup result {losetup_stdout_data}"
