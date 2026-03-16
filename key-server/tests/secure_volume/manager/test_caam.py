@@ -119,7 +119,7 @@ async def rehearse_load_key(
             "padd",
             "logon",
             f"ot-secure-storage:{id(subject)}",
-            "@p",
+            "@s",
             stdout=PIPE,
             stderr=PIPE,
             stdin=PIPE,

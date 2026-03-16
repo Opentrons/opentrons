@@ -157,14 +157,14 @@ class CAAMSecureVolume(SecureVolumeManager):
         if await import_key.wait() != 0:
             LOG.error(f"Failed to import key: {await _stringify_process(import_key)}")
         else:
-            LOG.error("Imported key from CAAM")
+            LOG.info("Imported key from CAAM")
         key_data = (self._base_directory / self.SECURE_STORAGE_KEY_NAME).read_bytes()
         keyring_add = await asyncio.create_subprocess_exec(
             "/usr/bin/keyctl",
             "padd",
             "logon",
             str(self._keyname()),
-            "@p",
+            "@s",
             stdout=PIPE,
             stderr=PIPE,
             stdin=PIPE,
