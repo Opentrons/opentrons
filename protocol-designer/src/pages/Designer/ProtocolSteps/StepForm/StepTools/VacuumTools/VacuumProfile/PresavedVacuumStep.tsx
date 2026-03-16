@@ -19,10 +19,11 @@ import {
   maskToSignedDecimal,
   maskToTimeMMSS,
 } from '/protocol-designer/steplist/fieldLevel/processing'
+import { getFormattedTimeMMSS } from '/protocol-designer/utils'
 
 import { PROFILE_STEP } from './constants'
 import { PresavedVacuumHeader } from './PresavedVacuumHeader'
-import { getFormattedTime, getStepErrors } from './utils'
+import { getStepErrors } from './utils'
 import styles from './vacuumprofile.module.css'
 
 import type {
@@ -93,7 +94,7 @@ export function PresavedVacuumStep(
       setShowErrors(true)
       return
     }
-    const formattedTime = getFormattedTime(time)
+    const formattedTime = getFormattedTimeMMSS(time)
     onSaveSuccess?.({
       ...stepData,
       time: formattedTime,

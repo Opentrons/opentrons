@@ -365,6 +365,23 @@
         "label": "Vent",
         "open": "Open"
       }
+    },
+    "step_summary": {
+      "num_steps": "{{numSteps}} steps",
+      "profile": "<text>Run vacuum profile with</text><tag/><text>Ending vent</text><tag2/>",
+      "state": {
+        "close": "Closed",
+        "open": "Open",
+        "pump": {
+          "power": "<text>Set pump power to</text><tag/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>"
+        },
+        "pump_with_end_hold": {
+          "power": "<text>Set pump power to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>"
+        },
+        "vent": "<text>Vent</text><tag/>"
+      }
     }
   },
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",

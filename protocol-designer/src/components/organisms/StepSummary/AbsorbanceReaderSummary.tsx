@@ -48,12 +48,14 @@ export function AbsorbanceReaderSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey="protocol_steps:absorbance_reader.read"
-          {...(labwareOnAbsorbanceReaderNickname != null
-            ? {
-                tagText: labwareOnAbsorbanceReaderNickname,
-              }
-            : {})}
-          tagText2={fileName}
+          tagInfos={[
+            {
+              text: labwareOnAbsorbanceReaderNickname,
+            },
+            {
+              text: fileName,
+            },
+          ]}
         />
       )
       break
@@ -79,15 +81,23 @@ export function AbsorbanceReaderSummary(
           referenceWavelengthActive === true && referenceWavelength != null ? (
             <StyledTrans
               i18nKey="protocol_steps:absorbance_reader.initialize_single_with_reference"
-              tagText={`${wavelengths[0]}${t('application:units.nanometer')}`}
-              tagText2={`${referenceWavelength}${t(
-                'application:units.nanometer'
-              )}`}
+              tagInfos={[
+                {
+                  text: `${wavelengths[0]}${t('application:units.nanometer')}`,
+                },
+                {
+                  text: `${referenceWavelength}${t('application:units.nanometer')}`,
+                },
+              ]}
             />
           ) : (
             <StyledTrans
               i18nKey="protocol_steps:absorbance_reader.initialize_single"
-              tagText={`${wavelengths[0]}${t('application:units.nanometer')}`}
+              tagInfos={[
+                {
+                  text: `${wavelengths[0]}${t('application:units.nanometer')}`,
+                },
+              ]}
             />
           )
         break
@@ -107,11 +117,15 @@ export function AbsorbanceReaderSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey="protocol_steps:absorbance_reader.initialize_lid"
-          tagText={t(
-            `protocol_steps:absorbance_reader.${
-              lidOpen === true ? 'open' : 'closed'
-            }`
-          )}
+          tagInfos={[
+            {
+              text: t(
+                `protocol_steps:absorbance_reader.${
+                  lidOpen === true ? 'open' : 'closed'
+                }`
+              ),
+            },
+          ]}
         />
       )
       break
