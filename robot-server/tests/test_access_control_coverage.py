@@ -59,7 +59,9 @@ def test_access_control_coverage() -> None:
     )
 
     if bad_endpoints:
-        endpoint_lines = "\n".join(f"{method} {path}" for method, path in bad_endpoints)
+        endpoint_lines = "\n".join(
+            f"* {method} {path}" for method, path in bad_endpoints
+        )
         message = (
             f"HTTP endpoints are missing access control."
             f"\n\n"

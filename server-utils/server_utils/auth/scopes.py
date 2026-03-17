@@ -13,7 +13,7 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = "api_name", "description"
+    # PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
