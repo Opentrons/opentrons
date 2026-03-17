@@ -21,8 +21,8 @@ import type {
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'
 import type {
-  PresavedVacuumCycleSavePayload,
   PresavedVacuumCycleBaseProps,
+  PresavedVacuumCycleSavePayload,
 } from './types'
 
 export interface PresavedVacuumCycleProps extends PresavedVacuumCycleBaseProps {
