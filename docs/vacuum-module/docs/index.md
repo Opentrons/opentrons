@@ -9,8 +9,6 @@ hide: toc
 
 ![Vacuum module and carboy temporary HERO](images/temporary-HERO.png)
 
-<p style="color: red; font-weight: bold;"><strong>IMAGE PLACEHOLDER</strong></p>
-
 **Opentrons Labworks Inc.**<br>
 Month Year
 
