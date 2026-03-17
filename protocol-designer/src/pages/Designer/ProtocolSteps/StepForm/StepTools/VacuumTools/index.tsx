@@ -19,10 +19,11 @@ import type { FieldPropsByName } from '../../types'
 interface VacuumToolsProps {
   formData: FormData
   propsForFields: FieldPropsByName
+  showFormErrors: boolean
 }
 
 export function VacuumTools(props: VacuumToolsProps): JSX.Element {
-  const { formData, propsForFields } = props
+  const { formData, propsForFields, showFormErrors } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'protocol_steps'])
   const vacuumLabwareOptions = useSelector(getVacuumLabwareOptions)
@@ -49,7 +50,11 @@ export function VacuumTools(props: VacuumToolsProps): JSX.Element {
       <Divider marginY="0" />
       <VacuumModuleState vacuumModuleState={vacuumModuleState} />
       <Divider marginY="0" />
-      <VacuumControls formData={formData} propsForFields={propsForFields} />
+      <VacuumControls
+        formData={formData}
+        propsForFields={propsForFields}
+        showFormErrors={showFormErrors}
+      />
     </div>
   )
 }

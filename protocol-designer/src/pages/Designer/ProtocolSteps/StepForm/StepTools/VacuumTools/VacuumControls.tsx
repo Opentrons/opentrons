@@ -39,10 +39,11 @@ import type { FieldPropsByName } from '../../types'
 interface VacuumControlsProps {
   formData: FormData
   propsForFields: FieldPropsByName
+  showFormErrors: boolean
 }
 export function VacuumControls(props: VacuumControlsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
-  const { formData, propsForFields } = props
+  const { formData, propsForFields, showFormErrors } = props
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false)
   const { moduleId } = formData
   const robotState = useSelector(getRobotStateAtActiveItem)
@@ -180,7 +181,12 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
           {t('vacuum.controls.profile.profile_steps')}
         </StyledText>
         <ListButton
-          type="noActive"
+          type={
+            showFormErrors &&
+            propsForFields.orderedProfileIds.errorToShow != null
+              ? 'error'
+              : 'noActive'
+          }
           onClick={() => {
             setShowProfileModal(true)
           }}

@@ -17,9 +17,8 @@ import {
 
 import {
   maskToSignedDecimal,
-  maskToTimeMMSS,
+  maskToTimeWithPlaceholders,
 } from '/protocol-designer/steplist/fieldLevel/processing'
-import { getFormattedTime } from '/protocol-designer/utils/getFormattedTime'
 
 import { PROFILE_STEP } from './constants'
 import { PresavedVacuumHeader } from './PresavedVacuumHeader'
@@ -94,11 +93,7 @@ export function PresavedVacuumStep(
       setShowErrors(true)
       return
     }
-    const formattedTime = getFormattedTime(time)
-    onSaveSuccess?.({
-      ...stepData,
-      time: formattedTime,
-    })
+    onSaveSuccess?.(stepData)
   }
 
   return (
@@ -172,7 +167,10 @@ export function PresavedVacuumStep(
                 title={t('vacuum.controls.profile.time')}
                 value={time}
                 onChange={e => {
-                  const maskedTime = maskToTimeMMSS(e.currentTarget.value)
+                  const maskedTime = maskToTimeWithPlaceholders(
+                    e.currentTarget.value,
+                    'mmss'
+                  )
                   updateField('time', maskedTime)
                 }}
                 units={t('application:units.time')}
