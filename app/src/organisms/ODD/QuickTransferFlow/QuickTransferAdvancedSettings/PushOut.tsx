@@ -181,6 +181,9 @@ export function PushOut(props: PushOutProps): JSX.Element {
               error={volumeError}
               label={t('push_out_volume')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex

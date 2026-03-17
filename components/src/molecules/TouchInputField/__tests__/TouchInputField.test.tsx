@@ -34,7 +34,9 @@ describe('TouchInputField', () => {
 
   it('renders label, caption, units, and input attributes', () => {
     render(props)
-    const input = screen.getByTestId('touch-input-id') as HTMLInputElement
+    const input = screen.getByRole('spinbutton', {
+      name: 'Speed',
+    }) as HTMLInputElement
 
     screen.getByText('Speed')
     screen.getByText('caption')
@@ -51,7 +53,9 @@ describe('TouchInputField', () => {
     props.placeholder = 'placeholder'
 
     render(props)
-    const input = screen.getByTestId('touch-input-id') as HTMLInputElement
+    const input = screen.getByRole('spinbutton', {
+      name: 'Speed',
+    }) as HTMLInputElement
 
     expect(input.value).toBe('')
     expect(input.placeholder).toBe('-')
@@ -59,7 +63,7 @@ describe('TouchInputField', () => {
 
   it('calls onFocus, onBlur, and onChange handlers', () => {
     render(props)
-    const input = screen.getByTestId('touch-input-id')
+    const input = screen.getByRole('spinbutton', { name: 'Speed' })
 
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: '7' } })
@@ -91,9 +95,11 @@ describe('TouchInputField', () => {
     const onClick = vi.fn()
     props.onClick = onClick
     props.disabled = true
+    props.testId = 'touch-input-id'
 
     render(props)
-    fireEvent.click(screen.getByTestId('touch-input-id'))
+    const input = screen.getByRole('spinbutton', { name: 'Speed' })
+    fireEvent.click(input)
 
     expect(onClick).not.toHaveBeenCalled()
   })

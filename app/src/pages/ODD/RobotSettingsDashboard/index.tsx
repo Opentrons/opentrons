@@ -5,6 +5,7 @@ import last from 'lodash/last'
 
 import {
   DeviceReset,
+  Devices,
   LanguageSetting,
   NetworkSettings,
   Privacy,
@@ -212,6 +213,11 @@ export function RobotSettingsDashboard(): JSX.Element {
           setCurrentOption={setCurrentOption}
           robotName={robotName}
         />
+      )
+
+    case 'Devices':
+      return (
+        <Devices robotName={robotName} setCurrentOption={setCurrentOption} />
       )
 
     // fallthrough option: render the robot settings list of buttons

@@ -306,12 +306,46 @@
         "profile": "Program a Vacuum profile",
         "state": "Change Vacuum state"
       },
+      "profile": {
+        "add_cycle": "Add cycle",
+        "add_cycle_step": "Add a cycle step",
+        "add_step": "Add step",
+        "cancel": "Cancel",
+        "cycle": "Cycle",
+        "delete": "Delete",
+        "edit": "Edit",
+        "errors": {
+          "name": "Enter a valid step name",
+          "pumpData": "Enter a valid pressure value",
+          "repetitions": "Enter a valid number of cycles",
+          "time": "Enter a valid time"
+        },
+        "gauge_pressure": "Gauge pressure",
+        "name": "Name",
+        "no_profile_defined": "No profile defined",
+        "no_steps_defined": "No steps defined",
+        "number_of_cycles": "Number of cycles",
+        "profile_steps": "Profile steps",
+        "profile_defined_single": "{{numSteps}} profile step defined",
+        "profile_defined_multiple": "{{numSteps}} profile steps defined",
+        "pump_power": "Pump power",
+        "repetitions": "Number of cycles",
+        "save": "Save",
+        "step": "Step",
+        "step_detail": {
+          "power": "{{power}}% power",
+          "pressure": "{{pressure}} mbar"
+        },
+        "time": "Time",
+        "title": "Edit Vacuum profile steps",
+        "unsaved_changes": "You have unsaved changes to the profile. Please save or discard them before closing."
+      },
       "state": {
         "label": "Select the state to change",
         "options": {
           "pump": "Turn on Vacuum pump",
           "vent": {
-            "close": "Close vent",
+            "closed": "Close vent",
             "open": "Open vent"
           }
         }
@@ -330,6 +364,24 @@
         "closed": "Closed",
         "label": "Vent",
         "open": "Open"
+      }
+    },
+    "step_summary": {
+      "num_steps_multiple": "{{numSteps}} steps",
+      "num_steps_one": "{{numSteps}} step",
+      "profile": "<text>Run vacuum profile with</text><tag/><text>Ending vent</text><tag2/>",
+      "state": {
+        "closed": "Closed",
+        "open": "Open",
+        "pump": {
+          "power": "<text>Set pump power to</text><tag/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>"
+        },
+        "pump_with_end_hold": {
+          "power": "<text>Set pump power to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>"
+        },
+        "vent": "<text>Vent</text><tag/>"
       }
     }
   },

@@ -120,6 +120,7 @@ export function CustomizeExpandButtonComponent(
               {limit != null && limit > 1 && allowInputField ? (
                 <InputField
                   id="CustomizeExpandButton_inputField"
+                  testId="customize-expand-button-input-field"
                   title={stackingProps.inputTitle}
                   onChange={e => {
                     e.stopPropagation()

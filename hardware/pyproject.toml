@@ -67,6 +67,9 @@ known-local-folder = ["opentrons_hardware"]
 "opentrons_hardware/_version.py" = ["I"]
 "opentrons_hardware/scripts/*" = ["T201"]
 
+[tool.ruff.format]
+exclude = ["opentrons_hardware/_version.py"]
+
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons_shared_data']
 

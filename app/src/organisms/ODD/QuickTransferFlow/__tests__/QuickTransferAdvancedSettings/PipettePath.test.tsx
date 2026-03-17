@@ -177,6 +177,7 @@ describe('PipettePath', () => {
         readOnly: true,
         type: 'number',
         value: 20,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -208,6 +209,7 @@ describe('PipettePath', () => {
         readOnly: true,
         type: 'number',
         value: 201,
+        onBlur: expect.any(Function),
       },
       {}
     )

@@ -55,6 +55,9 @@ known-first-party = ["opentrons", "opentrons_shared_data"]
 "g_code_parsing/_version.py" = ["I"]
 "cli.py" = ["T201"]
 
+[tool.ruff.format]
+exclude = ["g_code_parsing/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on

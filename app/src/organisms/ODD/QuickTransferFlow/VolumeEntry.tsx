@@ -110,6 +110,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
             label={textEntryCopy}
             error={error}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex

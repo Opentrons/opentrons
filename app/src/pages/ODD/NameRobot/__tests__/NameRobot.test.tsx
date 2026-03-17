@@ -80,7 +80,9 @@ describe('NameRobot', () => {
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
     expect(input).toHaveValue('abc')
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    await waitFor(() => expect(mockTrackEvent).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(mockTrackEvent).toHaveBeenCalled()
+    })
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
