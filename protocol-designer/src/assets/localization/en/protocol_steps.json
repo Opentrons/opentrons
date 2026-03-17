@@ -367,10 +367,11 @@
       }
     },
     "step_summary": {
-      "num_steps": "{{numSteps}} steps",
+      "num_steps_multiple": "{{numSteps}} steps",
+      "num_steps_one": "{{numSteps}} step",
       "profile": "<text>Run vacuum profile with</text><tag/><text>Ending vent</text><tag2/>",
       "state": {
-        "close": "Closed",
+        "closed": "Closed",
         "open": "Open",
         "pump": {
           "power": "<text>Set pump power to</text><tag/>",

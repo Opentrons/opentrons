@@ -165,7 +165,7 @@ describe('VacuumSummary', () => {
       expect(tagElements[1]).toHaveTextContent('Open')
     })
 
-    it('renders profile summary with step count and ending vent closed', () => {
+    it('renders profile summary with step count (1) and ending vent closed', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
@@ -175,7 +175,21 @@ describe('VacuumSummary', () => {
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
       const tagElements = screen.getAllByTestId('Tag_default')
-      expect(tagElements[0]).toHaveTextContent('1 steps')
+      expect(tagElements[0]).toHaveTextContent('1 step')
+      expect(tagElements[1]).toHaveTextContent('Closed')
+    })
+
+    it('renders profile summary with step count (multiple) and ending vent closed', () => {
+      render({
+        ...baseStep,
+        programType: VACUUM_PROGRAM_PROFILE,
+        stateType: null,
+        orderedProfileIds: ['p1', 'p2', 'p3'],
+        endingHoldVentCheckbox: false,
+      })
+      expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
+      const tagElements = screen.getAllByTestId('Tag_default')
+      expect(tagElements[0]).toHaveTextContent('3 steps')
       expect(tagElements[1]).toHaveTextContent('Closed')
     })
   })

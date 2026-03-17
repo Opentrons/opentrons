@@ -69,7 +69,7 @@ export function VacuumSummary(props: {
             },
             {
               text: t(
-                `vacuum.step_summary.state.${endingHoldVentCheckbox === true ? 'open' : 'close'}`
+                `vacuum.step_summary.state.${endingHoldVentCheckbox === true ? 'open' : 'closed'}`
               ),
             },
           ]}
@@ -94,18 +94,24 @@ export function VacuumSummary(props: {
     )
   }
   if (programType === VACUUM_PROGRAM_PROFILE && orderedProfileIds.length > 0) {
+    const numProfileSteps = orderedProfileIds.length
     return (
       <StyledTrans
         i18nKey="vacuum.step_summary.profile"
         tagInfos={[
           {
-            text: t('vacuum.step_summary.num_steps', {
-              numSteps: orderedProfileIds.length,
-            }),
+            text: t(
+              numProfileSteps === 1
+                ? 'vacuum.step_summary.num_steps_one'
+                : 'vacuum.step_summary.num_steps_multiple',
+              {
+                numSteps: numProfileSteps,
+              }
+            ),
           },
           {
             text: t(
-              `vacuum.step_summary.state.${endingHoldVentCheckbox === true ? 'open' : 'close'}`
+              `vacuum.step_summary.state.${endingHoldVentCheckbox === true ? 'open' : 'closed'}`
             ),
           },
         ]}
