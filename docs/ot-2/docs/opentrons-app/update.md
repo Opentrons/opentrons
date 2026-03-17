@@ -25,4 +25,4 @@ To update the OT-2 robot software:
 
 4. Click **Update robot now** in the update window to download and automatically install the latest software.
 
-It may take up to 15-minutes for the update to complete. Your OT-2 is ready for use after it updates itself and restarts.
+It may take up to 15 minutes for the update to complete. Your OT-2 is ready for use after it updates itself and restarts.
