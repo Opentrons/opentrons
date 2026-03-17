@@ -78,7 +78,9 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
   ): void => {
     setItemsById(prev => {
       const current = prev[stepId] as VacuumProfileStepItem | undefined
-      if (current?.type !== PROFILE_STEP) return prev
+      if (current?.type !== PROFILE_STEP) {
+        return prev
+      }
       return {
         ...prev,
         [stepId]: {
