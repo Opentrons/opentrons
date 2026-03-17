@@ -47,6 +47,14 @@ class Scope(enum.Enum):
         "Edit robot settings for which there is no more specific scope.",
     )
 
+    RUN_DATA_WRITE = (
+        "run_data.write",
+        (
+            "Create, update, or delete data that can be used as input to a run."
+            " Delete data that's been output by a run."
+        ),
+    )
+
     # We actually want access control mode to totally disable SSH, so this scope is
     # kind of moot. At some point, we might delete this, and replace the SSH endpoints'
     # use of `require_scopes(SSH_KEYS_WRITE)` with something like
