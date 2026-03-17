@@ -237,7 +237,7 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.2],
+              [1.0, -0.1],
               [10.0, 0.1],
               [20.0, -0.2]
             ],
@@ -322,7 +322,7 @@
             ],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.2],
+              [1.0, -0.1],
               [10.0, 0.1],
               [20.0, -0.2]
             ],
@@ -331,7 +331,7 @@
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 50
+                "volume": 20
               }
             },
             "delay": {
@@ -403,7 +403,7 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.2],
+              [1.0, -0.1],
               [10.0, 0.1],
               [20.0, -0.2]
             ],
@@ -411,14 +411,14 @@
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 50
+                "volume": 20
               }
             },
             "pushOutByVolume": [
               [1.0, 11.7],
               [4.999, 11.7],
               [5.0, 3.9],
-              [20.0, 3.9]
+              [50.0, 3.9]
             ],
             "delay": {
               "enable": true,
@@ -489,7 +489,7 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.2],
+              [1.0, -0.1],
               [10.0, 0.1],
               [20.0, -0.2]
             ],
@@ -497,7 +497,7 @@
               [1.0, 5.0],
               [40.0, 5.0],
               [45.0, 0.0],
-              [50.0, 0.0]
+              [20.0, 0.0]
             ],
             "disposalByVolume": [
               [1.0, 5.0],
@@ -1247,11 +1247,11 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 25.0]],
+            "flowRateByVolume": [[0.0, 10.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
+              [5.0, -0.2],
               [20.0, -0.2]
             ],
             "conditioningByVolume": [
@@ -1336,7 +1336,7 @@
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
+              [5.0, -0.2],
               [20.0, -0.2]
             ],
             "preWet": false,
@@ -1344,7 +1344,7 @@
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 50
+                "volume": 20
               }
             },
             "delay": {
@@ -1387,7 +1387,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 25.0
+                  "flowRate": 10.0
                 }
               },
               "touchTip": {
@@ -1413,18 +1413,18 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 25.0]],
+            "flowRateByVolume": [[0.0, 10.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
+              [5.0, -0.2],
               [20.0, -0.2]
             ],
             "mix": {
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 20
+                "volume": 50
               }
             },
             "pushOutByVolume": [
@@ -1499,11 +1499,11 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 25.0]],
+            "flowRateByVolume": [[0.0, 10.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
+              [5.0, -0.2],
               [20.0, -0.2]
             ],
             "conditioningByVolume": [
@@ -6599,9 +6599,9 @@
             ],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.1],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [1.0, -0.2],
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "preWet": false,
             "mix": {
@@ -6614,7 +6614,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 1.0
+                "duration": 1.1
               }
             }
           },
@@ -6680,9 +6680,9 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.1],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [1.0, -0.2],
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "mix": {
               "enable": false,
@@ -6695,12 +6695,12 @@
               [1.0, 11.7],
               [4.999, 11.7],
               [5.0, 6.0],
-              [20.0, 3.9]
+              [20.0, 6.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.5
+                "duration": 1.1
               }
             }
           },
@@ -6767,8 +6767,8 @@
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -6846,27 +6846,27 @@
             },
             "flowRateByVolume": [
               [1.0, 7.0],
-              [10.0, 10.0],
+              [5.0, 10.0],
               [20.0, 50.0]
             ],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "preWet": false,
             "mix": {
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 50
+                "volume": 20
               }
             },
             "delay": {
               "enable": true,
               "params": {
-                "duration": 1.0
+                "duration": 1.1
               }
             }
           },
@@ -6929,34 +6929,30 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [
-                [0.0, 25.0],
-                [5.0, 35.0],
-                [20.0, 25.0]
-            ],
+            "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "mix": {
               "enable": false,
               "params": {
                 "repetitions": 1,
-                "volume": 50
+                "volume": 20
               }
             },
             "pushOutByVolume": [
               [1.0, 11.7],
               [4.999, 11.7],
               [5.0, 6.0],
-              [20.0, 3.9]
+              [20.0, 6.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.5
+                "duration": 1.1
               }
             }
           },
@@ -7023,14 +7019,14 @@
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.2],
-              [10.0, 0.1],
-              [20.0, -0.2]
+              [5.0, -0.011],
+              [10.0, 0.1]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
               [40.0, 5.0],
               [45.0, 0.0],
-              [50.0, 0.0]
+              [20.0, 0.0]
             ],
             "disposalByVolume": [
               [1.0, 5.0],
