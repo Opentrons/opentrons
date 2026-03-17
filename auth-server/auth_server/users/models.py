@@ -23,11 +23,20 @@ class AccountType(StrEnum):
 
 
 # move this to db if we need to support updating scopes.
-ACCOUNT_TYPE_TO_SCOPES = {
-    AccountType.ADMIN: list(Scope),  # all scopes
-    AccountType.USER: [Scope.RUNS_WRITE],  # limited scopes
-    AccountType.AUDITOR: [Scope.USERS_READ],
-    AccountType.SERVICE: [Scope.RUNS_WRITE],
+ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
+    AccountType.ADMIN: set(Scope),  # all scopes
+    AccountType.SERVICE: set(Scope),  # all scopes
+    AccountType.USER: {
+        Scope.RESTART_WRITE,
+        Scope.ROBOT_CONTROL_WRITE,
+        Scope.ROBOT_SETTINGS_WRITE,
+        # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
+        Scope.UPDATES_WRITE,
+    },
+    # Auditors should have read-only access to everything. Our read-only endpoints are
+    # mostly accessible without authentication, but there are some exceptions. This
+    # just needs to have the scopes to cover those exceptions.
+    AccountType.AUDITOR: {Scope.USERS_READ},
 }
 
 

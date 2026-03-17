@@ -69,22 +69,28 @@ async def test_auth_server_checker_given_a_token(
     # Active, and meeting all scopes -> authorize
     decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
         TokenIntrospectionResponse(
-            active=True, scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE})
+            active=True,
+            scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
         )
     )
     assert (
-        await subject.check("test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE})
+        await subject.check(
+            "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
+        )
         == AuthorizedResult()
     )
 
     # Inactive -> do not authorize
     decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
         TokenIntrospectionResponse(
-            active=False, scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE})
+            active=False,
+            scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
         )
     )
     assert (
-        await subject.check("test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE})
+        await subject.check(
+            "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
+        )
         == NotAnActiveTokenResult()
     )
 
