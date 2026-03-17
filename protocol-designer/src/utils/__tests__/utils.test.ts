@@ -4,7 +4,6 @@ import { fixture96Plate } from '@opentrons/shared-data'
 
 import {
   getAllLabwareIdsOfCertainURIOnStack,
-  getFormattedTimeMMSS,
   getMaxConditioningVolume,
   removeOpentronsPhrases,
 } from '..'
@@ -213,17 +212,5 @@ describe('getAllLabwareIdsOfCertainURIOnStack', () => {
         mockLabwareOnDeck
       )
     ).toEqual(['labware', 'labware2', 'labware3'])
-  })
-})
-
-describe('getFormattedTimeMMSS', () => {
-  it('should return the formatted time in MM:SS format for bare minutes', () => {
-    expect(getFormattedTimeMMSS('1')).toBe('01:00')
-  })
-  it('should return the formatted time in MM:SS format for bare seconds', () => {
-    expect(getFormattedTimeMMSS('0:1')).toBe('00:01')
-  })
-  it('should return the formatted time in MM:SS format for minutes and seconds', () => {
-    expect(getFormattedTimeMMSS('1:1')).toBe('01:01')
   })
 })
