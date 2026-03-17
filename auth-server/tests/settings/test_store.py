@@ -50,3 +50,19 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     assert fetched.min_length_of_reason_for_interaction == 10
     assert fetched.require_logs_to_be_saved_in_app == True
     assert fetched.delete_over_max_on_disk_protocols == True
+
+    with pytest.raises(ValueError):
+        settings_store.add(
+            access_control_enabled=False,
+            max_number_of_login_attempts=5,
+            password_reset_time_in_days=15,
+            idle_lockout_in_minutes=200,
+            require_admin_creds_when_updating_robot_software=False,
+            require_admin_creds_when_sending_protocol_to_robot=False,
+            require_admin_creds_for_signoff_protocol=True,
+            require_signoff_for_protocol_log=False,
+            require_reason_for_interaction=True,
+            min_length_of_reason_for_interaction=10,
+            require_logs_to_be_saved_in_app=True,
+            delete_over_max_on_disk_protocols=True,
+        )

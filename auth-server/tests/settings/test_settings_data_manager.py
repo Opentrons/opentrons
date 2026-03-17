@@ -2,7 +2,6 @@ import pytest
 from decoy import Decoy
 
 from auth_server.settings.models import (
-    PasswordComplexity,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
@@ -10,8 +9,6 @@ from auth_server.settings.settings_data_manager import (
     SettingsDataManager,
 )
 from auth_server.settings.store import SettingsStore
-
-_DEFAULT_SETTINGS = SettingsResponseData.model_construct()
 
 
 @pytest.fixture()
@@ -31,6 +28,7 @@ def test_patch_settings(
 ) -> None:
     manager.patch(
         PatchSettingsRequestData(
+            accessControlEnabled=True,
             max_number_of_login_attempts=10,
             password_reset_time_in_days=30,
             idle_lockout_in_minutes=300,
@@ -55,17 +53,25 @@ def test_patch_settings(
                 require_admin_creds_when_sending_protocol_to_robot=True,
                 require_admin_creds_for_signoff_protocol=False,
                 require_signoff_for_protocol_log=True,
+                require_reason_for_interaction=True,
+                min_length_of_reason_for_interaction=10,
+                require_logs_to_be_saved_in_app=True,
+                delete_over_max_on_disk_protocols=True,
             ),
         )
     )
     manager.patch(
         PatchSettingsRequestData(
+            accessControlEnabled=True,
             max_number_of_login_attempts=15,
         )
     )
     decoy.verify(
         mock_store.update(
-            PatchSettingsRequestData(max_number_of_login_attempts=15),
+            PatchSettingsRequestData(
+                accessControlEnabled=True,
+                max_number_of_login_attempts=15,
+            ),
         )
     )
 
@@ -75,7 +81,9 @@ def test_reset_settings(
 ) -> None:
     manager.reset()
     decoy.verify(mock_store.reset())
-    assert manager.get() == _DEFAULT_SETTINGS
+    assert manager.get() == SettingsResponseData.model_construct(
+        accessControlEnabled=False
+    )
 
 
 def test_get_settings(

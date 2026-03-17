@@ -1,13 +1,13 @@
 from typing import Annotated
 
 import fastapi
+from sqlalchemy.engine import Engine as SQLEngine
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from server_utils.persistence.sql_engine import SQLEngine
 
 from .models import PatchSettingsRequestData, SettingsResponseData
 from .store import SettingsStore

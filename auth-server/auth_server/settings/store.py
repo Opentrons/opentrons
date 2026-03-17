@@ -44,7 +44,7 @@ class SettingsStore:
         require_logs_to_be_saved_in_app: bool,
         delete_over_max_on_disk_protocols: bool,
     ) -> Settings:
-        """Create a user's settings, persist it, and return it."""
+        """Create a settings, persist it, and return it."""
         # should the defaults exist in the pydantic or the db?
         new_settings = Settings(
             access_control_enabled=access_control_enabled,
@@ -61,9 +61,14 @@ class SettingsStore:
             delete_over_max_on_disk_protocols=delete_over_max_on_disk_protocols,
         )
         with self._session() as session:
-            session.add(new_settings)
-            session.commit()
-            session.expunge(new_settings)
+            # only allow one settings record to exist
+            if session.query(Settings).first() is None:
+                session.add(new_settings)
+                session.commit()
+                session.expunge(new_settings)
+            else:
+                raise ValueError("Settings already exist")
+
         return new_settings
 
     def reset(self) -> None:
