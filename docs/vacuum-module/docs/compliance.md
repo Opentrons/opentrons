@@ -13,6 +13,8 @@ The vacuum module is designed for laboratory use by trained personnel only. Use 
 
 ## Instrument safety warnings
 
+<font color="red">SAMPLE PLACEHOLDERS</font>
+
 Various labels on the vacuum module or in this manual warn you about sources of potential injury or harm.
 
 <table>
@@ -66,9 +68,13 @@ The vacuum module has been tested and found to be in compliance with all applica
 
 ### Hazardous substances
 
+<font color="red">SAMPLE PLACEHOLDERS</font>
+
 RoHS3 compliant.
 
 ### FCC warnings and notes
+
+<font color="red">SAMPLE PLACEHOLDERS</font>
 
 Warning: Changes or modifications to this module not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules.
 
@@ -76,11 +82,15 @@ Note: This equipment has been tested and found to comply with the limits for a C
 
 ### Canada ISED ICES-003(A)/NMB-003(A)
 
+<font color="red">SAMPLE PLACEHOLDERS</font>
+
 This product meets the applicable Innovation, Science and Economic Development Canada technical specifications.
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
 
 ### CISPR 11 Class A
+
+<font color="red">SAMPLE PLACEHOLDERS</font>
 
 Caution: This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
 
