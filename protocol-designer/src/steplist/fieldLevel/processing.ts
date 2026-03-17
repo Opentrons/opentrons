@@ -34,7 +34,7 @@ export const maskToTime = (rawValue: unknown): string => {
 /**
  * Masks input as MM:SS, building up from the right as the user types.
  * Digits are right-aligned and padded with leading zeros.
- * e.g. '' → '', '3' → '00:03', '34' → '00:34', '342' → '03:42', '3421' → '34:21'
+ * e.g. '' -> '', '3' -> '00:03', '34' -> '00:34', '342' -> '03:42', '3421' -> '34:21'
  */
 export const maskToTimeWithPlaceholders = (
   rawValue: unknown,
