@@ -1,15 +1,43 @@
 """A software state manager for the CAAM secure volume."""
 
+from __future__ import annotations
+
 import asyncio
 import json
+from functools import wraps
 from logging import getLogger
 from pathlib import Path
 from subprocess import PIPE
-from typing import Final, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Concatenate,
+    Coroutine,
+    Final,
+    ParamSpec,
+    TypeVar,
+    cast,
+)
 
 from .interface import SecureVolumeManager
 
 LOG = getLogger(__name__)
+
+_R = TypeVar("_R")
+_P = ParamSpec("_P")
+_T = TypeVar("_T", bound="CAAMSecureVolume")
+
+
+def _lock(
+    func: Callable[Concatenate[_T, _P], Awaitable[_R]],
+) -> Callable[Concatenate[_T, _P], Coroutine[Any, Any, _R]]:
+    @wraps(func)
+    async def _locked(slf: _T, /, *args: _P.args, **kwargs: _P.kwargs) -> _R:
+        async with slf._lock_obj:
+            return await func(slf, *args, **kwargs)
+
+    return _locked
 
 
 async def _stringify_process(
@@ -54,6 +82,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         self._base_directory = base_directory
         self._image_mount_point = image_mount_point
         self._volume_size_mb = volume_size_mb
+        self._lock_obj = asyncio.Lock()
 
     def _keyblob(self) -> Path:
         return self._base_directory / f"{self.SECURE_STORAGE_KEY_NAME}.bb"
@@ -64,83 +93,13 @@ class CAAMSecureVolume(SecureVolumeManager):
     def _keyname(self) -> str:
         return f"{self.SECURE_STORAGE_KEYCTL_PREFIX}:{id(self)}"
 
-    async def must_create(self) -> bool:
+    async def _must_create(self) -> bool:
         """Check if the volume is created (by seeing if the image and keyblob exist)."""
         if not self._keyblob().exists():
             return True
         if not self._image().exists():
             return True
         return False
-
-    async def create(self) -> None:
-        """Creates the secure volume by initializing a new CAAM black key and building a backing store."""
-        LOG.info("Creating secure volume: beginning")
-        if self._keyblob().exists():
-            LOG.info("Creating secure volume: removing existing CAAM keyblob")
-            self._keyblob().unlink()
-        LOG.info("Creating secure volume: creating CAAM keyblob")
-        create_bk = await asyncio.create_subprocess_exec(
-            "/usr/bin/caam-keygen",
-            "create",
-            str(self.SECURE_STORAGE_KEY_NAME),
-            "ccm",
-            "-s",
-            "24",
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        if await create_bk.wait() != 0:
-            LOG.error(
-                f"Failed to create CAAM black key: {await _stringify_process(create_bk)}"
-            )
-        # the command above creates a keyblob and also the actual key. we could use
-        # this actual key, but we'd have to have a special codepath, so we delete it
-        # so we can use the codepath that we use during boot when we have a keyblob
-        # but no loaded key yet.
-        (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
-        # the secure storage is stored on disk as an encrypted blob; create a zeroed
-        # file for it
-        if self._image().exists():
-            LOG.info("Creating secure volume: removing old secure volume image")
-            self._image().unlink()
-        LOG.info("Creating secure volume: making new secure volume image")
-        create_backing_store = await asyncio.create_subprocess_exec(
-            "/usr/bin/dd",
-            "if=/dev/zero",
-            f"of={str(self._image())}",
-            "bs=1M",
-            f"count={self._volume_size_mb}",
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        if await create_backing_store.wait() != 0:
-            LOG.error(
-                f"Creating secure volume: failed to create backing store: {await _stringify_process(create_backing_store)}"
-            )
-        else:
-            LOG.info("Creating secure volume: made secure volume image")
-        await self._load_key()
-        await self._loopback_setup()
-        await self._map()
-        mkfs = await asyncio.create_subprocess_exec(
-            "/usr/sbin/mkfs.ext4",
-            f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}",
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        if await mkfs.wait() != 0:
-            LOG.error(
-                f"Creating secure volume: failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
-            )
-        else:
-            LOG.info("Creating secure volume: made fs on encrypted volume")
-        LOG.info("Creating secure volume: unmapping device-mapper")
-        await self._unmap()
-        LOG.info("Creating secure volume: removing loopback")
-        await self._loopback_remove()
-        LOG.info("Creating secure volume: unloading key")
-        await self._unload_key()
-        LOG.info("Creating secure volume: done")
 
     async def _load_key(self) -> None:
         """Load the CAAM key from its state at boot - an encrypted, tagged blob - to the kernel key retention service.
@@ -348,15 +307,93 @@ class CAAMSecureVolume(SecureVolumeManager):
         )
         return ""
 
+    @_lock
+    async def create(self) -> None:
+        """Creates the secure volume by initializing a new CAAM black key and building a backing store."""
+        return await self._do_create()
+
+    async def _do_create(self) -> None:
+        LOG.info("Creating secure volume: beginning")
+        if self._keyblob().exists():
+            LOG.info("Creating secure volume: removing existing CAAM keyblob")
+            self._keyblob().unlink()
+        LOG.info("Creating secure volume: creating CAAM keyblob")
+        create_bk = await asyncio.create_subprocess_exec(
+            "/usr/bin/caam-keygen",
+            "create",
+            str(self.SECURE_STORAGE_KEY_NAME),
+            "ccm",
+            "-s",
+            "24",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        if await create_bk.wait() != 0:
+            LOG.error(
+                f"Failed to create CAAM black key: {await _stringify_process(create_bk)}"
+            )
+        # the command above creates a keyblob and also the actual key. we could use
+        # this actual key, but we'd have to have a special codepath, so we delete it
+        # so we can use the codepath that we use during boot when we have a keyblob
+        # but no loaded key yet.
+        (self._base_directory / self.SECURE_STORAGE_KEY_NAME).unlink()
+        # the secure storage is stored on disk as an encrypted blob; create a zeroed
+        # file for it
+        if self._image().exists():
+            LOG.info("Creating secure volume: removing old secure volume image")
+            self._image().unlink()
+        LOG.info("Creating secure volume: making new secure volume image")
+        create_backing_store = await asyncio.create_subprocess_exec(
+            "/usr/bin/dd",
+            "if=/dev/zero",
+            f"of={str(self._image())}",
+            "bs=1M",
+            f"count={self._volume_size_mb}",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        if await create_backing_store.wait() != 0:
+            LOG.error(
+                f"Creating secure volume: failed to create backing store: {await _stringify_process(create_backing_store)}"
+            )
+        else:
+            LOG.info("Creating secure volume: made secure volume image")
+        await self._load_key()
+        await self._loopback_setup()
+        await self._map()
+        mkfs = await asyncio.create_subprocess_exec(
+            "/usr/sbin/mkfs.ext4",
+            f"/dev/mapper/{self.SECURE_STORAGE_DEVMAPPER_NAME}",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        if await mkfs.wait() != 0:
+            LOG.error(
+                f"Creating secure volume: failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
+            )
+        else:
+            LOG.info("Creating secure volume: made fs on encrypted volume")
+        LOG.info("Creating secure volume: unmapping device-mapper")
+        await self._unmap()
+        LOG.info("Creating secure volume: removing loopback")
+        await self._loopback_remove()
+        LOG.info("Creating secure volume: unloading key")
+        await self._unload_key()
+        LOG.info("Creating secure volume: done")
+
+    @_lock
     async def mount(self) -> None:
         """Mounts a previously-created secure volume by loading a CAAM red key and setting up the dm-crypto table.
 
         If the keyblob does not exist (i.e. because of a previous call to destroy()), initializes a new one.
         """
+        await self._do_mount()
+
+    async def _do_mount(self) -> None:
         LOG.info("Mounting secure volume: beginning")
-        if await self.must_create():
+        if await self._must_create():
             LOG.info("Mounting secure volume: creating volume")
-            await self.create()
+            await self._do_create()
         LOG.info("Mounting secure volume: loading key")
         await self._load_key()
         LOG.info("Mounting secure volume: setting up loopback device")
@@ -368,8 +405,12 @@ class CAAMSecureVolume(SecureVolumeManager):
         self._path = self._image_mount_point
         LOG.info("Mounting secure volume: complete")
 
+    @_lock
     async def unmount(self) -> None:
         """Unmounts a currently-mounted secure volume and tears down dm-crypto and key setup (though the keyblob is preserved)."""
+        await self._do_unmount()
+
+    async def _do_unmount(self) -> None:
         LOG.info("Unmounting secure volume: beginning")
         self._path = None
         LOG.info("Unmounting secure volume: unmounting loopback device")
@@ -382,10 +423,11 @@ class CAAMSecureVolume(SecureVolumeManager):
         await self._unload_key()
         LOG.info("Unmounting secure volume: complete")
 
+    @_lock
     async def destroy(self) -> None:
         """Destroys a secure volume by removing the CAAM keyblob."""
         LOG.info("Destroying secure volume: beginning")
-        await self.unmount()
+        await self._do_unmount()
         if self._keyblob().exists():
             LOG.info("Destroying secure volume: removing keyblob")
             self._keyblob().unlink()

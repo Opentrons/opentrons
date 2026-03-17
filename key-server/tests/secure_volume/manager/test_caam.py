@@ -294,7 +294,7 @@ async def test_must_create(
     decoy.when(mock_keyblob_path.exists()).then_return(blob_exists)
     decoy.when(mock_image_path.exists()).then_return(image_exists)
 
-    assert await subject.must_create() == result
+    assert await subject._must_create() == result
 
 
 async def test_create_happypath_with_clears(

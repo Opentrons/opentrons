@@ -22,10 +22,6 @@ class DevSecureVolume(SecureVolumeManager):
             raise RuntimeError("Volume not mounted")
         return self._path
 
-    async def must_create(self) -> bool:
-        """For the dev implementation, create is unnecessary."""
-        return False
-
     async def create(self) -> None:
         """Create the secure volume (noop in dev)."""
         pass

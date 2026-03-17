@@ -12,10 +12,6 @@ class SecureVolumeManager(Protocol):
         """
         pass
 
-    async def must_create(self) -> bool:
-        """True if the secure volume is created; False otherwise."""
-        pass
-
     async def destroy(self) -> None:
         """Destroy the secure volume, making its data forever inaccessible.
 
