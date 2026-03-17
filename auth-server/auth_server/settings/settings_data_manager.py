@@ -29,8 +29,26 @@ class SettingsDataManager:
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
-        self._settings_store.update(settings=patch)
-        return self._settings_store.get()
+        current = self.get()  # SettingsResponseData with all fields populated
+        non_null_updates = patch.model_dump(exclude_none=True)
+        merged = current.model_copy(update=non_null_updates)
+
+        # add logic for password complexity
+        new_settings = self._settings_store.add(
+            access_control_enabled=merged.accessControlEnabled,
+            max_number_of_login_attempts=merged.max_number_of_login_attempts,
+            password_reset_time_in_days=merged.password_reset_time_in_days,
+            idle_lockout_in_minutes=merged.idle_lockout_in_minutes,
+            require_admin_creds_when_updating_robot_software=merged.require_admin_creds_when_updating_robot_software,
+            require_admin_creds_when_sending_protocol_to_robot=merged.require_admin_creds_when_sending_protocol_to_robot,
+            require_admin_creds_for_signoff_protocol=merged.require_admin_creds_for_signoff_protocol,
+            require_signoff_for_protocol_log=merged.require_signoff_for_protocol_log,
+            require_reason_for_interaction=merged.require_reason_for_interaction,
+            min_length_of_reason_for_interaction=merged.min_length_of_reason_for_interaction,
+            require_logs_to_be_saved_in_app=merged.require_logs_to_be_saved_in_app,
+            delete_over_max_on_disk_protocols=merged.delete_over_max_on_disk_protocols,
+        )
+        return new_settings
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
