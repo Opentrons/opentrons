@@ -63,4 +63,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../temperature-module/index.md)
 
+-   :material-vacuum-outline:{ .xl .middle } __Vacuum Module__
+
+    ---
+
+    An on-deck vacuum filtration and purification module.
+
+    [:octicons-arrow-right-24: Instruction Manual](../vacuum-module/index.md)
+
 </div>
