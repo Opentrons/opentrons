@@ -198,8 +198,7 @@ async def rehearse_unmap(
 
 @pytest.fixture
 async def rehearse_losetup_teardown(
-    decoy: Decoy,
-    mock_asyncio_subprocess: AsyncioCSE,
+    decoy: Decoy, mock_asyncio_subprocess: AsyncioCSE, mock_image_path: Path
 ) -> None:
     decoy.when(
         await mock_asyncio_subprocess(
@@ -245,6 +244,20 @@ async def rehearse_remove_key(
             stderr=PIPE,
         )
     ).then_return(await build_subproc_result(decoy, 0, "", ""))
+
+
+@pytest.fixture
+async def rehearse_umount(
+    decoy: Decoy,
+    mock_mount_path: Path,
+    mock_asyncio_subprocess: AsyncioCSE,
+) -> None:
+    """Fixture for removing a mount."""
+    decoy.when(
+        await mock_asyncio_subprocess(
+            "/usr/bin/umount", "mock mount path", stdout=PIPE, stderr=PIPE
+        )
+    ).then_return(await build_subproc_result(decoy, 0, "ok", "ok"))
 
 
 @pytest.fixture
@@ -443,3 +456,35 @@ async def test_mount_creates_if_necessary(
     await subject.mount()
     assert subject.path == mock_mount_path
     decoy.verify(mock_mount_path.mkdir())
+
+
+async def test_unmount_happypath(
+    decoy: Decoy,
+    mock_asyncio_subprocess: AsyncioCSE,
+    mock_mount_path: Path,
+    mock_keyblob_path: Path,
+    rehearse_unmap: None,
+    rehearse_losetup_teardown: None,
+    rehearse_umount: None,
+    rehearse_remove_key: None,
+    subject: CAAMSecureVolume,
+) -> None:
+    """It should unmount everything."""
+    subject._keyid = 1234
+    await subject.unmount()
+
+
+async def test_destroy(
+    decoy: Decoy,
+    rehearse_unmap: None,
+    rehearse_losetup_teardown: None,
+    rehearse_umount: None,
+    mock_keyblob_path: Path,
+    rehearse_remove_key: None,
+    subject: CAAMSecureVolume,
+) -> None:
+    """It should destroy the keyblob."""
+    decoy.when(mock_keyblob_path.exists()).then_return(True)
+    subject._keyid = 1234
+    await subject.destroy()
+    decoy.verify(mock_keyblob_path.unlink())

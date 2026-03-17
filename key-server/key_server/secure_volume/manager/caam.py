@@ -273,7 +273,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         """Unmount a created loopback device."""
         mount_path = self._image_mount_point
         unmount = await asyncio.create_subprocess_exec(
-            "/usr/bin/umount", mount_path, stdout=PIPE, stderr=PIPE
+            "/usr/bin/umount", str(mount_path), stdout=PIPE, stderr=PIPE
         )
         # we don't care if this fails, really; it would only do so if the mount wasn't mounted
         await unmount.wait()
