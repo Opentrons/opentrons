@@ -345,7 +345,7 @@
         "options": {
           "pump": "Turn on Vacuum pump",
           "vent": {
-            "close": "Close vent",
+            "closed": "Close vent",
             "open": "Open vent"
           }
         }
