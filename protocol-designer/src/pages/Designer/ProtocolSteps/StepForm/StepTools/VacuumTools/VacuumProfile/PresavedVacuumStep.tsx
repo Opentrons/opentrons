@@ -19,10 +19,11 @@ import {
   maskToSignedDecimal,
   maskToTimeMMSS,
 } from '/protocol-designer/steplist/fieldLevel/processing'
+import { getFormattedTime } from '/protocol-designer/utils/getFormattedTime'
 
 import { PROFILE_STEP } from './constants'
 import { PresavedVacuumHeader } from './PresavedVacuumHeader'
-import { getFormattedTime, getStepErrors } from './utils'
+import { getStepErrors } from './utils'
 import styles from './vacuumprofile.module.css'
 
 import type {
