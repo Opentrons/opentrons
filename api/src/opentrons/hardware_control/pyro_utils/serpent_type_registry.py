@@ -5,6 +5,7 @@ import inspect
 from typing import Any, Callable, Dict
 
 import serpent
+from pydantic import BaseModel
 from Pyro5 import api as pyro
 
 import opentrons.config.types
@@ -96,11 +97,41 @@ def register_type_to_serpent(
     class_type: Any,
     dict_to_class: Callable[[str, Any], Any],
     class_to_dict: Callable[[Any], dict[Any, Any]],
-) -> None:
+) -> str:
     """Adapter function to call the serpent registries for individual types."""
     class_path = ".".join((class_type.__module__, class_type.__qualname__))
     pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
     pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
+    return class_path
+
+
+class PydanticPyroSerializer:
+    _class_name_to_model: Dict[str, type[BaseModel]] = {}
+
+    @classmethod
+    def register_model(cls, model: type[BaseModel]) -> None:
+        class_name = register_type_to_serpent(
+            model, cls._pydantic_dict_to_class, cls._pydantic_class_to_dict
+        )
+        cls._class_name_to_model[class_name] = model
+
+    @classmethod
+    def _pydantic_class_to_dict(cls, model: BaseModel) -> Dict[str, Any]:
+        class_name = ".".join((model.__module__, model.__class__.__name__))
+        model_dict = model.model_dump(mode="json")
+        model_dict["__class__"] = class_name
+        return model_dict
+
+    @classmethod
+    def _pydantic_dict_to_class(cls, class_name: str, d: Dict[str, Any]) -> BaseModel:
+        del d["__class__"]
+        try:
+            model = cls._class_name_to_model[class_name]
+        except KeyError:
+            raise TypeError(
+                f"Could not convert {class_name} to an object, unregistered with pyro."
+            )
+        return model.model_validate(d)
 
 
 # Handy function to map all registries for the Hardware controller
