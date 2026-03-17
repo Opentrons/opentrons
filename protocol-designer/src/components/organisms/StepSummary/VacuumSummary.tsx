@@ -7,7 +7,7 @@ import {
   VACUUM_STATE_PUMP,
 } from '@opentrons/step-generation'
 
-import { getFormattedTimeMMSS } from '/protocol-designer/utils'
+import { getFormattedTime } from '/protocol-designer/utils/getFormattedTime'
 
 import { StyledTrans } from './StyledTrans'
 
@@ -30,9 +30,7 @@ export function VacuumSummary(props: {
   } = currentStep
   const { t } = useTranslation('protocol_steps')
   const formattedTime =
-    pumpDurationTime != null
-      ? getFormattedTimeMMSS(pumpDurationTime as string)
-      : ''
+    pumpDurationTime != null ? getFormattedTime(pumpDurationTime as string) : ''
   if (
     programType === VACUUM_PROGRAM_STATE &&
     stateType !== null &&

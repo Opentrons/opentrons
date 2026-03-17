@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
-import { getFormattedTimeMMSS, uuid } from '/protocol-designer/utils'
+import { uuid } from '/protocol-designer/utils'
+import { getFormattedTime } from '/protocol-designer/utils/getFormattedTime'
 
 import { PROFILE_CYCLE, PROFILE_STEP } from '../constants'
 import { getDefaultStepData } from '../utils'
@@ -168,7 +169,7 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
           ...acc,
           [key]: {
             ...value,
-            time: getFormattedTimeMMSS(value.time),
+            time: getFormattedTime(value.time),
           },
         }
       }, {})
