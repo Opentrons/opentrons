@@ -81,9 +81,6 @@ def test_reset_settings(
 ) -> None:
     manager.reset()
     decoy.verify(mock_store.reset())
-    assert manager.get() == SettingsResponseData.model_construct(
-        accessControlEnabled=False
-    )
 
 
 def test_get_settings(

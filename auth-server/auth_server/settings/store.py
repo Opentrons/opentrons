@@ -45,7 +45,6 @@ class SettingsStore:
         delete_over_max_on_disk_protocols: bool,
     ) -> Settings:
         """Create a settings, persist it, and return it."""
-        # should the defaults exist in the pydantic or the db?
         new_settings = Settings(
             access_control_enabled=access_control_enabled,
             max_number_of_login_attempts=max_number_of_login_attempts,
@@ -73,10 +72,11 @@ class SettingsStore:
 
     def reset(self) -> None:
         """Reset the settings to their defaults.
-
-        Raises ``ValueError`` if the username does not exist.
+        Delete the settings record and force settings to defaults.
         """
-        pass  # TODO: Implement
+        with self._session() as session:
+            session.query(Settings).delete()
+            session.commit()
 
     def update(
         self,
