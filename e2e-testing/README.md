@@ -4,15 +4,9 @@ End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Libr
 
 ## Prerequisites
 
-<<<<<<< HEAD
-- Python 3.12+
-- [uv](https://github.com/astral-sh/uv) (Python package manager)
-- Node.js 22 (for building Protocol Designer locally)
-=======
 - Python 3.12
 - [uv](https://github.com/astral-sh/uv) (Python package manager)
 - Node.js 22 (for building PD / LL locally)
->>>>>>> edge
 
 ## Quick Start
 

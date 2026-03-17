@@ -18,7 +18,6 @@ dependencies = [
     "pytest-timeout>=2.3.1",
     "python-dotenv>=1.2.1",
     "ruff>=0.14.2",
-    "syrupy>=5.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -31,10 +30,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-extend-exclude = [
-    "fixtures/*",
-    "migration-report/*",
-]
+extend-exclude = ['fixtures/protocol/9/*']
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
@@ -44,7 +40,6 @@ ignore = []
 
 [tool.mypy]
 python_version = "3.12"
-exclude = '(?x)(^fixtures/|^migration-report/)'
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true

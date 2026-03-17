@@ -158,6 +158,32 @@ wheels = [
 ]
 
 [[package]]
+name = "eyes-common"
+version = "6.5.20"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "core-universal4" },
+    { name = "marshmallow" },
+    { name = "websocket-client" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2c/6a/acaa250379156a167f5f6f242a37bf648490c9d48ecdf81945e5142cf904/eyes_common-6.5.20-py3-none-any.whl", hash = "sha256:6d3607fb301630631c64ae1706d3b0a978cefceca442f35e832f2cbb46f872e3", size = 87734, upload-time = "2026-01-22T08:32:42.996Z" },
+]
+
+[[package]]
+name = "eyes-playwright"
+version = "6.4.20"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "eyes-common" },
+    { name = "playwright" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cf/56/efc804328504261299810132b893e40f1d08672bb26511c9a1bde53aed11/eyes_playwright-6.4.20-py3-none-any.whl", hash = "sha256:8b70ea19f79ec88dbb6584e64004347cd6a94218fb24fd915ff027914a0f0cef", size = 14102, upload-time = "2026-01-22T08:32:47.883Z" },
+]
+
+[[package]]
 name = "greenlet"
 version = "3.2.4"
 source = { registry = "https://pypi.org/simple" }

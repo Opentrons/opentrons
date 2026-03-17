@@ -24,8 +24,6 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 
-For the **import → export → opentrons_simulate** PD test (same fixtures as `test_migrate`), see the **pd-import-export-simulate-e2e** skill. Update that skill when changing that test or its conftest fixtures.
-
 ## Architecture — Page Object Model
 
 **ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests.
