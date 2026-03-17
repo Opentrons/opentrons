@@ -77,14 +77,15 @@ export function AbsorbanceReaderSummary(
         </div>
       )
       if (mode === 'single') {
+        const readingTag = {
+          text: `${wavelengths[0]}${t('application:units.nanometer')}`,
+        }
         stepSummaryContent =
           referenceWavelengthActive === true && referenceWavelength != null ? (
             <StyledTrans
               i18nKey="protocol_steps:absorbance_reader.initialize_single_with_reference"
               tagInfos={[
-                {
-                  text: `${wavelengths[0]}${t('application:units.nanometer')}`,
-                },
+                readingTag,
                 {
                   text: `${referenceWavelength}${t('application:units.nanometer')}`,
                 },
@@ -93,11 +94,7 @@ export function AbsorbanceReaderSummary(
           ) : (
             <StyledTrans
               i18nKey="protocol_steps:absorbance_reader.initialize_single"
-              tagInfos={[
-                {
-                  text: `${wavelengths[0]}${t('application:units.nanometer')}`,
-                },
-              ]}
+              tagInfos={[readingTag]}
             />
           )
         break
