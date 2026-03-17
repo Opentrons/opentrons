@@ -248,22 +248,55 @@ export interface FormData {
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 export const PROFILE_STEP: 'profileStep' = 'profileStep'
-export interface ProfileStepItem {
+interface ProfileStepItemBase {
   type: typeof PROFILE_STEP
   id: string
   title: string
+}
+
+// Thermocycler
+// TODO: Rename plain "ProfileX" to "ThermocyclerProfileX"
+export interface ProfileStepItem extends ProfileStepItemBase {
   temperature: string
   durationMinutes: string
   durationSeconds: string
 }
-export interface ProfileCycleItem {
+
+interface ProfileCycleItemBase {
   type: typeof PROFILE_CYCLE
   id: string
-  steps: ProfileStepItem[]
   repetitions: string
 }
-// TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
+interface ProfileCycleItem extends ProfileCycleItemBase {
+  steps: ProfileStepItem[]
+}
+
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
+
+// Vacuum
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  powerPercent: number
+}
+
+type VacuumPumpData = VacuumPressureData | VacuumPowerData
+
+export interface VacuumProfileStep extends ProfileStepItemBase {
+  time: string
+  pumpData: VacuumPumpData
+}
+
+export type VacuumProfileCycle = ProfileCycleItemBase & {
+  profileStepItemsById: Record<string, VacuumProfileStep>
+  orderedProfileStepIds: string[]
+}
+export type VacuumProfileItem = VacuumProfileStep | VacuumProfileCycle
+
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
 export type BlankForm = AnnotationFields & {

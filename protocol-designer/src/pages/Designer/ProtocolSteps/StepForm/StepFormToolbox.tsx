@@ -37,6 +37,7 @@ import { FormAlerts } from '/protocol-designer/components/organisms'
 import { AdvancedSettingsUpdateConfirmationModal } from '/protocol-designer/components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { RenameStepModal } from '/protocol-designer/components/organisms/RenameStepModal'
+import { useVacuumModeUpdate } from '/protocol-designer/components/organisms/VacuumModeUpdateModal/hooks/useVacuumModeUpdate'
 import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
 import {
   getRobotStateTimeline,
@@ -63,6 +64,7 @@ import {
   selectDropdownItem,
 } from '/protocol-designer/ui/steps/actions/actions'
 
+import { VacuumModeUpdateModal } from '../../../../components/organisms/VacuumModeUpdateModal'
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
@@ -260,6 +262,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     showFormErrors,
     currentFormIsPresaved
   )
+
+  const vacuumModeUpdateResult = useVacuumModeUpdate(formData, propsForFields)
+  const { showVacuumModeUpdateModal } = vacuumModeUpdateResult
 
   const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
@@ -508,6 +513,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           }}
         />
       ) : null}
+      {showVacuumModeUpdateModal && (
+        <VacuumModeUpdateModal
+          onConfirm={vacuumModeUpdateResult.handleConfirmVacuumModeUpdate}
+          onClose={vacuumModeUpdateResult.handleCancelVacuumModeUpdate}
+        />
+      )}
       <Toolbox
         height="100%"
         maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}

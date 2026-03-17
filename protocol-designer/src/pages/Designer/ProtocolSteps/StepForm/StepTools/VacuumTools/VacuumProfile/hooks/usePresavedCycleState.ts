@@ -5,17 +5,17 @@ import { uuid } from '/protocol-designer/utils'
 import { PROFILE_STEP } from '../constants'
 import { getDefaultStepData, getInvalidPresavedStepIds } from '../utils'
 
+import type { VacuumProfileStep } from '/protocol-designer/form-types'
 import type {
   PresavedVacuumCycleSavePayload,
-  ProfileStepItem,
-  VacuumStepData,
+  VacuumProfileStepItem,
 } from '../types'
 import type { VacuumMode } from '../utils'
 
 export interface UsePresavedCycleStateArgs {
   orderedProfileStepIds: string[]
-  profileStepItemsById: Record<string, ProfileStepItem>
-  repetitions: number
+  profileStepItemsById: Record<string, VacuumProfileStepItem>
+  repetitions: string
   mode: VacuumMode
   onSaveCycle: (data: PresavedVacuumCycleSavePayload) => void
   handleAddCycleStep?: (stepId: string) => void
@@ -23,17 +23,17 @@ export interface UsePresavedCycleStateArgs {
 
 export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
   localOrderedProfileStepIds: string[]
-  localProfileStepItemsById: Record<string, ProfileStepItem>
-  localRepetitions: number
-  setLocalRepetitions: (value: number | ((prev: number) => number)) => void
+  localProfileStepItemsById: Record<string, VacuumProfileStepItem>
+  localRepetitions: string
+  setLocalRepetitions: (value: string | ((prev: string) => string)) => void
   showCycleErrors: boolean
   setShowCycleErrors: (value: boolean) => void
   showRepetitionErrors: boolean
   setShowRepetitionErrors: (value: boolean) => void
   isRepetitionError: boolean
   invalidStepIds: string[]
-  defaultStepData: VacuumStepData
-  handleStepChange: (stepId: string, patch: Partial<VacuumStepData>) => void
+  defaultStepData: VacuumProfileStep
+  handleStepChange: (stepId: string, patch: Partial<VacuumProfileStep>) => void
   handleDeleteStep: (stepId: string) => void
   handleEditStep: (stepId: string) => void
   handleAddStep: () => void
@@ -53,14 +53,15 @@ export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
     string[]
   >(orderedProfileStepIds)
   const [localProfileStepItemsById, setLocalProfileStepItemsById] =
-    useState<Record<string, ProfileStepItem>>(profileStepItemsById)
-  const [localRepetitions, setLocalRepetitions] = useState<number>(repetitions)
+    useState<Record<string, VacuumProfileStepItem>>(profileStepItemsById)
+  const [localRepetitions, setLocalRepetitions] = useState<string>(repetitions)
   const [showCycleErrors, setShowCycleErrors] = useState<boolean>(false)
   const [showRepetitionErrors, setShowRepetitionErrors] =
     useState<boolean>(false)
 
   const defaultStepData = getDefaultStepData(mode)
-  const isRepetitionError = localRepetitions == null || localRepetitions < 1
+  const isRepetitionError =
+    localRepetitions === '' || Number(localRepetitions) < 1
   const invalidStepIds = getInvalidPresavedStepIds(
     localOrderedProfileStepIds,
     localProfileStepItemsById
@@ -69,7 +70,7 @@ export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
 
   const handleStepChange = (
     stepId: string,
-    patch: Partial<VacuumStepData>
+    patch: Partial<VacuumProfileStep>
   ): void => {
     setLocalProfileStepItemsById(prev => ({
       ...prev,
@@ -106,7 +107,7 @@ export function usePresavedCycleState(args: UsePresavedCycleStateArgs): {
 
   const handleAddStep = (): void => {
     const id = uuid()
-    const newStep: ProfileStepItem = {
+    const newStep: VacuumProfileStepItem = {
       ...defaultStepData,
       id,
       isPresaved: true,
