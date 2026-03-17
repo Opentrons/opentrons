@@ -6,20 +6,14 @@ import pytest
 
 from server_utils.testing_utils.get_declared_security import get_declared_security
 
-from robot_server.app_setup import app
+from system_server.app_setup import app
 
 # Endpoints that are deliberately missing access control for some reason.
 IGNORED_ENDPOINTS: set[tuple[str, str]] = {
-    # /clientData is purely client-to-client communication, not actual robot control.
-    ("post", "/clientData"),
-    ("put", "/clientData"),
-    ("delete", "/clientData"),
-    ("put", "/clientData/{key}"),
-    ("delete", "/clientData/{key}"),
-    # This is spiritually a GET endpoint. It doesn't actually control or modify anything.
-    ("post", "/labwareOffsets/searches"),
-    # Protocol analyses are just disposable simulations.
-    ("post", "/protocols/{protocolId}/analyses"),
+    # /system/authorize and /system/register are legacy endpoints that need to remain
+    # accessible without authentication for compatibility reasons.
+    ("post", "/system/authorize"),
+    ("post", "/system/register"),
 }
 
 
