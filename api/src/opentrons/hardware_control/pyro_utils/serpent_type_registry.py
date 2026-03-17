@@ -117,9 +117,8 @@ class PydanticPyroSerializer:
 
     @classmethod
     def _pydantic_class_to_dict(cls, model: BaseModel) -> Dict[str, Any]:
-        class_name = ".".join((model.__module__, model.__class__.__name__))
         model_dict = model.model_dump(mode="json")
-        model_dict["__class__"] = class_name
+        model_dict["__class__"] = ".".join((model.__module__, model.__class__.__name__))
         return model_dict
 
     @classmethod
