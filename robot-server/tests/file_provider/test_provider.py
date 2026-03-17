@@ -1,4 +1,5 @@
 """Test the file provider."""
+
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import Mock
@@ -110,7 +111,7 @@ async def test_write_new_file(subject: FileProviderExecutor) -> None:
     )
     file_info = await subject.write_file_cb(file_data)
 
-    #make sure it appends a csv to the filename if there's not one
+    # make sure it appends a csv to the filename if there's not one
     assert file_info.path.endswith("file.csv")
 
     cmd_metadata = UserDefinedCSVCmdFileNameMetadata(
@@ -146,8 +147,8 @@ async def test_append(subject: FileProviderExecutor) -> None:
     # Do the first write
     first_file_info = await subject.write_file_cb(file_data)
 
-    subject._data_files_store.insert.assert_called_once_with(first_file_info) # type: ignore[attr-defined]
-    subject._data_files_store.insert.reset_mock() # type: ignore[attr-defined]
+    subject._data_files_store.insert.assert_called_once_with(first_file_info)  # type: ignore[attr-defined]
+    subject._data_files_store.insert.reset_mock()  # type: ignore[attr-defined]
 
     with open(first_file_info.path, "r") as output:
         first_call_lines = output.readlines()
@@ -170,7 +171,7 @@ async def test_append(subject: FileProviderExecutor) -> None:
     second_file_info = await subject.write_file_cb(file_data)
 
     # Should not be inserted a second time
-    subject._data_files_store.insert.assert_not_called() # type: ignore[attr-defined]
+    subject._data_files_store.insert.assert_not_called()  # type: ignore[attr-defined]
 
     # All of this should be the same
     assert first_file_info.id == second_file_info.id
