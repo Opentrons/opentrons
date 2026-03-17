@@ -25,7 +25,7 @@ def test_no_invalid_characters_in_scope(scope: Scope) -> None:
 def test_parse() -> None:
     assert parse_scopes("") == set()
 
-    assert parse_scopes("runs.write users.write") == {
+    assert parse_scopes("robot_control.write users.write") == {
         Scope.ROBOT_CONTROL_WRITE,
         Scope.USERS_WRITE,
     }
