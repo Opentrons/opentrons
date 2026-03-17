@@ -14,6 +14,13 @@ import type {
   TipRackWithDef,
   TipTrackingOption,
   TrashBinEntity,
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_PROGRAM_PROFILE,
+  VACUUM_PROGRAM_STATE,
+  VACUUM_STATE_PUMP,
+  VACUUM_VENT_SET_CLOSED,
+  VACUUM_VENT_SET_OPEN,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
 import type {
@@ -546,6 +553,20 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   stepType: 'vacuum'
   id: string
   moduleId: string
+  endingHoldVentCheckbox: boolean
+  modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
+  orderedProfileIds: string[]
+  powerPercent: number | null
+  pressureMbar: number | null
+  profileItemsById: Record<string, ProfileItem>
+  programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
+  pumpDurationCheckbox: boolean | null
+  pumpDurationTime: string | null
+  stateType:
+    | typeof VACUUM_STATE_PUMP
+    | typeof VACUUM_VENT_SET_OPEN
+    | typeof VACUUM_VENT_SET_CLOSED
+    | null
 }
 
 // fields used in TipPositionInput

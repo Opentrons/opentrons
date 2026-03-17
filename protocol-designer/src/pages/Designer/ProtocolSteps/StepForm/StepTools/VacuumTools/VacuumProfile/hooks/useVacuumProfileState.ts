@@ -1,9 +1,10 @@
 import { useState } from 'react'
 
 import { uuid } from '/protocol-designer/utils'
+import { getFormattedTime } from '/protocol-designer/utils/getFormattedTime'
 
 import { PROFILE_CYCLE, PROFILE_STEP } from '../constants'
-import { getDefaultStepData, getFormattedTime } from '../utils'
+import { getDefaultStepData } from '../utils'
 
 import type {
   PresavedVacuumCycleSavePayload,

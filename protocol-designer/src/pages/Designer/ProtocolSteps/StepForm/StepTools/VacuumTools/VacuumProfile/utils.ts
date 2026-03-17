@@ -72,9 +72,3 @@ export const getInvalidPresavedStepIds = (
     return step?.isPresaved === true && !getIsStepValid(step)
   })
 }
-
-export const getFormattedTime = (time: string): string => {
-  const [minutes, rawSeconds] = time.split(':')
-  const seconds = rawSeconds ? Number(rawSeconds) : 0
-  return `${minutes.padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-}
