@@ -24,6 +24,11 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
+    PROTOCOLS_WRITE = (
+        "protocols.write",
+        "Upload or delete protocols.",
+    )
+
     RESTART_WRITE = (
         "restart.write",
         "Restart the robot.",
