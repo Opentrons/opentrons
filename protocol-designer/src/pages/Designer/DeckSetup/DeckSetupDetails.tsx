@@ -163,42 +163,52 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     preSelectedFixture,
     slotPosition,
     isSlotAHopper,
-  } = useMemo(() => {
-    return getSlotInformation({
-      deckSetup: { ...activeDeckSetup, labware: allLabware },
-      slot: selectedZoomInSlot ?? '',
-      deckDef,
-      pendingCreationStateForHopper,
-    })
-  }, [activeDeckSetup, selectedZoomInSlot])
+  } = useMemo(
+    () => {
+      return getSlotInformation({
+        deckSetup: { ...activeDeckSetup, labware: allLabware },
+        slot: selectedZoomInSlot ?? '',
+        deckDef,
+        pendingCreationStateForHopper,
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeDeckSetup, selectedZoomInSlot]
+  )
 
   const createdTopLabwareForSlot = activeLabware[createdStackForSlot[0]]
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
-  useEffect(() => {
-    if (
-      createdTopLabwareForSlot ||
-      createdAdapterForSlot ||
-      createdLidForSlot
-    ) {
-      dispatch(
-        editSlotInfo({
-          labwareDefURI: createdTopLabwareForSlot?.labwareDefURI,
-          adapterDefURI: createdAdapterForSlot?.labwareDefURI,
-          moduleModel: createdModuleForSlot?.model,
-          fixture: preSelectedFixture,
-          lidDefURI: createdLidForSlot?.labwareDefURI,
-          amount,
-        })
-      )
-    }
-  }, [
-    createdAdapterForSlot,
-    createdLidForSlot,
-    createdTopLabwareForSlot,
-    amount,
-    selectedZoomInSlot,
-  ])
+  useEffect(
+    () => {
+      if (
+        createdTopLabwareForSlot ||
+        createdAdapterForSlot ||
+        createdLidForSlot
+      ) {
+        dispatch(
+          editSlotInfo({
+            labwareDefURI: createdTopLabwareForSlot?.labwareDefURI,
+            adapterDefURI: createdAdapterForSlot?.labwareDefURI,
+            moduleModel: createdModuleForSlot?.model,
+            fixture: preSelectedFixture,
+            lidDefURI: createdLidForSlot?.labwareDefURI,
+            amount,
+          })
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      createdAdapterForSlot,
+      createdLidForSlot,
+      createdTopLabwareForSlot,
+      amount,
+      selectedZoomInSlot,
+    ]
+  )
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =

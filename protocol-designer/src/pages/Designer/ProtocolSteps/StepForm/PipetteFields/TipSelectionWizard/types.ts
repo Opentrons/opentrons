@@ -3,8 +3,10 @@ import type {
   DeckDefinition,
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
+import type { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
 import type {
   INACCESSIBLE_COLLISION,
   INACCESSIBLE_INCOMPLETE,
@@ -24,6 +26,7 @@ export interface TipSelectionBaseProps {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   pipetteId: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export interface PipetteShadowProps {
@@ -33,6 +36,7 @@ export interface PipetteShadowProps {
   height: number
   fill: string
   stroke: string
+  rotate?: boolean
 }
 
 export type LabelPlacement =
@@ -45,6 +49,7 @@ export type InaccessibleReason =
   | typeof INACCESSIBLE_COLLISION
   | typeof INACCESSIBLE_INCOMPLETE
   | typeof INACCESSIBLE_TOO_MANY_PICKUPS
+  | typeof INACCESSIBLE_PARTIAL_TIP
 
 export interface AccessibilityStatus {
   isAccessible: boolean

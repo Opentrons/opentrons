@@ -1,9 +1,4 @@
-import {
-  ALIGN_CENTER,
-  Flex,
-  JUSTIFY_CENTER,
-  SPACING,
-} from '@opentrons/components'
+import { ALIGN_CENTER, Flex, JUSTIFY_CENTER } from '@opentrons/components'
 
 import { Slider } from './index'
 
@@ -15,7 +10,6 @@ const meta: Meta<typeof Slider> = {
   decorators: [
     Story => (
       <Flex
-        marginTop={SPACING.spacing16}
         width="20rem"
         height="22rem"
         justifyContent={JUSTIFY_CENTER}

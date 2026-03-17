@@ -19,9 +19,11 @@ from opentrons.protocol_api._liquid_properties import (
     MultiDispenseProperties,
     SingleDispenseProperties,
     Submerge,
+    TipPosition,
     TouchTipProperties,
     TransferProperties,
 )
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
 )
@@ -32,7 +34,6 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
 from opentrons.types import Location, Mount, Point
 
 if TYPE_CHECKING:
-    from ... import TrashBin, WasteChute
     from .instrument import InstrumentCore
     from .well import WellCore
 
@@ -454,7 +455,7 @@ class TransferComponentsExecutor:
                 )
             )
 
-    def retract_after_dispensing(
+    def retract_after_dispensing(  # noqa: C901
         self,
         trash_location: Union[Location, TrashBin, WasteChute],
         source_location: Optional[Location],
@@ -464,7 +465,10 @@ class TransferComponentsExecutor:
         """Execute post-dispense retraction steps.
         1. Position ref+offset is the ending position. Move to this position using specified speed
         2. If blowout is enabled and “destination”
-            - Do blow-out (at the retract position)
+            - Do blow-out at the position specified by BlowoutPosition.
+            - If BlowoutPosition is not specified, blow out at the retract position.
+              If destination is a DisposalLocation (TrashBin/ WasteChute), retract position is same as target position,
+              so, we blowout at the target position.
             - Leave plunger down
         3. Touch-tip in the destination well.
         4. If not ready-to-aspirate
@@ -477,12 +481,14 @@ class TransferComponentsExecutor:
                 If this is the last step of the transfer, and we aren't dropping the tip off,
                 then the air gap will be left as is(?).
         6. If blowout is “source” or “trash”
-            - Move to location (top of Well)
-            - Do blow-out (top of well)
+            - Move to position specified by BlowoutPosition.
+            - If BlowoutPosition is not specified:
+                - if blowing out at source, move to the top of Well
+                - if blowing out at trash, move to the location specified by trash_location
+            - Do blow-out
             - Do touch-tip AGAIN at the source well (if blowout in a non-trash location)
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
-        7. If drop tip, move to drop tip location, drop tip
 
         If target location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
         even if it is enabled.
@@ -532,10 +538,23 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
+            well_core = self._target_well if self._target_well is not None else None
+            if blowout_props.blowout_position is not None:
+                in_place = False
+                dest_blowout_location = (
+                    self._calculate_blowout_position_from_position_info(
+                        blowout_location=self._target_location,
+                        blowout_position=blowout_props.blowout_position,
+                        blowout_well=well_core,
+                    )
+                )
+            else:
+                dest_blowout_location = retract_location
+                in_place = True
             self._instrument.blow_out(
-                location=retract_location,
-                well_core=None,
-                in_place=True,
+                location=dest_blowout_location,
+                well_core=well_core,
+                in_place=in_place,
                 flow_rate=blowout_props.flow_rate,
             )
             self._tip_state.ready_to_aspirate = False
@@ -571,11 +590,21 @@ class TransferComponentsExecutor:
                     raise RuntimeError(
                         "Blowout location is 'source' but source location &/or well is not provided."
                     )
-                # TODO: check if we should add a blowout location z-offset in liq class definition
-                self._instrument.blow_out(
-                    location=Location(
+                src_blowout_location: Location
+                if blowout_props.blowout_position is not None:
+                    src_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=source_location,
+                            blowout_well=source_well,
+                        )
+                    )
+                else:
+                    src_blowout_location = Location(
                         source_well.get_top(0), labware=source_location.labware
-                    ),
+                    )
+                self._instrument.blow_out(
+                    location=src_blowout_location,
                     well_core=source_well,
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
@@ -585,17 +614,35 @@ class TransferComponentsExecutor:
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
-                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now?
                 if (
-                    "touchTipDisabled"
+                    blowout_touch_tip_props.enabled
+                    and "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
                 ):
                     blowout_touch_tip_props = replace(blowout_touch_tip_props)
                     blowout_touch_tip_props.enabled = False
             else:
+                trash_blowout_location: Union[Location, TrashBin, WasteChute]
+                blowout_well = (
+                    # We have already established that trash location of `Location` type
+                    # has its `labware` as `Well` type.
+                    trash_location.labware.as_well()._core
+                    if isinstance(trash_location, Location)
+                    else None
+                )
+                if blowout_props.blowout_position is not None:
+                    trash_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=trash_location,
+                            blowout_well=blowout_well,  # type: ignore[arg-type]
+                        )
+                    )
+                else:
+                    trash_blowout_location = trash_location
                 self._instrument.blow_out(
-                    location=trash_location,
-                    well_core=None,
+                    location=trash_blowout_location,
+                    well_core=blowout_well,  # type: ignore[arg-type]
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
                 )
@@ -696,10 +743,26 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
+            dest_blowout_location: Location
+            # Destination for multi-dispense is never a disposal location, so we will always have a target well
+            assert self._target_well is not None
+            well_core = self._target_well
+            if blowout_props.blowout_position is not None:
+                in_place = False
+                dest_blowout_location = (
+                    self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
+                        blowout_position=blowout_props.blowout_position,
+                        blowout_location=self._target_location,
+                        blowout_well=well_core,
+                    )
+                )
+            else:
+                dest_blowout_location = retract_location
+                in_place = True
             self._instrument.blow_out(
-                location=retract_location,
-                well_core=None,
-                in_place=True,
+                location=dest_blowout_location,
+                well_core=well_core,
+                in_place=in_place,
                 flow_rate=blowout_props.flow_rate,
             )
             # A blowout will remove all air gap and liquid (disposal volume) from the tip
@@ -769,15 +832,25 @@ class TransferComponentsExecutor:
             blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
+                src_blowout_location: Location
                 if source_location is None or source_well is None:
                     raise RuntimeError(
                         "Blowout location is 'source' but source location &/or well is not provided."
                     )
-                # TODO: check if we should add a blowout location z-offset in liq class definition
-                self._instrument.blow_out(
-                    location=Location(
+                if blowout_props.blowout_position is not None:
+                    src_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=source_location,
+                            blowout_well=source_well,
+                        )
+                    )
+                else:
+                    src_blowout_location = Location(
                         source_well.get_top(0), labware=source_location.labware
-                    ),
+                    )
+                self._instrument.blow_out(
+                    location=src_blowout_location,
                     well_core=source_well,
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
@@ -787,17 +860,33 @@ class TransferComponentsExecutor:
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
-                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now?
                 if (
-                    "touchTipDisabled"
+                    blowout_touch_tip_props.enabled
+                    and "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
                 ):
                     blowout_touch_tip_props = replace(blowout_touch_tip_props)
                     blowout_touch_tip_props.enabled = False
             else:
+                trash_blowout_location: Union[Location, TrashBin, WasteChute]
+                blowout_well = (
+                    trash_location._labware.as_well()._core
+                    if isinstance(trash_location, Location)
+                    else None
+                )
+                if blowout_props.blowout_position is not None:
+                    trash_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=trash_location,
+                            blowout_well=blowout_well,  # type: ignore[arg-type]
+                        )
+                    )
+                else:
+                    trash_blowout_location = trash_location
                 self._instrument.blow_out(
-                    location=trash_location,
-                    well_core=None,
+                    location=trash_blowout_location,
+                    well_core=blowout_well,  # type: ignore[arg-type]
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
                 )
@@ -828,6 +917,31 @@ class TransferComponentsExecutor:
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
                 air_gap_volume=air_gap_volume,
+            )
+
+    def _calculate_blowout_position_from_position_info(
+        self,
+        blowout_position: TipPosition,
+        blowout_location: Union[Location, TrashBin, WasteChute],
+        blowout_well: Optional[WellCore],
+    ) -> Union[Location, TrashBin, WasteChute]:
+        """Returns blowout position calculated from blowout position reference & offset."""
+        if isinstance(blowout_location, (TrashBin, WasteChute)):
+            return tx_utils.get_blowout_location_for_trash(
+                blowout_location,
+                blowout_position,
+            )
+        else:
+            assert blowout_well is not None
+            return Location(
+                absolute_point_from_position_reference_and_offset(
+                    well=blowout_well,
+                    well_volume_difference=0,
+                    position_reference=blowout_position.position_reference,
+                    offset=blowout_position.offset,
+                    mount=self._instrument.get_mount(),
+                ),
+                blowout_location.labware,
             )
 
     def _do_touch_tip_and_air_gap_after_dispense(

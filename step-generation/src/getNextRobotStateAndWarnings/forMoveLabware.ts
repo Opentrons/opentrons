@@ -51,6 +51,26 @@ export function forMoveLabware(
       return type === FLEX_STACKER_MODULE_TYPE && slot === initialDeckSlot
     }) ?? null
 
+  const movedStackFromShuttle =
+    initialShuttleParentStackerState != null &&
+    initialShuttleParentStackerState[1].moduleState.type ===
+      FLEX_STACKER_MODULE_TYPE
+      ? BOTTOM_UP_LABWARE_POOL_KEYS.map(
+          key =>
+            (
+              initialShuttleParentStackerState[1]
+                .moduleState as FlexStackerModuleState
+            ).labwareOnShuttle?.[key]
+        ).filter((id): id is string => id != null)
+      : []
+
+  const movedStackUpToTarget = movedStackFromShuttle.includes(labwareId)
+    ? movedStackFromShuttle.slice(
+        0,
+        movedStackFromShuttle.indexOf(labwareId) + 1
+      )
+    : []
+
   if (
     initialShuttleParentStackerState != null &&
     initialShuttleParentStackerState[1].moduleState.type ===
@@ -90,7 +110,10 @@ export function forMoveLabware(
     }) ?? null
   const [newModuleId, newStackerOnDeck] = newShuttleParentStackerState ?? []
   if (newModuleId != null && newStackerOnDeck != null) {
-    const fullStack = getLargestStackInSlot(labware, initialDeckSlot)
+    const fullStack =
+      movedStackUpToTarget.length > 0
+        ? movedStackUpToTarget
+        : getLargestStackInSlot(labware, initialDeckSlot)
     const stackIndexOfTarget = fullStack.indexOf(labwareId)
     const moduleState = newStackerOnDeck.moduleState as FlexStackerModuleState
     if (stackIndexOfTarget !== -1) {
@@ -132,15 +155,25 @@ export function forMoveLabware(
       }
     }
   }
-
   const newLocationStack: string[] = []
   if (locationIsOffDeck(newLocation)) {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
-    newLocationStack.push(
-      newLocation.moduleId,
-      modules[newLocation.moduleId].slot
-    )
+    //  NOTE: this special-case is only for PV. PD should not
+    //  be affected. PV's newLocation comes from the command.params
+    //  which includes moduleId when moving a labware onto the stacker shuttle
+    //  but for PD, the newLocation does not include the moduleId
+    if (
+      modules[newLocation.moduleId].moduleState.type ===
+      FLEX_STACKER_MODULE_TYPE
+    ) {
+      newLocationStack.push(modules[newLocation.moduleId].slot)
+    } else {
+      newLocationStack.push(
+        newLocation.moduleId,
+        modules[newLocation.moduleId].slot
+      )
+    }
   } else if ('slotName' in newLocation) {
     // need to handle slotName being a labwareId or a slotId (misleading property name)
     const { slotName } = newLocation

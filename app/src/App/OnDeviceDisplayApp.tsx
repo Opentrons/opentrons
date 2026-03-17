@@ -37,7 +37,6 @@ import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
-import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
@@ -85,7 +84,6 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/network-setup/wifi',
   '/protocols',
   '/protocols/:protocolId',
-  '/quick-transfer',
   '/quick-transfer/new',
   '/quick-transfer/:quickTransferId',
   '/robot-settings',
@@ -126,8 +124,6 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
-    case '/quick-transfer':
-      return <QuickTransferDashboard />
     case '/quick-transfer/new':
       return <QuickTransferFlow />
     case '/quick-transfer/:quickTransferId':
@@ -253,13 +249,18 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
-  useEffect(() => {
-    element?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto',
-    })
-  }, [location.pathname])
+  useEffect(
+    () => {
+      element?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto',
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname]
+  )
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings

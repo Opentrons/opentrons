@@ -13,6 +13,7 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from server_utils.fastapi_utils.models.json_api import RequestModel, SimpleBody
 
 from robot_server.maintenance_runs.maintenance_run_models import (
     LabwareDefinitionSummary,
@@ -25,7 +26,6 @@ from robot_server.maintenance_runs.router.labware_router import (
     add_labware_definition,
     add_labware_offset,
 )
-from robot_server.service.json_api import RequestModel, SimpleBody
 
 
 @pytest.fixture()

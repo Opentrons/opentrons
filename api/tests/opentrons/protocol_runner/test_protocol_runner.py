@@ -398,8 +398,13 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
+    decoy.when(
+        json_translator.translate_legacy_command_annotations(json_protocol)
+    ).then_return([])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
+        commands
+    )
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
     decoy.when(
         await protocol_engine.add_and_execute_command_wait_for_recovery(
@@ -506,7 +511,12 @@ async def test_load_json_runner(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(
+        json_translator.translate_legacy_command_annotations(json_protocol)
+    ).then_return([])
+    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
+        commands
+    )
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
     await json_runner_subject.load(json_protocol_source)

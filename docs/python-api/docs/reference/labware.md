@@ -1,5 +1,6 @@
 ---
 title: "Python API Reference: Labware and Trash"
+description: "Labware and trash container API reference for the Python API."
 ---
 
 ::: opentrons.protocol_api.Labware
@@ -10,7 +11,6 @@ title: "Python API Reference: Labware and Trash"
         - "!use_tips"
         - "!previous_tip"
         - "!return_tips"
-        - "!set_empty"
 
 ::: opentrons.protocol_api.TrashBin
     options:

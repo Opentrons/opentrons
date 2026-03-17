@@ -22,9 +22,9 @@ interface LabwareCommandSummaryProps {
   showModuleIcon: boolean
   commandType: RunTimeCommand['commandType']
 }
-export const LabwareCommandSummary = (
+export function LabwareCommandSummary(
   props: LabwareCommandSummaryProps
-): JSX.Element => {
+): JSX.Element {
   const { labwareDef, position, showModuleIcon, commandType } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
@@ -39,7 +39,7 @@ export const LabwareCommandSummary = (
   ]
 
   useEffect(() => {
-    if (labelContainerRef.current) {
+    if (labelContainerRef.current != null) {
       setLabelContainerHeight(labelContainerRef.current.offsetHeight)
     }
   }, [])

@@ -138,7 +138,17 @@ export function DeckSetupToolbox(
     (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
     (createdStackForSlot.length === 0 && deckSetup.labware[slot] != null)
   const handleClear = (): void => {
-    if (slot !== 'offDeck' && offDeckLabware == null) {
+    if (isHopperSlot) {
+      const labwareIdsToDelete = (labwareInHopper ?? []).reduce<string[]>(
+        (acc, group) => {
+          return [...acc, ...Object.values(group).filter(id => id != null)]
+        },
+        []
+      )
+      labwareIdsToDelete.forEach(labwareId => {
+        dispatch(deleteContainer({ labwareId: labwareId }))
+      })
+    } else if (slot !== 'offDeck' && offDeckLabware == null) {
       if (createdAdapterForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }

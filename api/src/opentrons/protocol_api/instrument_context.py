@@ -1075,11 +1075,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 position.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
-        <!-- TODO: uncomment when 2.28 is released
             flow_rate: The absolute flow rate in µL/s.
 
-                *New in version 2.28*
-        -->
+                *New in version 2.29*
 
         Raises:
             RuntimeError: If no location is specified and the location cache is `None`.
@@ -1092,10 +1090,10 @@ class InstrumentContext(publisher.CommandPublisher):
             InstrumentContext: This instance.
         """
         if flow_rate is not None:
-            if self.api_version < APIVersion(2, 28):
+            if self.api_version < APIVersion(2, 29):
                 raise APIVersionError(
                     api_element="flow_rate",
-                    until_version="2.28",
+                    until_version="2.29",
                     current_version=f"{self.api_version}",
                 )
         else:
@@ -1218,13 +1216,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Raises:
             UnexpectedTipRemovalError: If no tip is attached to the pipette.
-            RuntimeError: If no location is specified and the location cache is `None`.
-                This should happen if `touch_tip()` is called without first calling a
-                method that takes a location, like
-                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
-                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
-                              Also raises RuntimeError if location is in a labware with
-                              `touchTipDisabled` quirk.
+            RuntimeError:
+                - If no location is specified and the location cache is `None`.
+                    This should happen if `touch_tip()` is called without first calling a
+                    method that takes a location, like
+                    [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+                    [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
+                - If location is in a labware with `touchTipDisabled` quirk.
             ValueError: If both `mm_from_edge` and `radius` are specified.
 
         Returns:
@@ -1232,10 +1230,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.24:* Added the `mm_from_edge` parameter.
 
-        <!-- TODO: uncomment when 2.28 is released
-        *Changed in version 2.28:*
-            Raises an error if touching tip on a labware with the `touchTipDisabled` quirk.
-        -->
+        *Changed in version 2.29:*
+            The API will raise an error if touching tip on a labware with the `touchTipDisabled` quirk, like reservoirs or well plates with large wells.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -1275,7 +1271,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
 
         if "touchTipDisabled" in parent_labware.quirks:
-            if self.api_version < APIVersion(2, 28):
+            if self.api_version < APIVersion(2, 29):
                 _log.info(f"Ignoring touch tip on labware {well}")
                 return self
             raise RuntimeError(
@@ -1747,7 +1743,7 @@ class InstrumentContext(publisher.CommandPublisher):
         the same as specifying [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top],
         which is a fixed position.
 
-        Starting in API version 2.28, you can manually control whether ``drop_tip()`` varies
+        Starting in API version 2.29, you can manually control whether ``drop_tip()`` varies
         the drop location with ``alternate_drop_location``.
 
         Args:
@@ -1763,12 +1759,12 @@ class InstrumentContext(publisher.CommandPublisher):
             alternate_drop_location:
                 Whether to vary the tip drop position to prevent tips from piling up in
                 one spot.
-                
+
                 If not specified, the API will vary tip drop position by default when
-                ``location`` is ``None``, and drop the tip to a fixed position when 
+                ``location`` is ``None``, and drop the tip to a fixed position when
                 ``location`` is specified.
 
-                *New in version 2.28*
+                *New in version 2.29*
         Returns:
             This instance.
         """

@@ -203,7 +203,7 @@ def get_markdown_format() -> None:
     markdown_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}_docs.md")
     reference_file_path = os.path.join(current_dir, "..", "data", f"python_api_{current_version}_reference.md")
 
-    command = f"pipenv run sphinx-build -b singlehtml {docs_src_path} {build_html_path}"
+    command = f"uv run sphinx-build -b singlehtml {docs_src_path} {build_html_path}"
 
     run_sphinx_build(command)
 

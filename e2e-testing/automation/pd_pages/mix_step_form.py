@@ -6,7 +6,7 @@ from typing import Iterable, Sequence
 
 from playwright.sync_api import Locator, Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class MixStepForm(BasePage):
@@ -54,13 +54,13 @@ class MixStepForm(BasePage):
     def select_labware(self, option_text: str) -> None:
         """Select the labware entry shown in the dropdown."""
 
+        print(f"Selecting labware option: {option_text}")
         # Try field-specific test ID first (labware_dropdownMenu), then fallback to generic
         dropdown = self.page.get_by_test_id("labware_dropdownMenu").first
         if dropdown.count() == 0:
             dropdown = self.page.get_by_test_id("dropdownMenu").first
         self.wait_for_visible(dropdown, timeout=10000)
         dropdown.click()
-
         listbox = self.page.locator("div[role='listbox']").last
         self.wait_for_visible(listbox)
         buttons = listbox.locator("button")
@@ -76,31 +76,42 @@ class MixStepForm(BasePage):
 
     def select_pipette(self, option_text: str | None = None) -> None:
         """Select a pipette. Defaults to the first option if none provided."""
-
+        print(f"Selecting pipette option: {option_text}")
         self._select_dropdown_option("Pipette", option_text)
 
     def select_tiprack(self, option_text: str | None = None) -> None:
         """Select a tip rack. Defaults to the first option if none provided."""
-
+        print(f"Selecting tiprack option: {option_text}")
         self._select_dropdown_option("Tiprack", option_text)
 
-    def open_well_selector(self) -> None:
+    def open_nozzle_and_well_selector(self) -> None:
         """Open the well selector modal."""
 
-        self.page.locator('[name="wells"]').first.click()
+        self.page.get_by_test_id("nozzle_and_well_modal").click()
 
-    def expect_well_selector_modal(self) -> None:
-        """Verify the well selector modal content is present."""
-
+    def select_nozzles(self) -> None:
         modal = self._modal_area()
-        self.wait_for_visible(modal.get_by_text("Select wells", exact=False).first)
-        self.wait_for_visible(modal.get_by_role("button", name="Save"))
+        self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
+        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
+        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.get_by_role("button", name="Continue").click()
+
+    def expect_well_modal(self) -> None:
+        modal = self._modal_area()
+        self.wait_for_visible(
+            modal.get_by_text(
+                "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
+            ).first
+        )
+        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
 
     def select_wells(self, wells: Iterable[str]) -> None:
         """Select each well in the provided iterable."""
 
         for well in wells:
-            self.page.locator(f'circle[data-wellname="{well}"]').click()
+            self.page.locator(f"#{well}").click()
+        modal = self._modal_area()
+        modal.get_by_role("button", name="Continue").click()
 
     def save_modal(self) -> None:
         """Click the Save button within the currently open modal."""
@@ -173,9 +184,9 @@ class MixStepForm(BasePage):
         """Configure mix tip X/Y/Z positions."""
 
         modal = self._modal_area()
-        modal.locator('[data-testid="TipPositionModal_x_custom_input"]').fill(x)
-        modal.locator('[data-testid="TipPositionModal_y_custom_input"]').fill(y)
-        modal.locator('[data-testid="TipPositionModal_z_custom_input"]').fill(z)
+        modal.locator('[data-testid="tip-position-modal-x-custom-input"]').fill(x)
+        modal.locator('[data-testid="tip-position-modal-y-custom-input"]').fill(y)
+        modal.locator('[data-testid="tip-position-modal-z-custom-input"]').fill(z)
 
     def toggle_checkbox(self, index: int = 0) -> None:
         """Toggle a checkbox-like control by index among visible controls."""
@@ -223,11 +234,12 @@ class MixStepForm(BasePage):
             checkbox_input.click()
             return
 
+        checkbox_test_id_count = self.page.locator("[data-testid*='checkbox']").count()
         raise AssertionError(
             f"Could not find checkbox or switch at index {index}. "
             f"Found {self.page.get_by_role('switch').count()} switches, "
             f"{self.page.get_by_role('checkbox').count()} checkboxes, "
-            f"{self.page.locator('[data-testid*="checkbox"]').count()} checkbox test IDs."
+            f"{checkbox_test_id_count} checkbox test IDs."
         )
 
     def fill_delay_seconds(self, value: str) -> None:
@@ -320,13 +332,13 @@ class MixStepForm(BasePage):
     def open_blowout_position_modal(self) -> None:
         """Open the blowout position modal."""
 
-        self.page.locator("[data-testid='TipPositionField_blowout_z_offset']").click()
+        self.page.locator("[data-testid='tip-position-field-blowout_z_offset']").click()
 
     def set_blowout_position(self, value: str) -> None:
         """Adjust the blowout Z offset inside the modal."""
 
         modal = self._modal_area()
-        modal.locator('[data-testid="TipPositionModal_custom_input"]').fill(value)
+        modal.locator('[data-testid="tip-position-modal-custom-input"]').fill(value)
 
     def rename_step(self, name: str, notes: str) -> None:
         """Rename the Mix step and set notes."""

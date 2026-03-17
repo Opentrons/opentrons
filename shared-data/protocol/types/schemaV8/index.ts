@@ -1,5 +1,8 @@
 import type { CreateCommand } from '../../../command/types'
-import type { CommandAnnotation } from '../../../commandAnnotation/types'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../../../commandAnnotation/types'
 import type {
   CommandPreconditions,
   Liquid,
@@ -58,6 +61,16 @@ export interface CommandV15Mixin {
   commands: CreateCommand[]
 }
 
+export interface CommandV16Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV16'
+  commands: CreateCommand[]
+}
+
+export interface CommandV17Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV17'
+  commands: CreateCommand[]
+}
+
 export interface CommandAnnotationsStructure {
   commandAnnotationSchemaId: string
   commandAnnotations: any[]
@@ -65,7 +78,12 @@ export interface CommandAnnotationsStructure {
 
 export interface CommandAnnotationV1Mixin {
   commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1'
-  commandAnnotations: CommandAnnotation[]
+  commandAnnotations: CommandAnnotationV1[]
+}
+
+export interface CommandAnnotationV2Mixin {
+  commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV2'
+  commandAnnotations: CommandAnnotationV2[]
 }
 
 export interface LabwareStructure {
@@ -154,6 +172,9 @@ export type ProtocolFile<DesignerApplicationData = {}> =
       | CommandV12Mixin
       | CommandV13Mixin
       | CommandV14Mixin
+      | CommandV15Mixin
+      | CommandV16Mixin
+      | CommandV17Mixin
     ) &
     CommandAnnotationV1Mixin
 
@@ -183,7 +204,7 @@ export interface ProtocolAnalysisOutput {
   errors: AnalysisError[]
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
-  commandAnnotations?: CommandAnnotation[]
+  commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }

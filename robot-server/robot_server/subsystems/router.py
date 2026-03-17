@@ -8,6 +8,12 @@ from typing_extensions import Literal
 
 from opentrons.hardware_control import ThreadManagedHardware
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleMultiBody,
+)
 
 from .firmware_update_manager import (
     FirmwareUpdateManager,
@@ -42,12 +48,6 @@ from robot_server.hardware import (
     get_thread_manager,
 )
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleBody,
-    SimpleMultiBody,
-)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401

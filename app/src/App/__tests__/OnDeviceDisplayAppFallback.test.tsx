@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
+import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { appRestart } from '/app/redux/shell'
@@ -68,13 +68,6 @@ describe('OnDeviceDisplayAppFallback', () => {
   it('should call a mock function when tapping reload button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart touchscreen'))
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_ODD_APP_ERROR,
-      properties: {
-        errorMessage: 'mock error',
-        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
-      },
-    })
     expect(vi.mocked(appRestart)).toHaveBeenCalled()
   })
 })

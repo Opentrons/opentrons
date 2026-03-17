@@ -33,5 +33,10 @@ venv/
 .DS_Store
 Thumbs.db
 
+<<<<<<< HEAD
 migration-report/8.8.0-alpha.7/exports_manifest.json
 migration-report/8.7.1/exports_manifest.json
+=======
+.env*
+!.env.example
+>>>>>>> edge

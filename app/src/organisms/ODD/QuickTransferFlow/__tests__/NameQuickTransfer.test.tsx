@@ -7,15 +7,15 @@ import { i18n } from '/app/i18n'
 import { NameQuickTransfer } from '../NameQuickTransfer'
 
 import type { ComponentProps } from 'react'
-import type { InputField } from '@opentrons/components'
+import type { TouchInputField } from '@opentrons/components'
 
 vi.mock('../utils')
 
-vi.mock('/app/atoms/InputField', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 

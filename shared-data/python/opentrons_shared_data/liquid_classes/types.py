@@ -55,6 +55,7 @@ class BlowoutPropertiesDict(TypedDict):
     enabled: bool
     location: NotRequired[BLOWOUT_LOCATION_VALUE_TYPE]
     flow_rate: NotRequired[float]
+    blowout_position: NotRequired[TipPositionDict]
 
 
 class SubmergeDict(TypedDict):

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex Instruction Manual"
+description: "Official instruction manual for the Opentrons Flex liquid handling robot."
 ---
 
 <style>

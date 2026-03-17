@@ -88,7 +88,7 @@ protocol.capture_image(
 
 *New in version 2.27*
 
-Image filenames include your robot and protocol name, step number, and timestamps for the protocol and command running when the image was taken. Here, the custom filename `"deck_view"` is added to the beginning of the filename, making it easier to find the exact image you're looking for.
+Image filenames include your robot and protocol name, and a timestamp for when the image was taken. Here, the custom filename `"deck_view"` is added to the beginning of the filename, making it easier to find the exact image you're looking for.
 
 You can further customize your images using the [`capture_image()`][opentrons.protocol_api.ProtocolContext.capture_image] method's optional parameters, including image resolution, zoom, brightness, and more. After a protocol run, access and download your images from the Recent Protocol Runs section of the Opentrons App's robot details page.
 

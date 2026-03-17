@@ -254,7 +254,7 @@ function pythonInstallOne(platformName, archStr, targetDir) {
         path.join(__dirname, '..', '..', 'shared-data'),
         path.join(__dirname, '..', '..', 'hardware[flex]'),
         path.join(__dirname, '..', '..', 'api'),
-        'pandas==1.4.3',
+        'pandas==2.3.3',
       ])
     })
     .then(({ stdout }) => {

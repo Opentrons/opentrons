@@ -21,10 +21,10 @@ import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
-  WellFill,
+  WellFillByName,
   WellMouseEvent,
-  WellStroke,
-} from './labwareInternals/types'
+  WellStrokeByName,
+} from './labwareInternals/Wells'
 
 export interface LabwareProps {
   /** Labware definition to render */
@@ -40,9 +40,9 @@ export interface LabwareProps {
   /** option to highlight well labels with specified color */
   highlightedWellLabels?: HighlightedWellLabels
   /** CSS color to fill specified wells */
-  wellFill?: WellFill
+  wellFill?: WellFillByName
   /** CSS color to stroke specified wells */
-  wellStroke?: WellStroke
+  wellStroke?: WellStrokeByName
   /** adds thicker blue border with blur to labware */
   highlight?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */

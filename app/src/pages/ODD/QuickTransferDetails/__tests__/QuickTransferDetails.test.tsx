@@ -24,8 +24,8 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
 import { QuickTransferDetails } from '..'
-import { DeleteTransferConfirmationModal } from '../../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from '../Deck'
+import { DeleteTransferConfirmationModal } from '../DeleteTransferConfirmationModal'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 
@@ -39,7 +39,7 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock(
   '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-vi.mock('../../QuickTransferDashboard/DeleteTransferConfirmationModal')
+vi.mock('../DeleteTransferConfirmationModal')
 vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
 vi.mock('../Hardware')

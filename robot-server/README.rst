@@ -23,7 +23,7 @@ First, read the `top-level contributing guide section on setup <https://github.c
 Configuration
 -------------
 
-The configuration is defined in this `json schema <./settings_schema.json>`_  file.
+When the server is launched, it can be configured with environment variables. These environment variables are defined in `settings.py <./robot_server/settings.py>`_.
 
 Besides the usual methods, environment variables can be defined in a dotenv file located in ``/data/robot.env`` on robot or ``~/.opentrons/robot.env`` (``C:\Users\%USERNAME%\.opentrons\robot.env`` on Windows). The location of the dotenv file can be customized by defining `OT_ROBOT_SERVER_DOT_ENV_PATH` environment variable.
 

@@ -174,6 +174,7 @@ function CameraCardOverflowMenu({
           onClick={() => {
             handleItemClick(toggleControls)
           }}
+          disabled={!cameraEnabled}
         >
           {t('edit_settings')}
         </MenuItem>

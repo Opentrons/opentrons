@@ -1,6 +1,7 @@
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SECTIONS } from './constants'
@@ -25,6 +26,12 @@ export const getModuleSetupSteps = (
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.CLOSE_DOOR },
         { section: SECTIONS.INSTALL_SHUTTLE },
+        { section: SECTIONS.SUCCESS },
+      ]
+    case VACUUM_MODULE_TYPE:
+      return [
+        { section: SECTIONS.UPDATE_FIRMWARE },
+        { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.SUCCESS },
       ]
     default:

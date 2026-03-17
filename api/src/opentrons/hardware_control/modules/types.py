@@ -176,8 +176,8 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO: Change platformState to specific key
-        return data is not None and "platformState" in data.keys()
+        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
+        return data is not None
 
 
 class LiveData(TypedDict):

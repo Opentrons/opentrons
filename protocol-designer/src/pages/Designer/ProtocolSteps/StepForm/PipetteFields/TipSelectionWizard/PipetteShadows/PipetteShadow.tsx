@@ -22,6 +22,7 @@ import type {
   CoordinateTuple,
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
@@ -46,27 +47,27 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   },
 }
 
-// TODO: adjust once partial tip selection is enabled
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
   slotPosition: CoordinateTuple
   hoveredWell: string
-  selectedTiprackId: string
+  selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
   inaccessibleReason: InaccessibleReason | null
   isHoveredWellSelected: boolean
-  hasPickupsRemaining: boolean
-  primaryNozzle: string
+  hasPickupsRemaining: boolean | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   robotType: RobotType
   enclosingViewbox: string | null
   nozzles: NozzleConfigurationStyle
+  rotate?: boolean
 }): JSX.Element {
   const {
     pipetteSpec,
     slotPosition,
     hoveredWell,
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     isAccessible,
     inaccessibleReason,
@@ -76,9 +77,12 @@ export function PipetteShadow(props: {
     robotType,
     enclosingViewbox,
     nozzles,
+    rotate,
   } = props
   const [slotX, slotY] = slotPosition
-  const { t } = useTranslation('tip_selection')
+  const isTiprack = labwareState[selectedLabwareId].def.parameters.isTiprack
+  const translationFile = isTiprack ? 'tip_selection' : 'well_selection'
+  const { t } = useTranslation(translationFile)
   const labelRef = useRef<HTMLDivElement>(null)
   const [labelWidth, setLabelWidth] = useState(0)
   const [labelHeight, setLabelHeight] = useState(0)
@@ -86,17 +90,17 @@ export function PipetteShadow(props: {
   const isSingleTipPickup = nozzles === SINGLE
 
   const labelText = (() => {
-    if (!hasPickupsRemaining && !isHoveredWellSelected) {
+    if (!hasPickupsRemaining && !isHoveredWellSelected && isTiprack) {
       return t('all_pickups_selected')
     }
     if (!isAccessible && inaccessibleReason != null) {
-      return t(`tip_inaccessible.${inaccessibleReason}`)
+      return t(`inaccessible.${inaccessibleReason}`)
     }
     const pluralKey = isSingleTipPickup ? 'one' : 'multiple'
     if (isAccessible) {
       return isHoveredWellSelected
-        ? t(`tip_accessible.deselect_${pluralKey}`)
-        : t(`tip_accessible.select_${pluralKey}`)
+        ? t(`accessible.deselect_${pluralKey}`)
+        : t(`accessible.select_${pluralKey}`)
     }
     console.error('No label text found')
     return ''
@@ -108,9 +112,11 @@ export function PipetteShadow(props: {
       setLabelHeight(labelRef.current.offsetHeight)
     }
   }, [hoveredWell, labelText])
-
+  if (isHoveredWellSelected && !isTiprack) {
+    return <></>
+  }
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     wellName: hoveredWell,
     pipetteSpec,
@@ -123,7 +129,8 @@ export function PipetteShadow(props: {
   const height = backLeftCorner[1] - frontRightCorner[1]
 
   const isError =
-    !isAccessible || (!hasPickupsRemaining && !isHoveredWellSelected)
+    !isAccessible ||
+    (!hasPickupsRemaining && !isHoveredWellSelected && isTiprack)
 
   const shadowProps = {
     x: slotX + xOffset,
@@ -139,6 +146,7 @@ export function PipetteShadow(props: {
           fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
           stroke: COLORS.blue50,
         }),
+    rotate,
   }
 
   const labelPlacement = getPlacementByViewboxAndPipetteSpec({
@@ -159,7 +167,6 @@ export function PipetteShadow(props: {
     shadowHeight: height,
     isOt2EightChannel,
   })
-
   return (
     <g className={styles.shadow_overlay}>
       <PipetteLabel

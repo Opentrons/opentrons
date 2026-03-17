@@ -1,5 +1,6 @@
 ---
 title:"Opentrons Flex: Opentrons App"
+description: "Use the Opentrons App to manage Flex, transfer protocols, and control modules."
 ---
 
 You can control and work with Flex using either the on-device [touchscreen](../touchscreen/index.md) or from a computer running the Opentrons App. This chapter describes how to use the Opentrons software to manage your Flex robot, modules, and other app-only features.

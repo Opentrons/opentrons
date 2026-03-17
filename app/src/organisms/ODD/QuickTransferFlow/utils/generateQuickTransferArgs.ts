@@ -2,6 +2,7 @@ import intersection from 'lodash/intersection'
 import uuidv1 from 'uuid/v4'
 
 import {
+  ALL,
   getAllDefinitions,
   getLabwareDefURI,
   orderWells,
@@ -11,6 +12,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
@@ -21,7 +23,6 @@ import type {
   CutoutConfig,
   DeckConfiguration,
   LabwareDefinition,
-  NozzleConfigurationStyle,
   PipetteName,
 } from '@opentrons/shared-data'
 import type {
@@ -435,18 +436,20 @@ export function generateQuickTransferArgs(
         : undefined
   }
 
-  let nozzles = null
-  if (pipetteEntity.spec.channels === 96) {
-    nozzles = 'ALL' as NozzleConfigurationStyle
-  }
+  const nozzles = ALL
   const touchTipAfterDispenseOffsetMmFromTop =
     quickTransferState.touchTipDispense ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const touchTipAfterAspirateOffsetMmFromTop =
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles,
+    channels: pipetteEntity.spec.channels,
+  })
   const commonFields: SharedTransferLikeArgs = {
     stepNumber: 1,
+    primaryNozzle: primaryNozzle,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id!,
@@ -457,6 +460,10 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
+    blowoutOffsetFromTopMm: null,
+    blowoutXPosition: null,
+    blowoutYPosition: null,
+    blowoutPositionReference: null,
     blowoutFlowRateUlSec:
       quickTransferState.path === 'multiDispense'
         ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)

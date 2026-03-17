@@ -8,7 +8,6 @@ from .door_watcher import DoorWatcher
 from .equipment import (
     EquipmentHandler,
     LoadedConfigureForVolumeData,
-    LoadedConfigureNozzleLayoutData,
     LoadedLabwareData,
     LoadedModuleData,
     LoadedPipetteData,
@@ -38,7 +37,6 @@ __all__ = [
     "LoadedPipetteData",
     "LoadedModuleData",
     "LoadedConfigureForVolumeData",
-    "LoadedConfigureNozzleLayoutData",
     "MovementHandler",
     "GantryMover",
     "PipettingHandler",

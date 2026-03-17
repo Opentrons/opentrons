@@ -7,7 +7,7 @@ from automation.pd_pages import LandingPage
 
 
 @pytest.mark.pdE2E
-def test_import_v7_protocol_shows_migration_modal(page: Page, base_url: str) -> None:
+def test_import_v7_protocol_shows_migration_modal(page: Page, pd_base_url: str) -> None:
     """Test importing a v7 protocol shows the migration modal.
 
     This test replicates the Cypress import.cy.ts test for v7 protocols:
@@ -56,7 +56,7 @@ def test_import_v7_protocol_shows_migration_modal(page: Page, base_url: str) -> 
 
 
 @pytest.mark.pdE2E
-def test_import_v8_protocol_no_migration_modal(page: Page, base_url: str) -> None:
+def test_import_v8_protocol_no_migration_modal(page: Page, pd_base_url: str) -> None:
     """Test importing a v8 protocol does not show migration modal.
 
     This test replicates the Cypress import.cy.ts test for v8 protocols:

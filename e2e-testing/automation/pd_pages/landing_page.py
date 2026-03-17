@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, TimeoutError as PlaywrightTimeoutError, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class LandingPage(BasePage):
@@ -44,12 +44,17 @@ class LandingPage(BasePage):
         self.page.get_by_label("Import_from_landing").set_input_files(str(file_path))
 
     def dismiss_migration_modal(self) -> None:
-        """Dismiss the migration modal if it appears during import."""
-
+        """Dismiss the migration modal if it appears during import.
+        Waits for the overlay to appear (up to 10s), then clicks Import and
+        waits for the overlay to be fully removed.
+        """
         overlay = self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-        if overlay.is_visible():
-            self.page.get_by_role("button", name="Import", exact=True).click()
-            expect(overlay).not_to_be_visible()
+        try:
+            overlay.wait_for(state="visible", timeout=10000)
+        except PlaywrightTimeoutError:
+            return
+        self.page.get_by_role("button", name="Import", exact=True).click()
+        overlay.wait_for(state="hidden", timeout=10000)
 
     def edit_protocol(self) -> None:
         """Click the 'Edit protocol' button."""

@@ -8,10 +8,13 @@ Endpoints include:
 from datetime import datetime
 
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api.resource_links import (
+    ResourceLink,
+    ResourceLinkKey,
+)
 
 from .models import SystemTimeRequest, SystemTimeResponse, SystemTimeResponseAttributes
 from .time_utils import get_system_time, set_system_time
-from robot_server.service.json_api.resource_links import ResourceLink, ResourceLinkKey
 
 system_router = LightRouter()
 """Router for /system endpoints."""

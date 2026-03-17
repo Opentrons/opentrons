@@ -18,6 +18,7 @@ import {
 import type { AddressableAreaName } from '../../deck'
 import type { ModuleModel } from '../types'
 
+// TODO: (tz, 1/27/26): remove this function and use getSlotDisplayNameFromAAWithFakes instead when is supported by command text https://opentrons.atlassian.net/browse/AUTH-2736
 export function getSlotFromAddressableAreaName(
   addressableArea: AddressableAreaName
 ): string {
@@ -47,6 +48,7 @@ export function getSlotFromAddressableAreaName(
   return addressableArea
 }
 
+// TODO: (tz, 1/27/26): remove this function and use getModuleModelFromFixtureId instead https://opentrons.atlassian.net/browse/AUTH-2736
 export function getModuleModelFromAddressableArea(
   addressableArea: AddressableAreaName
 ): ModuleModel | null {

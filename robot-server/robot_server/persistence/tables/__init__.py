@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_14 import (
+from .schema_15 import (
     BooleanSettingKey,
     CommandStatusSQLEnum,
     PrimitiveParamSQLEnum,
@@ -12,6 +12,8 @@ from .schema_14 import (
     analysis_table,
     boolean_setting_table,
     camera_capture_image_settings_table,
+    command_annotation_table,
+    command_to_annotation_table,
     data_files_table,
     input_data_files_table,
     labware_offset_location_sequence_components_table,
@@ -32,6 +34,8 @@ __all__ = [
     "analysis_csv_rtp_table",
     "run_table",
     "run_command_table",
+    "command_annotation_table",
+    "command_to_annotation_table",
     "action_table",
     "run_csv_rtp_table",
     "data_files_table",

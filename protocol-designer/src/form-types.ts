@@ -4,6 +4,7 @@ import type {
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -13,6 +14,13 @@ import type {
   TipRackWithDef,
   TipTrackingOption,
   TrashBinEntity,
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_PROGRAM_PROFILE,
+  VACUUM_PROGRAM_STATE,
+  VACUUM_STATE_PUMP,
+  VACUUM_VENT_SET_CLOSED,
+  VACUUM_VENT_SET_OPEN,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
 import type {
@@ -173,7 +181,7 @@ export type StepType =
   | 'temperature'
   | 'thermocycler'
   | 'flexStacker'
-
+  | 'vacuum'
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
   camera: 'camera',
@@ -188,6 +196,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   pause: 'pause-circle',
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
+  vacuum: 'ot-vacuum',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -305,10 +314,12 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   disposalVolume_checkbox: boolean
   dropTip_location: string
   liquidClassesSupported: boolean
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
   path: PathOption
   // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+
   tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
@@ -340,6 +351,10 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_position_reference: PositionReference
   blowout_flowRate?: number | null
   blowout_location?: string | null
+  blowout_mmFromBottom?: number | null
+  blowout_x_position?: number | null
+  blowout_y_position?: number | null
+  blowout_position_reference?: string | null
   conditioning_checkbox: boolean | null
   conditioning_volume: number | null
   dispense_airGap_volume?: string | null
@@ -415,7 +430,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_touchTip_checkbox: boolean
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
   tipRack: TipRackWithDef
@@ -438,6 +453,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_position_reference: PositionReference
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   pushOut_volume: number | null
   pushOut_checkbox: boolean
   times?: number | null
@@ -533,9 +549,30 @@ export interface HydratedFlexStackerFormData extends AnnotationFields {
   moduleId: string
 }
 
+export interface HydratedVacuumFormData extends AnnotationFields {
+  stepType: 'vacuum'
+  id: string
+  moduleId: string
+  endingHoldVentCheckbox: boolean
+  modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
+  orderedProfileIds: string[]
+  powerPercent: number | null
+  pressureMbar: number | null
+  profileItemsById: Record<string, ProfileItem>
+  programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
+  pumpDurationCheckbox: boolean | null
+  pumpDurationTime: string | null
+  stateType:
+    | typeof VACUUM_STATE_PUMP
+    | typeof VACUUM_VENT_SET_OPEN
+    | typeof VACUUM_VENT_SET_CLOSED
+    | null
+}
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
+  | 'blowout_mmFromBottom'
   | 'dispense_mmFromBottom'
   | 'mix_mmFromBottom'
   | 'aspirate_touchTip_mmFromTop'
@@ -550,6 +587,7 @@ export type TipZOffsetFields =
 
 export type TipYOffsetFields =
   | 'aspirate_y_position'
+  | 'blowout_y_position'
   | 'dispense_y_position'
   | 'mix_y_position'
   | 'aspirate_retract_y_position'
@@ -559,6 +597,7 @@ export type TipYOffsetFields =
 
 export type TipXOffsetFields =
   | 'aspirate_x_position'
+  | 'blowout_x_position'
   | 'dispense_x_position'
   | 'mix_x_position'
   | 'aspirate_retract_x_position'
@@ -568,6 +607,7 @@ export type TipXOffsetFields =
 
 export type ReferenceFields =
   | 'aspirate_position_reference'
+  | 'blowout_position_reference'
   | 'dispense_position_reference'
   | 'aspirate_submerge_position_reference'
   | 'dispense_submerge_position_reference'
@@ -653,3 +693,4 @@ export type HydratedFormData =
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
   | HydratedFlexStackerFormData
+  | HydratedVacuumFormData

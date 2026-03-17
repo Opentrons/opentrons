@@ -7,7 +7,14 @@ from typing import Annotated, Literal, Union
 from fastapi import Depends, status
 
 from opentrons.protocol_engine.types import DeckConfigurationType
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..action_models import RunAction, RunActionCreate, RunActionType
 from ..dependencies import get_run_orchestrator_store, get_run_store
@@ -29,7 +36,6 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
 from robot_server.service.notifications import (
     MaintenanceRunsPublisher,
     RunsPublisher,
@@ -100,6 +106,7 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
 )
 async def create_run_action(
     runId: str,

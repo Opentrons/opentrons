@@ -53,38 +53,48 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
     isAppUpdateAvailable && !isAppUpdateIgnored
 
   // Only run this hook on app startup
-  useEffect(() => {
-    if (hasJustUpdated) {
-      makeToast(
-        t('branded:opentrons_app_successfully_updated') as string,
-        SUCCESS_TOAST,
-        {
-          closeButton: true,
-          disableTimeout: true,
-        }
-      )
-      dispatch(toggleConfigValue('update.hasJustUpdated'))
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (hasJustUpdated) {
+        makeToast(
+          t('branded:opentrons_app_successfully_updated') as string,
+          SUCCESS_TOAST,
+          {
+            closeButton: true,
+            disableTimeout: true,
+          }
+        )
+        dispatch(toggleConfigValue('update.hasJustUpdated'))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
-  useEffect(() => {
-    if (createAppUpdateAvailableToast) {
-      toastIdRef.current = makeToast(
-        t('branded:opentrons_app_update_available_variation') as string,
-        WARNING_TOAST,
-        {
-          closeButton: true,
-          disableTimeout: true,
-          linkText: t('view_update'),
-          onLinkClick: () => {
-            setShowUpdateModal(true)
-          },
-        }
-      )
-    } else if (removeToast && toastIdRef.current) {
-      removeActiveAppUpdateToast()
-    }
-  }, [isAppUpdateAvailable, isAppUpdateIgnored])
+  useEffect(
+    () => {
+      if (createAppUpdateAvailableToast) {
+        toastIdRef.current = makeToast(
+          t('branded:opentrons_app_update_available_variation') as string,
+          WARNING_TOAST,
+          {
+            closeButton: true,
+            disableTimeout: true,
+            linkText: t('view_update'),
+            onLinkClick: () => {
+              setShowUpdateModal(true)
+            },
+          }
+        )
+      } else if (removeToast && toastIdRef.current) {
+        removeActiveAppUpdateToast()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isAppUpdateAvailable, isAppUpdateIgnored]
+  )
 
   return (
     <>

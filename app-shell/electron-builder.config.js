@@ -34,6 +34,7 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
+    '!**/.venv/**',
     {
       from: '../app/dist',
       to: './ui',

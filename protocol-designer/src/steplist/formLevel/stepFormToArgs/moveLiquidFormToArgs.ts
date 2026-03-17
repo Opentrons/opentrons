@@ -173,6 +173,7 @@ export const moveLiquidFormToArgs = (
     dispense_x_position,
     aspirate_y_position,
     dispense_y_position,
+    primaryNozzle,
     pushOut_checkbox,
     pushOut_volume,
     tip_tracking,
@@ -326,6 +327,10 @@ export const moveLiquidFormToArgs = (
     blowoutFlowRateUlSec:
       castFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
+    blowoutOffsetFromTopMm: castFormData.blowout_mmFromBottom ?? null,
+    blowoutXPosition: castFormData.blowout_x_position ?? null,
+    blowoutYPosition: castFormData.blowout_y_position ?? null,
+    blowoutPositionReference: castFormData.blowout_position_reference ?? null,
     changeTip: castFormData.changeTip,
     preWetTip: Boolean(castFormData.preWetTip),
     aspirateDelay,
@@ -349,6 +354,7 @@ export const moveLiquidFormToArgs = (
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation,
     nozzles,
+    primaryNozzle,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
     aspirateZOffset:

@@ -117,10 +117,13 @@ export function getResultingTimelineFrameFromRunCommands(
             {}
           )
           const labwareStacks = labwareIds.reduce(
-            (acc: Record<string, { stack: string[] }>, id) => {
-              const sequence = sequenceMap[id]
+            (acc: Record<string, { stack: string[] }>, id, index) => {
+              const sequence = sequenceMap[id] ?? locationSequences[index]
               if (sequence != null) {
-                acc[id] = { stack: getStackForLabwareLocation(sequence) }
+                const stack = getStackForLabwareLocation(sequence)
+                acc[id] = {
+                  stack: stack[0] === id ? stack : [id, ...stack],
+                }
               } else {
                 const location = command.params.location
                 if (locationIsOffDeck(location)) {

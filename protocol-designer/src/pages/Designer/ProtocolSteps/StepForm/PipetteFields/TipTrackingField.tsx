@@ -33,7 +33,10 @@ import { getValidTiprackIds } from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { PathOption, TipTrackingOption } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../types'
@@ -63,6 +66,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles, channels })
   const tiprackDefinition = Object.values(labwareEntities).find(
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
@@ -124,11 +130,6 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels,
-  })
-
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({
       nozzles,
@@ -159,9 +160,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           {t('step_edit_form.field.tip_tracking.label')}
         </StyledText>
         <Flex className={styles.radio_buttons_container}>
-          {tipTrackingOptions.map(({ title, description, value }, i) => (
+          {tipTrackingOptions.map(({ title, description, value }) => (
             <RadioButton
-              key={i}
+              key={value}
               buttonLabel={title}
               buttonSubLabel={{
                 label: description,
@@ -221,6 +222,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           setShowTipSelectionModal={setShowTipSelectionModal}
           formTiprackUri={formData.tipRack as string}
           pipetteId={pipetteId}
+          primaryNozzle={primaryNozzle}
           nozzles={nozzles}
           numPickups={numPickups}
           tiprackSelected={formData.tiprack_selected}

@@ -1,5 +1,12 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
+import type {
+  PartialNozzles8Channel,
+  RowChannels,
+} from '../command/types/setup'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -41,6 +48,7 @@ import type {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_TYPE,
 } from './constants'
 import type { PipetteName } from './pipettes'
 
@@ -377,6 +385,7 @@ export type ModuleType =
   | typeof MAGNETIC_BLOCK_TYPE
   | typeof ABSORBANCE_READER_TYPE
   | typeof FLEX_STACKER_MODULE_TYPE
+  | typeof VACUUM_MODULE_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
@@ -639,6 +648,11 @@ export interface SlotTransforms {
 export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
+
+export type ActiveNozzleNumber =
+  | PipetteChannels
+  | PartialNozzles8Channel
+  | RowChannels
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
@@ -1072,7 +1086,7 @@ export interface CompletedProtocolAnalysis {
   errors: AnalysisError[]
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
-  commandAnnotations?: CommandAnnotation[]
+  commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
 }
 

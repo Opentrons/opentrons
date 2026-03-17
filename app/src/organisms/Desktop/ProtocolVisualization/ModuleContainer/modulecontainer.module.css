@@ -27,4 +27,5 @@
   width: 100%;
   flex-direction: column;
   justify-content: space-between;
+  gap: var(--spacing-4);
 }

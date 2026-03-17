@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Settings"
+description: "Touchscreen settings for network, display, and robot configuration."
 ---
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
@@ -30,7 +31,7 @@ Enable additional tools and features designed for developers. Not recommended fo
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
 
-### Disable Stacker sensors for labware detection in z- and x-axis
+### Disable Stacker Sensors for Labware Detection
 
 Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before attempting to dispense or store it.
 
@@ -50,6 +51,9 @@ Set the language used by the touchscreen to Chinese or English.
 ### Network Settings
 
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
+
+!!! Note
+    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
 
 ### Privacy
 

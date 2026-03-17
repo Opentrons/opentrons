@@ -9,6 +9,7 @@ import type { RobotState } from '@opentrons/step-generation'
 export const getIsCutoutA1Active = (
   labware: RobotState['labware'],
   modules: RobotState['modules'],
+  pipettes: RobotState['pipettes'],
   cutoutId: CutoutId,
   selectedRunTimeCommand?: RunTimeCommand
 ): boolean => {
@@ -21,7 +22,7 @@ export const getIsCutoutA1Active = (
 
   const { isActiveLayerVisible: isThermocyclerActive } =
     labwareOnB1 != null
-      ? getActiveLayer(labwareOnB1[0], selectedRunTimeCommand)
+      ? getActiveLayer(labwareOnB1[0], pipettes, selectedRunTimeCommand)
       : { isActiveLayerVisible: false }
 
   return isThermocyclerActive && hasThermocycler && cutoutId === 'cutoutA1'

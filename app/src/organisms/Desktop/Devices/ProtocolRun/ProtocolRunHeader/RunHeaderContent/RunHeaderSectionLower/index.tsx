@@ -60,7 +60,7 @@ export function RunHeaderSectionLower({
           )) ||
         (config.protocolType === 'json' &&
           config.schemaVersion >= MIN_SUPPORTED_JSON_SCHEMA_VERSION)
-      : false
+      : true
 
   const handleVisualizeClick = (): void => {
     if (!isSupportedProtocol) {

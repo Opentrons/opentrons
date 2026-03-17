@@ -1,0 +1,42 @@
+.error_info_text {
+  font-weight: var(--font-weight-bold);
+}
+
+.error_container {
+  display: flex;
+  width: 100%;
+  max-height: 11rem;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-20);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-35);
+  gap: var(--spacing-8);
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: normal;
+}
+
+.error_list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.error_list::-webkit-scrollbar {
+  width: 0.75rem;
+  background-color: var(--grey-35);
+}
+
+.error_list::-webkit-scrollbar-track {
+  margin-top: var(--spacing-16);
+  margin-bottom: var(--spacing-16);
+}
+
+.error_list::-webkit-scrollbar-thumb {
+  border-radius: 11px;
+  background: var(--grey-50);
+}
+
+.error_detail_text {
+  text-align: left;
+}

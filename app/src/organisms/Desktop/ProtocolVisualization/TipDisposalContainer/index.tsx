@@ -40,7 +40,6 @@ export function TipDisposalContainer({
             {t('remaining_tips', { remaining: totalEmptyTips })}
           </StyledText>
         </div>
-
         {/* TODO: count number of lids in trash when we support lids in PV
         <div className={styles.text_container}>
           <StyledText desktopStyle="captionSemiBold" color={COLORS.grey60}>

@@ -81,7 +81,9 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     render(props)
     const button = screen.getByRole('button', { name: 'Confirm' })
-    const input = screen.getByTestId('thermocyclerModuleV1_false')
+    const input = screen.getByRole('spinbutton', {
+      name: 'thermocyclerModuleV1_false',
+    })
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -107,7 +109,9 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     render(props)
     const button = screen.getByRole('button', { name: 'Confirm' })
-    const input = screen.getByTestId('thermocyclerModuleV1_true')
+    const input = screen.getByRole('spinbutton', {
+      name: 'thermocyclerModuleV1_true',
+    })
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -133,7 +137,9 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     render(props)
     const button = screen.getByLabelText('exit')
-    const input = screen.getByTestId('thermocyclerModuleV1_true')
+    const input = screen.getByRole('spinbutton', {
+      name: 'thermocyclerModuleV1_true',
+    })
     fireEvent.change(input, { target: { value: '45' } })
     fireEvent.click(button)
 

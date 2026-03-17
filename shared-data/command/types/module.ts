@@ -86,7 +86,11 @@ export type ModuleCreateCommand =
   | FlexStackerSetStoredLabwareItemsCreateCommand
   | FlexStackerStoreCreateCommand
   | IdentifyModuleCreateCommand
-
+  | VacuumModuleSetTargetPressureCreateCommand
+  | VacuumModuleSetTargetPowerCreateCommand
+  | VacuumModuleDeactivateCreateCommand
+  | VacuumModuleOpenVentCreateCommand
+  | VacuumModuleCloseVentCreateCommand
 export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
   commandType: 'magneticModule/engage'
   params: EngageMagnetParams
@@ -653,4 +657,39 @@ export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
 export interface IdentifyModuleRunTimeCommand
   extends CommonCommandRunTimeInfo, IdentifyModuleCreateCommand {
   result?: any
+}
+
+interface VacuumModuleSetTargetPressureParams {
+  moduleId: string
+  pressure: number
+}
+
+interface VacuumModuleSetTargetPowerParams {
+  moduleId: string
+  power: number
+}
+
+export interface VacuumModuleSetTargetPressureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/setTargetPressure'
+  params: VacuumModuleSetTargetPressureParams
+}
+
+export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/setTargetPower'
+  params: VacuumModuleSetTargetPowerParams
+}
+
+export interface VacuumModuleDeactivateCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/deactivate'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleOpenVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/openVent'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleCloseVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/closeVent'
+  params: ModuleOnlyParams
 }

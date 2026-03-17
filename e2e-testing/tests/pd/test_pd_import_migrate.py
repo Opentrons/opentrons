@@ -14,7 +14,7 @@ from protocols import ProtocolFixture, get_protocol_fixtures
     get_protocol_fixtures(),
     ids=lambda f: f.key,
 )
-def test_migrate(page: Page, base_url: str, protocol: ProtocolFixture) -> None:
+def test_migrate(page: Page, pd_base_url: str, protocol: ProtocolFixture) -> None:
     """Make sure that all the protocol fixtures can be imported into PD."""
     landing = LandingPage(page)
     landing.wait_for_page_load()

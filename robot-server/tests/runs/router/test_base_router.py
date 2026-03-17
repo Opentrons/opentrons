@@ -36,6 +36,13 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
@@ -79,13 +86,6 @@ from robot_server.runs.run_models import (
     TipState,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 
 
 def mock_notify_publishers() -> None:
@@ -797,7 +797,7 @@ async def test_get_run_commands_errors_raises_no_run(
     "error_list, expected_cursor_result",
     [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],  # type: ignore[call-arg]
 )
-async def test_get_run_commands_errors_defualt_cursor(
+async def test_get_run_commands_errors_default_cursor(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     error_list: list[pe_errors.ErrorOccurrence],

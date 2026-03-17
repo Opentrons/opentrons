@@ -6,6 +6,10 @@ import asyncio
 import logging
 from typing import NoReturn
 
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+)
+
 from . import get_app
 from otupdate.common import cli, constants, name_management, systemd
 from otupdate.common.run_application import run_and_notify_up
@@ -30,9 +34,11 @@ async def main() -> NoReturn:
     ) as name_synchronizer:
         LOG.info("Building buildroot update server")
         app = await get_app(
+            name_synchronizer=name_synchronizer,
+            # We don't support access control on the OT-2.
+            authorization_checker=AlwaysAllowedAuthorizationChecker(),
             system_version_file=args.version_file,
             config_file_override=args.config_file,
-            name_synchronizer=name_synchronizer,
         )
 
         LOG.info(f"Starting buildroot update server on http://{args.host}:{args.port}")

@@ -6,7 +6,7 @@ marks:
 stages:
   - name: POST request returns a new JWT
     request: &system_register_first
-      url: '{host:s}:{run_server.port:d}/system/register'
+      url: '{run_server.base_url}/system/register'
       method: POST
       params:
         agent: 'agent-1'
@@ -27,7 +27,7 @@ stages:
         token: '{issued_token}'
   - name: POST request with different info returns a new JWT
     request: &system_register_second
-      url: '{host:s}:{run_server.port:d}/system/register'
+      url: '{run_server.base_url}/system/register'
       method: POST
       params:
         agent: 'agent-2'

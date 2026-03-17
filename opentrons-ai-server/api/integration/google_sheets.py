@@ -1,6 +1,7 @@
 import json
 import random
 import re
+from typing import Optional
 
 import gspread
 import structlog
@@ -17,7 +18,14 @@ class GoogleSheetsClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.logger = structlog.stdlib.get_logger(settings.logger_name)
-        self.client: GspreadClient = self._initialize_client()
+        self._client: Optional[GspreadClient] = None
+
+    @property
+    def client(self) -> GspreadClient:
+        """Lazily initialize the gspread client on first use."""
+        if self._client is None:
+            self._client = self._initialize_client()
+        return self._client
 
     def _initialize_client(self) -> GspreadClient:
         """Initialize the gspread client with Service Account credentials loaded from the environment."""
