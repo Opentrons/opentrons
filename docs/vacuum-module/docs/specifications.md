@@ -4,6 +4,8 @@ title: "Vacuum Module: Product Specifications"
 
 <p style="color: red; font-weight: bold;"><strong>LABELED IMAGE PLACEHOLDER</strong></p>
 
+<figure class="side-by-side>
+
 ## Included parts
 
 <p style="color: red; font-weight: bold;"><strong>BOX CONTENTS IMAGES PLACEHOLDER</strong></p>
