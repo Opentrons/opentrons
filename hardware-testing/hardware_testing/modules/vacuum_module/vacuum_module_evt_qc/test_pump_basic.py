@@ -37,7 +37,7 @@ async def test_pump_motor(
     # Turn Off Pump
     await vacuum.set_vacuum_state(False)
     await vacuum.set_pump_state(False)
-    await asyncio.sleep(5)  # wait n seconds
+    await asyncio.sleep(2)  # wait n seconds
     # Make sure the motor is not moving
     await vacuum._reader.update_pump_state()
     pump_running = vacuum.pump_state.pump_running
