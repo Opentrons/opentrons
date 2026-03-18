@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V2 0317"}
+metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
