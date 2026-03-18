@@ -36,7 +36,6 @@ class SettingsDataManager:
         """Update the settings."""
         current = self.get()  # SettingsResponseData with all fields populated
         non_null_updates = patch.model_dump(exclude_none=True)
-        print(non_null_updates)
         merged = current.model_copy(update=non_null_updates)
 
         self._settings_store.add(
@@ -77,25 +76,14 @@ def install_settings_data_manager(
     _accessor.set_on(app_state, settings_data_manager)
 
 
-async def get_settings_store(
-    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-    sql_engine: Annotated[SQLEngine, fastapi.Depends(get_sql_engine)],
-) -> SettingsStore:
-    """Return the server's singleton SettingsStore."""
-    settings_store = _accessor.get_from(app_state)
-    if settings_store is None:
-        settings_store = SettingsStore(sql_engine=sql_engine)
-        _accessor.set_on(app_state, settings_store)
-    return settings_store
-
-
 def get_settings_data_manager(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    sql_engine: Annotated[SQLEngine, fastapi.Depends(get_sql_engine)],
 ) -> SettingsDataManager:
     """Return the server's singleton SettingsStore."""
     settings_data_manager = _accessor.get_from(app_state)
     if settings_data_manager is None:
+        settings_store = SettingsStore(sql_engine=sql_engine)
         settings_data_manager = SettingsDataManager(settings_store=settings_store)
         _accessor.set_on(app_state, settings_data_manager)
     return settings_data_manager

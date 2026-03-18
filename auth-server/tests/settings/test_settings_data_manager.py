@@ -3,7 +3,6 @@ from decoy import Decoy
 
 from auth_server.settings.models import (
     PatchSettingsRequestData,
-    SettingsResponseData,
 )
 from auth_server.settings.settings_data_manager import (
     SettingsDataManager,
@@ -60,6 +59,8 @@ def test_patch_settings(
             password_complexity_special_characters=None,
         )
     )
+
+
 def test_patch_settings_with_none_values(
     decoy: Decoy, mock_store: SettingsStore, manager: SettingsDataManager
 ) -> None:

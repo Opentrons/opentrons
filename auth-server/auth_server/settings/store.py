@@ -76,7 +76,9 @@ class SettingsStore:
 
     def reset(self) -> None:
         """Reset the settings to their defaults.
+
         Delete the settings record and force settings to defaults.
+
         """
         with self._session() as session:
             session.query(Settings).delete()

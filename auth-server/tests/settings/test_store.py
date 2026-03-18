@@ -4,9 +4,7 @@ from typing import Generator
 import pytest
 
 from auth_server.persistence.database import create_schema, sql_engine_ctx
-from auth_server.settings.settings_data_manager import SettingsDataManager
 from auth_server.settings.store import SettingsStore
-from auth_server.users.models import AccountType
 
 
 @pytest.fixture()
@@ -41,20 +39,20 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     )
     fetched = settings_store.get()
     assert fetched is not None
-    assert fetched.access_control_enabled == True
+    assert fetched.access_control_enabled
     assert fetched.max_number_of_login_attempts == 10
     assert fetched.password_reset_time_in_days == 30
     assert fetched.idle_lockout_in_minutes == 300
-    assert fetched.require_admin_creds_when_updating_robot_software == True
-    assert fetched.require_admin_creds_when_sending_protocol_to_robot == True
-    assert fetched.require_admin_creds_for_signoff_protocol == False
-    assert fetched.require_signoff_for_protocol_log == True
-    assert fetched.require_reason_for_interaction == True
+    assert fetched.require_admin_creds_when_updating_robot_software
+    assert fetched.require_admin_creds_when_sending_protocol_to_robot
+    assert fetched.require_admin_creds_for_signoff_protocol is False
+    assert fetched.require_signoff_for_protocol_log
+    assert fetched.require_reason_for_interaction
     assert fetched.min_length_of_reason_for_interaction == 10
-    assert fetched.require_logs_to_be_saved_in_app == True
-    assert fetched.delete_over_max_on_disk_protocols == True
+    assert fetched.require_logs_to_be_saved_in_app
+    assert fetched.delete_over_max_on_disk_protocols
     assert fetched.password_complexity_minimum_length == 8
-    assert fetched.password_complexity_special_characters == True
+    assert fetched.password_complexity_special_characters
     with pytest.raises(ValueError):
         settings_store.add(
             access_control_enabled=False,
