@@ -42,7 +42,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the refresh token and confirm it is found but inactive (only access tokens are active)
+  - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -91,7 +91,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the new refresh token and confirm it is found but inactive (only access tokens are active)
+  - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
