@@ -73,6 +73,9 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 
+[tool.ruff.format]
+exclude = ["auth_server/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on

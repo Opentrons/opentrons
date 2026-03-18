@@ -34,7 +34,9 @@ describe('InputField', () => {
 
   it('renders title, caption, units, and input attributes', () => {
     render(props)
-    const input = screen.getByTestId('input-id') as HTMLInputElement
+    const input = screen.getByRole('spinbutton', {
+      name: 'Speed',
+    }) as HTMLInputElement
 
     screen.getByText('Speed')
     screen.getByText('caption')
@@ -51,7 +53,9 @@ describe('InputField', () => {
     props.placeholder = 'placeholder'
 
     render(props)
-    const input = screen.getByTestId('input-id') as HTMLInputElement
+    const input = screen.getByRole('spinbutton', {
+      name: 'Speed',
+    }) as HTMLInputElement
 
     expect(input.value).toBe('')
     expect(input.placeholder).toBe('-')
@@ -59,7 +63,9 @@ describe('InputField', () => {
 
   it('calls onFocus, onBlur, and onChange handlers', () => {
     render(props)
-    const input = screen.getByTestId('input-id')
+    const input = screen.getByRole('spinbutton', {
+      name: 'Speed',
+    })
 
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: '7' } })

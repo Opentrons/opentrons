@@ -2,10 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, SINGLE } from '@opentrons/shared-data'
-
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
-import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -25,13 +22,7 @@ interface DropTipFieldProps extends FieldProps {
 }
 
 export function DropTipField(props: DropTipFieldProps): JSX.Element {
-  const {
-    value: dropdownItem,
-    updateValue,
-    nozzles,
-    tiprackDefUri,
-    channels,
-  } = props
+  const { value: dropdownItem, updateValue, tiprackDefUri } = props
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
@@ -59,11 +50,6 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     name: t('form:step_edit_form.field.dropTip.option.return'),
     value: tiprackDefUri,
   }
-  const enableAdditionalPartialTip = useSelector(
-    getEnableAdditionalPartialTipSelection
-  )
-  const isReturnTipValid =
-    nozzles === ALL || nozzles == null || (channels === 1 && nozzles === SINGLE)
 
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
@@ -88,11 +74,7 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     <DropdownStepFormField
       {...props}
       updateValue={updateValue}
-      options={
-        isReturnTipValid || enableAdditionalPartialTip
-          ? [...options, returnOption]
-          : options
-      }
+      options={[...options, returnOption]}
       value={dropdownItem ? String(dropdownItem) : null}
       title={i18n.format(
         t('step_edit_form.field.location.dropTip'),

@@ -208,6 +208,9 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
               label={t('disposal_volume_µL')}
               error={volumeError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex

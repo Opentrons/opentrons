@@ -99,6 +99,7 @@ describe('FlowRate', () => {
         readOnly: true,
         type: 'number',
         value: 35,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -121,6 +122,7 @@ describe('FlowRate', () => {
         readOnly: true,
         type: 'number',
         value: 62,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -138,6 +140,7 @@ describe('FlowRate', () => {
         readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )

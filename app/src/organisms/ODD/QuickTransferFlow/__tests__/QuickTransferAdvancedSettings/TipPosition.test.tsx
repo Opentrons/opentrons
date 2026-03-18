@@ -96,6 +96,7 @@ describe('TipPosition', () => {
         readOnly: true,
         type: 'text',
         value: 10,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -118,6 +119,7 @@ describe('TipPosition', () => {
         readOnly: true,
         type: 'text',
         value: 75,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -135,6 +137,7 @@ describe('TipPosition', () => {
         readOnly: true,
         type: 'text',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -158,6 +161,7 @@ describe('TipPosition', () => {
         readOnly: true,
         type: 'text',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )

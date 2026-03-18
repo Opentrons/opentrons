@@ -286,6 +286,9 @@ function SubmergeSettingComponent({
             value={speed}
             label={t('speed')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex
@@ -321,6 +324,9 @@ function SubmergeSettingComponent({
             value={delayDuration}
             label={t('delay_duration_s')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex
@@ -361,6 +367,9 @@ function SubmergeSettingComponent({
             error={positionError}
             label={positionText}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>

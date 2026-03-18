@@ -29,10 +29,7 @@ class Scope(enum.Enum):
         "Restart the robot.",
     )
 
-    ROBOT_SETTINGS_WRITE = (
-        "robot_settings.write",
-        "Edit general robot settings."
-    )
+    ROBOT_SETTINGS_WRITE = ("robot_settings.write", "Edit general robot settings.")
 
     RUNS_WRITE = (
         "runs.write",

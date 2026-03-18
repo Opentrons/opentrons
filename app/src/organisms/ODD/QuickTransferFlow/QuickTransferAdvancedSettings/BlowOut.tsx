@@ -401,6 +401,9 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
               label={t('blow_out_speed')}
               error={speedError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex

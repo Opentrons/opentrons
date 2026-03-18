@@ -112,14 +112,15 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     fireEvent.click(screen.getByText('1'))
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
+    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
         value: '',
-      },
+        onBlur: expect.any(Function),
+      }),
       {}
     )
   })
@@ -149,14 +150,15 @@ describe('TouchTip', () => {
     fireEvent.click(numButton)
     const secondNumButton = screen.getByText('8')
     fireEvent.click(secondNumButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
+    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -25 to 0',
         readOnly: true,
         type: 'text',
         value: '-98',
-      },
+        onBlur: expect.any(Function),
+      }),
       {}
     )
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
@@ -178,14 +180,15 @@ describe('TouchTip', () => {
     fireEvent.click(continueBtn)
     const numButton = screen.getByText('1')
     fireEvent.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
+    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -100 to 0',
         readOnly: true,
         type: 'text',
         value: '1',
-      },
+        onBlur: expect.any(Function),
+      }),
       {}
     )
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
@@ -223,14 +226,15 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
+    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
         value: '-25',
-      },
+        onBlur: expect.any(Function),
+      }),
       {}
     )
   })
@@ -250,14 +254,15 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     fireEvent.click(numButton)
     fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
+    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
         readOnly: true,
         type: 'text',
         value: '-8',
-      },
+        onBlur: expect.any(Function),
+      }),
       {}
     )
   })
