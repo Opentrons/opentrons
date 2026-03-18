@@ -36,9 +36,10 @@ class SettingsDataManager:
         """Update the settings."""
         current = self.get()  # SettingsResponseData with all fields populated
         non_null_updates = patch.model_dump(exclude_none=True)
+        print(non_null_updates)
         merged = current.model_copy(update=non_null_updates)
 
-        new_settings = self._settings_store.add(
+        self._settings_store.add(
             access_control_enabled=merged.accessControlEnabled,
             max_number_of_login_attempts=merged.max_number_of_login_attempts,
             password_reset_time_in_days=merged.password_reset_time_in_days,
@@ -58,7 +59,7 @@ class SettingsDataManager:
             if merged.password_complexity is not None
             else None,
         )
-        return SettingsResponseData.from_orm_settings(new_settings)
+        return merged
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
