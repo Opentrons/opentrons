@@ -280,19 +280,35 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         request: oauthlib.common.Request,
     ) -> dict[str, int | str | list[str]] | None:
         """Return information about an access or refresh token (if it exists)."""
-        found_token = self.__token_store.find_active_access_token(
+        found_access_token = self.__token_store.find_active_access_token(
             token, now=_now()
-        ) or self.__token_store.find_active_refresh_token(token, now=_now())
-        if found_token:
+        )
+        found_refresh_token = self.__token_store.find_active_refresh_token(
+            token, now=_now()
+        )
+
+        found_token_type, found_token = (
+            ("access", found_access_token)
+            if found_access_token
+            else ("refresh", found_refresh_token)
+            if found_refresh_token
+            else (None, None)
+        )
+
+        if found_token_type is None or found_token is None:
+            return None
+        else:
             # Values defined by:
             # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
             return {
-                "active": True,  # Always true because find_active_*_token() won't return inactive tokens.
+                # Only access tokens should work for accessing a protected resource, not
+                # refresh tokens. RFC7662 doesn't specify exactly how that distinction
+                # should be made. Here, we're doing it by calling refresh
+                # tokens "inactive."
+                "active": found_token_type == "access",
                 "scope": serialize_scopes(found_token.scopes),
                 "username": found_token.username,
             }
-        else:
-            return None
 
 
 @dataclass

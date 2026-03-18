@@ -42,7 +42,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the refresh token to confirm that it's active
+  - name: Introspect the refresh token and confirm it is found but inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -52,7 +52,7 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
+        active: false
         username: test_admin
         scope: *returned_scope
 
@@ -91,7 +91,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the new refresh token to confirm that it's active
+  - name: Introspect the new refresh token and confirm it is found but inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -101,7 +101,7 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
+        active: false
         username: test_admin
         scope: *returned_scope
 
