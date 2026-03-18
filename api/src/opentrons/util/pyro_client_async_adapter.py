@@ -1,4 +1,4 @@
-"""Class wrapper that ingests a PyroSynchronousObject and maps "synchronized" async functions to awaitable methods."""
+"""Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 from typing import Any, Iterator, ParamSpec, TypeVar
 
@@ -13,7 +13,25 @@ class _ACPO:
 
 
 def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
-    """*Async Client Wrapper Description Here*"""
+    """A Wrapper Class constructor to take a PyroSynchronousObject Proxy and make calls awaitable.
+
+    The purpose of this class re-constructor is to create an object with all the attributes of a Proxy object
+    that was created from a PyroSynchronousObject. The attributes which were originally async but were 'synchronized'
+    by the PyroSynchronousObject constructor will be wrapped to be awaitable again. Standard method calls and
+    property attributes will be forwarded as usual.
+
+    Proxy wrapping Example:
+    -------
+    An example of this would be with a remote call to an `OT3API` instance which has been wrapped and hosted.
+    .. code-block::
+    >>> import Pyro5.api as pyro
+    >>> ot3_uri = pyro.resolve("PYRONAME:OT3API")
+    >>> ot3_proxy = pyro.Proxy(ot3_uri)
+    >>> # ... At this point, `ot3_proxy` is a Proxy of a PyroSynchronousObject ...
+    >>> async_ot3 = AsyncClientPyroObject(ot3_proxy)
+    >>> # ... Now asynchronous `async_ot3` attributes can be awaited ...
+    >>> await async_ot3.home()
+    """
     AsyncCls = type(
         f"AsyncClientPyroObject_{pyro_synchronous_object.__class__.__name__}_{id(pyro_synchronous_object)}",
         (_ACPO,),
