@@ -11,8 +11,8 @@ from auth_server.persistence.orm_models import Settings
 class PasswordComplexity(pydantic.BaseModel):
     """The complexity of the password."""
 
-    minimum_length: int
-    special_characters: bool
+    minimumLength: int
+    specialCharacters: bool
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -34,51 +34,51 @@ class SettingsResponseData(_StrictBaseModel):
         "with the appropriate scopes. See the `/auth/oauth2` endpoints. "
         "When disabled (the default), all endpoints allow unauthenticated access.",
     )
-    max_number_of_login_attempts: int = pydantic.Field(
+    maxNumberOfLoginAttempts: int = pydantic.Field(
         default=5,
         description="Max number of login attempts before account deactivation.",
     )
-    password_reset_time_in_days: int | None = pydantic.Field(
+    passwordResetTimeInDays: int | None = pydantic.Field(
         default=None,
         description="Length of time in days until password must be changed.",
     )
-    password_complexity: PasswordComplexity | None = pydantic.Field(
+    passwordComplexity: PasswordComplexity | None = pydantic.Field(
         default=None,
         description="Password complexity level.",
     )
-    idle_lockout_in_minutes: int = pydantic.Field(
+    idleLockoutInMinutes: int = pydantic.Field(
         default=3,
         description="Length of time until account is locked due to inactivity.",
     )
-    require_admin_creds_when_updating_robot_software: bool = pydantic.Field(
+    requireAdminCredsWhenUpdatingRobotSoftware: bool = pydantic.Field(
         default=True,
         description="Require admin credentials when updating robot settings.",
     )
-    require_admin_creds_when_sending_protocol_to_robot: bool = pydantic.Field(
+    requireAdminCredsWhenSendingProtocolToRobot: bool = pydantic.Field(
         default=True,
         description="Require admin credentials when sending protocol to robot.",
     )
-    require_admin_creds_for_signoff_protocol: bool = pydantic.Field(
+    requireAdminCredsForSignoffProtocol: bool = pydantic.Field(
         default=False,
         description="Require admin credentials for signoff protocol.",
     )
-    require_signoff_for_protocol_log: bool = pydantic.Field(
+    requireSignoffForProtocolLog: bool = pydantic.Field(
         default=True,
         description="Require signoff for protocol log.",
     )
-    require_reason_for_interaction: bool = pydantic.Field(
+    requireReasonForInteraction: bool = pydantic.Field(
         default=True,
         description="Require reason for interaction.",
     )
-    min_length_of_reason_for_interaction: int | None = pydantic.Field(
+    minLengthOfReasonForInteraction: int | None = pydantic.Field(
         default=None,
         description="Minimum length of reason for interaction.",
     )
-    require_logs_to_be_saved_in_app: bool = pydantic.Field(
+    requireLogsToBeSavedInApp: bool = pydantic.Field(
         default=True,
         description="Require logs to be saved in app. Path should be configured in the app.",
     )
-    delete_over_max_on_disk_protocols: bool = pydantic.Field(
+    deleteOverMaxOnDiskProtocols: bool = pydantic.Field(
         default=True,
         description="Automatically delete protocol run logs on the robot when there are 20 protocol run records.",
     )
@@ -88,36 +88,33 @@ class SettingsResponseData(_StrictBaseModel):
         """Build a SettingsResponseData from an ORM Settings."""
         assert settings.access_control_enabled is not None
         assert settings.max_number_of_login_attempts is not None
-        assert settings.password_reset_time_in_days is not None
         assert settings.idle_lockout_in_minutes is not None
         assert settings.require_admin_creds_when_updating_robot_software is not None
         assert settings.require_admin_creds_when_sending_protocol_to_robot is not None
         assert settings.require_admin_creds_for_signoff_protocol is not None
         assert settings.require_signoff_for_protocol_log is not None
         assert settings.require_reason_for_interaction is not None
-        assert settings.min_length_of_reason_for_interaction is not None
         assert settings.require_logs_to_be_saved_in_app is not None
         assert settings.delete_over_max_on_disk_protocols is not None
-        assert settings.password_complexity_minimum_length is not None
-        assert settings.password_complexity_special_characters is not None
-
         return cls(
             accessControlEnabled=settings.access_control_enabled,
-            max_number_of_login_attempts=settings.max_number_of_login_attempts,
-            password_reset_time_in_days=settings.password_reset_time_in_days,
-            password_complexity=PasswordComplexity(
-                minimum_length=settings.password_complexity_minimum_length,
-                special_characters=settings.password_complexity_special_characters,
-            ),
-            idle_lockout_in_minutes=settings.idle_lockout_in_minutes,
-            require_admin_creds_when_updating_robot_software=settings.require_admin_creds_when_updating_robot_software,
-            require_admin_creds_when_sending_protocol_to_robot=settings.require_admin_creds_when_sending_protocol_to_robot,
-            require_admin_creds_for_signoff_protocol=settings.require_admin_creds_for_signoff_protocol,
-            require_signoff_for_protocol_log=settings.require_signoff_for_protocol_log,
-            require_reason_for_interaction=settings.require_reason_for_interaction,
-            min_length_of_reason_for_interaction=settings.min_length_of_reason_for_interaction,
-            require_logs_to_be_saved_in_app=settings.require_logs_to_be_saved_in_app,
-            delete_over_max_on_disk_protocols=settings.delete_over_max_on_disk_protocols,
+            maxNumberOfLoginAttempts=settings.max_number_of_login_attempts,
+            passwordResetTimeInDays=settings.password_reset_time_in_days,
+            passwordComplexity=PasswordComplexity(
+                minimumLength=settings.password_complexity_minimum_length,
+                specialCharacters=settings.password_complexity_special_characters,
+            )
+            if settings.password_complexity_minimum_length is not None
+            else None,
+            idleLockoutInMinutes=settings.idle_lockout_in_minutes,
+            requireAdminCredsWhenUpdatingRobotSoftware=settings.require_admin_creds_when_updating_robot_software,
+            requireAdminCredsWhenSendingProtocolToRobot=settings.require_admin_creds_when_sending_protocol_to_robot,
+            requireAdminCredsForSignoffProtocol=settings.require_admin_creds_for_signoff_protocol,
+            requireSignoffForProtocolLog=settings.require_signoff_for_protocol_log,
+            requireReasonForInteraction=settings.require_reason_for_interaction,
+            minLengthOfReasonForInteraction=settings.min_length_of_reason_for_interaction,
+            requireLogsToBeSavedInApp=settings.require_logs_to_be_saved_in_app,
+            deleteOverMaxOnDiskProtocols=settings.delete_over_max_on_disk_protocols,
         )
 
 

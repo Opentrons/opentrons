@@ -28,7 +28,7 @@ class Settings(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     access_control_enabled = Column(Boolean, nullable=False)
     max_number_of_login_attempts = Column(Integer, nullable=False)
-    password_reset_time_in_days = Column(Integer, nullable=False)
+    password_reset_time_in_days = Column(Integer, nullable=True)
     password_complexity_minimum_length = Column(Integer, nullable=True)
     password_complexity_special_characters = Column(Boolean, nullable=True)
     idle_lockout_in_minutes = Column(Integer, nullable=False)

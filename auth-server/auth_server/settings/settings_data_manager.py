@@ -40,22 +40,22 @@ class SettingsDataManager:
 
         self._settings_store.add(
             access_control_enabled=merged.accessControlEnabled,
-            max_number_of_login_attempts=merged.max_number_of_login_attempts,
-            password_reset_time_in_days=merged.password_reset_time_in_days,
-            idle_lockout_in_minutes=merged.idle_lockout_in_minutes,
-            require_admin_creds_when_updating_robot_software=merged.require_admin_creds_when_updating_robot_software,
-            require_admin_creds_when_sending_protocol_to_robot=merged.require_admin_creds_when_sending_protocol_to_robot,
-            require_admin_creds_for_signoff_protocol=merged.require_admin_creds_for_signoff_protocol,
-            require_signoff_for_protocol_log=merged.require_signoff_for_protocol_log,
-            require_reason_for_interaction=merged.require_reason_for_interaction,
-            min_length_of_reason_for_interaction=merged.min_length_of_reason_for_interaction,
-            require_logs_to_be_saved_in_app=merged.require_logs_to_be_saved_in_app,
-            delete_over_max_on_disk_protocols=merged.delete_over_max_on_disk_protocols,
-            password_complexity_minimum_length=merged.password_complexity.minimum_length
-            if merged.password_complexity is not None
+            max_number_of_login_attempts=merged.maxNumberOfLoginAttempts,
+            password_reset_time_in_days=merged.passwordResetTimeInDays,
+            idle_lockout_in_minutes=merged.idleLockoutInMinutes,
+            require_admin_creds_when_updating_robot_software=merged.requireAdminCredsWhenUpdatingRobotSoftware,
+            require_admin_creds_when_sending_protocol_to_robot=merged.requireAdminCredsWhenSendingProtocolToRobot,
+            require_admin_creds_for_signoff_protocol=merged.requireAdminCredsForSignoffProtocol,
+            require_signoff_for_protocol_log=merged.requireSignoffForProtocolLog,
+            require_reason_for_interaction=merged.requireReasonForInteraction,
+            min_length_of_reason_for_interaction=merged.minLengthOfReasonForInteraction,
+            require_logs_to_be_saved_in_app=merged.requireLogsToBeSavedInApp,
+            delete_over_max_on_disk_protocols=merged.deleteOverMaxOnDiskProtocols,
+            password_complexity_minimum_length=merged.passwordComplexity.minimumLength
+            if merged.passwordComplexity is not None
             else None,
-            password_complexity_special_characters=merged.password_complexity.special_characters
-            if merged.password_complexity is not None
+            password_complexity_special_characters=merged.passwordComplexity.specialCharacters
+            if merged.passwordComplexity is not None
             else None,
         )
         return merged
