@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V2"}
+metadata = {"protocolName": "Gravimetric QC V2 0317"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -426,6 +426,15 @@ class FixtureSettings:
         # do this after the set serial to overwrite where the name.
         test_report.set_robot_id(robot_serial)
         ctx.load_trash_bin("A3")
+        # do LPC when it is simulating
+        if ctx.is_simulating():
+            for volume, slot_list in tips.items():
+                for slot in slot_list:
+                    _labware = ctx.load_labware(f"opentrons_flex_96_tiprack_{volume}uL", slot)
+                    pipette.pick_up_tip(_labware.wells()[0])
+                    pipette.aspirate(volume, source_well)
+                    pipette.dispense(volume, source_well)
+                    pipette.drop_tip()
         return cls(
             ctx=ctx,
             name=name,
@@ -500,7 +509,7 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
         return_tip=fixture_settings.return_tip,
         mix=False,
         user_volumes=False,
-        kind=config.ConfigType.gravimetric,
+        kind=f"{config.ConfigType.gravimetric}.{fixture_settings.ctx.params.test_type}.{fixture_settings.ctx.params.production_type}",
         extra=fixture_settings.extra,
         jog=False,
         same_tip=False,
@@ -694,6 +703,35 @@ def add_parameters(parameters: ParameterContext) -> None:
             ]
         ],
         description="Operator for this QC run",
+    )
+
+    parameters.add_str(
+        display_name="Test Type",
+        variable_name="test_type",
+        default="Productions",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Productions",
+                "Engineering",
+            ]
+        ],
+        description="Testing for production line or engineering's verifications",
+    )
+
+    parameters.add_str(
+        display_name="Production Type",
+        variable_name="production_type",
+        default="Opentrons",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Opentrons",
+                "Millipore",
+                "Ultima",
+            ]
+        ],
+        description="Distinguish OEM productions",
     )
     
     parameters.add_bool(
@@ -1092,7 +1130,7 @@ def run_blank_test(
     else:
         liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
     # 移动到垃圾桶前，关闭所有光栅
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         ret=fixture_settings.ImpactSerial_U.close_all_gratings()
         fixture_settings.ctx.delay(
                 seconds=0.1,
@@ -1370,7 +1408,7 @@ def calculate_evaporation(
 
     # Z轴在秤的上方，调用switch_mode
     fixture_settings.pipette._retract()
-    if not fixture_settings.ctx.is_simulating():
+    if not fixture_settings.ctx.is_simulating() and fixture_settings.use_impact_protection:
         swichvaldict = {20:"SET_LEFT_T50", 50:"SET_LEFT_T50", 200:"SET_LEFT_T50", 1000:"SET_LEFT_T1000"}
         impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[fixture_settings.tip_sizes[0]])
         fixture_settings.ctx.delay(
@@ -1710,6 +1748,9 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
+    if fixture_settings.ctx.is_simulating():
+        print_info("Simulating. Not running actual tests and stopping analysis.")
+        return
     try:
         _store_config_as_old_style(fixture_settings)
         if _should_alter_discontinuity(fixture_settings):
