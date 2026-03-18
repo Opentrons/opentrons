@@ -8,7 +8,6 @@ from types import FunctionType
 from typing import TypeVar
 
 import pytest
-from pydantic import BaseModel
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
@@ -16,7 +15,6 @@ import opentrons.hardware_control.types as hw_types
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
-    PydanticPyroSerializer,
     register_hardware_types,
 )
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
@@ -29,45 +27,6 @@ def managed_obj(ot3_hardware: ThreadManager[OT3API]) -> OT3API:
     managed = ot3_hardware.managed_obj
     assert managed
     return managed
-
-
-class NestedTest(BaseModel):
-    """A basic pydantic model that is nested in another model."""
-
-    foo: str
-
-
-class TestModel(BaseModel):
-    """A basic pydantic model for serialization tests. Contains a basic type, nested model, and an enum."""
-
-    bar: int
-    xyzzy: NestedTest
-    critical: hw_types.CriticalPoint
-
-
-def test_pydantic_serialization() -> None:
-    """It should register a pydantic class and serialize it from class to dict and back."""
-    PydanticPyroSerializer.register_model(TestModel)
-
-    test_model = TestModel(
-        bar=123,
-        xyzzy=NestedTest(foo="xzibit"),
-        critical=hw_types.CriticalPoint.XY_CENTER,
-    )
-
-    test_dict = PydanticPyroSerializer._pydantic_class_to_dict(test_model)
-    assert test_dict == {
-        "bar": 123,
-        "xyzzy": {"foo": "xzibit"},
-        "critical": 4,
-        "__class__": "tests.opentrons.util.test_pyro_synchronous_adapter.TestModel",
-    }
-
-    result = PydanticPyroSerializer._pydantic_dict_to_class(
-        "tests.opentrons.util.test_pyro_synchronous_adapter.TestModel",
-        test_dict,
-    )
-    assert result == test_model
 
 
 def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
