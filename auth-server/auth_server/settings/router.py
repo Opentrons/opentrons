@@ -48,8 +48,7 @@ async def patch_settings(  # noqa: D103
         SettingsDataManager, fastapi.Depends(get_settings_data_manager)
     ],
 ) -> SimpleBody[SettingsResponseData]:
-    settings_data_manager.patch(request_body.data)
-    new_settings = settings_data_manager.get()
+    new_settings = settings_data_manager.patch(request_body.data)
     return SimpleBody.model_construct(data=new_settings)
 
 
