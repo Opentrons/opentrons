@@ -28,7 +28,7 @@ export function SavedVacuumStep(props: SavedVacuumStepProps): JSX.Element {
     onEdit,
     allowDelete = true,
   } = props
-  const { name, time, pumpData } = stepData
+  const { title, time, pumpData } = stepData
   const { mode } = pumpData
   const { t } = useTranslation('protocol_steps')
   const formattedPumpDetail =
@@ -49,7 +49,7 @@ export function SavedVacuumStep(props: SavedVacuumStepProps): JSX.Element {
       <div className={styles.flex_row_gap_24}>
         <Tag text={displayIndex} type="default" shrinkToContent />
         <StyledText desktopStyle="bodyDefaultRegular">
-          {[name, formattedPumpDetail, time].join(', ')}
+          {[title, formattedPumpDetail, time].join(', ')}
         </StyledText>
       </div>
       <div className={styles.flex_row_gap_8}>

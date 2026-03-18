@@ -63,6 +63,9 @@ max-complexity = 9
 known-first-party = ["opentrons", "opentrons_hardware", "opentrons_shared_data", "robot_server" ]
 known-local-folder = ["usb_bridge"]
 
+[tool.ruff.format]
+exclude = ["ot3usb/_version.py"]
+
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "ot3usb/_version.py"
 tag-pattern = 'v(?P<version>.*)'

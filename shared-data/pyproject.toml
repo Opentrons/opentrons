@@ -94,6 +94,8 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["opentrons_shared_data"]
 
+[tool.ruff.format]
+exclude = ["python/opentrons_shared_data/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="python/opentrons_shared_data/_version.py"

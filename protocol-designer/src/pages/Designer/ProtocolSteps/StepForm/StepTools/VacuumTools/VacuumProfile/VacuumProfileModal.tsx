@@ -23,9 +23,9 @@ import type {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'
-import type { FormData } from '/protocol-designer/form-types'
+import type { FormData, VacuumProfileStep } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../../types'
-import type { ProfileCycleItem, ProfileStepItem, VacuumStepData } from './types'
+import type { VacuumProfileCycleItem, VacuumProfileStepItem } from './types'
 
 export interface VacuumProfileModalProps {
   formData: FormData
@@ -124,13 +124,13 @@ export function VacuumProfileModal(
             {localOrderedProfileItemIds.map((id: string, index: number) => {
               const profileItem = localProfileItemsById[id]
               if (profileItem.type === PROFILE_STEP) {
-                const stepItem = profileItem as ProfileStepItem
+                const stepItem = profileItem as VacuumProfileStepItem
                 return stepItem.isPresaved ? (
                   <PresavedVacuumStep
                     key={id}
                     displayIndex={String(index + 1)}
                     stepData={stepItem}
-                    onSaveSuccess={(stepData: VacuumStepData) => {
+                    onSaveSuccess={(stepData: VacuumProfileStep) => {
                       onSaveSuccess(id, stepData)
                     }}
                     onStepChange={(_stepId, patch) => {
@@ -154,7 +154,7 @@ export function VacuumProfileModal(
                   />
                 )
               } else {
-                const cycleItem = profileItem as ProfileCycleItem
+                const cycleItem = profileItem as VacuumProfileCycleItem
                 return profileItem.isPresaved ? (
                   <PresavedVacuumCycle
                     key={id}

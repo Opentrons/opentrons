@@ -14,6 +14,7 @@ from .types import (
     PressureState,
     PumpState,
     VentState,
+    WasteConfigParameters,
 )
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
@@ -97,6 +98,27 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("O")),
             float(match.group("V")),
             float(match.group("H")),
+        )
+
+    @classmethod
+    def parse_get_waste_configs(cls, response: str) -> WasteConfigParameters:
+        """Parse the get waste configs."""
+        pattern = r"E:(?P<E>\d) S:(?P<S>\d.+) P:(?P<P>\d.+) F:(?P<F>\d.+) D:(?P<D>\d.+) R:(?P<R>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) M:(?P<M>\d.+) X:(?P<X>\d.+)"
+        _RE = re.compile(rf"^{GCODE.GET_WASTE_CONFIG} {pattern}$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for get waste confis: {response}")
+        return WasteConfigParameters(
+            bool(match.group("E")),
+            float(match.group("S")),
+            float(match.group("P")),
+            float(match.group("F")),
+            float(match.group("D")),
+            float(match.group("R")),
+            float(match.group("C")),
+            float(match.group("A")),
+            float(match.group("M")),
+            float(match.group("X")),
         )
 
     @classmethod
@@ -356,3 +378,50 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             GCODE.GET_PRESSURE_PID.build_command()
         )
         return self.parse_get_pressure_pid(resp)
+
+    async def set_waste_configs(  # noqa: C901
+        self,
+        enable_waste_full_detection: bool,
+        p_window_start: Optional[float] = None,
+        p_window_end: Optional[float] = None,
+        baseline_fast_factor: Optional[float] = None,
+        max_delta_per_tick: Optional[float] = None,
+        max_rise_per_tick: Optional[float] = None,
+        max_cummulative_rise: Optional[float] = None,
+        p_filter_alpha: Optional[float] = None,
+        min_window_time: Optional[float] = None,
+        max_window_time: Optional[float] = None,
+    ) -> None:
+        """Sets the Waste Full detection algorithm parameters"""
+
+        command = GCODE.SET_WASTE_CONFIG.build_command()
+        if p_window_start is not None:
+            command.add_float("S", p_window_start, GCODE_ROUNDING_PRECISION)
+        if p_window_end is not None:
+            command.add_float("P", p_window_end, GCODE_ROUNDING_PRECISION)
+        if baseline_fast_factor is not None:
+            command.add_float("F", baseline_fast_factor, GCODE_ROUNDING_PRECISION)
+        if max_delta_per_tick is not None:
+            command.add_float("D", max_delta_per_tick, GCODE_ROUNDING_PRECISION)
+        if max_rise_per_tick is not None:
+            command.add_float("R", max_rise_per_tick, GCODE_ROUNDING_PRECISION)
+        if max_cummulative_rise is not None:
+            command.add_float("C", max_cummulative_rise, GCODE_ROUNDING_PRECISION)
+        if p_filter_alpha is not None:
+            command.add_float("A", p_filter_alpha, GCODE_ROUNDING_PRECISION)
+        if min_window_time is not None:
+            command.add_float("M", min_window_time, GCODE_ROUNDING_PRECISION)
+        if max_window_time is not None:
+            command.add_float("X", max_window_time, GCODE_ROUNDING_PRECISION)
+        command.add_int("E", int(enable_waste_full_detection))
+
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_WASTE_CONFIG}$", resp):
+            raise ValueError(f"Incorrect Response for set waste config: {resp}")
+
+    async def get_waste_configs(self) -> WasteConfigParameters:
+        """Get the waste full detection configs"""
+        resp = await self._connection.send_command(
+            GCODE.GET_WASTE_CONFIG.build_command()
+        )
+        return self.parse_get_waste_configs(resp)
