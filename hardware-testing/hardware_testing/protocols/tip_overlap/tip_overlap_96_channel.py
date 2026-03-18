@@ -1,4 +1,4 @@
-"""Protocol to test tip overlap in the 8 channel."""
+"""Protocol to test tip overlap in the 96 channel."""
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.types import Point
 from opentrons.config import IS_ROBOT
@@ -124,8 +124,8 @@ LAYOUT_TO_START: Dict[str, Optional[str]] = {
     "SingleH12": "H12",
     "Column1": "A1",
     "Column12": "A12",
-    "RowA": "A12",
-    "RowH": "H12",
+    "RowA": "A1",
+    "RowH": "H1",
     "Full": None,
 }
 LAYOUT_TO_END: Dict[str, Optional[str]] = {
@@ -133,10 +133,10 @@ LAYOUT_TO_END: Dict[str, Optional[str]] = {
     "SingleH1": None,
     "SingleA12": None,
     "SingleH12": None,
-    "Column1": "H1",
-    "Column12": "H12",
-    "RowA": "A12",
-    "RowH": "H12",
+    "Column1": None,
+    "Column12": None,
+    "RowA": None,
+    "RowH": None,
     "Full": None,
 }
 
