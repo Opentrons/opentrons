@@ -38,7 +38,6 @@ class SettingsDataManager:
         non_null_updates = patch.model_dump(exclude_none=True)
         merged = current.model_copy(update=non_null_updates)
 
-        # add logic for password complexity
         new_settings = self._settings_store.add(
             access_control_enabled=merged.accessControlEnabled,
             max_number_of_login_attempts=merged.max_number_of_login_attempts,
@@ -52,13 +51,19 @@ class SettingsDataManager:
             min_length_of_reason_for_interaction=merged.min_length_of_reason_for_interaction,
             require_logs_to_be_saved_in_app=merged.require_logs_to_be_saved_in_app,
             delete_over_max_on_disk_protocols=merged.delete_over_max_on_disk_protocols,
+            password_complexity_minimum_length=merged.password_complexity.minimum_length
+            if merged.password_complexity is not None
+            else None,
+            password_complexity_special_characters=merged.password_complexity.special_characters
+            if merged.password_complexity is not None
+            else None,
         )
-        return new_settings
+        return SettingsResponseData.from_orm_settings(new_settings)
 
     def reset(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
         self._settings_store.reset()
-        return self._settings_store.get()
+        return self.get()
 
 
 _accessor = AppStateAccessor[SettingsDataManager]("settings_data_manager")

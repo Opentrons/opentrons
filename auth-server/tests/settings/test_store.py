@@ -20,6 +20,7 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
         yield store
 
 
+# test password complexity with none values
 def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     """add should persist the user so get can find it."""
     settings_store.add(
@@ -35,6 +36,8 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
         min_length_of_reason_for_interaction=10,
         require_logs_to_be_saved_in_app=True,
         delete_over_max_on_disk_protocols=True,
+        password_complexity_minimum_length=8,
+        password_complexity_special_characters=True,
     )
     fetched = settings_store.get()
     assert fetched is not None
@@ -50,7 +53,8 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     assert fetched.min_length_of_reason_for_interaction == 10
     assert fetched.require_logs_to_be_saved_in_app == True
     assert fetched.delete_over_max_on_disk_protocols == True
-
+    assert fetched.password_complexity_minimum_length == 8
+    assert fetched.password_complexity_special_characters == True
     with pytest.raises(ValueError):
         settings_store.add(
             access_control_enabled=False,
@@ -65,6 +69,8 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
             min_length_of_reason_for_interaction=10,
             require_logs_to_be_saved_in_app=True,
             delete_over_max_on_disk_protocols=True,
+            password_complexity_minimum_length=None,
+            password_complexity_special_characters=None,
         )
 
 
@@ -83,6 +89,8 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
         min_length_of_reason_for_interaction=10,
         require_logs_to_be_saved_in_app=True,
         delete_over_max_on_disk_protocols=True,
+        password_complexity_minimum_length=8,
+        password_complexity_special_characters=True,
     )
     settings_store.reset()
     fetched = settings_store.get()
