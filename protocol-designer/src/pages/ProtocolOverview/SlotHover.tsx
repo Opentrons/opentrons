@@ -44,6 +44,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   const { hover, setHover, slotId, slotPosition, robotType } = props
   const deckSetup = useSelector(getInitialDeckSetup)
   const { additionalEquipmentOnDeck, modules } = deckSetup
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [])
   const hasTCOnSlot = Object.values(modules).find(
     module => module.slot === slotId && module.type === THERMOCYCLER_MODULE_TYPE

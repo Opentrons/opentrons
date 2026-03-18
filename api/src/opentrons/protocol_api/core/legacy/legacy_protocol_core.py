@@ -10,6 +10,7 @@ from ..._liquid import Liquid, LiquidClass
 from ..._types import OffDeckType
 from ...disposal_locations import TrashBin, WasteChute
 from ...labware import Labware
+from ..csv import AbstractCSV
 from ..labware import LabwareLoadParams
 from ..protocol import AbstractProtocol
 from . import legacy_module_core, module_geometry
@@ -641,3 +642,7 @@ class LegacyProtocolCore(
     def create_timer(self, seconds: float) -> LegacyTaskCore:
         """Create a timer task that runs in the background."""
         assert False, "create_timer only supported on engine core"
+
+    def create_csv(self, filename: str, columns: int) -> AbstractCSV:
+        """Create a new csv file"""
+        assert False, "create_csv only supported on engine core"

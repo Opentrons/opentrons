@@ -302,6 +302,7 @@
       "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to after aspirating.",
       "aspirate_submerge_mmFromBottom": "Change where in the well the robot submerges from before aspirating.",
       "aspirate_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
+      "blowout_mmFromBottom": "Change where in the well the robot blows out from.",
       "blowout_z_offset": "Change where in the well the robot performs the blowout.",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing.",
       "dispense_mmFromBottom": "Change where in the well the robot dispenses from.",
@@ -351,6 +352,10 @@
   },
   "upload": "Upload",
   "upload_tiprack": "Upload a custom tiprack to select its definition",
+  "vacuum_mode_update": {
+    "body": "Selecting a new vacuum mode type will clear your current profile steps. This action can't be undone.",
+    "title": "Vacuum profile steps will be reset"
+  },
   "well_order": {
     "body": "Change the order in which the robot aspirates from the selected wells",
     "field_label": "Order",

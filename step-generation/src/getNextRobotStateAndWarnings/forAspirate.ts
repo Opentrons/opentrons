@@ -2,8 +2,7 @@ import isEmpty from 'lodash/isEmpty'
 import range from 'lodash/range'
 import uniq from 'lodash/uniq'
 
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
-
+import { getActiveNozzleAmount } from '../utils/getActiveNozzleAmount'
 import {
   AIR,
   getLocationTotalVolume,
@@ -37,18 +36,20 @@ export function forAspirate(
       : (robotState.pipettes[pipetteId].wellName ?? '')
   const { liquidState } = robotState
   const nozzles = robotState.pipettes[pipetteId].nozzles
+  const primaryNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const isReservoir = labwareDef.metadata.displayCategory === 'reservoir'
-  let channels = pipetteSpec.channels
-  if (nozzles === COLUMN) {
-    channels = 8
-  } else if (nozzles === SINGLE) {
-    channels = 1
-  }
+  const activeChannels = getActiveNozzleAmount({
+    pipetteSpec,
+    nozzles,
+    primaryNozzle,
+  })
 
   const { allWellsShared, wellsForTips } = getWellsForTips(
-    channels,
+    activeChannels,
     labwareDef,
     wellName
   )
@@ -61,12 +62,12 @@ export function forAspirate(
     )}`
   )
 
-  if (channels > 1 && allWellsShared) {
+  if (activeChannels > 1 && allWellsShared) {
     // special case: trough-like "shared" well with multi-channel pipette
     const commonWell = wellsForTips[0]
     const sourceLiquidState = liquidState.labware[labwareId][commonWell]
     const isOveraspirate =
-      volume * channels > getLocationTotalVolume(sourceLiquidState)
+      volume * activeChannels > getLocationTotalVolume(sourceLiquidState)
 
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
@@ -75,11 +76,11 @@ export function forAspirate(
     }
 
     const volumePerTip = isOveraspirate
-      ? getLocationTotalVolume(sourceLiquidState) / channels
+      ? getLocationTotalVolume(sourceLiquidState) / activeChannels
       : volume
     // all tips get the same amount of the same liquid added to them, from the source well
     const newLiquidFromWell = splitLiquid(volumePerTip, sourceLiquidState).dest
-    range(channels).forEach((tipIndex): void => {
+    range(activeChannels).forEach((tipIndex): void => {
       const pipette = liquidState.pipettes[pipetteId]
       const indexToString = tipIndex.toString()
       const tipLiquidState = pipette[indexToString]
@@ -97,14 +98,14 @@ export function forAspirate(
     })
     // Remove liquid from source well
     liquidState.labware[labwareId][commonWell] = splitLiquid(
-      volume * channels,
+      volume * activeChannels,
       liquidState.labware[labwareId][commonWell]
     ).source
     return
   }
 
   //  all wells in the reservoir are being used in this case but 8 channels per well
-  if (channels === 96 && isReservoir) {
+  if (activeChannels === 96 && isReservoir) {
     //  for each well the 96 channels are aspirating into
     wellsForTips.forEach(well => {
       const sourceLiquidState = liquidState.labware[labwareId][well]
@@ -127,7 +128,7 @@ export function forAspirate(
         sourceLiquidState
       ).dest
 
-      range(channels).forEach(tipIndex => {
+      range(activeChannels).forEach(tipIndex => {
         const pipette = liquidState.pipettes[pipetteId]
         const indexToString = tipIndex.toString()
         const tipLiquidState = pipette[indexToString]
@@ -156,7 +157,7 @@ export function forAspirate(
   }
 
   // general case (no common well shared across all tips)
-  range(channels).forEach(tipIndex => {
+  range(activeChannels).forEach(tipIndex => {
     const indexToString = tipIndex.toString()
     const pipette = liquidState.pipettes[pipetteId]
     const tipLiquidState = pipette[indexToString]

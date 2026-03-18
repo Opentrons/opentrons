@@ -96,14 +96,19 @@ export function ProtocolOverview(): JSX.Element {
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
 
-  useEffect(() => {
-    if (formValues?.created == null) {
-      console.log(
-        'formValues was possibly refreshed while on the overview page, redirecting to landing page'
-      )
-      navigate('/')
-    }
-  }, [formValues])
+  useEffect(
+    () => {
+      if (formValues?.created == null) {
+        console.log(
+          'formValues was possibly refreshed while on the overview page, redirecting to landing page'
+        )
+        navigate('/')
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formValues]
+  )
 
   const {
     modules: modulesOnDeck,

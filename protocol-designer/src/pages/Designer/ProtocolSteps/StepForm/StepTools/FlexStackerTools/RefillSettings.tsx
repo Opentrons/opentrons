@@ -88,32 +88,37 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
     storedPrimaryEntity != null && getIsTiprack(storedPrimaryEntity.def)
   // TODO: figure out a way to not need this use Effect. its hard because
   // you can't rely on generating the uuid in the hydrated form
-  useEffect(() => {
-    const newGroupQuantity = Number(fillQuantityLocalState) ?? 1
-    const difference = newGroupQuantity - oldGroupQuantity
-    const valueTooHigh = newGroupQuantity > maxRefillGroupQuantity
-    // Form errors do not have acccess to module state, so this logic is used
-    // to clear out the fillLabwareIds value if the quantity entered is too high
-    // and raise an error.
-    if (valueTooHigh) {
-      propsForFields.fillLabwareIds.updateValue([])
-    } else {
-      if (difference > 0) {
-        const additionalIds = Array.from({ length: difference }, () =>
-          nonNullEntities.map(entity => `${uuid()}:${entity.labwareDefURI}`)
-        ).flat()
-        // ensure we preserve the existing labware IDs, even if a user extensively modifies the quantity up/down
-        propsForFields.fillLabwareIds.updateValue([
-          ...initialLabwareIds,
-          ...additionalIds,
-        ])
-      } else if (difference < 0) {
-        propsForFields.fillLabwareIds.updateValue(
-          initialLabwareIds.slice(0, newGroupQuantity * numEntitiesInGroup)
-        )
+  useEffect(
+    () => {
+      const newGroupQuantity = Number(fillQuantityLocalState) ?? 1
+      const difference = newGroupQuantity - oldGroupQuantity
+      const valueTooHigh = newGroupQuantity > maxRefillGroupQuantity
+      // Form errors do not have acccess to module state, so this logic is used
+      // to clear out the fillLabwareIds value if the quantity entered is too high
+      // and raise an error.
+      if (valueTooHigh) {
+        propsForFields.fillLabwareIds.updateValue([])
+      } else {
+        if (difference > 0) {
+          const additionalIds = Array.from({ length: difference }, () =>
+            nonNullEntities.map(entity => `${uuid()}:${entity.labwareDefURI}`)
+          ).flat()
+          // ensure we preserve the existing labware IDs, even if a user extensively modifies the quantity up/down
+          propsForFields.fillLabwareIds.updateValue([
+            ...initialLabwareIds,
+            ...additionalIds,
+          ])
+        } else if (difference < 0) {
+          propsForFields.fillLabwareIds.updateValue(
+            initialLabwareIds.slice(0, newGroupQuantity * numEntitiesInGroup)
+          )
+        }
       }
-    }
-  }, [fillQuantityLocalState, storedPrimaryEntity?.labwareDefURI])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fillQuantityLocalState, storedPrimaryEntity?.labwareDefURI]
+  )
 
   return (
     <div className={styles.refill_settings_container}>

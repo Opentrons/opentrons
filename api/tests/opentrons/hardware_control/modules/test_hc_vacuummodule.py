@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 import pytest
 from decoy import Decoy
@@ -10,7 +10,10 @@ from opentrons.drivers.vacuum_module.types import (
     HardwareRevision,
     LEDColor,
     LEDPattern,
+    PressureState,
+    PumpState,
     VacuumModuleInfo,
+    VentState,
 )
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.types import (
@@ -168,3 +171,143 @@ async def test_statusbar_event_handler(
             reps=None,
         )
     )
+
+
+@pytest.mark.parametrize(
+    ("vent_state", "vent_state_bool"),
+    [(VentState.OPENED, False), (VentState.CLOSED, True)],
+)
+async def test_set_vent_state(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    vent_state: VentState,
+    vent_state_bool: bool,
+) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
+    vent_state
+    await subject.set_vent_state(vent_state=vent_state)
+    decoy.verify(await mock_driver.set_vent_state(state=vent_state_bool))
+
+
+@pytest.mark.parametrize(
+    ("enable_vacuum", "guage_pressure_mbar", "duration", "rate", "vent_after"),
+    [
+        (True, 100.0, 67, 55.5, False),
+        (False, 99.8, 45, 54, None),
+    ],
+)
+async def test_set_vacuum_state(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    enable_vacuum: bool,
+    guage_pressure_mbar: Optional[float],
+    duration: Optional[int],
+    rate: Optional[float],
+    vent_after: Optional[bool],
+    decoy: Decoy,
+) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
+    await subject.set_vacuum_state(
+        enable_vacuum=enable_vacuum,
+        guage_pressure_mbar=guage_pressure_mbar,
+        duration=duration,
+        rate=rate,
+        vent_after=vent_after,
+    )
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=enable_vacuum,
+            guage_pressure_mbar=guage_pressure_mbar,
+            duration=duration,
+            rate=rate,
+            vent_after=vent_after,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("start_pump", "target_rpm", "duty_cycle"), [(True, 60, 75), (False, 0, 90)]
+)
+async def test_set_pump_state(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    start_pump: bool,
+    target_rpm: int,
+    duty_cycle: int,
+) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
+    await subject.set_pump_state(
+        start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+    )
+    decoy.verify(
+        await mock_driver.set_pump_state(
+            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+        )
+    )
+
+
+@pytest.mark.parametrize("serial_number", ["VM111110100101", "myfunkyvacuum"])
+async def test_set_serial_number(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    serial_number: str,
+) -> None:
+    """Ensure that the hardware controller calls the driver method w the correct arguments."""
+    await subject.set_serial_number(sn=serial_number)
+    decoy.verify(await mock_driver.set_serial_number(sn=serial_number))
+
+
+@pytest.mark.parametrize(
+    "pump_state",
+    [
+        PumpState(
+            target_rpm=90,
+            current_rpm=80,
+            target_pwm=70,
+            current_pwm=60,
+            pump_running=False,
+            manual_control=True,
+        )
+    ],
+)
+async def test_update_pump_state(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    pump_state: PumpState,
+) -> None:
+    """Ensure that the module pump state gets update with the value the driver returns."""
+    decoy.when(await mock_driver.get_pump_state()).then_return(pump_state)
+
+    await subject._reader.update_pump_state()
+    assert subject._reader.pump_state == pump_state
+
+
+@pytest.mark.parametrize(
+    "vacuum_state",
+    [
+        PressureState(
+            target_guage_pressure=0,
+            current_guage_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vent_state=VentState.CLOSED,
+        )
+    ],
+)
+async def test_update_vacuum_state(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    vacuum_state: PressureState,
+) -> None:
+    """Ensure that the module vacuum state gets update with the value the driver returns."""
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(vacuum_state)
+
+    await subject._reader.update_vacuum_state()
+    assert subject._reader.vacuum_state == vacuum_state

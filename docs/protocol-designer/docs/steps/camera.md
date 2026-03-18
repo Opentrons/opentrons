@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Camera steps"
+description: "Capture images during a protocol run with the robot camera."
 ---
 
 Add a camera step to take a picture of the robot's deck at any point during your protocol. 

@@ -60,6 +60,7 @@ export default defineConfig({
         '../components/src/styles/global.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
+      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '/ai-client/': path.resolve('./src/') + '/',
     },
   },

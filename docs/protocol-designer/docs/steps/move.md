@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Moving Labware"
+description: "Move labware between deck locations with or without the Flex Gripper."
 ---
 
 Add a move step whenever you need to move labware during a protocol, either with the Flex Gripper or manually. By default, move steps will use a gripper if added in your protocol. Click **Use gripper** in the step form to change your selection. 

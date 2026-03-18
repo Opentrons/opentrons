@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Safety and Regulatory Information"
+description: "Safety symbols, compliance guidelines, and regulatory information for Flex."
 ---
 
 ## Safety information

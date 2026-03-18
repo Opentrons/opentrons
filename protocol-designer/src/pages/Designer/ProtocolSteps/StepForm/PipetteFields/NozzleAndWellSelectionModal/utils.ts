@@ -12,16 +12,16 @@ import {
   G1_NOZZLE,
   H1_NOZZLE,
   H12_NOZZLE,
-  PARTIAL,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
 
-import { PARTIAL_NOZZLE_MAP } from './constants'
-
 import type { TFunction } from 'i18next'
 import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
+  ActiveNozzleNumber,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
@@ -90,7 +90,7 @@ export const getAvailableNozzleConfigurations = (
     })
     nozzleConfigurationOptions.push({
       name: t('partial_nozzles'),
-      value: PARTIAL,
+      value: PARTIAL_COLUMN,
     })
   }
   return nozzleConfigurationOptions
@@ -98,7 +98,7 @@ export const getAvailableNozzleConfigurations = (
 
 export const getAvailablePrimaryNozzles = (
   channels: number,
-  nozzleConfiguration: string
+  nozzleConfiguration: NozzleConfigurationStyle
 ): DropdownOption[] => {
   const allowedNozzlesMapping: Record<
     number,
@@ -113,7 +113,7 @@ export const getAvailablePrimaryNozzles = (
     8: {
       SINGLE: [A1_NOZZLE, H1_NOZZLE],
       ALL: [A1_NOZZLE],
-      PARTIAL: [
+      PARTIAL_COLUMN: [
         B1_NOZZLE,
         C1_NOZZLE,
         D1_NOZZLE,
@@ -136,19 +136,18 @@ export const getAvailablePrimaryNozzles = (
 }
 
 export const getNozzleText = (
-  primaryNozzle: PrimaryNozzleConfigurationStyle | null,
-  nozzleConfiguration: NozzleConfigurationStyle,
-  partialNozzleCount?: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
+  nozzleConfiguration: NozzleConfigurationStyle
 ): string | null => {
   const nozzleTextMapping: Record<
     NozzleConfigurationStyle,
-    (primary: PrimaryNozzleConfigurationStyle | null) => string | null
+    (primary: PrimaryNozzleConfigurationStyle) => string | null
   > = {
     ALL: () => 'All',
-    PARTIAL: () =>
-      partialNozzleCount != null ? `${partialNozzleCount} nozzles` : null,
+    PARTIAL_COLUMN: () =>
+      `${PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]} nozzles`,
 
-    SINGLE: primary => (primary ? `${primary} nozzle` : null),
+    SINGLE: primary => `${primary} nozzle`,
 
     ROW: primary => (primary === A1_NOZZLE ? 'Top ' : 'Bottom '),
 
@@ -156,16 +155,19 @@ export const getNozzleText = (
     QUADRANT: () => null,
   }
 
-  return nozzleTextMapping[nozzleConfiguration](primaryNozzle) ?? null
+  return nozzleTextMapping[nozzleConfiguration](primaryNozzle)
 }
 
 export const getEntireWellSelection = (
-  wellName: string,
+  wellName: string | null,
   wellOrdering: string[][],
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
-  channels: number
+  channels: ActiveNozzleNumber
 ): string[] => {
+  if (!wellName) {
+    return []
+  }
   if (nozzleConfiguration === SINGLE) return [wellName]
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)
@@ -185,7 +187,7 @@ export const getEntireWellSelection = (
       return wellOrdering[columnIndex]
     case ROW:
       return wellOrdering.map(column => column[rowIndex])
-    case PARTIAL: {
+    case PARTIAL_COLUMN: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
@@ -253,7 +255,7 @@ export function getWellGroupLength(
     case ROW:
     case COLUMN:
       return totalSelected
-    case PARTIAL:
+    case PARTIAL_COLUMN:
       if (ordering.length === 1) {
         return totalSelected
       }
