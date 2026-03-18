@@ -53,8 +53,8 @@ stages:
       status_code: 200
       json:
         active: false
-        username: test_admin
-        scope: *returned_scope
+      strict:
+        - json:off
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -102,9 +102,8 @@ stages:
       status_code: 200
       json:
         active: false
-        username: test_admin
-        scope: *returned_scope
-
+      strict:
+        - json:off
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
 
