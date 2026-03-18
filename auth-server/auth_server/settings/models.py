@@ -86,12 +86,29 @@ class SettingsResponseData(_StrictBaseModel):
     @classmethod
     def from_orm_settings(cls, settings: Settings) -> "SettingsResponseData":
         """Build a SettingsResponseData from an ORM Settings."""
+        assert settings.access_control_enabled is not None
+        assert settings.max_number_of_login_attempts is not None
+        assert settings.password_reset_time_in_days is not None
+        assert settings.idle_lockout_in_minutes is not None
+        assert settings.require_admin_creds_when_updating_robot_software is not None
+        assert settings.require_admin_creds_when_sending_protocol_to_robot is not None
+        assert settings.require_admin_creds_for_signoff_protocol is not None
+        assert settings.require_signoff_for_protocol_log is not None
+        assert settings.require_reason_for_interaction is not None
+        assert settings.min_length_of_reason_for_interaction is not None
+        assert settings.require_logs_to_be_saved_in_app is not None
+        assert settings.delete_over_max_on_disk_protocols is not None
+        assert settings.password_complexity_minimum_length is not None
+        assert settings.password_complexity_special_characters is not None
 
         return cls(
             accessControlEnabled=settings.access_control_enabled,
             max_number_of_login_attempts=settings.max_number_of_login_attempts,
             password_reset_time_in_days=settings.password_reset_time_in_days,
-            password_complexity=settings.password_complexity,
+            password_complexity=PasswordComplexity(
+                minimum_length=settings.password_complexity_minimum_length,
+                special_characters=settings.password_complexity_special_characters,
+            ),
             idle_lockout_in_minutes=settings.idle_lockout_in_minutes,
             require_admin_creds_when_updating_robot_software=settings.require_admin_creds_when_updating_robot_software,
             require_admin_creds_when_sending_protocol_to_robot=settings.require_admin_creds_when_sending_protocol_to_robot,

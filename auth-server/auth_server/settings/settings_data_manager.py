@@ -25,7 +25,12 @@ class SettingsDataManager:
 
     def get(self) -> SettingsResponseData:
         """Get the current settings."""
-        return self._settings_store.get() or _DEFAULT_SETTINGS
+        settings = self._settings_store.get()
+        return (
+            SettingsResponseData.from_orm_settings(settings)
+            if settings is not None
+            else _DEFAULT_SETTINGS
+        )
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Update the settings."""
