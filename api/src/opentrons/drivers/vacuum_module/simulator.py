@@ -5,10 +5,12 @@ from .types import (
     HardwareRevision,
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
     PressureState,
     PumpState,
     VacuumModuleInfo,
     VentState,
+    WasteConfigParameters,
 )
 from opentrons.util.async_helpers import ensure_yield
 
@@ -118,3 +120,40 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     async def set_vent_state(self, state: bool) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
         self.vent_state = VentState(open)
+
+    async def set_pressure_control_tunings(
+        self,
+        kp: Optional[float] = None,
+        ki: Optional[float] = None,
+        kd: Optional[float] = None,
+        overshoot: Optional[float] = None,
+        k_velocity: Optional[float] = None,
+        k_holding: Optional[float] = None,
+        reset: bool = False,
+    ) -> None:
+        """Sets the PID tuning parameters for the pressure control."""
+        pass
+
+    async def get_pressure_control_tunings(self) -> PressureControlTunings:
+        """Get the pressure control pid tunings."""
+        return PressureControlTunings(0, 0, 0, 0, 0, 0)
+
+    async def set_waste_configs(
+        self,
+        enable_waste_full_detection: bool,
+        p_window_start: Optional[float] = None,
+        p_window_end: Optional[float] = None,
+        baseline_fast_factor: Optional[float] = None,
+        max_delta_per_tick: Optional[float] = None,
+        max_rise_per_tick: Optional[float] = None,
+        max_cummulative_rise: Optional[float] = None,
+        p_filter_alpha: Optional[float] = None,
+        min_window_time: Optional[float] = None,
+        max_window_time: Optional[float] = None,
+    ) -> None:
+        """Sets the Waste Full detection algorithm parameters"""
+        pass
+
+    async def get_waste_configs(self) -> WasteConfigParameters:
+        """Get the waste full detection configs"""
+        return WasteConfigParameters(False, 0, 0, 0, 0, 0, 0, 0, 0, 0)

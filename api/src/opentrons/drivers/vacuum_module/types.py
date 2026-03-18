@@ -20,6 +20,8 @@ class GCODE(StrEnum):
     SET_VENT_STATE = "M124"
     SET_PRESSURE_PID = "M125"
     GET_PRESSURE_PID = "M126"
+    SET_WASTE_CONFIG = "M127"
+    GET_WASTE_CONFIG = "M128"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -117,6 +119,22 @@ class PressureControlTunings:
     overshoot_error: float
     k_velocity: float
     k_holding: float
+
+
+@dataclass
+class WasteConfigParameters:
+    """Get the waste config parameters"""
+
+    waste_detection_enabled: bool
+    p_window_start: float
+    p_window_end: float
+    baseline_fast_factor: float
+    max_delta_per_tick: float
+    max_rise_per_tick: float
+    max_cummulative_rise: float
+    p_filter_alpha: float
+    min_window_time: float
+    max_window_time: float
 
 
 @dataclass
