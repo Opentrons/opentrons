@@ -7,4 +7,4 @@ def find_module_port(vid: int, pid: int) -> str:
         if i.vid == vid and i.pid == pid:
             print(f"Found module at port: {i.device}")
             return i.device
-    raise RuntimeError("could not find connected FLEX Stacker")
+    raise RuntimeError("could not find connected module.")

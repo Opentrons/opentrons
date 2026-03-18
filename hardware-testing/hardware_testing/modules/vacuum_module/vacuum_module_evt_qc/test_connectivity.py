@@ -9,8 +9,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from opentrons.drivers.flex_stacker.types import HardwareRevision
-from opentrons.hardware_control.modules.flex_stacker import FlexStacker
+from opentrons.drivers.vacuum_module.types import HardwareRevision
+from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -22,43 +22,48 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def test_gcode(stacker: FlexStacker, report: CSVReport) -> None:
+async def test_gcode(vacuum: VacuumModule, report: CSVReport) -> None:
     """Send and receive response for GCODE M115."""
     success = True
-    info = await stacker._driver.get_device_info()
-    if info.hw != HardwareRevision.PVT:
-        ui.print_warning(f"Hardware Revision is {info.hw}, expected PVT")
+    info = await vacuum._driver.get_device_info()
+    target_rev = HardwareRevision.NFF
+    hw = info["model"]
+    fw = info["version"]
+    sn = info["serial"]
+    if hw != target_rev.value:
+        ui.print_warning(f"Hardware Revision is {hw}, expected {target_rev.value}")
     report(
         "CONNECTIVITY",
         "usb-get-device-info",
-        [info.fw, info.hw, info.sn, CSVResult.from_bool(success)],
+        [fw, hw, sn, CSVResult.from_bool(success)],
     )
 
 
-async def test_eeprom(stacker: FlexStacker, report: CSVReport) -> None:
+async def test_eeprom(vacuum: VacuumModule, report: CSVReport) -> None:
     """Set serial number and make sure device info is updated accordingly."""
     success = True
-    if not stacker.is_simulated:
+    if not vacuum.is_simulated:
         serial = input("SCAN device barcode: ")
     else:
-        serial = "STACKER-SIMULATOR-SN"
-    await stacker._driver.set_serial_number(serial)
+        serial = "VACUUM-SIMULATOR-SN"
+    await vacuum._driver.set_serial_number(serial)
     report.set_tag(serial)
-    info = await stacker._driver.get_device_info()
-    if info.sn != serial:
+    info = await vacuum._driver.get_device_info()
+    sn = info["serial"]
+    if sn != serial:
         ui.print_error("Serial number is not set properly")
         success = False
     report(
         "CONNECTIVITY",
         "eeprom-set-serial-number",
-        [serial, info.sn, CSVResult.from_bool(success)],
+        [serial, sn, CSVResult.from_bool(success)],
     )
 
 
-async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
+async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
     ui.print_header("USB Communication")
-    await test_gcode(stacker, report)
+    await test_gcode(vacuum, report)
 
     ui.print_header("EEPROM Communication")
-    await test_eeprom(stacker, report)
+    await test_eeprom(vacuum, report)

@@ -16,7 +16,7 @@ from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
-from common.utils import find_module_port
+from ...common.utils import find_module_port
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
@@ -35,7 +35,7 @@ async def build_vacuum_module_report(
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
 
-    port = "" if is_simulating else find_module_port(VACUUM_PID, VACUUM_PID)
+    port = "" if is_simulating else find_module_port(VACUUM_VID, VACUUM_PID)
     vacuum_module = await VacuumModule.build(
         port=port,
         usb_port=USBPort(port, 0),
@@ -63,7 +63,7 @@ async def _main(cfg: TestConfig) -> None:
         await vacuum_module._reader.read()
 
     device_info = await vacuum_module._driver.get_device_info()
-    report.set_tag(device_info.sn if device_info.sn else "UNKNOWN")
+    report.set_tag(device_info.get("serial", "UNKNOWN"))
 
     # RUN TESTS
     try:

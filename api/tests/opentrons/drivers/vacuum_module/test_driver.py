@@ -190,7 +190,7 @@ async def test_get_vacuum_state(
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
 
-    assert pressure_state == types.PressureState(
+    assert pressure_state == types.VacuumState(
         400, 988, 989.3, 988.6, 992.5, True, types.VentState.CLOSED
     )
 
@@ -205,7 +205,7 @@ async def test_get_vacuum_state(
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
 
-    assert pressure_state == types.PressureState(
+    assert pressure_state == types.VacuumState(
         0, 0, 989.3, 988.6, 992.5, False, types.VentState.OPENED
     )
 

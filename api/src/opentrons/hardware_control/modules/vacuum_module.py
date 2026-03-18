@@ -19,8 +19,8 @@ from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
-    PressureState,
     PumpState,
+    VacuumState,
     VentState,
 )
 from opentrons.hardware_control.execution_manager import ExecutionManager
@@ -200,6 +200,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> LiveData:
+        # TODO: FIX THIS
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
         }
@@ -208,6 +209,14 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def should_identify(self) -> bool:
         return self._should_identify
+
+    @property
+    def vacuum_state(self) -> VacuumState:
+        return self._reader.vacuum_state
+
+    @property
+    def pump_state(self) -> PumpState:
+        return self._reader.pump_state
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -299,7 +308,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
-        await self._driver.set_vent_state(state=bool(vent_state.value))
+        await self._driver.set_vent_state(state=vent_state)
 
     async def set_vacuum_state(
         self,
@@ -339,7 +348,7 @@ class VacuumModuleReader(Reader):
 
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
-        self.vacuum_state: PressureState = PressureState(
+        self.vacuum_state: VacuumState = VacuumState(
             target_guage_pressure=0,
             current_guage_pressure=0,
             pressure_abs_a=0,

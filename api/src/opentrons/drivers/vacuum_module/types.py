@@ -97,8 +97,8 @@ class VentState(Enum):
 
 
 @dataclass
-class PressureState:
-    """Get the pressure state."""
+class VacuumState:
+    """Get the vacuum state."""
 
     target_guage_pressure: float
     current_guage_pressure: float

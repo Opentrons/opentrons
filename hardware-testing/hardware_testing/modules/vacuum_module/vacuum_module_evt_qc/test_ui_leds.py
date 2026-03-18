@@ -9,8 +9,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from opentrons.hardware_control.modules.flex_stacker import FlexStacker
-from opentrons.drivers.flex_stacker.types import LEDColor, LEDPattern
+from opentrons.hardware_control.modules.vacuum_module import VacuumModule
+from opentrons.drivers.vacuum_module.types import LEDColor, LEDPattern
 
 
 COLORS = [
@@ -25,33 +25,32 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     return [
         CSVLine(f"{loc}-{color}", [CSVResult])
-        for loc in ["internal", "external"]
+        for loc in ["internal"]
         for color in COLORS
     ]
 
 
-async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
+async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
     # Reset LEDs to off
-    if not stacker.is_simulated:
-        await stacker._driver.set_led(0, LEDColor.GREEN, False, LEDPattern.STATIC)
-        await stacker._driver.set_led(0, LEDColor.GREEN, True, LEDPattern.STATIC)
+    if not vacuum.is_simulated:
+        await vacuum._driver.set_led(0, LEDColor.GREEN, False, LEDPattern.STATIC)
+        await vacuum._driver.set_led(0, LEDColor.GREEN, True, LEDPattern.STATIC)
 
-    for external in [False, True]:
-        for color in COLORS:
-            tag = "external" if external else "internal"
-            ui.print_header(f"Check {tag} {color}")
-            if not stacker.is_simulated:
-                await stacker._driver.set_led(1.0, color, external)
-                led_on = ui.get_user_answer(f"Is the {tag} {color} LED on?")
-                # turn off led before moving on
-                await stacker._driver.set_led(0.0)
-            else:
-                led_on = True
-            report(section, f"{tag}-{color}", [CSVResult.from_bool(led_on)])
+    for color in COLORS:
+        tag = "internal"
+        ui.print_header(f"Check {tag} {color}")
+        if not vacuum.is_simulated:
+            await vacuum._driver.set_led(1.0, color)
+            led_on = ui.get_user_answer(f"Is the {tag} {color} LED on?")
+            # turn off led before moving on
+            await vacuum._driver.set_led(0.0)
+        else:
+            led_on = True
+        report(section, f"{tag}-{color}", [CSVResult.from_bool(led_on)])
 
     # Turn LEDs back to green
-    if not stacker.is_simulated:
-        await stacker._driver.set_led(
+    if not vacuum.is_simulated:
+        await vacuum._driver.set_led(
             0.5, color=LEDColor.GREEN, pattern=LEDPattern.STATIC
         )
