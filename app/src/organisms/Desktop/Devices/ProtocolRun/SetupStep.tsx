@@ -57,7 +57,12 @@ export function SetupStep({
             onClick={toggleExpanded}
             gridGap={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gap={SPACING.spacing4}
+              flex="1"
+              minWidth="0"
+            >
               <StyledText
                 color={COLORS.black90}
                 desktopStyle="bodyLargeSemiBold"
@@ -69,6 +74,7 @@ export function SetupStep({
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
+                css={DESCRIPTION_TEXT_STYLE}
               >
                 {description}
               </StyledText>
@@ -136,8 +142,18 @@ const ACCORDION_STYLE = css`
   }
 `
 
+const DESCRIPTION_TEXT_STYLE = css`
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+`
+
 const RIGHT_CONTENT_CONTAINER_STYLE = css`
   align-items: ${ALIGN_CENTER};
+  flex-shrink: 0;
   text-wrap: ${NO_WRAP};
 `
 
