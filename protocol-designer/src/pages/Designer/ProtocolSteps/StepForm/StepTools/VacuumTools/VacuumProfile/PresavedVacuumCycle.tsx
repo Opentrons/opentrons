@@ -21,12 +21,12 @@ import type {
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'
 import type {
+  PresavedVacuumCycleBaseProps,
   PresavedVacuumCycleSavePayload,
-  VacuumCycleBaseProps,
 } from './types'
 
-export interface PresavedVacuumCycleProps extends VacuumCycleBaseProps {
-  repetitions: number
+export interface PresavedVacuumCycleProps extends PresavedVacuumCycleBaseProps {
+  repetitions: string
   handleSaveCycle: (data: PresavedVacuumCycleSavePayload) => void
   mode: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER
   handleAddCycleStep?: (stepId: string) => void
@@ -138,7 +138,7 @@ export function PresavedVacuumCycle(
               value={localRepetitions}
               onChange={e => {
                 setLocalRepetitions(
-                  Number(maskToPositiveInteger(e.currentTarget.value))
+                  maskToPositiveInteger(e.currentTarget.value)
                 )
               }}
               error={

@@ -5,34 +5,34 @@ import { uuid } from '/protocol-designer/utils'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../constants'
 import { getDefaultStepData } from '../utils'
 
+import type { VacuumProfileStep } from '/protocol-designer/form-types'
 import type {
   PresavedVacuumCycleSavePayload,
-  ProfileCycleItem,
-  ProfileItem,
-  ProfileStepItem,
-  VacuumStepData,
+  VacuumProfileCycleItem,
+  VacuumProfileItem,
+  VacuumProfileStepItem,
 } from '../types'
 import type { VacuumMode } from '../utils'
 
 export interface UseVacuumProfileStateArgs {
   orderedProfileIds: string[]
-  profileItemsById: Record<string, ProfileItem>
+  profileItemsById: Record<string, VacuumProfileItem>
   mode: VacuumMode
 }
 
 export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
   orderedProfileItemIds: string[]
-  profileItemsById: Record<string, ProfileItem>
+  profileItemsById: Record<string, VacuumProfileItem>
   addStep: () => void
   addCycle: () => void
   deleteStep: (stepId: string) => void
   deleteCycleStep: (cycleId: string, stepId: string) => void
-  stepChange: (stepId: string, patch: Partial<VacuumStepData>) => void
-  saveStepSuccess: (stepId: string, stepData: VacuumStepData) => void
+  stepChange: (stepId: string, patch: Partial<VacuumProfileStep>) => void
+  saveStepSuccess: (stepId: string, stepData: VacuumProfileStep) => void
   editStep: (stepId: string) => void
   saveCycle: (
     cycleId: string,
-    cycleItem: ProfileCycleItem,
+    cycleItem: VacuumProfileCycleItem,
     data: PresavedVacuumCycleSavePayload
   ) => void
   hasUnsavedPresavedItems: boolean
@@ -41,14 +41,14 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
   const [orderedProfileItemIds, setOrderedProfileItemIds] =
     useState<string[]>(orderedProfileIds)
   const [itemsById, setItemsById] =
-    useState<Record<string, ProfileItem>>(profileItemsById)
+    useState<Record<string, VacuumProfileItem>>(profileItemsById)
 
   const defaultStepData = getDefaultStepData(mode)
 
   const addStep = (): void => {
     const id = uuid()
     setOrderedProfileItemIds(prev => [...prev, id])
-    const newStep: ProfileStepItem = {
+    const newStep: VacuumProfileStepItem = {
       ...defaultStepData,
       id,
       isPresaved: true,
@@ -57,7 +57,10 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
     setItemsById(prev => ({ ...prev, [id]: newStep }))
   }
 
-  const saveStepSuccess = (stepId: string, stepData: VacuumStepData): void => {
+  const saveStepSuccess = (
+    stepId: string,
+    stepData: VacuumProfileStep
+  ): void => {
     setItemsById(prev => ({
       ...prev,
       [stepId]: {
@@ -68,10 +71,15 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
     }))
   }
 
-  const stepChange = (stepId: string, patch: Partial<VacuumStepData>): void => {
+  const stepChange = (
+    stepId: string,
+    patch: Partial<VacuumProfileStep>
+  ): void => {
     setItemsById(prev => {
-      const current = prev[stepId] as ProfileStepItem | undefined
-      if (current?.type !== PROFILE_STEP) return prev
+      const current = prev[stepId] as VacuumProfileStepItem | undefined
+      if (current?.type !== PROFILE_STEP) {
+        return prev
+      }
       return {
         ...prev,
         [stepId]: {
@@ -97,7 +105,7 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
 
   const deleteCycleStep = (cycleId: string, stepId: string): void => {
     setItemsById(prev => {
-      const cycleItem = prev[cycleId] as ProfileCycleItem | undefined
+      const cycleItem = prev[cycleId] as VacuumProfileCycleItem | undefined
       if (cycleItem?.type !== PROFILE_CYCLE) return prev
       const nextOrderedIds = cycleItem.orderedProfileStepIds.filter(
         id => id !== stepId
@@ -148,7 +156,7 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
         type: PROFILE_CYCLE,
         orderedProfileStepIds: [seedStep.id],
         profileStepItemsById: { [seedStep.id]: seedStep },
-        repetitions: 1,
+        repetitions: '1',
         isPresaved: true,
       },
     }))
@@ -156,7 +164,7 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
 
   const saveCycle = (
     cycleId: string,
-    cycleItem: ProfileCycleItem,
+    cycleItem: VacuumProfileCycleItem,
     data: PresavedVacuumCycleSavePayload
   ): void => {
     setItemsById(prev => {
