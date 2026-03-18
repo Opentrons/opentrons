@@ -83,10 +83,18 @@ export const getModuleShortNames = (type: ModuleType): string => {
   }
 }
 
-const getModuleDisplayLocation = (moduleOnDeck: ModuleOnDeck): string => {
+export const getModuleDisplayLocation = (
+  moduleOnDeck: ModuleOnDeck,
+  robotType: RobotType
+): string => {
   const { type, slot } = moduleOnDeck
   if (type === VACUUM_MODULE_TYPE) {
     return VACUUM_MODULE_LOCATION
+  }
+  if (type === THERMOCYCLER_MODULE_TYPE) {
+    return robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
   }
   return slot
 }
@@ -108,7 +116,10 @@ export function getModuleLabwareOptions(
         moduleOnDeck.id,
         Object.values(labwares)
       )
-      const moduleDisplayLocation = getModuleDisplayLocation(moduleOnDeck)
+      const moduleDisplayLocation = getModuleDisplayLocation(
+        moduleOnDeck,
+        robotType
+      )
       if (topMostId != null) {
         return {
           name: nicknamesById[topMostId],

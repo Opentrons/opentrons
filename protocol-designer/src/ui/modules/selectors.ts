@@ -132,11 +132,13 @@ export const getVacuumLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getInitialDeckSetup,
     getLabwareNicknamesById,
-    (initialDeckSetup, nicknamesById) => {
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
       const vacuumModuleOptions = getModuleLabwareOptions(
         initialDeckSetup,
         nicknamesById,
-        VACUUM_MODULE_TYPE
+        VACUUM_MODULE_TYPE,
+        robotType
       )
       return vacuumModuleOptions
     }
