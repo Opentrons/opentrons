@@ -19,8 +19,8 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     PydanticPyroSerializer,
     register_hardware_types,
 )
-from opentrons.util.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
-from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
+from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_synchronous_adapter import PyroSynchronousObject
 
 
 @pytest.fixture
