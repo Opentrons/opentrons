@@ -32,7 +32,7 @@ import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { WizardBody } from './WizardBody'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { Fixtures } from '../../components/organisms'
+import type { FixtureInfo, Fixtures } from '../../components/organisms'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
@@ -130,12 +130,14 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
   }
 
+  const flexTrashFixtureItem: FixtureInfo = {
+    cutoutId: 'cutoutD1',
+    name: 'trashBin',
+    cutoutFixtureId: 'trashBinAdapter',
+  }
+
   const flexTrashFixture: Fixtures = {
-    [uuid()]: {
-      cutoutId: 'cutoutA3',
-      name: 'trashBin',
-      cutoutFixtureId: 'trashBinAdapter',
-    },
+    [uuid()]: flexTrashFixtureItem,
   }
   const ot2TrashFixture: Fixtures = {
     [uuid()]: {
@@ -176,11 +178,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
             )
           : {}
 
-      filteredFixtures[uuid()] = {
-        cutoutId: 'cutoutA3',
-        name: 'trashBin',
-        cutoutFixtureId: 'trashBinAdapter',
-      }
+      filteredFixtures[uuid()] = flexTrashFixtureItem
 
       setValue('fixtures', filteredFixtures)
     }
