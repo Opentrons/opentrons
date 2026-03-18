@@ -1,8 +1,8 @@
 """The versions of standard labware that the Protocol API should load by default."""
 
 from typing import TypeAlias
-from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.api_support.types import APIVersion
 
 DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 
@@ -143,6 +143,11 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "opentrons_tough_universal_lid": 2,
         "usascientific_12_reservoir_22ml": 4,
         "usascientific_96_wellplate_2.4ml_deep": 4,
+    },
+    APIVersion(2, 28): {
+        "black_96_well_microtiter_plate_lid": 2,
+        "corning_96_wellplate_360ul_lid": 2,
+        "corning_falcon_384_wellplate_130ul_flat_lid": 2,
     },
 }
 

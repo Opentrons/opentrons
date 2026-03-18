@@ -1,24 +1,22 @@
 """ProtocolEngine-based Well core implementations."""
+
 from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.types import Point, Mount, MountType
-
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from ..._liquid import Liquid
+from ..well import AbstractWellCore
+from . import point_calculations, stringify
+from opentrons.protocol_engine import WellLocation, WellOffset, WellOrigin
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.util import UnsupportedAPIError
-from opentrons.protocol_engine.types.liquid_level_detection import (
-    SimulatedProbeResult,
-    LiquidTrackingType,
-)
 from opentrons.protocol_engine.errors import PipetteNotAttachedError
-
-from . import point_calculations
-from . import stringify
-from ..well import AbstractWellCore
-from ..._liquid import Liquid
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    LiquidTrackingType,
+    SimulatedProbeResult,
+)
+from opentrons.protocols.api_support.util import UnsupportedAPIError
+from opentrons.types import Mount, MountType, Point
 
 
 class WellCore(AbstractWellCore):

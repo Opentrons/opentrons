@@ -1,39 +1,40 @@
 """Executor for liquid class based complex commands."""
+
 from __future__ import annotations
 
 import logging
 from copy import deepcopy
-from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field, replace
+from enum import Enum
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    PositionReference,
-    Coordinate,
     BlowoutLocation,
+    Coordinate,
+    PositionReference,
 )
 
 from opentrons.protocol_api._liquid_properties import (
-    Submerge,
-    TransferProperties,
     MixProperties,
-    SingleDispenseProperties,
     MultiDispenseProperties,
+    SingleDispenseProperties,
+    Submerge,
     TouchTipProperties,
-)
-from opentrons.types import Location, Point, Mount
-from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    LocationCheckDescriptors,
-    check_current_volume_before_dispensing,
+    TransferProperties,
 )
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
 )
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    LocationCheckDescriptors,
+    check_current_volume_before_dispensing,
+)
+from opentrons.types import Location, Mount, Point
 
 if TYPE_CHECKING:
-    from .well import WellCore
-    from .instrument import InstrumentCore
     from ... import TrashBin, WasteChute
+    from .instrument import InstrumentCore
+    from .well import WellCore
 
 log = logging.getLogger(__name__)
 
@@ -74,31 +75,31 @@ class TipState:
     def append_liquid(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be adding liquid
         # when there is an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.liquid += volume
 
     def delete_liquid(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be removing liquid
         # when there is an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.liquid -= volume
 
     def append_air_gap(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be adding air gaps
         # when there is already an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap already present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap already present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.air_gap = volume
 
     def delete_air_gap(self, volume: float) -> None:
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == volume
-        ), "Last air gap volume doe not match the volume being removed"
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == volume, (
+            "Last air gap volume doe not match the volume being removed"
+        )
         self.last_liquid_and_air_gap_in_tip.air_gap = 0
 
     def delete_last_air_gap_and_liquid(self) -> None:
@@ -531,11 +532,11 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             self._instrument.blow_out(
                 location=retract_location,
                 well_core=None,
                 in_place=True,
+                flow_rate=blowout_props.flow_rate,
             )
             self._tip_state.ready_to_aspirate = False
         is_final_air_gap = (
@@ -563,7 +564,6 @@ class TransferComponentsExecutor:
             and blowout_props.location != BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
@@ -578,12 +578,14 @@ class TransferComponentsExecutor:
                     ),
                     well_core=source_well,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = Location(
                     source_well.get_top(0), labware=source_location.labware
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now?
                 if (
                     "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
@@ -595,6 +597,7 @@ class TransferComponentsExecutor:
                     location=trash_location,
                     well_core=None,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
@@ -693,11 +696,11 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             self._instrument.blow_out(
                 location=retract_location,
                 well_core=None,
                 in_place=True,
+                flow_rate=blowout_props.flow_rate,
             )
             # A blowout will remove all air gap and liquid (disposal volume) from the tip
             # so delete them from tip state (although practically, there will not be
@@ -763,7 +766,6 @@ class TransferComponentsExecutor:
             and blowout_props.location != BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
@@ -778,12 +780,14 @@ class TransferComponentsExecutor:
                     ),
                     well_core=source_well,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = Location(
                     source_well.get_top(0), labware=source_location.labware
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now?
                 if (
                     "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
@@ -795,6 +799,7 @@ class TransferComponentsExecutor:
                     location=trash_location,
                     well_core=None,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
@@ -811,9 +816,7 @@ class TransferComponentsExecutor:
 
             if (
                 # Same check as before for when it's the final air gap of current retract
-                conditioning_volume > 0
-                and is_last_retract
-                and add_final_air_gap
+                conditioning_volume > 0 and is_last_retract and add_final_air_gap
             ):
                 # The volume in tip at this point should be 0uL
                 air_gap_volume = retract_props.air_gap_by_volume.get_for_volume(0)

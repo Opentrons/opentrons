@@ -1,31 +1,31 @@
 """Parameter context for python protocols."""
-import uuid
-from typing import List, Optional, Union, Dict
 
+import uuid
+from typing import Dict, List, Optional, Union
+
+from ._parameters import Parameters
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    FileInfo,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.parameters import (
-    parameter_definition,
     csv_parameter_definition,
+    parameter_definition,
     validation,
+)
+from opentrons.protocols.parameters.exceptions import (
+    IncompatibleParameterError,
+    ParameterDefinitionError,
+    ParameterValueError,
 )
 from opentrons.protocols.parameters.types import (
     ParameterChoice,
     UserFacingTypes,
 )
-from opentrons.protocols.parameters.exceptions import (
-    ParameterDefinitionError,
-    ParameterValueError,
-    IncompatibleParameterError,
-)
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-    FileInfo,
-)
-
-from ._parameters import Parameters
 
 _ParameterDefinitionTypes = Union[
     parameter_definition.ParameterDefinition,

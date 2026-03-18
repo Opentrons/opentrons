@@ -3,33 +3,31 @@
 import functools
 import logging
 from collections import UserDict
-from typing import Dict, Optional, List, Union, Mapping
-from typing_extensions import Protocol, Final
+from typing import Dict, List, Mapping, Optional, Union
+
+from typing_extensions import Final, Protocol
 
 from opentrons_shared_data.deck import load as load_deck
-
 from opentrons_shared_data.deck.types import SlotDefV3
 from opentrons_shared_data.labware.types import LabwareUri
 
+from .legacy_labware_core import LegacyLabwareCore
+from .module_geometry import HeaterShakerGeometry, ModuleGeometry, ThermocyclerGeometry
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.deck import CalibrationPosition
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocol_api.labware import load as load_lw
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.types import (
     DeckLocation,
+    DeckSlotName,
     Location,
     Mount,
     Point,
-    DeckSlotName,
     StagingSlotName,
 )
-
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.deck import CalibrationPosition
-from opentrons.protocol_api.labware import load as load_lw, Labware
-
-from .legacy_labware_core import LegacyLabwareCore
-from .module_geometry import ModuleGeometry, HeaterShakerGeometry, ThermocyclerGeometry
-
 
 _log = logging.getLogger(__name__)
 
@@ -44,12 +42,10 @@ DEFAULT_LEGACY_DECK_DEFINITION_VERSION: Final = 3
 
 class DeckItem(Protocol):
     @property
-    def highest_z(self) -> float:
-        ...
+    def highest_z(self) -> float: ...
 
     @property
-    def load_name(self) -> str:
-        ...
+    def load_name(self) -> str: ...
 
 
 class Deck(UserDict):  # type: ignore[type-arg]
@@ -82,7 +78,8 @@ class Deck(UserDict):  # type: ignore[type-arg]
             # If `Deck` is public, all items in a `Deck` should be
             # instances of other public APIs.
             loaded_f = load_lw(
-                f["labware"], self.position_for(slot_name)  # type: ignore
+                f["labware"],  # type: ignore
+                self.position_for(slot_name),
             )
             self.__setitem__(slot_name, loaded_f)
 
@@ -253,8 +250,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         if not slot_def:
             slot_ids = [slot["id"] for slot in slots]
             raise ValueError(
-                f"slot {slot_name} could not be found,"
-                f"valid deck slots are: {slot_ids}"
+                f"slot {slot_name} could not be found,valid deck slots are: {slot_ids}"
             )
         return slot_def
 
