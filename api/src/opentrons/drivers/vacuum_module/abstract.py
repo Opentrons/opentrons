@@ -1,6 +1,14 @@
 from typing import Optional, Protocol
 
-from .types import LEDColor, LEDPattern, PumpState, VacuumState, VentState
+from .types import (
+    LEDColor,
+    LEDPattern,
+    PressureControlTunings,
+    PressureState,
+    PumpState,
+    VacuumModuleInfo,
+    WasteConfigParameters,
+)
 
 
 class AbstractVacuumModuleDriver(Protocol):

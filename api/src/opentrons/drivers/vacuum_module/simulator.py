@@ -5,6 +5,8 @@ from .types import (
     HardwareRevision,
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
+    PressureState,
     PumpState,
     VacuumState,
     VentState,
