@@ -1,5 +1,10 @@
 from opentrons.hardware_control.modules.types import VacuumModuleModel
-from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_api import (
+    ProtocolContext,
+    ParameterContext,
+    VacuumModuleContext,
+    AbsorbanceReaderContext,
+)
 
 
 metadata = {
@@ -39,8 +44,8 @@ def run(ctx: ProtocolContext) -> None:
         )
 
     # Load Modules
-    vm_mod = ctx.load_module(module_name="vacuumModuleMilliporeV1", location="A3")
-    abs_mod = ctx.load_module(module_name="absorbanceReaderV1", location="D3")
+    vm_mod: VacuumModuleContext = ctx.load_module(module_name="vacuumModuleMilliporeV1", location="A3")  # type: ignore[assignment]
+    abs_mod: AbsorbanceReaderContext = ctx.load_module(module_name="absorbanceReaderV1", location="D3")  # type: ignore[assignment]
     abs_mod.open_lid()
 
     # Load Tipracks

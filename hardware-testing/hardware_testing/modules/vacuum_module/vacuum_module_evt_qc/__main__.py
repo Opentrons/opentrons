@@ -20,7 +20,6 @@ from ...common.utils import find_module_port
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
-from opentrons.drivers.vacuum_module.driver import VacuumModuleDriver
 from opentrons.drivers.vacuum_module.types import *
 
 
@@ -30,7 +29,7 @@ VACUUM_PID = 0xEF40
 
 async def build_vacuum_module_report(
     is_simulating: bool,
-) -> Tuple[CSVReport, VacuumModuleDriver]:
+) -> Tuple[CSVReport, VacuumModule]:
     """Report setup for Vacuum Module QC script."""
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())

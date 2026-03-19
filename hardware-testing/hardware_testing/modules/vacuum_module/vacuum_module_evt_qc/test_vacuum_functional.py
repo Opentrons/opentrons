@@ -85,6 +85,10 @@ async def test_vacuum_regulation(
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
     print("Set Vacuum State")
+
+    # Disable Waste Detection for now
+    await vacuum._driver.set_waste_configs(enable_waste_full_detection=False)
+
     # Turn off vacuum
     try:
         await vacuum.set_vacuum_state(False)
