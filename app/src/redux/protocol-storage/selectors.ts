@@ -48,6 +48,5 @@ export const getStoredProtocolGroupedCommands: (
     mostRecentAnalysis.commandAnnotations.length > 0
       ? getGroupedCommands(mostRecentAnalysis)
       : []
-
   return groupedCommands
 }

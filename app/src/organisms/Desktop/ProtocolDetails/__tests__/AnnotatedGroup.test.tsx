@@ -42,6 +42,7 @@ describe('AnnotatedGroup', () => {
       analysis: {} as any,
       allRunDefs: [] as any,
       commandStartNumber: 1,
+      annotationDescription: '',
       setSelectedCommand: vi.fn(),
       handlePause: mockHandlePause,
     }

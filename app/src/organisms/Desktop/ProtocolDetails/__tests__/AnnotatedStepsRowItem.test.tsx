@@ -60,6 +60,7 @@ describe('AnnotatedStepsRowItem', () => {
           } as any,
           annotationType: 'mock annotation',
           commandStartNumber: 1,
+          annotationDescription: '',
         },
       ],
     })
