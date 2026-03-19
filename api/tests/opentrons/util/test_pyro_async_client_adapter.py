@@ -82,7 +82,7 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
 
     # Confirm that all these things are awaitable
     await casted_ot3api.home()
-    tip_status = await casted_ot3api.get_tip_presence_status(
+    tip_status = await casted_ot3api.get_tip_presence_status(  # type: ignore
         mount=hw_types.OT3Mount.LEFT
     )
     assert tip_status is hw_types.TipStateType.ABSENT

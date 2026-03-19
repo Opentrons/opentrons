@@ -43,7 +43,8 @@ def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
 def _build_classdict(
     pso: Pyro5.api.Proxy,
 ) -> Iterator[tuple[str, Any]]:
-    pso._pyroBind()  # ensures metadata is available
+    # ensures metadata is available
+    pso._pyroBind()  # type: ignore
     async_methods = _get_async_methods(pso)
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
@@ -59,9 +60,12 @@ def _build_classdict(
     for attr in pso._pyroAttrs:
         # For property attributes we use a lambda function to attach a `getattr` call for that attribute.
         # This is set as a new property of the AsyncClientPyroObject that forwards calls to the PSO Proxy.
+        client_property: Any = lambda self, current_attr=attr: getattr(
+            pso, current_attr
+        )
         yield (
             attr,
-            property(lambda self, current_attr=attr: getattr(pso, current_attr)),
+            property(client_property),
         )
 
 
@@ -70,15 +74,17 @@ def _build_classdict(
 
 def _get_async_methods(proxy: Pyro5.api.Proxy) -> list[str]:
     try:
-        return getattr(proxy, "get_pyro_async_methods")
+        result: list[str] = getattr(proxy, "get_pyro_async_methods")
+        return result
     except Exception as e:
         return []
 
 
 def wrap_as_async(func: Any) -> Any:
-    """Wrapper to make a callable element on a PyroSynchrnousObject into an awaitable element on the wrapped object instance."""
+    """Wrapper to make a callable element on a PyroSynchronousObject into an awaitable element on a AsyncClientPyroObject."""
 
-    async def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:
+    async def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+        # Forward the call to the Proxy function, catching the `self` of the AsyncClientPyroObject
         return func(*args, **kwargs)
 
     return wrapper

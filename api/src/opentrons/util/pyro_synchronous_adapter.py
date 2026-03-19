@@ -278,7 +278,7 @@ def _build_classdict(  # noqa: C901
 
     # Attach the known async methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_async_methods", async_methods)
-    yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))
+    yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))  # type: ignore
 
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
@@ -301,8 +301,9 @@ def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None
     return None
 
 
-def get_pyro_async_methods(self) -> list[str]:
-    return self._pyro_async_methods
+def get_pyro_async_methods(self) -> list[str]:  # type: ignore
+    result: list[str] = self._pyro_async_methods
+    return result
 
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
