@@ -301,7 +301,8 @@ def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None
     return None
 
 
-def get_pyro_async_methods(self) -> list[str]:  # type: ignore
+def get_pyro_async_methods(self: Any) -> list[str]:
+    """Helper function to access the list of known async methods on a PyroSynchronousObject."""
     result: list[str] = self._pyro_async_methods
     return result
 

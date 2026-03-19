@@ -58,14 +58,11 @@ def _build_classdict(
             yield (method, attribute)
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
-        # For property attributes we use a lambda function to attach a `getattr` call for that attribute.
+        # For property attributes we use to attach a wrapped `getattr` call for that attribute.
         # This is set as a new property of the AsyncClientPyroObject that forwards calls to the PSO Proxy.
-        client_property: Any = lambda self, current_attr=attr: getattr(
-            pso, current_attr
-        )
         yield (
             attr,
-            property(client_property),
+            property(wrap_property(pso, attr)),
         )
 
 
@@ -73,18 +70,20 @@ def _build_classdict(
 
 
 def _get_async_methods(proxy: Pyro5.api.Proxy) -> list[str]:
-    try:
-        result: list[str] = getattr(proxy, "get_pyro_async_methods")
-        return result
-    except Exception as e:
-        return []
+    result: list[str] = getattr(proxy, "get_pyro_async_methods", [])
+    return result
 
 
 def wrap_as_async(func: Any) -> Any:
     """Wrapper to make a callable element on a PyroSynchronousObject into an awaitable element on a AsyncClientPyroObject."""
 
-    async def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+    async def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         # Forward the call to the Proxy function, catching the `self` of the AsyncClientPyroObject
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
+    """Wrapper to produce a call forward to a specified attribute of a Proxy object."""
+    return lambda self, current_attr=attr: getattr(proxy, current_attr)
