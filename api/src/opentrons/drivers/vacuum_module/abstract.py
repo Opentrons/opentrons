@@ -1,5 +1,15 @@
 from typing import Dict, Optional, Protocol
 
+from opentrons.drivers.vacuum_module.types import (
+    LEDColor,
+    LEDPattern,
+    PressureControlTunings,
+    PressureState,
+    PumpState,
+    VentState,
+    WasteConfigParameters,
+)
+
 
 class AbstractVacuumModuleDriver(Protocol):
     """Protocol for the Vacuum Module driver."""
