@@ -396,9 +396,9 @@ class CAAMSecureVolume(SecureVolumeManager):
 
     @_lock
     async def mount(self) -> None:
-        """Mounts a previously-created secure volume by loading a CAAM red key and setting up the dm-crypto table.
+        """Mounts a secure volume by loading a CAAM red key and setting up the dm-crypto table.
 
-        If the keyblob does not exist (i.e. because of a previous call to destroy()), initializes a new one.
+        If the volume doesn't exist yet, this will create it.
         """
         await self._do_mount()
 
