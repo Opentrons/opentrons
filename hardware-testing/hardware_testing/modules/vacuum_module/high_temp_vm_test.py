@@ -2,9 +2,9 @@ import asyncio
 import time
 from datetime import datetime
 from pathlib import Path
+from hardware_testing.modules.common.utils import find_module_port
 from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
-import serial.tools.list_ports  # type: ignore[import]
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
@@ -76,18 +76,6 @@ async def water_pump_timer(w_pump, run_time):
     await w_pump.turn_motor_on()
     await asyncio.sleep(run_time)
     await w_pump.turn_motor_off()
-
-
-def find_port_by_id(vendorId: int, productId: int) -> str:
-    try:
-        ports = serial.tools.list_ports.comports()
-        for port in ports:
-            print(f"port_vid: {port.vid}, port_pid: {port.pid}")
-            if port.vid == vendorId and port.pid == productId:
-                print(f"port: {port.device}")
-                return port.device
-    except Exception as e:
-        raise (e)
 
 
 async def _run_single_pump_api_cycle(
@@ -189,12 +177,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pump_fixture = None
     if not ctx.is_simulating():
         try:
-            vm_port = find_port_by_id(VM_idVendor, VM_idProduct)
+            vm_port = find_module_port(VM_idVendor, VM_idProduct)
             pump = loop.run_until_complete(
                 vacuum_module.VacuumModuleDriver.create(port=vm_port, loop=loop)
             )
             if water_pump:
-                ard_port = find_port_by_id(Ard_idVendor, Ard_idProduct)
+                ard_port = find_module_port(Ard_idVendor, Ard_idProduct)
                 # Arduino Water pump Driver
                 pump_fixture = loop.run_until_complete(
                     vacuum_pump.WaterPump.create(

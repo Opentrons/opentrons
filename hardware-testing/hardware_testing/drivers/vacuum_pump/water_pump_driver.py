@@ -1,4 +1,4 @@
-"""Fixture Pump Driver"""
+"""Fixture Pump Driver."""
 
 from serial import Serial  # type: ignore[import]
 from typing import Optional, Set
@@ -22,7 +22,10 @@ V_ACK = "\r\n"
 
 
 class WaterPump:
-    def __init__(self, connection: Serial):
+    """Waater pump."""
+
+    def __init__(self, connection: Serial) -> None:
+        """Init."""
         self.connection = connection
         self.st = time.perf_counter()
         # Logging controls
@@ -33,11 +36,12 @@ class WaterPump:
     async def create(
         cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]
     ) -> "WaterPump":
-        """Create a connection"""
+        """Create a connection."""
         conn = Serial(port=port, baudrate=baudrate, timeout=1.0)
         return WaterPump(connection=conn)
 
     async def connect(self) -> None:
+        """Connect."""
         try:
             if self.connection.is_open:
                 self._log("state", "Connection open")
@@ -53,8 +57,8 @@ class WaterPump:
         except Exception as e:
             raise RuntimeError(f"Unable to connect: {e}") from e
 
-    async def turn_motor_on(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_on(self) -> str:
+        """ "Change the state of the Pump, either on or off."""
         command = f"{COMMANDS['pumpOn']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -69,8 +73,8 @@ class WaterPump:
             self._log("error", f"Continuous read error: {e}")
             raise (e)
 
-    async def turn_motor_off(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_off(self) -> str:
+        """ "Change the state of the Pump, either on or off."""
         command = f"{COMMANDS['pumpOff']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -85,8 +89,8 @@ class WaterPump:
             self._log("error", f"Continuous read error: {e}")
             raise (e)
 
-    async def check_water_level(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def check_water_level(self) -> str:
+        """ "Change the state of the Pump, either on or off."""
         command = f"{COMMANDS['CHECK']}{V_ACK}"
         await self._write(command.encode())
         try:
