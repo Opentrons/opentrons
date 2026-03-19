@@ -1,15 +1,17 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
 import enum
-import inspect
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 import serpent
-from Pyro5 import api as pyro
 
 import opentrons.config.types
 import opentrons.hardware_control.types
 import opentrons.types
+from opentrons.util.pyro.pyro_serialization import (
+    find_enums_in_packages,
+    register_type_to_serpent,
+)
 
 
 def _serpent_enum_serializer(obj, serializer, stream, level):  # type: ignore
@@ -37,15 +39,6 @@ def _generic_enum_dict_to_class(classname: str, d: Any) -> Any:
     else:
         raise RuntimeError(f"Unsupported module processed in Pyro request: {classname}")
     return opentrons_type(d["value"])
-
-
-def find_enums_in_packages(modules: list) -> list:  # type: ignore
-    enums = []
-    for module in modules:
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, enum.Enum) and obj is not enum.Enum:
-                enums.append(obj)
-    return enums
 
 
 # Estop Overall Status registry
@@ -90,17 +83,6 @@ def _update_status_class_to_dict(obj) -> Dict:  # type: ignore
         "state": obj.state.value,
         "progress": obj.progress,
     }
-
-
-def register_type_to_serpent(
-    class_type: Any,
-    dict_to_class: Callable[[str, Any], Any],
-    class_to_dict: Callable[[Any], dict[Any, Any]],
-) -> None:
-    """Adapter function to call the serpent registries for individual types."""
-    class_path = ".".join((class_type.__module__, class_type.__qualname__))
-    pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
-    pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
 
 
 # Handy function to map all registries for the Hardware controller

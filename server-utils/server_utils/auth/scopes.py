@@ -13,7 +13,7 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = "api_name", "description"
+    # PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
@@ -24,19 +24,35 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
+    PROTOCOLS_WRITE = (
+        "protocols.write",
+        "Upload or delete protocols.",
+    )
+
     RESTART_WRITE = (
         "restart.write",
         "Restart the robot.",
     )
 
-    ROBOT_SETTINGS_WRITE = (
-        "robot_settings.write",
-        "Edit general robot settings."
+    ROBOT_CONTROL_WRITE = (
+        "robot_control.write",
+        (
+            "Run a protocol, move pipettes, control hardware modules,"
+            " or otherwise make the robot do something physical."
+        ),
     )
 
-    RUNS_WRITE = (
-        "runs.write",
-        "Create and control protocol runs.",
+    ROBOT_SETTINGS_WRITE = (
+        "robot_settings.write",
+        "Edit robot settings for which there is no more specific scope.",
+    )
+
+    RUN_DATA_WRITE = (
+        "run_data.write",
+        (
+            "Create, update, or delete data that's the input or output of a run,"
+            " such as images and CSV files."
+        ),
     )
 
     # We actually want access control mode to totally disable SSH, so this scope is
@@ -50,7 +66,7 @@ class Scope(enum.Enum):
 
     UPDATES_WRITE = (
         "updates.write",
-        "Perform system updates (begin, cancel, upload, commit).",
+        "Update the robot's software.",
     )
 
     USERS_READ = (

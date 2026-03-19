@@ -89,6 +89,9 @@ max-complexity = 9
 known-first-party = ["opentrons", "opentrons_shared_data", "server_utils"]
 known-local-folder = ["system_server"]
 
+[tool.ruff.format]
+exclude = ["system_server/_version.py"]
+
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"
 tag-pattern='v(?P<version>.*)'

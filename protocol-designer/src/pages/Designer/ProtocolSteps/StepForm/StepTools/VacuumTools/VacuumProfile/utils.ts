@@ -7,20 +7,20 @@ import {
 
 import { PROFILE_STEP } from './constants'
 
+import type { VacuumProfileStep } from '/protocol-designer/form-types'
 import type {
-  ProfileStepItem,
+  VacuumProfileStepItem,
   VacuumPumpData,
-  VacuumStepData,
   VacuumStepErrors,
 } from './types'
 
 export type VacuumMode = typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER
 
-export function getDefaultStepData(mode: VacuumMode): VacuumStepData {
+export function getDefaultStepData(mode: VacuumMode): VacuumProfileStep {
   const baseData = {
     id: '',
     time: '',
-    name: '',
+    title: '',
     type: PROFILE_STEP,
   }
   return mode === VACUUM_MODE_PRESSURE
@@ -31,7 +31,9 @@ export function getDefaultStepData(mode: VacuumMode): VacuumStepData {
     : { ...baseData, pumpData: { mode: VACUUM_MODE_POWER, powerPercent: 1 } }
 }
 
-const getIsNameError = (name: string): boolean => name === ''
+const getIsTitleError = (title: string): boolean => {
+  return title.trim() === ''
+}
 
 const getIsTimeError = (time: string): boolean =>
   time === '' || !/^\d{0,2}(:\d{0,2})?$/.test(time)
@@ -50,31 +52,25 @@ const getIsPumpDataError = (pumpData: VacuumPumpData): boolean => {
   )
 }
 
-export const getStepErrors = (step: VacuumStepData): VacuumStepErrors => {
+export const getStepErrors = (step: VacuumProfileStep): VacuumStepErrors => {
   return {
-    name: getIsNameError(step.name),
+    title: getIsTitleError(step.title),
     time: getIsTimeError(step.time),
     pumpData: getIsPumpDataError(step.pumpData),
   }
 }
 
-export const getIsStepValid = (step: VacuumStepData): boolean => {
+export const getIsStepValid = (step: VacuumProfileStep): boolean => {
   const errors = getStepErrors(step)
   return !Object.values(errors).some(Boolean)
 }
 
 export const getInvalidPresavedStepIds = (
   orderedProfileStepIds: string[],
-  profileStepItemsById: Record<string, ProfileStepItem>
+  profileStepItemsById: Record<string, VacuumProfileStepItem>
 ): string[] => {
   return orderedProfileStepIds.filter(stepId => {
     const step = profileStepItemsById[stepId]
     return step?.isPresaved === true && !getIsStepValid(step)
   })
-}
-
-export const getFormattedTime = (time: string): string => {
-  const [minutes, rawSeconds] = time.split(':')
-  const seconds = rawSeconds ? Number(rawSeconds) : 0
-  return `${minutes.padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }

@@ -10,7 +10,7 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons.util import logging_config
-from opentrons.util.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 
 log = logging.getLogger(__name__)
 
