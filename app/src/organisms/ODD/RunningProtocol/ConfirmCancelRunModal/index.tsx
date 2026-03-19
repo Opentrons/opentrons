@@ -63,15 +63,17 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      if (!isActiveRun) {
-        dismissCurrentRun(runId)
-        if (protocolId != null) {
-          navigate(`/protocols/${protocolId}`)
-        } else {
-          navigate('/protocols')
+  useEffect(
+    () => {
+      if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
+        if (!isActiveRun) {
+          dismissCurrentRun(runId)
+          if (protocolId != null) {
+            navigate(`/protocols/${protocolId}`)
+          } else {
+            navigate('/protocols')
+          }
         }
       }
     },

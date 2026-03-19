@@ -8,9 +8,6 @@ from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
-from . import (
-    validation,
-)  # isort: skip  # Imported after other protocol_api imports to avoid circular import
 from .core.common import (
     AbsorbanceReaderCore,
     FlexStackerCore,
@@ -46,6 +43,9 @@ from opentrons.protocols.api_support.util import (
     requires_version,
 )
 
+from . import (
+    validation,
+)  # isort: skip  # noqa: I001  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -712,8 +712,12 @@ class ThermocyclerContext(ModuleContext):
                         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                         liquid information.
 
-                *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
-                the block heats or cools.
+        <<<<<<< HEAD
+                        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        =======
+                        *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        >>>>>>> chore_release-9.0.0
+                        the block heats or cools.
 
                 !!! note
                     If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -766,8 +770,12 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-        *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
-        the block heats or cools.
+        <<<<<<< HEAD
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        =======
+                *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        >>>>>>> chore_release-9.0.0
+                the block heats or cools.
         """
 
         if block_max_volume is None:
