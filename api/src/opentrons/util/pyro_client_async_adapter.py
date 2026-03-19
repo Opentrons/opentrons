@@ -1,8 +1,12 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
+import asyncio
+import functools
+from types import CoroutineType
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
+from anyio import to_thread
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -48,14 +52,13 @@ def _build_classdict(
     async_methods = _get_async_methods(pso)
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
-        attribute = getattr(pso, method)
         if method in async_methods:
             # For methods that are awaitable wrap them as an async reference that forwards the call to the PSO Proxy.
-            async_method = wrap_as_async(attribute)
+            async_method = wrap_as_async(method)
             yield (method, async_method)
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, attribute)
+            yield (method, getattr(pso, method))
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -64,6 +67,7 @@ def _build_classdict(
             attr,
             property(wrap_property(pso, attr)),
         )
+    yield ("_proxy", pso)
 
 
 ### Helpers ###
@@ -74,12 +78,25 @@ def _get_async_methods(proxy: Pyro5.api.Proxy) -> list[str]:
     return result
 
 
-def wrap_as_async(func: Any) -> Any:
+def wrap_as_async(func_name: Any) -> Any:
     """Wrapper to make a callable element on a PyroSynchronousObject into an awaitable element on a AsyncClientPyroObject."""
 
     async def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
-        # Forward the call to the Proxy function, catching the `self` of the AsyncClientPyroObject
-        return func(*args, **kwargs)
+        def _thread_call(
+            proxy: Pyro5.api.Proxy,
+            func_name: str,
+            *args: P.args,  # type: ignore
+            **kwargs: P.kwargs,  # type: ignore
+        ) -> Any:
+            # This must be done because Pyro only accepts proxy calls from the thread that owns the proxy
+            thread_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+            func = getattr(thread_proxy, func_name)
+            return func(*args, **kwargs)
+
+        # Return a Coroutine that may be awaited, it will execute the `_thread_call` when called
+        return await asyncio.to_thread(
+            _thread_call, self._proxy, func_name, *args, **kwargs
+        )
 
     return wrapper
 
