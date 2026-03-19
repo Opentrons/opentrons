@@ -40,6 +40,19 @@ def _lock(
     return _locked
 
 
+async def _subproc_wait_timeout(
+    subproc: asyncio.subprocess.Process,
+    timeout: float | None = None,
+) -> int:
+    """Wait for a subprocess with a timeout, returning -ETIMEDOUT if the timeout hits."""
+    try:
+        return await asyncio.wait_for(subproc.wait(), timeout=(timeout or 10))
+    except asyncio.TimeoutError:
+        LOG.error("subprocess call timed out, terminating")
+        subproc.terminate()
+        return -60
+
+
 async def _stringify_process(
     proc: asyncio.subprocess.Process,
     override_stdout: str | None = None,
@@ -121,7 +134,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await import_key.wait() != 0:
+        if await _subproc_wait_timeout(import_key) != 0:
             LOG.error(f"Failed to import key: {await _stringify_process(import_key)}")
         else:
             LOG.info("Imported key from CAAM")
@@ -136,10 +149,10 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
             stdin=PIPE,
         )
-        (stdout_b, stderr_b) = await keyring_add.communicate(input=key_data)
+        stdout_b, stderr_b = await keyring_add.communicate(input=key_data)
         stdout = stdout_b.decode()
         stderr = stderr_b.decode()
-        if await keyring_add.wait() != 0:
+        if await _subproc_wait_timeout(keyring_add) != 0:
             LOG.error(
                 f"Failed to add key to KKRS: {await _stringify_process(keyring_add, override_stdout=stdout, override_stderr=stderr)}"
             )
@@ -161,7 +174,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         losetup = await asyncio.create_subprocess_exec(
             "/usr/sbin/losetup", "-f", str(self._image()), stdout=PIPE, stderr=PIPE
         )
-        if await losetup.wait() != 0:
+        if await _subproc_wait_timeout(losetup) != 0:
             LOG.error(f"losetup failed: {_stringify_process(losetup)}")
         else:
             LOG.info("Set up loopback device")
@@ -192,7 +205,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await dmsetup.wait() != 0:
+        if await _subproc_wait_timeout(dmsetup) != 0:
             LOG.error(
                 f"dmsetup failed with table {dmsetup_table}: {await _stringify_process(dmsetup)}"
             )
@@ -221,7 +234,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await mount.wait() != 0:
+        if await _subproc_wait_timeout(mount) != 0:
             LOG.error(
                 f"Failed to mount secure storage: {await _stringify_process(mount)}"
             )
@@ -235,7 +248,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             "/usr/bin/umount", str(mount_path), stdout=PIPE, stderr=PIPE
         )
         # we don't care if this fails, really; it would only do so if the mount wasn't mounted
-        await unmount.wait()
+        await _subproc_wait_timeout(unmount)
         LOG.info("Unmounted secure volume")
 
     async def _unmap(self) -> None:
@@ -249,7 +262,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await dmsetup_remove.wait() != 0:
+        if await _subproc_wait_timeout(dmsetup_remove) != 0:
             LOG.warning(
                 f"dmsetup remove failed: {await _stringify_process(dmsetup_remove)}"
             )
@@ -262,7 +275,7 @@ class CAAMSecureVolume(SecureVolumeManager):
         losetup_remove = await asyncio.create_subprocess_exec(
             "/usr/sbin/losetup", "-d", loopback_device, stdout=PIPE, stderr=PIPE
         )
-        if (await losetup_remove.wait()) != 0:
+        if (await _subproc_wait_timeout(losetup_remove)) != 0:
             LOG.error(f"losetup remove failed: {_stringify_process(losetup_remove)}")
         else:
             LOG.info(f"Removed loopback device {loopback_device}")
@@ -280,7 +293,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stderr=PIPE,
         )
         self._keyid = 0
-        if await timeout.wait() != 0:
+        if await _subproc_wait_timeout(timeout) != 0:
             LOG.warning(f"key timeout failed: {await _stringify_process(timeout)}")
         else:
             LOG.info("set key timeout from kkrs")
@@ -293,7 +306,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await losetup_list.wait() != 0:
+        if await _subproc_wait_timeout(losetup_list) != 0:
             LOG.error(f"losetup list failed: {await _stringify_process(losetup_list)} ")
         assert losetup_list.stdout
         losetup_stdout_data = (await losetup_list.stdout.read()).decode().strip()
@@ -328,7 +341,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await create_bk.wait() != 0:
+        if await _subproc_wait_timeout(create_bk) != 0:
             LOG.error(
                 f"Failed to create CAAM black key: {await _stringify_process(create_bk)}"
             )
@@ -352,12 +365,12 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await create_backing_store.wait() != 0:
+        if await _subproc_wait_timeout(create_backing_store) != 0:
             LOG.error(
                 f"Creating secure volume: failed to create backing store: {await _stringify_process(create_backing_store)}"
             )
         else:
-            LOG.info("Creating secure volume: made secure volume image")
+            LOG.info("Creating secure volumpe: made secure volume image")
         await self._load_key()
         await self._loopback_setup()
         await self._map()
@@ -367,7 +380,7 @@ class CAAMSecureVolume(SecureVolumeManager):
             stdout=PIPE,
             stderr=PIPE,
         )
-        if await mkfs.wait() != 0:
+        if await _subproc_wait_timeout(mkfs) != 0:
             LOG.error(
                 f"Creating secure volume: failed to mkfs on the encrypted volume: {await _stringify_process(mkfs)}"
             )
