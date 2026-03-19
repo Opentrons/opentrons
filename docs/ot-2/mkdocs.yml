@@ -41,6 +41,7 @@ nav:
       - Updating the Robot: opentrons-app/update.md
       - Resetting the Robot: opentrons-app/reset.md
       - Downloading OT-2 Log Files: opentrons-app/log-files.md
+      - Command Line Operation Over SSH: opentrons-app/ssh.md
       - App Features Summary: opentrons-app/features-summary.md
   - Maintenance:
       - Maintenance: maintenance/index.md
