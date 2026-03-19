@@ -64,6 +64,8 @@ class SettingsStore:
             delete_over_max_on_disk_protocols=delete_over_max_on_disk_protocols,
         )
         with self._session() as session:
+            if session.query(Settings).first() is not None:
+                raise ValueError("Settings row already exists")
             session.add(new_settings)
             session.commit()
             session.expunge(new_settings)

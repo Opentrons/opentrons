@@ -19,8 +19,8 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
 
 
 # test password complexity with none values
-def test_add_and_get_settings(settings_store: SettingsStore) -> None:
-    """add should persist the user so get can find it."""
+def test_insert_and_get_settings(settings_store: SettingsStore) -> None:
+    """insert should persist the settings so get can find it."""
     settings_store.insert(
         access_control_enabled=True,
         max_number_of_login_attempts=10,
