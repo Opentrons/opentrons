@@ -31,6 +31,12 @@ USB_DELAY_AFTER_HEALTH_S = 2.0  # wait after GET /health before starting update 
 # Network: after restart, main /health can be 200 before nginx/update-server is ready → 502 on upload
 NETWORK_DELAY_AFTER_READY_S = 2.0  # wait after update server is ready before starting next update
 NETWORK_UPDATE_SERVER_READY_TIMEOUT_S = 90  # max time to wait for GET /server/update/health after /health is up
+# After restart, GET /health and /server/update/health can be 200 while nginx still returns 502 for robot-server routes.
+NETWORK_HTTP_API_READY_TIMEOUT_S = 1000  # default --http-api-ready-timeout (non-Flex robots only; Flex uses --stable-state-*)
+# Stable snapshot: HTTP 200 on state routes + populated serials; two identical snapshots in a row.
+STABLE_STATE_TIMEOUT_S = 1000.0  # default ≥10 min before giving up on a good snapshot
+STABLE_STATE_NAG_AFTER_S = 420.0  # at 7 min, print a one-time “check the robot” message
+STABLE_STATE_POLL_INTERVAL_S = 5.0
 NETWORK_502_RETRIES = 3  # retry begin/upload this many times on 502 (Bad Gateway)
 NETWORK_502_RETRY_DELAY_S = 10  # seconds between 502 retries
 USB_DELAY_BETWEEN_REQUESTS_S = 1.0  # wait after each request/response before next
@@ -285,12 +291,55 @@ def _serial_post_multipart(
         return _serial_post_multipart_over_ser(ser, path, file_path, field_name, timeout)
 
 
-def get_robot_health(client: httpx.Client, base_url: str) -> dict:
-    """Fetch the full /health payload."""
+def _is_flex_robot(robot_model: str) -> bool:
+    """True for Opentrons Flex (OT-3). Health uses robot_model e.g. OT-3 Standard."""
+    return "OT-3" in robot_model
+
+
+def get_robot_health(
+    client: httpx.Client, base_url: str, request_timeout: Optional[float] = None
+) -> dict:
+    """Fetch the full /health payload. Short retries on 502/503 (initial connect / quick checks)."""
     # Robot server GET /health — response shape: .cursor/skills/robot-ip-health/SKILL.md (Health Response Fields)
-    resp = client.get(f"{base_url}/health")
-    resp.raise_for_status()
-    return resp.json()
+    data = _get_json_or_none(
+        client, f"{base_url}/health", request_timeout, "/health", verbose=False
+    )
+    if data is None:
+        raise RuntimeError(
+            "GET /health did not return 200 after retries (robot may still be starting)"
+        )
+    return data
+
+
+def wait_for_robot_health_json(
+    client: httpx.Client,
+    base_url: str,
+    per_request_timeout: float,
+    overall_timeout: float = STABLE_STATE_TIMEOUT_S,
+    interval: float = 5.0,
+) -> dict:
+    """Poll GET /health until HTTP 200 or overall_timeout.
+
+    After a restart, nginx may return 200 for /runs and /instruments while /health still 502s
+    (different upstream or caching). Use this after stable snapshot instead of get_robot_health.
+    """
+    print(
+        "Waiting for GET /health (software version for Final state) — often the last route to recover after restart…",
+        file=sys.stderr,
+    )
+    start = time.time()
+    while time.time() - start < overall_timeout:
+        try:
+            resp = client.get(f"{base_url}/health", timeout=per_request_timeout)
+            if resp.status_code == 200:
+                return resp.json()
+        except httpx.TransportError:
+            pass
+        time.sleep(interval)
+    raise RuntimeError(
+        f"GET /health did not return 200 within {overall_timeout:.0f}s "
+        "(nginx may still be proxying /health to a cold robot-server — retry or wait and run check_health)."
+    )
 
 
 def get_robot_model(client: httpx.Client, base_url: str) -> str:
@@ -347,12 +396,16 @@ def download_system_file(
 
         with open(output_path, "wb") as f:
             downloaded = 0
+            last_shown_pct = -1
             for chunk in resp.iter_bytes(chunk_size=8192):
                 f.write(chunk)
                 downloaded += len(chunk)
                 if progress_callback and total_size > 0:
                     progress = (downloaded / total_size) * 100
-                    progress_callback(progress)
+                    p_int = int(progress)
+                    if p_int > last_shown_pct or downloaded >= total_size:
+                        last_shown_pct = p_int
+                        progress_callback(progress)
 
     print(f"Downloaded {downloaded / (1024 * 1024):.1f} MB", file=sys.stderr)
 
@@ -363,7 +416,19 @@ def begin_update_session(client: httpx.Client, base_url: str) -> str:
     print("Starting update session...", file=sys.stderr)
     last_err = None
     for attempt in range(NETWORK_502_RETRIES):
-        resp = client.post(f"{base_url}/server/update/begin")
+        try:
+            resp = client.post(f"{base_url}/server/update/begin")
+        except httpx.TransportError as exc:
+            if attempt < NETWORK_502_RETRIES - 1:
+                print(
+                    f"  Connection error ({type(exc).__name__}: {exc}) "
+                    f"(attempt {attempt + 1}/{NETWORK_502_RETRIES}), "
+                    f"retrying in {NETWORK_502_RETRY_DELAY_S}s...",
+                    file=sys.stderr,
+                )
+                time.sleep(NETWORK_502_RETRY_DELAY_S)
+                continue
+            raise
         if resp.status_code == 502 and attempt < NETWORK_502_RETRIES - 1:
             print(
                 f"  HTTP 502 Bad Gateway (attempt {attempt + 1}/{NETWORK_502_RETRIES}), "
@@ -462,12 +527,24 @@ def upload_system_file(
 
     last_resp = None
     for attempt in range(NETWORK_502_RETRIES):
-        with open(file_path, "rb") as f:
-            files = {field_name: (file_path.name, f, "application/zip")}
-            resp = client.post(
-                f"{base_url}/server/update/{token}/file",
-                files=files,
-            )
+        try:
+            with open(file_path, "rb") as f:
+                files = {field_name: (file_path.name, f, "application/zip")}
+                resp = client.post(
+                    f"{base_url}/server/update/{token}/file",
+                    files=files,
+                )
+        except httpx.TransportError as exc:
+            if attempt < NETWORK_502_RETRIES - 1:
+                print(
+                    f"Connection error during upload ({type(exc).__name__}: {exc}) "
+                    f"(attempt {attempt + 1}/{NETWORK_502_RETRIES}), "
+                    f"retrying in {NETWORK_502_RETRY_DELAY_S}s...",
+                    file=sys.stderr,
+                )
+                time.sleep(NETWORK_502_RETRY_DELAY_S)
+                continue
+            raise
         last_resp = resp
         if resp.status_code == 502 and attempt < NETWORK_502_RETRIES - 1:
             print(
@@ -480,7 +557,9 @@ def upload_system_file(
         resp.raise_for_status()
         break
     else:
-        last_resp.raise_for_status()
+        if last_resp is not None:
+            last_resp.raise_for_status()
+        raise httpx.TransportError("All upload attempts failed with connection errors")
 
     session_state = last_resp.json()
     stage = session_state.get("stage", "unknown")
@@ -642,6 +721,82 @@ def _format_last_runs(runs: List[dict]) -> List[str]:
 
 # Column widths for state tables (shared USB + network)
 _STATE_TABLE_W = {"id": 12, "protocol": 24, "started": 20, "completed": 20, "lpc": 6, "mount": 8, "serial": 18}
+# GET /runs?pageLength=… — large enough for a full summary table (newest-first slice is client-side)
+STATE_SNAPSHOT_RUNS_PAGE_LENGTH = 100
+
+
+def _health_version_and_model_or_fallback(
+    client: httpx.Client,
+    base_url: str,
+    request_timeout: Optional[float],
+    fallback_version: str,
+    fallback_robot_model: str,
+) -> Tuple[str, str]:
+    """Prefer live /health for api_version and robot_model; on failure use fallbacks."""
+    try:
+        h = get_robot_health(client, base_url, request_timeout)
+        sw = str(h.get("api_version") or h.get("api_Version") or fallback_version)
+        rm = str(h.get("robot_model") or fallback_robot_model)
+        return sw, rm
+    except RuntimeError:
+        return fallback_version, fallback_robot_model
+
+
+def _try_print_network_state_on_failure(
+    ip: str,
+    port: int,
+    timeout: float,
+    robot_model: str,
+    title: str,
+    software_version: str,
+) -> None:
+    """Best-effort full state table after an error (single fetch, no stable wait)."""
+    base_url = f"http://{ip}:{port}"
+    print("\n  ─── State snapshot after error ───", file=sys.stderr)
+    try:
+        with httpx.Client(
+            headers={"Opentrons-Version": "*"},
+            timeout=timeout,
+        ) as client:
+            got = _fetch_state_network_once(client, base_url, timeout, robot_model)
+            if got is None:
+                print("  (Could not fetch state — robot may be unreachable.)", file=sys.stderr)
+                return
+            runs, pipettes_rows, modules_serials, _, _ = got
+            _format_state_tables(
+                runs,
+                pipettes_rows,
+                modules_serials,
+                title,
+                software_version=software_version,
+            )
+    except Exception as exc:
+        print("  (Could not print state snapshot: {})".format(exc), file=sys.stderr)
+
+
+def _try_print_usb_state_on_failure(
+    port_path: str,
+    timeout: float,
+    robot_model: str,
+    title: str,
+    software_version: str,
+) -> None:
+    print("\n  ─── State snapshot after error ───", file=sys.stderr)
+    try:
+        got = _fetch_state_usb_once(port_path, timeout, robot_model)
+        if got is None:
+            print("  (Could not fetch state over USB.)", file=sys.stderr)
+            return
+        runs, pipettes_rows, modules_serials, _, _ = got
+        _format_state_tables(
+            runs,
+            pipettes_rows,
+            modules_serials,
+            title,
+            software_version=software_version,
+        )
+    except Exception as exc:
+        print("  (Could not print state snapshot: {})".format(exc), file=sys.stderr)
 
 
 def _format_state_tables(
@@ -650,6 +805,7 @@ def _format_state_tables(
     modules_serials: List[str],
     title: str,
     header_lines: Optional[List[str]] = None,
+    software_version: Optional[str] = None,
 ) -> None:
     """Print runs (with LPC counts), pipettes (mount, serial), modules (serial) in aligned tables.
     Shared by USB and network paths so output format is identical."""
@@ -659,16 +815,21 @@ def _format_state_tables(
             print("  " + line, file=sys.stderr)
         print("", file=sys.stderr)
     print("  ─── " + title + " ───", file=sys.stderr)
+    if software_version is not None:
+        print("  Software version: " + str(software_version), file=sys.stderr)
+        print("", file=sys.stderr)
 
-    # Runs (last 4, newest first)
-    last_four = runs[-4:] if len(runs) > 4 else list(runs)
-    last_four = list(last_four)
-    last_four.reverse()
-    print("  Runs (last 4, newest first):", file=sys.stderr)
+    # Runs (full list from snapshot, newest first)
+    runs_display = list(runs)
+    runs_display.reverse()
+    print(
+        "  Runs ({} total, newest first):".format(len(runs_display)),
+        file=sys.stderr,
+    )
     h = ("id", "protocolId", "startedAt", "completedAt", "LPCs")
     print("    " + h[0].ljust(w["id"]) + h[1].ljust(w["protocol"]) + h[2].ljust(w["started"]) + h[3].ljust(w["completed"]) + h[4].ljust(w["lpc"]), file=sys.stderr)
     print("    " + "-" * (w["id"] + w["protocol"] + w["started"] + w["completed"] + w["lpc"]), file=sys.stderr)
-    for run in last_four:
+    for run in runs_display:
         rid = (run.get("id") or "?")[: w["id"] - 1]
         pid = (run.get("protocolId") or "-")[: w["protocol"] - 1]
         started = run.get("startedAt")
@@ -698,85 +859,306 @@ def _format_state_tables(
     print("", file=sys.stderr)
 
 
-def _fetch_state_network(
+def _instruments_payload_looks_good(data: dict, robot_model: str) -> bool:
+    """True if /instruments or /pipettes JSON has no placeholder serials for attached tools.
+
+    Flex (primary): `data` is a list of AttachedItem. Items with ok=False (BadPipette/BadGripper) may omit
+    serialNumber. Items with ok=True need serialNumber (or id). Empty list means no tools — OK.
+    Non-Flex /pipettes: PipettesByMount; for each mount with model/name, id must be present.
+    """
+    if "OT-3" in robot_model:
+        items = data.get("data")
+        if not isinstance(items, list):
+            return False
+        if len(items) == 0:
+            return True
+        for item in items:
+            if not isinstance(item, dict):
+                return False
+            if item.get("ok") is False:
+                continue
+            sn = item.get("serialNumber") or item.get("id")
+            if sn is None or str(sn).strip() in ("", "?"):
+                return False
+        return True
+    for mount in ("left", "right"):
+        v = data.get(mount)
+        if isinstance(v, dict) and (v.get("model") or v.get("name")):
+            pid = v.get("id") or v.get("name")
+            if pid is None or str(pid).strip() in ("", "?"):
+                return False
+    return True
+
+
+def _modules_payload_looks_good(data: dict) -> bool:
+    """Each module in data.data must have serialNumber or id when list is non-empty."""
+    mods = data.get("data", []) if isinstance(data.get("data"), list) else []
+    for m in mods:
+        if not isinstance(m, dict):
+            return False
+        s = m.get("serialNumber") or m.get("id")
+        if s is None or str(s).strip() in ("", "?"):
+            return False
+    return True
+
+
+def _state_snapshot_looks_good(
+    instruments_json: dict,
+    modules_json: dict,
+    robot_model: str,
+) -> bool:
+    return _instruments_payload_looks_good(instruments_json, robot_model) and _modules_payload_looks_good(
+        modules_json
+    )
+
+
+def _snapshot_identity_fingerprint(
+    pipettes_rows: List[Tuple[str, str]],
+    modules_serials: List[str],
+) -> Tuple[Tuple[Tuple[str, str], ...], Tuple[str, ...]]:
+    """Stable identity for two consecutive snapshots (runs excluded — can change independently)."""
+    return (tuple(pipettes_rows), tuple(str(s) for s in modules_serials))
+
+
+STATE_FETCH_RETRIES = 8
+STATE_FETCH_RETRY_DELAY_S = 5
+
+
+def _get_json_or_none(
+    client: httpx.Client,
+    url: str,
+    timeout: Optional[float],
+    label: str,
+    verbose: bool = False,
+) -> Optional[dict]:
+    """GET an endpoint with retries. Returns parsed JSON on 200, None on persistent failure.
+
+    Retries on 502 (nginx Bad Gateway — upstream robot-server not ready) and 503.
+    When verbose is False, do not print per-attempt lines (used for /health during startup).
+    """
+    for attempt in range(STATE_FETCH_RETRIES):
+        try:
+            resp = client.get(url, timeout=timeout)
+            if resp.status_code == 200:
+                return resp.json()
+            if resp.status_code in (502, 503) and attempt < STATE_FETCH_RETRIES - 1:
+                if verbose:
+                    print(
+                        f"  {label}: HTTP {resp.status_code} (nginx/upstream not ready), "
+                        f"retrying in {STATE_FETCH_RETRY_DELAY_S}s "
+                        f"({attempt + 1}/{STATE_FETCH_RETRIES})...",
+                        file=sys.stderr,
+                    )
+                time.sleep(STATE_FETCH_RETRY_DELAY_S)
+                continue
+            if verbose:
+                print(f"  {label}: HTTP {resp.status_code} (non-200, skipping)", file=sys.stderr)
+            return None
+        except httpx.TransportError as exc:
+            if attempt < STATE_FETCH_RETRIES - 1:
+                if verbose:
+                    print(
+                        f"  {label}: {type(exc).__name__} — "
+                        f"retrying in {STATE_FETCH_RETRY_DELAY_S}s "
+                        f"({attempt + 1}/{STATE_FETCH_RETRIES})...",
+                        file=sys.stderr,
+                    )
+                time.sleep(STATE_FETCH_RETRY_DELAY_S)
+                continue
+            if verbose:
+                print(
+                    f"  {label}: {type(exc).__name__} after {STATE_FETCH_RETRIES} attempts (skipping)",
+                    file=sys.stderr,
+                )
+            return None
+    return None
+
+
+def _fetch_state_network_once(
     client: httpx.Client,
     base_url: str,
     timeout: float,
     robot_model: str,
-) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
-    """Fetch runs, pipettes/instruments, modules over network. Returns (runs, pipettes_rows, modules_serials)."""
-    runs: List[dict] = []
-    pipettes_rows: List[Tuple[str, str]] = []
-    modules_serials: List[str] = []
+    runs_page_length: int = STATE_SNAPSHOT_RUNS_PAGE_LENGTH,
+) -> Optional[Tuple[List[dict], List[Tuple[str, str]], List[str], dict, dict]]:
+    """Single GET per route (no inner retry). Returns None if any route is not HTTP 200 or JSON invalid."""
     try:
-        resp = client.get(f"{base_url}/runs?pageLength=4", timeout=timeout)
-        if resp.status_code == 200:
-            runs = (resp.json().get("data") or []) or []
-    except Exception:
-        pass
+        resp = client.get(
+            f"{base_url}/runs?pageLength={runs_page_length}",
+            timeout=timeout,
+        )
+        if resp.status_code != 200:
+            return None
+        runs_json = resp.json()
+    except (httpx.TransportError, json.JSONDecodeError, ValueError):
+        return None
+    runs = (runs_json.get("data") or []) or []
+
+    path = "/instruments" if "OT-3" in robot_model else "/pipettes"
     try:
-        path = "/instruments" if "OT-3" in robot_model else "/pipettes"
         resp = client.get(f"{base_url}{path}", timeout=timeout)
-        if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data.get("data"), list):
-                for item in data["data"]:
-                    pipettes_rows.append((str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?")))))
-            else:
-                for mount in ("left", "right"):
-                    v = data.get(mount)
-                    if isinstance(v, dict) and (v.get("model") or v.get("id")):
-                        pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
-    except Exception:
-        pass
+        if resp.status_code != 200:
+            return None
+        inst_json = resp.json()
+    except (httpx.TransportError, json.JSONDecodeError, ValueError):
+        return None
+
+    pipettes_rows: List[Tuple[str, str]] = []
+    if isinstance(inst_json.get("data"), list):
+        for item in inst_json["data"]:
+            pipettes_rows.append(
+                (str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?"))))
+            )
+    else:
+        for mount in ("left", "right"):
+            v = inst_json.get(mount)
+            if isinstance(v, dict) and (v.get("model") or v.get("id")):
+                pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
+
     try:
         resp = client.get(f"{base_url}/modules", timeout=timeout)
-        if resp.status_code == 200:
-            data = resp.json()
-            mods = data.get("data", []) if isinstance(data.get("data"), list) else []
-            modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
-    except Exception:
-        pass
-    return runs, pipettes_rows, modules_serials
+        if resp.status_code != 200:
+            return None
+        mod_json = resp.json()
+    except (httpx.TransportError, json.JSONDecodeError, ValueError):
+        return None
+    mods = mod_json.get("data", []) if isinstance(mod_json.get("data"), list) else []
+    modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
+
+    return runs, pipettes_rows, modules_serials, inst_json, mod_json
 
 
-def _fetch_state_usb(
-    port_path: str, timeout: float, robot_model: str
-) -> Tuple[List[dict], List[Tuple[str, str]], List[str], str, str]:
-    """Fetch runs, pipettes, modules over USB. Returns (runs, pipettes_rows, modules_serials, api_ver, calibration)."""
-    runs: List[dict] = []
-    pipettes_rows: List[Tuple[str, str]] = []
-    modules_serials: List[str] = []
+def wait_for_stable_robot_state_network(
+    client: httpx.Client,
+    base_url: str,
+    per_request_timeout: float,
+    robot_model: str,
+    overall_timeout: float = STABLE_STATE_TIMEOUT_S,
+    nag_after_s: float = STABLE_STATE_NAG_AFTER_S,
+    poll_interval_s: float = STABLE_STATE_POLL_INTERVAL_S,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Flex (OT-3) only: poll until HTTP 200 on state routes, populated serials, and two consecutive matching snapshots."""
+    print(
+        "Waiting for a stable Flex snapshot (GET /runs, /instruments, /modules — HTTP 200, complete serials, "
+        "two matching polls)...",
+        file=sys.stderr,
+    )
+    start = time.time()
+    nag_printed = False
+    last_progress_log = 0.0
+    prev_fingerprint: Optional[Tuple[Tuple[Tuple[str, str], ...], Tuple[str, ...]]] = None
+    while time.time() - start < overall_timeout:
+        elapsed = time.time() - start
+        if not nag_printed and elapsed >= nag_after_s:
+            print(
+                "Still waiting for a complete instrument/module snapshot. If this continues, check the robot "
+                "(power, doors, pipettes seated, USB/network).",
+                file=sys.stderr,
+            )
+            nag_printed = True
+        if elapsed - last_progress_log >= 60.0:
+            print(
+                f"  … still waiting for stable state ({elapsed:.0f}s / {overall_timeout:.0f}s)",
+                file=sys.stderr,
+            )
+            last_progress_log = elapsed
+
+        got = _fetch_state_network_once(client, base_url, per_request_timeout, robot_model)
+        if got is None:
+            time.sleep(poll_interval_s)
+            continue
+        runs, pipettes_rows, modules_serials, inst_json, mod_json = got
+        if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            time.sleep(poll_interval_s)
+            continue
+        fp = _snapshot_identity_fingerprint(pipettes_rows, modules_serials)
+        if prev_fingerprint is not None and fp == prev_fingerprint:
+            print("Stable snapshot ready (two consecutive matching instrument/module identity sets).", file=sys.stderr)
+            return runs, pipettes_rows, modules_serials
+        prev_fingerprint = fp
+        time.sleep(poll_interval_s)
+
+    raise TimeoutError(
+        f"Stable Flex state snapshot not obtained within {overall_timeout:.0f}s "
+        "(need HTTP 200 on /runs, /instruments|/pipettes, /modules; non-placeholder serials; two matching polls)."
+    )
+
+
+def wait_for_populated_state_network_ot2(
+    client: httpx.Client,
+    base_url: str,
+    per_request_timeout: float,
+    robot_model: str,
+    overall_timeout: float,
+    poll_interval_s: float,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Non-Flex: poll until one snapshot has HTTP 200 everywhere and populated serials (no two-poll stability)."""
+    print(
+        "Waiting for robot state (GET /runs, /pipettes, /modules — HTTP 200, complete serials)...",
+        file=sys.stderr,
+    )
+    start = time.time()
+    last_progress_log = 0.0
+    while time.time() - start < overall_timeout:
+        elapsed = time.time() - start
+        if elapsed - last_progress_log >= 60.0:
+            print(
+                f"  … still waiting ({elapsed:.0f}s / {overall_timeout:.0f}s)",
+                file=sys.stderr,
+            )
+            last_progress_log = elapsed
+        got = _fetch_state_network_once(client, base_url, per_request_timeout, robot_model)
+        if got is None:
+            time.sleep(poll_interval_s)
+            continue
+        runs, pipettes_rows, modules_serials, inst_json, mod_json = got
+        if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            time.sleep(poll_interval_s)
+            continue
+        print("Robot state snapshot ready.", file=sys.stderr)
+        return runs, pipettes_rows, modules_serials
+
+    raise TimeoutError(
+        f"Robot state snapshot not obtained within {overall_timeout:.0f}s "
+        "(need HTTP 200 on /runs, /pipettes, /modules with non-placeholder serials)."
+    )
+
+
+def wait_for_robot_state_after_restart_network(
+    client: httpx.Client,
+    base_url: str,
+    per_request_timeout: float,
+    robot_model: str,
+    *,
+    flex_stable_timeout: float,
+    flex_nag_after: float,
+    flex_poll_interval: float,
+    ot2_overall_timeout: float,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Default path is Flex: stable two-poll wait + optional nag. Non-Flex uses ot2_overall_timeout for a simpler wait."""
+    if _is_flex_robot(robot_model):
+        return wait_for_stable_robot_state_network(
+            client,
+            base_url,
+            per_request_timeout,
+            robot_model,
+            overall_timeout=flex_stable_timeout,
+            nag_after_s=flex_nag_after,
+            poll_interval_s=flex_poll_interval,
+        )
+    return wait_for_populated_state_network_ot2(
+        client,
+        base_url,
+        per_request_timeout,
+        robot_model,
+        overall_timeout=ot2_overall_timeout,
+        poll_interval_s=flex_poll_interval,
+    )
+
+
+def _fetch_usb_health_calibration(port_path: str, timeout: float) -> Tuple[str, str]:
+    """GET /health and /calibration/status over USB for summary headers."""
     api_ver, calibration = "?", "?"
-    try:
-        status, raw = _serial_get(port_path, "/runs?pageLength=4", timeout=timeout)
-        if status == 200:
-            runs = (json.loads(raw.decode("utf-8")).get("data") or []) or []
-    except Exception:
-        pass
-    try:
-        path = "/instruments" if "OT-3" in robot_model else "/pipettes"
-        status, raw = _serial_get(port_path, path, timeout=timeout)
-        if status == 200:
-            data = json.loads(raw.decode("utf-8"))
-            if isinstance(data.get("data"), list):
-                for item in data["data"]:
-                    pipettes_rows.append((str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?")))))
-            else:
-                for mount in ("left", "right"):
-                    v = data.get(mount)
-                    if isinstance(v, dict) and (v.get("model") or v.get("id")):
-                        pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
-    except Exception:
-        pass
-    try:
-        status, raw = _serial_get(port_path, "/modules", timeout=timeout)
-        if status == 200:
-            data = json.loads(raw.decode("utf-8"))
-            mods = data.get("data", []) if isinstance(data.get("data"), list) else []
-            modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
-    except Exception:
-        pass
     try:
         status, raw = _serial_get(port_path, "/health", timeout=timeout)
         if status == 200:
@@ -790,36 +1172,213 @@ def _fetch_state_usb(
             calibration = str((json.loads(raw.decode("utf-8")).get("deckCalibration") or {}).get("status", "?"))
     except Exception:
         pass
-    return runs, pipettes_rows, modules_serials, api_ver, calibration
+    return api_ver, calibration
 
 
-def _print_state_tables_network(
-    client: httpx.Client,
-    base_url: str,
+def _fetch_state_usb_once(
+    port_path: str,
     timeout: float,
     robot_model: str,
-    title: str,
-    header_lines: Optional[List[str]] = None,
-) -> None:
-    """Fetch state over network and print unified state tables."""
-    runs, pipettes_rows, modules_serials = _fetch_state_network(client, base_url, timeout, robot_model)
-    _format_state_tables(runs, pipettes_rows, modules_serials, title, header_lines=header_lines)
+    runs_page_length: int = STATE_SNAPSHOT_RUNS_PAGE_LENGTH,
+) -> Optional[Tuple[List[dict], List[Tuple[str, str]], List[str], dict, dict]]:
+    """Single pass over USB for runs + instruments|pipettes + modules. None if any GET is not 200."""
+    try:
+        status, raw = _serial_get(
+            port_path,
+            "/runs?pageLength={}".format(runs_page_length),
+            timeout=timeout,
+        )
+        if status != 200:
+            return None
+        runs = (json.loads(raw.decode("utf-8")).get("data") or []) or []
+    except Exception:
+        return None
+    path = "/instruments" if "OT-3" in robot_model else "/pipettes"
+    try:
+        status, raw = _serial_get(port_path, path, timeout=timeout)
+        if status != 200:
+            return None
+        inst_json = json.loads(raw.decode("utf-8"))
+    except Exception:
+        return None
+    pipettes_rows: List[Tuple[str, str]] = []
+    if isinstance(inst_json.get("data"), list):
+        for item in inst_json["data"]:
+            pipettes_rows.append(
+                (str(item.get("mount", "")), str(item.get("serialNumber", item.get("id", "?"))))
+            )
+    else:
+        for mount in ("left", "right"):
+            v = inst_json.get(mount)
+            if isinstance(v, dict) and (v.get("model") or v.get("id")):
+                pipettes_rows.append((mount, str(v.get("id", v.get("name", "?") or "?"))))
+    try:
+        status, raw = _serial_get(port_path, "/modules", timeout=timeout)
+        if status != 200:
+            return None
+        mod_json = json.loads(raw.decode("utf-8"))
+    except Exception:
+        return None
+    mods = mod_json.get("data", []) if isinstance(mod_json.get("data"), list) else []
+    modules_serials = [m.get("serialNumber", m.get("id", "?")) for m in mods]
+    return runs, pipettes_rows, modules_serials, inst_json, mod_json
+
+
+def wait_for_stable_robot_state_usb(
+    port_path: str,
+    per_request_timeout: float,
+    robot_model: str,
+    overall_timeout: float = STABLE_STATE_TIMEOUT_S,
+    nag_after_s: float = STABLE_STATE_NAG_AFTER_S,
+    poll_interval_s: float = STABLE_STATE_POLL_INTERVAL_S,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Flex only: same policy as network — stable snapshot over USB serial HTTP."""
+    print(
+        "Waiting for a stable Flex snapshot over USB (/runs, /instruments, /modules — complete serials, two matching polls)...",
+        file=sys.stderr,
+    )
+    start = time.time()
+    nag_printed = False
+    last_progress_log = 0.0
+    prev_fingerprint: Optional[Tuple[Tuple[Tuple[str, str], ...], Tuple[str, ...]]] = None
+    while time.time() - start < overall_timeout:
+        elapsed = time.time() - start
+        if not nag_printed and elapsed >= nag_after_s:
+            print(
+                "Still waiting for a complete instrument/module snapshot. If this continues, check the robot "
+                "(power, doors, pipettes seated, USB cable).",
+                file=sys.stderr,
+            )
+            nag_printed = True
+        if elapsed - last_progress_log >= 60.0:
+            print(
+                f"  … still waiting for stable state ({elapsed:.0f}s / {overall_timeout:.0f}s)",
+                file=sys.stderr,
+            )
+            last_progress_log = elapsed
+
+        got = _fetch_state_usb_once(port_path, per_request_timeout, robot_model)
+        if got is None:
+            time.sleep(poll_interval_s)
+            continue
+        runs, pipettes_rows, modules_serials, inst_json, mod_json = got
+        if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            time.sleep(poll_interval_s)
+            continue
+        fp = _snapshot_identity_fingerprint(pipettes_rows, modules_serials)
+        if prev_fingerprint is not None and fp == prev_fingerprint:
+            print("Stable snapshot ready (two consecutive matching instrument/module identity sets).", file=sys.stderr)
+            return runs, pipettes_rows, modules_serials
+        prev_fingerprint = fp
+        time.sleep(poll_interval_s)
+
+    raise TimeoutError(
+        f"Stable Flex state snapshot not obtained within {overall_timeout:.0f}s over USB "
+        "(need HTTP 200 on state routes; non-placeholder serials; two matching polls)."
+    )
+
+
+def wait_for_populated_state_usb_ot2(
+    port_path: str,
+    per_request_timeout: float,
+    robot_model: str,
+    overall_timeout: float,
+    poll_interval_s: float,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    """Non-Flex over USB: one good snapshot without Flex two-poll stability."""
+    print(
+        "Waiting for robot state over USB (/runs, /pipettes, /modules — HTTP 200, complete serials)...",
+        file=sys.stderr,
+    )
+    start = time.time()
+    last_progress_log = 0.0
+    while time.time() - start < overall_timeout:
+        elapsed = time.time() - start
+        if elapsed - last_progress_log >= 60.0:
+            print(
+                f"  … still waiting ({elapsed:.0f}s / {overall_timeout:.0f}s)",
+                file=sys.stderr,
+            )
+            last_progress_log = elapsed
+        got = _fetch_state_usb_once(port_path, per_request_timeout, robot_model)
+        if got is None:
+            time.sleep(poll_interval_s)
+            continue
+        runs, pipettes_rows, modules_serials, inst_json, mod_json = got
+        if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            time.sleep(poll_interval_s)
+            continue
+        print("Robot state snapshot ready.", file=sys.stderr)
+        return runs, pipettes_rows, modules_serials
+
+    raise TimeoutError(
+        f"Robot state snapshot not obtained within {overall_timeout:.0f}s over USB "
+        "(need HTTP 200 on state routes with non-placeholder serials)."
+    )
+
+
+def wait_for_robot_state_after_restart_usb(
+    port_path: str,
+    per_request_timeout: float,
+    robot_model: str,
+    *,
+    flex_stable_timeout: float,
+    flex_nag_after: float,
+    flex_poll_interval: float,
+    ot2_overall_timeout: float,
+) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
+    if _is_flex_robot(robot_model):
+        return wait_for_stable_robot_state_usb(
+            port_path,
+            per_request_timeout,
+            robot_model,
+            overall_timeout=flex_stable_timeout,
+            nag_after_s=flex_nag_after,
+            poll_interval_s=flex_poll_interval,
+        )
+    return wait_for_populated_state_usb_ot2(
+        port_path,
+        per_request_timeout,
+        robot_model,
+        overall_timeout=ot2_overall_timeout,
+        poll_interval_s=flex_poll_interval,
+    )
 
 
 def _usb_final_summary(
-    port_path: str, timeout: float, file_uploaded: Path, robot_model: str
+    port_path: str,
+    timeout: float,
+    file_uploaded: Path,
+    robot_model: str,
+    stable_timeout: float,
+    stable_nag_after: float,
+    stable_poll_interval: float,
+    ot2_state_timeout: float,
+    fallback_software_version: str,
 ) -> None:
     """Print final state over USB using unified state tables (same format as network)."""
-    runs, pipettes_rows, modules_serials, api_ver, calibration = _fetch_state_usb(
-        port_path, timeout, robot_model
+    runs, pipettes_rows, modules_serials = wait_for_robot_state_after_restart_usb(
+        port_path,
+        timeout,
+        robot_model,
+        flex_stable_timeout=stable_timeout,
+        flex_nag_after=stable_nag_after,
+        flex_poll_interval=stable_poll_interval,
+        ot2_overall_timeout=ot2_state_timeout,
     )
+    api_ver, calibration = _fetch_usb_health_calibration(port_path, timeout)
+    sw = api_ver if api_ver != "?" else fallback_software_version
     header_lines = [
         "File uploaded:     " + file_uploaded.name,
-        "Software version: " + api_ver,
         "Calibration:       " + calibration,
     ]
     _format_state_tables(
-        runs, pipettes_rows, modules_serials, "Final state", header_lines=header_lines
+        runs,
+        pipettes_rows,
+        modules_serials,
+        "Final state",
+        header_lines=header_lines,
+        software_version=sw,
     )
 
 
@@ -863,7 +1422,7 @@ def wait_for_robot_ready(
             if resp.status_code == 200:
                 print("Robot is ready.", file=sys.stderr)
                 return
-        except (httpx.ConnectError, httpx.ReadError, httpx.WriteError):
+        except httpx.TransportError:
             pass
         time.sleep(interval)
     raise TimeoutError(
@@ -889,7 +1448,7 @@ def wait_for_update_server_ready(
             if resp.status_code == 200:
                 print("Update server is ready.", file=sys.stderr)
                 return
-        except (httpx.ConnectError, httpx.ReadError, httpx.WriteError):
+        except httpx.TransportError:
             pass
         time.sleep(interval)
     raise TimeoutError(
@@ -1090,6 +1649,33 @@ def main() -> int:
         help="Request timeout in seconds (default: 30)",
     )
     parser.add_argument(
+        "--stable-state-timeout",
+        type=float,
+        default=float(STABLE_STATE_TIMEOUT_S),
+        help="Opentrons Flex: max seconds to wait for a stable post-restart snapshot (HTTP 200 on /runs, /instruments, "
+        "/modules; real serials; two matching polls). Default %(default)s (10 min). Not used on non-Flex robots.",
+    )
+    parser.add_argument(
+        "--stable-state-nag-after",
+        type=float,
+        default=float(STABLE_STATE_NAG_AFTER_S),
+        help="Opentrons Flex: after this many seconds (default %(default)s ≈ 7 min), print one reminder to check the "
+        "robot if still waiting. Not used on non-Flex robots.",
+    )
+    parser.add_argument(
+        "--stable-state-poll-interval",
+        type=float,
+        default=float(STABLE_STATE_POLL_INTERVAL_S),
+        help="Seconds between state snapshot polls while waiting (default: %(default)s). Primary use: Flex updates.",
+    )
+    parser.add_argument(
+        "--http-api-ready-timeout",
+        type=float,
+        default=float(NETWORK_HTTP_API_READY_TIMEOUT_S),
+        help="Non-Flex robots only: max seconds for a simpler single state snapshot after restart (default: %(default)s). "
+        "On Flex, snapshot timing is controlled by --stable-state-* above.",
+    )
+    parser.add_argument(
         "--skip-download",
         action="store_true",
         help="Skip download, use existing file (must provide --file)",
@@ -1226,11 +1812,13 @@ def main() -> int:
         print("  Pausing {}s so robot is ready for update session...".format(USB_DELAY_AFTER_HEALTH_S), file=sys.stderr)
         time.sleep(USB_DELAY_AFTER_HEALTH_S)
 
+        last_completed_version_usb: Optional[str] = None
         try:
             for idx, (file_path, version) in enumerate(zip(files, versions)):
                 if len(files) > 1:
                     print("\n── Update {}/{}: {} ──".format(idx + 1, len(files), version), file=sys.stderr)
                 run_one_update_usb(ser, version, robot_model, file_path, args.timeout)
+                last_completed_version_usb = version
                 if idx < len(files) - 1:
                     try:
                         ser.close()
@@ -1243,15 +1831,24 @@ def main() -> int:
                     port_path = _find_opentrons_usb_port()
                     if not port_path:
                         raise RuntimeError("Robot not found after restart. Reconnect USB and retry.")
-                    print("Ready for next update.", file=sys.stderr)
-                    runs, pipettes_rows, modules_serials, _, _ = _fetch_state_usb(
-                        port_path, args.timeout, robot_model
+                    runs, pipettes_rows, modules_serials = wait_for_robot_state_after_restart_usb(
+                        port_path,
+                        args.timeout,
+                        robot_model,
+                        flex_stable_timeout=args.stable_state_timeout,
+                        flex_nag_after=args.stable_state_nag_after,
+                        flex_poll_interval=args.stable_state_poll_interval,
+                        ot2_overall_timeout=args.http_api_ready_timeout,
                     )
+                    print("Ready for next update (stable state snapshot OK).", file=sys.stderr)
+                    api_ver_bt, _ = _fetch_usb_health_calibration(port_path, args.timeout)
+                    sw_bt = api_ver_bt if api_ver_bt != "?" else version
                     _format_state_tables(
                         runs,
                         pipettes_rows,
                         modules_serials,
                         "State after update {} ({})".format(idx + 1, version),
+                        software_version=sw_bt,
                     )
                     ser = serial.Serial(
                         port=port_path,
@@ -1275,11 +1872,25 @@ def main() -> int:
                             args.timeout,
                             files[-1],
                             robot_model,
+                            args.stable_state_timeout,
+                            args.stable_state_nag_after,
+                            args.stable_state_poll_interval,
+                            args.http_api_ready_timeout,
+                            versions[-1],
                         )
             print("\n✅ Update completed successfully!", file=sys.stderr)
             return 0
         except (ValueError, RuntimeError, TimeoutError, json.JSONDecodeError) as e:
             print(f"Error: {e}", file=sys.stderr)
+            pp = _find_opentrons_usb_port()
+            if pp:
+                _try_print_usb_state_on_failure(
+                    pp,
+                    args.timeout,
+                    robot_model,
+                    "State after error (best effort)",
+                    last_completed_version_usb or "?",
+                )
             return 1
         except OSError as e:
             if e.errno == 16:
@@ -1360,6 +1971,8 @@ def main() -> int:
         return 1
 
     base_url = f"http://{args.ip}:{args.port}"
+    robot_model = "OT-3 Standard"
+    last_completed_version: Optional[str] = None
 
     try:
         with httpx.Client(
@@ -1370,7 +1983,7 @@ def main() -> int:
             print("", file=sys.stderr)
             print("  Connection:  network ({})".format(base_url), file=sys.stderr)
             print("", file=sys.stderr)
-            health = get_robot_health(client, base_url)
+            health = get_robot_health(client, base_url, args.timeout)
             robot_model = health.get("robot_model", "OT-2 Standard")
             robot_name = health.get("name", "unknown")
             current_ver = health.get("api_version") or health.get(
@@ -1453,19 +2066,34 @@ def main() -> int:
                         timeout=NETWORK_UPDATE_SERVER_READY_TIMEOUT_S,
                         interval=5,
                     )
-                    time.sleep(NETWORK_DELAY_AFTER_READY_S)
-                    print("Ready for next update (health + update server OK).", file=sys.stderr)
-                    # Per-update comparison: runs + LPCs + serial numbers in a pretty table
-                    _print_state_tables_network(
+                    runs, pipettes_rows, modules_serials = wait_for_robot_state_after_restart_network(
                         client,
                         base_url,
                         args.timeout,
                         robot_model,
-                        title="State after update {} ({})".format(idx, versions[idx - 1]),
+                        flex_stable_timeout=args.stable_state_timeout,
+                        flex_nag_after=args.stable_state_nag_after,
+                        flex_poll_interval=args.stable_state_poll_interval,
+                        ot2_overall_timeout=args.http_api_ready_timeout,
                     )
-                    # Refresh health for display (robot_model unchanged)
-                    health = get_robot_health(client, base_url)
-                    robot_model = health.get("robot_model", "OT-2 Standard")
+                    print(
+                        "Ready for next update (health, update server, state snapshot OK).",
+                        file=sys.stderr,
+                    )
+                    _sw, robot_model = _health_version_and_model_or_fallback(
+                        client,
+                        base_url,
+                        args.timeout,
+                        versions[idx - 1],
+                        robot_model,
+                    )
+                    _format_state_tables(
+                        runs,
+                        pipettes_rows,
+                        modules_serials,
+                        "State after update {} ({})".format(idx, versions[idx - 1]),
+                        software_version=_sw,
+                    )
 
                 print(
                     f"\n── Update {idx + 1}/{len(versions)}: {version} ──",
@@ -1501,6 +2129,7 @@ def main() -> int:
 
                 try:
                     run_one_update(client, base_url, version, robot_model, system_file)
+                    last_completed_version = version
                 finally:
                     if cleanup_file and system_file.exists():
                         system_file.unlink()
@@ -1518,8 +2147,32 @@ def main() -> int:
                 timeout=NETWORK_UPDATE_SERVER_READY_TIMEOUT_S,
                 interval=5,
             )
-            health = get_robot_health(client, base_url)
-            robot_model = health.get("robot_model", "OT-2 Standard")
+            runs, pipettes_rows, modules_serials = wait_for_robot_state_after_restart_network(
+                client,
+                base_url,
+                args.timeout,
+                robot_model,
+                flex_stable_timeout=args.stable_state_timeout,
+                flex_nag_after=args.stable_state_nag_after,
+                flex_poll_interval=args.stable_state_poll_interval,
+                ot2_overall_timeout=args.http_api_ready_timeout,
+            )
+            # After the *last* update, /health often lags behind /instruments (nginx); this is the usual failure point.
+            try:
+                health = wait_for_robot_health_json(
+                    client,
+                    base_url,
+                    args.timeout,
+                    overall_timeout=args.stable_state_timeout,
+                )
+            except RuntimeError as e:
+                print(f"  Warning: {e}", file=sys.stderr)
+                print(
+                    "  Printing Final state anyway (runs/modules serials above are from the stable snapshot).",
+                    file=sys.stderr,
+                )
+                health = {}
+            robot_model = health.get("robot_model") or robot_model
             last_ver = versions[-1]
             file_uploaded_name = (
                 f"ot3-system-{last_ver}.zip"
@@ -1527,10 +2180,9 @@ def main() -> int:
                 else f"ot2-system-{last_ver}.zip"
             )
             # Header lines then pretty table (runs + LPCs + serials) for end comparison
-            api_ver = health.get("api_version") or health.get("api_Version", "?")
+            api_ver = health.get("api_version") or health.get("api_Version") or versions[-1]
             header_lines = [
                 "File uploaded:     " + file_uploaded_name,
-                "Software version: " + str(api_ver),
             ]
             try:
                 resp = client.get(f"{base_url}/calibration/status", timeout=args.timeout)
@@ -1540,13 +2192,13 @@ def main() -> int:
                     header_lines.append("Calibration:       " + str(deck))
             except Exception:
                 header_lines.append("Calibration:       ?")
-            _print_state_tables_network(
-                client,
-                base_url,
-                args.timeout,
-                robot_model,
-                title="Final state",
+            _format_state_tables(
+                runs,
+                pipettes_rows,
+                modules_serials,
+                "Final state",
                 header_lines=header_lines,
+                software_version=str(api_ver),
             )
 
             print("\n✅ All updates completed successfully!", file=sys.stderr)
@@ -1567,15 +2219,47 @@ def main() -> int:
                 print(e.response.text, file=sys.stderr)
             except Exception:
                 print("(response body not available)", file=sys.stderr)
+        _try_print_network_state_on_failure(
+            args.ip,
+            args.port,
+            args.timeout,
+            robot_model,
+            "State after error (best effort)",
+            last_completed_version or "?",
+        )
         return 1
     except httpx.ConnectError as e:
         print(f"Connection error: {e}", file=sys.stderr)
+        _try_print_network_state_on_failure(
+            args.ip,
+            args.port,
+            args.timeout,
+            robot_model,
+            "State after error (best effort)",
+            last_completed_version or "?",
+        )
         return 1
     except httpx.RequestError as e:
         print(f"Request error: {e}", file=sys.stderr)
+        _try_print_network_state_on_failure(
+            args.ip,
+            args.port,
+            args.timeout,
+            robot_model,
+            "State after error (best effort)",
+            last_completed_version or "?",
+        )
         return 1
     except (ValueError, RuntimeError, TimeoutError) as e:
         print(f"Error: {e}", file=sys.stderr)
+        _try_print_network_state_on_failure(
+            args.ip,
+            args.port,
+            args.timeout,
+            robot_model,
+            "State after error (best effort)",
+            last_completed_version or "?",
+        )
         return 1
 
 

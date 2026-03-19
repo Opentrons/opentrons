@@ -1,6 +1,6 @@
 ---
 name: robot-ip-health
-description: Check robot health by IP address and update robot system software. Use when the user provides a robot IP (e.g. 10.14.19.233) to hit the health endpoint, verify robot connectivity, query robot status remotely, or update robot software from GitHub releases.
+description: Check robot health by IP address and update robot system software (Flex-first for updates). Use when the user provides a robot IP (e.g. 10.14.19.233) to hit the health endpoint, verify robot connectivity, query robot status remotely, or update Flex/OT-3 software from GitHub releases.
 ---
 
 # Robot Health by IP
@@ -66,6 +66,8 @@ python .cursor/skills/robot-ip-health/scripts/check_health.py --usb --update
 
 ### update_robot.py — Arguments
 
+Defaults and messaging assume **Opentrons Flex**; non-Flex behavior is a compatibility footnote.
+
 | Argument | Description |
 |----------|-------------|
 | `ip` | Robot IP or hostname. Omit when using `--usb`. |
@@ -74,6 +76,10 @@ python .cursor/skills/robot-ip-health/scripts/check_health.py --usb --update
 | `--port` | Default 31950 (robot server). Use 34000 for local dev server. Ignored when using `--usb`. |
 | `--wait-after-restart` | Seconds to wait for robot to come back between consecutive updates (default 300). For USB, script polls /health over serial until robot responds before printing success. **Caveat:** Over Wi‑Fi the connection drops when the robot restarts, so the script depends on the robot coming back on the network; over USB the link is maintained across restarts. |
 | `--timeout` | Request timeout in seconds (default 30). |
+| `--stable-state-timeout` | **Opentrons Flex (default workflow):** max seconds for a **stable** post-restart snapshot — HTTP 200 on `/runs`, `/instruments`, `/modules`, real serials, **two matching polls**. Default **600** (10 min). |
+| `--stable-state-nag-after` | **Flex:** after this many seconds (default **420** ≈ 7 min), one “check the robot” reminder if still waiting. |
+| `--stable-state-poll-interval` | Seconds between snapshot polls while waiting (default **5**). |
+| `--http-api-ready-timeout` | Only for **non-Flex** robots: cap for a simpler single-snapshot wait (default 600s). **Flex updates ignore this** in favor of `--stable-state-*`. |
 | `--skip-download` | Use existing zip; requires `--file`. Not allowed with multiple versions. |
 | `--file` | Path to system zip. Repeat for consecutive updates: `--file a.zip --file b.zip`. Required for `--usb`. Over network, one or more files; version derived from each filename (no download). |
 | `-y`, `--yes` | Skip the confirmation prompt (for scripts/CI). |
@@ -92,12 +98,13 @@ The same **user-facing usage** is supported; internally the script uses a single
 | **Source** | **Local file** | `--file /path/to/ot3-system-8.8.1.zip` | Version derived from filename. Required for USB. Supported for network (one or more files for consecutive updates). |
 | **Source** | **GitHub** | `--version 8.8.1` (or multiple versions) | Script downloads from GitHub releases. Network only (USB requires `--file`). |
 
-**Ready for next update (both paths):** After each restart the script verifies readiness before the next update, then prints a **per-update state table** for comparison:
+**Ready for next update (both paths):** After each restart the script waits for GET `/health` (USB: over serial; network: HTTP; retries are **quiet**), then GET `/server/update/health` (network only). Then:
 
-- **USB**: Polls GET `/health` over serial until 200, then prints *"Ready for next update."* and the state table (runs + LPC counts, pipettes serials, modules serials).
-- **Network**: Polls GET `/health`, then GET `/server/update/health`, short delay, then *"Ready for next update (health + update server OK)."* and the same state table. 502 on begin/upload is retried.
+- **Opentrons Flex (the usual case):** **Stable snapshot** — poll `/runs`, `/instruments`, `/modules` until HTTP 200, populated serials (`ok: false` bad-instrument entries allowed), and **two consecutive polls** match on instrument/module identity. Default max **10 minutes** (`--stable-state-timeout`); at **7 minutes** (`--stable-state-nag-after`) one reminder to check the robot. Clean, high-level logging only (no per-endpoint 502 spam).
 
-**State table (same format for USB and network):** Runs (last 4) with columns id, protocolId, startedAt, completedAt, **LPCs** (labwareOffsets count); Pipettes (mount, serial); Modules (serial). Printed after each update (between consecutive updates) and at the end as **Final state** (with file uploaded, software version, calibration in the header).
+Then it prints *"Ready for next update (health, update server, state snapshot OK)."* and the state table. Non-Flex robots use a simpler single-snapshot wait capped by `--http-api-ready-timeout`. 502 on begin/upload is still retried separately.
+
+**State table (same format for USB and network):** Each table includes a **Software version** line (from `/health` when available, else the target version). **Runs** lists up to **100** runs (newest first; `GET /runs?pageLength=100`). Columns: id, protocolId, startedAt, completedAt, **LPCs** (labwareOffsets count); Pipettes (mount, serial); Modules (serial). Printed after each intermediate update, as **Final state** after the last update (with file uploaded + calibration in the header), and on **best-effort after errors** (network or USB) when the robot is still reachable.
 
 ### update_robot.py — Pre-flight and Flow
 
