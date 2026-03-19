@@ -91,9 +91,9 @@ async def mock_server(
         if mock_server_type == "unix_domain_socket":
             socket_path = tmp_path_factory.mktemp("mock") / "sock"
 
-            site = aiohttp.web.UnixSite(runner, socket_path)
-            await site.start()
-            exit_stack.push_async_callback(site.stop)
+            unix_site = aiohttp.web.UnixSite(runner, socket_path)
+            await unix_site.start()
+            exit_stack.push_async_callback(unix_site.stop)
 
             client = await exit_stack.enter_async_context(
                 LocalHTTPClient(auth_server_uds=str(socket_path))
@@ -102,9 +102,9 @@ async def mock_server(
             yield (app_mock, client)
 
         else:  # mock_server_type == "tcp"
-            site = aiohttp.web.TCPSite(runner, host="localhost", port=0)
-            await site.start()
-            exit_stack.push_async_callback(site.stop)
+            tcp_site = aiohttp.web.TCPSite(runner, host="localhost", port=0)
+            await tcp_site.start()
+            exit_stack.push_async_callback(tcp_site.stop)
 
             port = runner.addresses[0][1]
             url = f"http://localhost:{port}"
