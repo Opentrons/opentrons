@@ -15,29 +15,56 @@ from auth_server.persistence.fastapi_dependencies import get_sql_engine
 
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
 
+# camelCase field name → snake_case store column name
+_CAMEL_TO_SNAKE = {
+    "accessControlEnabled": "access_control_enabled",
+    "maxNumberOfLoginAttempts": "max_number_of_login_attempts",
+    "passwordResetTimeInDays": "password_reset_time_in_days",
+    "idleLockoutInMinutes": "idle_lockout_in_minutes",
+    "requireAdminCredsWhenUpdatingRobotSoftware": "require_admin_creds_when_updating_robot_software",
+    "requireAdminCredsWhenSendingProtocolToRobot": "require_admin_creds_when_sending_protocol_to_robot",
+    "requireAdminCredsForSignoffProtocol": "require_admin_creds_for_signoff_protocol",
+    "requireSignoffForProtocolLog": "require_signoff_for_protocol_log",
+    "requireReasonForInteraction": "require_reason_for_interaction",
+    "minLengthOfReasonForInteraction": "min_length_of_reason_for_interaction",
+    "requireLogsToBeSavedInApp": "require_logs_to_be_saved_in_app",
+    "deleteOverMaxOnDiskProtocols": "delete_over_max_on_disk_protocols",
+}
+
 
 def _response_to_store_kwargs(settings: SettingsResponseData) -> dict:
-    """Map a full SettingsResponseData to store kwargs for insert."""
-    return {
-        "access_control_enabled": settings.accessControlEnabled,
-        "max_number_of_login_attempts": settings.maxNumberOfLoginAttempts,
-        "password_reset_time_in_days": settings.passwordResetTimeInDays,
-        "idle_lockout_in_minutes": settings.idleLockoutInMinutes,
-        "require_admin_creds_when_updating_robot_software": settings.requireAdminCredsWhenUpdatingRobotSoftware,
-        "require_admin_creds_when_sending_protocol_to_robot": settings.requireAdminCredsWhenSendingProtocolToRobot,
-        "require_admin_creds_for_signoff_protocol": settings.requireAdminCredsForSignoffProtocol,
-        "require_signoff_for_protocol_log": settings.requireSignoffForProtocolLog,
-        "require_reason_for_interaction": settings.requireReasonForInteraction,
-        "min_length_of_reason_for_interaction": settings.minLengthOfReasonForInteraction,
-        "require_logs_to_be_saved_in_app": settings.requireLogsToBeSavedInApp,
-        "delete_over_max_on_disk_protocols": settings.deleteOverMaxOnDiskProtocols,
-        "password_complexity_minimum_length": settings.passwordComplexity.minimumLength
-        if settings.passwordComplexity is not None
-        else None,
-        "password_complexity_special_characters": settings.passwordComplexity.specialCharacters
-        if settings.passwordComplexity is not None
-        else None,
-    }
+    """Convert a SettingsResponseData into all store kwargs."""
+    result = {}
+    for camel, snake in _CAMEL_TO_SNAKE.items():
+        result[snake] = getattr(settings, camel)
+    # Flatten the nested PasswordComplexity object into two columns
+    if settings.passwordComplexity is not None:
+        result["password_complexity_minimum_length"] = (
+            settings.passwordComplexity.minimumLength
+        )
+        result["password_complexity_special_characters"] = (
+            settings.passwordComplexity.specialCharacters
+        )
+    else:
+        result["password_complexity_minimum_length"] = None
+        result["password_complexity_special_characters"] = None
+    return result
+
+
+def _patch_to_store_kwargs(non_null_updates: dict) -> dict:
+    """Convert a partial camelCase DICT intostore kwargs."""
+    result = {}
+    for camel, snake in _CAMEL_TO_SNAKE.items():
+        if camel in non_null_updates:
+            result[snake] = non_null_updates[camel]
+    # Flatten passwordComplexity if it was provided
+    complexity = non_null_updates.get("passwordComplexity")
+    if complexity is not None:
+        result["password_complexity_minimum_length"] = complexity["minimumLength"]
+        result["password_complexity_special_characters"] = complexity[
+            "specialCharacters"
+        ]
+    return result
 
 
 class SettingsDataManager:
@@ -58,16 +85,18 @@ class SettingsDataManager:
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         existing = self._settings_store.get()
-        print("existing: ", existing)
         if existing is None:
             self._settings_store.insert(
                 **_response_to_store_kwargs(
-                    SettingsResponseData.model_construct(accessControlEnabled=False)
-                )
+                    SettingsResponseData()
+                )  # full object → all kwargs
             )
 
+        # Step 2: Update only the fields the user sent
         non_null_updates = patch.model_dump(exclude_none=True)
-        store_kwargs = _response_to_store_kwargs(non_null_updates)
+        store_kwargs = _patch_to_store_kwargs(
+            non_null_updates
+        )  # partial dict → partial kwargs
         if store_kwargs:
             self._settings_store.update(**store_kwargs)
 
