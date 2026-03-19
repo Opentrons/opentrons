@@ -2,10 +2,18 @@
 
 import asyncio
 import logging
+import subprocess
+import time
+from pathlib import Path
 from typing import Callable, Dict, List, Mapping, Optional, Sequence
+
+import Pyro5.api
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
+    register_process_types,
+)
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
     EstopState,
@@ -179,6 +187,10 @@ class RunOrchestratorStore:
         self._deck_type = deck_type
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
+        self._run_process: Optional[subprocess.Popen[bytes]] = None
+        self._run_proxy: Optional[Pyro5.api.Proxy] = None
+        if feature_flags.protocol_subprocess_enabled():
+            register_process_types()
         hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
@@ -189,11 +201,23 @@ class RunOrchestratorStore:
         return self._run_orchestrator
 
     @property
+    def run_proxy(self) -> Pyro5.api.Proxy:
+        if self._run_proxy is None:
+            # TODO this should be it's own error
+            raise NoRunOrchestrator()
+        return self._run_proxy
+
+    @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current run orchestrator."""
-        return (
-            self.run_orchestrator.run_id if self._run_orchestrator is not None else None
-        )
+        if feature_flags.protocol_subprocess_enabled():
+            return self._run_proxy.run_id if self._run_proxy is not None else None
+        else:
+            return (
+                self.run_orchestrator.run_id
+                if self._run_orchestrator is not None
+                else None
+            )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -265,6 +289,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.create_pyro(run_id=run_id)
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -318,10 +345,6 @@ class RunOrchestratorStore:
         self._run_orchestrator = orchestrator
         return summary
 
-    async def create_pyro(self) -> None:
-        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
-        pass
-
     async def clear(self) -> RunResult:
         """Remove the current run orchestrator.
 
@@ -329,6 +352,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.clear_pyro()
+
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
@@ -354,6 +380,63 @@ class RunOrchestratorStore:
             parameters=run_time_parameters,
             command_annotations=command_annotations,
             command_preconditions=preconditions,
+        )
+
+    async def create_pyro(
+        self,
+        run_id: str,
+    ) -> StateSummary:
+        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
+        if self._run_process is not None:
+            raise RunConflictError("Another run is currently active.")
+
+        # TODO this probably won't always be the entry point
+        entry_process_path = Path("./run_director.py").resolve()
+        self._run_process = subprocess.Popen(
+            ["python3", str(entry_process_path)], user="ot-protocol"
+        )
+
+        # TODO This timeout sucks
+        # TODO also we might want to type this into the proper type
+        start_time = time.monotonic()
+        with Pyro5.api.locate_ns() as ns:
+            while time.monotonic() - start_time < 60:
+                if "ot-protocol" in ns.list():
+                    self._run_proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])
+                    break
+            else:
+                self._run_process.terminate()
+                self._run_process = None
+                ns.remove("ot-protocol")
+                raise ValueError("Can't find process")
+
+        self._run_proxy.create(run_id)
+        return self._run_proxy.get_summary()
+
+    async def clear_pyro(self) -> RunResult:
+        if self.run_proxy.get_is_okay_to_clear():
+            await self.run_orchestrator.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
+        else:
+            raise RunConflictError("Current run is not idle or stopped.")
+
+        run_data = self.run_proxy.get_state_summary()
+
+        self._run_process.terminate()
+        self._run_process = None
+        self._run_proxy = None
+        with Pyro5.api.locate_ns() as ns:
+            ns.remove("ot-protocol")
+
+        return RunResult(
+            state_summary=run_data,
+            commands=[],
+            parameters=[],
+            command_annotations=[],
+            command_preconditions=None,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
@@ -401,6 +484,8 @@ class RunOrchestratorStore:
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        if feature_flags.protocol_subprocess_enabled():
+            return []
         return self.run_orchestrator.get_run_time_parameters()
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
@@ -534,6 +619,8 @@ class RunOrchestratorStore:
         self, capture_image_settings: CameraCaptureImageSettings
     ) -> None:
         """Add new camera capture image settings to state."""
+        if feature_flags.protocol_subprocess_enabled():
+            return
         self.run_orchestrator.add_camera_capture_image_settings(
             camera_id=capture_image_settings.cameraId,
             resolution=capture_image_settings.resolution,
