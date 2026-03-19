@@ -29,7 +29,7 @@ class SettingsStore:
                 session.expunge(settings)
             return settings
 
-    def add(
+    def insert(
         self,
         access_control_enabled: bool,
         max_number_of_login_attempts: int,
@@ -46,7 +46,7 @@ class SettingsStore:
         require_logs_to_be_saved_in_app: bool,
         delete_over_max_on_disk_protocols: bool,
     ) -> Settings:
-        """Create a settings, persist it, and return it."""
+        """Create the settings row with all values provided."""
         new_settings = Settings(
             access_control_enabled=access_control_enabled,
             max_number_of_login_attempts=max_number_of_login_attempts,
@@ -64,15 +64,22 @@ class SettingsStore:
             delete_over_max_on_disk_protocols=delete_over_max_on_disk_protocols,
         )
         with self._session() as session:
-            # only allow one settings record to exist
-            if session.query(Settings).first() is None:
-                session.add(new_settings)
-                session.commit()
-                session.expunge(new_settings)
-            else:
-                raise ValueError("Settings already exist")
-
+            session.add(new_settings)
+            session.commit()
+            session.expunge(new_settings)
         return new_settings
+
+    def update(self, **kwargs: object) -> Settings:
+        """Update only the specified fields on the existing settings row."""
+        with self._session() as session:
+            row: Settings | None = session.query(Settings).first()
+            if row is None:
+                raise RuntimeError("Settings row missing")
+            for attr, value in kwargs.items():
+                setattr(row, attr, value)
+            session.commit()
+            session.expunge(row)
+            return row
 
     def reset(self) -> None:
         """Reset the settings to their defaults.
@@ -83,34 +90,3 @@ class SettingsStore:
         with self._session() as session:
             session.query(Settings).delete()
             session.commit()
-
-    def update(
-        self,
-        # TODO: Extract to args
-        settings: PatchSettingsRequestData | None = None,
-    ) -> None:
-        """Update a settings's fields and return the updated Settings.
-
-        Raises ``ValueError`` if the user does not exist.
-        """
-        pass  # TODO: Implement
-        # with self._session() as session:
-        #     user: User | None = (
-        #         session.query(User).filter(User.username == username).first()
-        #     )
-        #     if user is None:
-        #         raise ValueError(f"User {username!r} not found")
-        #     updates: dict[str, object] = {
-        #         "username": new_username,
-        #         "hashed_password": hashed_password,
-        #         "full_name": full_name,
-        #         "account_type": AccountType(account_type)
-        #         if account_type is not None
-        #         else None,
-        #     }
-        #     for attr, value in updates.items():
-        #         if value is not None:
-        #             setattr(user, attr, value)
-        #     session.commit()
-        #     session.expunge(user)
-        #     return user

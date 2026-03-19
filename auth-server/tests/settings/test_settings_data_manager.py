@@ -42,7 +42,7 @@ def test_patch_settings(
         )
     )
     decoy.verify(
-        mock_store.add(
+        mock_store.insert(
             access_control_enabled=True,
             max_number_of_login_attempts=10,
             password_reset_time_in_days=30,
@@ -72,7 +72,7 @@ def test_patch_settings_with_none_values(
         )
     )
     decoy.verify(
-        mock_store.add(
+        mock_store.insert(
             access_control_enabled=True,
             max_number_of_login_attempts=15,
             password_reset_time_in_days=None,

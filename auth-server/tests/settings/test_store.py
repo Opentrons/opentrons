@@ -21,7 +21,7 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
 # test password complexity with none values
 def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     """add should persist the user so get can find it."""
-    settings_store.add(
+    settings_store.insert(
         access_control_enabled=True,
         max_number_of_login_attempts=10,
         password_reset_time_in_days=30,
@@ -54,7 +54,7 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
     assert fetched.password_complexity_minimum_length == 8
     assert fetched.password_complexity_special_characters
     with pytest.raises(ValueError):
-        settings_store.add(
+        settings_store.insert(
             access_control_enabled=False,
             max_number_of_login_attempts=5,
             password_reset_time_in_days=15,
@@ -74,7 +74,7 @@ def test_add_and_get_settings(settings_store: SettingsStore) -> None:
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
-    settings_store.add(
+    settings_store.insert(
         access_control_enabled=True,
         max_number_of_login_attempts=5,
         password_reset_time_in_days=15,

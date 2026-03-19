@@ -101,8 +101,9 @@ class SettingsResponseData(_StrictBaseModel):
             maxNumberOfLoginAttempts=settings.max_number_of_login_attempts,
             passwordResetTimeInDays=settings.password_reset_time_in_days,
             passwordComplexity=PasswordComplexity(
-                minimumLength=settings.password_complexity_minimum_length,
-                specialCharacters=settings.password_complexity_special_characters,
+                minimumLength=settings.password_complexity_minimum_length or 0,
+                specialCharacters=settings.password_complexity_special_characters
+                or False,
             )
             if settings.password_complexity_minimum_length is not None
             else None,
