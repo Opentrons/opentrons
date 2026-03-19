@@ -16,6 +16,30 @@ from auth_server.persistence.fastapi_dependencies import get_sql_engine
 _DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
 
 
+def _response_to_store_kwargs(settings: SettingsResponseData) -> dict:
+    """Map a full SettingsResponseData to store kwargs for insert."""
+    return {
+        "access_control_enabled": settings.accessControlEnabled,
+        "max_number_of_login_attempts": settings.maxNumberOfLoginAttempts,
+        "password_reset_time_in_days": settings.passwordResetTimeInDays,
+        "idle_lockout_in_minutes": settings.idleLockoutInMinutes,
+        "require_admin_creds_when_updating_robot_software": settings.requireAdminCredsWhenUpdatingRobotSoftware,
+        "require_admin_creds_when_sending_protocol_to_robot": settings.requireAdminCredsWhenSendingProtocolToRobot,
+        "require_admin_creds_for_signoff_protocol": settings.requireAdminCredsForSignoffProtocol,
+        "require_signoff_for_protocol_log": settings.requireSignoffForProtocolLog,
+        "require_reason_for_interaction": settings.requireReasonForInteraction,
+        "min_length_of_reason_for_interaction": settings.minLengthOfReasonForInteraction,
+        "require_logs_to_be_saved_in_app": settings.requireLogsToBeSavedInApp,
+        "delete_over_max_on_disk_protocols": settings.deleteOverMaxOnDiskProtocols,
+        "password_complexity_minimum_length": settings.passwordComplexity.minimumLength
+        if settings.passwordComplexity is not None
+        else None,
+        "password_complexity_special_characters": settings.passwordComplexity.specialCharacters
+        if settings.passwordComplexity is not None
+        else None,
+    }
+
+
 class SettingsDataManager:
     """Manages the current authorization and authentication settings."""
 
@@ -34,81 +58,18 @@ class SettingsDataManager:
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         existing = self._settings_store.get()
-        non_null_updates = patch.model_dump(exclude_none=True)
-
+        print("existing: ", existing)
         if existing is None:
-            # No row yet — start from defaults, merge in the patch, insert
-            defaults = SettingsResponseData()
-            merged = defaults.model_copy(update=non_null_updates)
             self._settings_store.insert(
-                access_control_enabled=merged.accessControlEnabled,
-                max_number_of_login_attempts=merged.maxNumberOfLoginAttempts,
-                password_reset_time_in_days=merged.passwordResetTimeInDays,
-                idle_lockout_in_minutes=merged.idleLockoutInMinutes,
-                require_admin_creds_when_updating_robot_software=merged.requireAdminCredsWhenUpdatingRobotSoftware,
-                require_admin_creds_when_sending_protocol_to_robot=merged.requireAdminCredsWhenSendingProtocolToRobot,
-                require_admin_creds_for_signoff_protocol=merged.requireAdminCredsForSignoffProtocol,
-                require_signoff_for_protocol_log=merged.requireSignoffForProtocolLog,
-                require_reason_for_interaction=merged.requireReasonForInteraction,
-                min_length_of_reason_for_interaction=merged.minLengthOfReasonForInteraction,
-                require_logs_to_be_saved_in_app=merged.requireLogsToBeSavedInApp,
-                delete_over_max_on_disk_protocols=merged.deleteOverMaxOnDiskProtocols,
-                password_complexity_minimum_length=merged.passwordComplexity.minimumLength
-                if merged.passwordComplexity is not None
-                else None,
-                password_complexity_special_characters=merged.passwordComplexity.specialCharacters
-                if merged.passwordComplexity is not None
-                else None,
+                **_response_to_store_kwargs(
+                    SettingsResponseData.model_construct(accessControlEnabled=False)
+                )
             )
-        else:
-            # Row exists — update only the fields that were sent
-            # Map camelCase → snake_case for the store
-            store_updates = {
-                "access_control_enabled": non_null_updates.get("accessControlEnabled"),
-                "max_number_of_login_attempts": non_null_updates.get(
-                    "maxNumberOfLoginAttempts"
-                ),
-                "password_reset_time_in_days": non_null_updates.get(
-                    "passwordResetTimeInDays"
-                ),
-                "idle_lockout_in_minutes": non_null_updates.get("idleLockoutInMinutes"),
-                "require_admin_creds_when_updating_robot_software": non_null_updates.get(
-                    "requireAdminCredsWhenUpdatingRobotSoftware"
-                ),
-                "require_admin_creds_when_sending_protocol_to_robot": non_null_updates.get(
-                    "requireAdminCredsWhenSendingProtocolToRobot"
-                ),
-                "require_admin_creds_for_signoff_protocol": non_null_updates.get(
-                    "requireAdminCredsForSignoffProtocol"
-                ),
-                "require_signoff_for_protocol_log": non_null_updates.get(
-                    "requireSignoffForProtocolLog"
-                ),
-                "require_reason_for_interaction": non_null_updates.get(
-                    "requireReasonForInteraction"
-                ),
-                "min_length_of_reason_for_interaction": non_null_updates.get(
-                    "minLengthOfReasonForInteraction"
-                ),
-                "require_logs_to_be_saved_in_app": non_null_updates.get(
-                    "requireLogsToBeSavedInApp"
-                ),
-                "delete_over_max_on_disk_protocols": non_null_updates.get(
-                    "deleteOverMaxOnDiskProtocols"
-                ),
-                "password_complexity_minimum_length": non_null_updates[
-                    "passwordComplexity"
-                ]["minimumLength"]
-                if non_null_updates.get("passwordComplexity") is not None
-                else None,
-                "password_complexity_special_characters": non_null_updates[
-                    "passwordComplexity"
-                ]["specialCharacters"]
-                if non_null_updates.get("passwordComplexity") is not None
-                else None,
-            }
-            store_updates = {k: v for k, v in store_updates.items() if v is not None}
-            self._settings_store.update(**store_updates)
+
+        non_null_updates = patch.model_dump(exclude_none=True)
+        store_kwargs = _response_to_store_kwargs(non_null_updates)
+        if store_kwargs:
+            self._settings_store.update(**store_kwargs)
 
         return self.get()
 
