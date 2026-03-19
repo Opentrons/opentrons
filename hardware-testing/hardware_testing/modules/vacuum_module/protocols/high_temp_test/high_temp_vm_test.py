@@ -1,5 +1,6 @@
+"""Vacuum Module High Humidity / Temp Test."""
+
 import asyncio
-import time
 from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api  # type: ignore[import]
@@ -106,7 +107,8 @@ async def _run_single_pump_api_cycle(
 
     # Dynamic CSV naming per trial (date + trial index + pressure)
     date_str = datetime.utcnow().strftime("%y-%m-%d %H:%M:%S")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if not ctx.is_simulating():
+        output_dir.mkdir(parents=True, exist_ok=True)
     print(f"output_dir: {output_dir}")
     trial_csv = (
         output_dir / f"{date_str}_trial_{cycle_index:02d}_{target_pressure}mbar.csv"
@@ -149,10 +151,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
-    output_dir = Path(OUTPUT_DIR)
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     if not ctx.is_simulating():
+        output_dir = Path(OUTPUT_DIR)
+        output_dir.mkdir(parents=True, exist_ok=True)
         from opentrons.drivers import vacuum_module  # type: ignore[import]
 
         if water_pump:
