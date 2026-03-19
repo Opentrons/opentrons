@@ -12,6 +12,8 @@ from opentrons.hardware_control import (
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
@@ -25,6 +27,7 @@ router = APIRouter()
     "/identify",
     summary="Blink the lights",
     description="Blink the gantry lights so you can pick it out of a crowd",
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_identify(
     seconds: Annotated[int, Query(..., description="Time to blink the lights for")],
@@ -81,6 +84,7 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
     },
     deprecated=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_move_robot(
     robot_move_target: control.RobotMoveTarget,
@@ -105,6 +109,7 @@ async def post_move_robot(
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_home_robot(
     robot_home_target: control.RobotHomeTarget,
@@ -156,6 +161,7 @@ async def get_robot_light_state(
     summary="Turn the lights on or off",
     description="Turn the rail lights on or off",
     response_model=control.RobotLightState,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_robot_light_state(
     robot_light_state: control.RobotLightState,

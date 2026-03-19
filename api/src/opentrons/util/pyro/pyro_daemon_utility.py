@@ -7,7 +7,10 @@ from typing import Any, Callable
 from Pyro5 import api as pyro
 from Pyro5 import errors
 
-from opentrons.util.pyro_synchronous_adapter import PyroSynchronousObject
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    DaemonUtility,
+    PyroSynchronousObject,
+)
 
 log = logging.getLogger(__name__)
 
@@ -23,25 +26,30 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     log.info(f"Running Pyro type registry for {pyroname}.")
     registry()
 
-    # Create a guaranteed synchronous adapted alias to the resource
-    pyro_object = PyroSynchronousObject(resource)
-
     # Handle Pyro registration and publication of our synchronized object
     pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
     with pyro.Daemon() as daemon:  # type: ignore
-        pyro_uri = daemon.register(pyro_object)
-
-        # Find the currently running nameserver
+        utility = DaemonUtility(daemon)
+        # Create a guaranteed synchronous adapted alias to the resource
+        pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
+        utility.add_PSO(pyro_object)
         try:
             with pyro.locate_ns() as ns:
                 # Register our objects URI with the system nameserver
-                ns.register(pyroname, pyro_uri)
+                try:
+                    ns.register(pyroname, daemon.uriFor(pyro_object))
+                    log.info(
+                        f"Pyro5 Dameon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
+                    )
 
-            log.info(f"Pyro5 Dameon available: pyroname={pyroname} uri={pyro_uri}")
-
-            # Maintain a request loop to handle requests on our resource instance from remote processes
-            daemon.requestLoop()
+                    # Maintain a request loop to handle requests on our resource instance from remote processes
+                    daemon.requestLoop()
+                finally:
+                    ns.remove(name=pyroname)
         except (errors.NamingError, errors.CommunicationError, socket.timeout):
             raise errors.CommunicationError(
                 f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
             )
+        finally:
+            utility.remove_PSO(pyro_object)
+            daemon.close()

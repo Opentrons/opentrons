@@ -158,7 +158,7 @@ async def get_current_run_from_url(
         },
         status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],

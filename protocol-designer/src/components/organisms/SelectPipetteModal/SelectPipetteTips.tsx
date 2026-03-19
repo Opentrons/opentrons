@@ -93,7 +93,7 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
               key={value}
               isChecked={selectedValues.includes(value)}
               labelText={removeOpentronsPhrases(name)}
-              onClick={() => {
+              onChange={() => {
                 handleSelectTips(value)
               }}
             />

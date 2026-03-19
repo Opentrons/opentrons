@@ -201,9 +201,14 @@ class MixStepForm(BasePage):
         # Try checkbox role (Checkbox component from @opentrons/components)
         checkbox = self.page.get_by_role("checkbox").nth(index)
         if checkbox.count() > 0:
-            self.wait_for_visible(checkbox)
-            checkbox.click()
-            return
+            try:
+                self.wait_for_visible(checkbox)
+                checkbox.click()
+                return
+            except Exception:
+                # New Checkbox implementation may expose a hidden input;
+                # continue to label/test-id based fallbacks.
+                pass
 
         # Try CheckboxExpandStepFormField - these use ListButton with a Btn containing Check icon
         # The inner Btn has a testId like "delay_checkbox", "blowout_checkbox", etc.
