@@ -27,6 +27,7 @@ import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { registerDataFiles, watchForMassStorage } from './usb'
+import { registerUsbDeviceHandlers } from './usbDevices'
 
 import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
@@ -89,6 +90,8 @@ app.once('render-process-gone', (_, __, details) => {
 
 function startUp(): void {
   log.info('Starting App')
+  log.debug('get connected USB devices, getting devices')
+  registerUsbDeviceHandlers()
   const storeNeedsReset = fse.existsSync(
     path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )

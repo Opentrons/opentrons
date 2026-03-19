@@ -21,6 +21,10 @@ const REALTEK_VID = parseInt('0BDA', 16)
 const RE_REALTEK_PID = /^8[0|1]5[0-9]$/
 
 export const isRealtekU2EAdapter = (device: UsbDevice): boolean => {
+  if (device.vendorId == null || device.productId == null) {
+    return false
+  }
+
   return (
     device.vendorId === REALTEK_VID &&
     RE_REALTEK_PID.test(device.productId.toString(16))

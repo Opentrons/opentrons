@@ -152,6 +152,10 @@ export const ICON_DATA_BY_NAME = {
     path: 'M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z',
     viewBox: '0 0 24 24',
   },
+  device: {
+    path: '',
+    viewBox: '0 0 48 48',
+  },
   'dots-horizontal': {
     path: 'M5.5 10A2.5 2.5 0 1 1 3 12.5 2.5 2.5 0 0 1 5.5 10zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5zm7 0a2.5 2.5 0 1 1-2.5 2.5 2.5 2.5 0 0 1 2.5-2.5z',
     viewBox: '0 0 24 24',

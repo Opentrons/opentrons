@@ -221,6 +221,7 @@
   "module_calibration": "Module Calibration",
   "module_calibration_description": "Module calibration uses a pipette and attached probe to determine the module's exact position relative to the deck.",
   "mount": "Mount",
+  "na": "N/A",
   "name_love_it": "{{name}}, love it!",
   "name_rule_description": "Enter up to 17 characters (letters and numbers only)",
   "name_rule_error_exist": "Oops! Name is already in use. Choose a different name.",
