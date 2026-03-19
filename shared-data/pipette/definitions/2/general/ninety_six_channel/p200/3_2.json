@@ -687,7 +687,7 @@
                 "default": 9.407,
                 "opentrons/opentrons_flex_96_tiprack_20ul/1": 9.027,
                 "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.132,
-                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.407
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.407,
                 "opentrons/opentrons_flex_96_filtertiprack_20ul/1": 9.027,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.132,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.407
