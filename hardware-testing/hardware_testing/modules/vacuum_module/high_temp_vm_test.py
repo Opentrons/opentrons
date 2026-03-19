@@ -2,7 +2,6 @@ import asyncio
 import time
 from datetime import datetime
 from pathlib import Path
-from hardware_testing.modules.common.utils import find_module_port
 from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
 
@@ -157,6 +156,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         from opentrons.drivers import vacuum_module  # type: ignore[import]
 
         if water_pump:
+            from hardware_testing.modules.common.utils import find_module_port
             from hardware_testing.drivers import vacuum_pump
 
     ctx.load_trash_bin("A3")
