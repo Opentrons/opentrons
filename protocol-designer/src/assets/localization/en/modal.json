@@ -352,6 +352,10 @@
   },
   "upload": "Upload",
   "upload_tiprack": "Upload a custom tiprack to select its definition",
+  "vacuum_mode_update": {
+    "body": "Selecting a new vacuum mode type will clear your current profile steps. This action can't be undone.",
+    "title": "Vacuum profile steps will be reset"
+  },
   "well_order": {
     "body": "Change the order in which the robot aspirates from the selected wells",
     "field_label": "Order",

@@ -103,7 +103,7 @@ describe('VacuumSummary', () => {
         modeType: VACUUM_MODE_POWER,
         powerPercent: 50,
         pumpDurationCheckbox: true,
-        pumpDurationTime: '5:30',
+        pumpDurationTime: '05:30',
         endingHoldVentCheckbox: true,
       })
       expect(screen.getByText(/Set pump power to/)).toBeInTheDocument()
@@ -121,7 +121,7 @@ describe('VacuumSummary', () => {
         modeType: VACUUM_MODE_POWER,
         powerPercent: 80,
         pumpDurationCheckbox: true,
-        pumpDurationTime: '1:00',
+        pumpDurationTime: '01:00',
         endingHoldVentCheckbox: false,
       })
       expect(screen.getByText(/Set pump power to/)).toBeInTheDocument()
@@ -139,7 +139,7 @@ describe('VacuumSummary', () => {
         modeType: VACUUM_MODE_PRESSURE,
         pressureMbar: 100,
         pumpDurationCheckbox: true,
-        pumpDurationTime: '2:45',
+        pumpDurationTime: '02:45',
         endingHoldVentCheckbox: true,
       })
       expect(screen.getByText(/Set gauge pressure to/)).toBeInTheDocument()

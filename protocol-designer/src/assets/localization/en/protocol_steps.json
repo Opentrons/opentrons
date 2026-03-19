@@ -315,13 +315,12 @@
         "delete": "Delete",
         "edit": "Edit",
         "errors": {
-          "name": "Enter a valid step name",
           "pumpData": "Enter a valid pressure value",
           "repetitions": "Enter a valid number of cycles",
-          "time": "Enter a valid time"
+          "time": "Enter a valid time",
+          "title": "Enter a valid step title"
         },
         "gauge_pressure": "Gauge pressure",
-        "name": "Name",
         "no_profile_defined": "No profile defined",
         "no_steps_defined": "No steps defined",
         "number_of_cycles": "Number of cycles",
@@ -336,6 +335,7 @@
           "power": "{{power}}% power",
           "pressure": "{{pressure}} mbar"
         },
+        "step_title": "Name",
         "time": "Time",
         "title": "Edit Vacuum profile steps",
         "unsaved_changes": "You have unsaved changes to the profile. Please save or discard them before closing."
