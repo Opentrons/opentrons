@@ -143,6 +143,9 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
             label={textEntryCopy}
             error={error}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex

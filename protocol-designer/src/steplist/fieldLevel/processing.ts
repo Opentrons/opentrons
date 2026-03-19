@@ -31,22 +31,27 @@ export const maskToTime = (rawValue: unknown): string => {
       : String(rawValue)
   return rawTimeValue
 }
-export const maskToTimeMMSS = (rawValue: unknown): string => {
+/**
+ * Masks input as MM:SS, building up from the right as the user types.
+ * Digits are right-aligned and padded with leading zeros.
+ * e.g. '' -> '', '3' -> '00:03', '34' -> '00:34', '342' -> '03:42', '3421' -> '34:21'
+ */
+export const maskToTimeWithPlaceholders = (
+  rawValue: unknown,
+  mode: 'mmss' | 'hhmmss' = 'mmss'
+): string => {
   if (rawValue == null || rawValue === '') {
     return ''
   }
 
   const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
+  const digits = value.replace(/\D/g, '').slice(-(mode === 'mmss' ? 4 : 6))
+  if (digits.length === 0) {
+    return ''
+  }
 
-  // remove invalid characters
-  const sanitized = value.replace(/[^\d:]/g, '')
-
-  // allow only one colon
-  const parts = sanitized.split(':')
-  const minutes = parts[0].slice(0, 2)
-  const seconds = parts[1]?.slice(0, 2)
-
-  return seconds != null ? `${minutes}:${seconds}` : minutes
+  const padded = digits.padStart(4, '0')
+  return `${padded.slice(0, 2)}:${padded.slice(2)}`
 }
 export const maskToSignedDecimal = (rawValue: unknown): string => {
   if (rawValue == null || rawValue === '') {

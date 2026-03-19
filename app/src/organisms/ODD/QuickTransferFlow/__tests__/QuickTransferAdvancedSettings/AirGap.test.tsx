@@ -101,6 +101,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: null,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -132,6 +133,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 200,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -161,6 +163,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -188,6 +191,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -213,6 +217,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -250,6 +255,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 4,
+        onBlur: expect.any(Function),
       },
       {}
     )
@@ -275,6 +281,7 @@ describe('AirGap', () => {
         readOnly: true,
         type: 'number',
         value: 16,
+        onBlur: expect.any(Function),
       },
       {}
     )

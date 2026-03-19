@@ -163,8 +163,8 @@ class ProtocolEditorPage(BasePage):
 
         target.click()
         if stacker:
-            self.page.get_by_test_id("CustomizeExpandButton_inputField").click()
-            self.page.get_by_test_id("CustomizeExpandButton_inputField").fill(str(fill_num))
+            self.page.get_by_test_id("customize-expand-button-input-field").click()
+            self.page.get_by_test_id("customize-expand-button-input-field").fill(str(fill_num))
         if lid:
             self._add_lid("Opentrons Flex 96 Tip Rack 50", "CheckboxField_icon")
         self.click_test_id("SelectLabwareModal_confirm")
@@ -337,7 +337,7 @@ class ProtocolEditorPage(BasePage):
             field_name: The name of the checkbox field to toggle.
         """
 
-        self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+        self.click_checkbox_label(field_name)
 
     def _add_lid(self, labware: str, test_id: str) -> None:
         """Add a lid to the selected labware.

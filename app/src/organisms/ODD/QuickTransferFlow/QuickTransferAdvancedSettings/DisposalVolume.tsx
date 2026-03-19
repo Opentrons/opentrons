@@ -246,6 +246,9 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               value={String(volume ?? '')}
               label={t('disposal_volume_µL')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex
@@ -315,6 +318,9 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               label={t('blowout_flow_rate_µL')}
               error={flowRateError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('disposal_volume_flow_rate', {

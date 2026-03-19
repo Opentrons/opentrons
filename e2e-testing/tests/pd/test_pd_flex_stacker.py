@@ -213,10 +213,17 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
 
     ## Transfer from reservoir to plate
     protocol_editor.add_step()
-    transfer_page.source_labware_select("NEST 1 Well Reservoir 195 mL")
-    transfer_page.destination_labware_select("Opentrons Tough 96 Well Plate")
+    SOURCE_LABWARE = "NEST 1 Well Reservoir 195 mL"
+    DESTINATION_LABWARE = "Opentrons Tough 96 Well Plate"
+    transfer_page.source_labware_select(SOURCE_LABWARE)
+    transfer_page.destination_labware_select(DESTINATION_LABWARE)
+    transfer_page.open_nozzle_and_well_selector()
+    transfer_page.select_nozzles()
+    transfer_page.wells_select("Source", SOURCE_LABWARE, [])
     transfer_page.wells_select(
-        "Destination", ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"], rect=False
+        "Destination",
+        DESTINATION_LABWARE,
+        ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"],
     )
     transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("50")

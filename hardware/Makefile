@@ -27,6 +27,8 @@ tests ?= tests
 cov_opts ?= --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
+files_to_check := opentrons_hardware tests
+
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
 pypi_username ?=
@@ -127,13 +129,14 @@ test-with-opentrons-sock-emulator: test-with-emulator
 
 .PHONY: lint
 lint:
-	$(python) -m mypy opentrons_hardware tests
-	$(ruff) check opentrons_hardware tests
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(ruff) format opentrons_hardware tests
-	$(ruff) check --select I --fix opentrons_hardware tests
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 # launch hardware controller in dev mode
 .PHONY: dev

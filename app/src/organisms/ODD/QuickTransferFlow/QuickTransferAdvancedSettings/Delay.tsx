@@ -199,6 +199,9 @@ export function Delay(props: DelayProps): JSX.Element {
               error={durationError}
               label={t('delay_duration_s')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex

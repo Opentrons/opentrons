@@ -19,6 +19,9 @@ from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
+    PumpState,
+    VacuumState,
+    VentState,
 )
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
@@ -33,6 +36,10 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
+)
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +50,7 @@ DFU_PID = "df11"
 
 
 class VacuumModule(mod_abc.AbstractModule):
-    """Hardware control interface for an attached Flex-Stacker module."""
+    """Hardware control interface for an attached Vacuum module."""
 
     MODULE_TYPE = ModuleType.VACUUM_MODULE
 
@@ -94,7 +101,7 @@ class VacuumModule(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=(await driver.get_device_info()).to_dict(),
+            device_info=(await driver.get_device_info()),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
@@ -150,6 +157,7 @@ class VacuumModule(mod_abc.AbstractModule):
     def _async_error_callback(self, exception: Exception) -> None:
         self.error_callback(exception)
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task"""
         await self._poller.stop()
@@ -192,6 +200,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> LiveData:
+        # TODO: FIX THIS
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
         }
@@ -200,6 +209,14 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def should_identify(self) -> bool:
         return self._should_identify
+
+    @property
+    def vacuum_state(self) -> VacuumState:
+        return self._reader.vacuum_state
+
+    @property
+    def pump_state(self) -> PumpState:
+        return self._reader.pump_state
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -289,12 +306,65 @@ class VacuumModule(mod_abc.AbstractModule):
         """Reset persistent data on the module that should not exist outside of a run."""
         self.set_statusbar_identify(False)
 
+    async def set_vent_state(self, vent_state: VentState) -> None:
+        """Open or close the vent."""
+        await self._driver.set_vent_state(state=vent_state)
+
+    async def set_vacuum_state(
+        self,
+        enable_vacuum: bool,
+        guage_pressure_mbar: Optional[float] = None,
+        duration: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        """Handler for internal pressure controls."""
+        await self._driver.set_vacuum_state(
+            enable_vacuum=enable_vacuum,
+            guage_pressure_mbar=guage_pressure_mbar,
+            duration=duration,
+            rate=rate,
+            vent_after=vent_after,
+        )
+
+    async def set_pump_state(
+        self,
+        start_pump: bool,
+        target_rpm: Optional[int] = None,
+        duty_cycle: Optional[int] = None,
+    ) -> None:
+        """Control the pump agnostically to the internal pressure"""
+        await self._driver.set_pump_state(
+            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+        )
+
+    async def set_serial_number(self, sn: str) -> None:
+        """Set the serial number."""
+        await self._driver.set_serial_number(sn=sn)
+
 
 class VacuumModuleReader(Reader):
     error: Optional[str]
 
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
+        self.vacuum_state: VacuumState = VacuumState(
+            target_guage_pressure=0,
+            current_guage_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vent_state=VentState.CLOSED,
+        )
+        self.pump_state: PumpState = PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=False,
+            manual_control=False,
+        )
         self._driver = driver
         self.initialized = False
         self._refresh_state = False
@@ -351,3 +421,11 @@ class VacuumModuleReader(Reader):
                 self.error = str(exception.args[0])
             except Exception:
                 self.error = repr(exception)
+
+    async def update_vacuum_state(self) -> None:
+        """Get latest vacuum state from driver and save updated values."""
+        self.vacuum_state = await self._driver.get_vacuum_state()
+
+    async def update_pump_state(self) -> None:
+        """Get latest pump state from driver and save updated values."""
+        self.pump_state = await self._driver.get_pump_state()
