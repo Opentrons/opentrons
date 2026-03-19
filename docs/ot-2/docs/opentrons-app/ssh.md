@@ -5,44 +5,78 @@ description: "SSH access instructions"
 
 The OT-2 gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
 
-- Run protocols directly via the [Python API and command line](../../../python-api/docs/advanced-control/command-line.md).
+- Run protocols directly via the <font color="red">Python API and command line</font>.
 - Perform advanced tasks like customizing the robot's Python environment.
 - Execute protocols that reference external files on disk (apart from custom labware definition files).
 
-An SSH key is required to perform these tasks and to issue commands from the terminal. The instructions below will show you how to create an SSH key and use it for terminal authentication and access.
+SSH key is required to perform these tasks and to issue commands from the terminal. The instructions below will show you how to create an SSH key and connect to an OT-2 via the terminal.
 
-1.  **Generate your SSH credentials.**
-    Open your terminal and run the following command to create a unique "lock and key" set for your robot. This keeps these credentials separate from your other development keys.
+## Before you begin
+
+The OT-2 requires an Ethernet connection to generate an IP address and to register a security key. This means you cannot use a wireless connection for SSH. Instead, you must connect your computer to the robot with an Ethernet cable before working through the steps in this procedure.
+
+![Robot and computer connected via Ethernet cable](../images/usb-ethernet.png)
+
+If you're using a computer without an Ethernet port, use the dongle that shipped with your OT-2 or another adapter with an Ethernet port.
+
+## Create an SSH key
+
+Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
+
+1. Open a terminal window and type this command:
+
     ```bash
     ssh-keygen -f ot2_ssh_key -t ecdsa
     ```
-    *When prompted for a passphrase, you can press **Enter** twice to skip it, or provide a password for extra security.*
 
-2.  **Identify the robot's Wired IP address.**
-    The OT-2 requires a wired connection to register new security keys.
-    * Connect your computer to the OT-2 via the **USB-to-Ethernet cable**.
-    * In the Opentrons App, go to **Devices** > **Robot Settings** > **Networking**.
-    * Locate the **Wired IP** address (e.g., `169.254.67.5`).
+2. Create a passphrase when prompted. A passphrase is not required, but you should create one.
 
-3.  **Register your public key with the robot.**
-    You must "handshake" with the robot by sending it your public key. This uses port **31950**, which is specific to the Opentrons API.
+## Install the key on your OT-2
 
-    !!! warning "Replace the IP Address"
-        In the command below, replace `<ROBOT_IP>` with the actual Wired IP address you found in the previous step.
+3. Open the Opentrons App and click **Devices**.
 
-    ```bash
-    curl -H "Content-Type: application/json" -d "{\"key\":\"$(cat ot2_ssh_key.pub)\"}" http://<ROBOT_IP>:31950/server/ssh_keys
+4. Find the OT-2 you want to work with.
+
+5. Click the three-dot menu (⋮) for that robot and then click **Robot settings**.
+
+6. Click the **Networking** tab. Note the IP address for your OT-2. You will use it in the next step.
+
+    <font color="red">PLACEHOLDER FOR IMAGE</font>
+
+7. Type the commands shown below in the terminal window. Replace `ROBOT_IP` with the IP address of your OT-2.
+
+    ```
+    curl \
+    -H 'Content-Type: application/json' \
+    -d "{\"key\":\"$(cat ot2_ssh_key.pub)\"}" \
+    http://ROBOT_IP:31950/server/ssh_keys
     ```
 
-4.  **Establish the SSH connection.**
-    Now that the robot recognizes your computer, you can log in as the `root` user.
+    When successful, the robot responds with a message that the key has been added.
 
-    !!! info "The 'yes' Prompt"
-        The first time you connect, the terminal will ask if you want to continue. You **must** type the full word `yes` and press **Enter**. Typing just `y` will result in a connection failure.
+8. Type the command shown below in the terminal window. Replace `ROBOT_IP` with the IP address of your OT-2.
 
-    ```bash
-    ssh -i ot2_ssh_key root@<ROBOT_IP>
+    `ssh -i ot2_ssh_key root@ROBOT_IP`
+
+    !!! note
+        The first time you connect, the terminal will:
+        - Show a message indicating the authenticity of the host can't be established. Ignore the message.
+        - Ask if you want to continue. Type the full word `yes` and click **Enter** or **Return** to continue.
+
+9. Verify the connection. The terminal will show ASCII art that spells "OT2" when the connection is successful.
+
+    ```
+          @@@@@    @@@@@
+        @@@@          @@@@
+       @@@      @@      @@@    @@@@@@   @@@@@
+      @@@      @@@@      @@@   @@@@@@  &@' '@@
+      @@     @@@@@@@@    &@@     @@         @@
+      @@    .@@@    @    #@@     @@        @@
+      @@@    @      @    @@@     @@       @@
+       @@@    @@..@@    @@@      @@      @@
+        @@@@          @@@@       @@     @@@@@&
+          @@@@@@@@@@@@@@         ##    &@@@@@#
+             (@@@@@@.
     ```
 
-5.  **Verify the connection.**
-    Once you see the Opentrons ASCII art logo in your terminal, you are successfully connected to the robot's command line. To end the session at any time, type `exit`.
+You can now interact with the OT-2 via the terminal.
