@@ -50,7 +50,7 @@ async def get_engaged_motors(
     "/motors/disengage",
     description="Disengage a motor or set of motors",
     response_model=V1BasicResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_disengage_motors(
     axes: model.Axes, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
