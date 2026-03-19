@@ -10,8 +10,8 @@ from opentrons.drivers.vacuum_module.types import (
     HardwareRevision,
     LEDColor,
     LEDPattern,
-    PressureState,
     PumpState,
+    VacuumState,
     VentState,
 )
 from opentrons.hardware_control import ExecutionManager, modules
@@ -292,7 +292,7 @@ async def test_update_pump_state(
 @pytest.mark.parametrize(
     "vacuum_state",
     [
-        PressureState(
+        VacuumState(
             target_guage_pressure=0,
             current_guage_pressure=0,
             pressure_abs_a=0,
@@ -307,7 +307,7 @@ async def test_update_vacuum_state(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
     decoy: Decoy,
-    vacuum_state: PressureState,
+    vacuum_state: VacuumState,
 ) -> None:
     """Ensure that the module vacuum state gets update with the value the driver returns."""
     decoy.when(await mock_driver.get_vacuum_state()).then_return(vacuum_state)

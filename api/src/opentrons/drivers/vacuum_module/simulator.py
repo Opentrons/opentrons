@@ -5,8 +5,8 @@ from .types import (
     LEDColor,
     LEDPattern,
     PressureControlTunings,
-    PressureState,
     PumpState,
+    VacuumState,
     VentState,
     WasteConfigParameters,
 )
@@ -98,9 +98,9 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.vacuum_on = enable_vacuum
         self.target_pressure = guage_pressure_mbar or self.target_pressure
 
-    async def get_vacuum_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
-        return PressureState(
+        return VacuumState(
             self.target_pressure,
             self.current_pressure,
             0,

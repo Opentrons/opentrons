@@ -11,8 +11,8 @@ from .types import (
     LEDColor,
     LEDPattern,
     PressureControlTunings,
-    PressureState,
     PumpState,
+    VacuumState,
     VentState,
     WasteConfigParameters,
 )
@@ -66,14 +66,14 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         return int(match.group("R"))
 
     @classmethod
-    def parse_get_pressure_state(cls, response: str) -> PressureState:
+    def parse_get_pressure_state(cls, response: str) -> VacuumState:
         """Parse the get pressure state."""
         pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
             raise ValueError(f"Incorrect Response for get pressure state: {response}")
-        return PressureState(
+        return VacuumState(
             float(match.group("T")),
             float(match.group("C")),
             float(match.group("A")),
@@ -299,7 +299,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
 
-    async def get_vacuum_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
         resp = await self._connection.send_command(
             GCODE.GET_PRESSURE_STATE.build_command()
