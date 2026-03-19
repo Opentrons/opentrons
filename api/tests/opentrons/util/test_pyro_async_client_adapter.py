@@ -78,6 +78,11 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
     # Make an AsyncClientPyroObject out of the proxy, and then typecast it to HardwareControlAPI for helpful typehints
     # This is similar to what a "full" pyro implementation roundtrip will look like
     ot3_async = AsyncClientPyroObject(ot3_proxy)
+
+    # assert metadata info about an async function
+    assert ot3_async.home.__name__ == "home"  # type: ignore
+    assert ot3_async.home.__qualname__ == "OT3API.home"  # type: ignore
+
     casted_ot3api = cast(HardwareControlAPI, ot3_async)
 
     # Confirm that all these things are awaitable

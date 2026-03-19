@@ -46,16 +46,19 @@ def _build_classdict(
 ) -> Iterator[tuple[str, Any]]:
     # ensures metadata is available
     pso._pyroBind()  # type: ignore
-    async_methods = _get_async_methods(pso)
+    async_methods: dict[str, dict[str, Any]] = _get_async_methods(pso)
+    async_method_names = [method["__name__"] for method in async_methods.values()]
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
-        if method in async_methods:
+        attribute = getattr(pso, method)
+        if method in async_method_names:
             # For methods that are awaitable wrap them as an async reference that forwards the call to the PSO Proxy.
-            async_method = wrap_as_async(method)
+            method_metadata: dict[str, Any] = async_methods[method]
+            async_method = wrap_as_async(method_metadata)
             yield (method, async_method)
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, getattr(pso, method))
+            yield (method, attribute)
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -70,12 +73,12 @@ def _build_classdict(
 ### Helpers ###
 
 
-def _get_async_methods(proxy: Pyro5.api.Proxy) -> list[str]:
-    result: list[str] = getattr(proxy, "get_pyro_async_methods", [])
+def _get_async_methods(proxy: Pyro5.api.Proxy) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = getattr(proxy, "get_pyro_async_methods", {})
     return result
 
 
-def wrap_as_async(func_name: Any) -> Any:
+def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
     """Wrapper to make a callable element on a PyroSynchronousObject into an awaitable element on a AsyncClientPyroObject."""
 
     async def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
@@ -92,8 +95,15 @@ def wrap_as_async(func_name: Any) -> Any:
 
         # Return a Coroutine that may be awaited, it will execute the `_thread_call` when called
         return await asyncio.to_thread(
-            _thread_call, self._proxy, func_name, *args, **kwargs
+            _thread_call, self._proxy, method_metadata["__name__"], *args, **kwargs
         )
+
+    # Construct the metadata of the client wrapper function
+    wrapper.__module__ = method_metadata["__module__"]
+    wrapper.__name__ = method_metadata["__name__"]
+    wrapper.__qualname__ = method_metadata["__qualname__"]
+    wrapper.__doc__ = method_metadata["__doc__"]
+    wrapper.__type_params__ = method_metadata["__type_params__"]
 
     return wrapper
 
