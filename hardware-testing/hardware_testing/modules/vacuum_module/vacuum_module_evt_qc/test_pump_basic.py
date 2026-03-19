@@ -1,4 +1,4 @@
-"""Test the pump basic"""
+"""Test the pump basic."""
 
 import asyncio
 from typing import List, Union

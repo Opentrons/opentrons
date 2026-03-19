@@ -1,4 +1,4 @@
-"""Test the vent"""
+"""Test the vent."""
 
 from typing import List, Union
 from hardware_testing.data import ui

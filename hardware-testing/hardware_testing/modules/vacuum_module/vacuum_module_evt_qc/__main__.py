@@ -20,7 +20,6 @@ from ...common.utils import find_module_port
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
-from opentrons.drivers.vacuum_module.types import *
 
 
 VACUUM_VID = 0x0483

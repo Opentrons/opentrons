@@ -1,4 +1,4 @@
-"""Test Pressure Sensor Basic"""
+"""Test Pressure Sensor Basic."""
 
 from typing import List, Union
 from hardware_testing.data import ui

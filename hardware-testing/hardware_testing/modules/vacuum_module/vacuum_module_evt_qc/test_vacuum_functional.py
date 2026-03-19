@@ -1,4 +1,4 @@
-"""Test the pressure regulation"""
+"""Test the pressure regulation."""
 
 import math
 import asyncio
