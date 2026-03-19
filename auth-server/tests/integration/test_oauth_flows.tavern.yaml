@@ -42,7 +42,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the refresh token to confirm that it's active
+  - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -52,9 +52,9 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
-        username: test_admin
-        scope: *returned_scope
+        active: false
+      strict:
+        - json:off
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -91,7 +91,7 @@ stages:
         username: test_admin
         scope: *returned_scope
 
-  - name: Introspect the new refresh token to confirm that it's active
+  - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -101,10 +101,9 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
-        username: test_admin
-        scope: *returned_scope
-
+        active: false
+      strict:
+        - json:off
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
 
