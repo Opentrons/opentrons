@@ -11,7 +11,7 @@ import {
 
 import { configReducer } from '/app/redux/config/reducer'
 
-import { AccordionKeyboard } from '.'
+import { AccordionKeyboard as AccordionKeyboardComponent } from '.'
 import { FullKeyboard } from '../SoftwareKeyboard'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -33,7 +33,7 @@ const store: Store<any> = legacy_createStore(
 
 const meta: Meta<typeof AccordionKeyboard> = {
   title: 'ODD/Atoms/AccordionKeyboard',
-  component: AccordionKeyboard,
+  component: AccordionKeyboardComponent,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
@@ -45,7 +45,7 @@ const meta: Meta<typeof AccordionKeyboard> = {
 }
 export default meta
 
-type Story = StoryObj<typeof AccordionKeyboard>
+type Story = StoryObj<typeof AccordionKeyboardComponent>
 
 const Keyboard = (): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -62,7 +62,7 @@ const Keyboard = (): JSX.Element => {
           width: '64rem',
         }}
       >
-        <AccordionKeyboard
+        <AccordionKeyboardComponent
           isOpen={isKeyboardOpen}
           onToggle={() => {
             setIsKeyboardOpen(prev => !prev)
@@ -73,12 +73,12 @@ const Keyboard = (): JSX.Element => {
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
-        </AccordionKeyboard>
+        </AccordionKeyboardComponent>
       </div>
     </div>
   )
 }
 
-export const FullSoftwareKeyboard: Story = {
+export const AccordionKeyboard: Story = {
   render: () => <Keyboard />,
 }
