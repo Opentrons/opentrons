@@ -101,7 +101,7 @@ class VacuumModule(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=(await driver.get_device_info()).to_dict(),
+            device_info=(await driver.get_device_info()),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,

@@ -11,7 +11,6 @@ from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
     PumpState,
-    VacuumModuleInfo,
     VacuumState,
     VentState,
 )
@@ -64,8 +63,9 @@ async def subject(
         poller=poller,
         device_info={
             "serial": "dummySerialFS",
-            "model": "a1",
+            "model": "nff",
             "version": "vacuum-fw",
+            "reset_reason": "0",
         },
         hw_control_loop=asyncio.get_running_loop(),
         execution_manager=mock_execution_manager,
@@ -73,7 +73,12 @@ async def subject(
         disconnected_callback=module_disconnected_callback,
     )
     decoy.when(await mock_driver.get_device_info()).then_return(
-        VacuumModuleInfo(fw="vacuum-fw", hw=HardwareRevision.NFF, sn="dummySerialFS")
+        {
+            "serial": "vacuum-fw",
+            "model": HardwareRevision.NFF.value,
+            "version": "dummySerialFS",
+            "reset_reason": "0",
+        }
     )
 
     await poller.start()
@@ -87,7 +92,7 @@ async def test_sim_state(subject: modules.VacuumModule) -> None:
     """It should forward state."""
     status = subject.device_info
     assert status["serial"] == "dummySerialFS"
-    assert status["model"] == "a1"
+    assert status["model"] == "nff"
     assert status["version"] == "vacuum-fw"
 
 
@@ -174,20 +179,18 @@ async def test_statusbar_event_handler(
 
 
 @pytest.mark.parametrize(
-    ("vent_state", "vent_state_bool"),
-    [(VentState.OPENED, False), (VentState.CLOSED, True)],
+    ("vent_state"),
+    [(VentState.OPENED), (VentState.CLOSED)],
 )
 async def test_set_vent_state(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
     decoy: Decoy,
     vent_state: VentState,
-    vent_state_bool: bool,
 ) -> None:
     """Ensure that the hardware controller calls the driver method w the correct arguments."""
-    vent_state
     await subject.set_vent_state(vent_state=vent_state)
-    decoy.verify(await mock_driver.set_vent_state(state=vent_state_bool))
+    decoy.verify(await mock_driver.set_vent_state(state=vent_state))
 
 
 @pytest.mark.parametrize(
