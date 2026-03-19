@@ -50,8 +50,8 @@ class Scope(enum.Enum):
     RUN_DATA_WRITE = (
         "run_data.write",
         (
-            "Create, update, or delete data that can be used as input to a run."
-            " Delete data that's been output by a run."
+            "Create, update, or delete data that's the input or output of a run,"
+            " such as images and CSV files."
         ),
     )
 
