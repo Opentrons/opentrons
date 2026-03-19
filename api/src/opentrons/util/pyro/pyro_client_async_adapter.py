@@ -1,12 +1,9 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 import asyncio
-import functools
-from types import CoroutineType
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
-from anyio import to_thread
 
 T = TypeVar("T")
 P = ParamSpec("P")

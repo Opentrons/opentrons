@@ -16,8 +16,8 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
-from opentrons.util.pyro_client_async_adapter import AsyncClientPyroObject
-from opentrons.util.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 
 
 @pytest.fixture
