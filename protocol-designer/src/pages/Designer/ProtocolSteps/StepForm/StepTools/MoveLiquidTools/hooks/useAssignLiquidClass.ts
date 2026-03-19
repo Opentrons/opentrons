@@ -111,49 +111,57 @@ export function useAssignLiquidClass(
   const [orderedLiquidClassOptions, setOrderedLiquidClassOptions] =
     useState<LiquidClassOption[]>(liquidClassOptions)
 
-  useEffect(() => {
-    if (aspirateLabwareLiquids != null) {
-      let runningLiquidClass: string | null = null
-      for (let i = 0; i < allWellsAdjustedForPipette.length; i++) {
-        const well = allWellsAdjustedForPipette[i]
-        const uniqueLiquidClassesInWell = new Set(
-          aspirateLabwareLiquids[well].groupIds.reduce<string[]>((acc, id) => {
-            const liquidClass = liquidEntities[id]?.liquidClass
-            return liquidClass != null ? [...acc, liquidClass] : acc
-          }, [])
-        )
-        if (uniqueLiquidClassesInWell.size > 1) {
-          // well contains more than one liquid class, so break
-          break
-        } else if (uniqueLiquidClassesInWell.size === 0) {
-          // well contains no liquid classes than one liquid class, so continue to next well
-          continue
-        } else {
-          // well contains a single liquid class, so assign
-          const liquidClass = Array.from(uniqueLiquidClassesInWell)[0]
-          if (
-            // liquid class differs from that of a previous well
-            liquidClass !== runningLiquidClass &&
-            runningLiquidClass != null
-          ) {
-            runningLiquidClass = null
+  useEffect(
+    () => {
+      if (aspirateLabwareLiquids != null) {
+        let runningLiquidClass: string | null = null
+        for (let i = 0; i < allWellsAdjustedForPipette.length; i++) {
+          const well = allWellsAdjustedForPipette[i]
+          const uniqueLiquidClassesInWell = new Set(
+            aspirateLabwareLiquids[well].groupIds.reduce<string[]>(
+              (acc, id) => {
+                const liquidClass = liquidEntities[id]?.liquidClass
+                return liquidClass != null ? [...acc, liquidClass] : acc
+              },
+              []
+            )
+          )
+          if (uniqueLiquidClassesInWell.size > 1) {
+            // well contains more than one liquid class, so break
             break
+          } else if (uniqueLiquidClassesInWell.size === 0) {
+            // well contains no liquid classes than one liquid class, so continue to next well
+            continue
           } else {
-            // first single liquid class encountered
-            runningLiquidClass = liquidClass
+            // well contains a single liquid class, so assign
+            const liquidClass = Array.from(uniqueLiquidClassesInWell)[0]
+            if (
+              // liquid class differs from that of a previous well
+              liquidClass !== runningLiquidClass &&
+              runningLiquidClass != null
+            ) {
+              runningLiquidClass = null
+              break
+            } else {
+              // first single liquid class encountered
+              runningLiquidClass = liquidClass
+            }
           }
         }
-      }
-      setOrderedLiquidClassOptions(
-        liquidClassOptions.sort((a, _) =>
-          a.value === (runningLiquidClass ?? 'none') ? -1 : 1
+        setOrderedLiquidClassOptions(
+          liquidClassOptions.sort((a, _) =>
+            a.value === (runningLiquidClass ?? 'none') ? -1 : 1
+          )
         )
-      )
-      if (currentFormIsPresaved || shouldUpdate) {
-        updateValue(runningLiquidClass ?? 'none')
+        if (currentFormIsPresaved || shouldUpdate) {
+          updateValue(runningLiquidClass ?? 'none')
+        }
       }
-    }
-  }, [formData[wellsField], formData[labwareField]])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formData[wellsField], formData[labwareField]]
+  )
 
   return orderedLiquidClassOptions
 }

@@ -9,7 +9,7 @@ import urllib.request
 import uuid
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Literal
 
 import pytest
 from _pytest.config import Config
@@ -210,17 +210,19 @@ def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
     }
 
 
-def _should_skip_dev_server(pytestconfig: pytest.Config) -> bool:
-    """Determine whether the dev server should be skipped (e.g., unit tests only)."""
-    markexpr = (pytestconfig.getoption("markexpr") or "").replace(" ", "").lower()
-    if not markexpr:
-        return False
-    # Skip when running exclusively with unit marker (like `-m unit`)
-    return "unit" in markexpr and "pde2e" not in markexpr
+PD_SERVER_PORTS = [4173, 4174, 4175]
+LL_SERVER_PORTS = [4176, 4177, 4178]
+
+# Substrings expected in the HTML <title> of each app.  Used by
+# ``_verify_server_identity`` to confirm the right application is serving.
+_APP_TITLE_FINGERPRINTS: dict[str, str] = {
+    "pd": "Protocol Designer",
+    "ll": "Labware Library",
+}
 
 
-def _is_server_running(url: str, timeout: int = 1) -> bool:
-    """Check if server is already running at the given URL."""
+def _is_http_server_running(url: str, timeout: int = 1) -> bool:
+    """Check if any HTTP server is already responding at the given URL."""
     try:
         urllib.request.urlopen(url, timeout=timeout)
         return True
@@ -228,34 +230,85 @@ def _is_server_running(url: str, timeout: int = 1) -> bool:
         return False
 
 
-def _find_running_server() -> str | None:
-    """Find if Protocol Designer server is running on any common port."""
-    ports_to_check = [4173, 4174, 4175]
+def _verify_server_identity(url: str, app: Literal["pd", "ll"], timeout: int = 2) -> bool:
+    """Return True if the server at *url* is serving the expected application.
+
+    Fetches the root page and checks that the HTML ``<title>`` contains the
+    fingerprint string for the requested app.  This prevents one app from
+    being mistaken for the other when they happen to share ports.
+    """
+    fingerprint = _APP_TITLE_FINGERPRINTS[app]
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
+            # Read a limited chunk — the <title> is near the top of the page.
+            body = resp.read(4096).decode("utf-8", errors="replace")
+            return fingerprint.lower() in body.lower()
+    except Exception:
+        return False
+
+
+def _find_running_server(
+    ports_to_check: list[int],
+    app: Literal["pd", "ll"] | None = None,
+) -> str | None:
+    """Find a running server on localhost for the given port list.
+
+    When *app* is provided the server's HTML title is checked to confirm
+    the correct application is serving.  A server that responds but serves
+    the wrong app is skipped with a warning.
+    """
     for port in ports_to_check:
         url = f"http://localhost:{port}"
-        if _is_server_running(url):
+        if _is_http_server_running(url):
+            if app is not None and not _verify_server_identity(url, app):
+                print(
+                    f"\n⚠️  Server on {url} is responding but does not look like "
+                    f"{app.upper()} (expected '{_APP_TITLE_FINGERPRINTS[app]}' in "
+                    f"<title>).  Skipping."
+                )
+                continue
             return url
     return None
 
 
-def _wait_for_server_ready(timeout: int = 240) -> str | None:
-    """Wait for the local Protocol Designer server to become available."""
+def _wait_for_server_ready(
+    ports_to_check: list[int],
+    timeout: int = 240,
+    app: Literal["pd", "ll"] | None = None,
+) -> str | None:
+    """Wait for a local server to become available on any of the given ports."""
     start = time.monotonic()
     while time.monotonic() - start < timeout:
-        running_server = _find_running_server()
+        running_server = _find_running_server(ports_to_check, app=app)
         if running_server:
             return running_server
         time.sleep(1)
     return None
 
 
-def _start_local_server() -> Generator[str, None, None]:
+def _get_suite_for_test(request: FixtureRequest) -> Literal["pd", "ll", "none"]:
+    """Infer which app a test targets based on markers."""
+    is_pd = request.node.get_closest_marker("pdE2E") is not None
+    is_ll = request.node.get_closest_marker("llE2E") is not None
+
+    if is_pd and is_ll:
+        raise RuntimeError(
+            "A test cannot be marked with both 'pdE2E' and 'llE2E'. Run these suites separately or split the test."
+        )
+    if is_pd:
+        return "pd"
+    if is_ll:
+        return "ll"
+    return "none"
+
+
+def _start_pd_server() -> Generator[str, None, None]:
     """Start or reuse a local Protocol Designer preview server."""
     skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
 
-    existing_server = _find_running_server()
+    existing_server = _find_running_server(PD_SERVER_PORTS, app="pd")
     if existing_server:
-        print(f"\n✓ Server already running on {existing_server}, skipping startup")
+        print(f"\n✓ Protocol Designer already running on {existing_server}, skipping startup")
         os.environ["PD_SERVER_URL"] = existing_server
         yield existing_server
         return
@@ -283,7 +336,7 @@ def _start_local_server() -> Generator[str, None, None]:
 
     # Wait for server to be ready, checking common ports
     max_attempts = 120
-    ports_to_try = [4173, 4174, 4175]
+    ports_to_try = PD_SERVER_PORTS
     output_lines = []
     server_url = None
 
@@ -309,6 +362,8 @@ def _start_local_server() -> Generator[str, None, None]:
             try:
                 test_url = f"http://localhost:{port}"
                 urllib.request.urlopen(test_url, timeout=1)
+                if not _verify_server_identity(test_url, "pd"):
+                    continue
                 print(f"✅ Preview server is ready on {test_url}")
                 server_url = test_url
                 break
@@ -351,14 +406,116 @@ def _start_local_server() -> Generator[str, None, None]:
                 server_process.stdout.close()
 
 
-@pytest.fixture(scope="session")
-def base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
-    """Return the resolved base URL for the Protocol Designer instance."""
-    if _should_skip_dev_server(pytestconfig):
-        fallback_url = os.environ.get("PD_SERVER_URL", "http://localhost:4173")
+def _start_ll_server() -> Generator[str, None, None]:
+    """Start or reuse a local Labware Library preview server."""
+    skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
+
+    existing_server = _find_running_server(LL_SERVER_PORTS, app="ll")
+    if existing_server:
+        print(f"\n✓ Labware Library already running on {existing_server}, skipping startup")
+        os.environ["LL_SERVER_URL"] = existing_server
+        yield existing_server
+        return
+
+    if skip_server:
+        fallback_url = os.environ.get("LL_SERVER_URL", "http://localhost:4176")
+        print(
+            "\n⚠️  SKIP_SERVER_START is set and no existing Labware Library server detected; "
+            "returning fallback URL without starting preview server."
+        )
+        os.environ["LL_SERVER_URL"] = fallback_url
         yield fallback_url
         return
 
+    print("\nStarting labware-library preview server...")
+    print("Building Labware Library (this may take 1-2 minutes)...")
+    print("=" * 80)
+
+    preferred_port = int(os.environ.get("LL_SERVER_PORT", str(LL_SERVER_PORTS[0])))
+    server_process = subprocess.Popen(
+        [
+            "make",
+            "-C",
+            "../labware-library",
+            "serve",
+            f"PORT={preferred_port}",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+
+    max_attempts = 120
+    ports_to_try = [preferred_port] + [p for p in LL_SERVER_PORTS if p != preferred_port]
+    output_lines: list[str] = []
+    server_url: str | None = None
+
+    for attempt in range(max_attempts):
+        if server_process.poll() is not None:
+            if server_process.stdout:
+                remaining_output = server_process.stdout.read()
+                if remaining_output:
+                    print(remaining_output, end="")
+                    output_lines.append(remaining_output)
+            print(f"\n❌ Labware Library server process exited with code {server_process.returncode}")
+            raise Exception("Labware Library preview server exited unexpectedly. Check output above for errors.")
+
+        if server_process.stdout and select.select([server_process.stdout], [], [], 0.1)[0]:
+            line = server_process.stdout.readline()
+            if line:
+                print(line, end="")
+                output_lines.append(line)
+
+        for port in ports_to_try:
+            try:
+                test_url = f"http://localhost:{port}"
+                urllib.request.urlopen(test_url, timeout=1)
+                if not _verify_server_identity(test_url, "ll"):
+                    continue
+                print(f"✅ Labware Library preview server is ready on {test_url}")
+                server_url = test_url
+                break
+            except Exception:
+                pass
+
+        if server_url:
+            break
+
+        if attempt > 0 and attempt % 10 == 0:
+            elapsed = attempt * 2
+            print(f"  Still waiting for Labware Library server... ({elapsed}s elapsed)")
+
+        if attempt == max_attempts - 1:
+            print(f"\n❌ Labware Library server failed to start after {max_attempts * 2} seconds")
+            server_process.kill()
+            raise Exception(
+                f"Labware Library preview server failed to start on any port: {ports_to_try}. "
+                f"Waited {max_attempts * 2} seconds."
+            )
+        time.sleep(2)
+
+    print("=" * 80)
+    assert server_url is not None
+    os.environ["LL_SERVER_URL"] = server_url
+
+    try:
+        yield server_url
+    finally:
+        print("\nStopping Labware Library dev server...")
+        server_process.terminate()
+        try:
+            server_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            print("⚠️  Labware Library preview server did not exit in time; sending SIGKILL.")
+            server_process.kill()
+            server_process.wait(timeout=5)
+        if server_process.stdout:
+            server_process.stdout.close()
+
+
+@pytest.fixture(scope="session")
+def pd_base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
+    """Return the resolved base URL for Protocol Designer tests."""
     env = os.environ.get("TEST_ENV", "local")
     environments = {
         "staging": "https://staging.designer.opentrons.com",
@@ -371,15 +528,47 @@ def base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
         yield remote_url
         return
 
-    yield from _start_local_server()
+    yield from _start_pd_server()
+
+
+@pytest.fixture(scope="session")
+def ll_base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
+    """Return the resolved base URL for Labware Library tests."""
+    env = os.environ.get("TEST_ENV", "local")
+    environments = {
+        "staging": "https://staging.labware.opentrons.com",
+        "prod": "https://labware.opentrons.com",
+    }
+
+    if env != "local":
+        remote_url = os.environ.get("LL_BASE_URL", environments.get(env, "https://labware.opentrons.com")).rstrip("/")
+        os.environ["LL_SERVER_URL"] = remote_url
+        yield remote_url
+        return
+
+    yield from _start_ll_server()
 
 
 @pytest.fixture
-def page(context: BrowserContext, base_url: str, request: FixtureRequest) -> Generator[Page, None, None]:
+def page(context: BrowserContext, request: FixtureRequest) -> Generator[Page, None, None]:
     """Configure page with base URL and rename recorded video using test name."""
     page = context.new_page()
     page.set_default_timeout(10000)
-    target_url = os.environ.get("PD_SERVER_URL", base_url)
+    suite = _get_suite_for_test(request)
+    if suite == "pd":
+        resolved_base_url = str(request.getfixturevalue("pd_base_url"))
+        target_url = os.environ.get("PD_SERVER_URL", resolved_base_url)
+        ports_to_check = PD_SERVER_PORTS
+        env_var = "PD_SERVER_URL"
+    elif suite == "ll":
+        resolved_base_url = str(request.getfixturevalue("ll_base_url"))
+        target_url = os.environ.get("LL_SERVER_URL", resolved_base_url)
+        ports_to_check = LL_SERVER_PORTS
+        env_var = "LL_SERVER_URL"
+    else:
+        target_url = os.environ.get("PD_SERVER_URL", "http://localhost:4173")
+        ports_to_check = PD_SERVER_PORTS
+        env_var = "PD_SERVER_URL"
 
     try:
         page.goto(target_url)
@@ -388,12 +577,18 @@ def page(context: BrowserContext, base_url: str, request: FixtureRequest) -> Gen
         if "ERR_CONNECTION_REFUSED" not in error_message:
             raise
 
-        print("\n⚠️  Connection refused, rechecking Protocol Designer server availability...")
-        restored_url = _wait_for_server_ready()
+        print("\n⚠️  Connection refused, rechecking server availability...")
+        if suite == "pd":
+            identity_app: Literal["pd", "ll"] | None = "pd"
+        elif suite == "ll":
+            identity_app = "ll"
+        else:
+            identity_app = None
+        restored_url = _wait_for_server_ready(ports_to_check, app=identity_app)
         if not restored_url:
             raise
 
-        os.environ["PD_SERVER_URL"] = restored_url
+        os.environ[env_var] = restored_url
         print(f"✓ Recovered server on {restored_url}, retrying navigation")
         page.goto(restored_url)
 

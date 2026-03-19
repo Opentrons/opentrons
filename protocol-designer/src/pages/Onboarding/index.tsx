@@ -369,13 +369,18 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
 
   // for resetting the onboarding page back to empty and page 1 when you hit "create new"
   //  from the nav bar
-  useEffect(() => {
-    if (location.state?.modalResetKey) {
-      formProps.reset()
-      setCurrentStepIndex(0)
-      dispatch(toggleNewProtocolModal(true))
-    }
-  }, [location.state?.modalResetKey])
+  useEffect(
+    () => {
+      if (location.state?.modalResetKey) {
+        formProps.reset()
+        setCurrentStepIndex(0)
+        dispatch(toggleNewProtocolModal(true))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.state?.modalResetKey]
+  )
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>

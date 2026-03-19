@@ -218,7 +218,7 @@ export function PipetteConfiguration({
                       }
                       isChecked={selectedTips.includes(option.value)}
                       labelText={removeOpentronsPhrases(option.name)}
-                      onClick={() => {
+                      onChange={() => {
                         const updatedTips = selectedTips.includes(option.value)
                           ? selectedTips.filter(v => v !== option.value)
                           : [...selectedTips, option.value]

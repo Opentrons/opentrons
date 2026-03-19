@@ -15,7 +15,7 @@ import {
 import type { CSSProperties, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
-import type { TipType } from './labwareInternals/types'
+import type { TipType, WellType } from './labwareInternals/types'
 import type {
   HighlightedWellLabels,
   WELL_LABEL_OPTIONS,
@@ -106,7 +106,7 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   showBorder?: boolean
   strokeColor?: string
-  tipStatusByWellName?: Record<string, TipType>
+  statusByWellName?: Record<string, TipType | WellType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
   fill?: CSSProperties['fill']
@@ -131,7 +131,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
     highlightedWellLabels,
     selectedWells,
     missingTips,
-    tipStatusByWellName,
+    statusByWellName,
     handleClickWell,
     selectedTipsByIndex,
     disabledWells,
@@ -200,7 +200,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         highlight={highlight}
         highlightShadow={highlightShadow}
         wellStroke={wellStroke}
-        tipStatusByWellName={tipStatusByWellName}
+        statusByWellName={statusByWellName}
         handleClickWell={handleClickWell}
         selectedTipsByIndex={selectedTipsByIndex}
         fill={fill}

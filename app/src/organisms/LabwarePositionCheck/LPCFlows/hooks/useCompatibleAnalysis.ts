@@ -57,48 +57,57 @@ export function useCompatibleAnalysis(
     mostRecentAnalysis?.commands ?? []
   )
 
-  useEffect(() => {
-    if (isFlex && mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
-      hasProcessedAnalysis.current = true
-      const runTimeParameterData =
-        runRecord != null ? getRunTimeParameterDataFromRun(runRecord) : {}
-      if (!isLocSeqAnalysisType) {
-        createProtocolAnalysis(
-          {
-            forceReAnalyze: true,
-            protocolKey: protocolId,
-            ...runTimeParameterData,
-          },
-          {
-            onSuccess: res => {
-              if (res != null) {
-                const data = res.data
-                // The last analysis is the most recent.
-                setCompatibleAnalysisId(data[data.length - 1].id as string)
-              }
+  useEffect(
+    () => {
+      if (
+        isFlex &&
+        mostRecentAnalysis != null &&
+        !hasProcessedAnalysis.current
+      ) {
+        hasProcessedAnalysis.current = true
+        const runTimeParameterData =
+          runRecord != null ? getRunTimeParameterDataFromRun(runRecord) : {}
+        if (!isLocSeqAnalysisType) {
+          createProtocolAnalysis(
+            {
+              forceReAnalyze: true,
+              protocolKey: protocolId,
+              ...runTimeParameterData,
             },
-          }
-        )
-      } else {
-        setCompatibleAnalysis(mostRecentAnalysis)
-      }
+            {
+              onSuccess: res => {
+                if (res != null) {
+                  const data = res.data
+                  // The last analysis is the most recent.
+                  setCompatibleAnalysisId(data[data.length - 1].id as string)
+                }
+              },
+            }
+          )
+        } else {
+          setCompatibleAnalysis(mostRecentAnalysis)
+        }
 
-      trackEvent({
-        name: ANALYTICS_LPC_ANALYSIS_KIND,
-        properties: {
-          runId,
-          kind: isLocSeqAnalysisType ? 'newAnalysis' : 'oldAnalysis',
-        },
-      })
-    }
-  }, [
-    mostRecentAnalysis,
-    isLocSeqAnalysisType,
-    protocolId,
-    runId,
-    trackEvent,
-    createProtocolAnalysis,
-  ])
+        trackEvent({
+          name: ANALYTICS_LPC_ANALYSIS_KIND,
+          properties: {
+            runId,
+            kind: isLocSeqAnalysisType ? 'newAnalysis' : 'oldAnalysis',
+          },
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      mostRecentAnalysis,
+      isLocSeqAnalysisType,
+      protocolId,
+      runId,
+      trackEvent,
+      createProtocolAnalysis,
+    ]
+  )
 
   return compatibleAnalysis
 }

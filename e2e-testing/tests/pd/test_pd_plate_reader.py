@@ -11,18 +11,19 @@ from eyes import Eyes
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes | None) -> None:
+def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
 
     # Create new Flex protocol setup
     ## Note This will need to be refactored to a reusable function later
-    test_flex_onboarding_workflow(page, base_url)
+    test_flex_onboarding_workflow(page, pd_base_url)
 
     # Configure deck hardware
     ## Snapshot: Validate Absorbance Plate Reader module configuration option
     plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
+    plate_reader_page.button_selection("Confirm")
     create_protocol.name_protocol("test")
     plate_reader_page.button_selection("Confirm")
 

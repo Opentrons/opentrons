@@ -22,6 +22,12 @@ interface DeckViewLabwareCommandSummariesProps {
   labwareEntitiesExtended: Record<string, LabwareEntityExtended>
   selectedRunTimeCommand?: RunTimeCommand
 }
+const STACKER_MOVE_MAP: Record<string, string> = {
+  A4: 'A3',
+  B4: 'B3',
+  C4: 'C3',
+  D4: 'D3',
+}
 
 export function DeckViewLabwareCommandSummaries(
   props: DeckViewLabwareCommandSummariesProps
@@ -46,7 +52,13 @@ export function DeckViewLabwareCommandSummaries(
         }
         const moduleUnderLabware = lw.stack.find(id => modules[id] != null)
         const slot = getSlotInLocationStack(lw.stack)
-        const slotPosition = getPositionFromSlotId(slot, deckDef)
+        // all other labware on module will be filtered out in line 49
+        // so this is a special-case scenario for the stacker
+        const stackerInSlot = Object.values(modules).some(
+          moduleTempProperties => moduleTempProperties.slot === slot
+        )
+        const slotForPositionMap = stackerInSlot ? STACKER_MOVE_MAP[slot] : slot
+        const slotPosition = getPositionFromSlotId(slotForPositionMap, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
           deckDef
@@ -72,7 +84,6 @@ export function DeckViewLabwareCommandSummaries(
           slot,
           moduleDef
         )
-
         const childSlotPosition: [number, number, number] = [
           slotPosition[0] + childSlotOffset.x,
           slotPosition[1] + childSlotOffset.y,

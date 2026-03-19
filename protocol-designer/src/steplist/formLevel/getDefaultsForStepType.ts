@@ -1,3 +1,4 @@
+import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import {
@@ -51,7 +52,7 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
-        primaryNozzle: null,
+        primaryNozzle: A1_NOZZLE,
         pushOut_checkbox: null,
         pushOut_volume: null,
         times: null,
@@ -101,6 +102,10 @@ export function getDefaultsForStepType(
         blowout_checkbox: false,
         blowout_flowRate: null,
         blowout_location: null,
+        blowout_mmFromBottom: null,
+        blowout_x_position: null,
+        blowout_y_position: null,
+        blowout_position_reference: 'well-top',
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         conditioning_checkbox: false,
         conditioning_volume: null,
@@ -142,7 +147,7 @@ export function getDefaultsForStepType(
         dropTip_wellNames: undefined,
         liquidClassesSupported: true,
         liquidClass: 'none',
-        nozzles: null,
+        nozzles: ALL,
         path: 'single',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
@@ -256,6 +261,20 @@ export function getDefaultsForStepType(
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,
+      }
+    case 'vacuum':
+      return {
+        moduleId: null,
+        programType: null, // state | profile
+        stateType: null, // vent | pump
+        modeType: null, // pressure | power
+        pressureMbar: null,
+        powerPercent: null,
+        pumpDurationCheckbox: null,
+        pumpDurationTime: null,
+        endingHoldVentCheckbox: null,
+        orderedProfileIds: [],
+        profileItemsById: {},
       }
     default:
       return {}

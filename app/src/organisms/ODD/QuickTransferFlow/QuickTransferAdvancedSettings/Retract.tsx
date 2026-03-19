@@ -7,10 +7,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
@@ -281,7 +281,15 @@ function RetractSettingComponent({
               ? t('withdraw_tip_from_liquid_aspirate')
               : t('withdraw_tip_from_liquid_dispense')}
           </StyledText>
-          <InputField type="number" value={speed} title={t('speed')} readOnly />
+          <TouchInputField
+            type="number"
+            value={speed}
+            label={t('speed')}
+            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+          />
         </Flex>
         <Flex
           paddingX={SPACING.spacing24}
@@ -311,11 +319,14 @@ function RetractSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="number"
             value={delayDuration}
-            title={t('delay_duration_s')}
+            label={t('delay_duration_s')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex
@@ -349,11 +360,11 @@ function RetractSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="text"
             value={position}
             error={positionError}
-            title={positionText}
+            label={positionText}
             readOnly
           />
           {positionError == null ? (

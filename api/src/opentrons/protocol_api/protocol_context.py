@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from typing import (
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -22,7 +24,9 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
+from ..config import feature_flags
 from . import validation
+from ._command_annotations import GroupedSteps
 from ._liquid import Liquid, LiquidClass
 from ._liquid_properties import build_transfer_properties
 from ._parameters import Parameters
@@ -42,6 +46,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractVacuumModuleCore,
 )
+from .csv_context import CSVContext
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
 from .instrument_context import InstrumentContext
@@ -1896,6 +1901,69 @@ class ProtocolContext(CommandPublisher):
                 saturation=saturation,
             )
         return None
+
+    @contextmanager
+    def group_steps(
+        self, name: str, description: Optional[str] = None
+    ) -> Iterator[None]:
+        """Group commands together for visualization in run previews and the run log.
+        This method is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement)
+        that uses the `with` syntax. All commands within this block will be grouped together.
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
+        annotation_id = self._core.start_step_grouping(name, description)
+        try:
+            yield
+        finally:
+            self._core.end_step_grouping(annotation_id)
+
+    def create_and_start_step_group(
+        self, name: str, description: Optional[str] = None
+    ) -> GroupedSteps:
+        """Starts a grouping of commands for visualization in run previews and the run log.
+        This returns a step group object which can then be closed by calling
+        [`end_group()`][opentrons.protocol_api.GroupedSteps.close_group].
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        if not feature_flags.allow_step_grouping():
+            raise NotImplementedError("This method is not yet implemented.")
+        annotation_id = self._core.start_step_grouping(name, description)
+        return GroupedSteps(
+            annotation_id=annotation_id,
+            protocol_core=self._core,
+            api_version=self._api_version,
+        )
+
+    @requires_version(2, 27)
+    def create_csv(
+        self,
+        filename: str,
+        columns: Optional[int] = None,
+        title_row: Optional[List[str]] = None,
+    ) -> CSVContext:
+        if not columns and not title_row:
+            raise ValueError("You must supply either columns or title_row.")
+        if columns and title_row:
+            raise ValueError("Use title row OR columns but not both")
+        csv_core = self._core.create_csv(
+            filename=filename,
+            columns=columns if columns else len(title_row),  # type: ignore [arg-type]
+        )
+        if title_row:
+            csv_core.write_row(title_row)
+        return CSVContext(core=csv_core, api_version=self._api_version)
 
 
 def _create_module_context(

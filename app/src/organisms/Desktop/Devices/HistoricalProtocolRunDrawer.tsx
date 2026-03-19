@@ -6,6 +6,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_END,
+  ALIGN_FLEX_START,
   Banner,
   BORDERS,
   Box,
@@ -164,7 +165,7 @@ export function HistoricalProtocolRunDrawer(
           color={COLORS.grey60}
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
         >
-          <Box width="33%">
+          <Box width="33%" minWidth="0">
             <LegacyStyledText
               forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
@@ -172,7 +173,7 @@ export function HistoricalProtocolRunDrawer(
               {t('name')}
             </LegacyStyledText>
           </Box>
-          <Box width="33%">
+          <Box width="33%" minWidth="0">
             <LegacyStyledText
               forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
@@ -180,7 +181,7 @@ export function HistoricalProtocolRunDrawer(
               {t('date')}
             </LegacyStyledText>
           </Box>
-          <Box width="34%">
+          <Box width="34%" minWidth="0">
             <LegacyStyledText
               forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
@@ -349,13 +350,18 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
   return (
     <Flex
       justifyContent={JUSTIFY_FLEX_START}
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing12}
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius4}
       gridGap={SPACING.spacing24}
     >
-      <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+      <Flex
+        width="33%"
+        minWidth="0"
+        gridGap={SPACING.spacing4}
+        alignItems={ALIGN_CENTER}
+      >
         <LegacyStyledText
           forwardedAs="p"
           css={css`
@@ -366,12 +372,12 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
           {name}
         </LegacyStyledText>
       </Flex>
-      <Box width="33%">
+      <Box width="33%" minWidth="0">
         <LegacyStyledText forwardedAs="p">
           {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
         </LegacyStyledText>
       </Box>
-      <Box width="34%">
+      <Box width="34%" minWidth="0">
         <DownloadCsvFileLink fileId={fileId} fileName={name} />
       </Box>
     </Flex>
@@ -407,21 +413,29 @@ function ImagesFileDataRow({
       borderRadius={BORDERS.borderRadius4}
       gridGap={SPACING.spacing24}
     >
-      <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+      <Flex
+        width="33%"
+        minWidth="0"
+        gridGap={SPACING.spacing4}
+        alignItems={ALIGN_CENTER}
+      >
         <LegacyStyledText
           forwardedAs="p"
           css={css`
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow-wrap: anywhere;
             overflow: ${OVERFLOW_HIDDEN};
-            text-overflow: ellipsis;
           `}
         >
           {buildImagesZipName()}
         </LegacyStyledText>
       </Flex>
-      <Box width="33%">
+      <Box width="33%" minWidth="0">
         <LegacyStyledText forwardedAs="p">{formattedRunTs}</LegacyStyledText>
       </Box>
-      <Box width="34%">
+      <Box width="34%" minWidth="0">
         <Link
           role="button"
           css={

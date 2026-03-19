@@ -147,7 +147,15 @@ jobs:
       - determine-deploy-config
       - build-pd
     runs-on: 'ubuntu-24.04'
-    if: always() && needs.build-pd.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # Uses GitHub Environments to require manual approval in the UI before production deploys.
+    # Configure required reviewers on the `pd-prod` environment.
+    environment:
+      name: ${{ needs.determine-deploy-config.outputs.environment == 'production' && 'pd-prod' || 'pd-non-prod' }}
+    if: >-
+      always() &&
+      needs.build-pd.result == 'success' &&
+      needs.determine-deploy-config.result == 'success' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       id-token: write
       contents: read

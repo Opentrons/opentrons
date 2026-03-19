@@ -4,7 +4,7 @@ from functools import partial
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from robot_server.service.json_api import (
+from server_utils.fastapi_utils.models.json_api import (
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,
 )

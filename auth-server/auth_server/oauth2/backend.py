@@ -9,8 +9,11 @@ import oauthlib.common
 import oauthlib.oauth2
 import pydantic
 
-from auth_server.users.scopes import Scope
-from auth_server.users.store import TEST_USERS, User
+from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
+
+from auth_server.users.models import UserResponse
+from auth_server.users.store import UserStore
+from auth_server.users.user_data_manager import password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -35,11 +38,11 @@ credentials" grant type.
 """
 
 
-def build() -> Backend:
+def build(user_store: UserStore) -> Backend:
     """Return a backend that our server can use to process OAuth 2 requests."""
     return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore()),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds())
+        _RequestValidator(_TokenStore(), user_store),
+        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
     )
 
 
@@ -68,15 +71,17 @@ _validate_call_config: pydantic.ConfigDict = {
 class _RequestValidator(oauthlib.oauth2.RequestValidator):
     """Our main bindings to oauthlib.
 
-    oauthlib calls these methods internally. We implement them with
+    oauthlib calls these methods internally. We implement them with our customizations
+    for storage and validation.
 
     oauthlib has poor support for type checking, even with the stubs from Typeshed.
     So we use `@pydantic.validate_call` liberally to protect ourselves from
     oauthlib calling us with argument types that we weren't expecting.
     """
 
-    def __init__(self, token_store: _TokenStore) -> None:
+    def __init__(self, token_store: _TokenStore, user_store: UserStore) -> None:
         self.__token_store = token_store
+        self.__user_store = user_store
         super().__init__()
 
     @override
@@ -100,12 +105,22 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Is the client allowed to access the requested scopes?"""
-        assert isinstance(request.user, User)
-        user: User = request.user
+        assert isinstance(request.user, UserResponse)
+        user: UserResponse = request.user
+
+        try:
+            for scope in scopes:
+                Scope.from_api_name(scope)
+        except UnrecognizedScopeError:
+            unrecognized_scope = True
+        else:
+            unrecognized_scope = False
+
+        if unrecognized_scope:
+            return False
 
         requested_scopes = set(scopes)
-        allowed_scopes = user.scopes
-        return requested_scopes.issubset(allowed_scopes)
+        return requested_scopes.issubset(user.scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -113,8 +128,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self, client_id: str, request: oauthlib.common.Request
     ) -> list[str]:
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
-        assert isinstance(request.user, User)
-        user: User = request.user
+        assert isinstance(request.user, UserResponse)
+        user: UserResponse = request.user
         return sorted(user.scopes)
 
     @override
@@ -150,11 +165,15 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
-        for user in TEST_USERS:
-            if user.username == username and user.password == password:
-                # Set `.user` per the oauthlib docs.
-                request.user = user  # type: ignore[attr-defined]
-                return True
+        user = self.__user_store.get(username)
+        # todo(tz, 2026-02-27): remove this check when we upgrade to sqlalchemy 2.0.
+        if (
+            user is not None
+            and user.hashed_password is not None
+            and password_hash.verify(password, user.hashed_password)
+        ):
+            request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
+            return True
         return False
 
     @override
@@ -189,12 +208,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
         scopes = cast(Any, request.scopes)
         assert _is_list_of_type(scopes, str)
-        scopes = [Scope(s) for s in scopes]
+        scopes = {Scope.from_api_name(s) for s in scopes}
 
         expires_in = token["expires_in"]
 
         user = request.user
-        assert isinstance(user, User)
+        assert isinstance(user, UserResponse)
 
         client_id = request.client_id
         assert isinstance(client_id, str)
@@ -205,47 +224,13 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self.__token_store.save(
             _TokenIssuance(
                 client_id=client_id,
-                username=user.username,
+                username=user.userName,
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
                 scopes=scopes,
             )
         )
-
-    @override
-    @pydantic.validate_call(config=_validate_call_config)
-    def validate_bearer_token(
-        self,
-        # Despite the docs, token can apparently be None if this is called
-        # through verify_request().
-        token: str | None,
-        scopes: list[str],
-        request: oauthlib.common.Request,
-    ) -> bool:
-        """Check if a bearer (access) token is allowed to access the given scopes."""
-        if token is None:
-            _log.info("The request provided no bearer token.")
-            return False
-
-        issuance = self.__token_store.find_active_access_token(token, now=_now())
-        if issuance is not None:
-            # find_active_access_token() already checked the expiration for us,
-            # so we just need to check scope membership.
-            requested_scopes = set(scopes)
-            issued_scopes = issuance.scopes
-            if requested_scopes.issubset(issued_scopes):
-                return True
-            else:
-                _log.info(
-                    f"The request provided a bearer token with insufficient scopes."
-                    f" Required: {requested_scopes}."
-                    f" Provided: {issued_scopes}."
-                )
-                return False
-        else:
-            _log.info("The request provided an expired or nonexistent bearer token.")
-            return False
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -263,11 +248,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=_now()
         )
         if issuance is not None:
-            user = next(
-                user for user in TEST_USERS if user.username == issuance.username
-            )
+            user = self.__user_store.get(issuance.username)
+            if user is None:
+                return False
             # Set `.user` per the oauthlib docs.
-            request.user = user  # type: ignore[attr-defined]
+            request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
             return True
         else:
             return False
@@ -284,7 +269,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         """
         token = self.__token_store.find_active_refresh_token(refresh_token, now=_now())
         assert token is not None
-        return sorted(token.scopes)
+        return sorted(s.api_name for s in token.scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -303,7 +288,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
             return {
                 "active": True,  # Always true because find_active_*_token() won't return inactive tokens.
-                "scope": " ".join(sorted(found_token.scopes)),
+                "scope": serialize_scopes(found_token.scopes),
                 "username": found_token.username,
             }
         else:
@@ -321,7 +306,7 @@ class _TokenIssuance:
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
-    scopes: list[Scope]
+    scopes: set[Scope]
 
 
 class _TokenStore:

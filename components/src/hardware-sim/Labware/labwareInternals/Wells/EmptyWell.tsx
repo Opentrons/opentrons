@@ -1,46 +1,90 @@
-import { DEFAULT_TIP_SIZE } from '../Tips/constants'
+import { COLORS } from '../../../../helix-design-system'
+import { LABWARE } from '../types'
+import { getWidthAndHeightOfWellSVG } from './utils'
 
-export function EmptyWell(props: { size?: string }): JSX.Element {
-  const { size } = props
-  const width = size ?? DEFAULT_TIP_SIZE
-  const height = size ?? DEFAULT_TIP_SIZE
+import type { LabwareWellMap } from '@opentrons/shared-data'
+import type { ParentType } from '../types'
+
+interface EmptyWellProps {
+  wellMap: LabwareWellMap
+  parentType: ParentType
+  size?: string
+}
+
+export function EmptyWell(props: EmptyWellProps): JSX.Element {
+  const { size, wellMap, parentType } = props
+  const firstWell = wellMap.A1
+  const isCircular = firstWell.shape === 'circular'
+  const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
+  const isLabware = parentType === LABWARE
+  const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
+  const circularDimension = 20
+  const viewBoxWidth = isCircular ? circularDimension : width
+  const viewBoxHeight = isCircular ? circularDimension : height
+  const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
+  const lineStrokeWidth = isCircular ? 2 : 1
+  const lineProps = isLabware
+    ? {
+        x1: 0,
+        y1: 0,
+        x2: viewBoxWidth,
+        y2: viewBoxHeight,
+      }
+    : {
+        x1: viewBoxWidth,
+        y1: 0,
+        x2: 0,
+        y2: viewBoxHeight,
+      }
   return (
     <svg
-      width={width}
-      height={height}
+      width={size ?? width}
+      height={size ?? height}
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
     >
       <mask
-        id="mask0_2315_3507"
-        style={{ maskType: 'alpha' }}
+        id="emptyWellMask"
         maskUnits="userSpaceOnUse"
         x="0"
         y="0"
-        width="20"
-        height="20"
+        width={isCircular ? circularDimension : width}
+        height={isCircular ? circularDimension : height}
       >
-        <path
-          d="M10 0.5C15.2467 0.5 19.5 4.7533 19.5 10C19.5 15.2467 15.2467 19.5 10 19.5C4.7533 19.5 0.5 15.2467 0.5 10C0.5 4.7533 4.7533 0.5 10 0.5Z"
-          fill="#CBCCCC"
-          stroke="black"
-        />
+        {isCircular ? (
+          <circle cx="10" cy="10" r="9.5" fill="white" />
+        ) : (
+          <rect x="0" y="0" width={width} height={height} fill="white" />
+        )}
       </mask>
-      <g mask="url(#mask0_2315_3507)">
-        <path
-          d="M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z"
-          fill="#CBCCCC"
-          stroke="#737578"
-          strokeWidth="2"
-        />
+
+      <g mask="url(#emptyWellMask)">
+        {isCircular ? (
+          <circle
+            cx="10"
+            cy="10"
+            r="9"
+            fill="#CBCCCC"
+            stroke={outlineColor}
+            strokeWidth="3"
+          />
+        ) : (
+          <rect
+            x="0"
+            y="0"
+            width={width}
+            height={height}
+            fill="#CBCCCC"
+            stroke={outlineColor}
+            strokeWidth="2"
+          />
+        )}
+
         <line
-          x1="24.7071"
-          y1="-4.29289"
-          x2="-3.29289"
-          y2="23.7071"
-          stroke="#737578"
-          strokeWidth="2"
+          {...lineProps}
+          stroke={outlineColor}
+          strokeWidth={lineStrokeWidth}
         />
       </g>
     </svg>

@@ -14,11 +14,13 @@
 .header_icons {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--spacing-4);
 }
 
 .header_text {
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
 }
 
@@ -30,6 +32,7 @@
 
 .header_container {
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -37,4 +40,12 @@
   width: 100%;
   padding-top: var(--spacing-8);
   text-align: center;
+}
+
+.tag_container {
+  height: 1.5rem;
+}
+
+.full_width_divider {
+  width: 100%;
 }

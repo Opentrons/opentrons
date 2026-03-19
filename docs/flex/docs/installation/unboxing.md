@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Unboxing"
+description: "Step-by-step unboxing, assembly, and initial preparation of your Flex."
 ---
 
 Congratulations! Your Opentrons Flex has arrived and you've prepared a space for it in your lab. Let's open that monster crate, remove the robot, and prepare it for operation. The information in this section provides a parts list and instructions that walk you through the steps required to get the Flex unboxed, set up, and ready for use. We've divided the setup procedure into three parts:

@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 from __future__ import annotations
 
 import logging
@@ -44,7 +45,9 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.types import StagingSlotName
 
-from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from . import (
+    validation,
+)  # isort: skip  # noqa: I001  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -686,39 +689,49 @@ class ThermocyclerContext(ModuleContext):
         block_max_volume: Optional[float] = None,
     ) -> None:
         """
-        Set the target temperature for the well block, in °C.
+                Set the target temperature for the well block, in °C.
 
-        Args:
-            temperature: A value between 4 and 99, representing the target
-                temperature in °C.
-            hold_time_minutes: The number of minutes to hold, after reaching
-                `temperature`, before proceeding to the next command. If
-                `hold_time_seconds` is also specified, the times are added
-                together.
-            hold_time_seconds: The number of seconds to hold, after reaching
-                `temperature`, before proceeding to the next command. If
-                `hold_time_minutes` is also specified, the times are added
-                together.
-            block_max_volume: The greatest volume of liquid contained in any
-                individual well of the loaded labware, in µL. If not specified,
-                the default is 25 µL.
+                Args:
+                    temperature: A value between 4 and 99, representing the target
+                        temperature in °C.
+                    hold_time_minutes: The number of minutes to hold, after reaching
+                        `temperature`, before proceeding to the next command. If
+                        `hold_time_seconds` is also specified, the times are added
+                        together.
+                    hold_time_seconds: The number of seconds to hold, after reaching
+                        `temperature`, before proceeding to the next command. If
+                        `hold_time_minutes` is also specified, the times are added
+                        together.
+                    block_max_volume: The greatest volume of liquid contained in any
+                        individual well of the loaded labware, in µL. If not specified,
+                        the default is 25 µL.
+                    ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                        in °C/second. The acceptable range is 0.01–2 °C/second
+                        to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                        the block will heat or cool as quickly as possible to reach the set temperature.
 
-                *Changed in version 2.27:* After API
-                version 2.27 it will attempt to use the liquid tracking of the
-                labware first and then fall back to the 25 if there is no
-                probed or loaded liquid.
+                        *Changed in version 2.27:* In API version
+                        2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+                        liquid information.
 
-        !!! note
-            If `hold_time_minutes` and `hold_time_seconds` are not specified,
-            the Thermocycler will proceed to the next command immediately after
-            `temperature` is reached.
+        <<<<<<< HEAD
+                        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        =======
+                        *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        >>>>>>> chore_release-9.0.0
+                        the block heats or cools.
+
+                !!! note
+                    If `hold_time_minutes` and `hold_time_seconds` are not specified,
+                    the Thermocycler will proceed to the next command immediately after
+                    `temperature` is reached.
         """
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 28) and ramp_rate:
+        if self._api_version < APIVersion(2, 29) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
@@ -740,25 +753,36 @@ class ThermocyclerContext(ModuleContext):
     ) -> Task:
         """Sets the target temperature for the Thermocycler Module's well block, in °C.
 
-        Returns a [`Task`][opentrons.protocol_api.Task] object that represents concurrent heating.
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+                Returns a [`Task`][opentrons.protocol_api.Task] object that represents concurrent heating.
+                Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+                to wait for the preheat to complete.
 
-        Args:
-            temperature: A value between 4 and 99, representing the target
-                temperature in °C.
-            block_max_volume: The greatest volume of liquid contained in any
-                individual well of the loaded labware, in µL. If not specified,
-                the default is 25 µL.
+                Args:
+                    temperature: A value between 4 and 99, representing the target
+                        temperature in °C.
+                    block_max_volume: The greatest volume of liquid contained in any
+                        individual well of the loaded labware, in µL. If not specified,
+                        the default is 25 µL.
+                    ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                        in °C/second. The acceptable range is 0.01–2 °C/second
+                        to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                        the block will heat or cool as quickly as possible to reach the set temperature.
 
-        *Changed in version 2.27:* In API version
-        2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
-        liquid information.
+                *Changed in version 2.27:* In API version
+                2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+                liquid information.
+
+        <<<<<<< HEAD
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        =======
+                *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        >>>>>>> chore_release-9.0.0
+                the block heats or cools.
         """
 
         if block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 28) and ramp_rate:
+        if self._api_version < APIVersion(2, 29) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
@@ -1847,7 +1871,7 @@ class VacuumModuleContext(ModuleContext):
     _core: VacuumModuleCore
 
     @property
-    @requires_version(2, 28)
+    @requires_version(2, 29)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()

@@ -69,6 +69,12 @@ export function useRecoveryOptionCopy(): (
         return t('replace_labware_in_stacker_and_retry')
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
         return t('load_labware_onto_shuttle_and_retry')
+      case RECOVERY_MAP.VACUUM_CARBOY_FULL_RETRY.ROUTE:
+        return t('empty_waste_and_retry')
+      case RECOVERY_MAP.VACUUM_CARBOY_FULL_SKIP.ROUTE:
+        return t('empty_waste_and_skip')
+      case RECOVERY_MAP.VACUUM_PRESSURE_NOT_REACHED_RETRY.ROUTE:
+        return t('inspect_module_and_retry')
       default:
         return 'Unknown action'
     }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -39,6 +40,19 @@ interface LabwareSlotContainerProps {
   pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
+
+// TODO: this is a temp fix in an interest of time
+// but we should investigate why the dropTip and pickUpTip
+// commands are showing the well container
+const HIDE_WELL_CONTAINER_COMMAND_TYPES = [
+  'comment',
+  'waitForDuration',
+  'waitForResume',
+  'waitForTasks',
+  'dropTip',
+  'pickUpTip',
+]
+
 export function LabwareSlotContainer(
   props: LabwareSlotContainerProps
 ): JSX.Element {
@@ -53,6 +67,7 @@ export function LabwareSlotContainer(
     moduleEntities,
   } = props
   const { t } = useTranslation('protocol_visualization')
+  const [hoveredWellName, setHoveredWellName] = useState<string | null>(null)
   const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = commands.find(
     command =>
@@ -70,7 +85,15 @@ export function LabwareSlotContainer(
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const { params } = currentCommand
+  const { params, commandType } = currentCommand
+  const commandWellName =
+    'wellName' in params && typeof params.wellName === 'string'
+      ? params.wellName
+      : null
+  const commandLabwareId =
+    'labwareId' in params && typeof params.labwareId === 'string'
+      ? params.labwareId
+      : null
   const labwareDef = labwareEntities[topLabwareOnSlotId].def
   const labwareDisplayName = labwareDef.metadata.displayName
 
@@ -91,10 +114,23 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
+  const selectedWellName =
+    commandLabwareId === topLabwareOnSlotId && commandWellName != null
+      ? commandWellName
+      : activeWellName
+  const shouldShowWellContainer =
+    selectedWellName != null &&
+    !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
   const wellGroup: WellGroup | null =
-    activeWellName != null
+    selectedWellName != null
       ? {
-          [activeWellName]: null,
+          [selectedWellName]: null,
+        }
+      : null
+  const hoveredWellGroup: WellGroup | null =
+    hoveredWellName != null
+      ? {
+          [hoveredWellName]: null,
         }
       : null
   const { wells } = labwareDef
@@ -104,8 +140,8 @@ export function LabwareSlotContainer(
       ? liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
       : null
   const labwareLocationLiquidState =
-    activeWellName != null
-      ? liquidState.labware[topLabwareOnSlotId]?.[activeWellName]
+    selectedWellName != null
+      ? liquidState.labware[topLabwareOnSlotId]?.[selectedWellName]
       : null
 
   const tipMaxVolume =
@@ -129,12 +165,12 @@ export function LabwareSlotContainer(
 
   return (
     <>
-      {activeWellName != null ? (
+      {shouldShowWellContainer ? (
         <WellContainer
           wells={wells}
           params={params}
-          activeWellName={activeWellName}
-          wellColor={wellFill[activeWellName]}
+          selectedWellName={selectedWellName}
+          wellColor={wellFill[selectedWellName]}
           labwareLocationLiquidState={labwareLocationLiquidState}
           pipetteLocationLiquidState={pipetteLocationLiquidState}
           liquids={liquids}
@@ -195,12 +231,15 @@ export function LabwareSlotContainer(
                         definition={labwareDef}
                         positioningMode="passThrough"
                         wellFill={wellFill}
-                        highlightedWells={wellGroup}
+                        highlightedWells={hoveredWellGroup}
+                        selectedWells={wellGroup}
                         onMouseLeaveWell={mouseEventArgs => {
+                          setHoveredWellName(null)
                           handleMouseLeaveWell(mouseEventArgs)
                           handleMouseLeaveWell(mouseEventArgs.event)
                         }}
                         onMouseEnterWell={({ wellName, event }) => {
+                          setHoveredWellName(wellName)
                           if (wellContents != null) {
                             makeHandleMouseEnterWell(
                               wellName,

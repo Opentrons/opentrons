@@ -1,9 +1,7 @@
 import {
   ALL,
-  COLUMN,
   getIsTiprack,
   getPositionFromSlotId,
-  SINGLE,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
@@ -12,6 +10,7 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import {
   LABEL_BORDER_WIDTH_PX,
   LABEL_PLACEMENT_BOTTOM,
@@ -27,6 +26,7 @@ import type {
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -75,14 +75,14 @@ export const getViewboxFromSelectedLabware = (
 }
 
 export const getHoveredOffsetFromWell = (args: {
-  selectedTiprackId: string
+  selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   wellName: string | null
   pipetteSpec: PipetteV2Specs
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     wellName,
     pipetteSpec,
@@ -96,14 +96,14 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
+  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null) {
+  if (wellName == null || labware.def.wells[wellName] == null) {
     return {
       x: 0,
       y: 0,
     }
   }
-  const labware = labwareState[selectedTiprackId ?? '']
   const well = labware.def.wells[wellName]
   return {
     x: well.x + xOffset,
@@ -111,8 +111,23 @@ export const getHoveredOffsetFromWell = (args: {
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(-2, -1)
+export const getColumnFromWellName = (wellName: string): string => {
+  const match = wellName.match(/^[A-Za-z]+(\d+)/)
+  if (match && match.length > 1) {
+    return match[1]
+  }
+  console.error('No column found for well name', wellName)
+  return ''
+}
+
+export const getRowFromWellName = (wellName: string): string => {
+  const rowLetter = wellName.match(/^[A-Za-z]+/)?.[0]
+  if (rowLetter) {
+    return rowLetter
+  }
+  console.error('No row found for well name', wellName)
+  return ''
+}
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
@@ -176,24 +191,23 @@ export const getAllWellsInColumn = (
   )
 }
 
-export const getAffectedWells = (args: {
-  wellName: string | null
+export const getAllWellsInRow = (
+  wellName: string,
   labwareDef: LabwareDefinition
-  channels: number
-  nozzles: NozzleConfigurationStyle
-}): string[] => {
-  const { wellName, labwareDef, channels, nozzles } = args
-  if (wellName == null) {
+): string[] => {
+  const rowLetter = getRowFromWellName(wellName)
+  const wellOrdering = labwareDef.ordering
+  if (rowLetter === null) {
     return []
   }
-  if (channels === 1 || nozzles === SINGLE) {
-    return [wellName]
-  } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
-    return getAllWellsInColumn(wellName, labwareDef)
-  } else if (channels === 96) {
-    return Object.keys(labwareDef.wells)
+  const firstRow = wellOrdering[0]
+  const colIndex = firstRow.findIndex(well => well.startsWith(rowLetter))
+
+  if (colIndex === -1) {
+    return []
   }
-  return []
+
+  return wellOrdering.map(row => row[colIndex])
 }
 
 export const getValidTiprackIds = (args: {
@@ -201,7 +215,7 @@ export const getValidTiprackIds = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
   numPickups: number
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   invariantContext: InvariantContext
   robotState: TimelineFrame | null
   tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
@@ -264,12 +278,13 @@ export const getValidTiprackIds = (args: {
                 })
               : true
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
-            const allAffectedWells = getAffectedWells({
+            const allAffectedWells = getEntireWellSelection(
               wellName,
-              labwareDef: tiprackDef,
-              channels,
+              tiprackDef.ordering,
               nozzles,
-            })
+              primaryNozzle,
+              channels
+            )
             addedWells.push(...allAffectedWells)
             foundSafePickup = true
             break // Found a safe pickup for this iteration, move to next pickup

@@ -92,7 +92,6 @@ function createTransports(): Transport[] {
         winston.format.printf(info => {
           const { level, message, timestamp, label } = info
           const time = timeFromStamp(timestamp as string)
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           const print = `${time} [${label}] ${level}: ${message}`
           const meta = inspect(info.meta, { depth: 6 })
 

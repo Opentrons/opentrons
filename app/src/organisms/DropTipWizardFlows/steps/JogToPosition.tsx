@@ -33,19 +33,21 @@ export const JogToPosition = ({
 
   return (
     <>
-      <Flex css={TITLE_SECTION_STYLE}>
-        <StyledText
-          desktopStyle="headingSmallBold"
-          oddStyle="level4HeaderSemiBold"
-        >
-          {t('position_the_pipette')}
-        </StyledText>
-        <LegacyStyledText forwardedAs="p">
-          {currentRoute === DT_ROUTES.BLOWOUT
-            ? t('position_and_blowout')
-            : t('position_and_drop_tip')}
-        </LegacyStyledText>
-      </Flex>
+      {!isOnDevice && (
+        <Flex css={TITLE_SECTION_STYLE}>
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {t('position_the_pipette')}
+          </StyledText>
+          <LegacyStyledText forwardedAs="p">
+            {currentRoute === DT_ROUTES.BLOWOUT
+              ? t('position_and_blowout')
+              : t('position_and_drop_tip')}
+          </LegacyStyledText>
+        </Flex>
+      )}
       <Flex
         css={
           modalStyle === 'simple'
@@ -53,11 +55,7 @@ export const JogToPosition = ({
             : INTERVENTION_CONTENT_SECTION_STYLE
         }
       >
-        <JogControls
-          jog={handleJog}
-          isOnDevice={isOnDevice}
-          height={isOnDevice ? '80%' : '100%'}
-        />
+        <JogControls jog={handleJog} isOnDevice={isOnDevice} height="100%" />
         <DropTipFooterButtons
           primaryBtnOnClick={proceed}
           primaryBtnTextOverride={t('shared:confirm_position')}

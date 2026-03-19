@@ -14,6 +14,15 @@ import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 
 vi.mock('electron-store')
 vi.mock('../../log')
+vi.mock('../../config', () => ({
+  getConfig: vi.fn((path?: string) => {
+    if (path === 'devInternal') {
+      return {}
+    } else {
+      return undefined
+    }
+  }),
+}))
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string

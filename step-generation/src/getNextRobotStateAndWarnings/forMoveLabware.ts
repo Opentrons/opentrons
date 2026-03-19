@@ -155,15 +155,25 @@ export function forMoveLabware(
       }
     }
   }
-
   const newLocationStack: string[] = []
   if (locationIsOffDeck(newLocation)) {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
-    newLocationStack.push(
-      newLocation.moduleId,
-      modules[newLocation.moduleId].slot
-    )
+    //  NOTE: this special-case is only for PV. PD should not
+    //  be affected. PV's newLocation comes from the command.params
+    //  which includes moduleId when moving a labware onto the stacker shuttle
+    //  but for PD, the newLocation does not include the moduleId
+    if (
+      modules[newLocation.moduleId].moduleState.type ===
+      FLEX_STACKER_MODULE_TYPE
+    ) {
+      newLocationStack.push(modules[newLocation.moduleId].slot)
+    } else {
+      newLocationStack.push(
+        newLocation.moduleId,
+        modules[newLocation.moduleId].slot
+      )
+    }
   } else if ('slotName' in newLocation) {
     // need to handle slotName being a labwareId or a slotId (misleading property name)
     const { slotName } = newLocation

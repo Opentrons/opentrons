@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Settings"
+description: "Touchscreen settings for network, display, and robot configuration."
 ---
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
@@ -50,6 +51,9 @@ Set the language used by the touchscreen to Chinese or English.
 ### Network Settings
 
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
+
+!!! Note
+    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
 
 ### Privacy
 

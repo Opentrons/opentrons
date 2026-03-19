@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse
 from mock import patch
 
 from opentrons.system import camera
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
@@ -15,7 +16,6 @@ from robot_server.runs.run_data_manager import (
     RunOrchestratorStore,
     RunStore,
 )
-from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 from robot_server.service.legacy.routers.camera import (
     add_camera_capture_image_settings,

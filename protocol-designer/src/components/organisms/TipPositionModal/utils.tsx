@@ -26,6 +26,7 @@ export function getDefaultMmFromEdge(args: {
 
   switch (name) {
     case 'mix_mmFromBottom':
+    case 'blowout_mmFromBottom':
     case 'dispense_mmFromBottom':
     case 'dispense_delay_mmFromBottom':
     case 'aspirate_delay_mmFromBottom':

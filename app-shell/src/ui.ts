@@ -63,7 +63,6 @@ export function createUi(): BrowserWindow {
 
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // eslint-disable-next-line no-void
     void shell.openExternal(url)
     return { action: 'deny' }
   })

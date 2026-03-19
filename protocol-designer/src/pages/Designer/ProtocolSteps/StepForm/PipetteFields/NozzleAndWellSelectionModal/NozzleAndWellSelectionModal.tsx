@@ -3,7 +3,13 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ModalShell, PrimaryButton, WizardHeader } from '@opentrons/components'
+import {
+  InlineNotification,
+  ModalShell,
+  PrimaryButton,
+  SecondaryButton,
+  WizardHeader,
+} from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -43,13 +49,34 @@ export function NozzleAndWellSelectionModal(
   const { t } = useTranslation('protocol_steps')
   const robotType = useSelector(getRobotType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
+  const [showError, setShowError] = useState<boolean>(false)
   const isMixStep = stepType === 'mix'
+  const stepFieldMap: Record<number, keyof FieldPropsByName> = {
+    1: isMixStep ? 'wells' : 'aspirate_wells',
+    2: 'dispense_wells',
+  }
+  const activeFieldKey = stepFieldMap[currentStepIndex]
+  const wellValues = propsForFields[activeFieldKey]?.value as []
+
   const handleContinue = (): void => {
-    setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+    setShowError(false)
+    if (currentStepIndex !== 0 && activeFieldKey !== null) {
+      if (wellValues.length === 0) {
+        setShowError(true)
+      } else {
+        setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+      }
+    } else {
+      setCurrentStepIndex(currentStepIndex => currentStepIndex + 1)
+    }
+  }
+  const handleBack = (): void => {
+    setCurrentStepIndex(currentStepIndex => currentStepIndex - 1)
   }
   const handleClose = (): void => {
     showModal(false)
   }
+
   const nozzleAndWellSelectionBaseModalProps = {
     robotType,
     propsForFields,
@@ -57,6 +84,7 @@ export function NozzleAndWellSelectionModal(
   const wellSelectorBaseProps = {
     ...nozzleAndWellSelectionBaseModalProps,
     deckSetup,
+    pipetteSpecs,
   }
   function getStepComponent(): JSX.Element {
     switch (currentStepIndex) {
@@ -99,6 +127,19 @@ export function NozzleAndWellSelectionModal(
     : false
   const footerElement = (
     <div className={styles.modal_footer}>
+      {showError ? (
+        <InlineNotification
+          type="error"
+          message={t('well_selection_error')}
+          hug
+        />
+      ) : null}
+      {currentStepIndex !== 0 ? (
+        <SecondaryButton onClick={handleBack}>
+          {t('shared:go_back')}
+        </SecondaryButton>
+      ) : null}
+
       <PrimaryButton
         onClick={isLastStep || isLastStepOfMix ? handleClose : handleContinue}
       >

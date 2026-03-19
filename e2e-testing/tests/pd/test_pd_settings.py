@@ -12,7 +12,7 @@ from automation.pd_pages.settings_page import SettingsPage
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_settings_toggle_persistence(page: Page, base_url: str) -> None:
+def test_settings_toggle_persistence(page: Page, pd_base_url: str) -> None:
     """Test that settings toggles persist across navigation.
 
     This test verifies that:

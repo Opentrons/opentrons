@@ -8,7 +8,9 @@ import sqlalchemy
 
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.persistence_directory import make_migration_orchestrator
+from robot_server.persistence.manage_persistence_directory import (
+    make_migration_orchestrator,
+)
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
 )
@@ -145,11 +147,13 @@ EXPECTED_STATEMENTS_LATEST = [
         annotation_id VARCHAR NOT NULL,
         name VARCHAR NOT NULL,
         description VARCHAR,
-        source VARCHAR(6) NOT NULL,
+        source VARCHAR(13) NOT NULL,
+        parent_id VARCHAR,
         params VARCHAR,
         PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, parent_id) REFERENCES command_annotation (run_id, annotation_id) ON DELETE CASCADE,
         FOREIGN KEY(run_id) REFERENCES run (id),
-        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('user', 'system'))
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('userCommand', 'systemCommand'))
     )
     """,
     """
@@ -168,12 +172,6 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
     """
     CREATE UNIQUE INDEX ix_c2a_run_id_command_id_annotation_id ON command_to_annotation (run_id, command_id, annotation_id)
-    """,
-    """
-    CREATE UNIQUE INDEX ix_c2a_run_id_annotation_id ON command_to_annotation (run_id, annotation_id)
-    """,
-    """
-    CREATE UNIQUE INDEX ix_c2a_run_id_command_id ON command_to_annotation (run_id, command_id)
     """,
     """
     CREATE TABLE data_files (

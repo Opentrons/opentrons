@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, RobotInfoLabel, StyledText } from '@opentrons/components'
-import { EMPTY } from '@opentrons/step-generation'
+import { RobotInfoLabel } from '@opentrons/components'
 
 import styles from './tipdisposalslot.module.css'
 
@@ -9,36 +8,42 @@ import type { RobotState } from '@opentrons/step-generation'
 
 interface TipDisposalSlotProps {
   robotState: RobotState
+  disposalType: 'trash' | 'wasteChute'
 }
 
 export function TipDisposalSlot({
   robotState,
+  disposalType,
 }: TipDisposalSlotProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
-  const { tipState } = robotState
-  const totalEmptyTips = Object.values(tipState.tipracks).reduce(
-    (sum, rack) =>
-      sum +
-      Object.values(rack).reduce(
-        (rackSum, tipVal) => rackSum + (tipVal === EMPTY ? 1 : 0),
-        0
-      ),
-    0
-  )
+  // temporary commenting out for Rs 9.0.0
+  // const totalEmptyTips = Object.values(tipState.tipracks).reduce(
+  //   (sum, rack) =>
+  //     sum +
+  //     Object.values(rack).reduce(
+  //       (rackSum, tipVal) => rackSum + (tipVal === EMPTY ? 1 : 0),
+  //       0
+  //     ),
+  //   0
+  // )
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <RobotInfoLabel deckLabel={t('trash')} />
+        <RobotInfoLabel
+          deckLabel={disposalType === 'trash' ? t('trash') : t('waste_chute')}
+        />
       </div>
       <div className={styles.main_content}>
-        <div className={styles.text_container}>
+        {/* <div className={styles.text_container}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-            {t('tips_in_trash')}
+            {disposalType === 'trash'
+              ? t('tips_in_trash')
+              : t('tips_in_waste_chute')}
           </StyledText>
           <StyledText desktopStyle="captionRegular">
             {t('remaining_tips', { remaining: totalEmptyTips })}
           </StyledText>
-        </div>
+        </div> */}
         {/* Note this is for phase-2
           <div className={styles.text_container}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>

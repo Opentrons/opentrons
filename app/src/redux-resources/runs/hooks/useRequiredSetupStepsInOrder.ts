@@ -104,26 +104,31 @@ export function useRequiredSetupStepsInOrder({
     protocolAnalysis?.labware.length === 0 &&
     protocolAnalysis?.liquids.length === 0
 
-  useEffect(() => {
-    const applicable = keysInOrder(
-      protocolAnalysis,
-      noLwOffsetsInRun,
-      noLabwareOrLiquidsInRun
-    )
-    dispatch(
-      updateRunSetupStepsRequired(runId, {
-        ...ALL_STEPS_IN_ORDER.reduce<
-          UpdateRunSetupStepsRequiredAction['payload']['required']
-        >(
-          (acc, thiskey) => ({
-            ...acc,
-            [thiskey]: applicable.orderedApplicableSteps.includes(thiskey),
-          }),
-          {}
-        ),
-      })
-    )
-  }, [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun])
+  useEffect(
+    () => {
+      const applicable = keysInOrder(
+        protocolAnalysis,
+        noLwOffsetsInRun,
+        noLabwareOrLiquidsInRun
+      )
+      dispatch(
+        updateRunSetupStepsRequired(runId, {
+          ...ALL_STEPS_IN_ORDER.reduce<
+            UpdateRunSetupStepsRequiredAction['payload']['required']
+          >(
+            (acc, thiskey) => ({
+              ...acc,
+              [thiskey]: applicable.orderedApplicableSteps.includes(thiskey),
+            }),
+            {}
+          ),
+        })
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun]
+  )
   return protocolAnalysis == null
     ? {
         orderedSteps: NO_ANALYSIS_STEPS_IN_ORDER,

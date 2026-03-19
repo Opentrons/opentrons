@@ -93,6 +93,16 @@ export interface FlexStackerData {
   status: FlexStackerStatus
 }
 
+export interface VacuumModuleData {
+  currentPressure: number | null
+  targetPressure: number | null
+  currentPower: number | null
+  targetPower: number | null
+  modeType: VacuumMode
+  ventStatus: 'open' | 'closed'
+  status: VacuumModuleStatus
+}
+
 export type TemperatureStatus =
   | 'idle'
   | 'holding at target'
@@ -129,6 +139,15 @@ export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
 
 export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'
 
+export type VacuumModuleStatus =
+  | 'idle'
+  | 'ramping'
+  | 'holding'
+  | 'venting'
+  | 'complete'
+  | 'error'
+
+export type VacuumMode = 'pressure' | 'power'
 export interface ApiTemperatureModule extends ApiBaseModule {
   moduleModel: TemperatureModuleModel
   name: typeof TEMPDECK

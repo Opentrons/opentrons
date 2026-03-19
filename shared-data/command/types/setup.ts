@@ -286,12 +286,27 @@ interface LoadLiquidClassResult {
   liquidClassId: string
 }
 
-export const COLUMN = 'COLUMN'
-export const SINGLE = 'SINGLE'
-export const ROW = 'ROW'
-export const QUADRANT = 'QUADRANT'
-export const ALL = 'ALL'
-export const PARTIAL = 'PARTIAL'
+export type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7
+export type RowChannels = 12
+
+export const PARTIAL_NOZZLE_MAP: Record<
+  PartialPrimaryNozzles,
+  PartialNozzles8Channel
+> = {
+  G1: 2,
+  F1: 3,
+  E1: 4,
+  D1: 5,
+  C1: 6,
+  B1: 7,
+} as const
+
+export const COLUMN = 'COLUMN' as const
+export const SINGLE = 'SINGLE' as const
+export const ROW = 'ROW' as const
+export const QUADRANT = 'QUADRANT' as const
+export const ALL = 'ALL' as const
+export const PARTIAL_COLUMN = 'PARTIAL_COLUMN' as const
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -299,18 +314,18 @@ export type NozzleConfigurationStyle =
   | typeof ROW
   | typeof QUADRANT
   | typeof ALL
-  | typeof PARTIAL
-export const A1_NOZZLE = 'A1'
-export const A12_NOZZLE = 'A12'
-export const H1_NOZZLE = 'H1'
-export const H12_NOZZLE = 'H12'
+  | typeof PARTIAL_COLUMN
+export const A1_NOZZLE = 'A1' as const
+export const A12_NOZZLE = 'A12' as const
+export const H1_NOZZLE = 'H1' as const
+export const H12_NOZZLE = 'H12' as const
 
-export const G1_NOZZLE = 'G1'
-export const E1_NOZZLE = 'E1'
-export const F1_NOZZLE = 'F1'
-export const D1_NOZZLE = 'D1'
-export const C1_NOZZLE = 'C1'
-export const B1_NOZZLE = 'B1'
+export const G1_NOZZLE = 'G1' as const
+export const E1_NOZZLE = 'E1' as const
+export const F1_NOZZLE = 'F1' as const
+export const D1_NOZZLE = 'D1' as const
+export const C1_NOZZLE = 'C1' as const
+export const B1_NOZZLE = 'B1' as const
 
 export type PartialPrimaryNozzles =
   | typeof B1_NOZZLE
@@ -326,7 +341,8 @@ export type PrimaryNozzleConfigurationStyle =
   | typeof A12_NOZZLE
   | typeof H1_NOZZLE
   | typeof H12_NOZZLE
-interface NozzleConfigurationParams {
+
+export interface NozzleConfigurationParams {
   primaryNozzle?: PrimaryNozzleConfigurationStyle
   style: NozzleConfigurationStyle
 }
