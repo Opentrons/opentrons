@@ -5,6 +5,10 @@
   gap: var(--spacing-8);
 }
 
+.slider_container_small {
+  gap: var(--spacing-4);
+}
+
 .slider_text_container_label {
   display: flex;
   flex-direction: row;
@@ -13,6 +17,10 @@
 
 .slider_text_container_no_label {
   justify-content: flex-end;
+}
+
+.slider_track_wrapper {
+  width: 100%;
 }
 
 .slider {
@@ -24,8 +32,8 @@
     to right,
     var(--blue-50) 0%,
     var(--blue-50) var(--value-percent),
-    var(--blue-20) var(--value-percent),
-    var(--blue-20) 100%
+    var(--slider-unfilled, var(--blue-20)) var(--value-percent),
+    var(--slider-unfilled, var(--blue-20)) 100%
   );
   cursor: pointer;
 }

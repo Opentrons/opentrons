@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .abstract import AbstractBarcodeScannerDriver
-from .types import BarcodeModuleInfo, LEDProfile, SoundProfile
+from .types import BarcodeModuleInfo, SoundProfile
 
 
 class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
@@ -9,10 +9,9 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         self.connected = False
         self.prefix = ""
         self.suffix = ""
-        self.scan_timeout = 1.0
+        self.scan_timeout = 1000
         self.serial_number = "fake-serial"
         self.sound_profile = SoundProfile.FULL_SOUND
-        self.led_profile = LEDProfile.SUCCESS_AND_FAILURE
 
     async def connect(self) -> None:
         """Connect to the barcode scanner."""
@@ -22,7 +21,7 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         """Disconnect from the barcode scanner."""
         self.connected = False
 
-    async def is_connected(self) -> bool:
+    def is_connected(self) -> bool:
         """Check connection to barcode scanner"""
         return self.connected
 
@@ -38,11 +37,11 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.suffix = suffix
 
-    async def set_scan_timeout(self, timeout: float) -> None:
+    async def set_scan_timeout(self, timeout_ms: int) -> None:
         """Set how long to run the decoder before timing out."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
-        self.scan_timeout = timeout
+        self.scan_timeout = timeout_ms
 
     async def scan_barcode(self) -> Optional[str]:
         """Scan and return a barcode."""
@@ -56,14 +55,17 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
             raise ConnectionError("Barcode scanner simulator not connected.")
         self.sound_profile = profile
 
-    async def set_led_profile(self, profile: LEDProfile) -> None:
-        """Set the led profile."""
-        if not self.connected:
-            raise ConnectionError("Barcode scanner simulator not connected.")
-        self.led_profile = profile
-
-    async def get_device_info(self) -> BarcodeModuleInfo:
+    def get_device_info(self) -> BarcodeModuleInfo:
         """Get Device Info."""
         if not self.connected:
             raise ConnectionError("Barcode scanner simulator not connected.")
-        return BarcodeModuleInfo(serial=self.serial_number)
+        return BarcodeModuleInfo(
+            serial=self.serial_number,
+            oem_serial="otserialnumber",
+            manufacturing_date="2025-08-29",
+            firmware_version="U6102.ST.T13S.4",
+            decoder_version="IOTC0610",
+            hardware_version="V1.2",
+            product_name="R214",
+            data_formating_version="3.06.049",
+        )

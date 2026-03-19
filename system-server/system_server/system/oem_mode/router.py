@@ -3,6 +3,8 @@
 import os
 import re
 from pathlib import Path
+from textwrap import dedent
+from typing import Annotated
 
 import filetype  # type: ignore[import-untyped]
 from fastapi import (
@@ -15,11 +17,22 @@ from fastapi import (
     status,
 )
 
-from ...settings import SystemServerSettings, get_settings, save_settings
-from .models import EnableOEMMode
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 
-# regex to sanitize the filename
-FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-.]")
+from .models import EnableOEMMode
+from .oem_settings_store import (
+    OEMSettingsStore,
+    get_oem_settings_store,
+)
+from system_server.persistence import get_persistence_directory
+
+# A regex to sanitize names of uploaded files.
+#
+# This is to avoid:
+# - Path traversal, e.g. if someone uploads a file named "../../foo.png".
+# - Shell injection and other parsing issues. See oem_settings_store.write_oem_settings().
+FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-_.]")
 
 
 oem_mode_router = APIRouter()
@@ -28,25 +41,42 @@ oem_mode_router = APIRouter()
 @oem_mode_router.put(
     "/system/oem_mode/enable",
     summary="Enable or disable OEM Mode",
-    description="Enable or disable OEM Mode",
+    description=dedent(
+        """\
+        Enable or disable OEM Mode.
+
+        Currently, this endpoint does not *completely* enable OEM mode, so it should not
+        be used directly. Use `POST /settings` instead. This may change in the future.
+        """
+        # To elaborate on the description above:
+        # The part of OEM mode that this endpoint doesn't do is telling the ODD to avoid
+        # branded language in its UX copy. That's currently done by the ODD querying
+        # the OEM mode status in robot-server's `GET /settings`, which in turn is set
+        # via robot-server's `POST /settings`. Ideally, system-server would have a pair
+        # of PUT+GET endpoints serving as the single source of truth, and either
+        # robot-server's `/settings` endpoints would proxy to them, or we'd outright
+        # delete OEM mode from `/settings`.
+    ),
     responses={
         status.HTTP_200_OK: {"message": "OEM Mode changed successfully."},
-        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not changed."},
+        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not change."},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "message": "OEM Mode unhandled exception."
         },
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def enable_oem_mode_endpoint(
     response: Response,
     enableRequest: EnableOEMMode,
-    settings: SystemServerSettings = Depends(get_settings),
+    oem_settings_store: Annotated[OEMSettingsStore, Depends(get_oem_settings_store)],
 ) -> Response:
     """Router for /system/oem_mode/enable endpoint."""
     enable = enableRequest.enable
+    oem_settings = oem_settings_store.read()
     try:
-        settings.oem_mode_enabled = enable
-        success = save_settings(settings)
+        oem_settings.oem_mode_enabled = enable
+        success = oem_settings_store.write(oem_settings)
         response.status_code = (
             status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
         )
@@ -70,15 +100,19 @@ async def enable_oem_mode_endpoint(
             "message": "OEM Mode splash unhandled exception."
         },
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def upload_splash_image(
     response: Response,
+    oem_settings_store: Annotated[OEMSettingsStore, Depends(get_oem_settings_store)],
+    persistence_directory: Annotated[Path, Depends(get_persistence_directory)],
     file: UploadFile = File(...),
-    settings: SystemServerSettings = Depends(get_settings),
 ) -> Response:
     """Router for /system/oem_mode/upload_splash endpoint."""
+    oem_settings = oem_settings_store.read()
+
     # Make sure oem mode is enabled before this request
-    if not settings.oem_mode_enabled:
+    if not oem_settings.oem_mode_enabled:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="OEM Mode needs to be enabled to upload splash image.",
@@ -120,21 +154,22 @@ async def upload_splash_image(
 
     try:
         # Remove the old image if exists
-        if settings.oem_mode_splash_custom:
-            os.unlink(settings.oem_mode_splash_custom)
+        if oem_settings.oem_mode_splash_custom:
+            os.unlink(oem_settings.oem_mode_splash_custom)
 
         # sanitize the filename
-        sanatized_filename = FILENAME_REGEX.sub("_", file.filename)
-        filename = f"{Path(sanatized_filename).stem}.{content_type}"
+        # todo(mm, 2026-02-24): Could we simplify this by just storing to some hard-coded path?
+        sanitized_filename = FILENAME_REGEX.sub("_", file.filename)
+        filename = f"{Path(sanitized_filename).stem}.{content_type}"
 
         # file is valid, save to final location
-        filepath = f"{settings.persistence_directory}/{filename}"
+        filepath = f"{persistence_directory}/{filename}"
         with open(filepath, "wb+") as f:
             f.write(file.file.read())
 
-        # store the file location to settings and save the dotenv
-        settings.oem_mode_splash_custom = filepath
-        success = save_settings(settings)
+        # store the file location
+        oem_settings.oem_mode_splash_custom = filepath
+        success = oem_settings_store.write(oem_settings)
         response.status_code = (
             status.HTTP_201_CREATED if success else status.HTTP_400_BAD_REQUEST
         )

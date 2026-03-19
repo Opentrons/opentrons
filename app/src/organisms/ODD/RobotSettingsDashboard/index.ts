@@ -1,3 +1,4 @@
+export * from './Devices'
 export * from './DeviceReset'
 export * from './LanguageSetting'
 export * from './NetworkSettings/RobotSettingsJoinOtherNetwork'

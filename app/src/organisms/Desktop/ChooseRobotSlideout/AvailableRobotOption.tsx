@@ -113,10 +113,14 @@ export function AvailableRobotOption(
     iconName = 'usb'
   }
 
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
+  useEffect(
+    () => {
+      dispatch(fetchStatus(robotName))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    []
+  )
 
   return showIdleOnly && isBusy ? null : (
     <>
@@ -133,6 +137,7 @@ export function AvailableRobotOption(
             width: 4rem;
             height: 3.5625rem;
           `}
+          alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

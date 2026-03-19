@@ -7,7 +7,6 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [1, 1.5, 2]

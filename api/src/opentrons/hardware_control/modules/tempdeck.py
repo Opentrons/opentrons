@@ -21,6 +21,10 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
 )
 from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
+)
 
 log = logging.getLogger(__name__)
 
@@ -124,6 +128,7 @@ class TempDeck(mod_abc.AbstractModule):
         self._poller = poller
         self._reader.set_error_callback(self.error_callback)
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop()

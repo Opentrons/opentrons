@@ -1,5 +1,6 @@
 ---
 title: "Thermocycler Module: Before You Begin"
+description: "Deck placement, Flex caddies, OT-2 exhaust duct, and anchor adjustments."
 ---
 
 Review this section for important information about the Thermocycler's deck placement, alignment, and anchor adjustments.

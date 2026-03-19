@@ -87,6 +87,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     flowType,
     section: SECTIONS.DETACH_PIPETTE,
   }
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedAttachedPipettes = useMemo(() => attachedPipettes, [])
   const is96ChannelPipette =
     memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96' ||

@@ -69,21 +69,26 @@ export function FeedbackModal(): JSX.Element {
     await callApi(config as AxiosRequestConfig)
   }
 
-  useEffect(() => {
-    if (isSubmitting && !isLoading) {
-      if (!error && data) {
-        // Success - track event and close modal
-        trackEvent({
-          name: ANALYTICS.FEEDBACK_SENT,
-          properties: {
-            feedback: feedbackValue,
-          },
-        })
-        setShowFeedbackModal(false)
+  useEffect(
+    () => {
+      if (isSubmitting && !isLoading) {
+        if (!error && data) {
+          // Success - track event and close modal
+          trackEvent({
+            name: ANALYTICS.FEEDBACK_SENT,
+            properties: {
+              feedback: feedbackValue,
+            },
+          })
+          setShowFeedbackModal(false)
+        }
+        setIsSubmitting(false)
       }
-      setIsSubmitting(false)
-    }
-  }, [isSubmitting, isLoading, error, data, feedbackValue])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSubmitting, isLoading, error, data, feedbackValue]
+  )
 
   return (
     <Modal
@@ -120,9 +125,9 @@ export function FeedbackModal(): JSX.Element {
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        {error && (
+        {error != null && (
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
-            {error}
+            {error.message}
           </StyledText>
         )}
         <InputField

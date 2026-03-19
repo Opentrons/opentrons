@@ -31,6 +31,7 @@ import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
 import styles from './summary.module.css'
+import { VacuumSummary } from './VacuumSummary'
 
 import type { FormData } from '/protocol-designer/form-types'
 
@@ -92,7 +93,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         magnetAction === 'engage' ? (
           <StyledTrans
             i18nKey="protocol_steps:magnetic_module.engage"
-            tagText={`${engageHeight}${t('application:units.millimeter')}`}
+            tagInfos={[
+              {
+                text: `${engageHeight}${t('application:units.millimeter')}`,
+              },
+            ]}
             values={{ module: magneticModuleDisplayName }}
           />
         ) : (
@@ -121,35 +126,55 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             {blockIsActive ? (
               <StyledTrans
                 i18nKey="protocol_steps:thermocycler_module.thermocycler_state.block"
-                tagText={`${blockTargetTemp}${t('application:units.degrees')}`}
+                tagInfos={[
+                  {
+                    text: `${blockTargetTemp}${t('application:units.degrees')}`,
+                  },
+                ]}
               />
             ) : null}
             {lidIsActive ? (
               <StyledTrans
                 i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_temperature"
-                tagText={`${lidTargetTemp}${t('application:units.degrees')}`}
+                tagInfos={[
+                  {
+                    text: `${lidTargetTemp}${t('application:units.degrees')}`,
+                  },
+                ]}
               />
             ) : null}
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_position"
-              tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${
-                  lidOpen ? 'open' : 'closed'
-                }`
-              )}
+              tagInfos={[
+                {
+                  text: t(
+                    `protocol_steps:thermocycler_module.lid_position.${
+                      lidOpen ? 'open' : 'closed'
+                    }`
+                  ),
+                },
+              ]}
             />
           </div>
         ) : (
           <div className={styles.container}>
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.volume"
-              tagText={`${profileVolume} ${t('application:units.microliter')}`}
+              tagInfos={[
+                {
+                  text: `${profileVolume} ${t('application:units.microliter')}`,
+                },
+              ]}
             />
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.lid_temperature"
-              tagText={`${profileTargetLidTemp}${t(
-                'application:units.degrees'
-              )}`}
+              tagInfos={[
+                {
+                  text: `${profileTargetLidTemp}${t(
+                    'application:units.degrees'
+                  )}`,
+                },
+              ]}
             />
           </div>
         )
@@ -187,7 +212,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:pause.pausingUntilTemperature"
               values={{ module: pauseModuleDisplayName }}
-              tagText={`${pauseTemperature}${t('application:units.degrees')}`}
+              tagInfos={[
+                {
+                  text: `${pauseTemperature}${t('application:units.degrees')}`,
+                },
+              ]}
             />
           )
           break
@@ -195,7 +224,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           stepSummaryContent = (
             <StyledTrans
               i18nKey={t('protocol_steps:pause.pausingForDuration')}
-              tagText={formatTime(pauseTime as string)}
+              tagInfos={[
+                {
+                  text: formatTime(pauseTime as string),
+                },
+              ]}
             />
           )
           break
@@ -219,7 +252,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       stepSummaryContent = isSettingTemperature ? (
         <StyledTrans
           i18nKey={'protocol_steps:temperature_module.active'}
-          tagText={`${targetTemperature}${t('application:units.degrees')}`}
+          tagInfos={[
+            {
+              text: `${targetTemperature}${t('application:units.degrees')}`,
+            },
+          ]}
           values={{ module: tempModuleDisplayName }}
         />
       ) : (
@@ -254,7 +291,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           values={{
             labware: labwareName,
           }}
-          tagText={newLocationName}
+          tagInfos={[
+            {
+              text: newLocationName,
+            },
+          ]}
         />
       )
       break
@@ -290,33 +331,47 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           <StyledTrans
             i18nKey="protocol_steps:heater_shaker.active.temperature"
             values={{ module: moduleDisplayName }}
-            tagText={
-              targetHeaterShakerTemperature
-                ? `${targetHeaterShakerTemperature}${t(
-                    'application:units.degrees'
-                  )}`
-                : t('protocol_steps:heater_shaker.active.ambient')
-            }
+            tagInfos={[
+              {
+                text: targetHeaterShakerTemperature
+                  ? `${targetHeaterShakerTemperature}${t(
+                      'application:units.degrees'
+                    )}`
+                  : t('protocol_steps:heater_shaker.active.ambient'),
+              },
+            ]}
           />
           {targetSpeed ? (
             <StyledTrans
               i18nKey="protocol_steps:heater_shaker.active.shake"
-              tagText={`${targetSpeed}${t('application:units.rpm')}`}
+              tagInfos={[
+                {
+                  text: `${targetSpeed}${t('application:units.rpm')}`,
+                },
+              ]}
             />
           ) : null}
           {heaterShakerTimer ? (
             <StyledTrans
               i18nKey="protocol_steps:heater_shaker.active.time"
-              tagText={formatTime(heaterShakerTimer as string)}
+              tagInfos={[
+                {
+                  text: formatTime(heaterShakerTimer as string),
+                },
+              ]}
             />
           ) : null}
           <StyledTrans
             i18nKey="protocol_steps:heater_shaker.active.latch"
-            tagText={t(
-              latchOpen
-                ? 'protocol_steps:heater_shaker.latch.open'
-                : 'protocol_steps:heater_shaker.latch.closed'
-            )}
+            tagInfos={[
+              {
+                text: t(
+                  latchOpen
+                    ? 'protocol_steps:heater_shaker.latch.open'
+                    : 'protocol_steps:heater_shaker.latch.closed'
+                ),
+              },
+            ]}
           />
         </div>
       )
@@ -339,6 +394,10 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           moduleRobotState={moduleState}
         />
       )
+      break
+    }
+    case 'vacuum': {
+      stepSummaryContent = <VacuumSummary currentStep={currentStep} />
       break
     }
 

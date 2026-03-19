@@ -56,7 +56,6 @@ log.debug('App config', {
 initializeSentry(getStore().analytics.optedIn)
 
 if (config.devtools) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   electronDebug({ isEnabled: true, showDevTools: true })
 }
 

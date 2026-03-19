@@ -25,19 +25,32 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   const { mount, pipetteSpecs, className, imageStyle, ...styleProps } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 
-  let imgSrc
+  let imgSrc: string
+  let altText: string
   switch (displayCategory) {
     case 'FLEX': {
       imgSrc = channels === 1 ? singleFlexSrc : eightChannelFlexSrc
+      altText =
+        channels === 1
+          ? 'Single Channel Flex Pipette'
+          : 'Eight Channel Flex Pipette'
       break
     }
     case 'GEN2': {
       imgSrc = channels === 1 ? singleGEN2Src : multiGEN2Src
+      altText =
+        channels === 1
+          ? 'Single Channel GEN2 Pipette'
+          : 'Multi Channel GEN2 Pipette'
       break
     }
     case 'GEN1':
     default: {
       imgSrc = channels === 1 ? singleSrc : multiSrc
+      altText =
+        channels === 1
+          ? 'Single Channel GEN1 Pipette'
+          : 'Multi Channel GEN1 Pipette'
     }
   }
   return (
@@ -49,6 +62,7 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
     >
       <img
         src={channels === 96 ? ninetySixSrc : imgSrc}
+        alt={channels === 96 ? '96 Channel Pipette' : altText}
         css={imageStyle}
         height="100%"
       />

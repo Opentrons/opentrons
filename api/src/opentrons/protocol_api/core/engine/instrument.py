@@ -2199,7 +2199,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
         if volume_for_pipette_mode_configuration is not None and (
-            self._protocol_core.api_version < APIVersion(2, 28)
+            self._protocol_core.api_version < APIVersion(2, 29)
             or self._engine_client.state.pipettes.get_will_volume_mode_change(
                 self._pipette_id, volume_for_pipette_mode_configuration
             )

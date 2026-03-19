@@ -86,11 +86,16 @@ export function DropdownStepFormField(
     }
   }
 
-  useEffect(() => {
-    if (options.length === 1) {
-      updateValue(options[0].value)
-    }
-  }, [options.length])
+  useEffect(
+    () => {
+      if (options.length === 1) {
+        updateValue(options[0].value)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [options.length]
+  )
 
   return (
     <Flex padding={padding ?? SPACING.spacing16}>
@@ -126,9 +131,7 @@ export function DropdownStepFormField(
           flexDirection={DIRECTION_COLUMN}
           width="100%"
         >
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-            {title}
-          </StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">{title}</StyledText>
           <ListItem type="default">
             <Flex
               gridGap={SPACING.spacing8}

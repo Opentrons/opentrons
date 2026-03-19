@@ -147,6 +147,8 @@ export function useRecoveryCommands({
       chainRunCommands(commands, continuePastFailure)
         // the catch never occurs if continuePastCommandFailure is "true"
         .catch((e: Error) => reportAndRouteFailedCmd(e)),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [analytics, selectedRecoveryOption]
   )
 
@@ -289,16 +291,21 @@ export function useRecoveryCommands({
     }
   }
 
-  const retryFailedCommand = useCallback((): Promise<CommandData[]> => {
-    const { commandType, params } = unvalidatedFailedCommand as FailedCommand // Null case is handled before command could be issued.
-    return chainRunRecoveryCommands(
-      [
-        // move back to the location of the command if it is an in-place command
-        buildRetryPrepMove(),
-        { commandType, params }, // retry the command that failed
-      ].filter(c => c != null) as CreateCommand[]
-    ) // the created command is the same command that failed
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand?.key])
+  const retryFailedCommand = useCallback(
+    (): Promise<CommandData[]> => {
+      const { commandType, params } = unvalidatedFailedCommand as FailedCommand // Null case is handled before command could be issued.
+      return chainRunRecoveryCommands(
+        [
+          // move back to the location of the command if it is an in-place command
+          buildRetryPrepMove(),
+          { commandType, params }, // retry the command that failed
+        ].filter(c => c != null) as CreateCommand[]
+      ) // the created command is the same command that failed
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand?.key]
+  )
 
   // Homes the Z-axis of all attached pipettes.
   const homePipetteZAxes = useCallback((): Promise<CommandData[]> => {
@@ -306,24 +313,29 @@ export function useRecoveryCommands({
   }, [chainRunRecoveryCommands])
 
   // Pick up the user-selected tips
-  const pickUpTips = useCallback((): Promise<CommandData[]> => {
-    const { selectedTipLocations, relevantPickUpTipLabware } =
-      failedLabwareUtils
+  const pickUpTips = useCallback(
+    (): Promise<CommandData[]> => {
+      const { selectedTipLocations, relevantPickUpTipLabware } =
+        failedLabwareUtils
 
-    const pickUpTipCmd = buildPickUpTips(
-      selectedTipLocations,
-      unvalidatedFailedCommand,
-      relevantPickUpTipLabware
-    )
-
-    if (pickUpTipCmd == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of pickUpTips command')
+      const pickUpTipCmd = buildPickUpTips(
+        selectedTipLocations,
+        unvalidatedFailedCommand,
+        relevantPickUpTipLabware
       )
-    } else {
-      return chainRunRecoveryCommands([pickUpTipCmd])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand, failedLabwareUtils])
+
+      if (pickUpTipCmd == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of pickUpTips command')
+        )
+      } else {
+        return chainRunRecoveryCommands([pickUpTipCmd])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand, failedLabwareUtils]
+  )
 
   const ignoreErrorKindThisRun = (ignoreErrors: boolean): Promise<void> => {
     setIgnoreErrors(ignoreErrors)
@@ -332,65 +344,80 @@ export function useRecoveryCommands({
 
   // Only send the finalized error policy to the server during a terminal recovery command that does not terminate the run.
   // If the request to update the policy fails, route to the error modal.
-  const handleIgnoringErrorKind = useCallback((): Promise<void> => {
-    if (ignoreErrors) {
-      if (unvalidatedFailedCommand?.error != null) {
-        const ifMatch: IfMatchType = isAssumeFalsePositiveResumeKind(
-          failedCommand
-        )
-          ? 'assumeFalsePositiveAndContinue'
-          : 'ignoreAndContinue'
-
-        const ignorePolicyRules = buildIgnorePolicyRules(
-          unvalidatedFailedCommand.commandType,
-          unvalidatedFailedCommand.error.errorType,
-          ifMatch
-        )
-
-        return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
-          .then(() => Promise.resolve())
-          .catch((e: Error) =>
-            reportAndRouteFailedCmd(
-              new Error(`Failed to update recovery policy: ${e.message}`)
-            )
+  const handleIgnoringErrorKind = useCallback(
+    (): Promise<void> => {
+      if (ignoreErrors) {
+        if (unvalidatedFailedCommand?.error != null) {
+          const ifMatch: IfMatchType = isAssumeFalsePositiveResumeKind(
+            failedCommand
           )
+            ? 'assumeFalsePositiveAndContinue'
+            : 'ignoreAndContinue'
+
+          const ignorePolicyRules = buildIgnorePolicyRules(
+            unvalidatedFailedCommand.commandType,
+            unvalidatedFailedCommand.error.errorType,
+            ifMatch
+          )
+
+          return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
+            .then(() => Promise.resolve())
+            .catch((e: Error) =>
+              reportAndRouteFailedCmd(
+                new Error(`Failed to update recovery policy: ${e.message}`)
+              )
+            )
+        } else {
+          return reportAndRouteFailedCmd(
+            new Error('Could not execute command. No failed command.')
+          )
+        }
       } else {
-        return reportAndRouteFailedCmd(
-          new Error('Could not execute command. No failed command.')
-        )
+        return Promise.resolve()
       }
-    } else {
-      return Promise.resolve()
-    }
-  }, [
-    unvalidatedFailedCommand?.error?.errorType,
-    unvalidatedFailedCommand?.commandType,
-    ignoreErrors,
-  ])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      unvalidatedFailedCommand?.error?.errorType,
+      unvalidatedFailedCommand?.commandType,
+      ignoreErrors,
+    ]
+  )
 
-  const resumeRun = useCallback((): void => {
-    void handleIgnoringErrorKind()
-      .then(() => resumeRunFromRecovery(runId))
-      .then(() => {
-        analytics.reportActionSelectedResult(
-          selectedRecoveryOption,
-          'succeeded'
-        )
-        makeSuccessToast()
-      })
-  }, [
-    runId,
-    ignoreErrors,
-    resumeRunFromRecovery,
-    handleIgnoringErrorKind,
-    selectedRecoveryOption,
-    makeSuccessToast,
-  ])
+  const resumeRun = useCallback(
+    (): void => {
+      void handleIgnoringErrorKind()
+        .then(() => resumeRunFromRecovery(runId))
+        .then(() => {
+          analytics.reportActionSelectedResult(
+            selectedRecoveryOption,
+            'succeeded'
+          )
+          makeSuccessToast()
+        })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      runId,
+      ignoreErrors,
+      resumeRunFromRecovery,
+      handleIgnoringErrorKind,
+      selectedRecoveryOption,
+      makeSuccessToast,
+    ]
+  )
 
-  const cancelRun = useCallback((): void => {
-    analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-    stopRun(runId)
-  }, [runId])
+  const cancelRun = useCallback(
+    (): void => {
+      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
+      stopRun(runId)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runId]
+  )
 
   const handleResumeAction = (): Promise<RunAction> => {
     if (isAssumeFalsePositiveResumeKind(failedCommand)) {
@@ -400,49 +427,64 @@ export function useRecoveryCommands({
     }
   }
 
-  const skipFailedCommand = useCallback((): void => {
-    void handleIgnoringErrorKind().then(() =>
-      handleResumeAction().then(() => {
-        analytics.reportActionSelectedResult(
-          selectedRecoveryOption,
-          'succeeded'
-        )
-        makeSuccessToast()
-      })
-    )
-  }, [
-    runId,
-    resumeRunFromRecovery,
-    handleIgnoringErrorKind,
-    selectedRecoveryOption,
-    makeSuccessToast,
-  ])
+  const skipFailedCommand = useCallback(
+    (): void => {
+      void handleIgnoringErrorKind().then(() =>
+        handleResumeAction().then(() => {
+          analytics.reportActionSelectedResult(
+            selectedRecoveryOption,
+            'succeeded'
+          )
+          makeSuccessToast()
+        })
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      runId,
+      resumeRunFromRecovery,
+      handleIgnoringErrorKind,
+      selectedRecoveryOption,
+      makeSuccessToast,
+    ]
+  )
 
   const releaseGripperJaws = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
-  const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
-    const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
-    if (buildOpenLatchCommand == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of open latch command')
-      )
-    } else {
-      return chainRunRecoveryCommands([buildOpenLatchCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  const releaseLabwareLatch = useCallback(
+    (): Promise<CommandData[]> => {
+      const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
+      if (buildOpenLatchCommand == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of open latch command')
+        )
+      } else {
+        return chainRunRecoveryCommands([buildOpenLatchCommand])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+  )
 
-  const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
-    const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
-    if (buildCloseLatchCommand == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of close latch command')
-      )
-    } else {
-      return chainRunRecoveryCommands([buildCloseLatchCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  const closeLabwareLatch = useCallback(
+    (): Promise<CommandData[]> => {
+      const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
+      if (buildCloseLatchCommand == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of close latch command')
+        )
+      } else {
+        return chainRunRecoveryCommands([buildCloseLatchCommand])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+  )
 
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
@@ -461,40 +503,57 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
-  const manualRetrieve = useCallback((): Promise<CommandData[]> => {
-    const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
-    if (manualRetrieveCommand == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of manual retrieve command')
+  const manualRetrieve = useCallback(
+    (): Promise<CommandData[]> => {
+      const manualRetrieveCommand = buildManualRetrieve(
+        unvalidatedFailedCommand
       )
-    } else {
-      return chainRunRecoveryCommands([manualRetrieveCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+      if (manualRetrieveCommand == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of manual retrieve command')
+        )
+      } else {
+        return chainRunRecoveryCommands([manualRetrieveCommand])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+  )
 
-  const manualStore = useCallback((): Promise<CommandData[]> => {
-    const manualStoreCommand = buildManualStore(unvalidatedFailedCommand)
-    if (manualStoreCommand == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of manual store command')
-      )
-    } else {
-      return chainRunRecoveryCommands([manualStoreCommand])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+  const manualStore = useCallback(
+    (): Promise<CommandData[]> => {
+      const manualStoreCommand = buildManualStore(unvalidatedFailedCommand)
+      if (manualStoreCommand == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of manual store command')
+        )
+      } else {
+        return chainRunRecoveryCommands([manualStoreCommand])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+  )
 
-  const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
-    const moveLabwareCmd = buildMoveLabwareWithoutPause(
-      unvalidatedFailedCommand
-    )
-    if (moveLabwareCmd == null) {
-      return reportAndRouteFailedCmd(
-        new Error('Invalid use of MoveLabware command')
+  const moveLabwareWithoutPause = useCallback(
+    (): Promise<CommandData[]> => {
+      const moveLabwareCmd = buildMoveLabwareWithoutPause(
+        unvalidatedFailedCommand
       )
-    } else {
-      return chainRunRecoveryCommands([moveLabwareCmd])
-    }
-  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+      if (moveLabwareCmd == null) {
+        return reportAndRouteFailedCmd(
+          new Error('Invalid use of MoveLabware command')
+        )
+      } else {
+        return chainRunRecoveryCommands([moveLabwareCmd])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+  )
 
   return {
     resumeRun,

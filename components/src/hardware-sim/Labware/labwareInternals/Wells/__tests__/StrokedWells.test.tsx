@@ -16,12 +16,9 @@ const troughFixture12 = fixture12Trough as LabwareDefinition
 
 describe('StrokedWells', () => {
   it('should render a series of wells with the given stroke', () => {
-    vi.mocked(Well).mockImplementation(({ stroke, wellName }) =>
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      {
-        return <div>{`well ${wellName} with stroke ${stroke}`}</div>
-      }
-    )
+    vi.mocked(Well).mockImplementation(({ stroke, wellName }) => {
+      return <div>{`well ${wellName} with stroke ${stroke}`}</div>
+    })
 
     render(
       <StrokedWells

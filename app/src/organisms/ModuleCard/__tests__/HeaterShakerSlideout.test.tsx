@@ -63,7 +63,9 @@ describe('HeaterShakerSlideout', () => {
     }
     render(props)
     const button = screen.getByRole('button', { name: 'Confirm' })
-    const input = screen.getByTestId('heaterShakerModuleV1_setTemp')
+    const input = screen.getByRole('spinbutton', {
+      name: 'heaterShakerModuleV1_setTemp',
+    })
     fireEvent.change(input, { target: { value: '40' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -88,7 +90,9 @@ describe('HeaterShakerSlideout', () => {
     }
     render(props)
     const button = screen.getByLabelText('exit')
-    const input = screen.getByTestId('heaterShakerModuleV1_setTemp')
+    const input = screen.getByRole('spinbutton', {
+      name: 'heaterShakerModuleV1_setTemp',
+    })
     fireEvent.change(input, { target: { value: '40' } })
     fireEvent.click(button)
 
