@@ -139,63 +139,63 @@ class PatchSettingsRequestData(_StrictBaseModel):
             )
         ),
     ] = None
-    max_number_of_login_attempts: Annotated[
+    maxNumberOfLoginAttempts: Annotated[
         int | None,
         pydantic.Field(
             description="Max number of login attempts before account deactivation."
         ),
     ] = None
-    password_reset_time_in_days: Annotated[
+    passwordResetTimeInDays: Annotated[
         int | None,
         pydantic.Field(
             description="Length of time in days until password must be changed."
         ),
     ] = None
-    password_complexity: Annotated[
+    passwordComplexity: Annotated[
         PasswordComplexity | None,
         pydantic.Field(description="Password complexity level."),
     ] = None
-    idle_lockout_in_minutes: Annotated[
+    idleLockoutInMinutes: Annotated[
         int | None,
         pydantic.Field(
             description="Length of time until account is locked due to inactivity."
         ),
     ] = None
-    require_admin_creds_when_updating_robot_software: Annotated[
+    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
         bool | None,
         pydantic.Field(
             description="Require admin credentials when updating robot settings."
         ),
     ] = None
-    require_admin_creds_when_sending_protocol_to_robot: Annotated[
+    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
         bool | None,
         pydantic.Field(
             description="Require admin credentials when sending protocol to robot."
         ),
     ] = None
-    require_admin_creds_for_signoff_protocol: Annotated[
+    requireAdminCredsForSignoffProtocol: Annotated[
         bool | None,
         pydantic.Field(description="Require admin credentials for signoff protocol."),
     ] = None
-    require_signoff_for_protocol_log: Annotated[
+    requireSignoffForProtocolLog: Annotated[
         bool | None,
         pydantic.Field(description="Require signoff for protocol log."),
     ] = None
-    require_reason_for_interaction: Annotated[
+    requireReasonForInteraction: Annotated[
         bool | None,
         pydantic.Field(description="Require reason for interaction."),
     ] = None
-    min_length_of_reason_for_interaction: Annotated[
+    minLengthOfReasonForInteraction: Annotated[
         int | None,
         pydantic.Field(description="Minimum length of reason for interaction."),
     ] = None
-    require_logs_to_be_saved_in_app: Annotated[
+    requireLogsToBeSavedInApp: Annotated[
         bool | None,
         pydantic.Field(
             description="Require logs to be saved in app. Path should be configured in the app."
         ),
     ] = None
-    delete_over_max_on_disk_protocols: Annotated[
+    deleteOverMaxOnDiskProtocols: Annotated[
         bool | None,
         pydantic.Field(
             description="Automatically delete protocol run logs on the robot when there are 20 protocol run records."

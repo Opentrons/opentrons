@@ -32,34 +32,15 @@ _CAMEL_TO_SNAKE = {
 }
 
 
-def _response_to_store_kwargs(settings: SettingsResponseData) -> dict:
-    """Convert a SettingsResponseData into all store kwargs."""
-    result = {}
-    for camel, snake in _CAMEL_TO_SNAKE.items():
-        result[snake] = getattr(settings, camel)
-    # Flatten the nested PasswordComplexity object into two columns
-    if settings.passwordComplexity is not None:
-        result["password_complexity_minimum_length"] = (
-            settings.passwordComplexity.minimumLength
-        )
-        result["password_complexity_special_characters"] = (
-            settings.passwordComplexity.specialCharacters
-        )
-    else:
-        result["password_complexity_minimum_length"] = None
-        result["password_complexity_special_characters"] = None
-    return result
-
-
-def _patch_to_store_kwargs(non_null_updates: dict) -> dict:
+def _patch_to_store_kwargs(non_null_updates: dict[str, object]) -> dict[str, object]:
     """Convert a partial camelCase DICT intostore kwargs."""
-    result = {}
+    result: dict[str, object] = {}
     for camel, snake in _CAMEL_TO_SNAKE.items():
         if camel in non_null_updates:
             result[snake] = non_null_updates[camel]
-    # Flatten passwordComplexity if it was provided
+
     complexity = non_null_updates.get("passwordComplexity")
-    if complexity is not None:
+    if complexity is not None and isinstance(complexity, dict):
         result["password_complexity_minimum_length"] = complexity["minimumLength"]
         result["password_complexity_special_characters"] = complexity[
             "specialCharacters"
@@ -86,10 +67,22 @@ class SettingsDataManager:
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         existing = self._settings_store.get()
         if existing is None:
+            defaults = SettingsResponseData()
             self._settings_store.insert(
-                **_response_to_store_kwargs(
-                    SettingsResponseData()
-                )  # full object → all kwargs
+                access_control_enabled=defaults.accessControlEnabled,
+                max_number_of_login_attempts=defaults.maxNumberOfLoginAttempts,
+                password_reset_time_in_days=defaults.passwordResetTimeInDays,
+                password_complexity_minimum_length=None,
+                password_complexity_special_characters=None,
+                idle_lockout_in_minutes=defaults.idleLockoutInMinutes,
+                require_admin_creds_when_updating_robot_software=defaults.requireAdminCredsWhenUpdatingRobotSoftware,
+                require_admin_creds_when_sending_protocol_to_robot=defaults.requireAdminCredsWhenSendingProtocolToRobot,
+                require_admin_creds_for_signoff_protocol=defaults.requireAdminCredsForSignoffProtocol,
+                require_signoff_for_protocol_log=defaults.requireSignoffForProtocolLog,
+                require_reason_for_interaction=defaults.requireReasonForInteraction,
+                min_length_of_reason_for_interaction=defaults.minLengthOfReasonForInteraction,
+                require_logs_to_be_saved_in_app=defaults.requireLogsToBeSavedInApp,
+                delete_over_max_on_disk_protocols=defaults.deleteOverMaxOnDiskProtocols,
             )
 
         # Step 2: Update only the fields the user sent

@@ -6,6 +6,27 @@ import pytest
 from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.store import SettingsStore
 
+_DEFAULTS = {
+    "access_control_enabled": False,
+    "max_number_of_login_attempts": 5,
+    "password_reset_time_in_days": None,
+    "password_complexity_minimum_length": None,
+    "password_complexity_special_characters": None,
+    "idle_lockout_in_minutes": 3,
+    "require_admin_creds_when_updating_robot_software": True,
+    "require_admin_creds_when_sending_protocol_to_robot": True,
+    "require_admin_creds_for_signoff_protocol": False,
+    "require_signoff_for_protocol_log": True,
+    "require_reason_for_interaction": True,
+    "min_length_of_reason_for_interaction": None,
+    "require_logs_to_be_saved_in_app": True,
+    "delete_over_max_on_disk_protocols": True,
+}
+
+
+def _insert_defaults(store: SettingsStore) -> None:
+    store.insert(**_DEFAULTS)  # type: ignore[arg-type]
+
 
 @pytest.fixture()
 def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
@@ -21,22 +42,7 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
 # test password complexity with none values
 def test_insert_and_get_settings(settings_store: SettingsStore) -> None:
     """insert should persist the settings so get can find it."""
-    settings_store.insert(
-        access_control_enabled=True,
-        max_number_of_login_attempts=10,
-        password_reset_time_in_days=30,
-        idle_lockout_in_minutes=300,
-        require_admin_creds_when_updating_robot_software=True,
-        require_admin_creds_when_sending_protocol_to_robot=True,
-        require_admin_creds_for_signoff_protocol=False,
-        require_signoff_for_protocol_log=True,
-        require_reason_for_interaction=True,
-        min_length_of_reason_for_interaction=10,
-        require_logs_to_be_saved_in_app=True,
-        delete_over_max_on_disk_protocols=True,
-        password_complexity_minimum_length=8,
-        password_complexity_special_characters=True,
-    )
+    _insert_defaults(settings_store)
     fetched = settings_store.get()
     assert fetched is not None
     assert fetched.access_control_enabled
@@ -74,22 +80,7 @@ def test_insert_and_get_settings(settings_store: SettingsStore) -> None:
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
-    settings_store.insert(
-        access_control_enabled=True,
-        max_number_of_login_attempts=5,
-        password_reset_time_in_days=15,
-        idle_lockout_in_minutes=200,
-        require_admin_creds_when_updating_robot_software=False,
-        require_admin_creds_when_sending_protocol_to_robot=False,
-        require_admin_creds_for_signoff_protocol=True,
-        require_signoff_for_protocol_log=False,
-        require_reason_for_interaction=True,
-        min_length_of_reason_for_interaction=10,
-        require_logs_to_be_saved_in_app=True,
-        delete_over_max_on_disk_protocols=True,
-        password_complexity_minimum_length=8,
-        password_complexity_special_characters=True,
-    )
+    _insert_defaults(settings_store)
     settings_store.reset()
     fetched = settings_store.get()
     assert fetched is None
@@ -120,33 +111,17 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
 )
 def test_update_changes_only_specified_fields(
     settings_store: SettingsStore,
-    updates: dict,
-    expected_changes: dict,
+    updates: dict[str, object],
+    expected_changes: dict[str, object],
 ) -> None:
     """update should change only the specified fields and leave the rest unchanged."""
-    defaults = {
-        "access_control_enabled": False,
-        "max_number_of_login_attempts": 5,
-        "password_reset_time_in_days": None,
-        "password_complexity_minimum_length": None,
-        "password_complexity_special_characters": None,
-        "idle_lockout_in_minutes": 3,
-        "require_admin_creds_when_updating_robot_software": True,
-        "require_admin_creds_when_sending_protocol_to_robot": True,
-        "require_admin_creds_for_signoff_protocol": False,
-        "require_signoff_for_protocol_log": True,
-        "require_reason_for_interaction": True,
-        "min_length_of_reason_for_interaction": None,
-        "require_logs_to_be_saved_in_app": True,
-        "delete_over_max_on_disk_protocols": True,
-    }
-    settings_store.insert(**defaults)
+    _insert_defaults(settings_store)
     settings_store.update(**updates)
 
     fetched = settings_store.get()
     assert fetched is not None
 
-    expected = {**defaults, **expected_changes}
+    expected = {**_DEFAULTS, **expected_changes}
     for attr, value in expected.items():
         assert getattr(fetched, attr) == value, (
             f"{attr}: expected {value}, got {getattr(fetched, attr)}"
