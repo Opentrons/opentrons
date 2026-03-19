@@ -2,9 +2,9 @@
   display: flex;
   overflow: hidden;
   width: 100%;
-  padding-left: 12px;
-  padding-right: 12px;
   flex-direction: column;
+  padding-right: var(--spacing-12);
+  padding-left: var(--spacing-12);
 }
 
 .annotated_group_header {
