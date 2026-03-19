@@ -28,35 +28,57 @@ def run(ctx: ProtocolContext) -> None:
     """Protocol."""
 
     # Create a virtual vm if one does not exist
-    vm = [m for m in ctx._hw_manager.hardware.attached_modules if m.serial_number == "VMA1020250119002"]
+    vm = [
+        m
+        for m in ctx._hw_manager.hardware.attached_modules
+        if m.serial_number == "VMA1020250119002"
+    ]
     if not vm:
-        ctx._hw_manager.hardware.create_simulating_module(VacuumModuleModel.VACUUM_MODULE_V1, "VMA1020250119002")
+        ctx._hw_manager.hardware.create_simulating_module(
+            VacuumModuleModel.VACUUM_MODULE_V1, "VMA1020250119002"
+        )
 
     # Load Modules
-    vm_mod  = ctx.load_module( module_name="vacuumModuleMilliporeV1", location="A3")
-    abs_mod = ctx.load_module( module_name="absorbanceReaderV1", location="D3")
+    vm_mod = ctx.load_module(module_name="vacuumModuleMilliporeV1", location="A3")
+    abs_mod = ctx.load_module(module_name="absorbanceReaderV1", location="D3")
     abs_mod.open_lid()
 
     # Load Tipracks
-    tiprack_1000 = ctx.load_labware('opentrons_flex_96_tiprack_1000ul',  "C1", adapter='opentrons_flex_96_tiprack_adapter')
-    tiprack_200 = ctx.load_labware('opentrons_flex_96_tiprack_200ul',  "D1", adapter='opentrons_flex_96_tiprack_adapter')
+    tiprack_1000 = ctx.load_labware(
+        "opentrons_flex_96_tiprack_1000ul",
+        "C1",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
+    tiprack_200 = ctx.load_labware(
+        "opentrons_flex_96_tiprack_200ul",
+        "D1",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
 
     # Load Labware
-    manifold_collar =  vm_mod.load_adapter_to_dock('millipore_vacuum_manifold_collar_tall')
+    manifold_collar = vm_mod.load_adapter_to_dock(
+        "millipore_vacuum_manifold_collar_tall"
+    )
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
-    black_flat_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid")
-    deep_well_plate = ctx.load_labware("nest_96_wellplate_2ml_deep", "C4", lid="opentrons_tough_universal_lid")
+    black_flat_plate = ctx.load_labware(
+        "corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid"
+    )
+    deep_well_plate = ctx.load_labware(
+        "nest_96_wellplate_2ml_deep", "C4", lid="opentrons_tough_universal_lid"
+    )
     reservoir_1 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C2")
     reservoir_2 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C3")
     riser = ctx.load_adapter("opentrons_flex_deck_riser", "D2")
     lid_stack = riser.load_lid_stack("opentrons_tough_universal_lid", quantity=2)
 
     # Load Instruments + Trash
-    pip = ctx.load_instrument('flex_96channel_1000', tip_racks=[tiprack_200, tiprack_1000])
+    pip = ctx.load_instrument(
+        "flex_96channel_1000", tip_racks=[tiprack_200, tiprack_1000]
+    )
     ctx.load_trash_bin("A1")
 
     # Run Time Parameters
-    cycles = ctx.params.cycles   # type: ignore[attr-defined]
+    cycles = ctx.params.cycles  # type: ignore[attr-defined]
 
     # Protocol Start
     # ------------------------------------------------------
@@ -122,5 +144,3 @@ def run(ctx: ProtocolContext) -> None:
         # Move the deep well plate to C4 and add lid
         ctx.move_labware(deep_well_plate, "C4", use_gripper=True)
         ctx.move_lid(lid_stack, deep_well_plate, use_gripper=True)
-
-

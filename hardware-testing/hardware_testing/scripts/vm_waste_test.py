@@ -24,30 +24,36 @@ VM_idVendor = 1155
 VM_idProduct = 61248
 
 st = time.perf_counter()
-current_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%y_%m_%d_%H_%M_%S")
+current_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
+    "%y_%m_%d_%H_%M_%S"
+)
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('/data/testing_data/' + 'test.log'),
-        logging.StreamHandler()
-    ]
+        logging.FileHandler("/data/testing_data/" + "test.log"),
+        logging.StreamHandler(),
+    ],
 )
 
 logger = logging.getLogger(__name__)
 logger.info(f"continuous read error: {12}")
 
+
 async def find_port_by_id(vendorId, productId):
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        print(f'port_vid: {port.vid}, port_pid: {port.pid}')
+        print(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
-            print(f'port: {port.device}')
+            print(f"port: {port.device}")
             return port.device
-    return None 
+    return None
 
-async def _write_to_csv(f_name, header_write: bool, timestamp: float, data: Dict) -> None:
+
+async def _write_to_csv(
+    f_name, header_write: bool, timestamp: float, data: Dict
+) -> None:
     """Append a data line to the CSV file (offloaded to a thread).
 
     Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
@@ -61,28 +67,33 @@ async def _write_to_csv(f_name, header_write: bool, timestamp: float, data: Dict
         with open(f_name, "a", newline="") as f:
             writer = csv.writer(f)
             if header_write:
-                writer.writerow([
-                    "Time(s)",
-                    "target_guage_pressure",
-                    "current_guage_pressure",
-                    "pressure_abs_a",
-                    "pressure_abs_b",
-                    "pressure_atm",
-                    "vacuum_enabled",
-                    "vent_state"
-                                    ])
-            writer.writerow([
-                f"{timestamp:.2f}",
-                f"{data['target_guage_pressure']}",
-                f"{data['current_guage_pressure']}",
-                f"{data['pressure_abs_a']}",
-                f"{data['pressure_abs_b']}",
-                f"{data['pressure_atm']}",
-                f"{data['vacuum_enabled']}",
-                f"{data['vent_state']}"
-            ])
+                writer.writerow(
+                    [
+                        "Time(s)",
+                        "target_guage_pressure",
+                        "current_guage_pressure",
+                        "pressure_abs_a",
+                        "pressure_abs_b",
+                        "pressure_atm",
+                        "vacuum_enabled",
+                        "vent_state",
+                    ]
+                )
+            writer.writerow(
+                [
+                    f"{timestamp:.2f}",
+                    f"{data['target_guage_pressure']}",
+                    f"{data['current_guage_pressure']}",
+                    f"{data['pressure_abs_a']}",
+                    f"{data['pressure_abs_b']}",
+                    f"{data['pressure_atm']}",
+                    f"{data['vacuum_enabled']}",
+                    f"{data['vent_state']}",
+                ]
+            )
 
     await asyncio.to_thread(_append)
+
 
 async def read_continuous_data(f_name, pump, start_time, run_time):
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
@@ -99,7 +110,8 @@ async def read_continuous_data(f_name, pump, start_time, run_time):
             await _write_to_csv(f_name, head_writer, ts, pressure_dict)
             head_writer = False
     except Exception as e:
-        raise(e)
+        raise (e)
+
 
 async def read_data(f_name, pump, start_time, duration: int):
     try:
@@ -110,24 +122,28 @@ async def read_data(f_name, pump, start_time, duration: int):
     except Exception as e:
         logging.info(f"continuous read error: {e}")
 
+
 async def flow_rate_thread(target_pressure):
     m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
     if m_port is None:
         logging.error("Could not find mass flow sensor port")
         return
     loop = asyncio.get_running_loop()
-    path = f'/data/testing_data/test-data/'
-    f_name = f'FlowrateData_{target_pressure}_{current_datetime}_{args.test_name}.csv'
+    path = f"/data/testing_data/test-data/"
+    f_name = f"FlowrateData_{target_pressure}_{current_datetime}_{args.test_name}.csv"
     file_name = path + f_name
-    sensor = await driver.MassFlowSensor.create(port=m_port,
-                                                csv_path = file_name,  
-                                                loop= loop)
+    sensor = await driver.MassFlowSensor.create(
+        port=m_port, csv_path=file_name, loop=loop
+    )
     # await sensor.connect()
     try:
         await sensor.set_csv_filename(file_name)
-        await sensor.read_continuous_data(args.run_sec+args.settle_sec+args.decay_sec)
+        await sensor.read_continuous_data(
+            args.run_sec + args.settle_sec + args.decay_sec
+        )
     except Exception as e:
         logging.critical("Critical failure: %s", e)
+
 
 async def vacuum_manifold(target_pressure):
     port = await find_port_by_id(VM_idVendor, VM_idProduct)
@@ -135,44 +151,48 @@ async def vacuum_manifold(target_pressure):
         logging.error("Could not find vacuum module port")
         return
     loop = asyncio.get_running_loop()
-    path = f'/data/testing_data/test-data/'
-    f_name = f'PressureData_{target_pressure}_{current_datetime}_{args.test_name}.csv'
+    path = f"/data/testing_data/test-data/"
+    f_name = f"PressureData_{target_pressure}_{current_datetime}_{args.test_name}.csv"
     file_name = path + f_name
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
     start_time = time.perf_counter()
     target_to_pump = target_pressure - atm_pressure
     await pump.set_vent_state(True)
     await asyncio.sleep(1)
-    # Set Pressure and Vacuum to target for x amount of time. 
-    await pump.set_vacuum_state(enable_vacuum = True,
-                                guage_pressure_mbar = target_to_pump,
-                                duration = None,
-                                )
+    # Set Pressure and Vacuum to target for x amount of time.
+    await pump.set_vacuum_state(
+        enable_vacuum=True,
+        guage_pressure_mbar=target_to_pump,
+        duration=None,
+    )
     logging.info(f"pump started at target {target_pressure} mbar")
     # Run the continuous data reader for RUN_SEC seconds.
     await read_data(file_name, pump, start_time, args.run_sec + args.settle_sec)
     # Stop the pump
-    await pump.set_vacuum_state(enable_vacuum = False,
-                                guage_pressure_mbar = target_to_pump,
-                                duration = None,
-                                )
+    await pump.set_vacuum_state(
+        enable_vacuum=False,
+        guage_pressure_mbar=target_to_pump,
+        duration=None,
+    )
     # Vent the pump system to atmospheric pressure while pump is on
     await pump.set_vent_state(False)
-    await read_data(file_name, pump, start_time, args.vent_sec+args.decay_sec)
+    await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
     await pump.set_vent_state(True)
+
 
 async def main(args):
     thread_1 = asyncio.create_task(flow_rate_thread(args.target_pressure))
     thread_2 = asyncio.create_task(vacuum_manifold(args.target_pressure))
     await asyncio.gather(thread_1, thread_2)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--target_pressure", type=int, default=600)
     parser.add_argument("--run_sec", type=int, default=35)
-    parser.add_argument("--vent_sec", type=int, default = 10)
-    parser.add_argument("--decay_sec", type=int, default = 20)
-    parser.add_argument("--settle_sec", type=int, default = 21)
+    parser.add_argument("--vent_sec", type=int, default=10)
+    parser.add_argument("--decay_sec", type=int, default=20)
+    parser.add_argument("--settle_sec", type=int, default=21)
     parser.add_argument("--test_name", type=str, default="test_name")
     args = parser.parse_args()
 

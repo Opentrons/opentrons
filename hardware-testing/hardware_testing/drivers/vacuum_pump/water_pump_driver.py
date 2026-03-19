@@ -6,12 +6,14 @@ from typing import List, Optional, Set
 import asyncio
 import time
 
-COMMANDS = {'pumpOn': 'ON', 
-            'pumpOff': 'OFF',
-            'autoOn': 'AUTO ON',
-            'autoOff': 'AUTO OFF',
-            'check': 'CHECK',
-            'status': 'STATUS'}
+COMMANDS = {
+    "pumpOn": "ON",
+    "pumpOff": "OFF",
+    "autoOn": "AUTO ON",
+    "autoOff": "AUTO OFF",
+    "check": "CHECK",
+    "status": "STATUS",
+}
 
 """Ready. Commands: ON, OFF, AUTO ON, AUTO OFF, CHECK, STATUS"""
 
@@ -19,7 +21,8 @@ BAUDRATE = 115200
 DEFAULT_V_TIMEOUT = 1
 V_ACK = "\r\n"
 
-class WaterPump():
+
+class WaterPump:
     def __init__(self, connection: Serial):
         self.connection = connection
         self.st = time.perf_counter()
@@ -28,29 +31,31 @@ class WaterPump():
         self._log_categories: Optional[Set[str]] = None  # None => all
 
     @classmethod
-    async def create(cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop])-> "WaterPump":
+    async def create(
+        cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> "WaterPump":
         """Create a connection"""
         conn = Serial(port=port, baudrate=baudrate, timeout=1.0)
-        return WaterPump(connection = conn)
+        return WaterPump(connection=conn)
 
-    async def connect(self)-> None:
+    async def connect(self) -> None:
         try:
             if self.connection.is_open:
-                self._log('state', 'Connection open')
+                self._log("state", "Connection open")
         except Exception as e:
             raise e
 
     async def disconnect(self) -> None:
         """Disconnect."""
-        try: 
+        try:
             if self.connection.is_open:
                 self.connection.close()
-                print('Connection close')
+                print("Connection close")
         except Exception as e:
             raise RuntimeError(f"Unable to connect: {e}") from e
-    
+
     async def turn_motor_on(self):
-        """"Change the state of the Pump, either on or off"""
+        """ "Change the state of the Pump, either on or off"""
         command = f"{COMMANDS['pumpOn']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -58,15 +63,15 @@ class WaterPump():
         try:
             while True:
                 line = await self._readline()
-                self._log('Motor:', line)
-                if line != '':
+                self._log("Motor:", line)
+                if line != "":
                     return line
         except Exception as e:
-            self._log('error', f"Continuous read error: {e}")
-            raise(e)
+            self._log("error", f"Continuous read error: {e}")
+            raise (e)
 
     async def turn_motor_off(self):
-        """"Change the state of the Pump, either on or off"""
+        """ "Change the state of the Pump, either on or off"""
         command = f"{COMMANDS['pumpOff']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -74,24 +79,24 @@ class WaterPump():
         try:
             while True:
                 line = await self._readline()
-                self._log('Motor:', line)
-                if line != '':
+                self._log("Motor:", line)
+                if line != "":
                     return line
         except Exception as e:
-            self._log('error', f"Continuous read error: {e}")
-            raise(e)
+            self._log("error", f"Continuous read error: {e}")
+            raise (e)
 
     async def check_water_level(self):
-        """"Change the state of the Pump, either on or off"""
+        """ "Change the state of the Pump, either on or off"""
         command = f"{COMMANDS['CHECK']}{V_ACK}"
         await self._write(command.encode())
         try:
             while True:
                 line = await self._readline()
-                self._log('Water Level:', line)
+                self._log("Water Level:", line)
         except Exception as e:
-            self._log('error', f"Continuous read error: {e}")
-            raise(e)
+            self._log("error", f"Continuous read error: {e}")
+            raise (e)
 
     async def _write(self, data: bytes) -> None:
         """Non-blocking write operation."""
@@ -99,16 +104,17 @@ class WaterPump():
             # Offload write to another thread to avoid blocking the event loop
             await asyncio.to_thread(self.connection.write, data)
         except Exception as e:
-            raise(e)
-        
+            raise (e)
+
     async def _readline(self) -> str:
         """Non-blocking read operation."""
         try:
             # Offload readline to another thread to avoid blocking the event loop
             return (await asyncio.to_thread(self.connection.readline)).decode("utf-8")
         except Exception as e:
-            raise(e)
+            raise (e)
         # ---------------------- Logging Helpers ----------------------
+
     def enable_logging(self, categories: Optional[Set[str]] = None) -> None:
         """Enable logging. Pass a set of categories to filter; None => all categories.
 
@@ -132,6 +138,7 @@ class WaterPump():
         if self._should_log(category):
             # Simple format; could route to ctx.comment or standard logger.
             print(f"[{category}] {message}")
+
 
 # async def main():
 #     pump = await WaterPump.create(port ='COM10', baudrate = 115200, loop = None)

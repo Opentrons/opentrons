@@ -13,14 +13,18 @@ FG_ERROR_KEYWORD = "err"
 FG_ASYNC_ERROR_ACK = "async"
 DEFAULT_COMMAND_RETRIES = 0
 
+
 class Mark10ProtocolError(Exception):
-    pass 
+    pass
+
 
 class Mark10Error(Exception):
     pass
 
+
 class AbstractForceGaugeDriver(Protocol):
     """Protocol for the force gauge driver."""
+
     async def connect(self) -> None:
         """Connect to force gauge."""
         ...
@@ -38,6 +42,7 @@ class AbstractForceGaugeDriver(Protocol):
         """Read Force in Newtons."""
         ...
 
+
 class Mark10(AbstractForceGaugeDriver):
     """Mark10 Driver."""
 
@@ -52,7 +57,9 @@ class Mark10(AbstractForceGaugeDriver):
         self._units = None
 
     @classmethod
-    async def create(cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]) -> "Mark10":
+    async def create(
+        cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> "Mark10":
         """Create a Mark10 driver."""
         conn = Serial(port=port, baudrate=baudrate, timeout=FG_TIMEOUT)
         return Mark10(connection=conn)
@@ -73,7 +80,7 @@ class Mark10(AbstractForceGaugeDriver):
 
     async def disconnect(self) -> None:
         """Disconnect."""
-        try: 
+        try:
             if self._force_guage.is_open:
                 await self._force_guage.close()
                 # logger.info("Disconneted from force gauge")
@@ -89,7 +96,6 @@ class Mark10(AbstractForceGaugeDriver):
         except Exception as e:
             # logger.error(f"Error writing to force gauge: {e}")
             raise Mark10Error("Unable to write to force gauge")
-
 
     async def _readline(self) -> str:
         """Non-blocking read operation."""

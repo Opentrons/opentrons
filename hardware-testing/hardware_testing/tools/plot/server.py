@@ -80,7 +80,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         path_list_grav = self._list_file_paths_in_directory(
             self.plot_directory, "GravimetricRecorder"
         )
-        print(f'Plot list grav: {path_list_grav}')
+        print(f"Plot list grav: {path_list_grav}")
         path_list_pip = self._list_file_paths_in_directory(
             self.plot_directory, "CSVReport"
         )
