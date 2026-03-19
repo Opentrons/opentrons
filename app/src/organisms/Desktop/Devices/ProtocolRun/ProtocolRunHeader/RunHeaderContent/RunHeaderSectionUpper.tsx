@@ -9,7 +9,6 @@ import {
   Box,
   DISPLAY_GRID,
   Flex,
-  JUSTIFY_FLEX_END,
   NO_WRAP,
   SPACING,
   StyledText,
@@ -61,7 +60,7 @@ export function RunHeaderSectionUpper(
           />
         }
       />
-      <Flex justifyContent={JUSTIFY_FLEX_END}>
+      <Flex css={BUTTONS_CONTAINER_STYLE}>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           {isCancellableStatus(runStatus) && (
             <AlertPrimaryButton
@@ -85,7 +84,21 @@ export function RunHeaderSectionUpper(
   )
 }
 
+const BUTTONS_CONTAINER_STYLE = css`
+  justify-content: flex-end;
+
+  @media (max-width: 60rem) {
+    justify-content: flex-start;
+  }
+`
+
 const SECTION_STYLE = css`
   display: ${DISPLAY_GRID};
   grid-template-columns: 4fr 3fr 3fr 4fr;
+
+  @media (max-width: 60rem) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    row-gap: ${SPACING.spacing16};
+  }
 `
