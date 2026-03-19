@@ -1,12 +1,12 @@
-from typing import Optional, Protocol
+from typing import Dict, Optional, Protocol
 
-from .types import (
+from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
     PressureControlTunings,
     PressureState,
     PumpState,
-    VacuumModuleInfo,
+    VentState,
     WasteConfigParameters,
 )
 
@@ -26,7 +26,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Check connection to vacuum module."""
         ...
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         ...
 
@@ -82,7 +82,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Get the pump state."""
         ...
 
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
         ...
 
