@@ -1,24 +1,24 @@
 .accordion_container {
+  display: flex;
   width: 100%;
   max-width: 64rem;
-  display: flex;
   flex-direction: column;
   background-color: var(--transparent);
 }
 
 .accordion_header {
+  display: flex;
   width: 100%;
   min-height: 3rem;
-  display: flex;
   align-items: center;
   justify-content: flex-end;
   background-color: var(--transparent);
 }
 
 .chevron_button {
+  display: flex;
   width: 3rem;
   height: 3rem;
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
