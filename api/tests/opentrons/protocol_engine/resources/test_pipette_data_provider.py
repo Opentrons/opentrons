@@ -128,10 +128,11 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
-        },
+        # uncomment and pick this diff when this branch gets merged into edge/9.0
+        #available_volume_modes_min_vol={
+        #    VolumeModes.default: 5.0,
+        #    VolumeModes.lowVolumeDefault: 0.5,
+        #},
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -170,10 +171,11 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
-        },
+        # uncomment and pick this diff when this branch gets merged into edge/9.0
+        #available_volume_modes_min_vol={
+        #    VolumeModes.default: 5.0,
+        #    VolumeModes.lowVolumeDefault: 0.5,
+        #},
     )
 
 
