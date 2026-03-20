@@ -1070,6 +1070,7 @@ class OT3Controller(FlexBackend):
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
         lookup_name = {
             FirmwarePipetteName.p1000_single: "P1KS",
+            FirmwarePipetteName.p5000_single: "P5KS",
             FirmwarePipetteName.p1000_multi: "P1KM",
             FirmwarePipetteName.p1000_multi_em: "P1KP",
             FirmwarePipetteName.p50_single: "P50S",
