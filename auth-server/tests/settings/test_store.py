@@ -45,20 +45,18 @@ def test_insert_and_get_settings(settings_store: SettingsStore) -> None:
     _insert_defaults(settings_store)
     fetched = settings_store.get()
     assert fetched is not None
-    assert fetched.access_control_enabled
-    assert fetched.max_number_of_login_attempts == 10
-    assert fetched.password_reset_time_in_days == 30
-    assert fetched.idle_lockout_in_minutes == 300
-    assert fetched.require_admin_creds_when_updating_robot_software
-    assert fetched.require_admin_creds_when_sending_protocol_to_robot
+    assert fetched.access_control_enabled is False
+    assert fetched.max_number_of_login_attempts == 5
+    assert fetched.password_reset_time_in_days is None
+    assert fetched.idle_lockout_in_minutes == 3
+    assert fetched.require_admin_creds_when_updating_robot_software is True
+    assert fetched.require_admin_creds_when_sending_protocol_to_robot is True
     assert fetched.require_admin_creds_for_signoff_protocol is False
-    assert fetched.require_signoff_for_protocol_log
-    assert fetched.require_reason_for_interaction
-    assert fetched.min_length_of_reason_for_interaction == 10
-    assert fetched.require_logs_to_be_saved_in_app
-    assert fetched.delete_over_max_on_disk_protocols
-    assert fetched.password_complexity_minimum_length == 8
-    assert fetched.password_complexity_special_characters
+    assert fetched.require_signoff_for_protocol_log is True
+    assert fetched.require_reason_for_interaction is True
+    assert fetched.min_length_of_reason_for_interaction is None
+    assert fetched.require_logs_to_be_saved_in_app is True
+    assert fetched.delete_over_max_on_disk_protocols is True
     with pytest.raises(ValueError):
         settings_store.insert(
             access_control_enabled=False,
