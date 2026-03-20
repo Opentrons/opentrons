@@ -25,8 +25,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  VACUUM_MODULE_V1,
   VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'

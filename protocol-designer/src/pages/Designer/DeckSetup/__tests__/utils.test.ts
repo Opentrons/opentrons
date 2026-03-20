@@ -60,8 +60,7 @@ describe('getModuleModelsBySlot', () => {
   it('renders all flex modules for B1', () => {
     expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'B1')).toEqual(
       FLEX_MODULE_MODELS.filter(
-        model =>
-          model !== ABSORBANCE_READER_V1 && model !== VACUUM_MODULE_V1
+        model => model !== ABSORBANCE_READER_V1 && model !== VACUUM_MODULE_V1
       )
     )
   })

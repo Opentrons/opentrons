@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
-  VACUUM_MODULE_V1,
   VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
