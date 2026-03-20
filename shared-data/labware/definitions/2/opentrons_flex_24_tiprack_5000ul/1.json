@@ -274,7 +274,7 @@
     }
   ],
   "parameters": {
-    "format": "24Standard",
+    "format": "irregular",
     "quirks": [],
     "isTiprack": true,
     "tipLength": 120,
