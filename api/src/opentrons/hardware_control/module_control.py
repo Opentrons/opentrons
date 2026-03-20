@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Union
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
-from . import modules
+from . import modules, peripherals
 from .types import (
     AionotifyEvent,
     AsynchronousModuleErrorNotification,
@@ -52,6 +52,8 @@ MODULE_PORT_REGEX = re.compile(
     re.I,
 )
 
+PERIPHERALS = ["barcodescanner"]
+
 
 class AttachedModulesControl:
     """
@@ -66,6 +68,7 @@ class AttachedModulesControl:
         event_callback: Callable[[HardwareEvent], None],
     ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
+        self._available_peripherals: List[peripherals.AbstractPeripheral] = []
         self._api = api
         self._usb = usb
         self._event_callback = event_callback
@@ -106,6 +109,10 @@ class AttachedModulesControl:
     def available_modules(self) -> List[modules.AbstractModule]:
         return self._available_modules
 
+    @property
+    def available_peripherals(self) -> List[peripherals.AbstractPeripheral]:
+        return self._available_peripherals
+
     async def clean_up(self) -> None:
         """Clean up all registered modules and emulator scanning tasks (if any)."""
         for module in self._available_modules:
@@ -138,6 +145,22 @@ class AttachedModulesControl:
         )
         return module
 
+    async def register_simulated_peripheral(
+        self,
+        simulated_usb_port: types.USBPort,
+        type: peripherals.PeripheralType,
+        sim_model: str,
+    ) -> peripherals.AbstractPeripheral:
+        """Register a simulated peripheral."""
+        peripheral = await self.build_peripheral(
+            "", simulated_usb_port, type, sim_model, sim_serial_number=None
+        )
+        self._available_peripherals.append(peripheral)
+        self._available_peripherals = sorted(
+            self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
+        )
+        return peripheral
+
     async def build_module(
         self,
         port: str,
@@ -164,6 +187,28 @@ class AttachedModulesControl:
         mod.event_listener(last_event)
         self.subscribe_to_api_event(mod)
         return mod
+
+    async def build_peripheral(
+        self,
+        port: str,
+        usb_port: types.USBPort,
+        type: peripherals.PeripheralType,
+        sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
+    ) -> peripherals.AbstractPeripheral:
+        per = await peripherals.build(
+            port=port,
+            usb_port=usb_port,
+            type=type,
+            simulating=self._api.is_simulator,
+            hw_control_loop=self._api.loop,
+            execution_manager=self._api._execution_manager,
+            sim_model=sim_model,
+            sim_serial_number=sim_serial_number,
+            disconnected_callback=self._disconnected_callback,
+            error_callback=self._async_error_callback,
+        )
+        return per
 
     def _disconnected_callback(
         self, model: str, port: str, serial: Optional[str]
@@ -250,6 +295,48 @@ class AttachedModulesControl:
             await removed_mod.cleanup()
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
+        )
+
+    async def register_peripherals(
+        self,
+        new_per_at_ports: Optional[
+            Union[List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]]
+        ] = None,
+        removed_per_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+    ) -> None:
+        if new_per_at_ports is None:
+            new_per_at_ports = []
+        if removed_per_at_ports is None:
+            removed_per_at_ports = []
+        self._new_per_at_ports = new_per_at_ports
+        unsorted_per_at_port = self._usb.match_virtual_ports(new_per_at_ports)
+        # build new peripherals
+        for per in unsorted_per_at_port:
+            try:
+                new_instance = await self.build_peripheral(
+                    port=per.port,
+                    usb_port=per.usb_port,
+                    type=peripherals.PERIPHERAL_TYPE_BY_NAME[per.name],
+                    sim_serial_number=(
+                        per.serial_number
+                        if isinstance(per, SimulatingModuleAtPort)
+                        else None
+                    ),
+                    sim_model=(
+                        per.model if isinstance(per, SimulatingModuleAtPort) else None
+                    ),
+                )
+                self._available_peripherals.append(new_instance)
+                log.info(
+                    f"Peripheral {per.name} discovered and attached"
+                    f" at port {per.port}, new_instance: {new_instance}"
+                )
+            except Exception as e:
+                log.exception(
+                    f"Failed to build peripheral {per.name} at port {per.port}: {e}"
+                )
+        self._available_peripherals = sorted(
+            self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )
 
     async def register_modules(
@@ -387,10 +474,16 @@ class AttachedModulesControl:
                 new_modules = [maybe_module_at_port]
                 log.info(f"Module Added: {maybe_module_at_port}")
             try:
-                await self.register_modules(
-                    removed_mods_at_ports=removed_modules,
-                    new_mods_at_ports=new_modules,
-                )
+                if maybe_module_at_port.name in PERIPHERALS:
+                    await self.register_peripherals(
+                        removed_per_at_ports=removed_modules,
+                        new_per_at_ports=new_modules,
+                    )
+                else:
+                    await self.register_modules(
+                        removed_mods_at_ports=removed_modules,
+                        new_mods_at_ports=new_modules,
+                    )
             except Exception:
                 log.exception("Exception in Module registration")
 
