@@ -205,48 +205,84 @@ stages:
           requireLogsToBeSavedInApp: true
           deleteOverMaxOnDiskProtocols: true
 
-# ---
-# test_name: DELETE resets to defaults
+---
+test_name: DELETE resets to defaults
 
-# marks:
-#   - usefixtures:
-#       - run_server
-#       - admin_access_token
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
 
-# stages:
-#   - name: PATCH to change some settings
-#     request:
-#       method: PATCH
-#       url: '{run_server.base_url}/auth/settings'
-#       headers:
-#         Authorization: '{admin_access_token}'
-#       json:
-#         data:
-#           accessControlEnabled: true
-#     response:
-#       status_code: 200
-#       json:
-#         data:
-#           accessControlEnabled: true
+stages:
+  - name: PATCH to change some settings
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
+          maxNumberOfLoginAttempts: 5
+          passwordResetTimeInDays: null
+          passwordComplexity: null
+          idleLockoutInMinutes: 3
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+          requireSignoffForProtocolLog: true
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true
 
-#   - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
-#     request:
-#       method: DELETE
-#       url: '{run_server.base_url}/auth/settings'
-#       headers:
-#         Authorization: '{admin_access_token}'
-#     response:
-#       status_code: 200
-#       json:
-#         data:
-#           accessControlEnabled: true
+  - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: false
+          deleteOverMaxOnDiskProtocols: true
+          maxNumberOfLoginAttempts: 5
+          passwordResetTimeInDays: null
+          minLengthOfReasonForInteraction: null
+          passwordComplexity: null
+          idleLockoutInMinutes: 3
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+          requireSignoffForProtocolLog: true
+          requireReasonForInteraction: true
+          requireLogsToBeSavedInApp: true
 
-#   - name: GET after DELETE returns the newly reset settings
-#     request:
-#       method: GET
-#       url: '{run_server.base_url}/auth/settings'
-#     response:
-#       status_code: 200
-#       json:
-#         data:
-#           accessControlEnabled: true
+  - name: GET after DELETE returns the newly reset settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: false
+          maxNumberOfLoginAttempts: 5
+          passwordResetTimeInDays: null
+          passwordComplexity: null
+          idleLockoutInMinutes: 3
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+          requireSignoffForProtocolLog: true
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true
