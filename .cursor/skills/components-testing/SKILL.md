@@ -40,15 +40,15 @@ components-testing/
 
 ## Makefile Targets
 
-| Target                   | Description                                                |
-| ------------------------ | ---------------------------------------------------------- |
-| `make setup`             | Build/extract local packages, `pnpm install --frozen-lockfile` |
-| `make dev`               | Run Vite dev server (runs `setup` first)                   |
-| `make test-setup`        | Install Playwright Chromium (`make setup` first)           |
-| `make test`              | Playwright + Eyes (needs `APPLITOOLS_API_KEY`)             |
-| `make build-local-packages` | Rebuild pack only                                       |
-| `make clean-local-packages` | Remove `pack/`                                           |
-| `make teardown`          | Remove `pack/` and `node_modules`                          |
+| Target                      | Description                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| `make setup`                | Build/extract local packages, `pnpm install --frozen-lockfile` |
+| `make dev`                  | Run Vite dev server (runs `setup` first)                       |
+| `make test-setup`           | Install Playwright Chromium (`make setup` first)               |
+| `make test`                 | Playwright + Eyes (needs `APPLITOOLS_API_KEY`)                 |
+| `make build-local-packages` | Rebuild pack only                                              |
+| `make clean-local-packages` | Remove `pack/`                                                 |
+| `make teardown`             | Remove `pack/` and `node_modules`                              |
 
 ## Quick Start
 

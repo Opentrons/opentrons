@@ -1,7 +1,8 @@
 import 'dotenv/config'
 
-import type { EyesFixture } from '@applitools/eyes-playwright/fixture'
 import { defineConfig, devices } from '@playwright/test'
+
+import type { EyesFixture } from '@applitools/eyes-playwright/fixture'
 
 const isCI = process.env.CI != null && process.env.CI !== ''
 
@@ -12,10 +13,7 @@ const isCI = process.env.CI != null && process.env.CI !== ''
 // eslint-disable-next-line import/no-default-export
 export default defineConfig<EyesFixture>({
   testDir: './tests',
-  reporter: [
-    ['html'],
-    ['@applitools/eyes-playwright/reporter'],
-  ],
+  reporter: [['html'], ['@applitools/eyes-playwright/reporter']],
   use: {
     baseURL: 'http://localhost:5173',
     viewport: { width: 1200, height: 800 },
