@@ -1283,13 +1283,13 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
         ("OT-3 Standard", DeckType.OT3_STANDARD),
     ],
 )
-@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 29)))
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
 def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     decoy: Decoy,
     mock_state_view: StateView,
     api_version: APIVersion,
 ) -> None:
-    """It should pass when location is a well and API version is at or over 2.29."""
+    """It should pass when location is a well and API version is at or over 2.28."""
     decoy.when(
         mock_state_view.pipettes.get_is_partially_configured("pipette-id")
     ).then_return(True)
@@ -1436,14 +1436,14 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     ],
 )
 @pytest.mark.parametrize(
-    "api_version", versions_below(APIVersion(2, 29), flex_only=True)
+    "api_version", versions_below(APIVersion(2, 28), flex_only=True)
 )
 def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
     decoy: Decoy,
     mock_state_view: StateView,
     api_version: APIVersion,
 ) -> None:
-    """It should pass when location is a well and API version is below 2.29."""
+    """It should pass when location is a well and API version is below 2.28."""
     decoy.when(
         mock_state_view.pipettes.get_is_partially_configured("pipette-id")
     ).then_return(True)

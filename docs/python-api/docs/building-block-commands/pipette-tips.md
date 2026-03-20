@@ -109,7 +109,7 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 *New in version 2.16*
 
-The API automatically varies the tip drop location in the default trash container, or when you haven't specified a `location`, to help keep tips from piling up. Beginning with API version 2.29, you can add the optional `alternate_drop_location` argument to control the tip drop location in a specified `location`:
+The API automatically varies the tip drop location in the default trash container, or when you haven't specified a `location`, to help keep tips from piling up. Beginning with API version 2.28, you can add the optional `alternate_drop_location` argument to control the tip drop location in a specified `location`:
 
 ```python
 trash = protocol_context.load_trash_bin("A3")
@@ -124,7 +124,7 @@ pipette.drop_tip(
     location=secondary_trash,
     alternate_drop_location=True)
 ```
-*New in version 2.29*
+*New in version 2.28*
 
 In the example above, the pipette drops each tip in a slightly different location in the `secondary_trash`.  
 
@@ -138,7 +138,7 @@ pipette.return_tip()
 
 *New in version 2.0*
 
-Beginning with API version 2.29, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). 
+Beginning with API version 2.28, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). 
 
 When you return tips to their original position in the tip rack, you'll need to consider which tips, if any, you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. When you call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] again, the robot won't be able to access unused tips in column 2.
 
@@ -161,7 +161,7 @@ pipette.pick_up_tip()
 pipette.drop_tip(tiprack_1["A1"])
 ```
 
-*New in version 2.29*
+*New in version 2.28*
 
 In the example above, the pipette uses automatic tip tracking to pick up the next available tip in its assigned tip rack. Then, it drops the attached tip in well A1 of the empty `tiprack_1`.
 
