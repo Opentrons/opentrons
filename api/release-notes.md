@@ -8,21 +8,27 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.9.0
+
+Welcome to the v8.9.0 release of the Opentrons robot software!
+
+This release includes support for Opentrons Flex 20 µL pipette tips. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands and with Flex 1- and 8-Channel (1-50 µL range) and 96-Channel (1-200 µL range) pipettes.
+
 ## Opentrons Robot Software Changes in 8.8.1
 
 The 8.8.1 hotfix release includes a small fix to allow all robots to properly boot after a recent upgrade.
 
-If error recovery was enabled in v8.8.0, installing v8.8.1 allows the robot to properly boot. 
+If error recovery was enabled in v8.8.0, installing v8.8.1 allows the robot to properly boot.
 
 ## Opentrons Robot Software Changes in 8.8.0
 
-Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.  
+Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.
 
 ### New Features
 
-- Use new concurrent commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously. 
--  Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action. 
-- Capture images of the Flex or OT-2 deck during a protocol. 
+- Use new concurrent commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously.
+- Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action.
+- Capture images of the Flex or OT-2 deck during a protocol.
 - Choose where your Flex pipette will select a new tip when performing a transfer with a liquid class.
 
 ---
