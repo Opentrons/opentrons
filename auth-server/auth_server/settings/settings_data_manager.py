@@ -88,9 +88,7 @@ class SettingsDataManager:
 
         # Step 2: Update only the fields the user sent
         non_null_updates = patch.model_dump(exclude_none=True)
-        store_kwargs = _patch_to_store_kwargs(
-            non_null_updates
-        )  # partial dict → partial kwargs
+        store_kwargs = _patch_to_store_kwargs(non_null_updates)
         if store_kwargs:
             self._settings_store.update(**store_kwargs)
 
