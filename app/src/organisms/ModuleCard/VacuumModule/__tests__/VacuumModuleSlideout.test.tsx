@@ -14,7 +14,7 @@ vi.mock('../hooks/useVacuumModuleControls')
 
 const mockVacuumModule: VacuumModule = {
   id: 'vacuum_id',
-  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleModel: 'vacuumModuleV1',
   moduleType: 'vacuumModuleType',
   serialNumber: 'vac123',
   hardwareRevision: 'vacuum_v1.0',

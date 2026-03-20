@@ -11,7 +11,7 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
@@ -61,7 +61,7 @@ describe('getModuleModelsBySlot', () => {
     expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'B1')).toEqual(
       FLEX_MODULE_MODELS.filter(
         model =>
-          model !== ABSORBANCE_READER_V1 && model !== VACUUM_MODULE_MILLIPORE_V1
+          model !== ABSORBANCE_READER_V1 && model !== VACUUM_MODULE_V1
       )
     )
   })
@@ -70,7 +70,7 @@ describe('getModuleModelsBySlot', () => {
       model =>
         model !== THERMOCYCLER_MODULE_V2 &&
         model !== ABSORBANCE_READER_V1 &&
-        model !== VACUUM_MODULE_MILLIPORE_V1
+        model !== VACUUM_MODULE_V1
     )
     expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'C1')).toEqual(noTC)
   })

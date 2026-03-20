@@ -1444,7 +1444,7 @@ class ModuleView:
         elif model == ModuleModel.VACUUM_MODULE_V1:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
-            return f"vacuumModuleMilliporeV1{deck_slot.value}"
+            return f"vacuumModuleV1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -178,7 +178,7 @@ const mockFlexStacker = {
 } as any
 const mockVacuumModule = {
   id: 'vacuum_id',
-  moduleModel: VACUUM_MODULE_MILLIPORE_V1,
+  moduleModel: VACUUM_MODULE_V1,
   moduleType: VACUUM_MODULE_TYPE,
   data: {
     status: 'idle',
