@@ -31,6 +31,7 @@ function TouchInputFieldStory(
   return (
     <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing4 }}>
       <TouchInputFieldComponent
+        autoFocus
         {...args}
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +51,7 @@ function TouchInputFieldWithErrorStory(
   return (
     <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing4 }}>
       <TouchInputFieldComponent
+        autoFocus 
         {...args}
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
