@@ -237,20 +237,25 @@ describe('v8.9.0 migration', () => {
 describe('isBroken890Export', () => {
   const v880TCProfile: LegacyFormData = {
     id: 'v880-tc-profile',
+    stepType: 'thermocycler',
     stepName: 'profile step name',
     stepDetails: 'profile step details',
-    stepType: 'thermocycler',
+
     thermocyclerFormType: 'thermocyclerProfile',
+
     moduleId: 'thermocycler-module-id',
+
     blockIsActive: false,
     blockTargetTemp: null,
     lidIsActive: false,
     lidTargetTemp: null,
     lidOpen: false,
+
     orderedProfileItems: [],
     profileItemsById: {},
     profileTargetLidTemp: '40',
     profileVolume: '10',
+
     blockIsActiveHold: true,
     blockTargetTempHold: '123',
     lidIsActiveHold: true,
@@ -260,16 +265,20 @@ describe('isBroken890Export', () => {
 
   const v890TCProfileStart: FormData = {
     id: 'v890-tc-profile',
+    stepType: 'thermocycler',
     stepName: 'profile step name',
     stepDetails: 'profile step details',
-    stepType: 'thermocycler',
+
     thermocyclerFormType: 'thermocyclerProfile',
+
     moduleId: 'thermocycler-module-id',
+
     blockIsActive: false,
     blockTargetTemp: null,
     lidIsActive: false,
     lidTargetTemp: null,
     lidOpen: false,
+
     orderedProfileItems: [],
     profileItemsById: {},
     profileTargetLidTemp: '40',
@@ -281,6 +290,7 @@ describe('isBroken890Export', () => {
     stepType: 'pause',
     stepName: 'pause',
     stepDetails: '',
+
     pauseAction: 'untilThermocyclerProfileComplete',
     moduleId: 'thermocycler-module-id',
   }
@@ -319,7 +329,7 @@ describe('isBroken890Export', () => {
   })
 })
 
-/** Create a mock protocol file with the given commands and version.. */
+/** Create a mock protocol file with the given commands and version. */
 function createFile({
   orderedStepIds,
   savedStepForms,
