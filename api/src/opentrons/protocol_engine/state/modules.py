@@ -91,6 +91,9 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderMeasureMode,
 )
+from opentrons.protocol_engine.state.module_substates.vacuum_module_substate import (
+    VacuumModuleSubState,
+)
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
@@ -842,6 +845,20 @@ class ModuleView:
             module_id=module_id,
             expected_type=FlexStackerSubState,
             expected_name="Flex Stacker",
+        )
+
+    def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
+        """Return a `VacuumModululeSubState` for the given Vacuum Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Vacuum Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=VacuumModuleSubState,
+            expected_name="Vacuum Module",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
