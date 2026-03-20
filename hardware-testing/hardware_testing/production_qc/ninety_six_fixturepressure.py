@@ -725,9 +725,11 @@ async def _main(
     #     )
     # await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
     
+    
     await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, Point(x=342,y=288,z=111.5)
         )
+    await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
     ui.get_user_ready("Starting to pick up")
     #await api.move_rel(OT3Mount.LEFT,Point(z=30))
     
