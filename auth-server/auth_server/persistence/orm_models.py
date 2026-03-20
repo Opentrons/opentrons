@@ -25,6 +25,5 @@ class Settings(Base):
 
     __tablename__ = "settings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     key = Column(String, primary_key=True)
     value = Column(String, nullable=True)

@@ -7,20 +7,20 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.store import SettingsStore
 
 _DEFAULTS = {
-    "access_control_enabled": False,
-    "max_number_of_login_attempts": 5,
-    "password_reset_time_in_days": None,
-    "password_complexity_minimum_length": None,
-    "password_complexity_special_characters": None,
-    "idle_lockout_in_minutes": 3,
-    "require_admin_creds_when_updating_robot_software": True,
-    "require_admin_creds_when_sending_protocol_to_robot": True,
-    "require_admin_creds_for_signoff_protocol": False,
-    "require_signoff_for_protocol_log": True,
-    "require_reason_for_interaction": True,
-    "min_length_of_reason_for_interaction": None,
-    "require_logs_to_be_saved_in_app": True,
-    "delete_over_max_on_disk_protocols": True,
+    "access_control_enabled": "False",
+    "max_number_of_login_attempts": "5",
+    "password_reset_time_in_days": "None",
+    "password_complexity_minimum_length": "0",
+    "password_complexity_special_characters": "False",
+    "idle_lockout_in_minutes": "3",
+    "require_admin_creds_when_updating_robot_software": "True",
+    "require_admin_creds_when_sending_protocol_to_robot": "True",
+    "require_admin_creds_for_signoff_protocol": "False",
+    "require_signoff_for_protocol_log": "True",
+    "require_reason_for_interaction": "True",
+    "min_length_of_reason_for_interaction": "None",
+    "require_logs_to_be_saved_in_app": "True",
+    "delete_over_max_on_disk_protocols": "True",
 }
 
 
@@ -56,27 +56,27 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
     _upsert_defaults(settings_store)
     settings_store.delete_all()
     fetched = settings_store.get_all()
-    assert fetched is None
+    assert fetched == {}
 
 
 @pytest.mark.parametrize(
     "updates, expected_changes",
     [
         pytest.param(
-            {"max_number_of_login_attempts": 10},
-            {"max_number_of_login_attempts": 10},
+            {"max_number_of_login_attempts": "10"},
+            {"max_number_of_login_attempts": "10"},
             id="single-field",
         ),
         pytest.param(
             {
-                "access_control_enabled": True,
-                "idle_lockout_in_minutes": 30,
-                "password_reset_time_in_days": 90,
+                "access_control_enabled": "True",
+                "idle_lockout_in_minutes": "30",
+                "password_reset_time_in_days": "90",
             },
             {
-                "access_control_enabled": True,
-                "idle_lockout_in_minutes": 30,
-                "password_reset_time_in_days": 90,
+                "access_control_enabled": "True",
+                "idle_lockout_in_minutes": "30",
+                "password_reset_time_in_days": "90",
             },
             id="multiple-fields",
         ),
@@ -84,21 +84,16 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
 )
 def test_update_changes_only_specified_fields(
     settings_store: SettingsStore,
-    updates: dict[str, object],
-    expected_changes: dict[str, object],
+    updates: dict[str, str],
+    expected_changes: dict[str, str],
 ) -> None:
     """update should change only the specified fields and leave the rest unchanged."""
     _upsert_defaults(settings_store)
     settings_store.upsert_many({key: str(value) for key, value in updates.items()})
 
     fetched = settings_store.get_all()
-    assert fetched is not None
-
     expected = {**_DEFAULTS, **expected_changes}
-    for attr, value in expected.items():
-        assert getattr(fetched, attr) == value, (
-            f"{attr}: expected {value}, got {getattr(fetched, attr)}"
-        )
+    assert fetched == expected
 
 
 def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
@@ -106,4 +101,4 @@ def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
     settings_store.upsert("max_number_of_login_attempts", "10")
     fetched = settings_store.get_all()
     assert fetched is not None
-    assert fetched == {**_DEFAULTS, "max_number_of_login_attempts": "10"}
+    assert fetched == {"max_number_of_login_attempts": "10"}
