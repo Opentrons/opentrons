@@ -1,5 +1,5 @@
 import json
-from typing import Annotated, Any
+from typing import Annotated
 
 import fastapi
 from sqlalchemy.engine import Engine as SQLEngine
@@ -10,7 +10,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .models import PasswordComplexity, PatchSettingsRequestData, SettingsResponseData
+from .models import PatchSettingsRequestData, SettingsResponseData
 from .store import SettingsStore
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
 
@@ -22,6 +22,7 @@ class SettingsDataManager:
         self._settings_store = settings_store
 
     def get(self) -> SettingsResponseData:
+        """Get the current settings."""
         settings = self._settings_store.get_all()
         if not settings:
             return SettingsResponseData()
@@ -31,6 +32,7 @@ class SettingsDataManager:
         return SettingsResponseData.model_validate(parsed)
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
+        """Patch the current settings."""
         non_null_updates = patch.model_dump(exclude_none=True)
         db_updates: dict[str, str | None] = {
             k: json.dumps(v) for k, v in non_null_updates.items()
@@ -39,6 +41,7 @@ class SettingsDataManager:
         return self.get()
 
     def reset(self) -> SettingsResponseData:
+        """Reset all settings to their defaults."""
         self._settings_store.delete_all()
         return self.get()
 

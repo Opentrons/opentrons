@@ -7,20 +7,20 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.store import SettingsStore
 
 _DEFAULTS = {
-    "access_control_enabled": "False",
+    "accessControlEnabled": "False",
     "max_number_of_login_attempts": "5",
-    "password_reset_time_in_days": "None",
-    "password_complexity_minimum_length": "0",
-    "password_complexity_special_characters": "False",
-    "idle_lockout_in_minutes": "3",
-    "require_admin_creds_when_updating_robot_software": "True",
-    "require_admin_creds_when_sending_protocol_to_robot": "True",
-    "require_admin_creds_for_signoff_protocol": "False",
-    "require_signoff_for_protocol_log": "True",
-    "require_reason_for_interaction": "True",
-    "min_length_of_reason_for_interaction": "None",
-    "require_logs_to_be_saved_in_app": "True",
-    "delete_over_max_on_disk_protocols": "True",
+    "passwordResetTimeInDays": "None",
+    "passwordComplexityMinimumLength": "0",
+    "passwordComplexitySpecialCharacters": "False",
+    "idleLockoutInMinutes": "3",
+    "requireAdminCredsWhenUpdatingRobotSoftware": "True",
+    "requireAdminCredsWhenSendingProtocolToRobot": "True",
+    "requireAdminCredsForSignoffProtocol": "False",
+    "requireSignoffForProtocolLog": "True",
+    "requireReasonForInteraction": "True",
+    "minLengthOfReasonForInteraction": "None",
+    "requireLogsToBeSavedInApp": "True",
+    "deleteOverMaxOnDiskProtocols": "True",
 }
 
 
@@ -45,10 +45,10 @@ def test_upsert_and_get_settings(settings_store: SettingsStore) -> None:
     fetched = settings_store.get_all()
     assert fetched is not None
     assert fetched == {key: str(value) for key, value in _DEFAULTS.items()}
-    settings_store.upsert("max_number_of_login_attempts", "10")
+    settings_store.upsert("maxNumberOfLoginAttempts", "10")
     fetched = settings_store.get_all()
     assert fetched is not None
-    assert fetched == {**_DEFAULTS, "max_number_of_login_attempts": "10"}
+    assert fetched == {**_DEFAULTS, "maxNumberOfLoginAttempts": "10"}
 
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
@@ -63,20 +63,20 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
     "updates, expected_changes",
     [
         pytest.param(
-            {"max_number_of_login_attempts": "10"},
-            {"max_number_of_login_attempts": "10"},
+            {"maxNumberOfLoginAttempts": "10"},
+            {"maxNumberOfLoginAttempts": "10"},
             id="single-field",
         ),
         pytest.param(
             {
-                "access_control_enabled": "True",
-                "idle_lockout_in_minutes": "30",
-                "password_reset_time_in_days": "90",
+                "accessControlEnabled": "True",
+                "idleLockoutInMinutes": "30",
+                "passwordResetTimeInDays": "90",
             },
             {
-                "access_control_enabled": "True",
-                "idle_lockout_in_minutes": "30",
-                "password_reset_time_in_days": "90",
+                "accessControlEnabled": "True",
+                "idleLockoutInMinutes": "30",
+                "passwordResetTimeInDays": "90",
             },
             id="multiple-fields",
         ),
@@ -98,7 +98,7 @@ def test_update_changes_only_specified_fields(
 
 def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
     """upsert should create a new row if no settings row exists."""
-    settings_store.upsert("max_number_of_login_attempts", "10")
+    settings_store.upsert("maxNumberOfLoginAttempts", "10")
     fetched = settings_store.get_all()
     assert fetched is not None
-    assert fetched == {"max_number_of_login_attempts": "10"}
+    assert fetched == {"maxNumberOfLoginAttempts": "10"}
