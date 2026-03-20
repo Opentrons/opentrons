@@ -68,7 +68,7 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
         The first time you connect, the terminal will:
 
         * Show a message indicating the authenticity of the host can't be established. Ignore the message.
-        * Ask if you want to continue. Type the full word `yes` and click **Enter** or **Return** to continue.
+        * Ask if you want to continue. Type the full word `yes` and press **Enter** or **Return** to continue.
 
 8. Verify the connection. The terminal will show ASCII art that spells "OT2" when the connection is successful.
 
