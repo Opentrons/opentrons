@@ -1,0 +1,300 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1", "D1"],
+    ["A2", "B2", "C2", "D2"],
+    ["A3", "B3", "C3", "D3"],
+    ["A4", "B4", "C4", "D4"],
+    ["A5", "B5", "C5", "D5"],
+    ["A6", "B6", "C6", "D6"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Flex 24 Tip Rack 5000 µL",
+    "displayCategory": "tipRack",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.75,
+    "zDimension": 125
+  },
+  "gripForce": 16,
+  "gripHeightFromLabwareBottom": 23.9,
+  "wells": {
+    "A1": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 18.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B1": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 18.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C1": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 18.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D1": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 18.68,
+      "y": 15.86,
+      "z": 1.5
+    },
+    "A2": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 36.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B2": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 36.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C2": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 36.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D2": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 36.68,
+      "y": 15.86,
+      "z": 1.5
+    },
+    "A3": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 54.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B3": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 54.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C3": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 54.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D3": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 54.68,
+      "y": 15.86,
+      "z": 1.5
+    },
+    "A4": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 72.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B4": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 72.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C4": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 72.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D4": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 72.68,
+      "y": 15.86,
+      "z": 1.5
+    },
+    "A5": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 90.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B5": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 90.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C5": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 90.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D5": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 90.68,
+      "y": 15.86,
+      "z": 1.5
+    },
+    "A6": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 108.68,
+      "y": 69.86,
+      "z": 1.5
+    },
+    "B6": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 108.68,
+      "y": 51.86,
+      "z": 1.5
+    },
+    "C6": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 108.68,
+      "y": 33.86,
+      "z": 1.5
+    },
+    "D6": {
+      "depth": 111.5,
+      "shape": "circular",
+      "diameter": 14.2,
+      "totalLiquidVolume": 5000,
+      "x": 108.68,
+      "y": 15.86,
+      "z": 1.5
+    }
+  },
+  "groups": [
+    {
+      "metadata": {},
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "D1",
+        "A2",
+        "B2",
+        "C2",
+        "D2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
+        "A5",
+        "B5",
+        "C5",
+        "D5",
+        "A6",
+        "B6",
+        "C6",
+        "D6"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "24Standard",
+    "quirks": [],
+    "isTiprack": true,
+    "tipLength": 120,
+    "tipOverlap": 16.2,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_flex_24_tiprack_5000ul"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "opentrons_flex_tiprack_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 0.25
+    }
+  }
+}

@@ -30,6 +30,7 @@ PipetteName = Literal[
     "p1000_single",
     "p1000_single_gen2",
     "p1000_single_flex",
+    "p5000_single_flex",
     "p1000_multi_flex",
     "p1000_multi_em",
     "p1000_96",
@@ -57,6 +58,7 @@ class PipetteNameType(StrEnum):
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
     P1000_SINGLE_FLEX = "p1000_single_flex"
+    P5000_SINGLE_FLEX = "p5000_single_flex"
     P1000_MULTI_FLEX = "p1000_multi_flex"
     P1000_MULTI_EM = "p1000_multi_em"
     P1000_96 = "p1000_96"

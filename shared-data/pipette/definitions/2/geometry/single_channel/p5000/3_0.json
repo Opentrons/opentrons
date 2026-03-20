@@ -1,0 +1,20 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
+  "pathTo3D": "pipette/definitions/2/geometry/single_channel/p1000/placeholder.gltf",
+  "nozzleOffset": [-8.0, -22.0, -240.27],
+  "pipetteBoundingBoxOffsets": {
+    "backLeftCorner": [-38.0, 0.0, -240.27],
+    "frontRightCorner": [11.5, -64.0, -240.27]
+  },
+  "orderedRows": [{ "key": "A", "orderedNozzles": ["A1"] }],
+  "orderedColumns": [{ "key": "1", "orderedNozzles": ["A1"] }],
+  "nozzleMap": {
+    "A1": [-8.0, -22.0, -240.27]
+  },
+  "lldSettings": {
+    "t5000": {
+      "minHeight": 1.0,
+      "minVolume": 0
+    }
+  }
+}

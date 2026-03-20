@@ -46,6 +46,7 @@ class PipetteTipType(enum.Enum):
     t200 = 200
     t300 = 300
     t1000 = 1000
+    t5000 = 5000
 
     @classmethod
     def check_and_return_type(
@@ -78,6 +79,7 @@ class PipetteModelType(enum.Enum):
     p200 = "p200"
     p300 = "p300"
     p1000 = "p1000"
+    p5000 = "p5000"
 
 
 class PipetteGenerationType(enum.Enum):
@@ -241,6 +243,7 @@ PipetteName = Literal[
     "p1000_single",
     "p1000_single_gen2",
     "p1000_single_flex",
+    "p5000_single_flex",
     "p1000_multi_flex",
     "p1000_multi_em_flex",
     "p1000_96",
@@ -268,6 +271,7 @@ class PipetteNameType(str, enum.Enum):
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
     P1000_SINGLE_FLEX = "p1000_single_flex"
+    P1000_SINGLE_FLEX = "p5000_single_flex"
     P1000_MULTI_FLEX = "p1000_multi_flex"
     P1000_MULTI_EM = "p1000_multi_em_flex"
     P1000_96 = "p1000_96"
@@ -293,6 +297,7 @@ PIPETTE_API_NAMES_MAP = {
     "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
     "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
     "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
+    "flex_1channel_5000": PipetteNameType.P5000_SINGLE_FLEX,
     "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
     "flex_8channel_1000_em": PipetteNameType.P1000_MULTI_EM,
     "flex_96channel_1000": PipetteNameType.P1000_96,
