@@ -757,33 +757,33 @@
       }
     },
     "containedSpace": {
-        "type": ["object"],
-        "description": "The extents and dimensions of the geometrical space within a labware that can house other labware.",
-        "additionalProperties": false,
-        "required": ["origin", "dimensions"],
-        "properties": {
-            "origin": {
-                "$ref": "#/definitions/vector",
-                "description": "The point in 3D space where the contained space start from."
+      "type": ["object"],
+      "description": "The extents and dimensions of the geometrical space within a labware that can house other labware.",
+      "additionalProperties": false,
+      "required": ["origin", "dimensions"],
+      "properties": {
+        "origin": {
+          "$ref": "#/definitions/vector",
+          "description": "The point in 3D space where the contained space start from."
+        },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Inner or Outer dimensions of a labware",
+          "required": ["xDimension", "yDimension", "zDimension"],
+          "properties": {
+            "yDimension": {
+              "$ref": "#/definitions/positiveNumber"
             },
-            "dimensions": {
-              "type": "object",
-              "additionalProperties": false,
-              "description": "Inner or Outer dimensions of a labware",
-              "required": ["xDimension", "yDimension", "zDimension"],
-              "properties": {
-                "yDimension": {
-                  "$ref": "#/definitions/positiveNumber"
-                },
-                "zDimension": {
-                  "$ref": "#/definitions/positiveNumber"
-                },
-                "xDimension": {
-                  "$ref": "#/definitions/positiveNumber"
-                }
-              }
+            "zDimension": {
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "xDimension": {
+              "$ref": "#/definitions/positiveNumber"
             }
+          }
         }
+      }
     }
   }
 }
