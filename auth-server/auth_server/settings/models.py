@@ -83,41 +83,6 @@ class SettingsResponseData(_StrictBaseModel):
         description="Automatically delete protocol run logs on the robot when there are 20 protocol run records.",
     )
 
-    @classmethod
-    def from_orm_settings(cls, settings: Settings) -> "SettingsResponseData":
-        """Build a SettingsResponseData from an ORM Settings."""
-        assert settings.access_control_enabled is not None
-        assert settings.max_number_of_login_attempts is not None
-        assert settings.idle_lockout_in_minutes is not None
-        assert settings.require_admin_creds_when_updating_robot_software is not None
-        assert settings.require_admin_creds_when_sending_protocol_to_robot is not None
-        assert settings.require_admin_creds_for_signoff_protocol is not None
-        assert settings.require_signoff_for_protocol_log is not None
-        assert settings.require_reason_for_interaction is not None
-        assert settings.require_logs_to_be_saved_in_app is not None
-        assert settings.delete_over_max_on_disk_protocols is not None
-        return cls(
-            accessControlEnabled=settings.access_control_enabled,
-            maxNumberOfLoginAttempts=settings.max_number_of_login_attempts,
-            passwordResetTimeInDays=settings.password_reset_time_in_days,
-            passwordComplexity=PasswordComplexity(
-                minimumLength=settings.password_complexity_minimum_length or 0,
-                specialCharacters=settings.password_complexity_special_characters
-                or False,
-            )
-            if settings.password_complexity_minimum_length is not None
-            else None,
-            idleLockoutInMinutes=settings.idle_lockout_in_minutes,
-            requireAdminCredsWhenUpdatingRobotSoftware=settings.require_admin_creds_when_updating_robot_software,
-            requireAdminCredsWhenSendingProtocolToRobot=settings.require_admin_creds_when_sending_protocol_to_robot,
-            requireAdminCredsForSignoffProtocol=settings.require_admin_creds_for_signoff_protocol,
-            requireSignoffForProtocolLog=settings.require_signoff_for_protocol_log,
-            requireReasonForInteraction=settings.require_reason_for_interaction,
-            minLengthOfReasonForInteraction=settings.min_length_of_reason_for_interaction,
-            requireLogsToBeSavedInApp=settings.require_logs_to_be_saved_in_app,
-            deleteOverMaxOnDiskProtocols=settings.delete_over_max_on_disk_protocols,
-        )
-
 
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.

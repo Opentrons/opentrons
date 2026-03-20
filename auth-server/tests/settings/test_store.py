@@ -25,7 +25,7 @@ _DEFAULTS = {
 
 
 def _insert_defaults(store: SettingsStore) -> None:
-    store.insert(**_DEFAULTS)  # type: ignore[arg-type]
+    store.upsert_many(_DEFAULTS)  # type: ignore[arg-type]
 
 
 @pytest.fixture()
