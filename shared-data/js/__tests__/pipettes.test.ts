@@ -177,13 +177,8 @@ describe('pipette data accessors', () => {
       defaultTipracks: [
         'opentrons/opentrons_flex_96_tiprack_50ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-<<<<<<< HEAD
-        'opentrons_flex_96_tiprack_20ul',
-        'opentrons_flex_96_filtertiprack_20ul',
-=======
         'opentrons/opentrons_flex_96_tiprack_20ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_20ul/1',
->>>>>>> chore_release-8.9.0
       ],
       maxVolume: 50,
       minVolume: 5,
@@ -265,13 +260,8 @@ describe('pipette data accessors', () => {
       defaultTipracks: [
         'opentrons/opentrons_flex_96_tiprack_50ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-<<<<<<< HEAD
-        'opentrons_flex_96_tiprack_20ul',
-        'opentrons_flex_96_filtertiprack_20ul',
-=======
         'opentrons/opentrons_flex_96_tiprack_20ul/1',
         'opentrons/opentrons_flex_96_filtertiprack_20ul/1',
->>>>>>> chore_release-8.9.0
       ],
       maxVolume: 30,
       minVolume: 0.5,
