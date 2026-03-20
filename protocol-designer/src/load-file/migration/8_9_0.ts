@@ -60,10 +60,26 @@ export const migrateFile = (
  * v8.9.0-shaped, except that designerApplication.version was incorrectly set to '8.8.0'.
  * This function detects such files.
  */
-export function isBroken890Export(appData: ProtocolFile<PDMetadata>): boolean {
-  if (appData.designerApplication?.version === '8.8.0') {
+export function isBroken890Export(
+  // This is `unknown` so this is safe to call on potentially ancient or invalid files,
+  // where we can't assume much about their structure.
+  appData: unknown
+): boolean {
+  // Inspect .designerApplication.version if it exists,
+  // paranoically accounting for unknown input file shapes.
+  const isDeclared880 =
+    typeof appData === 'object' &&
+    appData != null &&
+    'designerApplication' in appData &&
+    typeof appData.designerApplication === 'object' &&
+    appData.designerApplication != null &&
+    'version' in appData.designerApplication &&
+    appData.designerApplication.version === '8.8.0'
+
+  if (isDeclared880) {
+    const trustedAppData = appData as ProtocolFile<PDMetadata>
     const savedStepForms = Object.values(
-      appData.designerApplication?.data?.savedStepForms ?? {}
+      trustedAppData.designerApplication?.data?.savedStepForms ?? {}
     )
     const fileContains890Structures = savedStepForms.some(
       savedStepForm =>
