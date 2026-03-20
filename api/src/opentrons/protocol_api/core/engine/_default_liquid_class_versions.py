@@ -35,6 +35,11 @@ DEFAULT_LIQUID_CLASS_VERSIONS: DefaultLiquidClassVersions = {
     APIVersion(2, 27): {
         "ethanol_80": 2,
         "glycerol_50": 2,
+        "water": 2,
+    },
+    APIVersion(2, 28): {
+        "ethanol_80": 3,
+        "glycerol_50": 3,
         "water": 3,
     },
 }

@@ -8,7 +8,6 @@ from time import time
 import importlib
 import copy
 import json
-import traceback
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -380,10 +379,11 @@ class FixtureSettings(CSVSettings):
         fast_simulate = IS_ROBOT and simulating
 
         test_report = report.create_csv_test_report(
-            volumes=csv_settings.volumes_flat,
-            pipette_channels=csv_settings.channels,
-            trials=csv_settings.trials,
-            name=csv_settings.name,
+            volumes=volumes_flat,
+            pipette_channels=pipette_channels,
+            increment=increment,
+            trials=trials,
+            name=name,
             run_id=run_id,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
@@ -672,9 +672,6 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
-    if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
-        # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
-        return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
@@ -1618,8 +1615,7 @@ def run(ctx: ProtocolContext) -> None:
             _adjust_settings_for_increment(fixture_settings)
         _run(ctx, fixture_settings)
     except Exception as e:
-        print_error(f"Captured traceback:\n{traceback.format_exc()}")
-        raise e
+        print_error(f"error during run {e}")
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")
