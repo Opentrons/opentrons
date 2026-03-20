@@ -19,7 +19,36 @@ class Scope(enum.Enum):
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
 
-    # todo(mm, 2026-01-28): Replace these placeholder scopes with real ones.
+    AUTH_SETTINGS_WRITE = (
+        "auth_settings.write",
+        "Edit settings related to authentication, authorization, and access control.",
+    )
+
+    RESTART_WRITE = (
+        "restart.write",
+        "Restart the robot.",
+    )
+
+    ROBOT_SETTINGS_WRITE = ("robot_settings.write", "Edit general robot settings.")
+
+    RUNS_WRITE = (
+        "runs.write",
+        "Create and control protocol runs.",
+    )
+
+    # We actually want access control mode to totally disable SSH, so this scope is
+    # kind of moot. At some point, we might delete this, and replace the SSH endpoints'
+    # use of `require_scopes(SSH_KEYS_WRITE)` with something like
+    # `require_access_control_disabled()`.
+    SSH_KEYS_WRITE = (
+        "ssh_keys.write",
+        "Edit the robot's authorized SSH keys, allowing access to the robot's shell.",
+    )
+
+    UPDATES_WRITE = (
+        "updates.write",
+        "Perform system updates (begin, cancel, upload, commit).",
+    )
 
     USERS_READ = (
         "users.read",
@@ -28,17 +57,7 @@ class Scope(enum.Enum):
 
     USERS_WRITE = (
         "users.write",
-        "Read, write, and edit users.",
-    )
-
-    RUNS_READ = (
-        "runs.read",
-        "Retrieve information about protocol runs.",
-    )
-
-    RUNS_WRITE = (
-        "runs.write",
-        "Create and control protocol runs.",
+        "Create, update, and delete users.",
     )
 
     _description: str

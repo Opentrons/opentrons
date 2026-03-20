@@ -45,12 +45,4 @@ describe('Chat', () => {
     render()
     expect(mockNavigate).toHaveBeenCalledWith('/')
   })
-
-  it.skip('should not show the feedback modal when loading the page', () => {
-    render()
-    screen.getByText('Send feedback to Opentrons')
-    screen.getByText('Share why the response was not helpful')
-    screen.getByText('Cancel')
-    screen.getByText('Send feedback')
-  })
 })

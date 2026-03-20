@@ -782,10 +782,10 @@ class GeometryView:
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
 
-        In API levels before 2.28, we did not support dropping tips in a tip rack
+        In API levels before 2.29, we did not support dropping tips in a tip rack
         while in a partial configuration. The boolean variable `api_version_allows_partial_return_tip`
         will be set to False if called by a protocol API layer and the API level is both below
-        v2.28 and the pipette is partially configured.
+        v2.29 and the pipette is partially configured.
         """
         if (
             not api_version_allows_partial_return_tip
@@ -793,7 +793,7 @@ class GeometryView:
         ):
             raise errors.UnexpectedProtocolError(
                 "Cannot return tip to a tip rack while the pipette is"
-                " configured for partial tip before API version 2.28."
+                " configured for partial tip before API version 2.29."
             )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(

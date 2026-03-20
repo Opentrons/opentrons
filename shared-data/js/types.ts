@@ -1,5 +1,12 @@
 import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
+import type {
+  PartialNozzles8Channel,
+  RowChannels,
+} from '../command/types/setup'
+import type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
   ABSORBANCE_READER_TYPE,
@@ -642,6 +649,11 @@ export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
 
+export type ActiveNozzleNumber =
+  | PipetteChannels
+  | PartialNozzles8Channel
+  | RowChannels
+
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
@@ -1074,7 +1086,7 @@ export interface CompletedProtocolAnalysis {
   errors: AnalysisError[]
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
-  commandAnnotations?: CommandAnnotation[]
+  commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
 }
 

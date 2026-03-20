@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Module steps"
+description: "Control module actions: Heater-Shaker, Temperature Module, Thermocycler, and more."
 ---
 
 When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:
@@ -113,14 +114,10 @@ In the Heater-Shaker step form, set the heater or shaker functions to **On** and
 
 Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. 
 
-If your Heater-Shaker step doesn't include a set time, Protocol Designer will ask if you'd like to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
+If your Heater-Shaker step doesn't include a set time, Protocol Designer will automatically add a pause step to the timeline. Because reaching a target temperature takes more time than changing the shaking speed, this lets the Heater-Shaker reach a target temperature while your protocol proceeds to the next step. 
 
-<figure class="screenshot" markdown>
-  ![Heater-Shaker pause](../images/heater-shaker-pause.png)
-  <figcaption>Build a pause step now or later in your protocol.</figcaption>
-</figure>
-
-Click **Skip pause step** to resume your protocol while the Heater-Shaker reaches the target temperature. 
+!!! warning
+    If you delete the pause step, your protocol won't check to make sure the Heater-Shaker reaches its target temperature. Especially short protocols could end before the module fully heats or cools. 
 
 After your Heater-Shaker step, follow the same steps to deactivate
 the temperature and shake functions, open the labware latch, and
@@ -130,7 +127,7 @@ move your labware.
 
 Adding a Temperature Module step to your protocol displays any labware and adapters currently on the module. Aluminum blocks or a deep well adapter can be used to add labware to the module. Click to set the module state and enter a temperature between 4 and 95 °C. 
 
-After your Temperature module step, add a second step to deactivate the module. Just like in a Heater-Shaker step, you can choose to pause your protocol until the Temperature module reaches the set temperature. 
+After your Temperature module step, add a second step to deactivate the module. Just like in a Heater-Shaker step, Protocol Designer will automatically add a pause step to make sure your Temperature Module reaches its set temperature. 
 
 ## Thermocycler Module steps 
 
@@ -140,6 +137,9 @@ the state of the Thermocycler module or to program a profile.
 Changes to the module state include simple changes like opening
 the lid or setting an initial lid temperature, while programming a
 profile sets timed temperature cycles for your experiment.
+
+!!! note
+    When adding a Thermocycler Module step, labware in the module is not automatically displayed. Load labware in the Thermocycler on the protocol starting deck or move your labware to the Thermocycler module in a move step. To move labware to and from the Thermocycler, first open the lid by clicking **Change Thermocycler state**.
 
 Click **Change Thermocycler state** to set a block or lid
 temperature, or to open or close the lid. You can set the block at
@@ -163,7 +163,7 @@ in your experiment. Click **Add cycle** to add steps to a cycle. At the
 bottom of the menu, enter the number of times the cycle should
 repeat before saving your work.
 
-When adding a Thermocycler Module step, labware in the module is not automatically displayed. Load labware in the Thermocycler on the protocol starting deck or move your labware to the Thermocycler module in a move step. To move labware to and from the Thermocycler, first open the lid by clicking **Change Thermocycler state**.
+Running Thermocyler profiles is time-consuming, so you can choose to run other protocols steps [in parallel](../steps/parallel.md) with your profiles.
 
 
 

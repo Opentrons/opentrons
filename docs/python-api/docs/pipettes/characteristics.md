@@ -1,5 +1,6 @@
 ---
 title: "Python API: Pipette Characteristics"
+description: "Pipette specs, channels, and volume ranges in the Python API."
 ---
 
 Each Opentrons pipette has different capabilities, which you'll want to take advantage of in your protocols. This page covers some fundamental pipette characteristics.

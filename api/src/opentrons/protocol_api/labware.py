@@ -1376,7 +1376,7 @@ class Labware:
         """
         self._core.reset_tips()
 
-    @requires_version(2, 28)
+    @requires_version(2, 29)
     def set_empty(self) -> None:
         """Mark a tip rack as completely empty of tips.
 

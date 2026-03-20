@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  ALL,
+  POSITION_REFERENCE_BOTTOM,
+} from '@opentrons/shared-data'
 
 import { _castForm } from '../index'
 
@@ -64,10 +68,10 @@ describe('form casting', () => {
       pipette: {} as PipetteEntity,
       preWetTip: false,
       volume: 5,
-      primaryNozzle: 'A1',
+      primaryNozzle: A1_NOZZLE,
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
-      nozzles: null,
+      nozzles: ALL,
       tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
@@ -118,12 +122,12 @@ describe('form casting', () => {
       dispense_delay_seconds: 1,
       dropTip_location: 'some location',
       mix_touchTip_checkbox: false,
-      nozzles: null,
+      nozzles: ALL,
       tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
-      primaryNozzle: 'A1',
+      primaryNozzle: A1_NOZZLE,
       mix_position_reference: POSITION_REFERENCE_BOTTOM,
     }
 

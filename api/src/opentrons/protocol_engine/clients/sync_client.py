@@ -60,7 +60,7 @@ class SyncClient:
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(
             params=cast(Any, params),
-            commandAnnotations=command_annotations
+            commandAnnotationIds=command_annotations
             if command_annotations is not None
             else [],
         )
@@ -194,6 +194,14 @@ class SyncClient:
     ) -> commands.GetNextTipResult:
         pass
 
+    @overload
+    def execute_command_without_recovery(
+        self,
+        params: commands.CreateCSVParams,
+        command_annotations: list[str],
+    ) -> commands.CreateCSVResult:
+        pass
+
     def execute_command_without_recovery(
         self,
         params: commands.CommandParams,
@@ -207,7 +215,7 @@ class SyncClient:
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
         create_request = CreateType(
             params=cast(Any, params),
-            commandAnnotations=command_annotations
+            commandAnnotationIds=command_annotations
             if command_annotations is not None
             else [],
         )

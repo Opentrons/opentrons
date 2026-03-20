@@ -32,6 +32,11 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 - Adding a CSV file to an imported protocol no longer causes analysis errors.
 - Protocol run logs include correct descriptions for partial tip pickup with the Flex 96-channel pipette.
 
+### Known Issues
+
+- You can't open protocol visualization when re-running a completed protocol, only if the protocol was started on a different computer. Open visualization from the protocol details page instead.
+- Protocol visualization will produce an error for protocols that dispose of tips into a standard labware instead of a trash container.
+
 ---
 
 ## Opentrons App Changes in 8.8.1

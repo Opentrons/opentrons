@@ -81,20 +81,25 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
     getVectorDifference(joggedPosition, workingInitialOffset)
   )
 
-  useEffect(() => {
-    //  NOTE: this will perform a "null" jog when the jog controls mount so
-    //  if a user reaches the "confirm exit" modal (unmounting this component)
-    //  and clicks "go back" we are able so initialize the live offset to whatever
-    //  distance they had already jogged before clicking exit.
-    // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
-    let mounted = true
-    if (mounted) {
-      handleJog('x', 1, 0, setJoggedPosition)
-    }
-    return () => {
-      mounted = false
-    }
-  }, [])
+  useEffect(
+    () => {
+      //  NOTE: this will perform a "null" jog when the jog controls mount so
+      //  if a user reaches the "confirm exit" modal (unmounting this component)
+      //  and clicks "go back" we are able so initialize the live offset to whatever
+      //  distance they had already jogged before clicking exit.
+      // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
+      let mounted = true
+      if (mounted) {
+        handleJog('x', 1, 0, setJoggedPosition)
+      }
+      return () => {
+        mounted = false
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const slotOnlyDisplayLocation = getFlexSlotNameOnly(
     selectedLwInfo.offsetLocationDetails,

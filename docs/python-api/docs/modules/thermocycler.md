@@ -1,5 +1,6 @@
 ---
 title: "Python API: Thermocycler"
+description: "Control the Thermocycler: lid, block temperature, and profiles in protocols."
 ---
 
 The Thermocycler Module provides on-deck, fully automated thermocycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
@@ -157,7 +158,7 @@ In some protocols, your samples might require a slower ramp speed. Use the optio
 
 Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
 
-*New in version 2.28*
+*New in version 2.29*
 
 ### Block max volume
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the `block_max_volume` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.

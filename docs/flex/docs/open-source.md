@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Open-Source Software"
+description: "GitHub, releases, contributing, and other resources for Flex software."
 ---
 
 Opentrons believes that open-source software and hardware make science

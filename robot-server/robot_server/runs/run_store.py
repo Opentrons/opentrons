@@ -1,11 +1,12 @@
 """Runs' on-db store."""
 
+import json
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import sqlalchemy
 from pydantic import TypeAdapter, ValidationError
@@ -20,7 +21,8 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
-from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -39,6 +41,8 @@ from robot_server.persistence.pydantic import (
 )
 from robot_server.persistence.tables import (
     action_table,
+    command_annotation_table,
+    command_to_annotation_table,
     input_data_files_table,
     output_data_files_table,
     run_command_table,
@@ -114,6 +118,14 @@ class CommandNotFoundError(ValueError):
         super().__init__(f"Command {command_id} was not found.")
 
 
+class CommandAnnotationNotFoundError(ValueError):
+    """Error raised when a given command annotation ID is not found in the store."""
+
+    def __init__(self, command_annotation_id: str) -> None:
+        """Initialize the error message from the missing ID."""
+        super().__init__(f"Command annotation {command_annotation_id} was not found.")
+
+
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
@@ -129,6 +141,7 @@ class RunStore:
         run_id: str,
         summary: StateSummary,
         commands: List[Command],
+        command_annotations: List[CommandAnnotation],
         run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
         """Update the run's state summary and commands list.
@@ -137,6 +150,7 @@ class RunStore:
             run_id: The run to update
             summary: The run's equipment and status summary.
             commands: The run's commands.
+            command_annotations: The run's command annotations.
             run_time_parameters: The run's run time parameters, if any.
 
         Returns:
@@ -157,12 +171,21 @@ class RunStore:
                 )
             )
         )
-
+        delete_existing_command_annotations_mapping = sqlalchemy.delete(
+            command_to_annotation_table
+        ).where(command_to_annotation_table.c.run_id == run_id)
         delete_existing_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
         )
-        insert_command = sqlalchemy.insert(run_command_table)
+        delete_existing_command_annotations = sqlalchemy.delete(
+            command_annotation_table
+        ).where(command_annotation_table.c.run_id == run_id)
 
+        insert_command = sqlalchemy.insert(run_command_table)
+        insert_command_annotation = sqlalchemy.insert(command_annotation_table)
+        insert_command_annotation_mapping = sqlalchemy.insert(
+            command_to_annotation_table
+        )
         select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
@@ -177,7 +200,16 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
             transaction.execute(update_run)
+            transaction.execute(delete_existing_command_annotations_mapping)
             transaction.execute(delete_existing_commands)
+            transaction.execute(delete_existing_command_annotations)
+            for command_annotation in command_annotations:
+                transaction.execute(
+                    insert_command_annotation,
+                    _convert_command_annotation_to_sql_values(
+                        run_id, command_annotation
+                    ),
+                )
             for command_index, command in enumerate(commands):
                 transaction.execute(
                     insert_command,
@@ -197,6 +229,15 @@ class RunStore:
                         ),
                     },
                 )
+                for annotation_id in command.commandAnnotationIds:
+                    transaction.execute(
+                        insert_command_annotation_mapping,
+                        {
+                            "run_id": run_id,
+                            "command_id": command.id,
+                            "annotation_id": annotation_id,
+                        },
+                    )
 
             run_row = transaction.execute(select_run_resource).one()
             action_rows = transaction.execute(select_actions).all()
@@ -683,11 +724,115 @@ class RunStore:
 
         return _parse_command(command)
 
+    def get_total_command_annotations_count(self, run_id: str) -> int:
+        """Get total command annotations count of the run."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                command_annotation_table.c.run_id == run_id
+            )
+            count_result: int = transaction.execute(select_count).scalar_one()
+            return count_result
+
+    def get_command_annotations_slice(
+        self,
+        run_id: str,
+        cursor: int,
+        length: int,
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of the run's command annotations list."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+
+            total_count = transaction.execute(
+                sqlalchemy.select(sqlalchemy.func.count()).where(
+                    command_annotation_table.c.run_id == run_id
+                )
+            ).scalar_one()
+
+            # Note here that we have to order all queries using the `row_id` column rather than `sqlite.rowid`
+            # because we have CASCADE ON DELETE enabled on the command annotation table which deletes foreign-keyed children
+            # before parents and this cascaded order will not match insertion order. A result of that is that SQLite re-uses
+            # the freed ROWIDs from the cascaded deletions when re-inserting new annotations, while maintaining the
+            # insertion order of the annotations. So the ROWIDs are no longer representative of the insertion order
+            # but thankfully, the `row_id` column still is.
+            select_annotations = (
+                sqlalchemy.select(
+                    (
+                        sqlalchemy.func.row_number().over(
+                            order_by=command_annotation_table.c.row_id
+                        )
+                        - 1
+                    ).label("row_num"),
+                    command_annotation_table,
+                )
+                .where(
+                    command_annotation_table.c.run_id == run_id,
+                )
+                .order_by(command_annotation_table.c.row_id)
+                .subquery()
+            )
+
+            select_slice = (
+                sqlalchemy.select(
+                    select_annotations,
+                )
+                .where(
+                    and_(
+                        select_annotations.c.row_num >= cursor,
+                        select_annotations.c.row_num < cursor + length,
+                    )
+                )
+                .order_by(select_annotations.c.row_id)
+            )
+            slice_result = transaction.execute(select_slice).all()
+            command_annotations = [
+                _convert_sql_row_to_command_annotation(row) for row in slice_result
+            ]
+            return CommandAnnotationsSlice(
+                command_annotations=command_annotations,
+                cursor=cursor,
+                total_length=total_count,
+            )
+
+    def get_command_annotation(
+        self, run_id: str, command_annotation_id: str
+    ) -> CommandAnnotation:
+        """Get run command annotation by id."""
+        select_command_annotation = sqlalchemy.select(command_annotation_table).where(
+            and_(
+                command_annotation_table.c.run_id == run_id,
+                command_annotation_table.c.annotation_id == command_annotation_id,
+            )
+        )
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+
+            try:
+                command_annotation_row = transaction.execute(
+                    select_command_annotation
+                ).one()
+            except sqlalchemy.exc.NoResultFound:
+                raise CommandAnnotationNotFoundError(
+                    command_annotation_id=command_annotation_id
+                )
+
+        return _convert_sql_row_to_command_annotation(command_annotation_row)
+
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier."""
         delete_run = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
         delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
+        )
+        delete_command_to_annotation_mappings = sqlalchemy.delete(
+            command_to_annotation_table
+        ).where(command_to_annotation_table.c.run_id == run_id)
+        delete_command_annotations = sqlalchemy.delete(command_annotation_table).where(
+            command_annotation_table.c.run_id == run_id
         )
         delete_commands = sqlalchemy.delete(run_command_table).where(
             run_command_table.c.run_id == run_id
@@ -704,7 +849,9 @@ class RunStore:
 
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
+            transaction.execute(delete_command_to_annotation_mappings)
             transaction.execute(delete_commands)
+            transaction.execute(delete_command_annotations)
             transaction.execute(delete_csv_rtps)
             transaction.execute(delete_input_files)
             transaction.execute(delete_output_files)
@@ -849,3 +996,47 @@ def _convert_commands_status_to_sql_command_status(
             return CommandStatusSQLEnum.FAILED
         case CommandStatus.SUCCEEDED:
             return CommandStatusSQLEnum.SUCCEEDED
+
+
+def _convert_command_annotation_to_sql_values(
+    run_id: str,
+    command_annotation: CommandAnnotation,
+) -> Dict[str, Any]:
+    return {
+        "run_id": run_id,
+        "annotation_id": command_annotation.id,
+        "name": command_annotation.name,
+        "description": command_annotation.description,
+        "source": str(command_annotation.source),
+        # This is fine because a parent annotation would be added to the table before the child is added
+        # since the command annotations are added into the database in the order they were created.
+        "parent_id": command_annotation.parentId,
+        "params": json.dumps(command_annotation.params),
+    }
+
+
+def _convert_sql_row_to_command_annotation(
+    annotation_row: sqlalchemy.engine.Row,
+) -> CommandAnnotation:
+    annotation_id = annotation_row.annotation_id
+    name = annotation_row.name
+    description = annotation_row.description
+    source = str(annotation_row.source)
+    params = json.loads(annotation_row.params)
+    parent_id = annotation_row.parent_id
+
+    assert isinstance(annotation_id, str)
+    assert isinstance(name, str)
+    assert isinstance(description, str)
+    assert isinstance(source, str)
+    assert isinstance(parent_id, str) or parent_id is None
+    assert isinstance(params, dict)
+
+    return CommandAnnotation(
+        id=annotation_row.annotation_id,
+        source=annotation_row.source.value,
+        name=name,
+        description=description,
+        parentId=parent_id,
+        params=params,
+    )

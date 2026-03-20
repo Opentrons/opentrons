@@ -1,6 +1,7 @@
 """HTTP API registration token logic."""
 
 import logging
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, Request, status
@@ -14,11 +15,13 @@ _log = logging.getLogger(__name__)
 
 async def check_registration_token_header(
     request: Request,
-    authenticationBearer: str = Header(
-        ...,
-        description="An authentication header bearing a token provided by the `/system/register` endpoint.",
-    ),
-    signing_key: UUID = Depends(get_persistent_uuid),
+    authenticationBearer: Annotated[
+        str,
+        Header(
+            description="An authentication header bearing a token provided by the `/system/register` endpoint.",
+        ),
+    ],
+    signing_key: Annotated[UUID, Depends(get_persistent_uuid)],
 ) -> None:
     """A header requirement that requests a registration token from /system/register."""
     _log.info(f"Verifying registration token: {authenticationBearer}")
@@ -45,11 +48,13 @@ async def get_registration_token_header(request: Request) -> str:
 
 async def check_authorization_token_header(
     request: Request,
-    authenticationBearer: str = Header(
-        ...,
-        description="An authentication header bearing a token provided by the `/system/authorize` endpoint.",
-    ),
-    signing_key: UUID = Depends(get_persistent_uuid),
+    authenticationBearer: Annotated[
+        str,
+        Header(
+            description="An authentication header bearing a token provided by the `/system/authorize` endpoint.",
+        ),
+    ],
+    signing_key: Annotated[UUID, Depends(get_persistent_uuid)],
 ) -> None:
     """A header requirement that requests a authorization token from /system/authorize."""
     _log.info(f"Verifying authorization token: {authenticationBearer}")

@@ -36,6 +36,7 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
+
 const render = (props: ComponentProps<typeof LabwareCardOverflowMenu>) => {
   return renderWithProviders(<LabwareCardOverflowMenu {...props} />, {
     i18nInstance: i18n,

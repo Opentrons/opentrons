@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Python Protocol API"
+description: "Write Python protocols for Flex using the Opentrons Python API."
 ---
 
 Writing protocol scripts in Python gives you the most fine-grained control of Opentrons Flex. Version 2 of the Python Protocol API is a single Python package that exposes a wide range of liquid handling features on Opentrons robots. 
@@ -95,15 +96,15 @@ Sensors in Flex pipettes can detect the level of liquid in a well. You can use t
 
 Starting in API version 2.27, use start and end location parameters to control pipette movements during liquid transfers: 
 
-- Continuously target the [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html#meniscus) as it changes while pipetting liquid.
+- Continuously target the [liquid meniscus](../../python-api/robot-position.md#meniscus) as it changes while pipetting liquid.
 - Change the pipette's position within a well while aspirating, dispensing, or mixing.
-- Mix in different locations in labware using the [dynamic mix](https://docs.opentrons.com/v2/basic_commands/liquids.html#dynamic-mix) method.
+- Mix in different locations in labware using the [dynamic mix](../../python-api/building-block-commands/liquids.md#dynamic-mix) method.
 
 ### Concurrent commands
 
 Some module commands that take a long time to complete (such as executing a Thermocycler profile or heating to a high temperature) can be run in a *concurrent* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. 
 
-As of API version 2.27, concurrent commands are currently supported on the [Heater-Shaker](https://docs.opentrons.com/v2/modules/heater_shaker.html#heating-and-shaking), [Temperature](https://docs.opentrons.com/v2/modules/temperature_module.hmtl#temperature-control), and [Thermocyler](https://docs.opentrons.com/v2/modules/thermocycler.html) Modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](https://docs.opentrons.com/v2/modules/concurrent_module.html) for more.
+As of API version 2.27, concurrent commands are currently supported on the [Heater-Shaker](../../python-api/modules/heater-shaker.md#heating-and-shaking), [Temperature](../../python-api/modules/temperature-module.md#temperature-control), and [Thermocyler](../../python-api/modules/thermocycler.md) Modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](../../python-api/modules/concurrent.md) for more.
 
 ### Python packages
 

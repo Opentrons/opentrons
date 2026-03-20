@@ -39,7 +39,7 @@ type Story = StoryObj<typeof MiniCardComponent>
 const Children = (
   <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing8}>
     <Box backgroundColor={COLORS.white}>
-      <img src={ROBOT_IMG} style={{ width: '3rem' }} />
+      <img src={ROBOT_IMG} style={{ width: '3rem' }} alt="Robot image" />
     </Box>
     <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
       MiniCard stories protocol

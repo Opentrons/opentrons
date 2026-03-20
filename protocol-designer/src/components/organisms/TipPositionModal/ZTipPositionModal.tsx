@@ -188,6 +188,7 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
             })}
             error={errorText}
             id="TipPositionModal_custom_input"
+            testId="tip-position-modal-custom-input"
             isIndeterminate={value === null && isIndeterminate}
             onChange={handleInputFieldChange}
             units={t('application:units.millimeter')}

@@ -1,4 +1,4 @@
-"""HTTP routes to implement OAuth 2 flows."""
+"""HTTP routes to implement OAuth 2 flows, as an authorization server."""
 
 from typing import Annotated
 

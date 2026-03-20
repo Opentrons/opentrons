@@ -1077,7 +1077,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
             flow_rate: The absolute flow rate in µL/s.
 
-                *New in version 2.28*
+                *New in version 2.29*
 
         Raises:
             RuntimeError: If no location is specified and the location cache is `None`.
@@ -1090,10 +1090,10 @@ class InstrumentContext(publisher.CommandPublisher):
             InstrumentContext: This instance.
         """
         if flow_rate is not None:
-            if self.api_version < APIVersion(2, 28):
+            if self.api_version < APIVersion(2, 29):
                 raise APIVersionError(
                     api_element="flow_rate",
-                    until_version="2.28",
+                    until_version="2.29",
                     current_version=f"{self.api_version}",
                 )
         else:
@@ -1230,7 +1230,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.24:* Added the `mm_from_edge` parameter.
 
-        *Changed in version 2.28:*
+        *Changed in version 2.29:*
             The API will raise an error if touching tip on a labware with the `touchTipDisabled` quirk, like reservoirs or well plates with large wells.
         """
         if not self._core.has_tip():
@@ -1271,7 +1271,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
 
         if "touchTipDisabled" in parent_labware.quirks:
-            if self.api_version < APIVersion(2, 28):
+            if self.api_version < APIVersion(2, 29):
                 _log.info(f"Ignoring touch tip on labware {well}")
                 return self
             raise RuntimeError(
@@ -1743,7 +1743,7 @@ class InstrumentContext(publisher.CommandPublisher):
         the same as specifying [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top],
         which is a fixed position.
 
-        Starting in API version 2.28, you can manually control whether ``drop_tip()`` varies
+        Starting in API version 2.29, you can manually control whether ``drop_tip()`` varies
         the drop location with ``alternate_drop_location``.
 
         Args:
@@ -1764,7 +1764,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ``location`` is ``None``, and drop the tip to a fixed position when
                 ``location`` is specified.
 
-                *New in version 2.28*
+                *New in version 2.29*
         Returns:
             This instance.
         """

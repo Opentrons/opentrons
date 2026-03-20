@@ -87,12 +87,26 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
 )
+from .create_csv import (
+    CreateCSV,
+    CreateCSVCommandType,
+    CreateCSVCreate,
+    CreateCSVParams,
+    CreateCSVResult,
+)
 from .create_timer import (
     CreateTimer,
     CreateTimerCommandType,
     CreateTimerCreate,
     CreateTimerParams,
     CreateTimerResult,
+)
+from .csv_write_row import (
+    CSVWriteRow,
+    CSVWriteRowCommandType,
+    CSVWriteRowCreate,
+    CSVWriteRowParams,
+    CSVWriteRowResult,
 )
 from .custom import (
     Custom,
@@ -451,6 +465,8 @@ Command = Annotated[
         PressureDispense,
         UnsealPipetteFromTip,
         CaptureImage,
+        CreateCSV,
+        CSVWriteRow,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -560,6 +576,8 @@ CommandParams = Union[
     PressureDispenseParams,
     UnsealPipetteFromTipParams,
     CaptureImageParams,
+    CreateCSVParams,
+    CSVWriteRowParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -667,6 +685,8 @@ CommandType = Union[
     PressureDispenseCommandType,
     UnsealPipetteFromTipCommandType,
     CaptureImageCommandType,
+    CreateCSVCommandType,
+    CSVWriteRowCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -775,6 +795,8 @@ CommandCreate = Annotated[
         PressureDispenseCreate,
         UnsealPipetteFromTipCreate,
         CaptureImageCreate,
+        CreateCSVCreate,
+        CSVWriteRowCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -891,6 +913,8 @@ CommandResult = Union[
     PressureDispenseResult,
     UnsealPipetteFromTipResult,
     CaptureImageResult,
+    CreateCSVResult,
+    CSVWriteRowResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

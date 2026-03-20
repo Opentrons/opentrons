@@ -12,7 +12,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  InputField,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -21,6 +20,7 @@ import {
   POSITION_RELATIVE,
   SPACING,
   StepMeter,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -263,7 +263,7 @@ export function NameRobot(): JSX.Element {
                 control={control}
                 name="newRobotName"
                 render={({ field, fieldState }) => (
-                  <InputField
+                  <TouchInputField
                     data-testid="name-robot_input"
                     id="newRobotName"
                     name="newRobotName"
