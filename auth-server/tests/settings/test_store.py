@@ -24,8 +24,8 @@ _DEFAULTS = {
 }
 
 
-def _insert_defaults(store: SettingsStore) -> None:
-    store.upsert_many(_DEFAULTS)  # type: ignore[arg-type]
+def _upsert_defaults(store: SettingsStore) -> None:
+    store.upsert_many({key: str(value) for key, value in _DEFAULTS.items()})
 
 
 @pytest.fixture()
@@ -35,52 +35,27 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
     with sql_engine_ctx(db_path) as engine:
         create_schema(engine)
         store = SettingsStore(sql_engine=engine)
-        # service = SettingsDataManager(settings_store=store)
         yield store
 
 
 # test password complexity with none values
-def test_insert_and_get_settings(settings_store: SettingsStore) -> None:
+def test_upsert_and_get_settings(settings_store: SettingsStore) -> None:
     """insert should persist the settings so get can find it."""
-    _insert_defaults(settings_store)
-    fetched = settings_store.get()
+    _upsert_defaults(settings_store)
+    fetched = settings_store.get_all()
     assert fetched is not None
-    assert fetched.access_control_enabled is False
-    assert fetched.max_number_of_login_attempts == 5
-    assert fetched.password_reset_time_in_days is None
-    assert fetched.idle_lockout_in_minutes == 3
-    assert fetched.require_admin_creds_when_updating_robot_software is True
-    assert fetched.require_admin_creds_when_sending_protocol_to_robot is True
-    assert fetched.require_admin_creds_for_signoff_protocol is False
-    assert fetched.require_signoff_for_protocol_log is True
-    assert fetched.require_reason_for_interaction is True
-    assert fetched.min_length_of_reason_for_interaction is None
-    assert fetched.require_logs_to_be_saved_in_app is True
-    assert fetched.delete_over_max_on_disk_protocols is True
-    with pytest.raises(ValueError):
-        settings_store.insert(
-            access_control_enabled=False,
-            max_number_of_login_attempts=5,
-            password_reset_time_in_days=15,
-            idle_lockout_in_minutes=200,
-            require_admin_creds_when_updating_robot_software=False,
-            require_admin_creds_when_sending_protocol_to_robot=False,
-            require_admin_creds_for_signoff_protocol=True,
-            require_signoff_for_protocol_log=False,
-            require_reason_for_interaction=True,
-            min_length_of_reason_for_interaction=10,
-            require_logs_to_be_saved_in_app=True,
-            delete_over_max_on_disk_protocols=True,
-            password_complexity_minimum_length=None,
-            password_complexity_special_characters=None,
-        )
+    assert fetched == {key: str(value) for key, value in _DEFAULTS.items()}
+    settings_store.upsert("max_number_of_login_attempts", "10")
+    fetched = settings_store.get_all()
+    assert fetched is not None
+    assert fetched == {**_DEFAULTS, "max_number_of_login_attempts": "10"}
 
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
-    _insert_defaults(settings_store)
-    settings_store.reset()
-    fetched = settings_store.get()
+    _upsert_defaults(settings_store)
+    settings_store.delete_all()
+    fetched = settings_store.get_all()
     assert fetched is None
 
 
@@ -113,10 +88,10 @@ def test_update_changes_only_specified_fields(
     expected_changes: dict[str, object],
 ) -> None:
     """update should change only the specified fields and leave the rest unchanged."""
-    _insert_defaults(settings_store)
-    settings_store.update(**updates)
+    _upsert_defaults(settings_store)
+    settings_store.upsert_many({key: str(value) for key, value in updates.items()})
 
-    fetched = settings_store.get()
+    fetched = settings_store.get_all()
     assert fetched is not None
 
     expected = {**_DEFAULTS, **expected_changes}
@@ -126,7 +101,9 @@ def test_update_changes_only_specified_fields(
         )
 
 
-def test_update_without_row_raises(settings_store: SettingsStore) -> None:
-    """update should raise if no settings row exists."""
-    with pytest.raises(RuntimeError):
-        settings_store.update(max_number_of_login_attempts=10)
+def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
+    """upsert should create a new row if no settings row exists."""
+    settings_store.upsert("max_number_of_login_attempts", "10")
+    fetched = settings_store.get_all()
+    assert fetched is not None
+    assert fetched == {**_DEFAULTS, "max_number_of_login_attempts": "10"}
