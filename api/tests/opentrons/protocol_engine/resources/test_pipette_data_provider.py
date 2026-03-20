@@ -128,6 +128,11 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        # uncomment and pick this diff when this branch gets merged into edge/9.0
+        # available_volume_modes_min_vol={
+        #    VolumeModes.default: 5.0,
+        #    VolumeModes.lowVolumeDefault: 0.5,
+        # },
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -138,7 +143,7 @@ def test_configure_virtual_pipette_for_volume(
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
         display_name="Flex 1-Channel 50 µL",
-        min_volume=1,
+        min_volume=0.5,
         max_volume=30,
         channels=1,
         nozzle_offset_z=-259.15,
@@ -166,6 +171,11 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
+        # uncomment and pick this diff when this branch gets merged into edge/9.0
+        # available_volume_modes_min_vol={
+        #    VolumeModes.default: 5.0,
+        #    VolumeModes.lowVolumeDefault: 0.5,
+        # },
     )
 
 
