@@ -1,6 +1,6 @@
 ---
 name: components-testing
-description: ProtocolDeck component testing environment using built packages with Playwright visual snapshots in components-testing/. Use when working with component integration tests, package linking, or visual snapshot testing.
+description: ProtocolDeck component testing environment using built packages with Playwright and Applitools Eyes in components-testing/. Use when working with component integration tests, package linking, or visual testing.
 ---
 
 # Components Testing — ProtocolDeck Component Testing Environment
@@ -13,106 +13,56 @@ This project tests the **built packages** of `@opentrons/components` and `@opent
 - Component exports are properly accessible
 - Dependencies are correctly packaged and resolved
 - ProtocolDeck renders correctly with real protocol analysis data
-- Visual changes are caught through Playwright snapshot testing
+- Visual changes are tracked in **Applitools Eyes** (`@applitools/eyes-playwright`), not committed Playwright image snapshots
+
+## Applitools
+
+- Set **`APPLITOOLS_API_KEY`** via `.env` in `components-testing/` (loaded by `import 'dotenv/config'` in `playwright.config.ts`) or export it in the shell (see `components-testing/.env.example`).
+- App name in Eyes: **`Opentrons components-testing`** (`playwright.config.ts` → `use.eyesConfig.appName`).
+- Import **`test`** from `@applitools/eyes-playwright/fixture` in specs; use **`eyes.check(name, { region, matchLevel })`** for checkpoints.
+- Baseline updates happen in the Applitools dashboard (or enhanced HTML report), not via `--update-snapshots`.
 
 ## Package Linking Strategy
 
-Uses **`pnpm link`** with extracted package directories. This approach:
-
-- Does NOT modify `package.json` or `pnpm-lock.yaml`
-- Avoids lock file churn and side effects on other dependencies
-- Stores `.tgz` packages in a gitignored `pack/` directory
-
-Workflow: `pnpm install` → build packages as `.tgz` → extract to `pack/` → `pnpm link <absolute-path>`
+Uses **`pnpm link`** with extracted package directories. Workflow: `pnpm install` → build packages as `.tgz` → extract to `pack/` (see `components-testing/Makefile` `build-local-packages`).
 
 ## Project Structure
 
-```markdown
+```text
 components-testing/
-├── Makefile # Build and setup automation
-├── package.json # Dependencies (local packages NOT listed)
-├── pnpm-lock.yaml # Lock file (unaffected by local links)
-├── playwright.config.ts # Playwright test configuration
-├── vite.config.mts # Vite configuration
-├── index.html # HTML entry point
-├── pack/ # Gitignored .tgz packages
-├── src/
-│ ├── main.tsx # Main application with ProtocolDeck test
-│ ├── styles.css # Base styles
-│ └── StackerAnalysis.json # Protocol analysis test data
-└── tests/
-├── protocolDeck.spec.ts # Playwright visual tests
-└── **screenshots**/ # Baseline screenshots (committed)
+├── Makefile
+├── package.json
+├── playwright.config.ts   # EyesFixture + Applitools reporter
+├── tests/protocolDeck.spec.ts
+├── src/main.tsx
+└── pack/                  # gitignored
 ```
 
 ## Makefile Targets
 
-### Setup
-
-| Target                        | Description                                             |
-| ----------------------------- | ------------------------------------------------------- |
-| `make setup`                  | Complete setup: pnpm install, build packages, link them |
-| `make install-local-packages` | Rebuild and relink local packages only                  |
-| `make teardown`               | Remove `pack/` and `node_modules`                       |
-| `make clean-local-packages`   | Remove local packages only (keeps node_modules)         |
-
-### Development
-
-| Target         | Description                            |
-| -------------- | -------------------------------------- |
-| `make dev`     | Start Vite dev server (localhost:5173) |
-| `make build`   | Build for production                   |
-| `make preview` | Preview production build               |
-
-### Testing
-
-| Target                       | Description                                       |
-| ---------------------------- | ------------------------------------------------- |
-| `make test-setup`            | Install Playwright browsers (one-time)            |
-| `make test`                  | Run Playwright tests with current snapshots       |
-| `make test-update-snapshots` | Update visual snapshots after intentional changes |
+| Target                   | Description                                                |
+| ------------------------ | ---------------------------------------------------------- |
+| `make setup`             | Build/extract local packages, `pnpm install --frozen-lockfile` |
+| `make dev`               | Run Vite dev server (runs `setup` first)                   |
+| `make test-setup`        | Install Playwright Chromium (`make setup` first)           |
+| `make test`              | Playwright + Eyes (needs `APPLITOOLS_API_KEY`)             |
+| `make build-local-packages` | Rebuild pack only                                       |
+| `make clean-local-packages` | Remove `pack/`                                           |
+| `make teardown`          | Remove `pack/` and `node_modules`                          |
 
 ## Quick Start
 
 ```bash
-make teardown setup dev    # Clean, rebuild, and start dev server
+export APPLITOOLS_API_KEY='...'
+make teardown setup dev
 ```
-
-## Development Workflow
-
-When you change source `components` or `shared-data`:
-
-1. `make clean-local-packages`
-2. `make install-local-packages`
-3. `make dev` to see changes
-4. `make test` to verify visual tests
-
-### Updating Visual Snapshots
-
-After **intentional** style/layout changes to ProtocolDeck:
-
-1. Make changes in the source `components` package
-2. `make clean-local-packages && make install-local-packages`
-3. `make test-update-snapshots`
-4. Review screenshots in `tests/__screenshots__/`
-5. Commit updated snapshots
-
-## What's Being Tested
-
-- **ProtocolDeck component** with real analysis data, proper providers (Redux, React Query, i18next), CSS from built packages
-- **Package integration**: CSS bundling, component exports, dependency resolution, TypeScript types
 
 ## Troubleshooting
 
-- **Module not found**: `make clean-local-packages && make install-local-packages`
-- **CSS not loading**: Check components package CSS bundling, verify Vite config aliases
-- **React hooks errors** (dispatcher null / useMemo undefined): Multiple React copies — check `components/vite.config.mts` has React in `rollupOptions.external`, rebuild packages, `pnpm why react`
-- **Build failures**: `make teardown && make setup`
-- **Playwright failures**: Run `make test-setup`, ensure dev server is not running, use `make test-update-snapshots` if intentional
+- **Eyes / auth errors**: Confirm `APPLITOOLS_API_KEY` is set in the shell running Playwright.
+- **Module not found**: `make clean-local-packages && make setup`
+- **Playwright failures**: `make test-setup`; avoid port 5173 conflicts when CI sets `reuseExistingServer` false.
 
 ## Notes
 
-- Tests the **production build** of packages, not source code
-- Changes to source components require rebuilding to test
-- `package.json` and `pnpm-lock.yaml` remain stable — unaffected by linking
-- The `pack/` directory is gitignored
+- Tests consume the **packed** `components` and `shared-data` artifacts under `pack/`, not live monorepo source (until rebuilt).
