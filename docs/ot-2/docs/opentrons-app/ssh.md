@@ -39,9 +39,11 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 5. Click the three-dot menu (⋮) for that robot and then click **Robot settings**.
 
-6. Click the **Networking** tab. Note the IP address for your OT-2. You will use it in the next step.
+6. Click the **Networking** tab. Note the "Wired IP" address for your OT-2. You will use it in the next step.
 
-    <font color="red">PLACEHOLDER FOR IMAGE</font>
+    <figure class="screenshot" markdown>
+    ![App showing Ethernet address](../images/ip-wired.png){ width="80%" }
+    </figure>
 
 7. Type the commands shown below in the terminal window. Replace `ROBOT_IP` with the IP address of your OT-2.
 
