@@ -185,7 +185,7 @@ async def get_run_data_from_url(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run(  # noqa: C901
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -367,7 +367,7 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def remove_run(
     runId: str,
@@ -404,7 +404,7 @@ async def remove_run(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUNS_WRITE))],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def update_run(
     runId: str,

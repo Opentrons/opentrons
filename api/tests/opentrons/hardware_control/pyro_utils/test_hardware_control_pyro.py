@@ -17,7 +17,10 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
-from opentrons.util.pyro_synchronous_adapter import DaemonUtility, PyroSynchronousObject
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    DaemonUtility,
+    PyroSynchronousObject,
+)
 
 
 @pytest.fixture

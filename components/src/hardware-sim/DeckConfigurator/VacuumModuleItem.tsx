@@ -12,7 +12,7 @@ import {
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  VACUUM_MODULE_MILLIPORE_V1_FIXTURE_WIDTH,
+  VACUUM_MODULE_V1_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -71,7 +71,7 @@ export function VacuumModuleItem(props: VacuumModuleItemProps): JSX.Element {
   }
   return (
     <RobotCoordsForeignObject
-      width={VACUUM_MODULE_MILLIPORE_V1_FIXTURE_WIDTH}
+      width={VACUUM_MODULE_V1_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

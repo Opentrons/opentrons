@@ -7,7 +7,10 @@ from typing import Any, Callable
 from Pyro5 import api as pyro
 from Pyro5 import errors
 
-from opentrons.util.pyro_synchronous_adapter import DaemonUtility, PyroSynchronousObject
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    DaemonUtility,
+    PyroSynchronousObject,
+)
 
 log = logging.getLogger(__name__)
 
