@@ -5,8 +5,6 @@ from typing import Annotated, Literal
 
 import pydantic
 
-from auth_server.persistence.orm_models import Settings
-
 
 class PasswordComplexity(pydantic.BaseModel):
     """The complexity of the password."""
