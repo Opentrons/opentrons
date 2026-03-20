@@ -44,18 +44,18 @@ def test_patch_settings(
     decoy.verify(
         mock_store.upsert_many(
             {
-                "access_control_enabled": "true",
-                "max_number_of_login_attempts": "10",
-                "password_reset_time_in_days": "30",
-                "idle_lockout_in_minutes": "300",
-                "require_admin_creds_when_updating_robot_software": "true",
-                "require_admin_creds_when_sending_protocol_to_robot": "true",
-                "require_admin_creds_for_signoff_protocol": "false",
-                "require_signoff_for_protocol_log": "true",
-                "require_reason_for_interaction": "true",
-                "require_logs_to_be_saved_in_app": "true",
-                "delete_over_max_on_disk_protocols": "true",
-                "min_length_of_reason_for_interaction": "10",
+                "accessControlEnabled": "true",
+                "maxNumberOfLoginAttempts": "10",
+                "passwordResetTimeInDays": "30",
+                "idleLockoutInMinutes": "300",
+                "requireAdminCredsWhenUpdatingRobotSoftware": "true",
+                "requireAdminCredsWhenSendingProtocolToRobot": "true",
+                "requireAdminCredsForSignoffProtocol": "false",
+                "requireSignoffForProtocolLog": "true",
+                "requireReasonForInteraction": "true",
+                "requireLogsToBeSavedInApp": "true",
+                "deleteOverMaxOnDiskProtocols": "true",
+                "minLengthOfReasonForInteraction": "10",
             }
         )
     )
@@ -74,8 +74,8 @@ def test_patch_settings_with_none_values(
     decoy.verify(
         mock_store.upsert_many(
             {
-                "access_control_enabled": "true",
-                "max_number_of_login_attempts": "15",
+                "accessControlEnabled": "true",
+                "maxNumberOfLoginAttempts": "15",
             }
         )
     )

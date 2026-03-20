@@ -28,11 +28,13 @@ class SettingsDataManager:
         parsed = {
             k: json.loads(v) if v is not None else None for k, v in settings.items()
         }
-        return SettingsResponseData(**parsed)
+        return SettingsResponseData.model_validate(parsed)
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         non_null_updates = patch.model_dump(exclude_none=True)
-        db_updates = {k: json.dumps(v) for k, v in non_null_updates.items()}
+        db_updates: dict[str, str | None] = {
+            k: json.dumps(v) for k, v in non_null_updates.items()
+        }
         self._settings_store.upsert_many(db_updates)
         return self.get()
 
