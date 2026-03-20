@@ -3,7 +3,6 @@
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .models import PatchSettingsRequestData
 from auth_server.persistence.orm_models import Settings
 
 

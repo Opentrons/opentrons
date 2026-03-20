@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import signal
 import subprocess
 import sys
@@ -30,6 +31,10 @@ class DevServer:
         # In order to collect coverage we run using `coverage`.
         # `-a` is to append to existing `.coverage` file.
         # `--source` is the source code folder to collect coverage stats on.
+
+        # todo(tz, 2026-03-20): we need to remove this variable in order to run the tests cleanly. is there a better way to do this?
+        env = {k: v for k, v in os.environ.items()}
+        env["OT_AUTH_SERVER_persistence_directory"] = "automatically_make_temporary"
         self.proc = subprocess.Popen(
             [
                 sys.executable,
@@ -51,6 +56,7 @@ class DevServer:
             # Let it inherit our stdout and stderr so pytest captures its logs.
             stdout=None,
             stderr=None,
+            env=env,
         )
 
     def stop(self) -> None:

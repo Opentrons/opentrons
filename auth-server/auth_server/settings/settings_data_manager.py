@@ -65,6 +65,7 @@ class SettingsDataManager:
         )
 
     def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
+        """Patch the current settings."""
         existing = self._settings_store.get()
         if existing is None:
             defaults = SettingsResponseData()
