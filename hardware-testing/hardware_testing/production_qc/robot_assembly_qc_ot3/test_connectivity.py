@@ -273,7 +273,7 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
                 continue
 
             # determine port mapping from dev name
-            match = re.search("/dev/([a-z]{3}\d)", blkid_out)  # noqa: W605
+            match = re.search(r"/dev/([a-z]{3}\d)", blkid_out)
             if not match:
                 print(f"no match found: {tag}")
                 report(section, tag, [CSVResult.FAIL])

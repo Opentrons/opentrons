@@ -10,11 +10,7 @@
     "pressure": {
       "count": 1
     },
-    "sensors": [
-      "pressure",
-      "capacitive",
-      "environment"
-    ]
+    "sensors": ["pressure", "capacitive", "environment"]
   },
   "backCompatNames": [],
   "backlashDistance": 0.1,
@@ -90,9 +86,7 @@
   "shaftULperMM": 0.785,
   "validNozzleMaps": {
     "maps": {
-      "SingleA1": [
-        "A1"
-      ]
+      "SingleA1": ["A1"]
     }
   }
 }

@@ -379,11 +379,10 @@ class FixtureSettings(CSVSettings):
         fast_simulate = IS_ROBOT and simulating
 
         test_report = report.create_csv_test_report(
-            volumes=volumes_flat,
-            pipette_channels=pipette_channels,
-            increment=increment,
-            trials=trials,
-            name=name,
+            volumes=csv_settings.volumes_flat,
+            pipette_channels=csv_settings.channels,
+            trials=csv_settings.trials,
+            name=csv_settings.name,
             run_id=run_id,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
