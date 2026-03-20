@@ -108,7 +108,7 @@ jobs:
           NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
-          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
+          OT_PD_SENTRY_DSN: ${{ vars.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
           # Used by @sentry/vite-plugin (sourcemap upload is gated by OT_PD_SENTRY_PLUGIN_UPLOAD).
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
