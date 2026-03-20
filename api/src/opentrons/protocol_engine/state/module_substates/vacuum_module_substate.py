@@ -24,7 +24,6 @@ class VacuumModuleSubState:
         self, update: VacuumModuleStateUpdate
     ) -> "VacuumModuleSubState":
         """Return a new state with the given update applied."""
-
         return VacuumModuleSubState(
             module_id=self.module_id,
         )

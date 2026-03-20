@@ -1,7 +1,7 @@
 {
   "$otSharedSchema": "module/schemas/3",
   "moduleType": "vacuumModuleType",
-  "model": "vacuumModuleMilliporeV1",
+  "model": "vacuumModuleV1",
   "labwareOffset": {
     "x": 0,
     "y": 0,

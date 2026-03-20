@@ -22,7 +22,7 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -312,7 +312,7 @@ export const getModuleFixtures = (
     deckDef
   )
   const filteredModuleModels = getFilteredModules(moduleModel).filter(
-    model => model !== VACUUM_MODULE_MILLIPORE_V1 || enableVacuumModule
+    model => model !== VACUUM_MODULE_V1 || enableVacuumModule
   )
   const isStagingAreaInSlot4 =
     fixtures != null &&

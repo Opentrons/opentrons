@@ -141,7 +141,7 @@ from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
-from opentrons.util.pyro_synchronous_adapter import (
+from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     pyro_behavior,
 )

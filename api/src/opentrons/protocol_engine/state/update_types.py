@@ -392,9 +392,21 @@ class FlexStackerStateUpdate:
 
 @dataclasses.dataclass
 class VacuumModuleStateUpdate:
-    """An update to the vacuum module state."""
+    """An update to the Vacuum Module state."""
 
     module_id: str
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: VacuumModuleStateUpdate | NoChangeType,
+        module_id: str,
+    ) -> VacuumModuleStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return VacuumModuleStateUpdate(module_id=module_id)
+        else:
+            return maybe_inst
 
 
 @dataclasses.dataclass

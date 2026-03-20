@@ -36,7 +36,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
-from opentrons.util.pyro_synchronous_adapter import (
+from opentrons.util.pyro.pyro_synchronous_adapter import (
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -176,7 +176,7 @@ class VacuumModule(mod_abc.AbstractModule):
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
-        return "vacuumModuleMilliporeV1"
+        return "vacuumModuleV1"
 
     def model(self) -> str:
         if isinstance(self._driver, SimulatingDriver):
