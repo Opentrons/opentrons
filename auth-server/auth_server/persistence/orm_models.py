@@ -1,6 +1,6 @@
 """ORM table definitions and supporting column types."""
 
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Column, Integer, String
 
 from auth_server.persistence.database import Base
 

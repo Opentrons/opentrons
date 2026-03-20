@@ -133,7 +133,6 @@ def _response_to_db(settings: SettingsResponseData) -> dict[str, str | None]:
 
 def _db_to_response(db: dict[str, str | None]) -> SettingsResponseData:
     """Convert a DB key-value dict to a SettingsResponseData."""
-
     complexity_min = _to_optional_int(db.get(_KEY_PASSWORD_COMPLEXITY_MIN_LENGTH))
     complexity_special = db.get(_KEY_PASSWORD_COMPLEXITY_SPECIAL_CHARS)
 
