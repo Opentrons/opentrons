@@ -711,7 +711,7 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-                *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
                 the block heats or cools.
 
         !!! note
@@ -724,7 +724,7 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 29) and ramp_rate:
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
@@ -765,13 +765,13 @@ class ThermocyclerContext(ModuleContext):
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
 
-        *Changed in version 2.29:* Use the optional `ramp_rate` parameter to control how quickly
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
         the block heats or cools.
         """
 
         if block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        if self._api_version < APIVersion(2, 29) and ramp_rate:
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
             # because the argument was always there but didn't work, continue to swallow this arg on
             # old api versions.
             ramp_rate = None
