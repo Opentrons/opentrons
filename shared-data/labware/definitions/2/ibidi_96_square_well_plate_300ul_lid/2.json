@@ -2,19 +2,19 @@
   "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
-    "brand": "greiner",
+    "brand": "ibidi",
     "brandId": []
   },
   "metadata": {
-    "displayName": "Black 96-well Microtiter Plate Lid",
+    "displayName": "ibidi 96 Square Well Flat Bottom Plate 300 µL Lid",
     "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
   "dimensions": {
-    "xDimension": 127.5,
-    "yDimension": 85,
-    "zDimension": 10
+    "xDimension": 127,
+    "yDimension": 84.5,
+    "zDimension": 6.95
   },
   "wells": {},
   "groups": [
@@ -33,21 +33,21 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "black_96_well_microtiter_plate_lid"
+    "loadName": "ibidi_96_square_well_plate_300ul_lid"
   },
   "namespace": "opentrons",
   "version": 2,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
-    "milliplex_r_96_well_microtiter_plate": {
+    "ibidi_96_square_well_plate_300ul_lid": {
       "x": 0,
       "y": 0,
-      "z": 7.4
+      "z": 1.2
     },
-    "black_96_well_microtiter_plate_lid": {
+    "ibidi_96_square_well_plate_300ul": {
       "x": 0,
       "y": 0,
-      "z": 1
+      "z": 4.75
     },
     "opentrons_flex_deck_riser": {
       "x": 0,
@@ -64,11 +64,11 @@
   "compatibleParentLabware": [
     "protocol_engine_lid_stack_object",
     "opentrons_flex_deck_riser",
-    "milliplex_r_96_well_microtiter_plate",
-    "black_96_well_microtiter_plate_lid"
+    "ibidi_96_square_well_plate_300ul",
+    "ibidi_96_square_well_plate_300ul_lid"
   ],
   "gripForce": 10,
-  "gripHeightFromLabwareBottom": 7,
+  "gripHeightFromLabwareBottom": 5,
   "gripperOffsets": {
     "lidDisposalOffsets": {
       "pickUpOffset": {

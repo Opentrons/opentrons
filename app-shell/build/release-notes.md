@@ -39,6 +39,16 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 ---
 
+## Opentrons App Changes in 8.9.0
+
+Welcome to the v8.9.0 release of the Opentrons App! This release updates quick transfer protocols with the same features as any other Flex protocol:
+
+- Go to the Protocols tab on the touchscreen to start a quick transfer.
+- Find completed quick transfers in the Protocols tab.
+- Pin a quick transfer protocol to find it easily.
+
+---
+
 ## Opentrons App Changes in 8.8.1
 
 There are no changes to the Opentrons App in v8.8.1.
