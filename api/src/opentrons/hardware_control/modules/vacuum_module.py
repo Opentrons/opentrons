@@ -308,13 +308,15 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
+        # TODO: Handle error
         await self._driver.set_vent_state(state=vent_state)
 
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
         guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
@@ -322,7 +324,8 @@ class VacuumModule(mod_abc.AbstractModule):
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
             guage_pressure_mbar=guage_pressure_mbar,
-            duration=duration,
+            duration_s=duration_s,
+            timeout_s=timeout_s,
             rate=rate,
             vent_after=vent_after,
         )
@@ -337,10 +340,6 @@ class VacuumModule(mod_abc.AbstractModule):
         await self._driver.set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
         )
-
-    async def set_serial_number(self, sn: str) -> None:
-        """Set the serial number."""
-        await self._driver.set_serial_number(sn=sn)
 
 
 class VacuumModuleReader(Reader):
