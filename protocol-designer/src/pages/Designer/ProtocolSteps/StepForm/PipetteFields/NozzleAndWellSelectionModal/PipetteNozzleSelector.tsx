@@ -48,9 +48,10 @@ export function PipetteNozzleSelector(
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
-
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
+  const singleChannel = channels === 1
+  const nozzleConfiguration = singleChannel
+    ? ALL
+    : (propsForFields.nozzles.value as NozzleConfigurationStyle)
   const primaryNozzle =
     (propsForFields.primaryNozzle?.value as PrimaryNozzleConfigurationStyle) ??
     A1_NOZZLE
