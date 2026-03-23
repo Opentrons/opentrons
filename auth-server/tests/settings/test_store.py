@@ -20,7 +20,7 @@ _DEFAULTS = {
     "requireReasonForInteraction": "True",
     "minLengthOfReasonForInteraction": "None",
     "requireLogsToBeSavedInApp": "True",
-    "deleteOverMaxOnDiskProtocols": "True",
+    "delete_over_max_on_disk_protocols": "True",
 }
 
 

@@ -6,13 +6,6 @@ from typing import Annotated, Literal
 import pydantic
 
 
-class PasswordComplexity(pydantic.BaseModel):
-    """The complexity of the password."""
-
-    minimumLength: int
-    specialCharacters: bool
-
-
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
 
@@ -40,11 +33,15 @@ class SettingsResponseData(_StrictBaseModel):
         default=None,
         description="Length of time in days until password must be changed.",
     )
-    passwordComplexity: PasswordComplexity | None = pydantic.Field(
+    passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
-        description="Password complexity level.",
+        description="Minimum length of password.",
     )
-    idleLockoutInMinutes: int = pydantic.Field(
+    passwordComplexitySpecialCharacters: bool | None = pydantic.Field(
+        default=None,
+        description="Require special characters in password.",
+    )
+    idleLogoutInMinutes: int = pydantic.Field(
         default=3,
         description="Length of time until account is locked due to inactivity.",
     )
@@ -114,14 +111,18 @@ class PatchSettingsRequestData(_StrictBaseModel):
             description="Length of time in days until password must be changed."
         ),
     ] = None
-    passwordComplexity: Annotated[
-        PasswordComplexity | None,
-        pydantic.Field(description="Password complexity level."),
+    passwordComplexityMinimumLength: Annotated[
+        int | None,
+        pydantic.Field(description="Minimum length of password."),
     ] = None
-    idleLockoutInMinutes: Annotated[
+    passwordComplexitySpecialCharacters: Annotated[
+        bool | None,
+        pydantic.Field(description="Require special characters in password."),
+    ] = None
+    idleLogoutInMinutes: Annotated[
         int | None,
         pydantic.Field(
-            description="Length of time until account is locked due to inactivity."
+            description="Length of time until account is logged out due to inactivity."
         ),
     ] = None
     requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
