@@ -11,8 +11,6 @@ from opentrons.util.pyro.pyro_serialization import (
     register_type_to_serpent,
 )
 
-from opentrons.protocol_engine.state.state_summary import StateSummary
-
 
 # Estop Overall Status registry
 def _estop_overall_status_dict_to_class(  # type: ignore

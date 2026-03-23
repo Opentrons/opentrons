@@ -1,6 +1,7 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
-from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, cast
+from datetime import datetime
+from typing import Any, Dict, List, Mapping, Optional, Tuple, cast, get_args
 
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
@@ -8,6 +9,7 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.modules import (
     ModuleModel as HardwareModuleModel,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     Command,
     CommandCreate,
@@ -19,6 +21,8 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
 )
+from opentrons.protocol_engine.commands.command import CommandStatus
+from opentrons.protocol_engine.commands.comment import Comment, CommentParams
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
@@ -52,12 +56,24 @@ def register_process_types() -> None:
         CameraSettings,
         CommandAnnotation,
         CommandPreconditions,
+        CommandSlice,
+        CommandErrorSlice,
+        CommandPointer,
+        CommandAnnotationsSlice,
         LabwareOffset,
         LabwareOffsetCreate,
         LegacyLabwareOffsetCreate,
+        NozzleMap,
+        ProtocolSource,
+        RunResult,
         StateSummary,
     ]:
-        PydanticPyroSerializer.register_model(pydantic_model)
+        PydanticPyroSerializer.register_model(pydantic_model)  # type: ignore[arg-type]
+    # We do two levels of get_args because it's an annotated type union
+    for command in get_args(get_args(Command)[0]):
+        PydanticPyroSerializer.register_model(command)
+    for command_create in get_args(get_args(CommandCreate)[0]):
+        PydanticPyroSerializer.register_model(command_create)
 
 
 def create_directed_run_process(
@@ -97,12 +113,10 @@ class DirectedRunProcess:
 
     async def run(
         self,
-        # TODO all of these have to be serialized, ProtocolSource needs to be pydantic
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
-        # TODO make this pydantic and register it
         return RunResult(
             commands=[],
             state_summary=self.get_state_summary(),
@@ -182,32 +196,46 @@ class DirectedRunProcess:
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         return None
 
-    # TODO turn this into pydantic and register
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
-        pass
+        return CommandSlice(
+            commands=[],
+            cursor=0,
+            total_length=0,
+        )
 
-    # TODO turn this into pydantic and register
     def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
-        pass
+        return CommandAnnotationsSlice(
+            command_annotations=[],
+            cursor=0,
+            total_length=0,
+        )
 
-    # TODO turn this into pydantic and register
     def get_command_error_slice(
         self,
         cursor: int,
         length: int,
     ) -> CommandErrorSlice:
-        pass
+        return CommandErrorSlice(
+            commands_errors=[],
+            cursor=0,
+            total_length=0,
+        )
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         return None
 
-    # TODO will have to register every command probably
     def get_command(self, command_id: str) -> Command:
-        pass
+        return Comment(
+            id=command_id,
+            createdAt=datetime.now(),
+            key="abc",
+            status=CommandStatus.SUCCEEDED,
+            params=CommentParams(message="blah blah"),
+        )
 
     def get_all_commands(self) -> List[Command]:
         return []
@@ -273,7 +301,6 @@ class DirectedRunProcess:
     # TODO this isn't returning anything right now
     async def add_command_and_wait_for_interval(
         self,
-        # TODO same thing with Command, this is gonna have do multiple, probably?
         command: CommandCreate,
         wait_until_complete: bool = False,
         timeout: Optional[int] = None,
@@ -326,7 +353,6 @@ class DirectedRunProcess:
     def get_deck_type(self) -> DeckType:
         return self._deck_type
 
-    # TODO this is gonna be messy to serialize, maybe? NozzleMap needs to be a pydantic model too
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         return {}
 
@@ -340,10 +366,6 @@ class DirectedRunProcess:
     # TODO same with nozzle maps
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         return {}
-
-    # TODO figure this out too? Don't think it's used
-    async def command_generator(self) -> AsyncGenerator[str, None]:
-        pass
 
     def clear_command_history(self) -> None:
         pass
