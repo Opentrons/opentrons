@@ -636,7 +636,7 @@ class OT3API(
         return self._backend.module_controls.available_modules
 
     @property
-    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    # @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_peripherals(self) -> List[peripherals.AbstractPeripheral]:
         return self._backend.module_controls.available_peripherals
 

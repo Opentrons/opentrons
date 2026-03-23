@@ -120,9 +120,9 @@ class ModuleContext(CommandPublisher):
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
 
-        assert (
-            labware.parent == self._core.geometry
-        ), "Labware is not configured with this module as its parent"
+        assert labware.parent == self._core.geometry, (
+            "Labware is not configured with this module as its parent"
+        )
 
         return self._core.geometry.add_labware(labware)
 
