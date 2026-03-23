@@ -168,7 +168,10 @@ class TipView:
                 return False
             # Since we know a full configuration will always produce zero non-active overlapping wells
             # we can skip the following checks if it is a full configuration.
-            if nozzle_map.configuration != NozzleConfigurationType.FULL:
+            if (
+                nozzle_map.configuration != NozzleConfigurationType.FULL
+                and nozzle_map.physical_nozzle_count != nozzle_map.tip_count
+            ):
                 # If we have a partial configuration we need to ensure that any wells in the way are NOT present
                 wells_covered_physically = set(
                     wells_covered_by_physical_pipette(
@@ -242,6 +245,11 @@ class TipView:
             The well names of all the tips that the operation will use.
         """
         columns = self._state.columns_by_labware_id.get(labware_id, [])
+        if (
+            nozzle_map.physical_nozzle_count == 1
+        ):
+            return [well_name]
+
         return list(
             wells_covered_dense(
                 nozzle_map.columns,
