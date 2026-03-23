@@ -1,0 +1,45 @@
+# Lint, test, and build @opentrons/protocol-visualization (modeled on components CI).
+
+name: 'Protocol visualization — lint, test, build'
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/protocol-visualization-ci.yaml'
+      - 'Makefile'
+      - 'package.json'
+      - 'protocol-visualization/**'
+      - 'vitest.config.*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  protocol-visualization-ci:
+    name: 'protocol-visualization lint, test, and lib build'
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/js/setup
+      - name: 'typescript project build'
+        run: make -C protocol-visualization check-ts
+      - name: 'unit tests with coverage'
+        run: make -C protocol-visualization test-cov
+      - name: 'vite lib build'
+        run: make -C protocol-visualization lib
+      - name: 'Upload coverage report'
+        if: github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          flags: protocol-visualization
