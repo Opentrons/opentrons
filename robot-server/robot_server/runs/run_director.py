@@ -45,7 +45,7 @@ from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
-from opentrons.util.pyro.pyro_serialization import PydanticPyroSerializer
+from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -68,12 +68,12 @@ def register_process_types() -> None:
         RunResult,
         StateSummary,
     ]:
-        PydanticPyroSerializer.register_model(pydantic_model)  # type: ignore[arg-type]
+        OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
     # We do two levels of get_args because it's an annotated type union
     for command in get_args(get_args(Command)[0]):
-        PydanticPyroSerializer.register_model(command)
+        OpentronsPyroSerializer.register_pydantic_model(command)
     for command_create in get_args(get_args(CommandCreate)[0]):
-        PydanticPyroSerializer.register_model(command_create)
+        OpentronsPyroSerializer.register_pydantic_model(command_create)
 
 
 def create_directed_run_process(
@@ -270,11 +270,10 @@ class DirectedRunProcess:
     def run_has_stopped(self) -> bool:
         return True
 
-    # TODO this doesn't return anything yet
     def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
-        pass
+        return LabwareOffset.model_construct(id="fake")  # type: ignore[call-arg]
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         return cast(LabwareUri, "fake/uri/ahh")
@@ -298,7 +297,6 @@ class DirectedRunProcess:
         """Add new camera capture image settings."""
         pass
 
-    # TODO this isn't returning anything right now
     async def add_command_and_wait_for_interval(
         self,
         command: CommandCreate,
@@ -306,7 +304,13 @@ class DirectedRunProcess:
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
-        pass
+        return Comment(
+            id="blah",
+            createdAt=datetime.now(),
+            key="abc",
+            status=CommandStatus.SUCCEEDED,
+            params=CommentParams(message="blah blah"),
+        )
 
     def estop(self) -> None:
         pass

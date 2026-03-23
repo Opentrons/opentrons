@@ -9,6 +9,7 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     find_enums_in_packages,
     register_type_to_serpent,
+    serpent_enum_registration,
 )
 
 
