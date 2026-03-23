@@ -33,12 +33,20 @@ NETWORK_DELAY_AFTER_READY_S = 2.0  # wait after update server is ready before st
 NETWORK_UPDATE_SERVER_READY_TIMEOUT_S = 90  # max time to wait for GET /server/update/health after /health is up
 # After restart, GET /health and /server/update/health can be 200 while nginx still returns 502 for robot-server routes.
 NETWORK_HTTP_API_READY_TIMEOUT_S = 1000  # default --http-api-ready-timeout (non-Flex robots only; Flex uses --stable-state-*)
-# Stable snapshot: HTTP 200 on state routes + populated serials; two identical snapshots in a row.
-STABLE_STATE_TIMEOUT_S = 1000.0  # default ≥10 min before giving up on a good snapshot
+# Stable snapshot: HTTP 200 on state routes + populated serials; N identical snapshots in a row (Flex only).
+STABLE_STATE_TIMEOUT_S = 1000.0  # default ~17 min cap (pipettes may need most of this on real hardware)
 STABLE_STATE_NAG_AFTER_S = 420.0  # at 7 min, print a one-time “check the robot” message
 STABLE_STATE_POLL_INTERVAL_S = 5.0
+# Flex: consecutive matching fingerprints while instruments are fully online (see _flex_instruments_ready_for_validation).
+FLEX_STABLE_CONSECUTIVE_POLLS_DEFAULT = 2
+# Flex: one-time stderr warning if pipettes/grippers still not reporting healthy serials after this many seconds.
+FLEX_PIPETTE_SLOW_WARN_AFTER_S = 600.0
 NETWORK_502_RETRIES = 3  # retry begin/upload this many times on 502 (Bad Gateway)
 NETWORK_502_RETRY_DELAY_S = 10  # seconds between 502 retries
+# During validate/write, disk I/O can slow the update API; avoid spurious read timeouts on status polls
+UPDATE_STATUS_POLL_TIMEOUT_S = 120.0
+UPDATE_SESSION_LOST_HEALTH_WAIT_S = 120.0  # max time to poll /health after session loss
+UPDATE_SESSION_LOST_HEALTH_INTERVAL_S = 5.0
 USB_DELAY_BETWEEN_REQUESTS_S = 1.0  # wait after each request/response before next
 USB_BEGIN_TIMEOUT_S = 60.0  # longer timeout for POST begin (update server may be slow)
 # Windows serial stack often needs a bit more time after write before read (consecutive request/response)
@@ -459,13 +467,88 @@ def cancel_update_session(client: httpx.Client, base_url: str) -> None:
     print("Session cancelled", file=sys.stderr)
 
 
-def get_update_status(client: httpx.Client, base_url: str, token: str) -> dict:
+def get_update_status(
+    client: httpx.Client,
+    base_url: str,
+    token: str,
+    request_timeout: Optional[float] = None,
+) -> dict:
     """Get current update session status."""
     # update-server/otupdate/common/update.py — status(); session.state in otupdate/common/session.py
     # app __fixtures__ mockStatusSuccess (stage, message, progress)
-    resp = client.get(f"{base_url}/server/update/{token}/status")
+    resp = client.get(
+        f"{base_url}/server/update/{token}/status",
+        timeout=request_timeout,
+    )
     resp.raise_for_status()
     return resp.json()
+
+
+def _is_bad_token_response(response: httpx.Response) -> bool:
+    """True when update-server reports the session token is unknown (404 + error body)."""
+    if response.status_code != 404:
+        return False
+    try:
+        data = response.json()
+        return data.get("error") == "bad-token"
+    except Exception:
+        return False
+
+
+def _explain_update_session_lost(
+    client: httpx.Client,
+    base_url: str,
+    *,
+    last_stage: Optional[str],
+    last_progress: Optional[float],
+) -> None:
+    """Print why status polling failed and best-effort /health version after session loss."""
+    print("", file=sys.stderr)
+    print(
+        "  Update session disappeared on the robot (HTTP 404 bad-token).",
+        file=sys.stderr,
+    )
+    print(
+        "  The session token is no longer valid — often update-server restarted, the session",
+        file=sys.stderr,
+    )
+    print(
+        "  was cleared, or the robot rebooted during validate/write.",
+        file=sys.stderr,
+    )
+    if last_stage:
+        prog = ""
+        if last_progress is not None and last_progress > 0:
+            prog = f"  (last progress reported: {last_progress:.1f}%)"
+        print(
+            f"  Last stage seen: {STAGE_LABELS.get(last_stage, last_stage)}{prog}",
+            file=sys.stderr,
+        )
+    print("  Polling /health for current software version (best effort)...", file=sys.stderr)
+    deadline = time.time() + UPDATE_SESSION_LOST_HEALTH_WAIT_S
+    version_note = "unknown"
+    while time.time() < deadline:
+        try:
+            h = get_robot_health(client, base_url, 15.0)
+            version_note = str(h.get("api_version") or h.get("api_Version") or "unknown")
+            print(f"  /health reports software version: {version_note}", file=sys.stderr)
+            break
+        except Exception:
+            time.sleep(UPDATE_SESSION_LOST_HEALTH_INTERVAL_S)
+    else:
+        print(
+            "  Could not get /health within "
+            f"{UPDATE_SESSION_LOST_HEALTH_WAIT_S:.0f}s — robot may still be rebooting or unreachable.",
+            file=sys.stderr,
+        )
+    print(
+        "  Re-run this script when the robot is stable. Start from the version above (or the touchscreen / app);",
+        file=sys.stderr,
+    )
+    print(
+        "  do not assume the update finished successfully.",
+        file=sys.stderr,
+    )
 
 
 def wait_for_awaiting_file(
@@ -476,7 +559,22 @@ def wait_for_awaiting_file(
     print("Waiting for session to be ready for file upload...", file=sys.stderr)
     start_time = time.time()
     while time.time() - start_time < timeout:
-        status = get_update_status(client, base_url, token)
+        try:
+            status = get_update_status(
+                client,
+                base_url,
+                token,
+                request_timeout=UPDATE_STATUS_POLL_TIMEOUT_S,
+            )
+        except httpx.HTTPStatusError as exc:
+            if _is_bad_token_response(exc.response):
+                _explain_update_session_lost(
+                    client, base_url, last_stage=None, last_progress=None
+                )
+                raise RuntimeError(
+                    "Update session ended before the robot was ready for file upload."
+                ) from exc
+            raise
         stage_value = status.get("stage", "")
 
         if stage_value == "awaiting-file":
@@ -582,8 +680,50 @@ def wait_for_done(
     last_stage = None
     last_progress = None
 
+    def _stage_still_in_flight() -> bool:
+        return last_stage is None or last_stage in ("validating", "writing")
+
     while time.time() - start_time < timeout:
-        status = get_update_status(client, base_url, token)
+        try:
+            status = get_update_status(
+                client,
+                base_url,
+                token,
+                request_timeout=UPDATE_STATUS_POLL_TIMEOUT_S,
+            )
+        except httpx.HTTPStatusError as exc:
+            if _is_bad_token_response(exc.response):
+                _explain_update_session_lost(
+                    client,
+                    base_url,
+                    last_stage=last_stage,
+                    last_progress=last_progress,
+                )
+                raise RuntimeError(
+                    "Update session ended unexpectedly on the robot (details above)."
+                ) from exc
+            if exc.response.status_code in (502, 503) and _stage_still_in_flight():
+                elapsed = time.time() - start_time
+                print(
+                    f"  [{elapsed:5.1f}s]  Status HTTP {exc.response.status_code} "
+                    f"(Bad Gateway / unavailable); retrying in {NETWORK_502_RETRY_DELAY_S}s…",
+                    file=sys.stderr,
+                )
+                time.sleep(NETWORK_502_RETRY_DELAY_S)
+                continue
+            raise
+        except httpx.RequestError as exc:
+            if _stage_still_in_flight():
+                elapsed = time.time() - start_time
+                print(
+                    f"  [{elapsed:5.1f}s]  Status poll: {type(exc).__name__}: {exc} "
+                    "(robot may be busy or reconnecting; retrying in 5s…)",
+                    file=sys.stderr,
+                )
+                time.sleep(5)
+                continue
+            raise
+
         stage = status.get("stage", "")
         progress = status.get("progress", 0)
         message = status.get("message", "")
@@ -862,8 +1002,9 @@ def _format_state_tables(
 def _instruments_payload_looks_good(data: dict, robot_model: str) -> bool:
     """True if /instruments or /pipettes JSON has no placeholder serials for attached tools.
 
-    Flex (primary): `data` is a list of AttachedItem. Items with ok=False (BadPipette/BadGripper) may omit
-    serialNumber. Items with ok=True need serialNumber (or id). Empty list means no tools — OK.
+    Flex (primary): `data` is a list of AttachedItem. Items with ok=False may omit serialNumber while subsystems
+    boot; items with ok=True need serialNumber (or id). Empty list means no tools — OK.
+    (Whether pipettes are ready to validate an update is gated separately in Flex stable waits.)
     Non-Flex /pipettes: PipettesByMount; for each mount with model/name, id must be present.
     """
     if "OT-3" in robot_model:
@@ -910,6 +1051,28 @@ def _state_snapshot_looks_good(
     return _instruments_payload_looks_good(instruments_json, robot_model) and _modules_payload_looks_good(
         modules_json
     )
+
+
+def _flex_instruments_ready_for_validation(inst_json: dict) -> bool:
+    """True when every Flex /instruments entry is healthy (ok is not False) and has a real serial or id.
+
+    Called after HTTP 200 and lenient snapshot checks: we keep polling while pipettes boot; the stable-streak
+    only advances when this is True so we do not treat transient load states as success.
+    """
+    items = inst_json.get("data")
+    if not isinstance(items, list):
+        return False
+    if len(items) == 0:
+        return True
+    for item in items:
+        if not isinstance(item, dict):
+            return False
+        if item.get("ok") is False:
+            return False
+        sn = item.get("serialNumber") or item.get("id")
+        if sn is None or str(sn).strip() in ("", "?"):
+            return False
+    return True
 
 
 def _snapshot_identity_fingerprint(
@@ -1036,17 +1199,25 @@ def wait_for_stable_robot_state_network(
     overall_timeout: float = STABLE_STATE_TIMEOUT_S,
     nag_after_s: float = STABLE_STATE_NAG_AFTER_S,
     poll_interval_s: float = STABLE_STATE_POLL_INTERVAL_S,
+    consecutive_matching_polls: int = FLEX_STABLE_CONSECUTIVE_POLLS_DEFAULT,
+    pipette_slow_warn_after_s: float = FLEX_PIPETTE_SLOW_WARN_AFTER_S,
 ) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
-    """Flex (OT-3) only: poll until HTTP 200 on state routes, populated serials, and two consecutive matching snapshots."""
+    """Flex (OT-3) only: poll until HTTP 200, modules OK, pipettes fully online, then N matching snapshots."""
+    n = max(1, int(consecutive_matching_polls))
     print(
-        "Waiting for a stable Flex snapshot (GET /runs, /instruments, /modules — HTTP 200, complete serials, "
-        "two matching polls)...",
+        "Waiting for a stable Flex snapshot (GET /runs, /instruments, /modules — pipettes/grippers online with "
+        "serials, then {} consecutive matching polls)...".format(n),
         file=sys.stderr,
     )
     start = time.time()
     nag_printed = False
+    pipette_slow_warn_printed = False
     last_progress_log = 0.0
     prev_fingerprint: Optional[Tuple[Tuple[Tuple[str, str], ...], Tuple[str, ...]]] = None
+    match_streak = 0
+    last_good_runs: List[dict] = []
+    last_good_pipettes: List[Tuple[str, str]] = []
+    last_good_modules: List[str] = []
     while time.time() - start < overall_timeout:
         elapsed = time.time() - start
         if not nag_printed and elapsed >= nag_after_s:
@@ -1065,22 +1236,55 @@ def wait_for_stable_robot_state_network(
 
         got = _fetch_state_network_once(client, base_url, per_request_timeout, robot_model)
         if got is None:
+            prev_fingerprint = None
+            match_streak = 0
             time.sleep(poll_interval_s)
             continue
         runs, pipettes_rows, modules_serials, inst_json, mod_json = got
         if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            prev_fingerprint = None
+            match_streak = 0
+            time.sleep(poll_interval_s)
+            continue
+        if not _flex_instruments_ready_for_validation(inst_json):
+            prev_fingerprint = None
+            match_streak = 0
+            if (
+                not pipette_slow_warn_printed
+                and pipette_slow_warn_after_s > 0
+                and elapsed >= pipette_slow_warn_after_s
+            ):
+                print(
+                    "Warning: pipettes/grippers still not reporting healthy serials after "
+                    f"{pipette_slow_warn_after_s:.0f}s. On a real robot this can take many minutes while "
+                    "subsystems load — not an error. Still waiting (no timeout until "
+                    f"{overall_timeout:.0f}s); increase --stable-state-timeout if needed.",
+                    file=sys.stderr,
+                )
+                pipette_slow_warn_printed = True
             time.sleep(poll_interval_s)
             continue
         fp = _snapshot_identity_fingerprint(pipettes_rows, modules_serials)
+        last_good_runs, last_good_pipettes, last_good_modules = runs, pipettes_rows, modules_serials
         if prev_fingerprint is not None and fp == prev_fingerprint:
-            print("Stable snapshot ready (two consecutive matching instrument/module identity sets).", file=sys.stderr)
-            return runs, pipettes_rows, modules_serials
-        prev_fingerprint = fp
+            match_streak += 1
+        else:
+            prev_fingerprint = fp
+            match_streak = 1
+        if match_streak >= n:
+            print(
+                "Stable snapshot ready ({} consecutive matching instrument/module identity sets; instruments healthy).".format(
+                    n
+                ),
+                file=sys.stderr,
+            )
+            return last_good_runs, last_good_pipettes, last_good_modules
         time.sleep(poll_interval_s)
 
     raise TimeoutError(
         f"Stable Flex state snapshot not obtained within {overall_timeout:.0f}s "
-        "(need HTTP 200 on /runs, /instruments|/pipettes, /modules; non-placeholder serials; two matching polls)."
+        f"(need HTTP 200 on /runs, /instruments, /modules; pipettes online with real serials; {n} matching polls "
+        "while online). If pipettes were still loading, increase --stable-state-timeout."
     )
 
 
@@ -1133,9 +1337,10 @@ def wait_for_robot_state_after_restart_network(
     flex_stable_timeout: float,
     flex_nag_after: float,
     flex_poll_interval: float,
+    flex_consecutive_matching_polls: int,
     ot2_overall_timeout: float,
 ) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
-    """Default path is Flex: stable two-poll wait + optional nag. Non-Flex uses ot2_overall_timeout for a simpler wait."""
+    """Default path is Flex: stable multi-poll wait + optional nag. Non-Flex uses ot2_overall_timeout for a simpler wait."""
     if _is_flex_robot(robot_model):
         return wait_for_stable_robot_state_network(
             client,
@@ -1145,6 +1350,7 @@ def wait_for_robot_state_after_restart_network(
             overall_timeout=flex_stable_timeout,
             nag_after_s=flex_nag_after,
             poll_interval_s=flex_poll_interval,
+            consecutive_matching_polls=flex_consecutive_matching_polls,
         )
     return wait_for_populated_state_network_ot2(
         client,
@@ -1231,16 +1437,25 @@ def wait_for_stable_robot_state_usb(
     overall_timeout: float = STABLE_STATE_TIMEOUT_S,
     nag_after_s: float = STABLE_STATE_NAG_AFTER_S,
     poll_interval_s: float = STABLE_STATE_POLL_INTERVAL_S,
+    consecutive_matching_polls: int = FLEX_STABLE_CONSECUTIVE_POLLS_DEFAULT,
+    pipette_slow_warn_after_s: float = FLEX_PIPETTE_SLOW_WARN_AFTER_S,
 ) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
     """Flex only: same policy as network — stable snapshot over USB serial HTTP."""
+    n = max(1, int(consecutive_matching_polls))
     print(
-        "Waiting for a stable Flex snapshot over USB (/runs, /instruments, /modules — complete serials, two matching polls)...",
+        "Waiting for a stable Flex snapshot over USB (/runs, /instruments, /modules — pipettes online, "
+        "{} matching polls)...".format(n),
         file=sys.stderr,
     )
     start = time.time()
     nag_printed = False
+    pipette_slow_warn_printed = False
     last_progress_log = 0.0
     prev_fingerprint: Optional[Tuple[Tuple[Tuple[str, str], ...], Tuple[str, ...]]] = None
+    match_streak = 0
+    last_good_runs: List[dict] = []
+    last_good_pipettes: List[Tuple[str, str]] = []
+    last_good_modules: List[str] = []
     while time.time() - start < overall_timeout:
         elapsed = time.time() - start
         if not nag_printed and elapsed >= nag_after_s:
@@ -1259,22 +1474,55 @@ def wait_for_stable_robot_state_usb(
 
         got = _fetch_state_usb_once(port_path, per_request_timeout, robot_model)
         if got is None:
+            prev_fingerprint = None
+            match_streak = 0
             time.sleep(poll_interval_s)
             continue
         runs, pipettes_rows, modules_serials, inst_json, mod_json = got
         if not _state_snapshot_looks_good(inst_json, mod_json, robot_model):
+            prev_fingerprint = None
+            match_streak = 0
+            time.sleep(poll_interval_s)
+            continue
+        if not _flex_instruments_ready_for_validation(inst_json):
+            prev_fingerprint = None
+            match_streak = 0
+            if (
+                not pipette_slow_warn_printed
+                and pipette_slow_warn_after_s > 0
+                and elapsed >= pipette_slow_warn_after_s
+            ):
+                print(
+                    "Warning: pipettes/grippers still not reporting healthy serials after "
+                    f"{pipette_slow_warn_after_s:.0f}s. On a real robot this can take many minutes while "
+                    "subsystems load — not an error. Still waiting (no timeout until "
+                    f"{overall_timeout:.0f}s); increase --stable-state-timeout if needed.",
+                    file=sys.stderr,
+                )
+                pipette_slow_warn_printed = True
             time.sleep(poll_interval_s)
             continue
         fp = _snapshot_identity_fingerprint(pipettes_rows, modules_serials)
+        last_good_runs, last_good_pipettes, last_good_modules = runs, pipettes_rows, modules_serials
         if prev_fingerprint is not None and fp == prev_fingerprint:
-            print("Stable snapshot ready (two consecutive matching instrument/module identity sets).", file=sys.stderr)
-            return runs, pipettes_rows, modules_serials
-        prev_fingerprint = fp
+            match_streak += 1
+        else:
+            prev_fingerprint = fp
+            match_streak = 1
+        if match_streak >= n:
+            print(
+                "Stable snapshot ready ({} consecutive matching instrument/module identity sets; instruments healthy).".format(
+                    n
+                ),
+                file=sys.stderr,
+            )
+            return last_good_runs, last_good_pipettes, last_good_modules
         time.sleep(poll_interval_s)
 
     raise TimeoutError(
         f"Stable Flex state snapshot not obtained within {overall_timeout:.0f}s over USB "
-        "(need HTTP 200 on state routes; non-placeholder serials; two matching polls)."
+        f"(need HTTP 200 on state routes; pipettes online with real serials; {n} matching polls while online). "
+        "If pipettes were still loading, increase --stable-state-timeout."
     )
 
 
@@ -1325,6 +1573,7 @@ def wait_for_robot_state_after_restart_usb(
     flex_stable_timeout: float,
     flex_nag_after: float,
     flex_poll_interval: float,
+    flex_consecutive_matching_polls: int,
     ot2_overall_timeout: float,
 ) -> Tuple[List[dict], List[Tuple[str, str]], List[str]]:
     if _is_flex_robot(robot_model):
@@ -1335,6 +1584,7 @@ def wait_for_robot_state_after_restart_usb(
             overall_timeout=flex_stable_timeout,
             nag_after_s=flex_nag_after,
             poll_interval_s=flex_poll_interval,
+            consecutive_matching_polls=flex_consecutive_matching_polls,
         )
     return wait_for_populated_state_usb_ot2(
         port_path,
@@ -1353,6 +1603,7 @@ def _usb_final_summary(
     stable_timeout: float,
     stable_nag_after: float,
     stable_poll_interval: float,
+    flex_consecutive_matching_polls: int,
     ot2_state_timeout: float,
     fallback_software_version: str,
 ) -> None:
@@ -1364,6 +1615,7 @@ def _usb_final_summary(
         flex_stable_timeout=stable_timeout,
         flex_nag_after=stable_nag_after,
         flex_poll_interval=stable_poll_interval,
+        flex_consecutive_matching_polls=flex_consecutive_matching_polls,
         ot2_overall_timeout=ot2_state_timeout,
     )
     api_ver, calibration = _fetch_usb_health_calibration(port_path, timeout)
@@ -1540,6 +1792,16 @@ def run_one_update_usb(
     start = time.time()
     while time.time() - start < 300:
         status, raw = _serial_get_over_ser(ser, f"/server/update/{token}/status", timeout=timeout)
+        if status == 404:
+            try:
+                err = json.loads(raw.decode("utf-8"))
+                if err.get("error") == "bad-token":
+                    raise RuntimeError(
+                        "Update session was lost on the robot (404 bad-token). "
+                        "update-server may have restarted. Check the robot version and re-run."
+                    )
+            except json.JSONDecodeError:
+                pass
         if status != 200:
             raise RuntimeError(f"status failed: HTTP {status}")
         data = json.loads(raw.decode("utf-8"))
@@ -1575,6 +1837,16 @@ def run_one_update_usb(
     last_stage = None
     while time.time() - start < 600:
         status, raw = _serial_get_over_ser(ser, f"/server/update/{token}/status", timeout=timeout)
+        if status == 404:
+            try:
+                err = json.loads(raw.decode("utf-8"))
+                if err.get("error") == "bad-token":
+                    raise RuntimeError(
+                        "Update session was lost on the robot (404 bad-token) during validate/write. "
+                        "update-server may have restarted. Check the robot version and re-run."
+                    )
+            except json.JSONDecodeError:
+                pass
         if status != 200:
             raise RuntimeError(f"status failed: HTTP {status}")
         data = json.loads(raw.decode("utf-8"))
@@ -1652,8 +1924,9 @@ def main() -> int:
         "--stable-state-timeout",
         type=float,
         default=float(STABLE_STATE_TIMEOUT_S),
-        help="Opentrons Flex: max seconds to wait for a stable post-restart snapshot (HTTP 200 on /runs, /instruments, "
-        "/modules; real serials; two matching polls). Default %(default)s (10 min). Not used on non-Flex robots.",
+        help="Opentrons Flex: max seconds to wait for pipettes/grippers online with serials, then N matching polls "
+        "(see --flex-stable-consecutive-polls). Pipettes can take many minutes on real hardware — this is only a hard "
+        "cap. Default %(default)s (~17 min). Not used on non-Flex robots.",
     )
     parser.add_argument(
         "--stable-state-nag-after",
@@ -1667,6 +1940,14 @@ def main() -> int:
         type=float,
         default=float(STABLE_STATE_POLL_INTERVAL_S),
         help="Seconds between state snapshot polls while waiting (default: %(default)s). Primary use: Flex updates.",
+    )
+    parser.add_argument(
+        "--flex-stable-consecutive-polls",
+        type=int,
+        default=FLEX_STABLE_CONSECUTIVE_POLLS_DEFAULT,
+        metavar="N",
+        help="Opentrons Flex: after pipettes report healthy serials, require N consecutive matching instrument/module "
+        "snapshots (default %(default)s). Not used on non-Flex robots.",
     )
     parser.add_argument(
         "--http-api-ready-timeout",
@@ -1838,6 +2119,7 @@ def main() -> int:
                         flex_stable_timeout=args.stable_state_timeout,
                         flex_nag_after=args.stable_state_nag_after,
                         flex_poll_interval=args.stable_state_poll_interval,
+                        flex_consecutive_matching_polls=args.flex_stable_consecutive_polls,
                         ot2_overall_timeout=args.http_api_ready_timeout,
                     )
                     print("Ready for next update (stable state snapshot OK).", file=sys.stderr)
@@ -1875,6 +2157,7 @@ def main() -> int:
                             args.stable_state_timeout,
                             args.stable_state_nag_after,
                             args.stable_state_poll_interval,
+                            args.flex_stable_consecutive_polls,
                             args.http_api_ready_timeout,
                             versions[-1],
                         )
@@ -2074,6 +2357,7 @@ def main() -> int:
                         flex_stable_timeout=args.stable_state_timeout,
                         flex_nag_after=args.stable_state_nag_after,
                         flex_poll_interval=args.stable_state_poll_interval,
+                        flex_consecutive_matching_polls=args.flex_stable_consecutive_polls,
                         ot2_overall_timeout=args.http_api_ready_timeout,
                     )
                     print(
@@ -2155,6 +2439,7 @@ def main() -> int:
                 flex_stable_timeout=args.stable_state_timeout,
                 flex_nag_after=args.stable_state_nag_after,
                 flex_poll_interval=args.stable_state_poll_interval,
+                flex_consecutive_matching_polls=args.flex_stable_consecutive_polls,
                 ot2_overall_timeout=args.http_api_ready_timeout,
             )
             # After the *last* update, /health often lags behind /instruments (nginx); this is the usual failure point.
