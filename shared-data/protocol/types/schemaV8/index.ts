@@ -2,6 +2,7 @@ import type { CreateCommand } from '../../../command/types'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
   CommandPreconditions,
+  LabwareOffsetRecord,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -192,6 +193,7 @@ export interface ProtocolAnalysisOutput {
   robotType?: RobotType
   commandAnnotations?: CommandAnnotation[]
   commandPreconditions?: CommandPreconditions
+  labwareOffsets?: LabwareOffsetRecord[]
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 

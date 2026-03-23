@@ -1,4 +1,8 @@
-import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
+import type {
+  LabwareLocation,
+  LoadedLabwareLocation,
+  RunTimeCommand,
+} from '../command/types'
 import type { CommandAnnotation } from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
@@ -143,6 +147,38 @@ export interface Vector3D {
 }
 
 export type LabwareOffset = Vector3D
+
+export interface OnLabwareOffsetLocationSequenceComponent {
+  kind: 'onLabware'
+  labwareUri: string
+}
+
+export interface OnModuleOffsetLocationSequenceComponent {
+  kind: 'onModule'
+  moduleModel: ModuleModel
+}
+
+export interface OnAddressableAreaOffsetLocationSequenceComponent {
+  kind: 'onAddressableArea'
+  addressableAreaName: AddressableAreaName
+}
+
+export type LabwareOffsetLocationSequenceComponent =
+  | OnLabwareOffsetLocationSequenceComponent
+  | OnModuleOffsetLocationSequenceComponent
+  | OnAddressableAreaOffsetLocationSequenceComponent
+
+export type LabwareOffsetLocationSequence =
+  LabwareOffsetLocationSequenceComponent[]
+
+export interface LabwareOffsetRecord {
+  id: string
+  createdAt: string
+  definitionUri: string
+  location: LabwareLocation
+  locationSequence: LabwareOffsetLocationSequence
+  vector: LabwareOffset
+}
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -1074,6 +1110,7 @@ export interface CompletedProtocolAnalysis {
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
   commandPreconditions?: CommandPreconditions
+  labwareOffsets?: LabwareOffsetRecord[]
 }
 
 export interface ResourceFile {
