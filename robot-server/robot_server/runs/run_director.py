@@ -1,6 +1,7 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
-from typing import Any, Dict, List, Mapping, Optional, Tuple, cast
+from datetime import datetime
+from typing import Any, Dict, List, Mapping, Optional, Tuple, cast, get_args
 
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
@@ -20,6 +21,8 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
 )
+from opentrons.protocol_engine.commands.command import CommandStatus
+from opentrons.protocol_engine.commands.comment import Comment, CommentParams
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
@@ -65,7 +68,12 @@ def register_process_types() -> None:
         RunResult,
         StateSummary,
     ]:
-        PydanticPyroSerializer.register_model(pydantic_model)
+        PydanticPyroSerializer.register_model(pydantic_model)  # type: ignore[arg-type]
+    # We do two levels of get_args because it's an annotated type union
+    for command in get_args(get_args(Command)[0]):
+        PydanticPyroSerializer.register_model(command)
+    for command_create in get_args(get_args(CommandCreate)[0]):
+        PydanticPyroSerializer.register_model(command_create)
 
 
 def create_directed_run_process(
@@ -220,9 +228,14 @@ class DirectedRunProcess:
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         return None
 
-    # TODO will have to register every command probably
     def get_command(self, command_id: str) -> Command:
-        pass
+        return Comment(
+            id=command_id,
+            createdAt=datetime.now(),
+            key="abc",
+            status=CommandStatus.SUCCEEDED,
+            params=CommentParams(message="blah blah"),
+        )
 
     def get_all_commands(self) -> List[Command]:
         return []
@@ -288,7 +301,6 @@ class DirectedRunProcess:
     # TODO this isn't returning anything right now
     async def add_command_and_wait_for_interval(
         self,
-        # TODO same thing with Command, this is gonna have do multiple, probably?
         command: CommandCreate,
         wait_until_complete: bool = False,
         timeout: Optional[int] = None,
