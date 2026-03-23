@@ -185,13 +185,16 @@ export function Condition(props: DelayProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={conditionVolume}
               label={t('condition_volume')}
               error={volumeError}
-              readOnly
               onBlur={e => {
                 e.target.focus()
+              }}
+              onChange={e => {
+                setConditionVolume(Number(e.target.value))
               }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
