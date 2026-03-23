@@ -242,10 +242,16 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="text"
               value={String(volume ?? '')}
               label={t('disposal_volume_µL')}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                handleVolumeChange(e.target.value as string)
+              }}
             />
           </Flex>
           <Flex
@@ -310,11 +316,17 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="text"
               value={String(flowRate ?? '')}
               label={t('blowout_flow_rate_µL')}
               error={flowRateError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                handleFlowRateChange(e.target.value as string)
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('disposal_volume_flow_rate', {

@@ -203,11 +203,17 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={disposalVolume}
               label={t('disposal_volume_µL')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setDisposalVolume(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

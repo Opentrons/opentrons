@@ -47,7 +47,7 @@ export function CheckboxStepFormField(
             width="100%"
             type="neutral"
             isChecked={disabled ? false : Boolean(value)}
-            onClick={() => {
+            onChange={() => {
               updateValue(!value)
             }}
             labelText={label ?? ''}

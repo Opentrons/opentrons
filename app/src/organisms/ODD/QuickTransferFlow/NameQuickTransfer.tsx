@@ -65,9 +65,16 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
           width="100%"
         >
           <TouchInputField
+            autoFocus
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setName(e.target.value as string)
+            }}
           />
           <StyledText
             oddStyle="bodyTextRegular"

@@ -1,19 +1,12 @@
-import { css } from 'styled-components'
-
 import {
-  ALIGN_CENTER,
   Btn,
   COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  NO_WRAP,
-  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import styles from './setupstep.module.css'
 
 import type { ReactNode } from 'react'
 
@@ -44,20 +37,11 @@ export function SetupStep({
   rightElement,
 }: SetupStepProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <div className={styles.container}>
       <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            width="100%"
-            onClick={toggleExpanded}
-            gridGap={SPACING.spacing40}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
+        <div className={styles.outer_row_container}>
+          <div className={styles.clickable_container} onClick={toggleExpanded}>
+            <div className={styles.title_description_container}>
               <StyledText
                 color={COLORS.black90}
                 desktopStyle="bodyLargeSemiBold"
@@ -69,26 +53,27 @@ export function SetupStep({
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
+                className={styles.description_text}
               >
                 {description}
               </StyledText>
               {descriptionElement}
-            </Flex>
-            <Flex css={RIGHT_CONTENT_CONTAINER_STYLE}>
+            </div>
+            <div className={styles.right_content_container}>
               {rightElement}
               <Icon
                 color={COLORS.black90}
                 size="1.5rem"
-                css={ACCORDION_STYLE}
+                className={styles.accordion_icon}
                 name={expanded ? 'minus' : 'plus'}
-                margin={SPACING.spacing4}
               />
-            </Flex>
-          </Flex>
-        </Flex>
+            </div>
+          </div>
+        </div>
       </Btn>
       <div
-        css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        data-testid={`SetupStep_content_${expanded ? 'expanded' : 'collapsed'}`}
+        className={expanded ? styles.expanded : styles.collapsed}
         onTransitionEnd={e => {
           // HACK:
           // There's some kind of Chromium bug where, when the section expands,
@@ -102,44 +87,9 @@ export function SetupStep({
       >
         {children}
       </div>
-    </Flex>
+    </div>
   )
 }
-
-const EXPANDED_STYLE = css`
-  interpolate-size: allow-keywords;
-  overflow: hidden;
-
-  visibility: visible;
-  height: auto;
-  transition:
-    height 300ms ease-in,
-    visibility 300ms step-start;
-`
-const COLLAPSED_STYLE = css`
-  interpolate-size: allow-keywords;
-  overflow: hidden;
-
-  visibility: hidden;
-  height: 0;
-  transition:
-    height 500ms ease-out,
-    visibility 500ms step-end;
-`
-const ACCORDION_STYLE = css`
-  border-radius: 50%;
-  &:hover {
-    background: ${COLORS.grey30};
-  }
-  &:active {
-    background: ${COLORS.grey35};
-  }
-`
-
-const RIGHT_CONTENT_CONTAINER_STYLE = css`
-  align-items: ${ALIGN_CENTER};
-  text-wrap: ${NO_WRAP};
-`
 
 // https://stackoverflow.com/questions/3485365
 function forceRepaint(element: HTMLElement): void {

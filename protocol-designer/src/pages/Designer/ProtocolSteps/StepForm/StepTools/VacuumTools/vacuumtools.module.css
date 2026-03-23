@@ -91,6 +91,7 @@
 /* Ending hold vent (shown when pump duration is enabled) */
 .ending_hold_section {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: var(--spacing-8);
 }

@@ -146,7 +146,11 @@ export function ExtendedPartialTipField(
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {t('pipette_nozzles_and_wells')}
         </StyledText>
-        <ListButton type="noActive" onClick={handleOpen}>
+        <ListButton
+          type="noActive"
+          onClick={handleOpen}
+          testId="nozzle_and_well_modal"
+        >
           <StyledText desktopStyle="bodyDefaultRegular">
             {getNozzleWellText(
               primaryNozzle,
