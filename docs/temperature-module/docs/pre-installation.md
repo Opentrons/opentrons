@@ -5,16 +5,6 @@ description: "Deck placement, Flex caddies, and anchor adjustments before instal
 
 Review this section for important information about deck placement, alignment, and anchor adjustments for the Temperature Module.
 
-## Flex Caddies
-
-When used with a Flex robot, the Temperature Module fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing.
-
-![Module caddy with labels](images/temp-mod-caddy.png)
-
-The OT-2 does not use caddies. Modules clip directly to the deck.
-
-The Temperature Module caddy is also available for purchase from the Opentrons shop.
-
 ## Anchor Adjustments
 
 Anchors are screw-adjustable panels on the Temperature Module caddy. They provide the clamping force that secures the module to its caddy. Use a 2.5 mm screwdriver to adjust the anchors.
