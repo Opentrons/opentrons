@@ -172,6 +172,20 @@ async def test_analyze(
 
     command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
+    offset = pe_types.LabwareOffset(
+        id="1234123",
+        createdAt=datetime.now(),
+        definitionUri="opentrons/abcxyz/1",
+        location=pe_types.LegacyLabwareOffsetLocation(
+            slotName=DeckSlotName.SLOT_A1, moduleModel=None, definitionUri=None
+        ),
+        locationSequence=[
+            pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
+                addressableAreaName="A1"
+            )
+        ],
+        vector=pe_types.LabwareOffsetVector(x=1.0, y=2.0, z=3.0),
+    )
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -199,7 +213,7 @@ async def test_analyze(
                 labware=[analysis_labware],
                 pipettes=[analysis_pipette],
                 modules=[],
-                labwareOffsets=[],
+                labwareOffsets=[offset],
                 liquids=[],
                 liquidClasses=[],
                 wells=[],
@@ -229,6 +243,7 @@ async def test_analyze(
             liquidClasses=[],
             command_annotations=[command_annotation],
             command_preconditions=command_preconditions,
+            labware_offsets=[offset],
         )
     )
 
@@ -314,5 +329,6 @@ async def test_analyze_updates_pending_on_error(
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         ),
     )
