@@ -329,6 +329,7 @@ async def test_update_adds_details_and_completes_analysis(
         "commandAnnotations": [
             {"annotationType": "custom", "commandKeys": ["abc", "xyz"]}
         ],
+        "labwareOffsets": [],
     }
 
 
