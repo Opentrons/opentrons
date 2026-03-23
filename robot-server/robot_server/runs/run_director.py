@@ -1,6 +1,6 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
-from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, cast
+from typing import Any, Dict, List, Mapping, Optional, Tuple, cast
 
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
@@ -8,6 +8,7 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.modules import (
     ModuleModel as HardwareModuleModel,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     Command,
     CommandCreate,
@@ -59,6 +60,7 @@ def register_process_types() -> None:
         LabwareOffset,
         LabwareOffsetCreate,
         LegacyLabwareOffsetCreate,
+        NozzleMap,
         ProtocolSource,
         RunResult,
         StateSummary,
@@ -339,7 +341,6 @@ class DirectedRunProcess:
     def get_deck_type(self) -> DeckType:
         return self._deck_type
 
-    # TODO this is gonna be messy to serialize, maybe? NozzleMap needs to be a pydantic model too
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         return {}
 
@@ -353,10 +354,6 @@ class DirectedRunProcess:
     # TODO same with nozzle maps
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         return {}
-
-    # TODO figure this out too? Don't think it's used
-    async def command_generator(self) -> AsyncGenerator[str, None]:
-        pass
 
     def clear_command_history(self) -> None:
         pass
