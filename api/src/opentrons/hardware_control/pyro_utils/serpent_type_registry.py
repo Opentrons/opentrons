@@ -9,7 +9,6 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     find_enums_in_packages,
     register_type_to_serpent,
-    PydanticPyroSerializer,
 )
 
 from opentrons.protocol_engine.state.state_summary import StateSummary
@@ -85,6 +84,3 @@ def register_hardware_types() -> None:
         dict_to_class=_update_status_dict_to_class,
         class_to_dict=_update_status_class_to_dict,
     )
-
-def register_process_types() -> None:
-    PydanticPyroSerializer.register_model(StateSummary)
