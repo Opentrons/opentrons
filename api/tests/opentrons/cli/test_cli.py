@@ -323,6 +323,7 @@ def test_run_time_parameter_setting(
             "default": False,
         }
     ]
+    assert result.json_output["labwareOffsets"] == []
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
@@ -373,6 +374,7 @@ def test_run_time_parameter_error(
         "TypeError [line 5]: ParameterContext.add_bool() missing 1"
         " required positional argument: 'default'"
     )
+    assert result.json_output["labwareOffsets"] == []
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
@@ -431,6 +433,7 @@ def test_rtp_csv_file_setting(
             "file": {"id": "", "name": "csv_file.csv"},
         }
     ]
+    assert result.json_output["labwareOffsets"] == []
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
@@ -476,6 +479,7 @@ def test_file_required_error(
     }
     assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
     assert result.json_output["errors"]
+    assert result.json_output["labwareOffsets"] == []
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
@@ -569,3 +573,43 @@ def test_analyze_json_protocol(
     assert op is not None
     assert len(op["commands"]) == 27
     assert op["result"] == AnalysisResult.OK.value
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_analyze_protocol_with_offsets(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a protocol that sets a custom offset sees the offset in results."""
+    protocol = textwrap.dedent("""\
+                requirements = {"apiLevel": "2.18", "robotType": "Flex"} # line 1
+                                                                         # line 2
+                def run(protocol):                                       # line 3
+                    tip_rack = protocol.load_labware(                    # line 4
+                        "opentrons_flex_96_tiprack_1000ul", "A2"         # line 5
+                    )                                                    # line 6
+                    tip_rack.set_offset(x=1, y=2, z=3)                   # line 7
+                    pipette = protocol.load_instrument(                  # line 8
+                        "flex_1channel_1000", "left"                     # line 9
+                    )                                                    # line 10
+                    pipette.pick_up_tip(tip_rack["A1"])                  # line 11
+                """)
+
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(protocol, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-3 Standard"
+    assert result.json_output["result"] == AnalysisResult.OK
+    assert len(result.json_output["labwareOffsets"])
+    offset = result.json_output["labwareOffsets"][0]
+    assert offset["id"]
+    assert offset["definitionUri"] == "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+    assert offset["location"]["slotName"] == "A2"
+    assert offset["locationSequence"] == [
+        {"kind": "onAddressableArea", "addressableAreaName": "A2"}
+    ]
+    assert offset["vector"] == {"x": 1.0, "y": 2.0, "z": 3.0}
