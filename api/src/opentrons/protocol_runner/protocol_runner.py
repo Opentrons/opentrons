@@ -2,9 +2,10 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import anyio
+from pydantic import BaseModel
 
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
@@ -57,7 +58,7 @@ from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
 
 
-class RunResult(NamedTuple):
+class RunResult(BaseModel):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
