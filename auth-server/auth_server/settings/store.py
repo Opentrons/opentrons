@@ -103,8 +103,8 @@ def get_settings_store(
     sql_engine: Annotated[SQLEngine, fastapi.Depends(get_sql_engine)],
 ) -> SettingsStore:
     """Return the server's singleton SettingsStore."""
-    settings_data_manager = _accessor.get_from(app_state)
-    if settings_data_manager is None:
+    settings_store = _accessor.get_from(app_state)
+    if settings_store is None:
         settings_store = SettingsStore(sql_engine=sql_engine)
         _accessor.set_on(app_state, settings_store)
     return settings_store

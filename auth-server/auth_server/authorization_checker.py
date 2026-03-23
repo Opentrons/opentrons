@@ -39,6 +39,7 @@ from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.settings.store import (
     SettingsStore,
+    get_settings_store,
 )
 
 

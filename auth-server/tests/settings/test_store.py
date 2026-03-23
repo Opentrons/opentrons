@@ -1,9 +1,11 @@
+from datetime import timedelta
 from pathlib import Path
 from typing import Generator
 
 import pytest
 
 from auth_server.persistence.database import create_schema, sql_engine_ctx
+from auth_server.settings.models import PatchSettingsRequestData
 from auth_server.settings.store import SettingsStore
 
 _DEFAULTS = {
@@ -102,3 +104,34 @@ def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
     fetched = settings_store.get_all()
     assert fetched is not None
     assert fetched == {"maxNumberOfLoginAttempts": "10"}
+
+
+def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
+    """patch should transfer data to the settings store."""
+    _upsert_defaults(settings_store)
+    settings_store.patch_settings(
+        PatchSettingsRequestData(
+            accessControlEnabled=True,
+            idleLogout=timedelta(minutes=30),
+            passwordResetTime=timedelta(days=90),
+        )
+    )
+    fetched = settings_store.get_settings()
+    assert fetched.accessControlEnabled is True
+    assert fetched.idleLogout == timedelta(minutes=30)
+    assert fetched.passwordResetTime == timedelta(days=90)
+
+
+def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> None:
+    """patch should ignore none values."""
+    _upsert_defaults(settings_store)
+    settings_store.patch_settings(
+        PatchSettingsRequestData(
+            accessControlEnabled=None,
+            idleLogout=timedelta(minutes=30),
+            passwordResetTime=None,
+        )
+    )
+    fetched = settings_store.get_settings()
+    assert fetched.accessControlEnabled is False
+    assert fetched.idleLogout == timedelta(minutes=3)

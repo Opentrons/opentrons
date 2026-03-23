@@ -15,9 +15,8 @@ stages:
         data:
           accessControlEnabled: false
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -26,6 +25,9 @@ stages:
           minLengthOfReasonForInteraction: null
           requireLogsToBeSavedInApp: true
           deleteOverMaxOnDiskProtocols: true
+          passwordComplexitySpecialCharacters: null
+          passwordComplexityMinimumLength: null
+
 
 
 ---
@@ -47,9 +49,10 @@ stages:
         data:
           accessControlEnabled: false
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -74,9 +77,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -96,9 +100,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -130,9 +135,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -166,9 +172,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -193,9 +200,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -229,9 +237,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -254,10 +263,11 @@ stages:
           accessControlEnabled: false
           deleteOverMaxOnDiskProtocols: true
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
+          passwordResetTime: null
           minLengthOfReasonForInteraction: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -275,9 +285,10 @@ stages:
         data:
           accessControlEnabled: false
           maxNumberOfLoginAttempts: 5
-          passwordResetTimeInDays: null
-          passwordComplexity: null
-          idleLockoutInMinutes: 3
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: PT3M
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
