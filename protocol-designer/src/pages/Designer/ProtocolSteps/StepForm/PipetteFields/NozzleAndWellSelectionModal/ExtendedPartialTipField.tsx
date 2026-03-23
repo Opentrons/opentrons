@@ -67,10 +67,12 @@ export function ExtendedPartialTipField(
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
-  const dspLabwareDef = propsForFields.dispense_wells
-    ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
-        .def as LabwareDefinition)
+  const dispenseLocation = propsForFields.dispense_labware.value as string
+  const dispenseInLabware = deckSetup.labware[dispenseLocation] !== undefined
+  const dspLabwareDef = dispenseInLabware
+    ? (deckSetup.labware[dispenseLocation].def as LabwareDefinition)
     : null
+
   const partialChannels =
     primaryNozzle in PARTIAL_NOZZLE_MAP
       ? PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
