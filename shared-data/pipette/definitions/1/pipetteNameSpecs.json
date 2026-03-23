@@ -593,7 +593,7 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_flex_96_tiprack_5000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_5000ul/1"
     ]
   },
   "p1000_multi_flex": {
