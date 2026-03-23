@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { PD_APPLICATION_VERSION } from '@opentrons/step-generation'
 
-import { getMigrationVersionsToRunFromVersion } from '../index'
+import {
+  allMigrationsByVersion,
+  getMigrationVersionsToRunFromVersion,
+} from '../index'
 
 vi.mock('../../../labware-defs/utils')
 describe('runs appropriate migrations for version', () => {
@@ -50,7 +53,7 @@ describe('runs appropriate migrations for version', () => {
   })
   it('returns no migrations if supplied version is equal to PD_APPLICATION_VERSION', () => {
     const migrationsToRun = getMigrationVersionsToRunFromVersion(
-      stubbedMigrationByVersion,
+      allMigrationsByVersion,
       PD_APPLICATION_VERSION
     )
     expect(migrationsToRun).toEqual([])
