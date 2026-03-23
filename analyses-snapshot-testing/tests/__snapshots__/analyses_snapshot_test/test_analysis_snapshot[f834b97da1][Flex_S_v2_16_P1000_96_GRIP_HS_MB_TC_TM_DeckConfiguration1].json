@@ -14353,6 +14353,7 @@
       "location": "wasteChuteLocation"
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [
     {
