@@ -523,7 +523,7 @@ def run(protocol: ProtocolContext) -> None:
         liquid_heights = {}
         pip.pick_up_tip()
         for ifp_plate_well in ifp_plate.wells():
-            if ifp_plate_well.current_liquid_height() > 1 :
+            if ifp_plate_well.current_liquid_height() > 1:
                 pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
