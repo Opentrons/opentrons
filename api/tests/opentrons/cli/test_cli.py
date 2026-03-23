@@ -582,17 +582,17 @@ def test_analyze_protocol_with_offsets(
 ) -> None:
     """Test that a protocol that sets a custom offset sees the offset in results."""
     protocol = textwrap.dedent("""\
-                requirements = {"apiLevel": "2.18", "robotType": "Flex"} # line 1
-                                                                         # line 2
-                def run(protocol):                                       # line 3
-                    tip_rack = protocol.load_labware(                    # line 4
-                        "opentrons_flex_96_tiprack_1000ul", "A2"         # line 5
-                    )                                                    # line 6
-                    tip_rack.set_offset(x=1, y=2, z=3)                   # line 7
-                    pipette = protocol.load_instrument(                  # line 8
-                        "flex_1channel_1000", "left"                     # line 9
-                    )                                                    # line 10
-                    pipette.pick_up_tip(tip_rack["A1"])                  # line 11
+                requirements = {"apiLevel": "2.18", "robotType": "Flex"}
+
+                def run(protocol):
+                    tip_rack = protocol.load_labware(
+                        "opentrons_flex_96_tiprack_1000ul", "A2"
+                    )
+                    tip_rack.set_offset(x=1, y=2, z=3)
+                    pipette = protocol.load_instrument(
+                        "flex_1channel_1000", "left"
+                    )
+                    pipette.pick_up_tip(tip_rack["A1"])
                 """)
 
     protocol_source_file = tmp_path / "protocol.py"
