@@ -51,6 +51,17 @@ MODULE_PORT_REGEX = re.compile(
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
 )
+PERIPHERAL_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
+    # capture all modules by name using alternation
+    + "("
+    + "|".join(peripherals.PERIPHERAL_TYPE_BY_NAME.keys())
+    + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
+    + r"\d+(?!\.tmp-c\d+:\d+)",
+    re.I,
+)
 
 PERIPHERALS = ["barcodescanner"]
 
@@ -102,6 +113,7 @@ class AttachedModulesControl:
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
+            await mc_instance.register_peripherals(mc_instance.scan_peripherals())
 
         return mc_instance
 
@@ -412,6 +424,26 @@ class AttachedModulesControl:
         log.debug("Discovered modules: {}".format(discovered_modules))
         return discovered_modules
 
+    def scan_peripherals(self) -> List[modules.ModuleAtPort]:
+        """Scan for connected peripherals and return list of
+        tuples of serial ports and device names
+        """
+        if IS_ROBOT and IS_LINUX:
+            devices = glob("/dev/ot_module*")
+        else:
+            devices = []
+
+        discovered_peripherals = []
+
+        for port in devices:
+            symlink_port = port.split("dev/")[1]
+            peripheral_at_port = self.get_peripheral_at_port(symlink_port)
+            if peripheral_at_port:
+                discovered_peripherals.append(peripheral_at_port)
+
+        log.debug("Discovered peripherals: {}".format(discovered_peripherals))
+        return discovered_peripherals
+
     @staticmethod
     def get_module_at_port(port: str) -> Optional[modules.ModuleAtPort]:
         """Given a port, returns either a ModuleAtPort
@@ -426,7 +458,68 @@ class AttachedModulesControl:
             return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
         return None
 
-    async def handle_module_appearance(self, event: AionotifyEvent) -> None:
+    @staticmethod
+    def get_peripheral_at_port(port: str) -> Optional[modules.ModuleAtPort]:
+        """Given a port, returns either a ModuleAtPort
+        if it is a recognized peripheral, or None if not recognized.
+        """
+        match = PERIPHERAL_PORT_REGEX.search(port)
+        if match:
+            name = match.group(1).lower()
+            if name not in peripherals.PERIPHERAL_TYPE_BY_NAME:
+                log.warning(f"Unexpected peripheral connected: {name} on {port}")
+                return None
+            return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
+        return None
+
+    async def handle_device_appearance(self, event: AionotifyEvent) -> None:
+        """Only called upon availability of aionotify. Check that
+        the file system has changed and either remove or add devices
+        depending on the result.
+
+        Args:
+            event: The event passed from aionotify.
+
+        Returns:
+            None
+        """
+        maybe_module_at_port = self.get_module_at_port(event.name)
+        maybe_peripheral_at_port = self.get_peripheral_at_port(event.name)
+        if maybe_module_at_port is not None:
+            await self.handle_module_appearance(event, maybe_module_at_port)
+        if maybe_peripheral_at_port is not None:
+            await self.handle_peripheral_appearance(event, maybe_peripheral_at_port)
+
+    async def handle_peripheral_appearance(
+        self, event: AionotifyEvent, maybe_peripheral_at_port: modules.ModuleAtPort
+    ) -> None:
+        """Only called upon availability of aionotify. Check that
+        the file system has changed and either remove or add peripheral
+        depending on the result.
+
+        Args:
+            event: The event passed from aionotify.
+
+        Returns:
+            None
+        """
+        new_peripherals = None
+        removed_peripherals = None
+        if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
+            removed_peripherals = [maybe_peripheral_at_port]
+        elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
+            new_peripherals = [maybe_peripheral_at_port]
+        try:
+            await self.register_peripherals(
+                removed_per_at_ports=removed_peripherals,
+                new_per_at_ports=new_peripherals,
+            )
+        except Exception:
+            log.exception("Exception in Module registration")
+
+    async def handle_module_appearance(
+        self, event: AionotifyEvent, maybe_module_at_port: modules.ModuleAtPort
+    ) -> None:
         """Only called upon availability of aionotify. Check that
         the file system has changed and either remove or add modules
         depending on the result.
@@ -437,55 +530,47 @@ class AttachedModulesControl:
         Returns:
             None
         """
-        maybe_module_at_port = self.get_module_at_port(event.name)
         new_modules = None
         removed_modules = None
-        if maybe_module_at_port is not None:
-            if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
-                # NOTE: The absorbance reader is a hidraw device, when we first
-                # plug it into the Flex, udev rules create a
-                # /dev/ot_module_absorbancereader(n) symlink which aionotify
-                # detects as a CREATE event and registers an absorbance module.
-                # When we create this Absorbance module and connect to it,
-                # the Byonoy library opens the device via hidapi which removes
-                # the symlink and triggers a DELETE action from aionoify.
-                # When the device is deleted, we disconnect from it causing
-                # the /dev/ot_module_absorbance(n) symlink to get created, repeating
-                # the cycle.
+        if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
+            # NOTE: The absorbance reader is a hidraw device, when we first
+            # plug it into the Flex, udev rules create a
+            # /dev/ot_module_absorbancereader(n) symlink which aionotify
+            # detects as a CREATE event and registers an absorbance module.
+            # When we create this Absorbance module and connect to it,
+            # the Byonoy library opens the device via hidapi which removes
+            # the symlink and triggers a DELETE action from aionoify.
+            # When the device is deleted, we disconnect from it causing
+            # the /dev/ot_module_absorbance(n) symlink to get created, repeating
+            # the cycle.
 
-                # This DELETE action would normally delete the device, but in this case
-                # Lets ignore these events for the absorbance reader and handle
-                # cleanup when the poller attempts to read data and fails.
-                if maybe_module_at_port.name == "absorbancereader":
+            # This DELETE action would normally delete the device, but in this case
+            # Lets ignore these events for the absorbance reader and handle
+            # cleanup when the poller attempts to read data and fails.
+            if maybe_module_at_port.name == "absorbancereader":
+                return
+            removed_modules = [maybe_module_at_port]
+            log.info(f"Module Removed: {maybe_module_at_port}")
+        elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
+            # NOTE: Absorbance reader gets disonnected when updating, so
+            # if the device is updating, dont create a new instance.
+            for module in self._available_modules:
+                if (
+                    maybe_module_at_port.name == "absorbancereader"
+                    and isinstance(module, AbsorbanceReader)
+                    and module.updating
+                ):
                     return
-                removed_modules = [maybe_module_at_port]
-                log.info(f"Module Removed: {maybe_module_at_port}")
-            elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
-                # NOTE: Absorbance reader gets disonnected when updating, so
-                # if the device is updating, dont create a new instance.
-                for module in self._available_modules:
-                    if (
-                        maybe_module_at_port.name == "absorbancereader"
-                        and isinstance(module, AbsorbanceReader)
-                        and module.updating
-                    ):
-                        return
 
-                new_modules = [maybe_module_at_port]
-                log.info(f"Module Added: {maybe_module_at_port}")
-            try:
-                if maybe_module_at_port.name in PERIPHERALS:
-                    await self.register_peripherals(
-                        removed_per_at_ports=removed_modules,
-                        new_per_at_ports=new_modules,
-                    )
-                else:
-                    await self.register_modules(
-                        removed_mods_at_ports=removed_modules,
-                        new_mods_at_ports=new_modules,
-                    )
-            except Exception:
-                log.exception("Exception in Module registration")
+            new_modules = [maybe_module_at_port]
+            log.info(f"Module Added: {maybe_module_at_port}")
+        try:
+            await self.register_modules(
+                removed_mods_at_ports=removed_modules,
+                new_mods_at_ports=new_modules,
+            )
+        except Exception:
+            log.exception("Exception in Module registration")
 
     def get_module_by_module_id(
         self, module_id: str
