@@ -1,7 +1,8 @@
 """Flex Stacker substate."""
 
-from dataclasses import dataclass
 from typing import NewType
+
+from pydantic import BaseModel, ConfigDict
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -17,13 +18,14 @@ from opentrons.protocol_engine.types.module import (
 FlexStackerId = NewType("FlexStackerId", str)
 
 
-@dataclass(frozen=True)
-class FlexStackerSubState:
+class FlexStackerSubState(BaseModel):
     """Flex Stacker-specific state.
 
     Provides calculations and read-only state access
     for an individual loaded Flex Stacker Module.
     """
+
+    model_config = ConfigDict(frozen=True)
 
     module_id: FlexStackerId
     pool_primary_definition: LabwareDefinition | None
