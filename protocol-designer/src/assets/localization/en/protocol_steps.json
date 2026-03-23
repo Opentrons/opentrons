@@ -53,7 +53,6 @@
   "delete": "Delete step",
   "delete_steps": "Delete steps",
   "dispense": "Dispense",
-  "dispense_into_trash": "Dispense liquid into {{location}}",
   "dispense_labware": "Destination labware",
   "dispensed": "Dispensed",
   "disposal_volume": "Disposal volume",
@@ -274,7 +273,7 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
-  "trashBin": "trash bin",
+  "transfer_nozzles_selected_no_dispense": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
@@ -394,7 +393,6 @@
     "multiDispense": "Dispense volume per well",
     "single": "Volume per well"
   },
-  "wasteChute": "waste chute",
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
   "well_position": "Well position: X {{x}} Y {{y}} Z {{z}} (mm)",

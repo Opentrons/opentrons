@@ -90,13 +90,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   const labwareId = getLabwareId()
-  const isLabware = deckSetup.labware[labwareId] !== undefined
   const labware = deckSetup.labware[labwareId]
-  const labwareDef = labware?.def
-  const allWells = labwareDef?.ordering
-  const displayName = isLabware
-    ? labwareDef.metadata.displayName
-    : t(deckSetup.additionalEquipmentOnDeck[labwareId].name)
+  const labwareDef = labware.def
+  const allWells = labwareDef.ordering
+  const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
     switch (stepType) {
@@ -145,17 +142,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const allWellsWithStatus = useMemo(
     () =>
-      isLabware
-        ? getAllWellsSafetyStatus({
-            allWells,
-            robotState,
-            invariantContext,
-            pipetteId,
-            labwareId,
-            primaryNozzle,
-            nozzleConfiguration,
-          })
-        : {},
+      getAllWellsSafetyStatus({
+        allWells,
+        robotState,
+        invariantContext,
+        pipetteId,
+        labwareId,
+        primaryNozzle,
+        nozzleConfiguration,
+      }),
     [
       allWells,
       primaryNozzle,
@@ -164,31 +159,30 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       labwareId,
       robotState,
       invariantContext,
-      isLabware,
     ]
   )
-  const allWellsWithState = isLabware
-    ? allWells.flat().reduce<Record<string, WellType>>((acc, wellName) => {
-        const accessible = isLabware ? allWellsWithStatus[wellName] === 0 : true
+  const allWellsWithState = allWells
+    .flat()
+    .reduce<Record<string, WellType>>((acc, wellName) => {
+      const accessible = allWellsWithStatus[wellName] === 0
 
-        if (hoveredWells?.includes(wellName) && !accessible) {
-          acc[wellName] = SELECTED_ERROR
-        } else if (!accessible) {
-          acc[wellName] = INACCESSIBLE
-        } else if (
-          flatSelectedWells.includes(wellName) ||
-          hoveredWells?.includes(wellName)
-        ) {
-          acc[wellName] = SELECTED
-        } else {
-          acc[wellName] = UNSELECTED
-        }
-        return acc
-      }, {})
-    : {}
+      if (hoveredWells?.includes(wellName) && !accessible) {
+        acc[wellName] = SELECTED_ERROR
+      } else if (!accessible) {
+        acc[wellName] = INACCESSIBLE
+      } else if (
+        flatSelectedWells.includes(wellName) ||
+        hoveredWells?.includes(wellName)
+      ) {
+        acc[wellName] = SELECTED
+      } else {
+        acc[wellName] = UNSELECTED
+      }
+      return acc
+    }, {})
   const inaccessiblePartialWells = useMemo(
     () => {
-      if (!isPartialNozzle || selectedWells.length === 0 || isLabware) return []
+      if (!isPartialNozzle || selectedWells.length === 0) return []
 
       return getInaccessibleWellsForPartialNozzleRowMap(
         selectedWells,
@@ -199,13 +193,11 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef?.ordering]
+    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering]
   )
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const slot = isLabware
-    ? getSlotInLocationStack(labware.stack)
-    : deckSetup.additionalEquipmentOnDeck[labwareId].location
+  const slot = getSlotInLocationStack(labware.stack)
   const slotPosition = getPositionFromSlotId(slot, deckDef)
 
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
@@ -239,17 +231,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         channels
       )
     }
-    const allWellsWithStatus = isLabware
-      ? getAllWellsSafetyStatus({
-          allWells,
-          robotState,
-          invariantContext,
-          pipetteId,
-          labwareId,
-          primaryNozzle,
-          nozzleConfiguration,
-        })
-      : {}
+    const allWellsWithStatus = getAllWellsSafetyStatus({
+      allWells,
+      robotState,
+      invariantContext,
+      pipetteId,
+      labwareId,
+      primaryNozzle,
+      nozzleConfiguration,
+    })
 
     if (allWellsWithStatus[wellName] === 1) {
       return
@@ -292,11 +282,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       case 'dispense':
         return (
           <StyledText desktopStyle="headingMediumBold">
-            {isLabware
-              ? t('select_wells_to_dispense_liquid_into', {
-                  labware: displayName,
-                })
-              : t('dispense_into_trash', { location: displayName })}
+            {t('select_wells_to_dispense_liquid_into', {
+              labware: displayName,
+            })}
           </StyledText>
         )
 
@@ -395,11 +383,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
-        {isLabware ? (
-          <div className={styles.well_legend_box}>
-            <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
-          </div>
-        ) : null}
+        <div className={styles.well_legend_box}>
+          <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
+        </div>
       </div>
     </>
   )

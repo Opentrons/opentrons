@@ -122,9 +122,7 @@ export function NozzleAndWellSelectionModal(
     />
   )
   const isLastStep = currentStepIndex + 1 === totalSteps
-  const isLastStepOfMix = isMixStep
-    ? currentStepIndex + 1 === totalSteps - 1
-    : false
+
   const footerElement = (
     <div className={styles.modal_footer}>
       {showError ? (
@@ -140,10 +138,8 @@ export function NozzleAndWellSelectionModal(
         </SecondaryButton>
       ) : null}
 
-      <PrimaryButton
-        onClick={isLastStep || isLastStepOfMix ? handleClose : handleContinue}
-      >
-        {'Continue'}
+      <PrimaryButton onClick={isLastStep ? handleClose : handleContinue}>
+        {isLastStep ? 'Save' : 'Continue'}
       </PrimaryButton>
     </div>
   )
