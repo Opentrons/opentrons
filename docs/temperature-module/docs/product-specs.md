@@ -46,7 +46,7 @@ Additionally, Opentrons has tested the Temperature Module’s temperature profil
 
 The Temperature Module uses interchangeable aluminum thermal blocks to help hold labware at temperature.
 
-At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
+At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, a deep well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 
 !!! note "Hardware compatibility"
     All Opentrons thermal blocks are compatible with a Flex or an OT-2. However, the [OT-2 Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) _is not compatible_ with the Flex Gripper. Flex protocols that require the Gripper should use the [Flex Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-flex) instead.
@@ -64,6 +64,11 @@ At the time of purchase, each Temperature Module includes your choice of one (1)
 </figure>
 
 <figure markdown>
+  ![Flex deep well block](images/flex-deep-well-block.png "Deep Well Thermal Block")
+  <figcaption>Deep well block</figcaption>
+</figure>
+
+<figure markdown>
   ![Flex flat bottom thermal block](images/flex-flat-bottom-well.png "Flex Flat Bottom Thermal Block")
   <figcaption>Flat bottom block (Flex)</figcaption>
 </figure>
@@ -71,11 +76,6 @@ At the time of purchase, each Temperature Module includes your choice of one (1)
 <figure markdown>
   ![Flat plate block](images/flat-plate-transparent.svg "OT-2 Flat Bottom Aluminum Block")
   <figcaption>Flat bottom block (OT-2)</figcaption>
-</figure>
-
-<figure markdown>
-  ![Flex deep well block](images/flex-deep-well-block.png "Deep Well Thermal Block")
-  <figcaption>Deep well block</figcaption>
 </figure>
 
 </div>
