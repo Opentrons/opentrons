@@ -55,6 +55,7 @@ def register_process_types() -> None:
         LabwareOffset,
         LabwareOffsetCreate,
         LegacyLabwareOffsetCreate,
+        ProtocolSource,
         StateSummary,
     ]:
         PydanticPyroSerializer.register_model(pydantic_model)
@@ -97,7 +98,7 @@ class DirectedRunProcess:
 
     async def run(
         self,
-        # TODO all of these have to be serialized, ProtocolSource needs to be pydantic
+        # TODO DeckConfiguration and maybe PrimitiveRunTime params
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,

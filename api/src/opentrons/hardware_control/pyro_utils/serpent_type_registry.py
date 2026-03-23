@@ -13,8 +13,6 @@ from opentrons.util.pyro.pyro_serialization import (
     register_type_to_serpent,
 )
 
-from opentrons.protocol_engine.state.state_summary import StateSummary
-
 
 def _serpent_enum_serializer(obj, serializer, stream, level):  # type: ignore
     """Serpent serializer for generic Enum values."""
