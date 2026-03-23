@@ -478,6 +478,7 @@ class RunOrchestrator:
         """Load attached modules directly into state, without locations."""
         await self._protocol_engine.use_attached_modules(modules_by_id=modules_by_id)
 
+    # TODO this is only used by tests, remove?
     def get_protocol_runner(self) -> Optional[Union[JsonRunner, PythonAndLegacyRunner]]:
         """Get run's protocol runner if any, if not return None."""
         return self._protocol_runner
