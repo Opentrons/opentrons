@@ -52,6 +52,10 @@ def register_process_types() -> None:
         CameraSettings,
         CommandAnnotation,
         CommandPreconditions,
+        CommandSlice,
+        CommandErrorSlice,
+        CommandPointer,
+        CommandAnnotationsSlice,
         LabwareOffset,
         LabwareOffsetCreate,
         LegacyLabwareOffsetCreate,
@@ -182,25 +186,34 @@ class DirectedRunProcess:
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         return None
 
-    # TODO turn this into pydantic and register
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
-        pass
+        return CommandSlice(
+            commands=[],
+            cursor=0,
+            total_length=0,
+        )
 
-    # TODO turn this into pydantic and register
     def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
-        pass
+        return CommandAnnotationsSlice(
+            command_annotations=[],
+            cursor=0,
+            total_length=0,
+        )
 
-    # TODO turn this into pydantic and register
     def get_command_error_slice(
         self,
         cursor: int,
         length: int,
     ) -> CommandErrorSlice:
-        pass
+        return CommandErrorSlice(
+            commands_errors=[],
+            cursor=0,
+            total_length=0,
+        )
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
         return None
