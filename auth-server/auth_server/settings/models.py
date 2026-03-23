@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 from textwrap import dedent
-from typing import Annotated, Literal
+from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
 
@@ -26,7 +26,7 @@ class SettingsResponseData(_StrictBaseModel):
         "with the appropriate scopes. See the `/auth/oauth2` endpoints. "
         "When disabled (the default), all endpoints allow unauthenticated access.",
     )
-    maxNumberOfLoginAttempts: int = pydantic.Field(
+    maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
         description="Max number of login attempts before account deactivation.",
     )
@@ -162,3 +162,26 @@ class PatchSettingsRequestData(_StrictBaseModel):
             description="Automatically delete protocol run logs on the robot when there are 20 protocol run records."
         ),
     ] = None
+
+    _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "accessControlEnabled",
+            "idleLogout",
+            "requireAdminCredsWhenUpdatingRobotSoftware",
+            "requireAdminCredsWhenSendingProtocolToRobot",
+            "requireAdminCredsForSignoffProtocol",
+            "requireSignoffForProtocolLog",
+            "requireReasonForInteraction",
+            "requireLogsToBeSavedInApp",
+            "deleteOverMaxOnDiskProtocols",
+        }
+    )
+
+    @pydantic.model_validator(mode="before")
+    @classmethod
+    def reject_explicit_nulls(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            for field in cls._NON_NULLABLE_FIELDS:
+                if field in data and data[field] is None:
+                    raise ValueError(f"{field} cannot be null")
+        return data

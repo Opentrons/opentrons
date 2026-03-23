@@ -1,6 +1,5 @@
 """User store – pure data access layer for user persistence."""
 
-import json
 from typing import Annotated
 
 import fastapi
@@ -14,7 +13,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
-from auth_server.persistence.orm_models import Settings
+from auth_server.persistence.orm_models import Setting
 from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 
 
@@ -34,20 +33,17 @@ class SettingsStore:
 
     def get_settings(self) -> SettingsResponseData:
         """Get the current settings."""
-        raw_settings = self.get_all()
-        if not raw_settings:
-            return SettingsResponseData()
-        parsed = {
-            k: json.loads(v) if v is not None else None for k, v in raw_settings.items()
-        }
-        return SettingsResponseData.model_validate(parsed)
+        with self._session() as session:
+            rows = session.query(Setting).all()
+            if not rows:
+                return SettingsResponseData()
+            parsed = {row.key: row.value for row in rows}
+            return SettingsResponseData.model_validate(parsed, strict=False)
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""
-        updates = patch.model_dump(exclude_unset=True)
-        db_updates: dict[str, str | None] = {
-            k: json.dumps(v) for k, v in updates.items()
-        }
+        updates = patch.model_dump(mode="json", exclude_unset=True)
+        db_updates: dict[str, object] = {k: v for k, v in updates.items()}
         self.upsert_many(db_updates)
         return self.get_settings()
 
@@ -56,29 +52,25 @@ class SettingsStore:
         self.delete_all()
         return self.get_settings()
 
-    def get_all(self) -> dict[str, str | None]:
-        """Return all settings as a dict."""
-        with self._session() as session:
-            rows = session.query(Settings).all()
-            return {row.key: row.value for row in rows}
-
     def upsert(self, key: str, value: str | None) -> None:
         """Insert or update a single setting."""
         with self._session() as session:
-            row = session.query(Settings).filter(Settings.key == key).first()
+            row = session.query(Setting).filter(Setting.key == key).first()
             if row is None:
-                session.add(Settings(key=key, value=value))
+                session.add(Setting(key=key, value=value))
             else:
                 row.value = value
             session.commit()
 
-    def upsert_many(self, settings: dict[str, str | None]) -> None:
-        """Insert or update multiple settings at once."""
+    def upsert_many(self, settings: dict[str, object]) -> None:
+        """
+        Insert or update multiple settings at once.
+        """
         with self._session() as session:
             for key, value in settings.items():
-                row = session.query(Settings).filter(Settings.key == key).first()
+                row = session.query(Setting).filter(Setting.key == key).first()
                 if row is None:
-                    session.add(Settings(key=key, value=value))
+                    session.add(Setting(key=key, value=value))
                 else:
                     row.value = value
             session.commit()
@@ -86,7 +78,7 @@ class SettingsStore:
     def delete_all(self) -> None:
         """Delete all settings (for reset)."""
         with self._session() as session:
-            session.query(Settings).delete()
+            session.query(Setting).delete()
             session.commit()
 
 
