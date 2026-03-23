@@ -5,15 +5,12 @@ import logging
 import subprocess
 import time
 from pathlib import Path
-from typing import Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
 
 import Pyro5.api
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
-    register_process_types,
-)
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
     EstopState,
@@ -69,6 +66,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
+from .run_director import DirectedRunProcess, register_process_types
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -185,39 +183,29 @@ class RunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._run_orchestrator: Optional[RunOrchestrator] = None
+        # TODO come up with a better name for this.
+        self._run_orchestrator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
+            None
+        )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         self._run_process: Optional[subprocess.Popen[bytes]] = None
-        self._run_proxy: Optional[Pyro5.api.Proxy] = None
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
         hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
-    def run_orchestrator(self) -> RunOrchestrator:
+    def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
         """Get the "current" RunOrchestrator."""
         if self._run_orchestrator is None:
             raise NoRunOrchestrator()
         return self._run_orchestrator
 
     @property
-    def run_proxy(self) -> Pyro5.api.Proxy:
-        if self._run_proxy is None:
-            # TODO this should be it's own error
-            raise NoRunOrchestrator()
-        return self._run_proxy
-
-    @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current run orchestrator."""
-        if feature_flags.protocol_subprocess_enabled():
-            return self._run_proxy.run_id if self._run_proxy is not None else None
-        else:
-            return (
-                self.run_orchestrator.run_id
-                if self._run_orchestrator is not None
-                else None
-            )
+        return (
+            self.run_orchestrator.run_id if self._run_orchestrator is not None else None
+        )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -402,7 +390,10 @@ class RunOrchestratorStore:
         with Pyro5.api.locate_ns() as ns:
             while time.monotonic() - start_time < 60:
                 if "ot-protocol" in ns.list():
-                    self._run_proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])
+                    proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
+                    self._run_orchestrator = cast(
+                        DirectedRunProcess, cast(object, proxy)
+                    )
                     break
             else:
                 self._run_process.terminate()
@@ -410,11 +401,11 @@ class RunOrchestratorStore:
                 ns.remove("ot-protocol")
                 raise ValueError("Can't find process")
 
-        self._run_proxy.create(run_id)
-        return self._run_proxy.get_summary()
+        proxy.create(run_id)
+        return self._run_orchestrator.get_state_summary()
 
     async def clear_pyro(self) -> RunResult:
-        if self.run_proxy.get_is_okay_to_clear():
+        if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -423,11 +414,12 @@ class RunOrchestratorStore:
         else:
             raise RunConflictError("Current run is not idle or stopped.")
 
-        run_data = self.run_proxy.get_state_summary()
+        run_data = self.run_orchestrator.get_state_summary()
 
+        assert self._run_process is not None
         self._run_process.terminate()
         self._run_process = None
-        self._run_proxy = None
+        self._run_orchestrator = None
         with Pyro5.api.locate_ns() as ns:
             ns.remove("ot-protocol")
 
@@ -484,8 +476,6 @@ class RunOrchestratorStore:
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        if feature_flags.protocol_subprocess_enabled():
-            return []
         return self.run_orchestrator.get_run_time_parameters()
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
@@ -619,8 +609,6 @@ class RunOrchestratorStore:
         self, capture_image_settings: CameraCaptureImageSettings
     ) -> None:
         """Add new camera capture image settings to state."""
-        if feature_flags.protocol_subprocess_enabled():
-            return
         self.run_orchestrator.add_camera_capture_image_settings(
             camera_id=capture_image_settings.cameraId,
             resolution=capture_image_settings.resolution,
