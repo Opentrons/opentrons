@@ -70,8 +70,7 @@ def _load_key(maybe_key: Path) -> ec.EllipticCurvePrivateKey | None:
 
     This function upholds the internal requirements we set on a key to make sure we don't
     accidentally load the wrong thing, or indeed load the wrong thing in the future. This needs
-    to be an elliptic curve key that's properly loadable, and if it's anything else we won't load it
-    and will delete the file (so be careful calling this in an iterdir()).
+    to be an elliptic curve key that's properly loadable, and if it's anything else we won't load it.
     """
     try:
         key_bytes = maybe_key.read_bytes()
@@ -105,7 +104,7 @@ def _load_key(maybe_key: Path) -> ec.EllipticCurvePrivateKey | None:
 def _load_cert(maybe_cert: Path) -> x509.Certificate | None:
     """Load a prospective x509 cert from a path.
 
-    If the cert can't be loaded, returns None and deletes the malformed file.
+    If the cert can't be loaded, returns None.
     """
     try:
         cert_bytes = maybe_cert.read_bytes()
@@ -185,7 +184,10 @@ def _load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
 
 
 def _keys_from_dir(key_dir: Path) -> Iterator[tuple[Path, ec.EllipticCurvePrivateKey]]:
-    """Load all the keys that match our CA key format from the specified path."""
+    """Load all the keys that match our CA key format from the specified path.
+
+    If any key that is named like one of our CAs is not one of our CAs, delete it.
+    """
     for maybe_key in key_dir.iterdir():
         if _CA_NAME_PATTERN.match(maybe_key.name):
             key = _load_key(maybe_key)
