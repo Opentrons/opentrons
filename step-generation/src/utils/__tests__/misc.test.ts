@@ -450,12 +450,7 @@ describe('getFullStackFromLabwares', () => {
       },
     }
     const slot = 'D3'
-    const largestStack = getFullStackFromLabwares(
-      labware,
-      slot,
-      undefined,
-      true
-    )
+    const largestStack = getFullStackFromLabwares(labware, slot, undefined)
     expect(largestStack).toEqual(['labwareId2', 'labwareId1', 'D3'])
   })
 })

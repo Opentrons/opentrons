@@ -91,8 +91,7 @@ export function LabwareCardOverflowMenu(
   const fullStack = getFullStackFromLabwares(
     deckSetupLabware,
     slotName,
-    topLabwareId,
-    true
+    topLabwareId
   )
   const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
   const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null

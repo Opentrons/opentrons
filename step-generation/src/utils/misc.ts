@@ -1055,8 +1055,7 @@ export const getFullStackFromLabwares = (
     [labwareId: string]: LabwareTemporalProperties
   },
   slot: string,
-  offDeckOverrideId?: string,
-  returnLargestStack?: boolean
+  offDeckOverrideId?: string
 ): string[] => {
   if (slot === 'offDeck' && offDeckOverrideId == null) {
     console.error(
@@ -1074,15 +1073,11 @@ export const getFullStackFromLabwares = (
       (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
       lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
   )
-  const index = returnLargestStack ? -1 : 0
+  if (isOnHopper) {
+    return labwareStack.reverse()[0].stack ?? []
+  }
   return (
-    labwareStack
-      .sort(
-        returnLargestStack
-          ? (a, b) => a.stack.length - b.stack.length
-          : (a, b) => b.stack.length - a.stack.length
-      )
-      .at(index)?.stack ?? []
+    labwareStack.sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )
 }
 
