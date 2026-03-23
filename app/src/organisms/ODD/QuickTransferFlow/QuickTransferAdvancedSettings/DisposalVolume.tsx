@@ -7,11 +7,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
@@ -241,11 +241,14 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="text"
               value={String(volume ?? '')}
-              title={t('disposal_volume_µL')}
+              label={t('disposal_volume_µL')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex
@@ -309,12 +312,15 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="text"
               value={String(flowRate ?? '')}
-              title={t('blowout_flow_rate_µL')}
+              label={t('blowout_flow_rate_µL')}
               error={flowRateError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('disposal_volume_flow_rate', {

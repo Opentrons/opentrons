@@ -21,6 +21,7 @@ test_name: PATCH updates and returns new settings
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
 
 stages:
   - name: GET initial settings (accessControlEnabled false by default)
@@ -37,6 +38,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           accessControlEnabled: true
@@ -60,6 +63,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           accessControlEnabled: false
@@ -82,12 +87,15 @@ test_name: PATCH with null field leaves value unchanged
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
 
 stages:
   - name: PATCH to enable access control
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           accessControlEnabled: true
@@ -101,6 +109,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           accessControlEnabled: null
@@ -116,12 +126,15 @@ test_name: DELETE resets to defaults
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
 
 stages:
   - name: PATCH to change some settings
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
       json:
         data:
           accessControlEnabled: true
@@ -135,6 +148,8 @@ stages:
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
     response:
       status_code: 200
       json:

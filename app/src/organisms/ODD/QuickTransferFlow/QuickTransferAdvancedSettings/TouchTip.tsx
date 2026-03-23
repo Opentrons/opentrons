@@ -7,11 +7,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -234,11 +234,14 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="text"
               value={String(speed ?? '')}
-              title={t('speed')}
+              label={t('speed')}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
           </Flex>
           <Flex
@@ -274,12 +277,15 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
               type="text"
               value={String(position ?? '')}
-              title={t('touch_tip_position_mm')}
+              label={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('touch_tip_from_top', {

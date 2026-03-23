@@ -37,7 +37,9 @@ export function NumericalKeyboard({
      *  useButtonTag: this is for testing purpose that each key renders as a button
      */
     <Keyboard
-      keyboardRef={r => (keyboardRef.current = r)}
+      keyboardRef={r => {
+        keyboardRef.current = r
+      }}
       theme="hg-theme-default oddTheme1 numerical-keyboard"
       onInit={keyboard => {
         keyboard.setInput(initialValue)

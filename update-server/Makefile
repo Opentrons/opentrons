@@ -4,7 +4,6 @@ include ../scripts/python-uv.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
@@ -13,6 +12,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 port ?= 34000
 tests ?= tests
 test_opts ?=
+
+files_to_check := otupdate tests
+
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,update-server,$(project_rs_default),update-server)
@@ -37,9 +39,12 @@ lock:
 	$(UV) lock
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate --log-level debug --port $(port)
+	$(python) -m otupdate.buildroot --log-level debug --port $(port)
+
+.PHONY: dev-flex
+dev-flex:
+	$(python) -m otupdate.openembedded --log-level debug --port $(port)
 
 .PHONY: clean
 clean:
@@ -62,6 +67,7 @@ test:
 
 .PHONY: lint
 lint:
+<<<<<<< HEAD
 	$(python) -m mypy otupdate tests scripts
 	$(ruff) check otupdate tests scripts
 
@@ -69,6 +75,16 @@ lint:
 format:
 	$(ruff) format otupdate tests scripts
 	$(ruff) check --select I --fix otupdate tests scripts
+=======
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
+
+.PHONY: format
+format:
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
+>>>>>>> edge
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

@@ -27,7 +27,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
@@ -136,6 +135,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     mixInDestination,
     nozzles,
     pipette,
+    primaryNozzle,
     pushOut,
     sourceLabware,
     sourceWells,
@@ -307,6 +307,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       pipetteId: pipette,
       labwareId: sourceLabware,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
       robotState: prevRobotState,
@@ -314,6 +316,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       pipetteId: pipette,
       labwareId: destLabware,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())
@@ -364,7 +368,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     tiprackURI,
     invariantContext,
     prevRobotState,
-    ...(nozzles != null ? [nozzles] : [])
+    primaryNozzle,
+    nozzles
   )
 
   const aspirateCorrectionVolumeForSampleAspiration =
@@ -418,11 +423,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
-
   const shouldSelectManualTips =
     tipTracking === MANUAL &&
     tiprackSelected != null &&
@@ -431,7 +431,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -682,12 +682,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            primaryNozzle,
+            nozzles,
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack: tiprackURI,
-            ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

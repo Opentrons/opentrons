@@ -18,10 +18,11 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 
+import { useVacuumModuleControls } from './hooks/useVacuumModuleControls'
 import styles from './vacuummodule.module.css'
 
-import type { VacuumModule } from '@opentrons/api-client'
 import type { VacuumMode } from '/app/redux/modules/api-types'
+import type { VacuumModule } from '/app/redux/modules/types'
 
 // TODO: get from module definition or equivalent
 const MAX_PRESSURE = 1000
@@ -43,11 +44,23 @@ export function VacuumModuleSlideout(
   const [pressure, setPressure] = useState<number | null>(null)
   const [powerPercent, setPowerPercent] = useState<number>(1)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { setVacuumPressure, setVacuumPower } = useVacuumModuleControls(module)
 
   const handleConfirm = (): void => {
-    console.log('TODO: save settings')
+    if (modeType == null) {
+      return
+    }
+    if (modeType === 'power') {
+      setVacuumPower(powerPercent)
+    } else if (pressure != null) {
+      // non-null pressure value with pressure mode selected
+      setVacuumPressure(pressure)
+    } else {
+      return
+    }
     onCloseClick()
   }
+
   return (
     <Slideout
       title={t('set_vacuum', {

@@ -1,5 +1,6 @@
 """Base page object with common functionality."""
 
+import re
 from typing import Any
 
 from playwright.sync_api import Locator, Page, expect
@@ -31,6 +32,17 @@ class BasePage:
     def click_test_id(self, test_id: str) -> None:
         """Click an element by test ID."""
         self.page.get_by_test_id(test_id).click()
+
+    def click_checkbox_label(self, label_text: str) -> None:
+        """Click a checkbox by exact visible label text.
+
+        This avoids partial matches like "Tip Rack 50 µL" matching
+        "Filter Tip Rack 50 µL", and avoids clicking hidden checkbox inputs.
+        """
+
+        label = self.page.locator("label").filter(has=self.page.get_by_text(re.compile(rf"^{re.escape(label_text)}$")))
+        expect(label).to_have_count(1, timeout=5000)
+        label.first.click()
 
     def dismiss_release_notes_toast(self) -> None:
         """Close the update toast if it appears."""

@@ -8,10 +8,12 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   CheckboxField,
+  COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
+  Icon,
   InfoScreen,
   InlineNotification,
   InputField,
@@ -120,25 +122,27 @@ export function SelectLabwareModal(
   const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
   const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
 
-  const [areCategoriesExpanded, setAreCategoriesExpanded] =
+  const [userCategoryExpandState, setUserCategoryExpandState] =
     useState<CategoryExpand>(allCategoriesCollapsed)
 
   const [searchTerm, setSearchTerm] = useState<string>('')
+  const areCategoriesExpanded = searchTerm
+    ? allCategoriesExpanded
+    : userCategoryExpandState
 
-  useEffect(() => {
-    setAreCategoriesExpanded(
-      searchTerm ? allCategoriesExpanded : allCategoriesCollapsed
-    )
-  }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
-
-  useEffect(() => {
-    if (!hasNoLabware && error != null) {
-      setError(null)
-    }
-  }, [hasNoLabware])
+  useEffect(
+    () => {
+      if (!hasNoLabware && error != null) {
+        setError(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNoLabware]
+  )
 
   const handleResetLabwareTools = (): void => {
-    setAreCategoriesExpanded(allCategoriesCollapsed)
+    setUserCategoryExpandState(allCategoriesCollapsed)
     setSearchTerm('')
   }
 
@@ -205,33 +209,40 @@ export function SelectLabwareModal(
         parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
   )
 
-  const labwareByCategory = useMemo(() => {
-    return reduce<
-      LabwareDefByDefURI,
-      { [category: string]: LabwareDefinition2[] }
-    >(
-      defs,
-      (acc, def: (typeof defs)[keyof typeof defs]) => {
-        const category: string = def.metadata.displayCategory
-        //  filter out non-permitted tipracks
-        if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
-        ) {
-          return acc
-        }
+  const labwareByCategory = useMemo(
+    () => {
+      return reduce<
+        LabwareDefByDefURI,
+        { [category: string]: LabwareDefinition2[] }
+      >(
+        defs,
+        (acc, def: (typeof defs)[keyof typeof defs]) => {
+          const category: string = def.metadata.displayCategory
+          //  filter out non-permitted tipracks
+          if (
+            category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))
+          ) {
+            return acc
+          }
 
-        return {
-          ...acc,
-          [category]: [...(acc[category] || []), def],
-        }
-      },
-      {}
-    )
-  }, [permittedTipracks])
+          return {
+            ...acc,
+            [category]: [...(acc[category] || []), def],
+          }
+        },
+        {}
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [permittedTipracks]
+  )
 
   const filteredLabwareByCategory: Record<string, LabwareInfo[]> = useMemo(
     () =>
@@ -269,15 +280,17 @@ export function SelectLabwareModal(
           ),
         }
       }, {}),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
 
   const handleCategoryClick = (category: string, expand?: boolean): void => {
     const updatedExpandState = {
-      ...areCategoriesExpanded,
-      [category]: expand ?? !areCategoriesExpanded[category],
+      ...userCategoryExpandState,
+      [category]: expand ?? !userCategoryExpandState[category],
     }
-    setAreCategoriesExpanded(updatedExpandState)
+    setUserCategoryExpandState(updatedExpandState)
   }
 
   const validateQuantity = (): boolean => {
@@ -404,11 +417,18 @@ export function SelectLabwareModal(
             }}
             placeholder={t('search_labware')}
             size="medium"
-            leftIcon="search"
-            showDeleteIcon
-            onDelete={() => {
-              setSearchTerm('')
-            }}
+            leftElement={
+              <Icon name="search" size="1.25rem" color={COLORS.grey60} />
+            }
+            rightElement={
+              <Icon
+                name="close"
+                size="1.75rem"
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+              />
+            }
           />
           {moduleType != null ||
           (isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE) ? (

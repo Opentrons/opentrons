@@ -91,51 +91,56 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
   }
 
   // set initial language for boot modal; match app language to supported options
-  useEffect(() => {
-    if (systemLanguage != null) {
-      // prefer match entire locale, then match just language e.g. zh-Hant and zh-CN
-      const matchSystemLanguage: () => ArrayElement<
-        typeof LANGUAGES
-      > | null = () => {
-        try {
-          return (
-            LANGUAGES.find(lng => lng.value === systemLanguage) ??
-            LANGUAGES.find(
-              lng =>
-                new Intl.Locale(lng.value).language ===
-                new Intl.Locale(systemLanguage).language
-            ) ??
-            null
-          )
-        } catch (error: unknown) {
-          // Sometimes the language that we get from the shell will not be something
-          // js i18n can understand. Specifically, some linux systems will have their
-          // locale set to "C" (https://www.gnu.org/software/libc/manual/html_node/Standard-Locales.html)
-          // and that will cause Intl.Locale to throw. In this case, we'll treat it as
-          // unset and fall back to our default.
-          console.log(`Failed to search languages: ${error}`)
-          return null
+  useEffect(
+    () => {
+      if (systemLanguage != null) {
+        // prefer match entire locale, then match just language e.g. zh-Hant and zh-CN
+        const matchSystemLanguage: () => ArrayElement<
+          typeof LANGUAGES
+        > | null = () => {
+          try {
+            return (
+              LANGUAGES.find(lng => lng.value === systemLanguage) ??
+              LANGUAGES.find(
+                lng =>
+                  new Intl.Locale(lng.value).language ===
+                  new Intl.Locale(systemLanguage).language
+              ) ??
+              null
+            )
+          } catch (error: unknown) {
+            // Sometimes the language that we get from the shell will not be something
+            // js i18n can understand. Specifically, some linux systems will have their
+            // locale set to "C" (https://www.gnu.org/software/libc/manual/html_node/Standard-Locales.html)
+            // and that will cause Intl.Locale to throw. In this case, we'll treat it as
+            // unset and fall back to our default.
+            console.log(`Failed to search languages: ${error}`)
+            return null
+          }
         }
-      }
-      const matchedSystemLanguageOption = matchSystemLanguage()
+        const matchedSystemLanguageOption = matchSystemLanguage()
 
-      if (matchedSystemLanguageOption != null) {
-        // initial current option: set to detected system language
-        setCurrentOption(matchedSystemLanguageOption)
-        if (showBootModal) {
-          // for boot modal temp change app display language based on initial system locale
-          void i18n.changeLanguage(systemLanguage)
+        if (matchedSystemLanguageOption != null) {
+          // initial current option: set to detected system language
+          setCurrentOption(matchedSystemLanguageOption)
+          if (showBootModal) {
+            // for boot modal temp change app display language based on initial system locale
+            void i18n.changeLanguage(systemLanguage)
+          }
         }
+        // only show update modal if we support the language their system has updated to
+        setShowUpdateModal(
+          appLanguage != null &&
+            matchedSystemLanguageOption != null &&
+            storedSystemLanguage != null &&
+            systemLanguage !== storedSystemLanguage
+        )
       }
-      // only show update modal if we support the language their system has updated to
-      setShowUpdateModal(
-        appLanguage != null &&
-          matchedSystemLanguageOption != null &&
-          storedSystemLanguage != null &&
-          systemLanguage !== storedSystemLanguage
-      )
-    }
-  }, [i18n, systemLanguage, showBootModal])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n, systemLanguage, showBootModal]
+  )
 
   return showBootModal || showUpdateModal ? (
     <Modal title={title}>

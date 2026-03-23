@@ -98,6 +98,7 @@ import type { Dispatch, State } from '/app/redux/types'
 const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 ]
 
 const POLL_INTERVAL_MS = 5000

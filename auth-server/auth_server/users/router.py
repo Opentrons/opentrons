@@ -2,6 +2,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -12,65 +13,16 @@ from server_utils.fastapi_utils.models.json_api import (
 
 from auth_server.oauth2.backend import Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
+from auth_server.users.dependencies import get_user_data_manager
 from auth_server.users.models import UpdateUser, UserCreate, UserResponse
-from auth_server.users.store import (
-    add,
-    get,
-    remove,
-    update,
+from auth_server.users.user_data_manager import (
+    InvalidInputError,
+    UserAlreadyExistsError,
+    UserDataManager,
+    UserNotFoundError,
 )
 
 router = fastapi.APIRouter()
-
-
-def _verify_scopes(
-    request: fastapi.Request,
-    oauth2_backend: Backend,
-    scopes: list[Scope],
-    body: str | None = None,
-) -> None:
-    """Verify OAuth2 scopes. Raises 403 if invalid."""
-    valid, _ = oauth2_backend.verify_request(
-        str(request.url),
-        http_method=request.method,  # type: ignore[arg-type]
-        body=body,
-        headers=dict(request.headers),
-        scopes=[scope.api_name for scope in scopes],
-    )
-    if not valid:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_403_FORBIDDEN,
-            detail="Forbidden",
-        )
-
-
-def _validate_user_create_input(
-    user_name: str | None = None,
-    password: str | None = None,
-    full_name: str | None = None,
-    account_type: str | None = None,
-) -> None:
-    """Validate required fields for user creation. Raises HTTPException if any are empty."""
-    if (
-        user_name is not None
-        and user_name == ""
-        or password is not None
-        and password == ""
-        or full_name is not None
-        and full_name == ""
-        or account_type is not None
-        and account_type == ""
-    ):
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="Bad request",
-        )
-
-    if password is not None and len(password) < 8:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters long",
-        )
 
 
 @PydanticResponse.wrap_route(
@@ -81,38 +33,40 @@ def _validate_user_create_input(
     responses={
         fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def post_users(
     request: fastapi.Request,
     request_body: RequestModel[UserCreate],
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Create a user."""
-    scopes_required = [Scope.USERS_WRITE]
-    _verify_scopes(request, oauth2_backend, scopes_required)
+    # todo(mm, 2026-02-20): The new user's scopes should either depend on their account type,
+    # or they should be passed in the request body.
     user_create = request_body.data
-    _validate_user_create_input(
-        user_create.userName,
-        user_create.password.get_secret_value(),
-        user_create.fullName,
-        user_create.accountType,
-    )
-    if get(user_create.userName) is not None:
+    try:
+        new_user = user_data_manager.create_user(
+            username=user_create.userName,
+            password=user_create.password.get_secret_value(),
+            full_name=user_create.fullName,
+            account_type=user_create.accountType,
+        )
+    except UserAlreadyExistsError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
         )
-    # once we store it in the db we can have a unique id as well.
-    new_user = add(
-        username=user_create.userName,
-        password=user_create.password.get_secret_value(),
-        full_name=user_create.fullName,
-        account_type=user_create.accountType,
-        scopes=scopes_required,
-    )
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
-        content=SimpleBody(data=UserResponse.from_user(new_user)),
+        content=SimpleBody(data=new_user),
     )
 
 
@@ -125,23 +79,27 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ))],
 )
 async def get_user(
     request: fastapi.Request,
     userName: str,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
-    user = get(userName)
-    if user is None:
+    try:
+        user = user_data_manager.get_user(userName)
+    except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(data=UserResponse.from_user(user)),
+        content=SimpleBody(data=user),
     )
 
 
@@ -153,18 +111,24 @@ async def get_user(
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
     request: fastapi.Request,
     userName: str,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
-    user = get(userName)
-    if user is None:
-        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-    remove(user)
+    try:
+        user_data_manager.delete_user(userName)
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
         status_code=fastapi.status.HTTP_200_OK,
@@ -179,38 +143,40 @@ async def delete_user(
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def update_user(
     request: fastapi.Request,
     request_body: RequestModel[UpdateUser],
     userName: str,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
-    _verify_scopes(request, oauth2_backend, [Scope.USERS_WRITE])
-    update_user = request_body.data
-    _validate_user_create_input(
-        user_name=update_user.userName,
-        password=update_user.password.get_secret_value()
-        if update_user.password is not None
-        else None,
-        full_name=update_user.fullName,
-        account_type=update_user.accountType,
-    )
-    user = get(userName)
-    if user is None:
-        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-
-    updated_user = update(
-        user,
-        username=update_user.userName,
-        password=update_user.password.get_secret_value()
-        if update_user.password is not None
-        else None,
-        full_name=update_user.fullName,
-        account_type=update_user.accountType,
-    )
+    update_data = request_body.data
+    try:
+        updated_user = user_data_manager.update_user(
+            userName,
+            new_username=update_data.userName,
+            password=update_data.password.get_secret_value()
+            if update_data.password is not None
+            else None,
+            full_name=update_data.fullName,
+            account_type=update_data.accountType,
+        )
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(data=UserResponse.from_user(updated_user)),
+        content=SimpleBody(data=updated_user),
     )

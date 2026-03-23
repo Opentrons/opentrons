@@ -2,6 +2,7 @@ import path from 'path'
 import { shell } from 'electron'
 import fse from 'fs-extra'
 
+import { getConfig } from '../config'
 import {
   analyzeProtocol,
   analyzeProtocolFailure,
@@ -29,6 +30,25 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+function getIgnoreOT2App(): boolean {
+  const devInternal = getConfig('devInternal') ?? {}
+  return devInternal.ignoreOT2App ?? false
+}
+
+let protocolsDirectoryPath: string | null = null
+
+// Returns the protocols directory path. Set once at initialization based on
+// `ignoreOT2App` feature flag. Does not change during app lifecycle.
+function getProtocolsDirectoryPath(): string {
+  if (protocolsDirectoryPath == null) {
+    protocolsDirectoryPath = getIgnoreOT2App()
+      ? FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH
+      : FileSystem.PROTOCOLS_DIRECTORY_PATH
+  }
+
+  return protocolsDirectoryPath
+}
 
 export const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
   Number(path.basename(analysisPath, path.extname(analysisPath)))
@@ -110,55 +130,109 @@ export function preParityMigrateProtocolsFrom(
   }
 }
 
+// If ignoreOT2App is enabled and the not-OT-2 directory does not exist,
+// copy protocols from protocols to protocols-10.0-plus. Exclude only
+// protocols that explicitly are OT-2 protocols.
+async function migrateProtocolsToNotOt2Directory(): Promise<void> {
+  if (!getIgnoreOT2App()) return
+
+  try {
+    const destStat = await fse.stat(FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH)
+    if (destStat.isDirectory()) return
+  } catch {
+    // the "not-OT-2 directory" doesn't exist, proceed with migration
+  }
+
+  try {
+    await ensureDir(FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH)
+    const protocolDirPaths = await FileSystem.readDirectoriesWithinDirectory(
+      FileSystem.PROTOCOLS_DIRECTORY_PATH
+    )
+
+    for (const dirPath of protocolDirPaths) {
+      const shouldMigrate =
+        await FileSystem.shouldMigrateToNotOt2Directory(dirPath)
+      if (shouldMigrate) {
+        const protocolKey = path.parse(dirPath).base
+        const destPath = path.join(
+          FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH,
+          protocolKey
+        )
+        await fse.copy(dirPath, destPath, { overwrite: false })
+      }
+    }
+    console.log(
+      `Protocol migration to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME} complete.`
+    )
+  } catch (e) {
+    console.log(
+      `Error migrating protocols to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME}: ${e}`
+    )
+  }
+}
+
+function storedProtocolDirToProtocolData(storedProtocolDir: {
+  dirPath: string
+  modified: number
+  srcFilePaths: string[]
+  analysisFilePaths: string[]
+}): {
+  protocolKey: string
+  modified: number
+  srcFileNames: string[]
+  srcFiles: Buffer[]
+  mostRecentAnalysis: ProtocolAnalysisOutput | null
+} {
+  const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
+    string | null
+  >((acc, analysisFilePath) => {
+    if (acc !== null) {
+      if (
+        getUnixTimeFromAnalysisPath(analysisFilePath) >
+        getUnixTimeFromAnalysisPath(acc)
+      ) {
+        return analysisFilePath
+      }
+      return acc
+    }
+    return analysisFilePath
+  }, null)
+  const mostRecentAnalysis =
+    mostRecentAnalysisFilePath != null
+      ? (getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null)
+      : null
+
+  return {
+    protocolKey: path.parse(storedProtocolDir.dirPath).base,
+    modified: storedProtocolDir.modified,
+    srcFileNames: storedProtocolDir.srcFilePaths.map(
+      filePath => path.parse(filePath).base
+    ),
+    srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+      const buffer = fse.readFileSync(srcFilePath)
+      return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+    }),
+    mostRecentAnalysis,
+  }
+}
+
 export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
   return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
     .then(() => migrateProtocolsFromTempDirectory())
-    .then(() =>
-      FileSystem.readDirectoriesWithinDirectory(
-        FileSystem.PROTOCOLS_DIRECTORY_PATH
-      )
-    )
+    .then(() => migrateProtocolsToNotOt2Directory())
+    .then(() => {
+      const protocolsDir = getProtocolsDirectoryPath()
+      return FileSystem.readDirectoriesWithinDirectory(protocolsDir)
+    })
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
-      const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
-        const mostRecentAnalysisFilePath =
-          storedProtocolDir.analysisFilePaths.reduce<string | null>(
-            (acc, analysisFilePath) => {
-              if (acc !== null) {
-                if (
-                  getUnixTimeFromAnalysisPath(analysisFilePath) >
-                  getUnixTimeFromAnalysisPath(acc)
-                ) {
-                  return analysisFilePath
-                }
-                return acc
-              }
-              return analysisFilePath
-            },
-            null
-          )
-        const mostRecentAnalysis =
-          mostRecentAnalysisFilePath != null
-            ? (getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null)
-            : null
-
-        return {
-          protocolKey: path.parse(storedProtocolDir.dirPath).base,
-          modified: storedProtocolDir.modified,
-          srcFileNames: storedProtocolDir.srcFilePaths.map(
-            filePath => path.parse(filePath).base
-          ),
-          srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
-            const buffer = fse.readFileSync(srcFilePath)
-            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
-          }),
-          mostRecentAnalysis,
-        }
-      })
-      dispatch(updateProtocolList(storedProtocolsData, source))
+      const protocolDataList = storedProtocols.map(
+        storedProtocolDirToProtocolData
+      )
+      dispatch(updateProtocolList(protocolDataList, source))
     })
     .catch((error: Error) => {
       dispatch(updateProtocolListFailure(error.message, source))
@@ -171,25 +245,27 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       case FETCH_PROTOCOLS:
       case UI_INITIALIZED: {
         const source = action.type === FETCH_PROTOCOLS ? POLL : INITIAL
-        fetchProtocols(dispatch, source)
+        void fetchProtocols(dispatch, source)
         break
       }
 
       case ADD_PROTOCOL: {
-        FileSystem.addProtocolFile(
+        const protocolsDir = getProtocolsDirectoryPath()
+        void FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
+          protocolsDir
         ).then(protocolKey => {
-          fetchProtocols(dispatch, PROTOCOL_ADDITION)
+          void fetchProtocols(dispatch, PROTOCOL_ADDITION)
           dispatch(analyzeProtocol(protocolKey))
         })
         break
       }
 
       case ANALYZE_PROTOCOL: {
-        FileSystem.analyzeProtocolByKey(
+        const protocolsDir = getProtocolsDirectoryPath()
+        void FileSystem.analyzeProtocolByKey(
           action.payload.protocolKey,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
+          protocolsDir
         )
           .then(() => {
             dispatch(analyzeProtocolSuccess(action.payload.protocolKey))
@@ -202,23 +278,25 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       }
 
       case REMOVE_PROTOCOL: {
-        FileSystem.removeProtocolByKey(
+        const protocolsDir = getProtocolsDirectoryPath()
+        void FileSystem.removeProtocolByKey(
           action.payload.protocolKey,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
+          protocolsDir
         ).then(() => fetchProtocols(dispatch, PROTOCOL_ADDITION))
         break
       }
 
       case VIEW_PROTOCOL_SOURCE_FOLDER: {
+        const protocolsDir = getProtocolsDirectoryPath()
         FileSystem.viewProtocolSourceFolder(
           action.payload.protocolKey,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
+          protocolsDir
         )
         break
       }
 
       case OPEN_PROTOCOL_DIRECTORY: {
-        shell.openPath(FileSystem.PROTOCOLS_DIRECTORY_PATH)
+        void shell.openPath(getProtocolsDirectoryPath())
         break
       }
     }

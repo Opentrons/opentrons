@@ -1,0 +1,27 @@
+.section_container {
+  display: grid;
+  grid-template-columns: 4fr 3fr 3fr 4fr;
+}
+
+.buttons_container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttons_inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+@media (width <= 960px) {
+  .section_container {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    row-gap: var(--spacing-16);
+  }
+
+  .buttons_container {
+    justify-content: flex-start;
+  }
+}

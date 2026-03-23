@@ -13,17 +13,20 @@ import {
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getModuleType,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import absorbanceReaderManualQRCode from '/app/assets/images/absorbance_reader_instruction_manual_code.png'
 import helpCenterQRCode from '/app/assets/images/module_instruction_code.png'
 import stackerInstallationQRCode from '/app/assets/images/stacker_installation_qr.png'
+import vacuumModuleManualQRCode from '/app/assets/images/vacuum_setup_instructions_qr.png'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
@@ -32,6 +35,8 @@ const ABSORBANCE_READER_MANUAL_URL =
   'https://insights.opentrons.com/hubfs/Absorbance%20Plate%20Reader%20Instruction%20Manual.pdf'
 const FLEX_STACKER_INSTALL_DOCS_URL =
   'https://docs.opentrons.com/stacker/installation/'
+// TODO: add vacuum module manual url
+const VACUUM_MODULE_MANUAL_URL = 'https://docs.opentrons.com/modules/'
 
 interface ModuleSetupModalProps {
   close: () => void
@@ -57,6 +62,10 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
         return t('module_instructions_quickstart', {
           moduleName: t('device_details:stacker'),
         })
+      case VACUUM_MODULE_TYPE:
+        return t('module_instructions_quickstart', {
+          moduleName: t('device_details:vacuum_module'),
+        })
       default:
         // Legacy module instructions direct user to the help center instead of the quickstart guide
         return t('branded:modal_instructions')
@@ -70,6 +79,8 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
         return ABSORBANCE_READER_MANUAL_URL
       case FLEX_STACKER_MODULE_TYPE:
         return FLEX_STACKER_INSTALL_DOCS_URL
+      case VACUUM_MODULE_TYPE:
+        return VACUUM_MODULE_MANUAL_URL
       default:
         return MODULE_SETUP_URL
     }
@@ -81,6 +92,8 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
         return absorbanceReaderManualQRCode
       case FLEX_STACKER_MODULE_TYPE:
         return stackerInstallationQRCode
+      case VACUUM_MODULE_TYPE:
+        return vacuumModuleManualQRCode
       default:
         return helpCenterQRCode
     }
@@ -105,6 +118,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             <Link
               external
               css={TYPOGRAPHY.linkPSemiBold}
+              style={{ whiteSpace: WRAP }}
               href={instructionURL()}
               target="_blank"
               rel="noopener noreferrer"
@@ -120,7 +134,12 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
               />
             </Link>
           </Flex>
-          <img width="192px" height="194px" src={instructionQRCode()} />
+          <img
+            width="192px"
+            height="194px"
+            src={instructionQRCode()}
+            alt="Module setup QR code"
+          />
         </Flex>
         <PrimaryButton onClick={props.close} alignSelf={ALIGN_FLEX_END}>
           {i18n.format(t('shared:close'), 'capitalize')}

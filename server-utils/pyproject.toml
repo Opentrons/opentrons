@@ -60,6 +60,9 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["server_utils"]
 
+[tool.ruff.format]
+exclude = ["server_utils/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on

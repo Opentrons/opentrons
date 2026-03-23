@@ -25,7 +25,6 @@ export function renderWithProviders<State>(
   Component: ReactElement,
   options?: RenderWithProvidersOptions<State>
 ): [RenderResult, Store<State>] {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {}, i18nInstance = null } = options || {}
 
   const store: Store<State> = legacy_createStore(vi.fn(), initialState)

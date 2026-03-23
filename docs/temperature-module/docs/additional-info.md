@@ -1,5 +1,6 @@
 ---
 title: "Temperature Module: Additional Product Information"
+description: "Warranty, support, app download, and manufacturer information for the module."
 ---
 
 ## Warranty

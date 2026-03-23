@@ -21,6 +21,8 @@ import {
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
 
+import { useVacuumModuleControls } from './VacuumModule/hooks/useVacuumModuleControls'
+
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -136,6 +138,8 @@ export function useModuleOverflowMenu(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { deactivateVacuum, openVent, closeVent } =
+    useVacuumModuleControls(module)
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -332,6 +336,10 @@ export function useModuleOverflowMenu(
     })
   }
 
+  const isVentClosed =
+    module.moduleType === VACUUM_MODULE_TYPE &&
+    module.data.ventStatus === 'closed'
+
   const sendBlockTempCommand =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     module.data.targetTemperature != null
@@ -474,7 +482,7 @@ export function useModuleOverflowMenu(
       },
     ],
     vacuumModuleType: [
-      module.data.status === 'idle'
+      module.moduleType === VACUUM_MODULE_TYPE && module.data.status === 'idle'
         ? {
             setSetting: t('overflow_menu_set_vacuum'),
             isSecondary: false,
@@ -489,31 +497,22 @@ export function useModuleOverflowMenu(
             isSecondary: false,
             isSettingDisabled: isDisabled,
             menuButtons: [],
-            onClick: () => {
-              // TODO: add vacuum module deactivate command
-              // handleDeactivationCommand('vacuumModule/deactivate')
-              console.log('TODO: deactivate vacuum')
-            },
+            onClick: deactivateVacuum,
           },
-      module.moduleType === VACUUM_MODULE_TYPE &&
-      module.data.ventStatus === 'closed'
+      isVentClosed
         ? {
             setSetting: t('overflow_menu_open_vent'),
             isSecondary: false,
             isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn],
-            onClick: () => {
-              console.log('TODO: open vent')
-            },
+            menuButtons: [aboutModuleBtn, setupBtn],
+            onClick: openVent,
           }
         : {
             setSetting: t('overflow_menu_close_vent'),
             isSecondary: false,
             isSettingDisabled: isDisabled,
-            menuButtons: [aboutModuleBtn],
-            onClick: () => {
-              console.log('TODO: close vent')
-            },
+            menuButtons: [aboutModuleBtn, setupBtn],
+            onClick: closeVent,
           },
     ],
   }

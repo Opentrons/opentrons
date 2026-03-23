@@ -64,6 +64,10 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
+)
 
 log = logging.getLogger(__name__)
 
@@ -320,6 +324,7 @@ class FlexStacker(mod_abc.AbstractModule):
     def _async_error_callback(self, exception: Exception) -> None:
         self.error_callback(exception)
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task"""
         await self._poller.stop()

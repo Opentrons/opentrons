@@ -23,7 +23,10 @@ module.exports = {
     'testing-library',
     'opentrons',
     '@eslint-react',
+    'jsx-a11y',
   ],
+
+  reportUnusedDisableDirectives: true,
 
   rules: {
     camelcase: 'off',
@@ -32,7 +35,7 @@ module.exports = {
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': [
-      'warn',
+      'error',
       {
         additionalHooks: '(useDrag|useDrop)',
       },
@@ -148,6 +151,7 @@ module.exports = {
       rules: {
         'import/no-absolute-path': 'off',
         '@eslint-react/no-nested-component-definitions': 'error',
+        'jsx-a11y/alt-text': 'error',
       },
     },
     {

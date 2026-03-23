@@ -52,8 +52,7 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
 export const ABSORBANCE_READER_V1: 'absorbanceReaderV1' = 'absorbanceReaderV1'
 export const FLEX_STACKER_MODULE_V1: 'flexStackerModuleV1' =
   'flexStackerModuleV1'
-export const VACUUM_MODULE_MILLIPORE_V1: 'vacuumModuleMilliporeV1' =
-  'vacuumModuleMilliporeV1'
+export const VACUUM_MODULE_V1: 'vacuumModuleV1' = 'vacuumModuleV1'
 
 export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
@@ -123,7 +122,7 @@ export const ABSORBANCE_READER_MODELS = [ABSORBANCE_READER_V1]
 
 export const FLEX_STACKER_MODULE_MODELS = [FLEX_STACKER_MODULE_V1]
 
-export const VACUUM_MODULE_MODELS = [VACUUM_MODULE_MILLIPORE_V1]
+export const VACUUM_MODULE_MODELS = [VACUUM_MODULE_V1]
 
 export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
 
@@ -229,6 +228,9 @@ export const SINGLE_MOUNT_PIPETTES: 'Single-Channel_and_8-Channel' =
 // Thermocycler module info
 export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
+
+// Vacuum module info
+export const VACUUM_MODULE_LOCATION: 'A3+A4' = 'A3+A4'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
@@ -448,8 +450,10 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
   'flexStackerModuleV1C4'
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
-export const VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA: 'vacuumModuleMilliporeV1A3' =
-  'vacuumModuleMilliporeV1A3'
+export const VACUUM_MODULE_A3_ADDRESSABLE_AREA: 'vacuumModuleV1A3' =
+  'vacuumModuleV1A3'
+export const VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA: 'vacuumModuleV1DockA4' =
+  'vacuumModuleV1DockA4'
 
 export const exactMatchOnlyLoadNames = new Set([
   'milliplex_microtiter_plate',
@@ -522,7 +526,8 @@ export const FLEX_STACKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
 ]
 
 export const VACUUM_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
-  VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA,
+  VACUUM_MODULE_A3_ADDRESSABLE_AREA,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 ]
 
 export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
@@ -548,6 +553,7 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
   ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 ]
 
 export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] =
@@ -687,8 +693,7 @@ export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStacke
   'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
 export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
   'flexStackerModuleV1WithMagneticBlockV1'
-export const VACUUM_MODULE_MILLIPORE_V1_FIXTURE: 'vacuumModuleMilliporeV1' =
-  'vacuumModuleMilliporeV1'
+export const VACUUM_MODULE_V1_FIXTURE: 'vacuumModuleV1' = 'vacuumModuleV1'
 
 export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [moduleModel in ModuleModel]?: AreaType
@@ -699,7 +704,7 @@ export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [THERMOCYCLER_MODULE_V2]: 'thermocycler',
   [ABSORBANCE_READER_V1]: 'absorbanceReader',
   [FLEX_STACKER_MODULE_V1]: 'flexStacker',
-  [VACUUM_MODULE_MILLIPORE_V1]: 'vacuumModule',
+  [VACUUM_MODULE_V1]: 'vacuumModule',
 }
 
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
@@ -709,7 +714,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   THERMOCYCLER_V2_FRONT_FIXTURE,
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_STACKER_V1_FIXTURE,
-  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
 ]
 
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
@@ -770,7 +775,7 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
 ]
 
 export const VACUUM_MODULE_FIXTURES: CutoutFixtureId[] = [
-  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
 ]
 
 export const MODULE_FIXTURES_BY_MODEL: {
@@ -785,7 +790,7 @@ export const MODULE_FIXTURES_BY_MODEL: {
   ],
   [ABSORBANCE_READER_V1]: [ABSORBANCE_READER_V1_FIXTURE],
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
-  [VACUUM_MODULE_MILLIPORE_V1]: [VACUUM_MODULE_MILLIPORE_V1_FIXTURE],
+  [VACUUM_MODULE_V1]: [VACUUM_MODULE_V1_FIXTURE],
 }
 
 export const DEFAULT_AA_FOR_WASTE_CHUTE =

@@ -300,16 +300,21 @@ function useTipSelectionUtils(
     relevantPickUpTipCmd.commandType === 'pickUpTip'
       ? relevantPickUpTipCmd.params.wellName
       : null
-  useEffect(() => {
-    if (
-      relevantPickUpTipCmd != null &&
-      relevantPickUpTipCmd.commandType === 'pickUpTip'
-    ) {
-      setSelectedLocs({
-        [relevantPickUpTipCmd.params.wellName]: null,
-      })
-    }
-  }, [initialWellName])
+  useEffect(
+    () => {
+      if (
+        relevantPickUpTipCmd != null &&
+        relevantPickUpTipCmd.commandType === 'pickUpTip'
+      ) {
+        setSelectedLocs({
+          [relevantPickUpTipCmd.params.wellName]: null,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [initialWellName]
+  )
 
   const deselectTips = (locations: string[]): void => {
     setSelectedLocs(prevLocs =>

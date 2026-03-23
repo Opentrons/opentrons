@@ -6,7 +6,12 @@ from typing import Any, Mapping, Optional
 
 from aiohttp import web
 
+from server_utils.auth.resource_server.authorization_checker import (
+    AuthorizationChecker,
+)
+
 from otupdate.common import (
+    auth,
     config,
     constants,
     control,
@@ -40,6 +45,7 @@ async def log_error_middleware(request, handler):
 
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
+    authorization_checker: AuthorizationChecker,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
@@ -65,6 +71,7 @@ async def get_app(
     app[FILE_ACTIONS_VARNAME] = updater
 
     name_management.install_name_synchronizer(name_synchronizer, app)
+    auth.install_authorization_checker(app, authorization_checker)
 
     app.router.add_routes(
         [

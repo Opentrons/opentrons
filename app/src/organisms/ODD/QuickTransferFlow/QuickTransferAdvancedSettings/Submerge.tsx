@@ -7,10 +7,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
@@ -281,7 +281,15 @@ function SubmergeSettingComponent({
           <StyledText oddStyle="level4HeaderRegular">
             {t(`submerge_${kind}_description`)}
           </StyledText>
-          <InputField type="number" value={speed} title={t('speed')} readOnly />
+          <TouchInputField
+            type="number"
+            value={speed}
+            label={t('speed')}
+            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+          />
         </Flex>
         <Flex
           paddingX={SPACING.spacing24}
@@ -311,11 +319,14 @@ function SubmergeSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="number"
             value={delayDuration}
-            title={t('delay_duration_s')}
+            label={t('delay_duration_s')}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
         </Flex>
         <Flex
@@ -350,12 +361,15 @@ function SubmergeSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
             type="text"
             value={position}
             error={positionError}
-            title={positionText}
+            label={positionText}
             readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>

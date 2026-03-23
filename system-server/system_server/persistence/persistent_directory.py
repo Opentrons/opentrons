@@ -3,17 +3,16 @@
 import logging
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import Optional
+from typing import Final
 
 from anyio import Path as AsyncPath
-from typing_extensions import Final
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-system-server-"
 
 _log = logging.getLogger(__name__)
 
 
-async def create_persistent_directory(path: Optional[Path]) -> Path:
+async def create_persistent_directory(path: Path | None) -> Path:
     """Create a persistent directory.
 
     If the directory in `path` doesn't exist, this function will generate
