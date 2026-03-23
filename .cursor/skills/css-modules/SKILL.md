@@ -1,6 +1,6 @@
 ---
 name: css-modules
-description: CSS Modules conventions, Stylelint rules, design tokens (spacing, colors, typography, border-radius), and patterns for the Opentrons monorepo. Use when working with .module.css files or styling React components.
+description: CSS Modules conventions, Stylelint rules, design tokens (spacing, colors, typography, border-radius), and patterns for the Opentrons monorepo. Use when working with .module.css files or styling React components in app/, components/, protocol-visualization/, protocol-designer/, or other JS packages.
 ---
 
 # CSS Modules — Opentrons Conventions
