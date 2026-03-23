@@ -46,7 +46,7 @@ class ModuleModel(StrEnum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
-    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
+    VACUUM_MODULE_V1 = "vacuumModuleV1"
 
     @classmethod
     def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":

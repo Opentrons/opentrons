@@ -29,7 +29,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
-_PARTIAL_TIP_RETURN_VERSION_GATE = APIVersion(2, 29)
+_PARTIAL_TIP_RETURN_VERSION_GATE = APIVersion(2, 28)
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
