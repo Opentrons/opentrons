@@ -102,12 +102,13 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: null,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -133,12 +134,13 @@ describe('Mix', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix volume (µL)',
         error: 'Value must be between 1 to 200',
-        readOnly: true,
         type: 'number',
         value: 0,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -160,12 +162,13 @@ describe('Mix', () => {
     fireEvent.click(zeroButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix repetitions',
         error: 'Value must be between 1 to 999',
-        readOnly: true,
         type: 'number',
         value: 0,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -207,24 +210,26 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 15,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix repetitions',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 55,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -247,24 +252,26 @@ describe('Mix', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 18,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Mix repetitions',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 2,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
