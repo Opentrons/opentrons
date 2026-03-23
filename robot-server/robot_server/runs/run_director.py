@@ -270,11 +270,10 @@ class DirectedRunProcess:
     def run_has_stopped(self) -> bool:
         return True
 
-    # TODO this doesn't return anything yet
     def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
-        pass
+        return LabwareOffset.model_construct(id="fake")  # type: ignore[call-arg]
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         return cast(LabwareUri, "fake/uri/ahh")
@@ -298,7 +297,6 @@ class DirectedRunProcess:
         """Add new camera capture image settings."""
         pass
 
-    # TODO this isn't returning anything right now
     async def add_command_and_wait_for_interval(
         self,
         command: CommandCreate,
@@ -306,7 +304,13 @@ class DirectedRunProcess:
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
-        pass
+        return Comment(
+            id="blah",
+            createdAt=datetime.now(),
+            key="abc",
+            status=CommandStatus.SUCCEEDED,
+            params=CommentParams(message="blah blah"),
+        )
 
     def estop(self) -> None:
         pass
