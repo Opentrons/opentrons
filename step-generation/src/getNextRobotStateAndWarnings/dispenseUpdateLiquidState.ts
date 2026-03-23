@@ -3,7 +3,6 @@ import reduce from 'lodash/reduce'
 
 import { getActiveNozzleAmount } from '../utils/getActiveNozzleAmount'
 import {
-  AIR,
   getLocationTotalVolume,
   getWellsForTips,
   mergeLiquid,
@@ -93,7 +92,7 @@ export function dispenseUpdateLiquidState(
   const splitLiquidStates: Record<string, SourceAndDest> = mapValues(
     prevLiquidState.pipettes[pipetteId],
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
-      const { [AIR]: _airGap, ...liquidOnlyState } = prevTipLiquidState
+      const { ...liquidOnlyState } = prevTipLiquidState
 
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(liquidOnlyState)
