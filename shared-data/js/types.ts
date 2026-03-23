@@ -171,12 +171,18 @@ export type LabwareOffsetLocationSequenceComponent =
 export type LabwareOffsetLocationSequence =
   LabwareOffsetLocationSequenceComponent[]
 
+export interface LegacyLabwareOffsetLocation {
+  slotName: string
+  moduleModel?: ModuleModel
+  definitionUri?: string
+}
+
 export interface LabwareOffsetRecord {
   id: string
   createdAt: string
   definitionUri: string
-  location: LabwareLocation
-  locationSequence: LabwareOffsetLocationSequence
+  location: LegacyLabwareOffsetLocation
+  locationSequence?: LabwareOffsetLocationSequence
   vector: LabwareOffset
 }
 
