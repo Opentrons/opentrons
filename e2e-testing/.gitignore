@@ -1,6 +1,8 @@
 # Test results and artifacts
 test-results/
 playwright-report/
+# Local Playwright browser cache (e.g. PLAYWRIGHT_BROWSERS_PATH for CI/sandbox)
+.pw-browsers/
 
 # Python cache
 __pycache__/

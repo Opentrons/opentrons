@@ -4,7 +4,12 @@ import json
 
 import pytest
 
-from protocols import ProtocolFixture, get_protocol_fixture_by_key, get_protocol_fixtures
+from protocols import (
+    ProtocolFixture,
+    get_protocol_fixture_by_key,
+    get_protocol_fixtures,
+    get_protocol_fixtures_filtered_for_e2e,
+)
 
 
 @pytest.mark.unit
@@ -61,6 +66,24 @@ def test_get_protocol_fixture_by_key() -> None:
     assert fixture.path.exists()
     assert fixture.path.name == "doItAllV8.json"
     assert fixture.path.suffix == ".json"
+
+
+@pytest.mark.unit
+def test_get_protocol_fixtures_filtered_for_e2e_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Without env filters, filtered list matches full fixture list."""
+    monkeypatch.delenv("PD_PROTOCOL_FIXTURE_KEY", raising=False)
+    monkeypatch.delenv("PD_PROTOCOL_FIXTURE_KEYS", raising=False)
+    assert get_protocol_fixtures_filtered_for_e2e() == get_protocol_fixtures()
+
+
+@pytest.mark.unit
+def test_get_protocol_fixtures_filtered_for_e2e_single_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    """PD_PROTOCOL_FIXTURE_KEY returns one fixture."""
+    monkeypatch.delenv("PD_PROTOCOL_FIXTURE_KEYS", raising=False)
+    monkeypatch.setenv("PD_PROTOCOL_FIXTURE_KEY", "doItAllV8")
+    fixtures = get_protocol_fixtures_filtered_for_e2e()
+    assert len(fixtures) == 1
+    assert fixtures[0].key == "doItAllV8"
 
 
 @pytest.mark.unit

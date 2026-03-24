@@ -8,49 +8,74 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
-from protocols import ProtocolFixture, get_protocol_fixtures
+from protocols import get_protocol_fixtures_filtered_for_e2e
 
 
 @pytest.mark.slow
 @pytest.mark.pdE2E
-@pytest.mark.parametrize(
-    "protocol",
-    get_protocol_fixtures(),
-    ids=lambda f: f.key,
-)
 def test_import_export_simulate(
     page: Page,
     pd_base_url: str,
-    protocol: ProtocolFixture,
     tmp_path: Path,
+    e2e_monorepo_root: Path,
     opentrons_simulate_path: Path,
 ) -> None:
-    """Import each protocol fixture in PD, export as Python, run opentrons_simulate to verify it simulates."""
+    """Import each protocol fixture in PD, export as Python, run opentrons_simulate.
+
+    Runs in one browser session. Narrow fixtures with ``PD_PROTOCOL_FIXTURE_KEY`` or
+    ``PD_PROTOCOL_FIXTURE_KEYS``; see :func:`protocols.get_protocol_fixtures_filtered_for_e2e`.
+    """
     if not opentrons_simulate_path.exists():
         pytest.skip(reason="api venv not set up; run make -C api setup")
 
+    fixtures = get_protocol_fixtures_filtered_for_e2e()
     landing = LandingPage(page)
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(protocol.path)
-    landing.dismiss_migration_modal()
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=5000)
 
-    editor = ProtocolEditorPage(page)
-    downloaded_path = editor.export_protocol()
-    exported_py = tmp_path / f"{protocol.key}.py"
-    shutil.copy(downloaded_path, exported_py)
+    failures: list[tuple[str, str]] = []
 
-    monorepo_root = opentrons_simulate_path.parent.parent.parent
-    result = subprocess.run(
-        [str(opentrons_simulate_path), str(exported_py)],
-        capture_output=True,
-        text=True,
-        cwd=str(monorepo_root),
-        timeout=60,
-    )
+    for index, protocol in enumerate(fixtures):
+        if index > 0:
+            page.goto(pd_base_url)
+            landing.wait_for_page_load()
+            landing.confirm_welcome_modal_if_present()
 
-    assert result.returncode == 0, (
-        f"opentrons_simulate failed for {protocol.key}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
-    )
+        landing.click_import_existing_protocol()
+        landing.upload_protocol_file(str(protocol.path))
+        landing.dismiss_migration_modal()
+        try:
+            expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=5000)
+        except AssertionError as exc:
+            failures.append((protocol.key, f"metadata: {exc}"))
+            continue
+
+        editor = ProtocolEditorPage(page)
+        try:
+            downloaded_path = editor.export_protocol()
+        except Exception as exc:
+            failures.append((protocol.key, f"export: {exc}"))
+            continue
+
+        exported_py = tmp_path / f"{protocol.key}.py"
+        shutil.copy(downloaded_path, exported_py)
+
+        result = subprocess.run(
+            [str(opentrons_simulate_path), str(exported_py)],
+            capture_output=True,
+            text=True,
+            cwd=str(e2e_monorepo_root),
+            timeout=60,
+        )
+        if result.returncode != 0:
+            failures.append(
+                (
+                    protocol.key,
+                    "simulate failed\nstdout:\n"
+                    f"{result.stdout}\nstderr:\n{result.stderr}",
+                )
+            )
+
+    if failures:
+        lines = "\n".join(f"  - {key}: {err}" for key, err in failures)
+        pytest.fail(f"import/export/simulate failed for {len(failures)} fixture(s):\n{lines}")

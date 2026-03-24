@@ -180,6 +180,18 @@ make codegen        # Playwright Inspector/recorder (default localhost:4173)
 make codegen URL=<url>  # Record against custom URL
 ```
 
+**Migration export & fixture simulation** (from `e2e-testing/`; needs `make setup` and `make test-setup` for Playwright):
+
+```bash
+make migration-export-prod     # Export fixtures → migration-report/<version>/
+make migration-export-staging  # Same, against staging PD
+make migration-export-local    # Local PD (default http://localhost:4173; override PD_URL=...)
+make migration-baseline SOURCE_FOLDER=8.7.1   # Copy exports to baseline/ (OVERWRITE=1 to replace)
+make test-pd-simulate        # Import/export/simulate all fixtures (needs `make -C ../api setup`)
+make test-pd-simulate-fast   # Same with PW_E2E_RECORD_VIDEO=false (less I/O)
+# Narrow fixtures: PD_PROTOCOL_FIXTURE_KEY=stem or PD_PROTOCOL_FIXTURE_KEYS=a,b,c
+```
+
 ## Code Quality Standards
 
 ### Type Annotations (REQUIRED)

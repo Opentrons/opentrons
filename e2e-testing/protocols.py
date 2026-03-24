@@ -6,6 +6,7 @@ fixture files under `e2e-testing/fixtures/`.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -134,6 +135,39 @@ def get_protocol_fixtures() -> list[ProtocolFixture]:
 
     # Ensure deterministic order for parametrization.
     return sorted(fixtures, key=lambda fixture: str(fixture.path))
+
+
+def get_protocol_fixtures_filtered_for_e2e() -> list[ProtocolFixture]:
+    """Return fixtures for bulk PD migration / import-export-simulate tests.
+
+    By default this matches :func:`get_protocol_fixtures`. Narrow the set with:
+
+    - ``PD_PROTOCOL_FIXTURE_KEY``: single fixture stem (e.g. ``batchEdit``).
+    - ``PD_PROTOCOL_FIXTURE_KEYS``: comma-separated stems.
+
+    Raises:
+        ValueError: If a requested key is unknown.
+    """
+
+    all_fixtures = get_protocol_fixtures()
+    by_key = {f.key: f for f in all_fixtures}
+
+    single = (os.environ.get("PD_PROTOCOL_FIXTURE_KEY", "") or "").strip()
+    keys_raw = (os.environ.get("PD_PROTOCOL_FIXTURE_KEYS", "") or "").strip()
+
+    if single:
+        if single not in by_key:
+            raise ValueError(f"Unknown PD_PROTOCOL_FIXTURE_KEY: {single}")
+        return [by_key[single]]
+
+    if keys_raw:
+        keys = [k.strip() for k in keys_raw.split(",") if k.strip()]
+        unknown = [k for k in keys if k not in by_key]
+        if unknown:
+            raise ValueError(f"Unknown PD_PROTOCOL_FIXTURE_KEYS: {', '.join(unknown)}")
+        return [by_key[k] for k in keys]
+
+    return all_fixtures
 
 
 def get_protocol_fixtures_by_key(

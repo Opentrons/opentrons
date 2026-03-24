@@ -127,3 +127,44 @@ test-compare:
 		  --browser chromium \
 		  tests/pd $(PYTEST_ARGS) -s; \
 	fi
+
+# --- Migration export & fixture simulation ---
+# Export PD fixtures as .py under migration-report/<app-version>/ (needs: make setup && make test-setup).
+# Optional env: MIGRATION_REPORT_KEYS, MIGRATION_REPORT_SINGLE_KEY, MIGRATION_REPORT_CLEAN=true, etc.
+# See migration_report.py module docstring.
+
+.PHONY: migration-export-prod
+migration-export-prod:
+	uv run python migration_report.py
+
+.PHONY: migration-export-staging
+migration-export-staging:
+	MIGRATION_REPORT_BASE_URL=https://staging.designer.opentrons.com uv run python migration_report.py
+
+# Local PD dev server (default http://localhost:4173). Override: make migration-export-local PD_URL=http://127.0.0.1:4173
+
+.PHONY: migration-export-local
+migration-export-local:
+	MIGRATION_REPORT_BASE_URL="$(or $(PD_URL),http://localhost:4173)" uv run python migration_report.py
+
+# Promote migration-report/<SOURCE_FOLDER>/exports → migration-report/baseline/exports
+# Example: make migration-baseline SOURCE_FOLDER=8.7.1
+# Replace existing baseline: make migration-baseline SOURCE_FOLDER=8.7.1 OVERWRITE=1
+
+.PHONY: migration-baseline
+migration-baseline:
+	@test -n "$(SOURCE_FOLDER)" || (echo "Set SOURCE_FOLDER (e.g. SOURCE_FOLDER=8.7.1). See migration_baseline.py."; exit 1)
+	uv run python migration_baseline.py --source-folder "$(SOURCE_FOLDER)" $(if $(filter 1 true yes,$(OVERWRITE)),--overwrite,)
+
+# Import each fixture in PD, export Python, run opentrons_simulate (slow). Requires api venv: make -C ../api setup
+
+.PHONY: test-pd-simulate
+test-pd-simulate:
+	TEST_ENV=local uv run pytest tests/pd/test_pd_import_export_simulate.py $(PYTEST_ARGS)
+
+# Same as test-pd-simulate but skips per-test video encoding (bulk run).
+# Optional: PD_PROTOCOL_FIXTURE_KEYS=key1,key2 to narrow fixtures.
+
+.PHONY: test-pd-simulate-fast
+test-pd-simulate-fast:
+	TEST_ENV=local PW_E2E_RECORD_VIDEO=false uv run pytest tests/pd/test_pd_import_export_simulate.py $(PYTEST_ARGS)

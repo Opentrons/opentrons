@@ -174,15 +174,24 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
 def browser_context_args() -> dict[str, Any]:
     """Configure browser context.
 
-    Records videos for all tests (passing and failing) to test-results/videos/.
-    Videos are useful for debugging test failures, especially in CI.
+    Records videos for all tests (passing and failing) to test-results/videos/
+    unless ``PW_E2E_RECORD_VIDEO`` is ``false`` / ``0`` / ``no`` / ``off``
+    (saves time and disk for long bulk runs such as migration / simulate).
     """
-    return {
+    record_video = os.environ.get("PW_E2E_RECORD_VIDEO", "true").lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
+    )
+    args: dict[str, Any] = {
         "viewport": {"width": 1280, "height": 720},
-        "record_video_dir": "test-results/videos",
-        "record_video_size": {"width": 1280, "height": 720},
         "accept_downloads": True,
     }
+    if record_video:
+        args["record_video_dir"] = "test-results/videos"
+        args["record_video_size"] = {"width": 1280, "height": 720}
+    return args
 
 
 def _e2e_monorepo_root() -> Path:
@@ -191,9 +200,15 @@ def _e2e_monorepo_root() -> Path:
 
 
 @pytest.fixture(scope="session")
-def opentrons_simulate_path() -> Path:
+def e2e_monorepo_root() -> Path:
+    """Monorepo root (parent of ``e2e-testing/``). Use as protocol simulate ``cwd`` for branch checkout."""
+    return _e2e_monorepo_root()
+
+
+@pytest.fixture(scope="session")
+def opentrons_simulate_path(e2e_monorepo_root: Path) -> Path:
     """Path to api/.venv/bin/opentrons_simulate. Use to skip tests when api venv is not set up."""
-    return _e2e_monorepo_root() / "api" / ".venv" / "bin" / "opentrons_simulate"
+    return e2e_monorepo_root / "api" / ".venv" / "bin" / "opentrons_simulate"
 
 
 @pytest.fixture(scope="session")
