@@ -9,7 +9,7 @@ import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
 import { getMissingTips } from '../utils/getMissingTips'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { WellGroup } from '@opentrons/components'
+import type { WellGroup, WellMouseEvent } from '@opentrons/components'
 import type { LabwareDefinition2, Liquid } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
 
@@ -22,6 +22,8 @@ interface LabwareOnDeckProps {
   y: number
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
+  onMouseEnterWell?: (e: WellMouseEvent) => unknown
+  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -88,6 +90,8 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
         wellFill={wellFill}
         highlightedWells={wellGroup}
         missingTips={missingTips}
+        onMouseEnterWell={props.onMouseEnterWell}
+        onMouseLeaveWell={props.onMouseLeaveWell}
       />
     </g>
   )

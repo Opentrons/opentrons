@@ -21,6 +21,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { WellTooltip } from '/protocol-designer/components/organisms/Labware/WellTooltip'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
@@ -343,19 +344,33 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />
-        <LabwareOnDeck
-          labwareOnDeck={labware}
-          x={slotPosition[0]}
-          y={slotPosition[1]}
-          handleClickWell={handleClickWell}
-          onMouseEnterWell={handleHoverWell}
-          selectedTipsByIndex={allWellsWithStatus}
-          statusByWellName={allWellsWithState}
-          fill={COLORS.white}
-          inWellSelectionModal
-          ignoreMissingTips
-          wellLabelOptions="SHOW_LABEL_INSIDE"
-        />
+        <WellTooltip ingredNames={{}}>
+          {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
+            <LabwareOnDeck
+              labwareOnDeck={labware}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              handleClickWell={handleClickWell}
+              selectedTipsByIndex={allWellsWithStatus}
+              statusByWellName={allWellsWithState}
+              fill={COLORS.white}
+              inWellSelectionModal
+              ignoreMissingTips
+              wellLabelOptions="SHOW_LABEL_INSIDE"
+              onMouseEnterWell={e => {
+                handleHoverWell(e)
+
+                makeHandleMouseEnterWell(e.wellName, {})(e.event)
+              }}
+              onMouseLeaveWell={e => {
+                handleMouseLeaveWell(e.event)
+                leaveTimeoutRef.current = setTimeout(() => {
+                  setHoveredWells(null)
+                }, 50)
+              }}
+            />
+          )}
+        </WellTooltip>
         {hoveredWells?.[0] && (
           <PipetteShadow
             robotType={robotType}
