@@ -31,8 +31,8 @@ def usb_bus(decoy: Decoy) -> USBDriverInterface:
 
 
 @pytest.fixture()
-def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
-    """Get a mocked out AttachedModuleControl.build_module.
+def build_device(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
+    """Get a mocked out AttachedModuleControl.build_device.
 
     !!! warning
 
@@ -43,7 +43,7 @@ def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
     """
     return cast(
         Callable[..., Awaitable[AbstractModule]],
-        decoy.mock(name="build_module", is_async=True),
+        decoy.mock(name="build_device", is_async=True),
     )
 
 
@@ -56,7 +56,7 @@ def event_callback(decoy: Decoy) -> Callable[[types.HardwareEvent], None]:
 def subject(
     hardware_api: HardwareAPI,
     usb_bus: USBDriverInterface,
-    build_module: Callable[..., Awaitable[AbstractModule]],
+    build_device: Callable[..., Awaitable[AbstractModule]],
     event_callback: Callable[[types.HardwareEvent], None],
 ) -> AttachedModulesControl:
     modules_control = AttachedModulesControl(
@@ -66,7 +66,7 @@ def subject(
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests
     # https://github.com/testdouble/contributing-tests/wiki/Partial-Mock
-    modules_control.build_module = build_module  # type: ignore[assignment]
+    modules_control.build_device = build_device  # type: ignore[assignment]
     return modules_control
 
 
@@ -89,7 +89,7 @@ def subject(
 async def test_register_modules(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
-    build_module: Callable[..., Awaitable[AbstractModule]],
+    build_device: Callable[..., Awaitable[AbstractModule]],
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
     module_at_port_input: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
@@ -110,7 +110,7 @@ async def test_register_modules(
         actual_ports
     )
     decoy.when(
-        await build_module(
+        await build_device(
             port="/dev/foo",
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
@@ -119,7 +119,7 @@ async def test_register_modules(
         )
     ).then_return(module)
 
-    await subject.register_modules(new_mods_at_ports=module_at_port_input)
+    await subject.register_devices(new_devices_at_ports=module_at_port_input)
     result = subject.available_modules
 
     assert result == [module]
@@ -128,7 +128,7 @@ async def test_register_modules(
 async def test_register_modules_sort(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
-    build_module: Callable[..., Awaitable[AbstractModule]],
+    build_device: Callable[..., Awaitable[AbstractModule]],
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
@@ -167,7 +167,7 @@ async def test_register_modules_sort(
 
     for mod in [module_1, module_2, module_3, module_4, module_5]:
         decoy.when(
-            await build_module(
+            await build_device(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
                 type=matchers.Anything(),
@@ -176,7 +176,7 @@ async def test_register_modules_sort(
             )
         ).then_return(mod)
 
-    await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
+    await subject.register_devices(new_devices_at_ports=new_mods_at_ports)
     result = subject.available_modules
 
     assert result == [module_5, module_4, module_3, module_2, module_1]

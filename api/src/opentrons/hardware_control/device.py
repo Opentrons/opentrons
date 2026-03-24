@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Optional, Type, Union
+from typing import Dict, Optional, Union
 
 from . import modules, peripherals
 from .execution_manager import ExecutionManager
