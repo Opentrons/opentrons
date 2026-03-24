@@ -35,12 +35,16 @@ export function WellComponent(props: WellProps): JSX.Element {
     isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null,
   } = props
   const { x, y } = well
+  console.log('isInteract', isInteractive)
+  console.log('onMouseEnterWell', onMouseEnterWell)
+  console.log('onMouseLeaveWell', onMouseLeaveWell)
 
   const wellFill = fill ?? COLORS.white
 
   const pointerEvents: CSSProperties['pointerEvents'] = isInteractive
     ? 'auto'
     : 'none'
+
   const commonProps = {
     [INTERACTIVE_WELL_DATA_ATTRIBUTE]: isInteractive ? wellName : undefined,
     onMouseEnter:

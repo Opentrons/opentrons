@@ -64,6 +64,7 @@
   gap: var(--spacing-8);
 }
 
+
 .select_well_alignment {
   display: flex;
   flex-direction: row;
@@ -75,3 +76,4 @@
   display: flex;
   width: 10rem;
 }
+

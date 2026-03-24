@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE} from '@opentrons/shared-data'
 import {
   COLORS,
   DEFAULT_TIP_SIZE,
@@ -12,14 +12,17 @@ import {
   UNSELECTED,
   WELL,
 } from '@opentrons/components'
+import { getCollidingWells} from '/protocol-designer/utils/index'
 import {
   getDeckDefFromRobotType,
   getPositionFromSlotId,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import type { GenericRect } from '/protocol-designer/collision-types'
 
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+import { SelectionRect} from '/protocol-designer/components/organisms/Labware/SelectionRect'
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -260,7 +263,41 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       return next
     })
   }
+  const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
+      const wellsInRect = getCollidingWells(rect)
+      
+      const highlightedWells: string[][] = []
+      for (const well in wellsInRect){
+      const wellSelection = getEntireWellSelection(
+        well,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+      highlightedWells.push(wellSelection)
 
+      }
+      return highlightedWells
+    }
+
+ const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
+        e,
+        rect
+      ) => {
+        if (!e.shiftKey) {
+          const wellsUnderRect = _getWellsFromRect(rect)
+          setSelectedWells(wellsUnderRect)
+        }
+      }
+    
+      const handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
+        e,
+        rect
+      ) => {
+        const wellsUnderRect = _getWellsFromRect(rect)
+          setSelectedWells(wellsUnderRect)
+      }
   const getWellSelectionText = (): JSX.Element => {
     switch (stepType) {
       case 'mix':
@@ -340,15 +377,22 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
     const is96Channel = channels === 96
+   console.log(
+  document.querySelectorAll(`[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`)
+)
+const handleMouse = (e: WellMouseEvent): void => {
+    console.log('test')
+  }
     controls = (
       <>
-        <DeckOverlay deckDef={deckDef} />
+       
         <LabwareOnDeck
           labwareOnDeck={labware}
           x={slotPosition[0]}
           y={slotPosition[1]}
           handleClickWell={handleClickWell}
-          onMouseEnterWell={handleHoverWell}
+          onMouseEnterWell={handleMouse}
+      onMouseLeaveWell={handleMouse}
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
@@ -356,6 +400,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
+         
         {hoveredWells?.[0] && (
           <PipetteShadow
             robotType={robotType}
@@ -373,7 +418,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             nozzles={nozzleConfiguration}
             rotate={is96Channel}
           />
-        )}
+        )} 
       </>
     )
   }
@@ -382,7 +427,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     <>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
       <div className={styles.select_well_alignment}>
+<SelectionRect
+         onSelectionMove={handleSelectionMove}
+      onSelectionDone={handleSelectionDone}>
+       
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+         </SelectionRect>
         <div className={styles.well_legend_box}>
           <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
         </div>
