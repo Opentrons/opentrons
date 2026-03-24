@@ -128,6 +128,7 @@
   "display_led_lights_description": "Control the strip of color lights on the front of the robot.",
   "display_sleep_settings": "Display Sleep Settings",
   "do_not_turn_off": "This could take up to {{minutes}} minutes. Don't turn off the robot.",
+  "documentation_required": "Documentation required",
   "done": "Done",
   "downgrade": "downgrade",
   "download": "Download",
