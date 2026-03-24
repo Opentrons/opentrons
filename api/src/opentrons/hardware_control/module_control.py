@@ -320,7 +320,6 @@ class AttachedModulesControl:
             new_per_at_ports = []
         if removed_per_at_ports is None:
             removed_per_at_ports = []
-        self._new_per_at_ports = new_per_at_ports
         unsorted_per_at_port = self._usb.match_virtual_ports(new_per_at_ports)
         # build new peripherals
         for per in unsorted_per_at_port:
@@ -372,7 +371,6 @@ class AttachedModulesControl:
 
         # destroy removed mods
         await self.unregister_modules(removed_mods_at_ports)
-        self._new_mods_at_ports = new_mods_at_ports
         unsorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
