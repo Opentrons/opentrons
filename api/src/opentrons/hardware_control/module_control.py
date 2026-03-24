@@ -304,9 +304,7 @@ class AttachedModulesControl:
             removed_devices_at_ports = []
         # destroy removed mods
         await self.unregister_devices(removed_devices_at_ports)
-        unsorted_device_at_port = self._usb.match_virtual_ports(
-            removed_devices_at_ports
-        )
+        unsorted_device_at_port = self._usb.match_virtual_ports(new_devices_at_ports)
         for device in unsorted_device_at_port:
             try:
                 new_instance = await self.build_device(
