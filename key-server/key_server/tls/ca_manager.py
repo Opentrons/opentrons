@@ -1,5 +1,6 @@
 """Code for managing TLS CAs."""
 
+import asyncio
 import logging
 import re
 from dataclasses import dataclass
@@ -331,6 +332,11 @@ def _create_ca(
     return pair
 
 
+def _delete_certpair(pair: X509Pair) -> None:
+    _safe_del(pair.certpath, "rotated away")
+    _safe_del(pair.keypath, "rotated away")
+
+
 class TLSCAManager:
     """Class that manages TLS CAs.
 
@@ -343,6 +349,7 @@ class TLSCAManager:
     CA_EXPIRY_DURATION: Final = timedelta(days=365, hours=1)
     CA_OVERLAP_DURATION: Final = timedelta(days=30 * 3)
     CA_ROTATION_TIME_BEFORE_EXPIRY: Final = timedelta(days=1)
+    CA_EXPIRY_CHECK_POLL_PERIOD: Final = timedelta(days=1)
 
     def __init__(self, key_dir: Path, ca_cert_dir: Path) -> None:
         """Build the object. Scans the given directories to set up the first set of CAs."""
@@ -426,9 +433,61 @@ class TLSCAManager:
             LOG.info(
                 f"Created {_fingerprint(self._next_ca.cert)} ({self._next_ca.cert.not_valid_before_utc}-{self._next_ca.cert.not_valid_after_utc}) as next CA"
             )
+        self._expiry_task: "asyncio.Task[None]" = asyncio.create_task(
+            self._expiry_task_outer()
+        )
+
+    async def teardown(self) -> None:
+        """Run code necessary to stop the CA manager."""
+        self._expiry_task.cancel()
+        try:
+            await self._expiry_task
+        except asyncio.CancelledError:
+            pass
+
+    def _must_rotate(self, now: datetime) -> bool:
+        must_rotate = self._current_ca.cert.not_valid_after_utc < (
+            now + self.CA_ROTATION_TIME_BEFORE_EXPIRY
+        )
+        LOG.info(
+            f"Rotation required at {now} for cert expiring at {self._current_ca.cert.not_valid_after_utc}: {must_rotate}"
+        )
+        return must_rotate
+
     def _must_build_next(self, now: datetime) -> bool:
         return (
             self._current_ca.cert.not_valid_after_utc < (now + self.CA_OVERLAP_DURATION)
             and not self._next_ca
         )
 
+    def _rotate(self, now: datetime) -> None:
+        LOG.info("Rotating CA certificates")
+
+        if self._must_build_next(now):
+            LOG.warning("No next CA present at rotation")
+            self._next_ca = _create_ca(
+                self._key_dir, self._ca_cert_dir, now, self.CA_EXPIRY_DURATION
+            )
+
+        old_current = self._current_ca
+        assert self._next_ca
+        self._current_ca = self._next_ca
+        self._next_ca = None
+        _delete_certpair(old_current)
+        if self._must_build_next(now):
+            self._next_ca = _create_ca(
+                self._key_dir, self._ca_cert_dir, now, self.CA_EXPIRY_DURATION
+            )
+
+    async def _expiry_task_outer(self) -> None:
+        try:
+            await self._expiry_task_inner()
+        except asyncio.CancelledError:
+            LOG.info("Stopping expiry task")
+
+    async def _expiry_task_inner(self) -> None:
+        while True:
+            now = datetime.now(tz=timezone.utc)
+            if self._must_rotate(now):
+                self._rotate(now)
+            await asyncio.sleep(self.CA_EXPIRY_CHECK_POLL_PERIOD.total_seconds())

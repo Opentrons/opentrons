@@ -1,9 +1,10 @@
+import asyncio
 import random
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Callable, Iterator, Literal
+from typing import Any, AsyncIterator, Callable, Iterator, Literal
 
 import pytest
 from cryptography import x509
@@ -422,7 +423,34 @@ def ca_cert_dir(tmp_path: Path) -> Iterator[Path]:
     rmtree(ca_dir)
 
 
-def test_init_limits_to_two_certs(key_dir: Path, ca_cert_dir: Path) -> None:
+class SubjectFactory:
+    def __init__(self, key_dir: Path, ca_cert_dir: Path) -> None:
+        self._key_dir = key_dir
+        self._ca_cert_dir = ca_cert_dir
+        self._manager: None | ca_manager.TLSCAManager
+
+    def create(self) -> ca_manager.TLSCAManager:
+        self._manager = ca_manager.TLSCAManager(self._key_dir, self._ca_cert_dir)
+        return self._manager
+
+    async def destroy(self, *args: Any, **kwargs: Any) -> None:
+        if self._manager:
+            await self._manager.teardown()
+            self._manager = None
+
+
+@pytest.fixture
+async def subject_factory(
+    key_dir: Path, ca_cert_dir: Path
+) -> AsyncIterator[SubjectFactory]:
+    ctm = SubjectFactory(key_dir, ca_cert_dir)
+    yield ctm
+    await ctm.destroy()
+
+
+async def test_init_limits_to_two_certs(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
     """It should use multiple criteria to limit itself to two valid CAs."""
     not_yet_valid = ca_manager._create_ca(
         key_dir,
@@ -462,7 +490,7 @@ def test_init_limits_to_two_certs(key_dir: Path, ca_cert_dir: Path) -> None:
             timedelta(days=365, hours=1),
         ),
     ]
-    subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
+    subject = subject_factory.create()
 
     assert subject._current_ca.certpath == current.certpath
     assert subject._current_ca.cert.fingerprint(
@@ -486,7 +514,9 @@ def test_init_limits_to_two_certs(key_dir: Path, ca_cert_dir: Path) -> None:
         assert not sd.keypath.exists()
 
 
-def test_does_not_create_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
+async def test_does_not_create_next_ca(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
     """If it finds only one CA and it expires in more than 3 months it should not create a next."""
     current = ca_manager._create_ca(
         key_dir,
@@ -494,7 +524,7 @@ def test_does_not_create_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
         datetime.now() - timedelta(days=1),
         timedelta(days=365, hours=1),
     )
-    subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
+    subject = subject_factory.create()
     assert subject._current_ca.cert == current.cert
     assert subject._next_ca is None
 
@@ -503,7 +533,9 @@ def dt_isclose(a: datetime, b: datetime) -> bool:
     return (a > b - timedelta(minutes=1)) and (a < b + timedelta(minutes=1))
 
 
-def test_creates_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
+async def test_creates_next_ca(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
     """If it finds only one CA and it expires in less than 3 months it should create a next."""
     nowish = datetime.now(timezone.utc)
     current = ca_manager._create_ca(
@@ -512,7 +544,7 @@ def test_creates_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
         nowish - timedelta(days=350),
         timedelta(days=365, hours=1),
     )
-    subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
+    subject = subject_factory.create()
     assert subject._current_ca.cert == current.cert
     assert subject._next_ca is not None
 
@@ -521,11 +553,58 @@ def test_creates_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
     )
 
 
-def test_creates_current_ca(key_dir: Path, ca_cert_dir: Path) -> None:
+async def test_creates_current_ca(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
     """If it finds no CAs, it should make a current one and not a next one."""
-    subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
+    subject = subject_factory.create()
     assert dt_isclose(
         subject._current_ca.cert.not_valid_after_utc,
         datetime.now(timezone.utc) + timedelta(days=365, hours=1),
     )
     assert subject._next_ca is None
+
+
+async def test_rotates_ca_if_necessary_on_boot(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
+    """If the current CA is soon to expire, it should switch to the next."""
+    nowish = datetime.now(timezone.utc)
+    ca_manager._create_ca(
+        key_dir,
+        ca_cert_dir,
+        nowish - timedelta(days=365, hours=3),
+        timedelta(days=365, hours=1),
+    )
+    next = ca_manager._create_ca(
+        key_dir, ca_cert_dir, nowish - timedelta(days=30), timedelta(days=365, hours=1)
+    )
+    subject = subject_factory.create()
+    assert subject._current_ca.cert.fingerprint(
+        hashes.SHA256()
+    ) == next.cert.fingerprint(hashes.SHA256())
+    assert subject._next_ca is None
+
+
+async def test_rotates_ca_while_live(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
+    """While the manager is running, if it detects expiry it should rotate CAs."""
+    nowish = datetime.now(timezone.utc)
+    current = ca_manager._create_ca(
+        key_dir,
+        ca_cert_dir,
+        nowish - timedelta(days=365, minutes=59, seconds=58),
+        timedelta(days=365, hours=1),
+    )
+    subject = subject_factory.create()
+    await subject.teardown()
+    # this is a Final so we have to ignore a type error to overwrite it
+    subject.CA_EXPIRY_CHECK_POLL_PERIOD = timedelta(seconds=3)  # type: ignore[misc]
+    subject._expiry_task = asyncio.create_task(subject._expiry_task_outer())
+    await asyncio.sleep(4)
+    assert subject._current_ca.cert.fingerprint(
+        hashes.SHA256()
+    ) != current.cert.fingerprint(hashes.SHA256())
+    assert not current.certpath.exists()
+    assert not current.keypath.exists()
