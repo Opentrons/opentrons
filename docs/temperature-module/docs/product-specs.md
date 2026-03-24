@@ -80,7 +80,7 @@ At the time of purchase, each Temperature Module includes your choice of one (1)
 
 </div>
 
-Additional thermal blocks are available for purchase from the [Modules section](https://opentrons.com/products/categories/modules) of the Opentrons website.
+Thermal blocks are available for purchase from the [Modules section](https://opentrons.com/products/categories/modules) of the Opentrons website.
 
 ## Flex caddies
 
