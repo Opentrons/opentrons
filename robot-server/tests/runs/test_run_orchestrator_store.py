@@ -376,6 +376,7 @@ async def test_estop_callback(
 ) -> None:
     """The callback should stop an active engine."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(decoy.mock(cls=RunOrchestrator))
 
     disengage_event = EstopStateNotification(
         old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
@@ -413,6 +414,7 @@ async def test_estop_callback(
 async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
     """It should noop without a run."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(decoy.mock(cls=RunOrchestrator))
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -441,6 +443,7 @@ async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
 async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> None:
     """It shouldn't finish if the engine doesn't want it to."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(decoy.mock(cls=RunOrchestrator))
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -469,6 +472,7 @@ async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> No
 async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) -> None:
     """It should finish with the error if the engine says it should."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(decoy.mock(cls=RunOrchestrator))
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
