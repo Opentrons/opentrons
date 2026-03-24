@@ -92,7 +92,7 @@ async def test_module_caching() -> None:
     assert len(with_magdeck) == 2
     assert with_magdeck[0] is found_mods[0]
     await api._backend.module_controls.register_devices(
-        new_devices_at_ports=[
+        removed_devices_at_ports=[
             ModuleAtPort(port="/dev/ot_module_sim_tempdeck111", name="tempdeck")
         ]
     )
