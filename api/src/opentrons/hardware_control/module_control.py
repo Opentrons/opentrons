@@ -253,53 +253,37 @@ class AttachedModulesControl:
 
         Remove any modules that are no longer found by aionotify.
         """
-        removed_modules = []
-        removed_peripherals = []
+        removed_devices = []
         for dev in devices_at_ports:
-            for attached_mod in self.available_modules:
+            for attached_dev in self.available_modules + self.available_peripherals:
                 if (
-                    attached_mod.serial_number == dev.serial
-                    or attached_mod.port == dev.port
+                    attached_dev.serial_number == dev.serial
+                    or attached_dev.port == dev.port
                 ):
-                    removed_modules.append(attached_mod)
-            for attached_per in self.available_peripherals:
-                if (
-                    attached_per.serial_number == dev.serial
-                    or attached_per.port == dev.port
-                ):
-                    removed_peripherals.append(attached_per)
-        for removed_mod in removed_modules:
+                    removed_devices.append(attached_dev)
+        for removed_dev in removed_devices:
             try:
-                self._available_modules.remove(removed_mod)
+                if removed_dev in self._available_modules and isinstance(
+                    removed_dev, modules.AbstractModule
+                ):
+                    self._available_modules.remove(removed_dev)
+                if removed_dev in self._available_peripherals and isinstance(
+                    removed_dev, peripherals.AbstractPeripheral
+                ):
+                    self._available_peripherals.remove(removed_dev)
                 # Important: this wants to be after the remove because this may trigger
                 # recursion back to here; we therefore want the module to already be
                 # removed so that the recursion terminates next loop
-                removed_mod.disconnected_callback()
+                removed_dev.disconnected_callback()
             except ValueError:
                 log.warning(
-                    f"Removed Module {removed_mod} not found in attached modules"
+                    f"Removed Device {removed_dev} not found in attached device"
                 )
-        for removed_peripheral in removed_peripherals:
-            try:
-                self._available_peripherals.remove(removed_peripheral)
-                # Important: this wants to be after the remove because this may trigger
-                # recursion back to here; we therefore want the module to already be
-                # removed so that the recursion terminates next loop
-                removed_peripheral.disconnected_callback()
-            except ValueError:
-                log.warning(
-                    f"Removed Module {removed_peripheral} not found in attached modules"
-                )
-        for removed_mod in removed_modules:
+        for removed_dev in removed_devices:
             log.info(
-                f"Module {removed_mod.name()} detached from port {removed_mod.port}"
+                f"Device {removed_dev.name()} detached from port {removed_dev.port}"
             )
-            await removed_mod.cleanup()
-        for removed_peripheral in removed_peripherals:
-            log.info(
-                f"Peripheral {removed_peripheral.name()} detached from port {removed_peripheral.port}"
-            )
-            await removed_peripheral.cleanup()
+            await removed_dev.cleanup()
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
