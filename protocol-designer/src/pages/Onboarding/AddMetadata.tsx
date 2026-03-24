@@ -72,9 +72,9 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               {...register('fields.description')}
-              value={watch('fields.description')}
+              value={watch('fields.description') ?? ''}
               height="6.8125rem"
             />
           </Flex>
