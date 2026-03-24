@@ -60,7 +60,7 @@
   },
   "stackingOffsetWithLabware": {
     "opentrons_1_well_adapter": {
-      "x": 0,
+      "x": 0.3,
       "y": 0,
       "z": 23.75
     }
