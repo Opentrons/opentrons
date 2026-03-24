@@ -3,7 +3,7 @@
 from pydantic import BaseModel
 
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.util.pyro.pyro_serialization import PydanticPyroSerializer
+from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
 
 
 class NestedTest(BaseModel):
@@ -22,7 +22,7 @@ class TestModel(BaseModel):
 
 def test_pydantic_serialization() -> None:
     """It should register a pydantic class and serialize it from class to dict and back."""
-    PydanticPyroSerializer.register_model(TestModel)
+    OpentronsPyroSerializer.register_pydantic_model(TestModel)
 
     test_model = TestModel(
         bar=123,
@@ -30,7 +30,7 @@ def test_pydantic_serialization() -> None:
         critical=CriticalPoint.XY_CENTER,
     )
 
-    test_dict = PydanticPyroSerializer._pydantic_class_to_dict(test_model)
+    test_dict = OpentronsPyroSerializer._pydantic_class_to_dict(test_model)
     assert test_dict == {
         "bar": 123,
         "xyzzy": {"foo": "xzibit"},
@@ -38,7 +38,7 @@ def test_pydantic_serialization() -> None:
         "__class__": "tests.opentrons.util.test_pyro_serialization.TestModel",
     }
 
-    result = PydanticPyroSerializer._pydantic_dict_to_class(
+    result = OpentronsPyroSerializer._pydantic_dict_to_class(
         "tests.opentrons.util.test_pyro_serialization.TestModel",
         test_dict,
     )
