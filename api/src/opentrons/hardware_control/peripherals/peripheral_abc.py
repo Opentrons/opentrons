@@ -1,7 +1,8 @@
 import abc
 import asyncio
-from typing import Any, ClassVar, Mapping, Optional
+from typing import ClassVar, Optional
 
+from ..abstract_device import AbstractDevice
 from ..execution_manager import ExecutionManager
 from ..modules.mod_abc import TaskPayload
 from ..modules.types import (
@@ -12,7 +13,7 @@ from .types import PeripheralType
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
-class AbstractPeripheral(abc.ABC):
+class AbstractPeripheral(AbstractDevice):
     PERIPHERAL_TYPE: ClassVar[PeripheralType]
 
     @classmethod
@@ -86,32 +87,6 @@ class AbstractPeripheral(abc.ABC):
         if self._execution_manager is not None:
             self._execution_manager.register_cancellable_task(task)
 
-    @abc.abstractmethod
-    async def deactivate(self, must_be_running: bool = True) -> None:
-        """Deactivate the module.
-
-        Contains an override to the `wait_for_is_running` step in cases where the
-        module must be deactivated regardless of context."""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def status(self) -> str:
-        """Return some string describing status."""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def device_info(self) -> Mapping[str, str]:
-        """Return a dict of the module's static information (serial, etc)"""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def is_simulated(self) -> bool:
-        """True if >this is a simulated module."""
-        pass
-
     @property
     def port(self) -> str:
         """The virtual port where the module is connected."""
@@ -126,34 +101,3 @@ class AbstractPeripheral(abc.ABC):
     def serial_number(self) -> Optional[str]:
         """The usb serial number of this device."""
         return self.device_info.get("serial")
-
-    @abc.abstractmethod
-    def model(self) -> str:
-        """A name for this specific module, matching module defs"""
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def name(cls) -> str:
-        """A shortname used for matching usb ports, among other things"""
-        pass
-
-    async def cleanup(self) -> None:
-        """Clean up the module instance.
-
-        Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
-        object destruction.
-        """
-        pass
-
-    def event_listener(self, event: Any) -> None:
-        """Listen for events and update the module state."""
-        pass
-
-    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
-        """Identify the module."""
-        pass
-
-    def cleanup_persistent(self) -> None:
-        """Reset any persistent data on the module that should not exist outside of a run."""
-        pass

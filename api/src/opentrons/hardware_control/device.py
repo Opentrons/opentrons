@@ -2,6 +2,7 @@ import asyncio
 from typing import Dict, Optional, Union
 
 from . import modules, peripherals
+from .abstract_device import AbstractDevice
 from .execution_manager import ExecutionManager
 from .modules.types import (
     ModuleDisconnectedCallback,
@@ -10,8 +11,6 @@ from .modules.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 DeviceType = Union[modules.ModuleType, peripherals.PeripheralType]
-
-AbstractDevice = Union[modules.AbstractModule, peripherals.AbstractPeripheral]
 
 DEVICE_TYPE_BY_NAME: Dict[
     str, Union[peripherals.PeripheralType, modules.ModuleType]

@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Union
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from . import modules, peripherals
+from .abstract_device import AbstractDevice
 from .device import (
     DEVICE_TYPE_BY_NAME,
-    AbstractDevice,
     DeviceType,
     build_attached_device,
 )
