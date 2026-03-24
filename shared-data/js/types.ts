@@ -1,8 +1,4 @@
-import type {
-  LabwareLocation,
-  LoadedLabwareLocation,
-  RunTimeCommand,
-} from '../command/types'
+import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
 import type { CommandAnnotation } from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
