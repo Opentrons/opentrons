@@ -13,6 +13,13 @@ DeviceType = Union[modules.ModuleType, peripherals.PeripheralType]
 
 AbstractDevice = Union[modules.AbstractModule, peripherals.AbstractPeripheral]
 
+DEVICE_TYPE_BY_NAME: Dict[
+    str, Union[peripherals.PeripheralType, modules.ModuleType]
+] = {
+    **modules.MODULE_TYPE_BY_NAME,
+    **peripherals.PERIPHERAL_TYPE_BY_NAME,
+}
+
 
 async def build_attached_device(
     port: str,
