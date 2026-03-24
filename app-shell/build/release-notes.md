@@ -21,7 +21,7 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 ### Improvements
 
-- Quick transfer protocols now include the same features as any other Flex protocol: 
+- Quick transfer protocols now include the same features as any other Flex protocol:
   - Go to the Protocols tab on the touchscreen to start a quick transfer.
   - Find completed quick transfers in the Protocols tab.
   - Pin a quick transfer protocol to find it easily.
