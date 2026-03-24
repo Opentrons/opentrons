@@ -2,9 +2,10 @@
 
 import asyncio
 import logging
+import os
 import subprocess
+import sys
 import time
-from pathlib import Path
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
 
 import Pyro5.api
@@ -67,6 +68,7 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from .run_director import DirectedRunProcess, register_process_types
+from . import run_director
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -378,14 +380,13 @@ class RunOrchestratorStore:
         if self._run_process is not None:
             raise RunConflictError("Another run is currently active.")
 
-        # TODO this probably won't always be the entry point
-        entry_process_path = Path("./run_director.py").resolve()
         self._run_process = subprocess.Popen(
-            ["python3", str(entry_process_path)], user="ot-protocol"
+            args=[sys.executable, "-m", run_director.__name__],
+            env={k: v for k, v in os.environ.items()},
+            # user="ot-protocol"  # TODO how do we make sure this works locally?
         )
 
         # TODO This timeout sucks
-        # TODO also we might want to type this into the proper type
         start_time = time.monotonic()
         with Pyro5.api.locate_ns() as ns:
             while time.monotonic() - start_time < 60:
