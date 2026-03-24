@@ -19,6 +19,7 @@ class SettingsResponseData(_StrictBaseModel):
     Do not change them without coordinating.
     """
 
+    # TODO(tz, 2026-03-24): https://opentrons.atlassian.net/browse/EXEC-2468
     accessControlEnabled: bool = pydantic.Field(
         default=False,
         description="When enabled, authorization is enforced throughout the robot's HTTP APIs. "
