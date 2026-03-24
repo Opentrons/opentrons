@@ -220,6 +220,7 @@ async def test_get_by_analysis_id_as_document(
         "modules": [],
         "pipettes": [],
         "commandAnnotations": [],
+        "labwareOffsets": [],
     }
 
 

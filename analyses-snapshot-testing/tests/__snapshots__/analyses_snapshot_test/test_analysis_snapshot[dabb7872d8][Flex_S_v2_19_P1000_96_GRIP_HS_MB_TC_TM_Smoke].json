@@ -15988,6 +15988,46 @@
       }
     }
   ],
+  "labwareOffsets": [
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
+      "id": "UUID",
+      "location": {
+        "slotName": "C2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "C2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    },
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
+      "id": "UUID",
+      "location": {
+        "slotName": "D2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "D2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    }
+  ],
   "liquidClasses": [],
   "liquids": [
     {

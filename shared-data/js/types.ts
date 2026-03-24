@@ -144,6 +144,44 @@ export interface Vector3D {
 
 export type LabwareOffset = Vector3D
 
+export interface OnLabwareOffsetLocationSequenceComponent {
+  kind: 'onLabware'
+  labwareUri: string
+}
+
+export interface OnModuleOffsetLocationSequenceComponent {
+  kind: 'onModule'
+  moduleModel: ModuleModel
+}
+
+export interface OnAddressableAreaOffsetLocationSequenceComponent {
+  kind: 'onAddressableArea'
+  addressableAreaName: AddressableAreaName
+}
+
+export type LabwareOffsetLocationSequenceComponent =
+  | OnLabwareOffsetLocationSequenceComponent
+  | OnModuleOffsetLocationSequenceComponent
+  | OnAddressableAreaOffsetLocationSequenceComponent
+
+export type LabwareOffsetLocationSequence =
+  LabwareOffsetLocationSequenceComponent[]
+
+export interface LegacyLabwareOffsetLocation {
+  slotName: string
+  moduleModel?: ModuleModel
+  definitionUri?: string
+}
+
+export interface LabwareOffsetRecord {
+  id: string
+  createdAt: string
+  definitionUri: string
+  location: LegacyLabwareOffsetLocation
+  locationSequence?: LabwareOffsetLocationSequence
+  vector: LabwareOffset
+}
+
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
 export interface LabwareParameters {
@@ -1074,6 +1112,7 @@ export interface CompletedProtocolAnalysis {
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
   commandPreconditions?: CommandPreconditions
+  labwareOffsets?: LabwareOffsetRecord[]
 }
 
 export interface ResourceFile {
