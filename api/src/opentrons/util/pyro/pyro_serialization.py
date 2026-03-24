@@ -84,7 +84,9 @@ class OpentronsPyroSerializer:
         try:
             enum_type = cls._enum_class_name_to_model[class_name]
         except KeyError:
-            raise RuntimeError(f"Unsupported module processed in Pyro request: {class_name}")
+            raise RuntimeError(
+                f"Unsupported module processed in Pyro request: {class_name}"
+            )
         return enum_type(d["value"])
 
     @classmethod

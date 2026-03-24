@@ -45,13 +45,27 @@ from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
-from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
+from opentrons.util.pyro.pyro_serialization import (
+    OpentronsPyroSerializer,
+    serpent_enum_registration,
+)
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
 
 def register_process_types() -> None:
+    with serpent_enum_registration():
+        for enum_type in [
+            DeckType,
+            EngineStatus,
+            ParseMode,
+            PostRunHardwareState,
+        ]:
+            OpentronsPyroSerializer.register_enum(enum_type)
+        for hardware_module_model in get_args(HardwareModuleModel):
+            OpentronsPyroSerializer.register_enum(hardware_module_model)
+
     for pydantic_model in [
         CameraSettings,
         CommandAnnotation,
@@ -136,26 +150,15 @@ class DirectedRunProcess:
 
     async def finish(
         self,
+        # TODO we'll need to register exceptions
         error: Optional[Exception] = None,
         drop_tips_after_run: bool = True,
         set_run_status: bool = True,
-        # TODO register this
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
         pass
 
     def get_state_summary(self) -> StateSummary:
-        # labware = LoadedLabware(
-        #     id="abc",
-        #     loadName="123",
-        #     definitionUri="xyz",
-        #     location=DeckSlotLocation(
-        #         slotName=DeckSlotName.SLOT_A1,
-        #     ),
-        #     lid_id=None,
-        #     offsetId=None,
-        #     displayName=None,
-        # )
         return StateSummary(
             status=EngineStatus.IDLE,
             errors=[],
@@ -243,7 +246,6 @@ class DirectedRunProcess:
     def get_command_errors(self) -> List[ErrorOccurrence]:
         return []
 
-    # TODO register this
     def get_run_status(self) -> EngineStatus:
         return EngineStatus.IDLE
 
@@ -315,14 +317,11 @@ class DirectedRunProcess:
     def estop(self) -> None:
         pass
 
-    # TODO HardwareModuleModel, presumably Casey's dealing with this already somewhere
-    # TODO use casey's generic enum or an update version
     async def asynchronous_module_error(
         self, module_model: HardwareModuleModel, module_serial: str | None
     ) -> bool:
         return False
 
-    # TODO ibid
     async def module_disconnected(
         self, module_model: HardwareModuleModel, module_serial: str | None
     ) -> bool:
@@ -353,7 +352,6 @@ class DirectedRunProcess:
     def get_robot_type(self) -> RobotType:
         return self._robot_type
 
-    # TODO serialize this
     def get_deck_type(self) -> DeckType:
         return self._deck_type
 
@@ -367,7 +365,6 @@ class DirectedRunProcess:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         pass
 
-    # TODO same with nozzle maps
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         return {}
 
