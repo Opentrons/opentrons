@@ -241,7 +241,7 @@ $(SHARED_DATA_DIR)-py-lint:
 lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
-lint-js-eslint:
+lint-js-eslint: build-ts
 	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
