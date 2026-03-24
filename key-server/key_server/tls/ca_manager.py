@@ -258,9 +258,11 @@ def _fingerprint(cert: x509.Certificate) -> str:
     return cert.fingerprint(hashes.SHA256()).hex()
 
 
-def _create_ca(key_dir: Path, ca_cert_dir: Path, now: datetime) -> X509Pair:
+def _create_ca(
+    key_dir: Path, ca_cert_dir: Path, now: datetime, duration: timedelta
+) -> X509Pair:
     """Make a new CA pair."""
-    expiry = now + timedelta(days=365, hours=1)
+    expiry = now + duration
     key = ec.generate_private_key(ec.SECP256R1())
     cert = (
         x509.CertificateBuilder()
@@ -338,6 +340,10 @@ class TLSCAManager:
     - CA cert export
     """
 
+    CA_EXPIRY_DURATION: Final = timedelta(days=365, hours=1)
+    CA_OVERLAP_DURATION: Final = timedelta(days=30 * 3)
+    CA_ROTATION_TIME_BEFORE_EXPIRY: Final = timedelta(days=1)
+
     def __init__(self, key_dir: Path, ca_cert_dir: Path) -> None:
         """Build the object. Scans the given directories to set up the first set of CAs."""
         self._key_dir = key_dir
@@ -401,21 +407,28 @@ class TLSCAManager:
             LOG.info("Found no next CA to load")
         else:
             LOG.info("Found no CAs to load, creating")
-            self._current_ca = _create_ca(key_dir, ca_cert_dir, now)
+            self._current_ca = _create_ca(
+                key_dir, ca_cert_dir, now, self.CA_EXPIRY_DURATION
+            )
             LOG.info(
                 f"Created {_fingerprint(self._current_ca.cert)} ({self._current_ca.cert.not_valid_before_utc}-{self._current_ca.cert.not_valid_after_utc}) as current CA"
             )
             self._next_ca = None
 
         # if we don't have a next CA and our current expires in <90 days (ish), make a next one
-        if (
-            self._current_ca.cert.not_valid_after_utc < (now + timedelta(days=3 * 30))
-            and not self._next_ca
-        ):
+        if self._must_build_next(now):
             LOG.info(
                 f"Current CA expires at {self._current_ca.cert.not_valid_after_utc} which is less than 3 months from {now} and we have no next CA, creating"
             )
-            self._next_ca = _create_ca(key_dir, ca_cert_dir, now)
+            self._next_ca = _create_ca(
+                key_dir, ca_cert_dir, now, self.CA_EXPIRY_DURATION
+            )
             LOG.info(
                 f"Created {_fingerprint(self._next_ca.cert)} ({self._next_ca.cert.not_valid_before_utc}-{self._next_ca.cert.not_valid_after_utc}) as next CA"
             )
+    def _must_build_next(self, now: datetime) -> bool:
+        return (
+            self._current_ca.cert.not_valid_after_utc < (now + self.CA_OVERLAP_DURATION)
+            and not self._next_ca
+        )
+

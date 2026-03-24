@@ -264,7 +264,7 @@ def test_load_create_ca_cert_roundtrips(tmp_path: Path) -> None:
     key_dir.mkdir()
     ca_dir.mkdir()
     now = datetime.now(timezone.utc)
-    pair = ca_manager._create_ca(key_dir, ca_dir, now)
+    pair = ca_manager._create_ca(key_dir, ca_dir, now, timedelta(days=25))
     assert ca_manager._load_ca_cert(pair.certpath) == pair.cert
 
 
@@ -397,7 +397,10 @@ def test_create_ca_handles_fs_issues(
     # manipulation.
     prep_fs(tmp_path)
     pair = ca_manager._create_ca(
-        tmp_path / key_subdir, tmp_path / cert_subdir, datetime.now()
+        tmp_path / key_subdir,
+        tmp_path / cert_subdir,
+        datetime.now(),
+        timedelta(days=25),
     )
     assert pair.key.public_key() == pair.cert.public_key()
     assert re.search(log_pattern, caplog.text)
@@ -422,22 +425,42 @@ def ca_cert_dir(tmp_path: Path) -> Iterator[Path]:
 def test_init_limits_to_two_certs(key_dir: Path, ca_cert_dir: Path) -> None:
     """It should use multiple criteria to limit itself to two valid CAs."""
     not_yet_valid = ca_manager._create_ca(
-        key_dir, ca_cert_dir, datetime.now() + timedelta(days=1)
+        key_dir,
+        ca_cert_dir,
+        datetime.now() + timedelta(days=1),
+        timedelta(days=365, hours=1),
     )
     already_invalid = ca_manager._create_ca(
-        key_dir, ca_cert_dir, datetime.now() - timedelta(days=365 * 10)
+        key_dir,
+        ca_cert_dir,
+        datetime.now() - timedelta(days=365 * 10),
+        timedelta(days=365, hours=1),
     )
     current = ca_manager._create_ca(
-        key_dir, ca_cert_dir, datetime.now() - timedelta(days=30 * 6)
+        key_dir,
+        ca_cert_dir,
+        datetime.now() - timedelta(days=30 * 6),
+        timedelta(days=365, hours=1),
     )
     next = ca_manager._create_ca(
-        key_dir, ca_cert_dir, datetime.now() - timedelta(days=30 * 3)
+        key_dir,
+        ca_cert_dir,
+        datetime.now() - timedelta(days=30 * 3),
+        timedelta(days=365, hours=1),
     )
     should_delete = [
         ca_manager._create_ca(
-            key_dir, ca_cert_dir, datetime.now() - timedelta(days=10)
+            key_dir,
+            ca_cert_dir,
+            datetime.now() - timedelta(days=10),
+            timedelta(days=365, hours=1),
         ),
-        ca_manager._create_ca(key_dir, ca_cert_dir, datetime.now() - timedelta(days=5)),
+        ca_manager._create_ca(
+            key_dir,
+            ca_cert_dir,
+            datetime.now() - timedelta(days=5),
+            timedelta(days=365, hours=1),
+        ),
     ]
     subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
 
@@ -466,7 +489,10 @@ def test_init_limits_to_two_certs(key_dir: Path, ca_cert_dir: Path) -> None:
 def test_does_not_create_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
     """If it finds only one CA and it expires in more than 3 months it should not create a next."""
     current = ca_manager._create_ca(
-        key_dir, ca_cert_dir, datetime.now() - timedelta(days=1)
+        key_dir,
+        ca_cert_dir,
+        datetime.now() - timedelta(days=1),
+        timedelta(days=365, hours=1),
     )
     subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
     assert subject._current_ca.cert == current.cert
@@ -480,7 +506,12 @@ def dt_isclose(a: datetime, b: datetime) -> bool:
 def test_creates_next_ca(key_dir: Path, ca_cert_dir: Path) -> None:
     """If it finds only one CA and it expires in less than 3 months it should create a next."""
     nowish = datetime.now(timezone.utc)
-    current = ca_manager._create_ca(key_dir, ca_cert_dir, nowish - timedelta(days=350))
+    current = ca_manager._create_ca(
+        key_dir,
+        ca_cert_dir,
+        nowish - timedelta(days=350),
+        timedelta(days=365, hours=1),
+    )
     subject = ca_manager.TLSCAManager(key_dir, ca_cert_dir)
     assert subject._current_ca.cert == current.cert
     assert subject._next_ca is not None
