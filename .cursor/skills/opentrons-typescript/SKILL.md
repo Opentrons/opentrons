@@ -1,6 +1,6 @@
 ---
 name: opentrons-typescript
-description: TypeScript conventions, React patterns, testing, styling, and import rules for the Opentrons monorepo JS/TS packages. Use when working with TypeScript or React files in app/, components/, shared-data/, step-generation/, protocol-designer/, opentrons-ai-client/, or other JS/TS packages.
+description: TypeScript conventions, React patterns, testing, styling, and import rules for the Opentrons monorepo JS/TS packages. Use when working with TypeScript or React files in app/, components/, shared-data/, step-generation/, protocol-designer/, protocol-visualization/, opentrons-ai-client/, or other JS/TS packages.
 ---
 
 # Opentrons Monorepo — TypeScript Conventions
@@ -9,26 +9,27 @@ Node.js, Yarn, Python setup, teardown, and troubleshooting are in the always-app
 
 ## Monorepo Structure
 
-Yarn workspaces monorepo with 14 TypeScript packages. No Lerna/Nx/Turbo — uses Yarn Classic workspaces + TypeScript project references.
+Yarn workspaces monorepo with 15 TypeScript packages. No Lerna/Nx/Turbo — uses Yarn Classic workspaces + TypeScript project references.
 
 ### Packages
 
-| Package                        | Directory                 | Type                        |
-| ------------------------------ | ------------------------- | --------------------------- |
-| `@opentrons/app`               | `app/`                    | React app                   |
-| `@opentrons/app-shell`         | `app-shell/`              | Electron shell              |
-| `@opentrons/app-shell-odd`     | `app-shell-odd/`          | Electron shell (ODD)        |
-| `@opentrons/components`        | `components/`             | React UI components library |
-| `@opentrons/api-client`        | `api-client/`             | Pure TS library             |
-| `@opentrons/react-api-client`  | `react-api-client/`       | React hooks library         |
-| `@opentrons/discovery-client`  | `discovery-client/`       | Pure TS (Node)              |
-| `@opentrons/shared-data`       | `shared-data/`            | Pure TS/JS data library     |
-| `@opentrons/step-generation`   | `step-generation/`        | Pure TS library             |
-| `@opentrons/labware-library`   | `labware-library/`        | React app                   |
-| `@opentrons/labware-designer`  | `labware-designer/`       | React app                   |
-| `opentrons-ai-client`          | `opentrons-ai-client/`    | React app                   |
-| `protocol-designer`            | `protocol-designer/`      | React app                   |
-| `@opentrons/usb-bridge-client` | `usb-bridge/node-client/` | Pure TS (Node)              |
+| Package                             | Directory                 | Type                              |
+| ----------------------------------- | ------------------------- | --------------------------------- |
+| `@opentrons/app`                    | `app/`                    | React app                         |
+| `@opentrons/app-shell`              | `app-shell/`              | Electron shell                    |
+| `@opentrons/app-shell-odd`          | `app-shell-odd/`          | Electron shell (ODD)              |
+| `@opentrons/components`             | `components/`             | React UI components library       |
+| `@opentrons/api-client`             | `api-client/`             | Pure TS library                   |
+| `@opentrons/react-api-client`       | `react-api-client/`       | React hooks library               |
+| `@opentrons/discovery-client`       | `discovery-client/`       | Pure TS (Node)                    |
+| `@opentrons/shared-data`            | `shared-data/`            | Pure TS/JS data library           |
+| `@opentrons/step-generation`        | `step-generation/`        | Pure TS library                   |
+| `@opentrons/labware-library`        | `labware-library/`        | React app                         |
+| `@opentrons/labware-designer`       | `labware-designer/`       | React app                         |
+| `opentrons-ai-client`               | `opentrons-ai-client/`    | React app                         |
+| `protocol-designer`                 | `protocol-designer/`      | React app                         |
+| `@opentrons/protocol-visualization` | `protocol-visualization/` | React library (protocol viz, WIP) |
+| `@opentrons/usb-bridge-client`      | `usb-bridge/node-client/` | Pure TS (Node)                    |
 
 ### Dependency Graph
 
@@ -40,6 +41,8 @@ shared-data
 ├── components
 ├── api-client → react-api-client
 └── discovery-client
+↓
+protocol-visualization (scaffold; depends on components + shared-data + step-generation)
 ↓
 app, protocol-designer, labware-library, opentrons-ai-client (leaf apps)
 ```

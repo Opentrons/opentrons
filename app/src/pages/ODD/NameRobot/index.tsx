@@ -264,6 +264,7 @@ export function NameRobot(): JSX.Element {
                 name="newRobotName"
                 render={({ field, fieldState }) => (
                   <TouchInputField
+                    autoFocus
                     data-testid="name-robot_input"
                     id="newRobotName"
                     name="newRobotName"
@@ -273,6 +274,10 @@ export function NameRobot(): JSX.Element {
                     textAlign={TYPOGRAPHY.textAlignCenter}
                     onBlur={e => {
                       e.target.focus()
+                    }}
+                    onChange={e => {
+                      field.onChange(e)
+                      setNewName(e.target.value as string)
                     }}
                   />
                 )}

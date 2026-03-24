@@ -622,7 +622,7 @@ def test_blowout_location_for_trash(
     trash = TrashBin(
         location=DeckSlotName.SLOT_A1,
         addressable_area_name="moveableTrashD3",
-        api_version=APIVersion(2, 29),
+        api_version=APIVersion(2, 28),
         engine_client=engine_client,
     )
     decoy.when(
