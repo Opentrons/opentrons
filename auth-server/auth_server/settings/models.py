@@ -180,6 +180,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
     @pydantic.model_validator(mode="before")
     @classmethod
     def reject_explicit_nulls(cls, data: Any) -> Any:
+        """Reject explicit nulls for non-nullable fields."""
         if isinstance(data, dict):
             for field in cls._NON_NULLABLE_FIELDS:
                 if field in data and data[field] is None:

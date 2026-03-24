@@ -63,9 +63,7 @@ class SettingsStore:
             session.commit()
 
     def upsert_many(self, settings: dict[str, object]) -> None:
-        """
-        Insert or update multiple settings at once.
-        """
+        """Insert or update multiple settings at once."""
         with self._session() as session:
             for key, value in settings.items():
                 row = session.query(Setting).filter(Setting.key == key).first()
