@@ -13,6 +13,7 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 ### New Features
 
 - Use the `set_empty()` method to load an empty tip rack on the deck.
+- Use Opentrons Flex 20 µL pipette tips in your protocols. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands and with Flex 1- and 8-Channel (1-50 µL range) and 96-Channel (1-200 µL range) pipettes.
 
 ### Feature Improvements
 
@@ -23,12 +24,6 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 - Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
 
 ---
-
-## Opentrons Robot Software Changes in 8.9.0
-
-Welcome to the v8.9.0 release of the Opentrons robot software!
-
-This release includes support for Opentrons Flex 20 µL pipette tips. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands and with Flex 1- and 8-Channel (1-50 µL range) and 96-Channel (1-200 µL range) pipettes.
 
 ## Opentrons Robot Software Changes in 8.8.1
 
