@@ -1,7 +1,5 @@
 {
-  "allowedRoles": [
-    "system"
-  ],
+  "allowedRoles": ["system"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
