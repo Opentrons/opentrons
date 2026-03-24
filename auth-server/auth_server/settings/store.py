@@ -76,7 +76,10 @@ class SettingsStore:
     def delete_all(self) -> None:
         """Delete all settings (for reset)."""
         with self._session() as session:
-            session.query(Setting).delete()
+            # todo(tz, 2026-03-24): this is a hack to prevent the accessControlEnabled setting from being deleted
+            session.query(Setting).filter(
+                Setting.key != "accessControlEnabled"
+            ).delete()
             session.commit()
 
 
