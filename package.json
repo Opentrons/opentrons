@@ -13,6 +13,7 @@
       "labware-library",
       "opentrons-ai-client",
       "protocol-designer",
+      "protocol-visualization",
       "react-api-client",
       "shared-data",
       "step-generation",

@@ -49,7 +49,7 @@ export const getMigrationVersionsToRunFromVersion = (
   )
 }
 
-const allMigrationsByVersion: MigrationsByVersion = {
+export const allMigrationsByVersion: MigrationsByVersion = {
   // @ts-expect-error file types are incompatible
   '1.1.0': migrateFileOne,
   // @ts-expect-error file types are incompatible
