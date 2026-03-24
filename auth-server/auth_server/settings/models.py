@@ -46,22 +46,6 @@ class SettingsResponseData(_StrictBaseModel):
         default=timedelta(minutes=3),
         description="Duration until account is logged out due to inactivity.",
     )
-    # requireAdminCredsWhenUpdatingRobotSoftware: bool = pydantic.Field(
-    #     default=True,
-    #     description="Require admin credentials when updating robot settings.",
-    # )
-    # requireAdminCredsWhenSendingProtocolToRobot: bool = pydantic.Field(
-    #     default=True,
-    #     description="Require admin credentials when sending protocol to robot.",
-    # )
-    # requireAdminCredsForSignoffProtocol: bool = pydantic.Field(
-    #     default=False,
-    #     description="Require admin credentials for signoff protocol.",
-    # )
-    # requireSignoffForProtocolLog: bool = pydantic.Field(
-    #     default=True,
-    #     description="Require signoff for protocol log.",
-    # )
     requireReasonForInteraction: bool = pydantic.Field(
         default=True,
         description="Require reason for interaction.",
@@ -70,14 +54,6 @@ class SettingsResponseData(_StrictBaseModel):
         default=None,
         description="Minimum length of reason for interaction.",
     )
-    # requireLogsToBeSavedInApp: bool = pydantic.Field(
-    #     default=True,
-    #     description="Require logs to be saved in app. Path should be configured in the app.",
-    # )
-    # deleteOverMaxOnDiskProtocols: bool = pydantic.Field(
-    #     default=True,
-    #     description="Automatically delete protocol run logs on the robot when there are 20 protocol run records.",
-    # )
 
 
 class PatchSettingsRequestData(_StrictBaseModel):

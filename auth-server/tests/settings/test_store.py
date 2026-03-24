@@ -8,7 +8,9 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 from auth_server.settings.store import SettingsStore
 
-_DEFAULTS: dict[str, object] = SettingsResponseData().model_dump(mode="json")
+_DEFAULTS: dict[str, object] = SettingsResponseData().model_dump(
+    mode="json", exclude_none=True
+)
 
 
 def _upsert_defaults(store: SettingsStore) -> None:
