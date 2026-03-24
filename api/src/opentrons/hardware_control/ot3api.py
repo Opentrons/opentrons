@@ -652,7 +652,7 @@ class OT3API(
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
 
-        return await self._backend.module_controls.register_simulated_module(
+        module = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.LEFT
             ),
@@ -660,6 +660,8 @@ class OT3API(
             sim_model=model.value,
             sim_serial=sim_serial,
         )
+        assert isinstance(module, modules.AbstractModule)
+        return module
 
     async def create_simulating_peripheral(
         self,
@@ -670,13 +672,15 @@ class OT3API(
             "Cannot build simulating peripheral from non-simulating hardware control API"
         )
 
-        return await self._backend.module_controls.register_simulated_peripheral(
+        peripheral = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.LEFT
             ),
             type=peripherals.PeripheralType.from_model(model),
             sim_model=model.value,
         )
+        assert isinstance(peripheral, peripherals.AbstractPeripheral)
+        return peripheral
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
