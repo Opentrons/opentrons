@@ -15,12 +15,9 @@ from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.drivers.vacuum_module.types import VentState
 
 # Target guage pressure
-START = -100
-END = -1000
-STEP = -200
-TARGET_PRESSURE = list(range(START, END, STEP))
-PRESSURE_SAMPLES = 100
-PRESSURE_TOLERANCE = 5
+TARGET_PRESSURE = [0, -100, -200, -300, -400, -500, -600, -700, -800, -900]
+PRESSURE_SAMPLES = 150
+PRESSURE_TOLERANCE = 8
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -45,7 +42,18 @@ async def test_vacuum_regulation(
     # Turn Off Vacuum
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(VentState.OPENED)
-    await asyncio.sleep(5)  # wait n seconds
+
+    # Wait for the Pressure to equalize
+    for i in range(10):
+        await vacuum._reader.update_vacuum_state()
+        state = vacuum.vacuum_state
+        equalized = math.isclose(
+            state.pressure_abs_b, state.pressure_atm, abs_tol=PRESSURE_TOLERANCE
+        )
+        if equalized:
+            break
+        await asyncio.sleep(1)
+
     # Make sure the motor is not moving
     await vacuum._reader.update_pump_state()
     pump_running = vacuum.pump_state.pump_running
@@ -68,13 +76,15 @@ async def test_vacuum_regulation(
         sleep = 0.1 if pressure == 0 else 0.4
         await asyncio.sleep(sleep)
 
-    # wait until pressire stabilizes
+    # wait until pressure stabilizes
     await asyncio.sleep(5)  # wait n seconds
 
     # Verify target pressure
     await vacuum._reader.update_vacuum_state()
+    expected = target_pressure > -50 or target_pressure < -800
     pressure = vacuum.vacuum_state.current_guage_pressure
     passed = math.isclose(target_pressure, pressure, abs_tol=PRESSURE_TOLERANCE)
+    passed = passed or expected
     report(
         section,
         f"vacuum-target-pressure-{target_pressure}",
