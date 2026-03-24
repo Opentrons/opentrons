@@ -139,7 +139,7 @@ export function NozzleAndWellSelectionModal(
       ) : null}
 
       <PrimaryButton onClick={isLastStep ? handleClose : handleContinue}>
-        {isLastStep ? 'Save' : 'Continue'}
+        {isLastStep ? t('shared:save') : t('shared:continue')}
       </PrimaryButton>
     </div>
   )
