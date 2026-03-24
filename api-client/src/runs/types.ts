@@ -1,10 +1,11 @@
 import type {
   LabwareDefinition,
+  LabwareOffsetRecord,
+  LegacyLabwareOffsetLocation,
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
-  ModuleModel,
   NozzleLayoutConfig,
   OnDeckLabwareLocation,
   RunCommandError,
@@ -19,6 +20,10 @@ import type {
 } from '../types'
 
 export * from './commands/types'
+export type {
+  LegacyLabwareOffsetLocation,
+  LabwareOffsetRecord,
+} from '@opentrons/shared-data'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
@@ -89,14 +94,6 @@ export interface VectorOffset {
   y: number
   z: number
 }
-export interface LabwareOffset {
-  id: string
-  createdAt: string
-  definitionUri: string
-  location: LegacyLabwareOffsetLocation
-  locationSequence?: LabwareOffsetLocationSequence
-  vector: VectorOffset
-}
 
 export interface RunLoadedLabwareDefinitions {
   data: LabwareDefinition[]
@@ -166,11 +163,8 @@ export interface CreateRunActionData {
   actionType: RunActionType
 }
 
-export interface LegacyLabwareOffsetLocation {
-  slotName: string
-  moduleModel?: ModuleModel
-  definitionUri?: string
-}
+export type LabwareOffset = LabwareOffsetRecord
+
 export interface LegacyLabwareOffsetCreateData {
   definitionUri: string
   location: LegacyLabwareOffsetLocation

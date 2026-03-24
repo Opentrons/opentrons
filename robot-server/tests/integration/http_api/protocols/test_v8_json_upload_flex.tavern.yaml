@@ -224,7 +224,7 @@ stages:
                       moduleId: temperatureModuleId
                     - kind: onCutoutFixture
                       cutoutId: cutoutD1
-                      possibleCutoutFixtureIds: ["temperatureModuleV2"]
+                      possibleCutoutFixtureIds: ['temperatureModuleV2']
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -251,7 +251,12 @@ stages:
                       moduleId: magneticBlockId
                     - kind: onCutoutFixture
                       cutoutId: cutoutD3
-                      possibleCutoutFixtureIds: ["flexStackerModuleV1WithMagneticBlockV1", "magneticBlockV1", "stagingAreaSlotWithMagneticBlockV1"]
+                      possibleCutoutFixtureIds:
+                        [
+                          'flexStackerModuleV1WithMagneticBlockV1',
+                          'magneticBlockV1',
+                          'stagingAreaSlotWithMagneticBlockV1',
+                        ]
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -668,6 +673,7 @@ stages:
                 description: Liquid H2O
                 displayColor: '#7332a8'
             liquidClasses: []
+            labwareOffsets: []
 
 ---
 test_name: Upload and analyze a JSONv8 protocol, with liquids

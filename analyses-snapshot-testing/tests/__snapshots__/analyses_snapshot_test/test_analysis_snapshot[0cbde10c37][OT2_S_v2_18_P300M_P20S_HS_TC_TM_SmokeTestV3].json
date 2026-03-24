@@ -18253,6 +18253,46 @@
       "offsetId": "UUID"
     }
   ],
+  "labwareOffsets": [
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "id": "UUID",
+      "location": {
+        "slotName": "3"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "3",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    },
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "id": "UUID",
+      "location": {
+        "slotName": "2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    }
+  ],
   "liquidClasses": [],
   "liquids": [
     {
