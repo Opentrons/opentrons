@@ -273,6 +273,7 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
+  "transfer_nozzles_selected_no_dispense": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
