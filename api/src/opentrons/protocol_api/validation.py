@@ -311,6 +311,7 @@ def ensure_and_convert_deck_slot(
         return parsed_staging_slot
     else:
         try:
+            print("WTF", deck_slot)
             parsed_slot = DeckSlotName.from_primitive(deck_slot)
         except ValueError as e:
             raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e

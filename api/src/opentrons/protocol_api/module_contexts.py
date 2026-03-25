@@ -43,7 +43,7 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
-from opentrons.types import StagingSlotName
+from opentrons.types import ModuleFixtureLocation, StagingSlotName
 
 from . import (
     validation,
@@ -1868,6 +1868,20 @@ class VacuumModuleContext(ModuleContext):
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
+    @property
+    @requires_version(2, 28)
+    def manifold_dock(self) -> ModuleFixtureLocation:
+        base_slot = self._core.get_deck_slot().id
+        area_name = f"{self.model}Dock{base_slot[0]}4"
+        return ModuleFixtureLocation(addressable_area_name=area_name)
+
+    @requires_version(2, 28)
+    def dock(self) -> str:
+        """Returns the location for the dock."""
+        base_slot = self._core.get_deck_slot().id
+        area_name = f"{self.model}Dock{base_slot[0]}4"
+        return area_name
+
     @requires_version(2, 28)
     def load_adapter_to_dock(
         self,
@@ -1877,10 +1891,8 @@ class VacuumModuleContext(ModuleContext):
     ) -> Labware:
         """Load a collar adapter to the vacuum module dock."""
 
-        base_slot = self._core.get_deck_slot().id
-        area_name = f"{self.model}Dock{base_slot[0]}4"
+        area_name = self.manifold_dock.addressable_area_name
         location = AddressableAreaLocation(addressableAreaName=area_name)
-        # location = StagingSlotName.from_primitive(f"{self._core.get_deck_slot().id[0]}4")
         labware_core = self._protocol_core.load_adapter(
             load_name=name,
             namespace=namespace,

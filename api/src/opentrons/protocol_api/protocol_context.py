@@ -82,6 +82,7 @@ from opentrons.legacy_commands.publisher import (
     publish_context,
 )
 from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
+from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
@@ -96,7 +97,14 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
-from opentrons.types import DeckLocation, DeckSlotName, Location, Mount, StagingSlotName
+from opentrons.types import (
+    DeckLocation,
+    DeckSlotName,
+    Location,
+    ModuleFixtureLocation,
+    Mount,
+    StagingSlotName,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -412,7 +420,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware(  # noqa: C901
         self,
         load_name: str,
-        location: Union[DeckLocation, OffDeckType],
+        location: Union[DeckLocation, OffDeckType, ModuleFixtureLocation],
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
@@ -545,7 +553,13 @@ class ProtocolContext(CommandPublisher):
                 )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
+        load_location: Union[
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            AddressableAreaLocation,
+        ]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -573,6 +587,8 @@ class ProtocolContext(CommandPublisher):
             load_location = loaded_adapter._core
         elif isinstance(location, OffDeckType):
             load_location = location
+        elif isinstance(location, ModuleFixtureLocation):
+            load_location = AddressableAreaLocation(addressableAreaName=str(location))
         else:
             load_location = validation.ensure_and_convert_deck_slot(
                 location, self._api_version, self._core.robot_type
@@ -709,7 +725,7 @@ class ProtocolContext(CommandPublisher):
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckLocation, OffDeckType],
+        location: Union[DeckLocation, OffDeckType, ModuleFixtureLocation],
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> Labware:
@@ -728,7 +744,7 @@ class ProtocolContext(CommandPublisher):
                 You can find the `load_name` for any standard adapter on the Opentrons
                 [Labware Library](https://labware.opentrons.com).
 
-            location (Union[int, str, OffDeckType]): Either a
+            location (Union[int, str, OffDeckType, ModuleFixtureLocation]): Either a
                 [deck slot](../deck-slots.md), like `1`, `"1"`, or `"D1"`, or the special value
                 [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
@@ -747,9 +763,13 @@ class ProtocolContext(CommandPublisher):
                 leave this unspecified to let `load_adapter()` choose a version automatically.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
+        load_location: Union[
+            OffDeckType, DeckSlotName, StagingSlotName, AddressableAreaLocation
+        ]
         if isinstance(location, OffDeckType):
             load_location = location
+        elif isinstance(location, ModuleFixtureLocation):
+            load_location = AddressableAreaLocation(addressableAreaName=str(location))
         else:
             load_location = validation.ensure_and_convert_deck_slot(
                 location, self._api_version, self._core.robot_type
@@ -808,7 +828,13 @@ class ProtocolContext(CommandPublisher):
         self,
         labware: Labware,
         new_location: Union[
-            DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute, TrashBin
+            DeckLocation,
+            Labware,
+            ModuleTypes,
+            OffDeckType,
+            WasteChute,
+            TrashBin,
+            ModuleFixtureLocation,
         ],
         use_gripper: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
@@ -871,6 +897,7 @@ class ProtocolContext(CommandPublisher):
             OffDeckType,
             DeckSlotName,
             StagingSlotName,
+            AddressableAreaLocation,
             TrashBin,
         ]
         if isinstance(new_location, (Labware, ModuleContext)):
@@ -884,6 +911,8 @@ class ProtocolContext(CommandPublisher):
                 raise LabwareMovementNotAllowedError(
                     "Can only dispose of tips and Lid-type labware in a Trash Bin. Did you mean to use a Waste Chute?"
                 )
+        elif isinstance(new_location, ModuleFixtureLocation):
+            location = AddressableAreaLocation(addressableAreaName=str(new_location))
         else:
             location = validation.ensure_and_convert_deck_slot(
                 new_location, self._api_version, self._core.robot_type

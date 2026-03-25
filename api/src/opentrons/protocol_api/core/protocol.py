@@ -78,7 +78,12 @@ class AbstractProtocol(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, StagingSlotName, LabwareCoreType, ModuleCoreType, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            OffDeckType,
+            AddressableAreaLocation,
         ],
         label: Optional[str],
         namespace: Optional[str],

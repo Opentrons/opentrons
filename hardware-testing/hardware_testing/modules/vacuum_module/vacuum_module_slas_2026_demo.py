@@ -1,5 +1,5 @@
 from opentrons.hardware_control.modules.types import VacuumModuleModel
-from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_api import ProtocolContext, ParameterContext, VacuumModuleContext
 
 
 metadata = {
@@ -39,7 +39,7 @@ def run(ctx: ProtocolContext) -> None:
         )
 
     # Load Modules
-    vm_mod = ctx.load_module(module_name="vacuumModuleV1", location="A3")
+    vm_mod: VacuumModuleContext = ctx.load_module(module_name="vacuumModuleV1", location="A3")
     abs_mod = ctx.load_module(module_name="absorbanceReaderV1", location="D3")
     abs_mod.open_lid()
 
@@ -56,9 +56,8 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # Load Labware
-    manifold_collar = vm_mod.load_adapter_to_dock(
-        "millipore_vacuum_manifold_collar_tall"
-    )
+    # TODO: DONT LET ME LOAD ANY ADAPTER/LABWARE ONTO DOCK
+    manifold_collar =  ctx.load_adapter('millipore_vacuum_manifold_collar_tall', vm_mod.manifold_dock)
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     black_flat_plate = ctx.load_labware(
         "corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid"
@@ -75,7 +74,7 @@ def run(ctx: ProtocolContext) -> None:
     pip = ctx.load_instrument(
         "flex_96channel_1000", tip_racks=[tiprack_200, tiprack_1000]
     )
-    ctx.load_trash_bin("A1")
+    trash = ctx.load_trash_bin("A1")
 
     # Run Time Parameters
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
@@ -86,6 +85,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.comment(f"Cycle #{cycle}")
         ctx.home()
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+        ctx.move_labware(manifold_collar, trash, use_gripper=True)
 
         # Aspirate 500ul with 1000ul tips from reservoir2 onto filter plate
         pip.pick_up_tip(tiprack_1000)
@@ -99,7 +99,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.delay(10, msg="Start Vacuum -400 mbar for 10s")
 
         # Move the collar with filter plate to the dock
-        vm_mod.move_to_dock(manifold_collar, use_gripper=True)
+        ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
 
         # Remove the lids from the flat and deep well plates
         ctx.move_lid(black_flat_plate, lid_stack, use_gripper=True)
@@ -122,7 +122,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.delay(10, msg="Start Vacuum -400 mbar for 10s")
 
         # Move the collar with filter plate to the dock
-        vm_mod.move_to_dock(manifold_collar, use_gripper=True)
+        ctx.move_labware(manifold_collar, "A2", use_gripper=True)
 
         # Aspirate 150ml from the deep well onto the flat plate
         pip.pick_up_tip(tiprack_200)
