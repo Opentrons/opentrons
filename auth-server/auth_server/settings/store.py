@@ -1,4 +1,4 @@
-"""User store – pure data access layer for user persistence."""
+"""Settings store – pure data access layer for settings persistence."""
 
 from typing import Annotated
 
@@ -44,15 +44,15 @@ class SettingsStore:
         """Patch the settings."""
         updates = patch.model_dump(mode="json", exclude_unset=True)
         db_updates: dict[str, object] = {k: v for k, v in updates.items()}
-        self.upsert_many(db_updates)
+        self._upsert_many(db_updates)
         return self.get_settings()
 
     def reset_settings(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
-        self.delete_all()
+        self._delete_all()
         return self.get_settings()
 
-    def upsert(self, key: str, value: str | None) -> None:
+    def _upsert(self, key: str, value: str | None) -> None:
         """Insert or update a single setting."""
         with self._session() as session:
             row = session.query(Setting).filter(Setting.key == key).first()
@@ -62,7 +62,7 @@ class SettingsStore:
                 row.value = value
             session.commit()
 
-    def upsert_many(self, settings: dict[str, object]) -> None:
+    def _upsert_many(self, settings: dict[str, object]) -> None:
         """Insert or update multiple settings at once."""
         with self._session() as session:
             for key, value in settings.items():
@@ -73,7 +73,7 @@ class SettingsStore:
                     row.value = value
             session.commit()
 
-    def delete_all(self) -> None:
+    def _delete_all(self) -> None:
         """Delete all settings (for reset)."""
         with self._session() as session:
             # todo(tz, 2026-03-24): this is a hack to prevent the accessControlEnabled setting from being deleted

@@ -14,7 +14,7 @@ _DEFAULTS: dict[str, object] = SettingsResponseData().model_dump(
 
 
 def _upsert_defaults(store: SettingsStore) -> None:
-    store.upsert_many(_DEFAULTS)
+    store._upsert_many(_DEFAULTS)
 
 
 @pytest.fixture()
@@ -27,23 +27,11 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
         yield store
 
 
-# test password complexity with none values
-def test_upsert_and_get_settings(settings_store: SettingsStore) -> None:
-    """insert should persist the settings so get can find it."""
-    _upsert_defaults(settings_store)
-    fetched = settings_store.get_settings()
-    assert fetched is not None
-    assert fetched == SettingsResponseData.model_construct()
-    settings_store.upsert("maxNumberOfLoginAttempts", "10")
-    fetched = settings_store.get_settings()
-    assert fetched is not None
-    assert fetched == SettingsResponseData.model_construct(maxNumberOfLoginAttempts=10)
-
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
     _upsert_defaults(settings_store)
-    settings_store.delete_all()
+    settings_store.reset_settings()
     fetched = settings_store.get_settings()
     assert fetched == SettingsResponseData()
 
@@ -52,45 +40,35 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
     "updates, expected_changes",
     [
         pytest.param(
-            {"maxNumberOfLoginAttempts": 10},
-            {"maxNumberOfLoginAttempts": 10},
+            PatchSettingsRequestData(maxNumberOfLoginAttempts=10),
+            SettingsResponseData(maxNumberOfLoginAttempts=10),
             id="single-field",
         ),
         pytest.param(
-            {
-                "accessControlEnabled": True,
-                "idleLogout": "PT30M",
-                "passwordResetTime": "P90D",
-            },
-            {
-                "accessControlEnabled": True,
-                "idleLogout": timedelta(minutes=30),
-                "passwordResetTime": timedelta(days=90),
-            },
+            PatchSettingsRequestData(
+                accessControlEnabled=True,
+                idleLogout=timedelta(minutes=30),
+                passwordResetTime=timedelta(days=90),
+            ),
+            SettingsResponseData(
+                accessControlEnabled=True,
+                idleLogout=timedelta(minutes=30),
+                passwordResetTime=timedelta(days=90),
+            ),
             id="multiple-fields",
         ),
     ],
 )
 def test_update_changes_only_specified_fields(
     settings_store: SettingsStore,
-    updates: dict[str, object],
-    expected_changes: dict[str, object],
+    updates: PatchSettingsRequestData,
+    expected_changes: SettingsResponseData,
 ) -> None:
     """update should change only the specified fields and leave the rest unchanged."""
     _upsert_defaults(settings_store)
-    settings_store.upsert_many(updates)
-
+    settings_store.patch_settings(updates)
     fetched = settings_store.get_settings()
-    for key, value in expected_changes.items():
-        assert getattr(fetched, key) == value
-
-
-def test_upsert_without_row_raises(settings_store: SettingsStore) -> None:
-    """upsert should create a new row if no settings row exists."""
-    settings_store.upsert("maxNumberOfLoginAttempts", "10")
-    fetched = settings_store.get_settings()
-    assert fetched is not None
-    assert fetched == SettingsResponseData(maxNumberOfLoginAttempts=10)
+    assert fetched == expected_changes
 
 
 def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
