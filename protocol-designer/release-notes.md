@@ -17,9 +17,9 @@ This release improves partial tip pickup in Protocol Designer and includes other
 ### New Features
 
 - Choose from additional partial tip pickup options in Protocol Designer:
-  - Flex 96-channel pipette single column (column A1), single row (row A1 or H1), or single nozzle (choose from A1, A12, or H1) tip pickup.
-  - Flex 8-channel pipette partial column pickup (2–7 consecutive tips) for column B1.
-  - OT-2 8-channel pipette partial column pickup (2–7 consecutive tips) for columns B1–H1.
+  - Flex 96-channel pipette single column (column 1), single row (row A or H), or single nozzle (A1, A12, or H1) tip pickup.
+  - Flex 8-channel pipette partial column pickup (2–7 consecutive nozzles ending at H1).
+  - OT-2 8-channel pipette partial column pickup (2–7 consecutive nozzles ending at H1).
 - Return tips to their original position in the tip rack with a pipette configured for partial tip pickup. Tips are marked "used" and can be picked up again using manual tip tracking.
 
 ### Improvements
@@ -32,7 +32,6 @@ This release improves partial tip pickup in Protocol Designer and includes other
 - Place at least one labware without a lid, accessible to the attached pipette, on the deck to add a transfer step.
 - Place compatible Opentrons Tough Universal Lids on custom well plates or reservoirs on the deck.
 - Labware nicknames now apply to the topmost labware that is not a lid.
-
 
 ## Opentrons Protocol Designer Changes in 8.9.1
 
