@@ -73,6 +73,7 @@ from .update_types import (
     AbsorbanceReaderStateUpdate,
     FlexStackerStateUpdate,
     LoadModuleUpdate,
+    VacuumModuleStateUpdate,
 )
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -308,6 +309,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
+        if state_update.vacuum_module_state_update != update_types.NO_CHANGE:
+            self._handle_vacuum_module_commands(state_update.vacuum_module_state_update)
 
     def _add_module_substate(
         self,
@@ -655,9 +658,17 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             f"{module_id} is not a Flex Stacker."
         )
 
-        self._state.substate_by_module_id[module_id] = (
-            prev_substate.new_from_state_change(state_update)
+        prev_substate.new_from_state_change(state_update)
+
+    def _handle_vacuum_module_commands(
+        self, state_update: VacuumModuleStateUpdate
+    ) -> None:
+        module_id = state_update.module_id
+        vm_substate = self._state.substate_by_module_id[module_id]
+        assert isinstance(vm_substate, VacuumModuleSubState), (
+            f"{module_id} is not a vacuum module."
         )
+        vm_substate.new_from_state_change(state_update)
 
 
 class ModuleView:
