@@ -13,7 +13,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
-from auth_server.persistence.orm_models import Setting
+from auth_server.persistence.orm_models import AccessControlEnabled, Setting
 from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 
 
@@ -39,6 +39,25 @@ class SettingsStore:
                 return SettingsResponseData()
             parsed = {row.key: row.value for row in rows}
             return SettingsResponseData.model_validate(parsed, strict=False)
+
+    def update_access_control_table(self, enabled: bool) -> None:
+        """Update the access control enabled setting."""
+        with self._session() as session:
+            row = (
+                session.query(AccessControlEnabled)
+                .filter(AccessControlEnabled.id == 1)
+                .first()
+            )
+            if row is None:
+                session.add(AccessControlEnabled(id=1, enabled=enabled))
+            else:
+                row.enabled = enabled
+            session.commit()
+
+    def patch_access_control(self, enabled: bool) -> SettingsResponseData:
+        """Patch the access control enabled setting."""
+        self.update_access_control_table(enabled)
+        return self.get_settings()
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""

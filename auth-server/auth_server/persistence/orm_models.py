@@ -3,7 +3,7 @@
 import json
 from typing import Any
 
-from sqlalchemy import Column, Integer, String, TypeDecorator
+from sqlalchemy import Boolean, Column, Integer, String, TypeDecorator
 
 from auth_server.persistence.database import Base
 
@@ -50,3 +50,12 @@ class Setting(Base):
 
     key = Column(String, primary_key=True)
     value = Column(JsonValue, nullable=False)
+
+
+class AccessControlEnabled(Base):
+    """ORM model for the access control enabled setting."""
+
+    __tablename__ = "access_control_enabled"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    enabled = Column(Boolean, nullable=True, default=None)
