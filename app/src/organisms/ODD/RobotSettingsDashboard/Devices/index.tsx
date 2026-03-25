@@ -1,17 +1,14 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { RobotInfoLabel, StyledText } from '@opentrons/components'
 
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { fetchUsbDevices } from '/app/redux/system-info/actions'
 import { getUsbDeviceDisplayRows } from '/app/redux/system-info/selectors'
 
 import styles from './devices.module.css'
 
-import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from '../types'
 
 interface DevicesProps {
@@ -24,12 +21,7 @@ export function Devices({
   setCurrentOption,
 }: DevicesProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
   const deviceRows = useSelector(getUsbDeviceDisplayRows)
-
-  useEffect(() => {
-    void dispatch(fetchUsbDevices())
-  }, [dispatch])
 
   return (
     <div className={styles.devices_container}>

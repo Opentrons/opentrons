@@ -182,7 +182,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => {
             setCurrentOption('Devices')
           }}
-          iconName="camera" // ToDo replace the icon with device
+          iconName="device"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}

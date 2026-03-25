@@ -23,11 +23,11 @@ import {
 import { registerAppRestart } from './restart'
 import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
+import { registerSystemInfo } from './system-info'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
-import { registerDataFiles, watchForMassStorage } from './usb'
-import { registerUsbDeviceHandlers } from './usbDevices'
+import { registerDataFiles, watchForMassStorage } from './usbDevices/usb'
 
 import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
@@ -91,7 +91,6 @@ app.once('render-process-gone', (_, __, details) => {
 function startUp(): void {
   log.info('Starting App')
   log.debug('get connected USB devices, getting devices')
-  registerUsbDeviceHandlers()
   const storeNeedsReset = fse.existsSync(
     path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
@@ -148,6 +147,7 @@ function startUp(): void {
     registerUpdateBrightness(),
     registerNotify(dispatch, mainWindow),
     registerDataFiles(dispatch),
+    registerSystemInfo(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
