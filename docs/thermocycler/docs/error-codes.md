@@ -1,9 +1,9 @@
 ---
 title: "Thermocycler Module: Error Codes"
-description: "Lists error codes returned by a Thermocycler."
+description: "Lists errors returned by Thermocycler G-code commands."
 ---
 
-This table lists Thermocycler error codes. These codes are also used by other Opentrons modules. Descriptions are based on literal firmware output, edited for brevity and clarity.
+The following table defines errors returned by G-code commands sent to a Thermocycler. While documented here for the Thermocycler, these codes are also used by other Opentrons modules. Descriptions are adapted from firmware output and edited for brevity and clarity.
 
 | Error code | Description |
 |---|---|
