@@ -57,7 +57,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # Load Labware
     # TODO: DONT LET ME LOAD ANY ADAPTER/LABWARE ONTO DOCK
-    manifold_collar =  ctx.load_adapter('millipore_vacuum_manifold_collar_tall', vm_mod.manifold_dock)
+    manifold_collar = ctx.load_adapter('opentrons_96_deep_well_adapter', vm_mod.manifold_dock)
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     black_flat_plate = ctx.load_labware(
         "corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid"
