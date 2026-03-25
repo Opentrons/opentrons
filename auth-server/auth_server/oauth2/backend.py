@@ -280,19 +280,23 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         request: oauthlib.common.Request,
     ) -> dict[str, int | str | list[str]] | None:
         """Return information about an access or refresh token (if it exists)."""
-        found_token = self.__token_store.find_active_access_token(
+        # Note: It's important that we return non-None only when the token is both
+        # (1) currently active, and (2) an access token, as opposed to a refresh token.
+        # oauthlib sets `"active": True` on any non-None response, and our resource
+        # servers interpret that as meaning "this is a currently valid access token".
+        found_access_token = self.__token_store.find_active_access_token(
             token, now=_now()
-        ) or self.__token_store.find_active_refresh_token(token, now=_now())
-        if found_token:
+        )
+        if found_access_token is None:
+            return None
+        else:
             # Values defined by:
             # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
             return {
-                "active": True,  # Always true because find_active_*_token() won't return inactive tokens.
-                "scope": serialize_scopes(found_token.scopes),
-                "username": found_token.username,
+                "scope": serialize_scopes(found_access_token.scopes),
+                "username": found_access_token.username,
+                # "active": True is set implicitly by oauthlib.
             }
-        else:
-            return None
 
 
 @dataclass

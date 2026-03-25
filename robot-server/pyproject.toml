@@ -73,7 +73,7 @@ dev = [
     "python-box==6.1.0",
     "requests==2.27.1",
     "rpds-py==0.18.1",
-    "sqlalchemy2-stubs==0.0.2a21",
+    "sqlalchemy2-stubs==0.0.2a38",
     "tavern>=3.0.2",
     "types-mock~=5.1.0",
     "types-paho-mqtt==1.6.0.20240106",

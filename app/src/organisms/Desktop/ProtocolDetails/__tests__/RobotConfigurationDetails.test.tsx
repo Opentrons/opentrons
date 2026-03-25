@@ -65,7 +65,7 @@ const mockRequiredVacuumModuleDetails = {
   commandType: 'loadModule' as const,
   key: 'vacuum-module-stub-key',
   params: {
-    model: 'vacuumModuleMilliporeV1',
+    model: 'vacuumModuleV1',
     location: {
       slotName: 'A3',
     },

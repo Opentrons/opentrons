@@ -74,9 +74,9 @@ async def test_authorized_result(
         (MissingTokenResult(), 401, []),
         (NotAnActiveTokenResult(), 401, []),
         (
-            InsufficientScopeResult(provided_scopes={Scope.RUNS_WRITE}),
+            InsufficientScopeResult(provided_scopes={Scope.ROBOT_CONTROL_WRITE}),
             403,
-            [Scope.RUNS_WRITE.api_name],
+            [Scope.ROBOT_CONTROL_WRITE.api_name],
         ),
     ],
 )

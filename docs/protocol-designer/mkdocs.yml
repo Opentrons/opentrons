@@ -45,6 +45,7 @@ nav:
       - Magnet steps: steps/magnet.md
       - Pause steps: steps/pause.md
       - Camera steps: steps/camera.md
+      - Parallel steps: steps/parallel.md
   - Editing steps: edit-steps.md
   - Warnings and errors: warnings-errors.md
   - Export a protocol: export-protocol.md

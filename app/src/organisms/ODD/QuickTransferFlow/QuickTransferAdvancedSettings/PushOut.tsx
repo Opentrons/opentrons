@@ -176,13 +176,16 @@ export function PushOut(props: PushOutProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={volume}
               error={volumeError}
               label={t('push_out_volume')}
-              readOnly
               onBlur={e => {
                 e.target.focus()
+              }}
+              onChange={e => {
+                setVolume(Number(e.target.value))
               }}
             />
           </Flex>

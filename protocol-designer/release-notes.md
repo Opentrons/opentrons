@@ -32,6 +32,12 @@ This release improves partial tip pickup in Protocol Designer and includes other
 - Place at least one labware without a lid, accessible to the attached pipette, on the deck to add a transfer step.
 - Place compatible Opentrons Tough Universal Lids on custom well plates or reservoirs on the deck.
 
+## Opentrons Protocol Designer Changes in 8.9.1
+
+**Welcome to Protocol Designer 8.9.1!**
+
+This hotfix release addresses a bug to properly export, import, and update Protocol Designer protocols to the latest version.
+
 ## Opentrons Protocol Designer Changes in 8.9.0
 
 **Welcome to Protocol Designer 8.9.0!**

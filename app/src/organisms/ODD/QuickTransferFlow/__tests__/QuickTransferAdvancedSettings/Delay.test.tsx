@@ -102,12 +102,13 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: null,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -133,12 +134,13 @@ describe('Delay', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Delay duration (seconds)',
         error: 'Value must be between 0.1 to 9999999999',
-        readOnly: true,
         type: 'number',
         value: 0,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -179,12 +181,13 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 15,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -206,12 +209,13 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 20,
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

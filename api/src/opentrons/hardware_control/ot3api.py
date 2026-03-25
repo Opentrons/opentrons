@@ -141,7 +141,7 @@ from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
-from opentrons.util.pyro_synchronous_adapter import (
+from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     pyro_behavior,
 )
@@ -643,11 +643,9 @@ class OT3API(
     async def create_simulating_module(
         self,
         model: modules.types.ModuleModel,
+        sim_serial: Optional[str] = None,
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
-        assert self.is_simulator, (
-            "Cannot build simulating module from non-simulating hardware control API"
-        )
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(
@@ -655,6 +653,7 @@ class OT3API(
             ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
