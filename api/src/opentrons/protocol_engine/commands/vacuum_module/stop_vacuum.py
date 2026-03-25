@@ -57,7 +57,7 @@ class StopVacuumImpl(
 
 
 class StopVacuum(BaseCommand[StopVacuumParams, StopVacuumResult, ErrorOccurrence]):
-    """A command to close a Thermocycler's lid."""
+    """A command to stop the vacuum pump."""
 
     commandType: StopVacuumCommandType = "vacuum_module/stopVacuum"
     params: StopVacuumParams
@@ -67,7 +67,7 @@ class StopVacuum(BaseCommand[StopVacuumParams, StopVacuumResult, ErrorOccurrence
 
 
 class StopVacuumCreate(BaseCommandCreate[StopVacuumParams]):
-    """A request to close a Thermocycler's lid."""
+    """A request to stop the vacuum pump."""
 
     commandType: StopVacuumCommandType = "vacuum_module/stopVacuum"
     params: StopVacuumParams

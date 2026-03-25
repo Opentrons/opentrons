@@ -666,7 +666,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id = state_update.module_id
         vm_substate = self._state.substate_by_module_id[module_id]
         assert isinstance(vm_substate, VacuumModuleSubState), (
-            f"{module_id} is not a vacuum module."
+            f"{module_id} is not a Vacuum Module."
         )
         vm_substate.new_from_state_change(state_update)
 
