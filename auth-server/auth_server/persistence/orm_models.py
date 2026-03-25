@@ -4,8 +4,9 @@ import json
 from typing import Any
 
 from sqlalchemy import Column, Integer, String, TypeDecorator
+from sqlalchemy.orm import declarative_base
 
-from auth_server.persistence.database import Base
+Base = declarative_base()
 
 
 class User(Base):
