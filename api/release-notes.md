@@ -23,6 +23,10 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 - Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method.
 - Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
 
+### Bug Fixes
+
+- This release fixes the Flex boot issue on some network configurations.
+
 ---
 
 ## Opentrons Robot Software Changes in 8.8.1
