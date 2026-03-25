@@ -275,7 +275,7 @@ stages:
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null          
 
-  - name: GET after DELETE returns the newly reset settings
+  - name: DELETE returns the newly reset settings
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
