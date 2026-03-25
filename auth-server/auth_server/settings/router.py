@@ -28,6 +28,19 @@ async def get_settings(  # noqa: D103
     return SimpleBody.model_construct(data=settings)
 
 
+@router.get(
+    "/auth/settings/access-control",
+    summary="Get access control settings",
+    description="Get the current access control settings.\
+    This is seperated from the main settings endpoint because it is a special case that we do not want to change often.",
+)
+async def get_access_control_settings(  # noqa: D103
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+) -> SimpleBody[bool]:
+    accessControlEnabled = settings_store.get_access_control_settings()
+    return SimpleBody.model_construct(data=accessControlEnabled)
+
+
 @router.patch(
     "/auth/settings",
     summary="Change auth settings",

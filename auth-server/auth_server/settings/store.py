@@ -1,6 +1,6 @@
 """User store – pure data access layer for user persistence."""
 
-from typing import Annotated
+from typing import Annotated, cast
 
 import fastapi
 from sqlalchemy.engine import Engine as SQLEngine
@@ -39,6 +39,18 @@ class SettingsStore:
                 return SettingsResponseData()
             parsed = {row.key: row.value for row in rows}
             return SettingsResponseData.model_validate(parsed, strict=False)
+
+    def get_access_control_settings(self) -> bool:
+        """Get the current access control settings."""
+        with self._session() as session:
+            row = (
+                session.query(AccessControlEnabled)
+                .filter(AccessControlEnabled.id == 1)
+                .first()
+            )
+            if row is None:
+                return False
+            return cast(bool, row.enabled)
 
     def update_access_control_table(self, enabled: bool) -> None:
         """Update the access control enabled setting."""
