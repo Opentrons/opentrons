@@ -75,7 +75,7 @@ _HARDWARE_AXIS_TO_MOTOR_AXIS: Dict[HardwareAxis, MotorAxis] = {
 #
 # That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
 # is configured to not virtualize pipettes, so this number should match it.
-VIRTUAL_MAX_OT3_HEIGHT = 248.0
+VIRTUAL_MAX_OT3_HEIGHT = 268.0
 # This number was found by using the longest pipette's P1000V2 default configuration values.
 VIRTUAL_MAX_OT2_HEIGHT = 268.14
 
