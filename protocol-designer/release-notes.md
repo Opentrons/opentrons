@@ -31,6 +31,8 @@ This release improves partial tip pickup in Protocol Designer and includes other
 - Use partial tip pickup for a transfer or mix step in a tube rack without errors.
 - Place at least one labware without a lid, accessible to the attached pipette, on the deck to add a transfer step.
 - Place compatible Opentrons Tough Universal Lids on custom well plates or reservoirs on the deck.
+- Labware nicknames now apply to the topmost labware that is not a lid.
+
 
 ## Opentrons Protocol Designer Changes in 8.9.1
 
