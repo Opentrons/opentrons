@@ -125,7 +125,7 @@ stages:
           minLengthOfReasonForInteraction: null
 
 ---
-test_name: PATCH with null field leaves value unchanged
+test_name: PATCH with accessControlEnabled null field leaves value unchanged
 
 marks:
   - usefixtures:
@@ -203,18 +203,26 @@ stages:
       json:
         data:
           accessControlEnabled: true
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: P30D
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: PT1M
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
     response:
       status_code: 200
       json:
         data:
           accessControlEnabled: true
-          maxNumberOfLoginAttempts: 5
-          passwordResetTime: null
-          passwordComplexityMinimumLength: null
-          passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: P30D
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: PT1M
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
+
 
   - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
     request:

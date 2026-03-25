@@ -28,19 +28,19 @@ class _BaseSettings(_StrictBaseModel):
     )
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
-        description="Max number of login attempts before account deactivation.",
+        description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
     )
     passwordResetTime: timedelta | None = pydantic.Field(
         default=None,
-        description="Duration until password must be changed.",
+        description="Duration until password must be changed. Set to null to remove the limit.",
     )
     passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
-        description="Minimum length of password.",
+        description="Minimum length of password. Set to null to remove the limit.",
     )
     passwordComplexitySpecialCharacters: bool | None = pydantic.Field(
         default=None,
-        description="Require special characters in password.",
+        description="Require special characters in password. Set to null to remove the requirement.",
     )
     idleLogout: timedelta = pydantic.Field(
         default=timedelta(minutes=3),
@@ -52,7 +52,7 @@ class _BaseSettings(_StrictBaseModel):
     )
     minLengthOfReasonForInteraction: int | None = pydantic.Field(
         default=None,
-        description="Minimum length of reason for interaction.",
+        description="Minimum length of reason for interaction. Set to null to remove the requirement.",
     )
 
 
@@ -70,6 +70,7 @@ def _make_all_fields_optional(
     for name, info in source.model_fields.items():
         ann: Any = info.annotation
         args = get_args(ann) or ()
+        # pydantic will treat timedelta as a lax type, and we need to make sure it is strict=False
         needs_lax = timedelta in args or ann is timedelta  # check BEFORE modifying ann
         if type(None) not in args:
             ann = ann | None
@@ -90,7 +91,7 @@ _PatchSettingsBase = pydantic.create_model(
 class PatchSettingsRequestData(_PatchSettingsBase):  # type: ignore[valid-type,misc]
     """A request to change the settings.
 
-    All fields default to ``None``, meaning "leave unchanged".
+    All fields default to ``null``, meaning "remove the requirement".
     Only fields explicitly provided in the request body will be updated.
     """
 

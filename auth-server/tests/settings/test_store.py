@@ -27,7 +27,6 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
         yield store
 
 
-
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
     _upsert_defaults(settings_store)
