@@ -48,6 +48,7 @@ export function SelectionLegend({
                 size={size}
                 parentType={LABWARE}
                 wellMap={labwareWellMap}
+                wellName={label}
               />
             </div>
           )}

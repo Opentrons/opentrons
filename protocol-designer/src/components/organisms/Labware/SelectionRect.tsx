@@ -145,7 +145,6 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       document.removeEventListener('mouseup', handleMouseUp)
     }
   }, [handleDrag, handleMouseUp])
-
   return svg ? (
     <g
       onMouseDown={handleMouseDown}

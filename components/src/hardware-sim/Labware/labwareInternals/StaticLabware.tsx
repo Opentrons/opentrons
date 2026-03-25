@@ -82,6 +82,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     selectedTipsByIndex,
     borderStroke,
   } = props
+
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
@@ -157,6 +158,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                           wellMap={definition.wells}
                           type={statusByWellName[wellName] as WellType}
                           parentType={LABWARE}
+                          wellName={wellName}
                         />
                       )}
                     </svg>

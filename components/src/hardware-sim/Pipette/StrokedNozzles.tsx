@@ -56,6 +56,7 @@ export function StrokedNozzlesComponent(
               wellMap={wells}
               showStroke
               parentType={PIPETTE}
+              wellName={key}
             />
           </svg>
         )
