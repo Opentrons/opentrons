@@ -1,5 +1,5 @@
 import { COLORS } from '@opentrons/components'
-import { AIR_GAP_LIQUID_STATE_CONST } from '@opentrons/step-generation'
+import { AIR } from '@opentrons/step-generation'
 
 import type { Liquid } from '@opentrons/shared-data'
 import type { LocationLiquidState } from '@opentrons/step-generation'
@@ -15,8 +15,7 @@ export const getTipSvgInfo = (
   liquids: Liquid[]
 ): TipSvgInfo => {
   const ingredIds = Object.keys(pipetteLocationLiquidState)
-  const airGapVolume =
-    pipetteLocationLiquidState[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
+  const airGapVolume = pipetteLocationLiquidState[AIR]?.volume ?? 0
   const colorsInTip = liquids.reduce<string[]>(
     (acc, { id, displayColor }) =>
       ingredIds.includes(id) && displayColor ? [...acc, displayColor] : acc,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
@@ -37,17 +37,16 @@ export function FullKeyboard({
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)
-  const [keyboardLanguage, setKeyboardLanguage] = useState<KeyboardLanguage>(
+  const initialKeyboardLanguage: KeyboardLanguage =
     appLanguage === 'zh-CN' ? 'zh-CN' : 'en-US'
+  const [keyboardLanguage, setKeyboardLanguage] = useState<KeyboardLanguage>(
+    initialKeyboardLanguage
   )
+
   const [spacePreviewLabel, setSpacePreviewLabel] = useState<string | null>(
     null
   )
   const languageTimerRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    setKeyboardLanguage(appLanguage === 'zh-CN' ? 'zh-CN' : 'en-US')
-  }, [appLanguage])
 
   useEffect(() => {
     return () => {
@@ -76,7 +75,7 @@ export function FullKeyboard({
     }
   }
 
-  const handleLanguageToggle = (): void => {
+  const handleLanguageToggle = useCallback((): void => {
     if (languageTimerRef.current != null) {
       window.clearTimeout(languageTimerRef.current)
     }
@@ -95,7 +94,24 @@ export function FullKeyboard({
 
       return nextLanguage
     })
-  }
+  }, [])
+
+  // Language switch by Ctrl + Shift + Space
+  // not using Alt + Shift or Meta + Space because they should be handled by the OS
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      const isLanguageToggle = e.ctrlKey && e.shiftKey && e.code === 'Space'
+      if (!isLanguageToggle) return
+
+      e.preventDefault()
+      handleLanguageToggle()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleLanguageToggle])
 
   const onKeyPress = (button: string): void => {
     // layout change

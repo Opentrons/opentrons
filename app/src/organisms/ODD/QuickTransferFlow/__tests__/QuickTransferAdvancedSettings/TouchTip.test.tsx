@@ -116,7 +116,6 @@ describe('TouchTip', () => {
       expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
         onBlur: expect.any(Function),
@@ -154,7 +153,6 @@ describe('TouchTip', () => {
       expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -25 to 0',
-        readOnly: true,
         type: 'text',
         value: '-98',
         onBlur: expect.any(Function),
@@ -184,7 +182,6 @@ describe('TouchTip', () => {
       expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: 'Value must be between -100 to 0',
-        readOnly: true,
         type: 'text',
         value: '1',
         onBlur: expect.any(Function),
@@ -230,7 +227,6 @@ describe('TouchTip', () => {
       expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '-25',
         onBlur: expect.any(Function),
@@ -258,7 +254,6 @@ describe('TouchTip', () => {
       expect.objectContaining({
         label: 'Touch tip position from top of well (mm)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '-8',
         onBlur: expect.any(Function),

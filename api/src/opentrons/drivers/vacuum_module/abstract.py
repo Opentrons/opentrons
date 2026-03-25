@@ -58,7 +58,8 @@ class AbstractVacuumModuleDriver(Protocol):
         self,
         enable_vacuum: bool,
         guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
@@ -94,6 +95,7 @@ class AbstractVacuumModuleDriver(Protocol):
         overshoot: Optional[float] = None,
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
         reset: bool = False,
     ) -> None:
         """Sets the PID tuning parameters for the pressure control."""
