@@ -38,9 +38,11 @@ export function useMemoizedUpdatedDeckConfig(
       replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
         emptyDeckConfiguration
       )
+    const modulesValues = Object.values(modules)
+    const fixturesValues = Object.values(fixtures)
     const simpleDeckConfig: DeckConfiguration = emptyDeckConfiguration.filter(
       ({ cutoutId }) => {
-        const hasModule = Object.values(modules).some(
+        const hasModule = modulesValues.some(
           module =>
             getCutoutIdFromAddressableArea(module.slot as string, deckDef) ===
             cutoutId
@@ -48,17 +50,17 @@ export function useMemoizedUpdatedDeckConfig(
         //  since we are adding cutoutA1 in moduleConfig if
         //  there is a TC
         const hasTCAndCutoutA1 =
-          Object.values(modules).some(
+          modulesValues.some(
             module => module.type === THERMOCYCLER_MODULE_TYPE
           ) && cutoutId === 'cutoutA1'
-        const hasFixture = Object.values(fixtures).some(
+        const hasFixture = fixturesValues.some(
           fixture => fixture.cutoutId === cutoutId
         )
         return !hasModule && !hasFixture && !hasTCAndCutoutA1
       }
     )
 
-    const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
+    const moduleConfig: CutoutConfigMap[] = modulesValues.flatMap(
       (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
         const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
         const cutoutId = getCutoutIdFromAddressableArea(module.slot, deckDef)!
@@ -81,14 +83,11 @@ export function useMemoizedUpdatedDeckConfig(
         )
       }
     )
-    const additionalEquipmentConfig: DeckConfiguration = Object.values(
-      fixtures
-    ).map(
-      (ae): CutoutConfig => ({
-        cutoutId: ae.cutoutId as CutoutId,
-        cutoutFixtureId: ae.cutoutFixtureId,
-      })
-    )
+    const additionalEquipmentConfig: DeckConfiguration =
+      fixturesValues.map<CutoutConfig>(fixtureItem => ({
+        cutoutId: fixtureItem.cutoutId as CutoutId,
+        cutoutFixtureId: fixtureItem.cutoutFixtureId,
+      }))
 
     // Merge modules and fixtures into combo fixtures where applicable
     const {
