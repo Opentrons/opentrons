@@ -62,6 +62,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('name')}
             </StyledText>
             <InputField
+              aria-label={t('name')}
               {...register('fields.name')}
               type="text"
               value={watch('fields.name')}
@@ -83,6 +84,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('author_org')}
             </StyledText>
             <InputField
+              aria-label={t('author_org')}
               {...register('fields.organizationOrAuthor')}
               type="text"
               value={watch('fields.organizationOrAuthor')}
