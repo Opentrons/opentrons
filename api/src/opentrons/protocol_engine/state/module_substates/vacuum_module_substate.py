@@ -1,4 +1,4 @@
-"""Vacuum Module sub-state."""
+"""Vacuum Module substate."""
 
 from dataclasses import dataclass
 from typing import NewType
