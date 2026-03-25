@@ -85,7 +85,6 @@ def run(ctx: ProtocolContext) -> None:
         ctx.comment(f"Cycle #{cycle}")
         ctx.home()
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-        ctx.move_labware(manifold_collar, trash, use_gripper=True)
 
         # Aspirate 500ul with 1000ul tips from reservoir2 onto filter plate
         pip.pick_up_tip(tiprack_1000)
