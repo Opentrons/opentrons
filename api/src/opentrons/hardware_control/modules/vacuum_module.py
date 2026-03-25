@@ -203,6 +203,7 @@ class VacuumModule(mod_abc.AbstractModule):
         # TODO: FIX THIS
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
+            "pumpEngaged": self._reader.pump_state.pump_running,
         }
         return {"status": self.status.value, "data": data}
 

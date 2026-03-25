@@ -39,6 +39,7 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     TempDeck,
     Thermocycler,
+    VacuumModule,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
@@ -48,6 +49,7 @@ from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    VacuumModuleId,
 )
 from opentrons.types import MountType
 
@@ -757,6 +759,12 @@ class EquipmentHandler:
         self,
         module_id: FlexStackerId,
     ) -> Optional[FlexStacker]: ...
+
+    @overload
+    def get_module_hardware_api(
+        self,
+        module_id: VacuumModuleId,
+    ) -> Optional[VacuumModule]: ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:
         """Get the hardware API for a given module."""
