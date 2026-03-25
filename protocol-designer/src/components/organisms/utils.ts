@@ -28,16 +28,10 @@ import type * as wellContentsSelectors from '/protocol-designer/top-selectors/we
 
 export const getAllLabwareWithoutLids = (
   deckSetup: AllTemporalPropertiesForTimelineFrame,
-  labwareIds?: string[]
+  labwareIds: string[]
 ): string[] => {
   const labwareOnDeck = deckSetup.labware
-  if (labwareIds) {
-    return labwareIds.filter(
-      id => !labwareOnDeck[id].def.allowedRoles?.includes('lid')
-    )
-  }
-  const allLabwareIds = Object.keys(labwareOnDeck)
-  return allLabwareIds.filter(
+  return labwareIds.filter(
     id => !labwareOnDeck[id].def.allowedRoles?.includes('lid')
   )
 }
