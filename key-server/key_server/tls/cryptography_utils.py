@@ -184,18 +184,30 @@ def load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
     return cert
 
 
-def keys_from_dir(key_dir: Path) -> Iterator[tuple[Path, ec.EllipticCurvePrivateKey]]:
-    """Load all the keys that match our CA key format from the specified path.
+def keys_from_dir(
+    key_dir: Path, name_re: re.Pattern[str]
+) -> Iterator[tuple[Path, ec.EllipticCurvePrivateKey]]:
+    """Load all the keys that match a specified name format from the specified path.
 
-    If any key that is named like one of our CAs is not one of our CAs, delete it.
+    If any key that is named like the format can't be loaded, delete it.
     """
     for maybe_key in key_dir.iterdir():
-        if _CA_NAME_PATTERN.match(maybe_key.name):
+        if name_re.match(maybe_key.name):
             key = load_key(maybe_key)
             if key:
                 yield (maybe_key, key)
             else:
                 safe_del(maybe_key, "bad CA private key")
+
+
+def ca_keys_from_dir(
+    key_dir: Path,
+) -> Iterator[tuple[Path, ec.EllipticCurvePrivateKey]]:
+    """Load keys matching the CA key naming style from a directory.
+
+    If a candidate key can't be loaded, delete it.
+    """
+    return keys_from_dir(key_dir, _CA_NAME_PATTERN)
 
 
 def ca_certs_from_dir(ca_cert_dir: Path) -> Iterator[tuple[Path, x509.Certificate]]:

@@ -33,7 +33,7 @@ class TLSCAManager:
         try:
             pairs = list(
                 cryptography_utils.match_keys_and_certs(
-                    cryptography_utils.keys_from_dir(key_dir),
+                    cryptography_utils.ca_keys_from_dir(key_dir),
                     cryptography_utils.ca_certs_from_dir(ca_cert_dir),
                 )
             )
