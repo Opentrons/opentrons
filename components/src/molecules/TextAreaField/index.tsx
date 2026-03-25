@@ -12,8 +12,8 @@ import type {
   ComponentPropsWithoutRef,
   CSSProperties,
   MouseEventHandler,
+  ReactNode,
 } from 'react'
-import type { IconName } from '../../icons'
 
 // hook to detect tab focus vs mouse focus
 const useFocusVisible = (): boolean => {
@@ -54,12 +54,10 @@ interface TextAreaFieldProps extends NativeTextareaProps {
   caption?: string | null
   /** horizontal text alignment for title, textarea, and (sub)captions */
   textAlign?: 'left' | 'center'
-  /** optional IconName to display icon aligned to left of textarea field */
-  leftIcon?: IconName
-  /** if true, show delete icon aligned to right of textarea field */
-  showDeleteIcon?: boolean
-  /** callback passed to optional delete icon onClick */
-  onDelete?: () => void
+  /** optional element to display aligned to the left of the input field */
+  leftElement?: ReactNode
+  /** optional element to display aligned to the right of the input field */
+  rightElement?: ReactNode
   /** if true, style the background of textarea field to error state */
   hasBackgroundError?: boolean
   /** optional prop to support focus when tapping text area */
@@ -86,9 +84,8 @@ export const TextAreaField = forwardRef<
     tooltipText,
     caption,
     textAlign = 'left',
-    leftIcon,
-    showDeleteIcon = false,
-    onDelete,
+    leftElement,
+    rightElement,
     hasBackgroundError = false,
     onWrapperClick,
     borderRadius,
@@ -127,20 +124,20 @@ export const TextAreaField = forwardRef<
   )
 
   const titleClasses = clsx(
-    styles.title_text,
-    textAlign === 'center' ? styles.title_text_center : styles.title_text_left
+    styles.label_text,
+    textAlign === 'center' ? styles.label_text_center : styles.label_text_left
   )
 
   const textareaRowClasses = clsx(
     styles.textarea_row,
-    leftIcon !== undefined && styles.textarea_row_with_icon
+    leftElement != null && styles.textarea_row_with_icon
   )
 
   return (
     <div className={wrapperClasses}>
       <div className={styles.column_container}>
         {label != null && (
-          <div className={styles.title_row}>
+          <div className={styles.label_row}>
             <label htmlFor={textareaId}>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -169,15 +166,8 @@ export const TextAreaField = forwardRef<
           onClick={!rawDisabled ? onWrapperClick : undefined}
         >
           <div className={textareaRowClasses}>
-            {leftIcon !== undefined && (
-              <div className={styles.left_icon_wrapper}>
-                <Icon
-                  name={leftIcon}
-                  color={COLORS.grey60}
-                  size="1.25rem"
-                  data-testid="left-icon"
-                />
-              </div>
+            {leftElement !== undefined && (
+              <div className={styles.left_element_wrapper}>{leftElement}</div>
             )}
             <textarea
               id={textareaId}
@@ -197,9 +187,14 @@ export const TextAreaField = forwardRef<
               ref={ref}
               {...restTextareaProps}
             />
-            {showDeleteIcon && (
-              <div className={styles.delete_icon_wrapper} onClick={onDelete}>
-                <Icon name="close" size="1.75rem" />
+            {rightElement != null && (
+              <div
+                className={styles.right_element_wrapper}
+                onClick={e => {
+                  e.stopPropagation()
+                }}
+              >
+                {rightElement}
               </div>
             )}
           </div>

@@ -65,8 +65,8 @@ describe('TextAreaField', () => {
   })
 
   it('display left icon when leftIcon prop is provided', () => {
-    props.leftIcon = 'information'
+    props.leftElement = 'information'
     render(props)
-    screen.getByTestId('left-icon')
+    screen.getByText('information')
   })
 })
