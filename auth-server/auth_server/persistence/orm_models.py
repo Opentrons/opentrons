@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from sqlalchemy import Boolean, Column, Integer, String, TypeDecorator
+from sqlalchemy.orm import validates
 
 from auth_server.persistence.database import Base
 
@@ -59,3 +60,10 @@ class AccessControlEnabled(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     enabled = Column(Boolean, nullable=True, default=None)
+
+    @validates("enabled")  # type: ignore[untyped-decorator]
+    def validates_enabled(self, key: str, value: bool) -> bool:
+        """Validate that the enabled field is not modified."""
+        if self.enabled is not None:  # Field already exists
+            raise ValueError("Enabled cannot be modified.")
+        return value

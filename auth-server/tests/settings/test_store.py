@@ -27,7 +27,6 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
         yield store
 
 
-# test password complexity with none values
 def test_upsert_and_get_settings(settings_store: SettingsStore) -> None:
     """insert should persist the settings so get can find it."""
     _upsert_defaults(settings_store)
@@ -120,3 +119,12 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
     fetched = settings_store.get_settings()
     assert fetched.accessControlEnabled is False
     assert fetched.idleLogout == timedelta(minutes=30)
+
+
+def test_get_access_control_settings(settings_store: SettingsStore) -> None:
+    """get_access_control_settings should return the current access control settings."""
+    fetched = settings_store.get_access_control_settings()
+    assert fetched is False
+    settings_store.patch_access_control(True)
+    fetched = settings_store.get_access_control_settings()
+    assert fetched is True
