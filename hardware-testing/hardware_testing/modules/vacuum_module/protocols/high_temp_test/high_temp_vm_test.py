@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
+from opentrons.drivers import vacuum_module  # type: ignore[import]
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
@@ -23,7 +24,8 @@ DISPENSE_OFFSET_MM = 8
 OUTPUT_DIR = "/data/vm_test/"
 
 
-def add_parameters(parameters: ParameterContext):
+def add_parameters(parameters: ParameterContext) -> None:
+    """Protocol Parameters."""
     parameters.add_int(
         display_name="cycles",
         variable_name="cycles",
@@ -72,23 +74,24 @@ def add_parameters(parameters: ParameterContext):
     )
 
 
-async def water_pump_timer(w_pump, run_time):
+async def water_pump_timer(w_pump, run_time: int) -> None:  # noqa: ANN001
+    """Timer."""
     await w_pump.turn_motor_on()
     await asyncio.sleep(run_time)
     await w_pump.turn_motor_off()
 
 
 async def _run_single_pump_api_cycle(
-    pump,
-    water_pump_fixture,
+    pump,  # noqa: ANN001
+    water_pump_fixture,  # noqa: ANN001
     target_pressure: int,
     trough_fill_time: int,
     cycle_index: int,
     output_dir: Path,
     ctx: protocol_api.ProtocolContext,
-):
-    """
-    Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
+) -> None:
+    """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
+
     Relies on the driver's internal CSV logging (e.g. pump_test.csv) instead of
     creating a per-cycle CSV here.
     """
@@ -145,17 +148,17 @@ async def _run_single_pump_api_cycle(
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
+    """Main entry point."""
     z_offset = ctx.params.offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
     water_pump = ctx.params.run_pump  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
+    output_dir = Path(OUTPUT_DIR)
 
     if not ctx.is_simulating():
-        output_dir = Path(OUTPUT_DIR)
         output_dir.mkdir(parents=True, exist_ok=True)
-        from opentrons.drivers import vacuum_module  # type: ignore[import]
 
         if water_pump:
             from hardware_testing.modules.common.utils import find_module_port
@@ -176,6 +179,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
+    pump: vacuum_module.VacuumModuleDriver
     pump_fixture = None
     if not ctx.is_simulating():
         try:
@@ -195,6 +199,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             ctx.comment("Pump connected.")
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
+            return
 
     pip.pick_up_tip()
 
