@@ -1,7 +1,8 @@
 """Request and response models for the `/settings` endpoints."""
 
 from datetime import timedelta
-from typing import Annotated, Any, ClassVar, Literal, get_args
+from textwrap import dedent
+from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
 
@@ -10,8 +11,8 @@ class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
 
 
-class _BaseSettings(_StrictBaseModel):
-    """Canonical setting definitions.
+class SettingsResponseData(_StrictBaseModel):
+    """A response with the current settings.
 
     Field defaults define the system defaults for all settings.
     These are used to seed the database and to reset settings.
@@ -56,39 +57,7 @@ class _BaseSettings(_StrictBaseModel):
     )
 
 
-class SettingsResponseData(_BaseSettings):
-    """A response with the current settings."""
-
-    pass
-
-
-def _make_all_fields_optional(
-    source: type[pydantic.BaseModel],
-) -> dict[str, Any]:
-    """Derive field definitions from `source` with every default set to None and type made Optional."""
-    fields: dict[str, Any] = {}
-    for name, info in source.model_fields.items():
-        ann: Any = info.annotation
-        args = get_args(ann) or ()
-        # pydantic will treat timedelta as a lax type, and we need to make sure it is strict=False
-        needs_lax = timedelta in args or ann is timedelta  # check BEFORE modifying ann
-        if type(None) not in args:
-            ann = ann | None
-        field_kwargs: dict[str, Any] = {"description": info.description}
-        if needs_lax:
-            field_kwargs["strict"] = False
-        fields[name] = (Annotated[ann, pydantic.Field(**field_kwargs)], None)
-    return fields
-
-
-_PatchSettingsBase = pydantic.create_model(
-    "_PatchSettingsBase",
-    __base__=_StrictBaseModel,
-    **_make_all_fields_optional(_BaseSettings),
-)
-
-
-class PatchSettingsRequestData(_PatchSettingsBase):  # type: ignore[valid-type,misc]
+class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.
 
     All fields default to ``null``, meaning "remove the requirement".
@@ -96,18 +65,94 @@ class PatchSettingsRequestData(_PatchSettingsBase):  # type: ignore[valid-type,m
     """
 
     accessControlEnabled: Annotated[
+        # Note: `Literal[True]` instead of `bool` to enforce one-way latching.
         Literal[True] | None,
         pydantic.Field(
-            description="Set to `true` to enable access control. "
-            "Once enabled, access control cannot be disabled without assistance from Opentrons."
+            description=dedent(
+                """
+                Set to `true` to enable access control. Omit or set to `null` to leave it unchanged.
+
+                **Warning:** Once enabled, access control cannot be disabled without assistance from Opentrons!
+                """
+            )
+        ),
+    ] = None
+    maxNumberOfLoginAttempts: Annotated[
+        int | None,
+        pydantic.Field(
+            description="Max number of login attempts before account deactivation."
+        ),
+    ] = None
+    passwordResetTime: timedelta | None = pydantic.Field(
+        default=None,
+        strict=False,
+        description="Duration until password must be changed.",
+    )
+    passwordComplexityMinimumLength: Annotated[
+        int | None,
+        pydantic.Field(description="Minimum length of password."),
+    ] = None
+    passwordComplexitySpecialCharacters: Annotated[
+        bool | None,
+        pydantic.Field(description="Require special characters in password."),
+    ] = None
+    idleLogout: timedelta = pydantic.Field(
+        default=timedelta(minutes=3),
+        strict=False,
+        description="Duration until account is logged out due to inactivity.",
+    )
+    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when updating robot settings."
+        ),
+    ] = None
+    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require admin credentials when sending protocol to robot."
+        ),
+    ] = None
+    requireAdminCredsForSignoffProtocol: Annotated[
+        bool | None,
+        pydantic.Field(description="Require admin credentials for signoff protocol."),
+    ] = None
+    requireSignoffForProtocolLog: Annotated[
+        bool | None,
+        pydantic.Field(description="Require signoff for protocol log."),
+    ] = None
+    requireReasonForInteraction: Annotated[
+        bool | None,
+        pydantic.Field(description="Require reason for interaction."),
+    ] = None
+    minLengthOfReasonForInteraction: Annotated[
+        int | None,
+        pydantic.Field(description="Minimum length of reason for interaction."),
+    ] = None
+    requireLogsToBeSavedInApp: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Require logs to be saved in app. Path should be configured in the app."
+        ),
+    ] = None
+    deleteOverMaxOnDiskProtocols: Annotated[
+        bool | None,
+        pydantic.Field(
+            description="Automatically delete protocol run logs on the robot when there are 20 protocol run records."
         ),
     ] = None
 
     _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
         {
-            name
-            for name, info in _BaseSettings.model_fields.items()
-            if type(None) not in (get_args(info.annotation) or ())
+            "accessControlEnabled",
+            "idleLogout",
+            "requireAdminCredsWhenUpdatingRobotSoftware",
+            "requireAdminCredsWhenSendingProtocolToRobot",
+            "requireAdminCredsForSignoffProtocol",
+            "requireSignoffForProtocolLog",
+            "requireReasonForInteraction",
+            "requireLogsToBeSavedInApp",
+            "deleteOverMaxOnDiskProtocols",
         }
     )
 
