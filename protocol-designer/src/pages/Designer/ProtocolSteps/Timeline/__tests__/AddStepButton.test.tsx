@@ -10,8 +10,8 @@ import {
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  VACUUM_MODULE_MILLIPORE_V1,
   VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 import { makeContext, makeInitialRobotState } from '@opentrons/step-generation'
 
@@ -269,7 +269,7 @@ describe('AddStepButton', () => {
       modules: {
         ...MOCK_INITIAL_DECK_SETUP.modules,
         vacuum: {
-          model: VACUUM_MODULE_MILLIPORE_V1,
+          model: VACUUM_MODULE_V1,
           type: VACUUM_MODULE_TYPE,
           id: 'vacuumId',
           moduleState: {} as any,

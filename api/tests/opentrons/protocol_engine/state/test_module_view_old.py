@@ -48,6 +48,10 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
 )
+from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
+    MAX_COOLING_RATE,
+    MAX_HEATING_RATE,
+)
 from opentrons.protocol_engine.state.modules import (
     HardwareModule,
     ModuleState,
@@ -66,9 +70,7 @@ from opentrons.protocol_engine.types import (
     ModuleOffsetData,
     PotentialCutoutFixture,
 )
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName, MountType, Point
 
 
@@ -1718,6 +1720,57 @@ def test_thermocycler_validate_ramp_rate(
     # must be positive.
     with pytest.raises(errors.InvalidRampRateError):
         subject.validate_ramp_rate(ramp_rate=-0.1, target_temp=0)
+
+
+@pytest.fixture
+def module_view_with_thermocycler_target_set(
+    thermocycler_v1_def: ModuleDefinition,
+) -> ModuleView:
+    """Get a module state view with a loaded thermocycler that has a target temp set."""
+    return make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=thermocycler_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId("module-id"),
+                target_block_temperature=75.0,
+                target_lid_temperature=None,
+                is_lid_open=False,
+            )
+        },
+    )
+
+
+def test_thermocycler_validate_ramp_rate_same_target(
+    module_view_with_thermocycler_target_set: ModuleView,
+) -> None:
+    """It should allow up to the max of MAX_HEATING_RATE and MAX_COOLING_RATE when new target equals current target."""
+    subject = module_view_with_thermocycler_target_set.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    result = subject.validate_ramp_rate(ramp_rate=3.0, target_temp=75.0)
+    assert result == 3.0
+
+    result = subject.validate_ramp_rate(ramp_rate=MAX_HEATING_RATE, target_temp=75.0)
+    assert result == MAX_HEATING_RATE
+
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=MAX_HEATING_RATE + 0.1, target_temp=75.0)
+
+    result = subject.validate_ramp_rate(ramp_rate=4.0, target_temp=80.0)
+    assert result == 4.0
+
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=MAX_COOLING_RATE + 0.1, target_temp=50.0)
+
+    result = subject.validate_ramp_rate(ramp_rate=1.5, target_temp=50.0)
+    assert result == 1.5
 
 
 @pytest.mark.parametrize("input_temperature", [36.999, 110.001])

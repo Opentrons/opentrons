@@ -210,6 +210,7 @@ def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
 def _build_classdict(  # noqa: C901
     core_obj: Any, utility: DaemonUtility
 ) -> Iterator[tuple[str, Any]]:
+    async_methods: dict[str, dict[str, Any]] = {}
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_behavior = _get_specialty_behavior(attr, name)
@@ -244,6 +245,16 @@ def _build_classdict(  # noqa: C901
             elif isinstance(attr, FunctionType) and inspect.iscoroutinefunction(attr):
                 # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
                 exposed = pyro.expose(synchronous(attr))
+                # Track the known async functions so they may be provided as metadata to a client wrapper
+                async_metadata = {
+                    "__module__": attr.__module__,
+                    "__name__": attr.__name__,
+                    "__qualname__": attr.__qualname__,
+                    "__doc__": attr.__doc__,
+                    "__type_params__": attr.__type_params__,
+                }
+                async_methods[name] = async_metadata
+
                 bound_method = MethodType(exposed, core_obj)
                 yield (name, bound_method)
             elif isinstance(attr, FunctionType):
@@ -272,6 +283,11 @@ def _build_classdict(  # noqa: C901
                 )
                 exposed = pyro.expose(bound_property)  # type: ignore
                 yield (name, exposed)
+
+    # Attach the known async methods list to the PSO as a private member and expose a getter method
+    yield ("_pyro_async_methods", async_methods)
+    yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))  # type: ignore
+
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
         # If the `core_obj` contains a weakref then for tracking we yield the inner instance
@@ -291,6 +307,12 @@ def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None
         if hasattr(func.fget, "_pyro_specialty_behavior"):
             return func.fget._pyro_specialty_behavior  # type: ignore
     return None
+
+
+def get_pyro_async_methods(self: Any) -> dict[str, dict[str, Any]]:
+    """Helper function to access the dictionary of known async method metadata on a PyroSynchronousObject."""
+    result: dict[str, dict[str, Any]] = self._pyro_async_methods
+    return result
 
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###

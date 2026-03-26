@@ -91,6 +91,9 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderMeasureMode,
 )
+from opentrons.protocol_engine.state.module_substates.vacuum_module_substate import (
+    VacuumModuleSubState,
+)
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
@@ -844,6 +847,20 @@ class ModuleView:
             expected_name="Flex Stacker",
         )
 
+    def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
+        """Return a `VacuumModululeSubState` for the given Vacuum Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Vacuum Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=VacuumModuleSubState,
+            expected_name="Vacuum Module",
+        )
+
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
         location = self.get(module_id).location
@@ -1444,7 +1461,7 @@ class ModuleView:
         elif model == ModuleModel.VACUUM_MODULE_V1:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
-            return f"vacuumModuleMilliporeV1{deck_slot.value}"
+            return f"vacuumModuleV1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."
