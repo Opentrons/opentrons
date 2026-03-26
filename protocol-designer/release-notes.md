@@ -10,7 +10,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ## Opentrons Protocol Designer Changes in 8.10.0
 
-**Welcome to Protocol Designer 8.10.01!**
+**Welcome to Protocol Designer 8.10.0!**
 
 This release adds full support for Flex 20 µL pipette tips and all available partial tip pickup configurations in Protocol Designer, and includes other bug fixes and improvements.
 
