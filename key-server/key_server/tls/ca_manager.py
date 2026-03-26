@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Final
 
-from . import cryptography_utils
+from . import cryptography_utils, file_utils
 
 LOG = logging.getLogger(__name__)
 
@@ -33,8 +33,8 @@ class TLSCAManager:
         try:
             pairs = list(
                 cryptography_utils.match_keys_and_certs(
-                    cryptography_utils.ca_keys_from_dir(key_dir),
-                    cryptography_utils.ca_certs_from_dir(ca_cert_dir),
+                    file_utils.ca_keys_from_dir(key_dir),
+                    file_utils.ca_certs_from_dir(ca_cert_dir),
                 )
             )
         except OSError:
