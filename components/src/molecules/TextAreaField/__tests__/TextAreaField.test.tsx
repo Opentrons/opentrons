@@ -15,7 +15,7 @@ describe('TextAreaField', () => {
 
   beforeEach(() => {
     props = {
-      label: 'TextAreaField',
+      label: 'textAreaField',
       placeholder: 'Enter text...',
       value: '',
       onChange: vi.fn(),
@@ -25,8 +25,8 @@ describe('TextAreaField', () => {
 
   it('renders the TextAreaField component', () => {
     render(props)
-    screen.getByText('TextAreaField')
-    const textarea = screen.getByRole('textbox', { name: /textAreaField/i })
+    screen.getByText('textAreaField')
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
     expect(textarea).toBeInTheDocument()
   })
 
@@ -37,7 +37,7 @@ describe('TextAreaField', () => {
 
   it('updates value when user types', () => {
     render(props)
-    const textarea = screen.getByRole('textbox', { name: /textAreaField/i })
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
 
     fireEvent.change(textarea, { target: { value: 'Hello, world!' } })
 
@@ -47,7 +47,7 @@ describe('TextAreaField', () => {
   it('disables the textarea when disabled prop is true', () => {
     props.disabled = true
     render(props)
-    const textarea = screen.getByRole('textbox', { name: /textAreaField/i })
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
     expect(textarea).toBeDisabled()
   })
 
