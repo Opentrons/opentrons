@@ -687,7 +687,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
             )
-            scrape_tips = self.get_channels() <= 8
+            #scrape_tips = self.get_channels() <= 8
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
