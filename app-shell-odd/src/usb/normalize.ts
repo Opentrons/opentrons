@@ -1,17 +1,7 @@
-import { getUsbDevices } from '../usbDevices/usbDevices'
+import { getUsbDevices } from '../usb/devices'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
-
-interface AppShellUsbDevice {
-  id: string
-  product: string
-  manufacturer?: string | null
-  vendorId?: string | null
-  productId?: string | null
-  serialNumber?: string | null
-  location: string
-  sysName: string
-}
+import type { AppShellUsbDevice } from './types'
 
 const parseHexId = (value: string | null | undefined): number | null => {
   if (value == null || value === '') return null

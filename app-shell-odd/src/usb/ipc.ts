@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 
-import { getUsbDevices } from './usbDevices'
+import { getUsbDevices } from './devices'
 
 export function registerUsbDeviceHandlers(): void {
   ipcMain.handle('usb:getDevices', async () => {

@@ -2,7 +2,7 @@ import { app } from 'electron'
 
 import { initialized, usbDeviceAdded, usbDeviceRemoved } from '../actions'
 import { UI_INITIALIZED } from '../constants'
-import { getUsbDevicesNormalized } from './usb-devices'
+import { getUsbDevicesNormalized } from './normalize'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action } from '@opentrons/app/src/redux/types'

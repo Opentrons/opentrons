@@ -3,17 +3,7 @@ import { join } from 'path'
 
 import { createLogger } from '../log'
 
-// ToDo (kk:2026/03/19) might need to remove items
-interface UsbDevice {
-  id: string
-  product: string
-  manufacturer?: string | null
-  vendorId?: string | null
-  productId?: string | null
-  serialNumber: string | null
-  location: string
-  sysName: string
-}
+import type { AppShellUsbDevice } from './types'
 
 const USB_SYS_PATH = '/sys/bus/usb/devices'
 const log = createLogger(new URL('', import.meta.url).pathname)
@@ -99,7 +89,9 @@ const getLocation = ({
   return formatExternalLocation(sysName)
 }
 
-const readUsbDevice = async (sysName: string): Promise<UsbDevice | null> => {
+const readUsbDevice = async (
+  sysName: string
+): Promise<AppShellUsbDevice | null> => {
   const dirPath = join(USB_SYS_PATH, sysName)
 
   const [product, manufacturer, vendorId, productId, serialNumber] =
@@ -134,14 +126,17 @@ const readUsbDevice = async (sysName: string): Promise<UsbDevice | null> => {
   }
 }
 
-const compareUsbSysfsNames = (a: UsbDevice, b: UsbDevice): number => {
+const compareUsbSysfsNames = (
+  a: AppShellUsbDevice,
+  b: AppShellUsbDevice
+): number => {
   return a.sysName.localeCompare(b.sysName, undefined, {
     numeric: true,
     sensitivity: 'base',
   })
 }
 
-export const getUsbDevices = async (): Promise<UsbDevice[]> => {
+export const getUsbDevices = async (): Promise<AppShellUsbDevice[]> => {
   log.info(`Reading USB devices from ${USB_SYS_PATH}`)
 
   try {
@@ -160,7 +155,7 @@ export const getUsbDevices = async (): Promise<UsbDevice[]> => {
     )
 
     const result = devices
-      .filter((device): device is UsbDevice => device != null)
+      .filter((device): device is AppShellUsbDevice => device != null)
       .sort(compareUsbSysfsNames)
 
     log.info(`Found ${result.length} USB devices`)

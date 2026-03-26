@@ -23,11 +23,11 @@ import {
 import { registerAppRestart } from './restart'
 import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
-import { registerSystemInfo } from './system-info'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
-import { registerDataFiles, watchForMassStorage } from './usbDevices/usb'
+import { registerSystemInfo } from './usb'
+import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
