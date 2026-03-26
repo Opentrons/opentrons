@@ -8,16 +8,16 @@ title: "Vacuum Module: Product Specifications"
 
 <font color="red">PARTS IMAGES PLACEHOLDERS</font>
 
-<div class="parts-list align-top" markdown>
+<div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum pump unit](images/part-placeholder.png "Vacuum pump")
-<figcaption>(1) External vacuum pump</figcaption>
+![Vacuum pump unit](images/vacuum-pump.png "Vacuum pump")
+<figcaption>(1) Vacuum pump</figcaption>
 </figure>
 
 <figure markdown>
-![Waste collection carboy](images/part-placeholder.png "Waste collection carboy")
-<figcaption>(1) Polycarbonate glass waste collection carboy</figcaption>
+![Waste collection jar](images/waste-jar-line.png "Waste collection jar")
+<figcaption>(1) GL60 waste collection jar</figcaption>
 </figure>
 
 <figure markdown>
@@ -26,7 +26,7 @@ title: "Vacuum Module: Product Specifications"
 </figure>
 
 <figure markdown>
-![Waste collection carboy](images/part-placeholder.png "Deck caddy")
+![Waste collection carboy](images/deck-caddy.png "Deck caddy")
 <figcaption>(1) Deck caddy</figcaption>
 </figure>
 
