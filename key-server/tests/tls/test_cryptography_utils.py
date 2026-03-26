@@ -3,6 +3,7 @@
 import random
 import re
 from datetime import datetime, timedelta, timezone
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Callable
 
@@ -161,3 +162,59 @@ def test_create_ca_handles_fs_issues(
     )
     assert pair.key.public_key() == pair.cert.public_key()
     assert re.search(log_pattern, caplog.text)
+
+
+def test_tls_certs_verify_dns(tmp_path: Path) -> None:
+    """Its created TLS certs should verify."""
+    ca = cryptography_utils.create_ca(
+        tmp_path, tmp_path, datetime.now(), timedelta(days=1)
+    )
+    precert = cryptography_utils.build_tls_precert(
+        tmp_path,
+        datetime.now(),
+        timedelta(hours=1),
+        robot_hostname="myrobot",
+        robot_ips=["127.0.0.1"],
+    )
+    sealed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
+    tls_ee = cryptography_utils.install_tls_cert(tmp_path, sealed)
+    store = x509.verification.Store([ca.cert])
+    verification_time = datetime.now()
+    dns_verifier = (
+        x509.verification.PolicyBuilder()
+        .store(store)
+        .time(verification_time)
+        .build_server_verifier(x509.DNSName("myrobot.local"))
+    )
+    dns_chain = dns_verifier.verify(tls_ee.cert, [])
+    assert dns_chain[-1].fingerprint(hashes.SHA256()) == ca.cert.fingerprint(
+        hashes.SHA256()
+    )
+
+
+def test_tls_certs_verify_ip(tmp_path: Path) -> None:
+    """Its created TLS certs should verify."""
+    ca = cryptography_utils.create_ca(
+        tmp_path, tmp_path, datetime.now(), timedelta(days=1)
+    )
+    precert = cryptography_utils.build_tls_precert(
+        tmp_path,
+        datetime.now(),
+        timedelta(hours=1),
+        robot_hostname="myrobot.local",
+        robot_ips=["127.0.0.1"],
+    )
+    sealed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
+    tls_ee = cryptography_utils.install_tls_cert(tmp_path, sealed)
+    store = x509.verification.Store([ca.cert])
+    verification_time = datetime.now()
+    ip_verifier = (
+        x509.verification.PolicyBuilder()
+        .store(store)
+        .time(verification_time)
+        .build_server_verifier(x509.IPAddress(IPv4Address("127.0.0.1")))
+    )
+    ip_chain = ip_verifier.verify(tls_ee.cert, [])
+    assert ip_chain[-1].fingerprint(hashes.SHA256()) == ca.cert.fingerprint(
+        hashes.SHA256()
+    )
