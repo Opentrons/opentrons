@@ -12,7 +12,7 @@
   "dimensions": {
     "xDimension": 128,
     "yDimension": 86,
-    "zDimension": 155
+    "zDimension": 150
   },
   "parameters": {
     "format": "irregular",
@@ -29,7 +29,7 @@
       "diameter": 4,
       "x": 60.8,
       "y": 41.5,
-      "z": 154.5
+      "z": 149.5
     }
   },
   "brand": {
