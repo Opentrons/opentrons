@@ -1,4 +1,3 @@
-from datetime import timedelta
 from pathlib import Path
 from typing import Generator
 
@@ -46,13 +45,13 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
         pytest.param(
             PatchSettingsRequestData(
                 accessControlEnabled=True,
-                idleLogout=timedelta(minutes=30),
-                passwordResetTime=timedelta(days=90),
+                idleLogout=1800.0,
+                passwordResetTime=7776000.0,
             ),
             SettingsResponseData(
                 accessControlEnabled=True,
-                idleLogout=timedelta(minutes=30),
-                passwordResetTime=timedelta(days=90),
+                idleLogout=1800.0,
+                passwordResetTime=7776000.0,
             ),
             id="multiple-fields",
         ),
@@ -76,14 +75,14 @@ def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
     settings_store.patch_settings(
         PatchSettingsRequestData(
             accessControlEnabled=True,
-            idleLogout=timedelta(minutes=30),
-            passwordResetTime=timedelta(days=90),
+            idleLogout=1800.0,
+            passwordResetTime=7776000.0,
         )
     )
     fetched = settings_store.get_settings()
     assert fetched.accessControlEnabled is True
-    assert fetched.idleLogout == timedelta(minutes=30)
-    assert fetched.passwordResetTime == timedelta(days=90)
+    assert fetched.idleLogout == 1800.0
+    assert fetched.passwordResetTime == 7776000.0
 
 
 def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> None:
@@ -91,9 +90,9 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
     settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.patch_settings(
         PatchSettingsRequestData(
-            idleLogout=timedelta(minutes=30),
+            idleLogout=1800.0,
         )
     )
     fetched = settings_store.get_settings()
     assert fetched.accessControlEnabled is False
-    assert fetched.idleLogout == timedelta(minutes=30)
+    assert fetched.idleLogout == 1800.0

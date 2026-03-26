@@ -1,6 +1,5 @@
 """Request and response models for the `/settings` endpoints."""
 
-from datetime import timedelta
 from textwrap import dedent
 from typing import Annotated, Any, ClassVar, Literal
 
@@ -31,9 +30,9 @@ class SettingsResponseData(_StrictBaseModel):
         default=5,
         description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
     )
-    passwordResetTime: timedelta | None = pydantic.Field(
+    passwordResetTime: float | None = pydantic.Field(
         default=None,
-        description="Duration until password must be changed. Set to null to remove the limit.",
+        description="Duration in seconds until password must be changed. Set to null to remove the limit.",
     )
     passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
@@ -43,9 +42,9 @@ class SettingsResponseData(_StrictBaseModel):
         default=None,
         description="Require special characters in password. Set to null to remove the requirement.",
     )
-    idleLogout: timedelta = pydantic.Field(
-        default=timedelta(minutes=3),
-        description="Duration until account is logged out due to inactivity.",
+    idleLogout: float = pydantic.Field(
+        default=180.0,
+        description="Duration in seconds until account is logged out due to inactivity.",
     )
     requireReasonForInteraction: bool = pydantic.Field(
         default=True,
@@ -83,11 +82,10 @@ class PatchSettingsRequestData(_StrictBaseModel):
             description="Max number of login attempts before account deactivation."
         ),
     ] = None
-    passwordResetTime: timedelta | None = pydantic.Field(
-        default=None,
-        strict=False,
-        description="Duration until password must be changed.",
-    )
+    passwordResetTime: Annotated[
+        float | None,
+        pydantic.Field(description="Duration in seconds until password must be changed."),
+    ] = None
     passwordComplexityMinimumLength: Annotated[
         int | None,
         pydantic.Field(description="Minimum length of password."),
@@ -96,11 +94,10 @@ class PatchSettingsRequestData(_StrictBaseModel):
         bool | None,
         pydantic.Field(description="Require special characters in password."),
     ] = None
-    idleLogout: timedelta = pydantic.Field(
-        default=timedelta(minutes=3),
-        strict=False,
-        description="Duration until account is logged out due to inactivity.",
-    )
+    idleLogout: Annotated[
+        float | None,
+        pydantic.Field(description="Duration in seconds until account is logged out due to inactivity."),
+    ] = None
     requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
         bool | None,
         pydantic.Field(

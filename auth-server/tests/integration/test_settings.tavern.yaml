@@ -16,7 +16,7 @@ stages:
           accessControlEnabled: false
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
           passwordComplexitySpecialCharacters: null
@@ -46,7 +46,7 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
@@ -59,9 +59,9 @@ stages:
       json:
         data:
           accessControlEnabled: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           requireReasonForInteraction: false
@@ -71,10 +71,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
@@ -88,10 +88,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
@@ -117,10 +117,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
@@ -152,7 +152,7 @@ stages:
           passwordComplexityMinimumLength: null
 
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
@@ -181,7 +181,7 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
@@ -204,10 +204,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: 10
     response:
@@ -216,10 +216,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: 10
 
@@ -240,7 +240,7 @@ stages:
           minLengthOfReasonForInteraction: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
 
 
@@ -271,7 +271,7 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null          
 
@@ -290,6 +290,6 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
