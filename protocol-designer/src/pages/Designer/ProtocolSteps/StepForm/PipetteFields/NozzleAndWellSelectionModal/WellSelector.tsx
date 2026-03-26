@@ -137,7 +137,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stepType]
   )
-  const flatSelectedWells = selectedWells.flat()
 
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
@@ -187,7 +186,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       } else if (!accessible) {
         acc[wellName] = INACCESSIBLE
       } else if (
-        flatSelectedWells.includes(wellName) ||
+        selectedWells.flat().includes(wellName) ||
         hoveredWells?.includes(wellName)
       ) {
         acc[wellName] = SELECTED
@@ -303,14 +302,40 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     }
   }
 
-  const handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
-    e,
-    rect
-  ) => {
+  const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
     if (!e.shiftKey) {
       const wellsUnderRect = _getWellsFromRect(rect)
-      wellsUnderRect.forEach(wellList => {
-        handleClickWell(wellList[0])
+      setSelectedWells(prev => {
+        const next = [...prev]
+        const selectedFlat = new Set(prev.flat())
+        const allAlreadySelected = wellsUnderRect.every(group =>
+          group.every(well => selectedFlat.has(well))
+        )
+
+        let updated: string[][]
+        // Remove all wells if the entire selection is already selected
+        if (allAlreadySelected) {
+          const keysToRemove = new Set(wellsUnderRect.map(g => g[0]))
+          updated = next.filter(group => !keysToRemove.has(group[0]))
+        } else {
+          // Add additional selected wells if there is a mixture of selected and unselected
+          updated = [...next]
+          wellsUnderRect.forEach(wellGroup => {
+            const primaryWellInGroup = wellGroup[0]
+            const exists = updated.some(
+              wellGroup => wellGroup[0] === primaryWellInGroup
+            )
+            // Add to update list if the well does not currently exist in the list and is accessible
+            if (!exists && allWellsWithStatus[primaryWellInGroup] !== 1) {
+              updated.push(wellGroup)
+            }
+          })
+        }
+        const wellsField = getWellsField()
+        if (wellsField != null) {
+          wellsField.updateValue(updated.map(wellGroup => wellGroup[0]))
+        }
+        return updated
       })
       setHoveredWells(null)
     }
@@ -356,7 +381,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   if (slotPosition && labware && robotState) {
     inaccessiblePartialWells.forEach(well => {
-      if (!flatSelectedWells.includes(well)) {
+      if (!selectedWells.flat().includes(well)) {
         if (hoveredWells?.includes(well)) {
           allWellsWithState[well] = SELECTED_ERROR
         } else {
@@ -365,7 +390,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
     })
     const hoveredIsSelected = hoveredWells
-      ? hoveredWells.some(w => flatSelectedWells.includes(w))
+      ? hoveredWells.some(w => selectedWells.flat().includes(w))
       : false
     const isAccessible = hoveredWells
       ? hoveredWells.every(w => {
