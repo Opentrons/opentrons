@@ -1,6 +1,6 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
-from typing import Any, Dict
+from typing import Dict
 
 import opentrons.config.types
 import opentrons.hardware_control.types
