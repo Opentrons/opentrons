@@ -171,6 +171,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
             deckDef={deckDef}
             zoomed={true}
             viewBox={stackerViewBox}
+            adjustViewBoxForStacker={hasFlexStacker}
           >
             {() => (
               <>

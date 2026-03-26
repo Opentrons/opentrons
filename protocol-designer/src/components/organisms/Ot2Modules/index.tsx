@@ -423,6 +423,7 @@ export function Ot2Modules(): JSX.Element {
             height="100%"
             width="100%"
             deckDef={deckDef}
+            adjustViewBoxForStacker={false}
             viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
           >
             {() => (

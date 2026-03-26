@@ -59,8 +59,7 @@
 
 .deck_svg_wrapper {
   display: flex;
-  width: auto;
-  min-width: 100%;
+  width: 1000;
   height: 100%;
 }
 
