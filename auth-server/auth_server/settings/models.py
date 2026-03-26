@@ -84,7 +84,9 @@ class PatchSettingsRequestData(_StrictBaseModel):
     ] = None
     passwordResetTime: Annotated[
         float | None,
-        pydantic.Field(description="Duration in seconds until password must be changed."),
+        pydantic.Field(
+            description="Duration in seconds until password must be changed."
+        ),
     ] = None
     passwordComplexityMinimumLength: Annotated[
         int | None,
@@ -96,7 +98,9 @@ class PatchSettingsRequestData(_StrictBaseModel):
     ] = None
     idleLogout: Annotated[
         float | None,
-        pydantic.Field(description="Duration in seconds until account is logged out due to inactivity."),
+        pydantic.Field(
+            description="Duration in seconds until account is logged out due to inactivity."
+        ),
     ] = None
     requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
         bool | None,

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Generator
+from typing import Any, Generator
 
 import pytest
 
@@ -7,7 +7,7 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 from auth_server.settings.store import SettingsStore
 
-_DEFAULTS: dict[str, object] = {
+_DEFAULTS: dict[str, Any] = {
     k: v
     for k, v in SettingsResponseData()
     .model_dump(mode="json", exclude_none=True)
