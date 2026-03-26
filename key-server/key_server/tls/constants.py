@@ -39,3 +39,37 @@ CA_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.(pem
 
 CA_CERT_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.cer"
 CA_KEY_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.pem"
+
+END_ENTITY_BASIC_CONSTRAINTS = x509.BasicConstraints(ca=False, path_length=None)
+
+END_ENTITY_NAME = x509.Name(
+    [
+        x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "US"),
+        x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, "New York"),
+        x509.NameAttribute(x509.NameOID.LOCALITY_NAME, "New York"),
+        x509.NameAttribute(x509.NameOID.ORGANIZATION_NAME, "Opentrons"),
+        x509.NameAttribute(x509.NameOID.COMMON_NAME, "Opentrons Flex Robot"),
+    ]
+)
+
+END_ENTITY_KU = x509.KeyUsage(
+    digital_signature=True,
+    content_commitment=False,
+    key_encipherment=True,
+    data_encipherment=False,
+    key_agreement=False,
+    key_cert_sign=False,
+    crl_sign=True,
+    encipher_only=False,
+    decipher_only=False,
+)
+
+END_ENTITY_EKU = x509.ExtendedKeyUsage(
+    [
+        x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
+        x509.oid.ExtendedKeyUsageOID.SERVER_AUTH,
+    ]
+)
+
+TLS_KEY_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-key.pem$")
+TLS_CERT_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-cert.cer$")
