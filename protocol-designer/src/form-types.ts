@@ -14,6 +14,13 @@ import type {
   TipRackWithDef,
   TipTrackingOption,
   TrashBinEntity,
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_PROGRAM_PROFILE,
+  VACUUM_PROGRAM_STATE,
+  VACUUM_STATE_PUMP,
+  VACUUM_VENT_SET_CLOSED,
+  VACUUM_VENT_SET_OPEN,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
 import type {
@@ -241,22 +248,55 @@ export interface FormData {
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 export const PROFILE_STEP: 'profileStep' = 'profileStep'
-export interface ProfileStepItem {
+interface ProfileStepItemBase {
   type: typeof PROFILE_STEP
   id: string
   title: string
+}
+
+// Thermocycler
+// TODO: Rename plain "ProfileX" to "ThermocyclerProfileX"
+export interface ProfileStepItem extends ProfileStepItemBase {
   temperature: string
   durationMinutes: string
   durationSeconds: string
 }
-export interface ProfileCycleItem {
+
+interface ProfileCycleItemBase {
   type: typeof PROFILE_CYCLE
   id: string
-  steps: ProfileStepItem[]
   repetitions: string
 }
-// TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
+interface ProfileCycleItem extends ProfileCycleItemBase {
+  steps: ProfileStepItem[]
+}
+
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
+
+// Vacuum
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  powerPercent: number
+}
+
+type VacuumPumpData = VacuumPressureData | VacuumPowerData
+
+export interface VacuumProfileStep extends ProfileStepItemBase {
+  time: string
+  pumpData: VacuumPumpData
+}
+
+export type VacuumProfileCycle = ProfileCycleItemBase & {
+  profileStepItemsById: Record<string, VacuumProfileStep>
+  orderedProfileStepIds: string[]
+}
+export type VacuumProfileItem = VacuumProfileStep | VacuumProfileCycle
+
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
 export type BlankForm = AnnotationFields & {
@@ -546,6 +586,20 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   stepType: 'vacuum'
   id: string
   moduleId: string
+  endingHoldVentCheckbox: boolean
+  modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
+  orderedProfileIds: string[]
+  powerPercent: number | null
+  pressureMbar: number | null
+  profileItemsById: Record<string, ProfileItem>
+  programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
+  pumpDurationCheckbox: boolean | null
+  pumpDurationTime: string | null
+  stateType:
+    | typeof VACUUM_STATE_PUMP
+    | typeof VACUUM_VENT_SET_OPEN
+    | typeof VACUUM_VENT_SET_CLOSED
+    | null
 }
 
 // fields used in TipPositionInput

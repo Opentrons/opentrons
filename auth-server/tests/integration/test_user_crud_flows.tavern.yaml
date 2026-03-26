@@ -4,6 +4,8 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - admin_scopes_list
+      - user_scopes_list
 
 stages:
   - name: Create a new user
@@ -25,7 +27,7 @@ stages:
           userName: test_new_user
           fullName: Test New User
           accountType: user
-          scopes: [runs.write]
+          scopes: !force_original_structure '{user_scopes_list}'
 
   - name: Create a new user with a password less than 8 characters
     request:
@@ -57,7 +59,7 @@ stages:
           accountType: user
           fullName: Test New User
           userName: test_new_user
-          scopes: [runs.write]
+          scopes: !force_original_structure '{user_scopes_list}'
 
   - name: Update the user
     request:
@@ -76,7 +78,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user
-          scopes: [auth_settings.write, robot_settings.write, runs.write, users.read, users.write]
+          scopes: !force_original_structure '{admin_scopes_list}'
 
   - name: Update the username and password
     request:
@@ -95,7 +97,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user_updated
-          scopes: [auth_settings.write, robot_settings.write, runs.write, users.read, users.write]
+          scopes: !force_original_structure '{admin_scopes_list}'
 
   - name: Get a new access token with the updated username and password
     request:

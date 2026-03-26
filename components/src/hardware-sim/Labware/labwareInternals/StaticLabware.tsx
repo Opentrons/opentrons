@@ -138,6 +138,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         onMouseLeaveWell?.({ wellName, event: e })
                       }
                       onClick={() => handleClickWell?.(wellName)} // TODO: add select logic
+                      id={wellName}
                     >
                       {isTiprack ? (
                         <TipStatus

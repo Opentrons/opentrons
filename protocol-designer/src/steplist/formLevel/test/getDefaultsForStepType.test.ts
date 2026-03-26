@@ -258,6 +258,8 @@ describe('getDefaultsForStepType', () => {
         programType: null,
         stateType: null,
         modeType: null,
+        orderedProfileIds: [],
+        profileItemsById: {},
         pressureMbar: null,
         powerPercent: null,
         pumpDurationCheckbox: null,

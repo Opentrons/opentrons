@@ -7,9 +7,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 import {
   getTipTypeFromTipRackDefinition,
@@ -137,12 +137,18 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
+            autoFocus
             type="number"
             value={flowRate}
-            title={textEntryCopy}
+            label={textEntryCopy}
             error={error}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setFlowRate(Number(e.target.value))
+            }}
           />
         </Flex>
         <Flex

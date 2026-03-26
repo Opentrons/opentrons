@@ -8,7 +8,7 @@ import {
   maskToInteger,
   maskToSignedDecimal,
   maskToTime,
-  maskToTimeMMSS,
+  maskToTimeWithPlaceholders,
   numberOrNull,
   onlyPositiveNumbers,
   trimDecimals,
@@ -445,7 +445,7 @@ const stepFieldHelperMap = {
     castValue: numberOrNull,
   }),
   pumpDurationTime: stepFieldHelpers({
-    maskValue: composeMaskers(maskToTimeMMSS),
+    maskValue: composeMaskers(maskToTimeWithPlaceholders),
   }),
   pressureMbar: stepFieldHelpers({
     maskValue: composeMaskers(maskToSignedDecimal),

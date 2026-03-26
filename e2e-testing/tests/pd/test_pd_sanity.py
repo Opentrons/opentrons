@@ -103,10 +103,12 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     editor.confirm_liquid_setup()  # Close labware setup
     editor.add_step("Transfer")
     transfer_page = TransferPage(page)
-    # Source labware is selected by default so we proceed to selecting the well
-    transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
     transfer_page.destination_labware_select(labware_on_deck)
-    transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
+    transfer_page.open_nozzle_and_well_selector()
+    transfer_page.select_nozzles()
+    transfer_page.wells_select(location="Source", labwareName=labware_on_deck, wells=["A1"], finalStep=False)
+    transfer_page.wells_select(location="Destination", labwareName=labware_on_deck, wells=["A2"], finalStep=True)
+    transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("100")
     print("✓ Transfer step configured")
     print("\n✅ Full onboarding flow completed successfully!")

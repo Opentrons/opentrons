@@ -1,6 +1,5 @@
 ---
 title: 'Python API: Liquid Classes'
-description: 'How to use Opentrons-verified and custom liquid clases to increase pipetting accuracy on Flex.'
 ---
 
 Accounting for properties of liquids in your protocol can increase pipetting accuracy on the Flex. For example, a slower flow rate can improve pipetting for a viscous liquid, and an air gap can prevent a volatile liquid from dripping onto the deck.
@@ -283,7 +282,7 @@ custom_water_properties.dispense.dispense_position = custom_water_properties.asp
 
 _New in version 2.24_
 
-_Changed in version 2.29_: Edit tip position for an aspirate, dispense, or blowout in a single line, and use one tip position to set another.
+_Changed in version 2.28_: Edit tip position for an aspirate, dispense, or blowout in a single line, and use one tip position to set another.
 
 Then, complete your transfers with the modified `custom_water` liquid class.
 
@@ -382,7 +381,7 @@ custom_viscous = protocol.define_liquid_class(
 
 _New in version 2.24_
 
-_Changed in version 2.29_: Add ability to control where and when the pipette blows out excess liquid.
+_Changed in version 2.28_: Add ability to control where and when the pipette blows out excess liquid.
 
 You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
 

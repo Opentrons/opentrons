@@ -5,9 +5,9 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   LegacyStyledText,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -128,13 +128,13 @@ export function ChooseNumber({
           >
             {parameter.description}
           </LegacyStyledText>
-          <InputField
+          <TouchInputField
             autoFocus
             type="text"
             units={parameter.suffix}
             placeholder={parameter.default.toString()}
             value={paramValue}
-            title={parameter.displayName}
+            label={parameter.displayName}
             caption={
               parameter.type === 'int'
                 ? `${parameter.min}-${parameter.max}`
@@ -145,12 +145,11 @@ export function ChooseNumber({
               e.target.focus()
             }}
             onChange={e => {
-              const updatedValue =
-                parameter.type === 'int'
-                  ? Math.round(e.target.valueAsNumber)
-                  : e.target.valueAsNumber
+              const inputValue = Number(e.target.value as string)
+              const modifiedValue =
+                parameter.type === 'int' ? Math.round(inputValue) : inputValue
               setParamValue(
-                Number.isNaN(updatedValue) ? '' : String(updatedValue)
+                Number.isNaN(modifiedValue) ? '' : String(modifiedValue)
               )
             }}
           />

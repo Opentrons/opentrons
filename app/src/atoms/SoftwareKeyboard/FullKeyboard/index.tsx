@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
@@ -12,12 +12,15 @@ import {
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
-import type { LayoutName } from '../types'
+import type { KeyboardLanguage, LayoutName } from '../types'
 
 import '../index.css'
 import './index.css'
 
 const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']
+const PREVIEW_LABEL_RENDERING_DURATION_MS = 800
+const PREVIEW_LABEL_EN = 'english (us)'
+const PREVIEW_LABEL_CH = '简体拼音'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
@@ -34,6 +37,25 @@ export function FullKeyboard({
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)
+  const initialKeyboardLanguage: KeyboardLanguage =
+    appLanguage === 'zh-CN' ? 'zh-CN' : 'en-US'
+  const [keyboardLanguage, setKeyboardLanguage] = useState<KeyboardLanguage>(
+    initialKeyboardLanguage
+  )
+
+  const [spacePreviewLabel, setSpacePreviewLabel] = useState<string | null>(
+    null
+  )
+  const languageTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (languageTimerRef.current != null) {
+        window.clearTimeout(languageTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleLayoutChange = (button: string): void => {
     switch (button) {
       case '{shift}':
@@ -53,11 +75,66 @@ export function FullKeyboard({
     }
   }
 
+  const handleLanguageToggle = useCallback((): void => {
+    if (languageTimerRef.current != null) {
+      window.clearTimeout(languageTimerRef.current)
+    }
+
+    setKeyboardLanguage(prev => {
+      const nextLanguage: KeyboardLanguage =
+        prev === 'en-US' ? 'zh-CN' : 'en-US'
+
+      setSpacePreviewLabel(
+        nextLanguage === 'zh-CN' ? PREVIEW_LABEL_CH : PREVIEW_LABEL_EN
+      )
+
+      languageTimerRef.current = window.setTimeout(() => {
+        setSpacePreviewLabel(null)
+      }, PREVIEW_LABEL_RENDERING_DURATION_MS)
+
+      return nextLanguage
+    })
+  }, [])
+
+  // Language switch by Ctrl + Shift + Space
+  // not using Alt + Shift or Meta + Space because they should be handled by the OS
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      const isLanguageToggle = e.ctrlKey && e.shiftKey && e.code === 'Space'
+      if (!isLanguageToggle) return
+
+      e.preventDefault()
+      handleLanguageToggle()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleLanguageToggle])
+
   const onKeyPress = (button: string): void => {
+    // layout change
     if (SPECIAL_LAYOUT_KEYS.includes(button)) {
       handleLayoutChange(button)
     }
+
+    // language change
+    if (button === '{globe}') {
+      handleLanguageToggle()
+    }
   }
+
+  const display = useMemo(() => {
+    const defaultSpaceLabel = keyboardLanguage === 'zh-CN' ? '空格' : 'space'
+    const returnLabel = keyboardLanguage === 'zh-CN' ? '换行' : 'return'
+
+    return {
+      ...customDisplay,
+      '{space}': spacePreviewLabel ?? defaultSpaceLabel,
+      '{return}': returnLabel,
+    }
+  }, [keyboardLanguage, spacePreviewLabel])
 
   return (
     <Keyboard
@@ -70,13 +147,33 @@ export function FullKeyboard({
       layoutName={layoutName}
       layout={fullKeyboardLayout}
       layoutCandidates={
-        appLanguage != null ? layoutCandidates[appLanguage] : undefined
+        keyboardLanguage != null
+          ? layoutCandidates[keyboardLanguage]
+          : undefined
       }
-      display={customDisplay}
+      display={display}
       mergeDisplay={true}
       useButtonTag={true}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
+      buttonTheme={[
+        {
+          class: 'hg-globe',
+          buttons: '{globe}',
+        },
+        {
+          class: 'hg-space-key',
+          buttons: '{space}',
+        },
+        {
+          class: 'hg-return',
+          buttons: '{return}',
+        },
+        {
+          class: 'hg-shift-icon',
+          buttons: '{shift}',
+        },
+      ]}
     />
   )
 }
