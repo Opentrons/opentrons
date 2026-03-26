@@ -22,7 +22,7 @@
   flex-direction: column;
 }
 
-.title_row {
+.label_row {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -48,11 +48,11 @@
   gap: var(--spacing-8);
 }
 
-.left_icon_wrapper {
+.left_element_wrapper {
   display: flex;
 }
 
-.delete_icon_wrapper {
+.right_element_wrapper {
   display: flex;
   cursor: pointer;
   text-align: right;
@@ -99,7 +99,7 @@
   outline-offset: 2px;
 }
 
-.title_text {
+.label_text {
   padding-bottom: var(--spacing-4);
   color: var(--grey-60);
   font-size: var(--font-size-h3);
@@ -107,11 +107,11 @@
   line-height: var(--line-height-20);
 }
 
-.title_text_left {
+.label_text_left {
   text-align: left;
 }
 
-.title_text_center {
+.label_text_center {
   text-align: center;
 }
 
