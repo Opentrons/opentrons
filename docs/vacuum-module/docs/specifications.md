@@ -51,10 +51,12 @@ title: "Vacuum Module: Product Specifications"
 
 | Header | Header |
 |----|----|
-| Vacuum housing | L W H (include handle), weight |
-| Vacuum pump | type, vacuum range/spec? |
-| Waste container | 5 L, GL60 flask, borosilicate glass? |
+| Vacuum module | L W H (include handle), weight |
+| Maximum pump rate | L/min  |
+| Measurement range (absolute) | 0 <emdash> xxx mbar |
+| Resolution | x.x mbar |
 | Tubing | Diameter, length, composition |
+| Relative humidity | xx% at C |
 | Temperature | |
 | Humidity | |
 | Altitude | Sea level to xxxx meters |
@@ -79,3 +81,6 @@ The vacuum module has the following power requirements, which are met by the inc
 
 - Typical: _xx_ W
 - Peak: _xx_ W
+
+## LED Status Light
+
