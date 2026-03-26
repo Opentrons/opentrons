@@ -1,8 +1,13 @@
 """Test for the Pyro Serialization."""
 
+import enum
+
+import pytest
 from pydantic import BaseModel
 
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_engine.types.module import ModuleModel
+from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
 
 
@@ -12,7 +17,7 @@ class NestedTest(BaseModel):
     foo: str
 
 
-class TestModel(BaseModel):
+class BasicTestModel(BaseModel):
     """A basic pydantic model for serialization tests. Contains a basic type, nested model, and an enum."""
 
     bar: int
@@ -20,11 +25,52 @@ class TestModel(BaseModel):
     critical: CriticalPoint
 
 
+@pytest.mark.parametrize(
+    "enum_class, enum_instance, class_name",
+    [
+        # A basic enum.Enum
+        (
+            DeckSlotName,
+            DeckSlotName.SLOT_A1,
+            "opentrons.types.DeckSlotName",
+        ),
+        # An enum that uses enum.auto()
+        (
+            CriticalPoint,
+            CriticalPoint.TIP,
+            "opentrons.hardware_control.types.CriticalPoint",
+        ),
+        # An enum that inherits from StrEnum
+        (
+            ModuleModel,
+            ModuleModel.THERMOCYCLER_MODULE_V2,
+            "opentrons.protocol_engine.types.module.ModuleModel",
+        ),
+    ],
+)
+def test_enum_serialization_str_enum(
+    enum_class: type[enum.Enum],
+    enum_instance: enum.Enum,
+    class_name: str,
+) -> None:
+    """It should register an enum and keep it that type."""
+    OpentronsPyroSerializer.register_enum(enum_class)
+
+    test_dict = OpentronsPyroSerializer._generic_enum_class_to_dict(enum_instance)
+    assert test_dict == {
+        "__class__": class_name,
+        "value": enum_instance.value,
+    }
+
+    result = OpentronsPyroSerializer._generic_enum_dict_to_class(class_name, test_dict)
+    assert result == enum_instance
+
+
 def test_pydantic_serialization() -> None:
     """It should register a pydantic class and serialize it from class to dict and back."""
-    OpentronsPyroSerializer.register_pydantic_model(TestModel)
+    OpentronsPyroSerializer.register_pydantic_model(BasicTestModel)
 
-    test_model = TestModel(
+    test_model = BasicTestModel(
         bar=123,
         xyzzy=NestedTest(foo="xzibit"),
         critical=CriticalPoint.XY_CENTER,
@@ -35,11 +81,11 @@ def test_pydantic_serialization() -> None:
         "bar": 123,
         "xyzzy": {"foo": "xzibit"},
         "critical": 4,
-        "__class__": "tests.opentrons.util.test_pyro_serialization.TestModel",
+        "__class__": "tests.opentrons.util.test_pyro_serialization.BasicTestModel",
     }
 
     result = OpentronsPyroSerializer._pydantic_dict_to_class(
-        "tests.opentrons.util.test_pyro_serialization.TestModel",
+        "tests.opentrons.util.test_pyro_serialization.BasicTestModel",
         test_dict,
     )
     assert result == test_model
