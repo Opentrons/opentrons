@@ -54,13 +54,6 @@
     "y": 0,
     "z": 0
   },
-  "stackingOffsetWithLabware": {
-    "opentrons_1_well_adapter": {
-      "x": 0,
-      "y": 0,
-      "z": 16.3
-    }
-  },
   "innerLabwareGeometry": {
     "MainWellGeometry": {
       "sections": [
