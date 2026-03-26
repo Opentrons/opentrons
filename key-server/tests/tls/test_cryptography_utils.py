@@ -380,7 +380,7 @@ def test_match_keys_and_certs() -> None:
             lambda tmp_path: (tmp_path / "ca_cert_dir").mkdir(mode=0o000),
             Path("key_dir"),
             Path("ca_cert_dir"),
-            r"Could not write cert for",
+            r"Could not write CA cert for",
             id="cert-not-writable",
         ),
     ],

@@ -102,6 +102,64 @@ def load_key(maybe_key: Path) -> ec.EllipticCurvePrivateKey | None:
     return key
 
 
+def save_key(
+    key_dir: Path, key: ec.EllipticCurvePrivateKey, key_name: str, cert_fingerprint: str
+) -> Path:
+    """Save a private key to the private key directory."""
+    if not key_dir.exists():
+        try:
+            key_dir.mkdir(parents=True)
+        except OSError:
+            LOG.warning(
+                f"Key directory {str(key_dir)} could not be created! Key for {cert_fingerprint} will not be saved"
+            )
+    elif not key_dir.is_dir():
+        LOG.warning(
+            f"Key directory {str(key_dir)} is not a directory! Key for {cert_fingerprint} will not be saved"
+        )
+    key_path = key_dir / key_name
+    try:
+        key_path.write_bytes(
+            key.private_bytes(
+                serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,
+                serialization.NoEncryption(),
+            )
+        )
+        LOG.info(f"Wrote key for {cert_fingerprint} to {str(key_path)}")
+    except OSError:
+        LOG.error(
+            f"Could not write key for {cert_fingerprint} to {str(key_path)}, key will be lost on server shutdown"
+        )
+    return key_path
+
+
+def save_cert(
+    cert_dir: Path, cert: x509.Certificate, cert_name: str, kind: str
+) -> Path:
+    """Save an x509 cert to a cert directory."""
+    if not cert_dir.exists():
+        try:
+            cert_dir.mkdir(parents=True)
+        except OSError:
+            LOG.warning(
+                f"{kind} cert directory {str(cert_dir)} could not be created! Certs will not be saved"
+            )
+    elif not cert_dir.is_dir():
+        LOG.warning(
+            f"{kind} cert directory {str(cert_dir)} is not a directory! Certs will not be saved"
+        )
+    cert_path = cert_dir / cert_name
+    try:
+        cert_path.write_bytes(cert.public_bytes(serialization.Encoding.DER))
+        LOG.info(f"Wrote {kind} cert for {fingerprint(cert)} to {str(cert_path)}")
+    except OSError:
+        LOG.error(
+            f"Could not write {kind} cert for {fingerprint(cert)} to {str(cert_path)}, CA will be lost on server shutdown"
+        )
+    return cert_path
+
+
 def load_cert(maybe_cert: Path) -> x509.Certificate | None:
     """Load a prospective x509 cert from a path.
 
@@ -285,53 +343,21 @@ def create_ca(
     )
     LOG.info(f"Created CA {fingerprint(cert)}")
     pair = X509Pair(
-        keypath=key_dir / f"ot-robot-tls-ca-{expiry.strftime('%Y-%m-%d')}.pem",
-        certpath=ca_cert_dir / f"ot-robot-tls-ca-{expiry.strftime('%Y-%m-%d')}.cer",
+        keypath=save_key(
+            key_dir,
+            key,
+            f"ot-robot-tls-ca-{expiry.strftime('%Y-%m-%d')}.pem",
+            fingerprint(cert),
+        ),
+        certpath=save_cert(
+            ca_cert_dir,
+            cert,
+            f"ot-robot-tls-ca-{expiry.strftime('%Y-%m-%d')}.cer",
+            "CA",
+        ),
         key=key,
         cert=cert,
     )
-    if not key_dir.exists():
-        try:
-            key_dir.mkdir(parents=True)
-        except OSError:
-            LOG.warning(
-                f"Key directory {str(key_dir)} could not be created! Keys will not be saved"
-            )
-    elif not key_dir.is_dir():
-        LOG.warning(
-            f"Key directory {str(key_dir)} is not a directory! Keys will not be saved"
-        )
-    try:
-        pair.keypath.write_bytes(
-            key.private_bytes(
-                serialization.Encoding.PEM,
-                serialization.PrivateFormat.PKCS8,
-                serialization.NoEncryption(),
-            )
-        )
-        LOG.info(f"Wrote key for {fingerprint(pair.cert)} to {str(pair.keypath)}")
-    except OSError:
-        LOG.error(
-            f"Could not write key for {fingerprint(pair.cert)} to {str(pair.keypath)}, CA will be lost on server shutdown"
-        )
-    if not ca_cert_dir.exists():
-        try:
-            ca_cert_dir.mkdir(parents=True)
-        except OSError:
-            LOG.warning(
-                f"CA cert directory {str(ca_cert_dir)} could not be created! Certs will not be saved"
-            )
-    elif not ca_cert_dir.is_dir():
-        LOG.warning(
-            f"CA cert directory {str(ca_cert_dir)} is not a directory! Certs will not be saved"
-        )
-    try:
-        pair.certpath.write_bytes(cert.public_bytes(serialization.Encoding.DER))
-        LOG.info(f"Wrote cert for {fingerprint(pair.cert)} to {str(pair.certpath)}")
-    except OSError:
-        LOG.error(
-            f"Could not write cert for {fingerprint(pair.cert)} to {str(pair.certpath)}, CA will be lost on server shutdown"
-        )
     return pair
 
 
