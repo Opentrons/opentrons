@@ -40,6 +40,7 @@ export function SelectionLegend({
               type={type as TipType}
               size={size}
               wellMap={labwareWellMap}
+              wellName={label}
             />
           ) : (
             <div className={styles.well_legend_item}>

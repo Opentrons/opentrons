@@ -144,6 +144,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                       {isTiprack ? (
                         <TipStatus
                           wellMap={definition.wells}
+                          wellName={wellName}
                           type={statusByWellName[wellName] as TipType}
                           text={
                             selectedTipsByIndex != null &&

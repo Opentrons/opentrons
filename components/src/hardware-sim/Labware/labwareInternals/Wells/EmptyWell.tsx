@@ -10,17 +10,15 @@ import type { ParentType } from '../types'
 interface EmptyWellProps {
   wellMap: LabwareWellMap
   parentType: ParentType
-  wellName?: string
+  wellName: string
   size?: string
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
   const { size, wellMap, wellName, parentType } = props
-  const commonProps = wellName
-    ? {
-        [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
-      }
-    : {}
+  const commonProps = {
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
+  }
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
