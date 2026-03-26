@@ -390,7 +390,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
     })
     const hoveredIsSelected = hoveredWells
-      ? hoveredWells.some(w => selectedWells.flat().includes(w))
+      ? hoveredWells.every(w => selectedWells.flat().includes(w))
       : false
     const isAccessible = hoveredWells
       ? hoveredWells.every(w => {
