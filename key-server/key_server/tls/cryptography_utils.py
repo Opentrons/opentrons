@@ -43,7 +43,7 @@ _OT_CA_KU = x509.KeyUsage(
     decipher_only=False,
 )
 # our ca name field
-_NAME = _ISSUER = x509.Name(
+_CA_NAME = x509.Name(
     [
         x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "US"),
         x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, "New York"),
@@ -166,12 +166,12 @@ def load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
         )
         return None
     # if the cert doesn't have our static details, we can't have that
-    if cert.subject != _NAME:
+    if cert.subject != _CA_NAME:
         LOG.error(
             f"Failed to parse Opentrons Flex CA cert from {str(maybe_cert)}: wrong subject {cert.subject}"
         )
         return None
-    if cert.issuer != _NAME:
+    if cert.issuer != _CA_NAME:
         LOG.error(
             f"Failed to parse Opentrons Flex CA cert from {str(maybe_cert)}: wrong issuer {cert.issuer}"
         )
@@ -270,8 +270,8 @@ def create_ca(
     key = ec.generate_private_key(ec.SECP256R1())
     cert = (
         x509.CertificateBuilder()
-        .subject_name(_NAME)
-        .issuer_name(_ISSUER)
+        .subject_name(_CA_NAME)
+        .issuer_name(_CA_NAME)
         .public_key(key.public_key())
         .serial_number(x509.random_serial_number())
         .not_valid_before(now)
