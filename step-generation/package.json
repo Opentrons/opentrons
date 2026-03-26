@@ -8,6 +8,7 @@
     "email": "engineering@opentrons.com"
   },
   "name": "@opentrons/step-generation",
+  "productName": "Opentrons Step Generation",
   "version": "0.0.0-dev",
   "description": "Step generation",
   "main": "lib/index.js",
