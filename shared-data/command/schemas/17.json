@@ -8200,6 +8200,54 @@
       "required": ["moduleId"],
       "title": "OpenLidParams",
       "type": "object"
+    },
+    "opentrons__protocol_engine__commands__vacuum_module__stop_vacuum__StopVacuumCreate": {
+      "description": "A request to stop the vacuum pump.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuum_module/stopVacuum",
+          "default": "vacuum_module/stopVacuum",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/opentrons__protocol_engine__commands__vacuum_module__stop_vacuum__StopVacuumParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StopVacuumCreate",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__vacuum_module__stop_vacuum__StopVacuumParams": {
+      "description": "Input parameters to stop the vacuum pump.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Vacuum Module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "StopVacuumParams",
+      "type": "object"
     }
   },
   "$id": "opentronsCommandSchemaV17",
@@ -8248,6 +8296,7 @@
       "heaterShaker/setShakeSpeed": "#/$defs/SetShakeSpeedCreate",
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
+      "vacuumModule/stopVacuum": "#/defs/opentrons__protocol_engine__commands_vacuum_module__stop_vacuum__StopVacuumCreate",
       "home": "#/$defs/HomeCreate",
       "identifyModule": "#/$defs/IdentifyModuleCreate",
       "liquidProbe": "#/$defs/LiquidProbeCreate",
@@ -8577,6 +8626,9 @@
     },
     {
       "$ref": "#/$defs/EmptyCreate"
+    },
+    {
+      "$ref": "#/$defs/StopVacuumCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
