@@ -16,8 +16,18 @@ interface UsbDevice {
 }
 
 const USB_SYS_PATH = '/sys/bus/usb/devices'
-
 const log = createLogger(new URL('', import.meta.url).pathname)
+const USB_PORT_LOCATIONS = [
+  ['1.4.4', 'USB-1'],
+  ['1.4.3', 'USB-2'],
+  ['1.4.2', 'USB-3'],
+  ['1.4.1', 'USB-4'],
+  ['1.3.4', 'USB-5'],
+  ['1.3.3', 'USB-6'],
+  ['1.3.2', 'USB-7'],
+  ['1.3.1', 'USB-8'],
+  ['1.7', 'FrontPort'],
+] as const
 
 const readFileSafe = async (filePath: string): Promise<string | null> => {
   try {
@@ -31,10 +41,22 @@ const readFileSafe = async (filePath: string): Promise<string | null> => {
 // device nodes use names like `1-1` or `1-1.6`.
 const isUsbDeviceDir = (name: string): boolean => /^\d+-[\d.]+$/.test(name)
 
-const formatExternalLocation = (sysfsName: string): string => {
+const getUsbPortPath = (sysfsName: string): string | null => {
   const parts = sysfsName.split('-')
-  if (parts.length < 2) return sysfsName
-  return `USB-${parts[1]}`
+  return parts.length < 2 ? null : parts[1]
+}
+
+// Map sysName port to the labels on Flex
+const formatExternalLocation = (sysfsName: string): string => {
+  const portPath = getUsbPortPath(sysfsName)
+  if (portPath == null) return sysfsName
+
+  const mappedLocation = USB_PORT_LOCATIONS.find(
+    ([mappedPath]) =>
+      portPath === mappedPath || portPath.startsWith(`${mappedPath}.`)
+  )
+
+  return mappedLocation?.[1] ?? `USB-${portPath}`
 }
 
 const isInternalDevice = (
