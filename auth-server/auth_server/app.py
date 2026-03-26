@@ -58,7 +58,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     with sql_engine_ctx(db_path) as engine:
         set_sql_engine(app.state, engine)
-        create_schema(engine)
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)
