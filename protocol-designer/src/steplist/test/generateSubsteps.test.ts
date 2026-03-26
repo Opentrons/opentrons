@@ -15,7 +15,7 @@ import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
-} from '../../../../step-generation/src/types'
+} from '@opentrons/step-generation'
 import type { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
 
 describe('generateSubstepItem', () => {

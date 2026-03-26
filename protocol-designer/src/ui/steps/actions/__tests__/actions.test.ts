@@ -21,7 +21,7 @@ import {
   saveStepForm,
 } from '../thunks'
 
-import type { Timeline } from '@opentrons/step-generation/src/types'
+import type { Timeline } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {

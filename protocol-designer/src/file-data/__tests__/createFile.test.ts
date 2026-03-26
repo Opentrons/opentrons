@@ -34,7 +34,7 @@ import type {
   InvariantContext,
   LabwareEntities,
   PipetteEntities,
-} from '../../../../step-generation/src/types'
+} from '@opentrons/step-generation'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 
 vi.mock('../../load-file/migration/utils/getLoadLiquidCommands')
