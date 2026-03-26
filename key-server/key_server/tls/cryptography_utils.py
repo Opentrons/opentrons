@@ -12,6 +12,8 @@ from cryptography.exceptions import UnsupportedAlgorithm
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
+from . import constants
+
 LOG = logging.getLogger(__name__)
 
 
@@ -23,39 +25,6 @@ class X509Pair:
     certpath: Path
     key: ec.EllipticCurvePrivateKey
     cert: x509.Certificate
-
-
-# these are the x509 cert details that are the same for all of our CA certs
-
-# our CA style: no intermediate CAs (we rotate these pretty frequently, and wouldn't be storing them
-# anywhere different)
-_OT_CA_BASIC_CONSTRAINTS = x509.BasicConstraints(ca=True, path_length=0)
-# standard ca KU
-_OT_CA_KU = x509.KeyUsage(
-    digital_signature=True,  # required for any signature
-    content_commitment=False,
-    key_encipherment=False,
-    data_encipherment=False,
-    key_agreement=False,
-    key_cert_sign=True,
-    crl_sign=True,  # we don't use CRLs, at least not yet, but browsers may choke without this
-    encipher_only=False,
-    decipher_only=False,
-)
-# our ca name field
-_CA_NAME = x509.Name(
-    [
-        x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, "New York"),
-        x509.NameAttribute(x509.NameOID.LOCALITY_NAME, "New York"),
-        x509.NameAttribute(x509.NameOID.ORGANIZATION_NAME, "Opentrons"),
-        x509.NameAttribute(x509.NameOID.COMMON_NAME, "Opentrons Flex TLS CA"),
-    ]
-)
-
-_CA_NAME_PATTERN: Final = re.compile(
-    r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.(pem|cer)$"
-)
 
 
 def safe_del(path: Path, kind: str) -> None:
@@ -224,12 +193,12 @@ def load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
         )
         return None
     # if the cert doesn't have our static details, we can't have that
-    if cert.subject != _CA_NAME:
+    if cert.subject != constants.CA_NAME:
         LOG.error(
             f"Failed to parse Opentrons Flex CA cert from {str(maybe_cert)}: wrong subject {cert.subject}"
         )
         return None
-    if cert.issuer != _CA_NAME:
+    if cert.issuer != constants.CA_NAME:
         LOG.error(
             f"Failed to parse Opentrons Flex CA cert from {str(maybe_cert)}: wrong issuer {cert.issuer}"
         )
@@ -265,7 +234,7 @@ def ca_keys_from_dir(
 
     If a candidate key can't be loaded, delete it.
     """
-    return keys_from_dir(key_dir, _CA_NAME_PATTERN)
+    return keys_from_dir(key_dir, constants.CA_NAME_PATTERN)
 
 
 def ca_certs_from_dir(ca_cert_dir: Path) -> Iterator[tuple[Path, x509.Certificate]]:
@@ -274,7 +243,7 @@ def ca_certs_from_dir(ca_cert_dir: Path) -> Iterator[tuple[Path, x509.Certificat
     If any cert that is named like one of our CAs is not one of our CAs, delete it.
     """
     for maybe_cert in ca_cert_dir.iterdir():
-        if _CA_NAME_PATTERN.match(maybe_cert.name):
+        if constants.CA_NAME_PATTERN.match(maybe_cert.name):
             # loading the cert requires that it be a valid x509 cert in DER
             cert = load_ca_cert(maybe_cert)
             if cert:
@@ -328,14 +297,14 @@ def create_ca(
     key = ec.generate_private_key(ec.SECP256R1())
     cert = (
         x509.CertificateBuilder()
-        .subject_name(_CA_NAME)
-        .issuer_name(_CA_NAME)
+        .subject_name(constants.CA_NAME)
+        .issuer_name(constants.CA_NAME)
         .public_key(key.public_key())
         .serial_number(x509.random_serial_number())
         .not_valid_before(now)
         .not_valid_after(expiry)
-        .add_extension(_OT_CA_BASIC_CONSTRAINTS, critical=True)
-        .add_extension(_OT_CA_KU, critical=True)
+        .add_extension(constants.CA_BASIC_CONSTRAINTS, critical=True)
+        .add_extension(constants.CA_KU, critical=True)
         .add_extension(
             x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False
         )

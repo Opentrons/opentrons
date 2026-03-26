@@ -1,0 +1,41 @@
+"""Useful constants for TLS management."""
+
+import re
+from typing import Final
+
+from cryptography import x509
+
+# these are the x509 cert details that are the same for all of our CA certs
+
+# our CA style: no intermediate CAs (we rotate these pretty frequently, and wouldn't be storing them
+# anywhere different)
+CA_BASIC_CONSTRAINTS = x509.BasicConstraints(ca=True, path_length=0)
+# standard ca KU
+CA_KU = x509.KeyUsage(
+    digital_signature=True,  # required for any signature
+    content_commitment=False,
+    key_encipherment=False,
+    data_encipherment=False,
+    key_agreement=False,
+    key_cert_sign=True,
+    crl_sign=True,  # we don't use CRLs, at least not yet, but browsers may choke without this
+    encipher_only=False,
+    decipher_only=False,
+)
+# our ca name field
+CA_NAME = x509.Name(
+    [
+        x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "US"),
+        x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, "New York"),
+        x509.NameAttribute(x509.NameOID.LOCALITY_NAME, "New York"),
+        x509.NameAttribute(x509.NameOID.ORGANIZATION_NAME, "Opentrons"),
+        x509.NameAttribute(x509.NameOID.COMMON_NAME, "Opentrons Flex TLS CA"),
+    ]
+)
+
+# the names of our CA keys and certs, both as a regex for parsing from directories and a format
+# for saving
+CA_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.(pem|cer)$")
+
+CA_CERT_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.cer"
+CA_KEY_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.pem"

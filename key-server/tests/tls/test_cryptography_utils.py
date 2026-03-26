@@ -11,7 +11,7 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
-from key_server.tls import cryptography_utils
+from key_server.tls import constants, cryptography_utils
 
 
 def test_load_key_handles_unreadable_file(
@@ -127,7 +127,7 @@ def _build_cert(
             critical=True,
         )
     if with_name == "valid":
-        builder = builder.subject_name(cryptography_utils._CA_NAME)
+        builder = builder.subject_name(constants.CA_NAME)
     else:
         builder = builder.subject_name(
             x509.Name(
@@ -141,7 +141,7 @@ def _build_cert(
             )
         )
     if with_issuer == "valid":
-        builder = builder.issuer_name(cryptography_utils._CA_NAME)
+        builder = builder.issuer_name(constants.CA_NAME)
     else:
         builder = builder.issuer_name(
             x509.Name(
@@ -280,8 +280,8 @@ def test_match_keys_and_certs() -> None:
             .serial_number(x509.random_serial_number())
             .not_valid_before(datetime.now())
             .not_valid_after(datetime.now() + timedelta(seconds=1))
-            .subject_name(cryptography_utils._CA_NAME)
-            .issuer_name(cryptography_utils._CA_NAME)
+            .subject_name(constants.CA_NAME)
+            .issuer_name(constants.CA_NAME)
             .sign(key, hashes.SHA256())
         )
         matched_originals.append(
@@ -305,8 +305,8 @@ def test_match_keys_and_certs() -> None:
             .serial_number(x509.random_serial_number())
             .not_valid_before(datetime.now())
             .not_valid_after(datetime.now() + timedelta(seconds=1))
-            .subject_name(cryptography_utils._CA_NAME)
-            .issuer_name(cryptography_utils._CA_NAME)
+            .subject_name(constants.CA_NAME)
+            .issuer_name(constants.CA_NAME)
             .sign(key, hashes.SHA256()),
         )
         for idx, key in enumerate(keys_to_dump)
