@@ -1,5 +1,6 @@
 export * from './Devices'
 export * from './DeviceReset'
+export * from './ExternalKeyboardTest'
 export * from './LanguageSetting'
 export * from './NetworkSettings/RobotSettingsJoinOtherNetwork'
 export * from './NetworkSettings/RobotSettingsSelectAuthenticationType'

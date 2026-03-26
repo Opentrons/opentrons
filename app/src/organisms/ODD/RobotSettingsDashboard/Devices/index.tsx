@@ -46,7 +46,6 @@ export function Devices({
       <ChildNavigation
         header={t('devices')}
         onClickBack={() => {
-          console.log('clicked')
           setCurrentOption(null)
         }}
       />
