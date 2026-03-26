@@ -180,8 +180,11 @@ export const wellVolumeMax = (
     return null
   }
 
+  // Note: this may need another way to resolve the issue in the future
   const dispenseLabwareMaxVolume =
-    'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
+    'def' in labware
+      ? (labware.def?.wells?.A1?.totalLiquidVolume ?? null)
+      : null
 
   return dispenseLabwareMaxVolume != null &&
     typeof fields.volume === 'string' &&
