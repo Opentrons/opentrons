@@ -11,7 +11,9 @@ from auth_server.settings.models import (
 )
 from auth_server.settings.store import SettingsStore
 
-_DEFAULTS: dict[str, Any] = SettingsResponseData().model_dump(mode="json", exclude_none=True)
+_DEFAULTS: dict[str, Any] = SettingsResponseData().model_dump(
+    mode="json", exclude_none=True
+)
 
 
 @pytest.fixture()
@@ -42,7 +44,6 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
         ),
         pytest.param(
             PatchSettingsRequestData(
-                accessControlEnabled=True,
                 idleLogout=1800.0,
                 passwordResetTime=7776000.0,
             ),
@@ -89,8 +90,7 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
         )
     )
     fetched = settings_store.get_settings()
-    assert fetched.accessControlEnabled is False
-    assert fetched.idleLogout == 1800.0
+    assert fetched == SettingsResponseData(idleLogout=1800.0)
 
 
 def test_get_access_control_settings(settings_store: SettingsStore) -> None:

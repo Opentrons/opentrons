@@ -1,6 +1,5 @@
 """Request and response models for the `/settings` endpoints."""
 
-from textwrap import dedent
 from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
