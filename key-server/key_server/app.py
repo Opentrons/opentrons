@@ -1,6 +1,5 @@
 """The server's ASGI app object."""
 
-import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import AsyncGenerator
 
@@ -8,7 +7,6 @@ from fastapi import FastAPI
 
 from server_utils import systemd_utils
 
-from key_server.logging_config import configure_logging
 from key_server.secure_volume.dependency import (
     build_secure_volume_manager,
     install_secure_volume_manager,
@@ -20,11 +18,6 @@ from key_server.settings.store import SettingsStore, install_settings_store
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
-        try:
-            configure_logging(logging.INFO)
-        except Exception as be:
-            # needs to be a print because logging doesn't work yet!
-            print(f"Logging configuration failed: {be}")  # noqa: T201
         settings_store = SettingsStore()
         install_settings_store(app.state, settings_store)
         secure_volume_manager = build_secure_volume_manager(settings_store)
