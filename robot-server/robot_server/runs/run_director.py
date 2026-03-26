@@ -18,7 +18,6 @@ from opentrons.protocol_engine import (
     CommandSlice,
     DeckType,
     ErrorOccurrence,
-    ProtocolEngine,
     StateSummary,
 )
 from opentrons.protocol_engine.commands.command import CommandStatus
@@ -55,6 +54,7 @@ from opentrons_shared_data.robot.types import RobotType
 
 
 def register_process_types() -> None:
+    """Register classes and types sent and received by the protocol subprocess."""
     with serpent_enum_registration():
         for enum_type in [
             DeckType,
@@ -120,9 +120,11 @@ class DirectedRunProcess:
 
     @property
     def run_id(self) -> Optional[str]:
+        """Get the "current" persisted run_id."""
         return self._run_id
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+        """Start or resume the run."""
         pass
 
     async def run(
@@ -131,6 +133,7 @@ class DirectedRunProcess:
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
+        """Start the run."""
         return RunResult(
             commands=[],
             state_summary=self.get_state_summary(),
@@ -140,12 +143,15 @@ class DirectedRunProcess:
         )
 
     def pause(self) -> None:
+        """Pause the run."""
         pass
 
     async def stop(self) -> None:
+        """Stop the run."""
         pass
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+        """Resume the run from recovery."""
         pass
 
     async def finish(
@@ -156,9 +162,11 @@ class DirectedRunProcess:
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
+        """Finish the run."""
         pass
 
     def get_state_summary(self) -> StateSummary:
+        """Get protocol run data."""
         return StateSummary(
             status=EngineStatus.IDLE,
             errors=[],
@@ -169,21 +177,40 @@ class DirectedRunProcess:
         )
 
     def get_preconditions(self) -> CommandPreconditions:
+        """Get the preconditions of a protocol run."""
         return CommandPreconditions()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        """Get loaded labware definitions."""
         return []
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
+        """Get the list of run time parameters defined in the protocol, if any.
+
+        This returns a list of all run time parameters with their validated definitions
+        and client-requested values. Will always be empty before loading the runner.
+
+        If there was an error during RTP definition validation, then this list will
+        contain the parameter definitions that were validated before the error occurred.
+        These parameters' values will be default values.
+
+        If all definitions validated successfully but an error occurred while
+        setting the RTP values with those sent by the client, then only the parameters
+        whose values were successfully set will have the client-requested values while
+        the others will contain the default values.
+        """
         return []
 
     def get_all_command_annotations(self) -> List[CommandAnnotation]:
+        """Get the list of command annotations defined in the protocol, if any."""
         return []
 
     def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations defined in the protocol, if any."""
         return 0
 
     def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the command annotation by ID."""
         return CommandAnnotation(
             id=annotation_id,
             source="fake",
@@ -194,14 +221,23 @@ class DirectedRunProcess:
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
+        """Get the "current" command, if any."""
         return None
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
+        """Get the most recently finalized command, if any."""
         return None
 
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
+        """Get a slice of run commands.
+
+        Args:
+            cursor: Requested index of first command in the returned slice.
+            length: Length of slice to return.
+            include_fixit_commands: Get all command intents.
+        """
         return CommandSlice(
             commands=[],
             cursor=0,
@@ -211,6 +247,7 @@ class DirectedRunProcess:
     def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
+        """Get a slice of command annotations in the run."""
         return CommandAnnotationsSlice(
             command_annotations=[],
             cursor=0,
@@ -222,6 +259,14 @@ class DirectedRunProcess:
         cursor: int,
         length: int,
     ) -> CommandErrorSlice:
+        """Get a slice of run commands errors.
+
+        Args:
+            cursor: Requested index of first error in the returned slice.
+                If the cursor is omitted, a cursor will be selected automatically
+                based on the last error occurrence.
+            length: Length of slice to return.
+        """
         return CommandErrorSlice(
             commands_errors=[],
             cursor=0,
@@ -229,9 +274,11 @@ class DirectedRunProcess:
         )
 
     def get_command_recovery_target(self) -> Optional[CommandPointer]:
+        """Get the current error recovery target."""
         return None
 
     def get_command(self, command_id: str) -> Command:
+        """Get a run's command by ID."""
         return Comment(
             id=command_id,
             createdAt=datetime.now(),
@@ -241,15 +288,19 @@ class DirectedRunProcess:
         )
 
     def get_all_commands(self) -> List[Command]:
+        """Get all run commands."""
         return []
 
     def get_command_errors(self) -> List[ErrorOccurrence]:
+        """Get all run command errors."""
         return []
 
     def get_run_status(self) -> EngineStatus:
+        """Get the current execution status of the engine."""
         return EngineStatus.IDLE
 
     def get_is_run_terminal(self) -> bool:
+        """Get whether engine is in a terminal state."""
         return False
 
     def get_camera_capture_image_settings(
@@ -267,23 +318,28 @@ class DirectedRunProcess:
         }
 
     def run_has_started(self) -> bool:
+        """Get whether the run has started."""
         return False
 
     def run_has_stopped(self) -> bool:
+        """Get whether the run has stopped."""
         return True
 
     def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
+        """Add a new labware offset to state."""
         return LabwareOffset.model_construct(id="fake")  # type: ignore[call-arg]
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        """Add a new labware definition to state."""
         return cast(LabwareUri, "fake/uri/ahh")
 
     def add_camera_enablement_settings(
         self,
         enablement_settings: CameraSettings,
     ) -> CameraSettings:
+        """Add new camera enablement settings."""
         return enablement_settings
 
     def add_camera_capture_image_settings(
@@ -306,6 +362,7 @@ class DirectedRunProcess:
         timeout: Optional[int] = None,
         failed_command_id: Optional[str] = None,
     ) -> Command:
+        """Add a new command to execute and wait for it to complete if needed."""
         return Comment(
             id="blah",
             createdAt=datetime.now(),
@@ -315,22 +372,34 @@ class DirectedRunProcess:
         )
 
     def estop(self) -> None:
+        """Handle an E-stop event from the hardware API."""
         pass
 
     async def asynchronous_module_error(
         self, module_model: HardwareModuleModel, module_serial: str | None
     ) -> bool:
+        """Handle an asynchronous module error reported by hardware.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
         return False
 
     async def module_disconnected(
         self, module_model: HardwareModuleModel, module_serial: str | None
     ) -> bool:
+        """Handle an unexpected module disconnection.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
         return False
 
     # TODO this should work, more or less, since these HardwareModuleAPIs should be proxys
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]
     ) -> None:
+        """Load attached modules directly into state, without locations."""
         pass
 
     async def load(
@@ -341,34 +410,44 @@ class DirectedRunProcess:
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
+        """Load a json/python protocol."""
         pass
 
     def get_is_okay_to_clear(self) -> bool:
+        """Get whether the engine is stopped or sitting idly, so it could be removed."""
         return True
 
     def prepare(self) -> None:
+        """Prepare live runner for a run."""
         pass
 
     def get_robot_type(self) -> RobotType:
+        """Get engine robot type."""
         return self._robot_type
 
     def get_deck_type(self) -> DeckType:
+        """Get engine deck type."""
         return self._deck_type
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
+        """Get current nozzle maps keyed by pipette id."""
         return {}
 
     def get_tip_attached(self) -> Dict[str, bool]:
+        """Get current tip state keyed by pipette id."""
         return {}
 
     # TODO figure out how to serialize this
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Create error recovery policy for the run."""
         pass
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+        """Get current (if any) Flex Stacker Substates keyed by module id."""
         return {}
 
     def clear_command_history(self) -> None:
+        """Force cleanup of command history."""
         pass
 
 

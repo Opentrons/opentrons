@@ -406,6 +406,7 @@ class RunOrchestratorStore:
         return self._run_orchestrator.get_state_summary()
 
     async def clear_pyro(self) -> RunResult:
+        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
