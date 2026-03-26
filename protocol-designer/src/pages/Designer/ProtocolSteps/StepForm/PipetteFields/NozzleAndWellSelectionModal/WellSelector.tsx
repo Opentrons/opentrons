@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -128,7 +128,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     useState<string[][]>(getSelectedWells())
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
-
+  useEffect(
+    () => {
+      setSelectedWells(getSelectedWells())
+      setHoveredWells(null)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stepType]
+  )
   const flatSelectedWells = selectedWells.flat()
 
   const handleHoverWell = (e: WellMouseEvent): void => {
@@ -371,7 +379,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
     const is96Channel = channels === 96
-    console.log('selectedWells', selectedWells)
     controls = (
       <>
         <LabwareOnDeck
@@ -416,6 +423,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         <SelectionRect
           onSelectionMove={handleSelectionMove}
           onSelectionDone={handleSelectionDone}
+          customWidth={45}
         >
           <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
         </SelectionRect>
