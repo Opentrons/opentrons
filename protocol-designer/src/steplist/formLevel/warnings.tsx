@@ -180,7 +180,8 @@ export const wellVolumeMax = (
     return null
   }
 
-  // Note: this may need another way to resolve the issue in the future
+  // Note: aside from the special case where the labware lacks an A1 well,
+  // the code below behaves as intended.
   const dispenseLabwareMaxVolume =
     'def' in labware
       ? (labware.def?.wells?.A1?.totalLiquidVolume ?? null)
