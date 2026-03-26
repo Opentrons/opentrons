@@ -4,6 +4,7 @@ nav:
   - Opentrons Vacuum Module GEN1 Instruction Manual: index.md
   - Safety and Compliance: compliance.md
   - Product Specifications: specifications.md
+  - Installation Prerequisites: prerequisites.md
   - Installing the Vacuum Module: installation.md
   - Using the Vacuum Module: use.md
   - Maintenance and Cleaning: maintenance.md
