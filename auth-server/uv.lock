@@ -1686,7 +1686,6 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "systemd-python", marker = "sys_platform == 'linux'" },
     { name = "typing-extensions" },
-    { name = "uvicorn" },
     { name = "wsproto" },
 ]
 
@@ -1702,7 +1701,6 @@ requires-dist = [
     { name = "sqlalchemy", specifier = "==1.4.51" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "uvicorn", specifier = "==0.27.0.post1" },
     { name = "wsproto", specifier = "==1.2.0" },
 ]
 
