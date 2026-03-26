@@ -61,3 +61,16 @@ export const getDriverStatus = (device: UsbDevice): DriverStatus => {
 
   return upToDate ? UP_TO_DATE : OUTDATED
 }
+
+export const compareUsbDevicesByLocation = (
+  a: UsbDevice,
+  b: UsbDevice
+): number => {
+  const aIsInternal = a.location === 'INTERNAL'
+  const bIsInternal = b.location === 'INTERNAL'
+
+  if (aIsInternal && !bIsInternal) return 1
+  if (!aIsInternal && bIsInternal) return -1
+
+  return 0
+}

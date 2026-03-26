@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect'
 
 import { NOT_APPLICABLE } from './constants'
-import { getDriverStatus, isRealtekU2EAdapter } from './utils'
+import {
+  compareUsbDevicesByLocation,
+  getDriverStatus,
+  isRealtekU2EAdapter,
+} from './utils'
 
 import type { State } from '../types'
 import type {
@@ -48,7 +52,7 @@ export const getU2EDeviceAnalyticsProps: (
 
 export const getUsbDeviceDisplayRows: (state: State) => UsbDeviceDisplayRow[] =
   createSelector(getUsbDevices, usbDevices =>
-    usbDevices.map(device => {
+    [...usbDevices].sort(compareUsbDevicesByLocation).map(device => {
       const manufacturer = device.manufacturerName?.trim()
       const product = device.productName?.trim()
       const normalizedManufacturer = manufacturer?.toLowerCase()
