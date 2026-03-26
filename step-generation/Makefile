@@ -9,6 +9,18 @@ tests ?=
 cov_opts ?= --coverage --pool=threads
 test_opts ?=
 
+# TypeScript project references emit JS and declarations to lib/ (see tsconfig.json).
+.PHONY: build-ts
+build-ts:
+	cd .. && yarn tsc --build step-generation/tsconfig.json
+
+.PHONY: lib
+lib: build-ts
+
+.PHONY: pack
+pack: lib
+	yarn pack
+
 .PHONY: test
 test:
 	$(MAKE) -C .. test-js-step-generation tests="$(tests)" test_opts="$(test_opts)"

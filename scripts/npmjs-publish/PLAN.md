@@ -1,47 +1,58 @@
 ---
-
 name: NPM publish + component testing
-overview: Add a uv-managed Python CLI under `scripts/npm-release/` (Rich + Typer) that resolves one semver, checks the NPM registry for idempotency, rewrites manifests, builds, and publishes four NPM packages in order. If all four versions already exist (e.g. published locally before the tag push), skip build and publish and exit success. Remove NPM publish from existing workflows; add a dedicated workflow with a new tag pattern (TBD). Extend `components-testing` for pack/link parity.
+overview: Unified NPM release for four scoped packages via `scripts/npmjs-publish/` (uv, Typer, Rich), tag `npmjs-publish@*`, registry preflight, manifest rewrites, ordered builds. Old `shared-data@` / `components@` NPM jobs to be removed from legacy workflows. Extend `components-testing` for step-generation and protocol-visualization.
 todos:
-
-- id: scaffold-cli
-content: Add `scripts/npm-release/` uv project (Typer + Rich, version parse from new tag in CI, registry pre-check for all four packages, manifest rewrite, build/publish orchestration, skip-if-complete, dry-run/ci; handle partial-publish policy)
-status: pending
-- id: step-gen-shippable
-content: Make `step-generation` publishable (remove `private`, add lib/vite build + `pack` Makefile target if missing, verify `files`/`exports` for npm)
-status: pending
-- id: ci-unify
-content: Remove NPM publish jobs from shared-data and components workflows; add new workflow (single job, new tag glob) invoking the CLI; adjust notify job `needs` / conditions; keep shared-data PyPI deploy separate
-status: pending
-- id: components-testing-pv
-content: Extend components-testing Makefile, package.json, vite smoke import, workflow paths, SKILL.md (pack/link step-generation + protocol-visualization as needed)
-status: pending
-- id: tests-docs
-content: Add pytest for tag parsing and registry idempotency logic (mocked); document new tag, local-then-push workflow, and dependency graph
-status: pending
-
+  - id: scaffold-cli
+    content: 'scripts/npmjs-publish uv project: preflight (registry + semver), manifest rewrite, build orchestration; wired job summaries. Remaining: npm publish orchestration in CLI or workflow, optional dry-run.'
+    status: in_progress
+  - id: step-gen-shippable
+    content: 'step-generation publishable (private removed, lib exports/files, Makefile build-ts lib pack).'
+    status: completed
+  - id: ci-unify
+    content: 'Remove NPM publish jobs from shared-data and components workflows; point tag releases at npmjs-publish workflow only; adjust notify needs. Partially done: npmjs-publish.yaml exists for tag + PR.'
+    status: in_progress
+  - id: components-testing-pv
+    content: 'Extend components-testing to pack/link step-generation and protocol-visualization; paths and SKILL.'
+    status: pending
+  - id: tests-docs
+    content: 'pytest for version parsing and registry rules; document tag and local workflow. Partially done: tests under scripts/npmjs-publish/tests; README and Cursor skill added.'
+    status: in_progress
 ---
 
 # Unified NPM publish and components-testing for protocol-visualization
 
-## Current behavior (pain points)
+## Implementation status (snapshot)
 
-- Versioning and NPM manifest edits live only in CI: `[components-test-build-deploy.yaml](../../.github/workflows/components-test-build-deploy.yaml)` (`publish-components` on `components@*` tags) and `[shared-data-test-lint-deploy.yaml](../../.github/workflows/shared-data-test-lint-deploy.yaml)` (`publish-to-npm` gated by `publish-switch` for `shared-data@*` / `components@*` tags).
-- NPM publishing is **split across two workflows** and can **race** (ordering not guaranteed).
-- **NPM publish is coupled** to those broader test-and-deploy workflows instead of a single, intentional release entry point.
-- Local rehearsal means reassembling CI shell by hand.
-- `[components-testing](../../components-testing/)` packs only `[shared-data](../../shared-data/)` and `[components](../../components/)`; `[protocol-visualization](../../protocol-visualization/)` is not integrated yet.
+**Delivered in repo (ongoing work):**
+
+- **`scripts/npmjs-publish/`** (not `npm-release`): `publish_core.py`, `publish.py`, `build_packages.py`, `manifests.py`, `github_summary.py`, Makefile, pytest.
+- **Tag:** `npmjs-publish@<semver>` for workflow and version parsing.
+- **Preflight:** rejects invalid semver and wrong tag prefixes; partial and full “already on registry” cases are **errors** (npm cannot overwrite an existing version).
+- **Build chain:** `build_packages.py` runs `make build-ts`, `shared-data lib-js`, `step-generation lib`, components `build-ts` + `lib`, protocol-visualization `build-ts` + `lib`, then optional manifest rewrite.
+- **Workflow** [`.github/workflows/npmjs-publish.yaml`](../../.github/workflows/npmjs-publish.yaml): PR path filters run lint + test; tag push runs publish preflight job with version from ref.
+- **step-generation:** npm-oriented `package.json` and `Makefile` targets (`build-ts`, `lib`, `pack`).
+
+**Not done yet:**
+
+- **`npm publish`** for all four packages from CI or from this CLI.
+- **Removing** `publish-to-npm` / `publish-components` (and related notify wiring) from legacy workflows.
+- **components-testing** parity for four packages.
+- Optional **dry-run** and any “resume partial publish” flag (current policy is fail on partial).
+
+---
+
+## Current behavior (pain points), historical
+
+- Versioning and NPM manifest edits lived in CI in [components-test-build-deploy.yaml](../../.github/workflows/components-test-build-deploy.yaml) (`publish-components` on `components@*` tags) and [shared-data-test-lint-deploy.yaml](../../.github/workflows/shared-data-test-lint-deploy.yaml) (`publish-to-npm` gated by `publish-switch` for `shared-data@*` / `components@*` tags).
+- NPM publishing was **split across two workflows** and could **race** (ordering not guaranteed).
 
 ## Target behavior
 
-- **One Python CLI** for local and CI: version resolution, **NPM registry idempotency check**, manifest rewrites, ordered builds, `npm publish`.
-- **Local-first or GitHub outage:** You can publish from a dev machine, then push the release tag when GitHub is back. CI must **not** fail or duplicate work: if the **tag semver already exists on the registry for all four packages**, the CLI exits **0** early and **skips** build and publish (log clearly: “already published”).
+- **One Python-oriented toolkit** for local and CI: version resolution, **NPM registry checks**, manifest rewrites, ordered builds, then **`npm publish`** (publish step still to be wired).
 - **Four NPM packages**, same semver per release: `@opentrons/shared-data`, `@opentrons/step-generation`, `@opentrons/components`, `@opentrons/protocol-visualization`.
-- **NPM publishing is not done inside** `[shared-data-test-lint-deploy.yaml](../../.github/workflows/shared-data-test-lint-deploy.yaml)` or `[components-test-build-deploy.yaml](../../.github/workflows/components-test-build-deploy.yaml)`. Remove those NPM publish jobs (and related `publish-switch` / notify wiring used only for NPM).
-- **One new workflow** (dedicated file, e.g. `npm-packages-publish.yaml` or similar) with **one job** that runs on a **new tag pattern only** (exact prefix TBD; examples: `npm-packages@`*, `opentrons-npm@*`, `js-packages@*`). That job checks out the tag, sets up Node and uv, runs `uv run` on the publish CLI (`--ci`, version from tag). Yarn/setup-js runs only when the CLI proceeds past the registry check (see section 1).
-- **Shared-data Python** (wheel / Test PyPI / PyPI in the existing workflow) **stays where it is** unless you later choose to merge it; this plan treats **unified deployment** as **unified NPM release of the four JS packages** only.
+- **NPM publishing** should eventually **not** run inside shared-data or components test-and-deploy workflows; use the dedicated **`npmjs-publish@*`** workflow (and local scripts) as the single entry point.
 
-### Dependency graph (what consumers get)
+### Dependency graph
 
 ```mermaid
 flowchart TD
@@ -57,109 +68,44 @@ flowchart TD
   co --> pv
 ```
 
-
-
-
-| Package                  | Stands alone               | Depends on                                     |
-| ------------------------ | -------------------------- | ---------------------------------------------- |
-| `shared-data`            | Yes                        | (no `@opentrons/*`)                            |
-| `step-generation`        | Possible                   | `shared-data`                                  |
-| `components`             | No (for this product line) | `shared-data`, `step-generation`               |
-| `protocol-visualization` | No                         | `shared-data`, `step-generation`, `components` |
-
-
 **Publish order:** `shared-data` → `step-generation` → `components` → `protocol-visualization`.
 
-**Pattern:** Publish `@opentrons/step-generation` as its own package; pin exact internal versions; npm dedupes when `components` and `protocol-visualization` both depend on the same `step-generation` version.
+---
 
-```mermaid
-flowchart LR
-  resolve[Resolve version from new tag]
-  rewrite[Rewrite package.json files]
-  build_sd[Build shared-data]
-  pub_sd[Publish shared-data]
-  build_sg[Build step-generation]
-  pub_sg[Publish step-generation]
-  build_co[Build components]
-  pub_co[Publish components]
-  build_pv[Build protocol-visualization]
-  pub_pv[Publish protocol-visualization]
-  resolve --> rewrite --> build_sd --> pub_sd --> build_sg --> pub_sg --> build_co --> pub_co --> build_pv --> pub_pv
-```
+## Sections 1–7 (original plan detail)
 
+The sections below are the **original** design notes. Treat the **Implementation status** block at the top as the source of truth for what is merged today. Path names in older bullets may say `scripts/npm-release/`; the actual directory is **`scripts/npmjs-publish/`**.
 
+### 1. CLI package (uv + Rich + Typer)
 
-## 1. New CLI package: `scripts/npm-release/` (uv + Rich + Typer)
+Mirror [scripts/static-deploy/](../static-deploy/): `pyproject.toml`, `Makefile`, README.
 
-Mirror `[scripts/static-deploy/](../static-deploy/)`: `pyproject.toml`, `Makefile`, optional README.
+Registry checks use `npm view` (no auth for reads). Manifest rewrite keeps **step-generation** as a dependency of **components** (no deletion of that dependency).
 
+### 2. CI: one workflow + tag
 
-| Capability        | Notes                                                                                                                                                                                                                |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Parse version     | `--version` locally; in CI, parse from `GITHUB_REF` using the **new tag prefix only** (strip prefix to semver).                                                                                                      |
-| Validate          | Reject invalid semver.                                                                                                                                                                                               |
-| Registry check    | For each of the four scoped packages, determine whether **that exact version** already exists on the **public** NPM registry (`npm view <pkg>@<version> version`, or registry HTTP API). No auth required for reads. |
-| Idempotent exit   | If **all four** already exist: print summary, **exit 0**, do **not** run builds or `npm publish`. Matches “published locally, tag pushed later” and avoids duplicate tarballs.                                       |
-| Partial publish   | If **some** but not all exist: **do not** silently skip. **Default:** exit **failure** with a clear message (corrupt manual state).                                                                                  |
-| Rewrite manifests | When continuing to publish: four packages; exact pins; do not strip `step-generation`.                                                                                                                               |
-| Build / publish   | Per-package Make targets; `npm publish` in DAG order; only for packages that failed the “already exists” check (normally all or none).                                                                               |
-| Modes             | `--dry-run` (show plan + registry query results); `--ci`; local Rich + confirm.                                                                                                                                      |
+**Still to do:** remove NPM publish from legacy workflows; rely on `npmjs-publish.yaml` for the four-package line.
 
+**Done:** dedicated workflow on `npmjs-publish@*`, PR checks for this script tree.
 
-**CI ordering:** Run the CLI early; let it query the registry first. Optionally split workflow into “light check” vs “full build” steps only if you want a faster green check without installing yarn (registry-only step can use `curl`/`npm view` from a tiny setup). Simplest: one job, CLI handles short-circuit before `make setup-js`.
+### 3. `step-generation`
 
-```mermaid
-flowchart TD
-  tag[Read version from tag or flag]
-  reg[Query NPM for each package at version]
-  all[All four exist?]
-  skip[Exit 0 skip build publish]
-  build[Build and publish in DAG order]
-  tag --> reg --> all
-  all -->|yes| skip
-  all -->|no| build
-```
+**Done:** publish-oriented `package.json`, `lib` build via `tsc --build`, Makefile **pack** path.
 
+### 4. `protocol-visualization`
 
+In the build train after components; pins come from `manifests.apply_release_versions` and `PACKAGES` order in `publish_core.py`.
 
-## 2. CI: remove NPM from old workflows; one new workflow + tag
+### 5. `components-testing`
 
-**Remove**
+**Pending:** pack/link step-generation and protocol-visualization; workflow paths; skill update there.
 
-- From `[shared-data-test-lint-deploy.yaml](../../.github/workflows/shared-data-test-lint-deploy.yaml)`: `publish-switch` (if only used for NPM gating), `publish-to-npm`, and any `notify-`* conditions that require `publish-to-npm`. **Keep** Python lint/test/deploy jobs unrelated to NPM.
-- From `[components-test-build-deploy.yaml](../../.github/workflows/components-test-build-deploy.yaml)`: `publish-components` and adjust `notify-success` / `notify-failure` / `notify-cancelled` so they do not depend on a removed publish job (Storybook build/deploy and unit tests remain).
+### 6. Local developer workflow
 
-**Add**
+Use **`publish.py`** with `--version` / interactive; **`build_packages.py`** with or without `--version`; **`make build-packages`** from `scripts/npmjs-publish`.
 
-- New workflow YAML: `on.push.tags` limited to the **new glob** (decide name with release owners; document in runbook).
-- Single job: checkout + tag fix (if needed), `scripts/npm-release` `make setup`, `uv` (and Node if `npm view` is used from CLI), then `uv run ... publish --ci`. **Defer** `[js/setup](../../.github/actions/js/setup)` and `make setup-js` until the CLI decides work is needed (subprocess or second step), so tag pushes that only “catch up” after a local publish stay fast.
-- Slack/notify step after success, parallel to other release workflows.
+### 7. Testing and verification
 
-**Tag naming (TBD):** Pick something short and unambiguous (avoid clashing with `v`* or app tags). Document migration: releases that used `components@` / `shared-data@` for NPM move to the new tag for the four-package drop.
+**Ongoing:** expand mocks for registry edge cases if needed; run **`make -C components-testing test`** after components-testing Makefile changes.
 
-## 3. `step-generation`: first-class publish target
-
-- Remove `private` for release artifacts; add `lib` build + `pack` Makefile chain; correct `exports` / `files` for npm.
-- Old CI lines that delete `step-generation` from `components` go away with the removed `publish-components` job; the CLI is the only manifest rewriter for NPM.
-
-## 4. `protocol-visualization` in the publish train
-
-Publish fourth; pin `shared-data`, `step-generation`, and `components` to the same release version.
-
-## 5. `components-testing`
-
-Pack and link `step-generation` and `protocol-visualization`; update workflow path filters and SKILL.
-
-## 6. Local developer workflow
-
-CLI to query the current versions
-
-CLI with `--version` (and `--dry-run`); no need for the new tag locally unless you want parity testing.
-
-## 7. Testing and verification
-
-- Pytest: tag parsing; **mocked registry responses** for all-present (skip), none-present (publish path), partial-present (expect failure unless resume flag).
-- `make -C components-testing test` after Makefile changes.
-- `components@ and shared-data@`**pushes:** do nothing
-- update all readmes, skills and rules
-
+When legacy NPM jobs are removed, **`components@`** / **`shared-data@`** tag pushes should **not** drive the four-package NPM release (migration to **`npmjs-publish@`**).

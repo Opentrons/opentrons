@@ -8,13 +8,22 @@
     "email": "engineering@opentrons.com"
   },
   "name": "@opentrons/step-generation",
-  "productName": "Opentrons Step Generation",
-  "private": true,
   "version": "0.0.0-dev",
   "description": "Step generation",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "module": "src/index.ts",
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib"
+  ],
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

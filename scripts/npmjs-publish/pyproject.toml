@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "npmjs-publish"
+version = "0.0.0"
+description = "NPMJS publish workflow scaffold and release planning helpers."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8.4.1",
+    "rich>=14.1.0",
+    "semver>=3.0.4",
+    "typer>=0.17.4",
+    "ruff>=0.12.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.ruff]
+line-length = 140
+indent-width = 4
+target-version = "py310"
+src = ["*.py", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "C",
+    "B",
+]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

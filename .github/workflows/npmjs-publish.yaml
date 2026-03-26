@@ -1,0 +1,98 @@
+name: npmjs publish
+
+# PR: lint and unit tests only (file-filtered). Tag push: same jobs plus publish (tag-only).
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/npmjs-publish.yaml'
+      - 'scripts/npmjs-publish/**'
+  push:
+    tags:
+      - 'npmjs-publish@*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  lint:
+    name: Lint npmjs-publish
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: scripts/npmjs-publish
+        run: make setup
+
+      - name: Lint
+        working-directory: scripts/npmjs-publish
+        run: make lint
+
+  test:
+    name: Unit test npmjs-publish
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: scripts/npmjs-publish
+        run: make setup
+
+      - name: Unit tests
+        working-directory: scripts/npmjs-publish
+        run: make test
+
+  publish:
+    name: Publish preflight (tag only)
+    runs-on: ubuntu-24.04
+    # Only tag pushes matching npmjs-publish@* (not PRs).
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/npmjs-publish@')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fix actions checkout odd handling of tags
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+
+      - name: Setup npmjs-publish dependencies
+        working-directory: scripts/npmjs-publish
+        run: make setup
+
+      - uses: ./.github/actions/js/setup
+
+      - name: build packages
+        working-directory: scripts/npmjs-publish
+        run: make build-packages VERSION=${{ github.ref }}
+
+      - name: publish packages
+        working-directory: scripts/npmjs-publish
+        run: make run-ci VERSION=${{ github.ref }}
