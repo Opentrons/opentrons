@@ -19,7 +19,7 @@ from auth_server.oauth2.fastapi_dependencies import (
     install_oauth2_backend,
 )
 from auth_server.oauth2.router import router as oauth2_router
-from auth_server.persistence.database import create_schema, sql_engine_ctx
+from auth_server.persistence.database import sql_engine_ctx
 from auth_server.persistence.fastapi_dependencies import (
     set_persistence_directory,
     set_sql_engine,
@@ -58,7 +58,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     with sql_engine_ctx(db_path) as engine:
         set_sql_engine(app.state, engine)
-        create_schema(engine)
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)

@@ -4,9 +4,9 @@ import json
 from typing import Any
 
 from sqlalchemy import Boolean, Column, Integer, String, TypeDecorator
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import declarative_base, validates
 
-from auth_server.persistence.database import Base
+Base = declarative_base()
 
 
 class User(Base):
@@ -32,9 +32,7 @@ class JsonValue(TypeDecorator[object]):
 
     def process_bind_param(self, value: object | None, dialect: Any) -> str | None:
         """Python → DB: json.dumps before writing."""
-        if value is not None:
-            return json.dumps(value)
-        return None
+        return json.dumps(value)
 
     def process_result_value(self, value: str | None, dialect: Any) -> object | None:
         """DB → Python: json.loads after reading."""
@@ -50,6 +48,7 @@ class Setting(Base):
     __tablename__ = "setting"
 
     key = Column(String, primary_key=True)
+    # todo(tz, 2026-03-25): change type to Json https://docs.sqlalchemy.org/en/21/core/type_basics.html#sqlalchemy.types.JSON
     value = Column(JsonValue, nullable=False)
 
 

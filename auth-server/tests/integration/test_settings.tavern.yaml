@@ -16,7 +16,7 @@ stages:
           accessControlEnabled: false
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
           passwordComplexitySpecialCharacters: null
@@ -46,11 +46,11 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
-  - name: PATCH to enable access control
+  - name: PATCH more settings
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -59,9 +59,9 @@ stages:
       json:
         data:
           accessControlEnabled: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           requireReasonForInteraction: false
@@ -71,10 +71,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
@@ -88,10 +88,10 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
@@ -117,15 +117,15 @@ stages:
         data:
           accessControlEnabled: true
           maxNumberOfLoginAttempts: 10
-          passwordResetTime: P30D
+          passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          idleLogout: PT1M
+          idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
 
 ---
-test_name: PATCH with null field leaves value unchanged
+test_name: PATCH with accessControlEnabled null field leaves value unchanged
 
 marks:
   - usefixtures:
@@ -152,7 +152,7 @@ stages:
           passwordComplexityMinimumLength: null
 
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
@@ -181,7 +181,7 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
@@ -203,20 +203,28 @@ stages:
       json:
         data:
           accessControlEnabled: true
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
     response:
       status_code: 200
       json:
         data:
           accessControlEnabled: true
-          maxNumberOfLoginAttempts: 5
-          passwordResetTime: null
-          passwordComplexityMinimumLength: null
-          passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
 
-  - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
+
+  - name: DELETE resets everything except accessControlEnabled to its default
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
@@ -232,7 +240,7 @@ stages:
           minLengthOfReasonForInteraction: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
 
 
@@ -245,7 +253,7 @@ marks:
       - admin_access_token
 
 stages:
-  - name: PATCH to enable access control
+  - name: PATCH to enable maxNumberOfLoginAttempts
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -263,11 +271,11 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null          
 
-  - name: GET after DELETE returns the newly reset settings
+  - name: DELETE returns the newly reset settings
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
@@ -282,7 +290,7 @@ stages:
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
-          idleLogout: PT3M
+          idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
