@@ -10,6 +10,7 @@ import {
   SecondaryButton,
   WizardHeader,
 } from '@opentrons/components'
+import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -60,6 +61,10 @@ export function NozzleAndWellSelectionModal(
 
   const handleContinue = (): void => {
     setShowError(false)
+    if (currentStepIndex === 0 && pipetteSpecs.channels === 1) {
+      propsForFields.primaryNozzle.updateValue(A1_NOZZLE)
+      propsForFields.nozzles.updateValue(ALL)
+    }
     if (currentStepIndex !== 0 && activeFieldKey !== null) {
       if (wellValues.length === 0) {
         setShowError(true)

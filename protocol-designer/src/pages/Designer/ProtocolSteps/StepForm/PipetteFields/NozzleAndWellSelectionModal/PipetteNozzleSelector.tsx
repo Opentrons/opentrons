@@ -88,6 +88,7 @@ export function PipetteNozzleSelector(
         primaryNozzle,
         channels
       )
+      console.log('updatednozzles', updatedNozzles)
     } else {
       const numNozzles =
         PARTIAL_NOZZLE_MAP[
