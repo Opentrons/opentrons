@@ -90,23 +90,35 @@ class UpdateClient:
 
     def set_name(self, name: str) -> NameResponse:
         """POST /server/name with JSON body {"name": name}."""
-        response = self._client.post("/server/name", json={"name": name})
+        response = self.set_name_response({"name": name})
         response.raise_for_status()
         return NameResponse.model_validate(response.json())
+
+    def set_name_response(self, body: dict[str, Any]) -> httpx.Response:
+        """POST /server/name without raising, useful for error assertions."""
+        return self._client.post("/server/name", json=body)
 
     # -- Update session --------------------------------------------------------
 
     def begin_update(self) -> BeginResponse:
         """POST /server/update/begin. Returns session token (201)."""
-        response = self._client.post("/server/update/begin")
+        response = self.begin_update_response()
         response.raise_for_status()
         return BeginResponse.model_validate(response.json())
 
+    def begin_update_response(self) -> httpx.Response:
+        """POST /server/update/begin without raising."""
+        return self._client.post("/server/update/begin")
+
     def cancel_update(self) -> dict[str, Any]:
         """POST /server/update/cancel. Returns {"message": "Session cancelled"}."""
-        response = self._client.post("/server/update/cancel")
+        response = self.cancel_update_response()
         response.raise_for_status()
         return response.json()
+
+    def cancel_update_response(self) -> httpx.Response:
+        """POST /server/update/cancel without raising."""
+        return self._client.post("/server/update/cancel")
 
     def get_status(self, session_token: str) -> StatusResponse:
         """GET /server/update/{session}/status."""
@@ -122,14 +134,22 @@ class UpdateClient:
 
     def commit_update(self, session_token: str) -> dict[str, Any]:
         """POST /server/update/{session}/commit. Only valid when stage is done."""
-        response = self._client.post(f"/server/update/{session_token}/commit")
+        response = self.commit_update_response(session_token)
         response.raise_for_status()
         return response.json()
+
+    def commit_update_response(self, session_token: str) -> httpx.Response:
+        """POST /server/update/{session}/commit without raising."""
+        return self._client.post(f"/server/update/{session_token}/commit")
 
     # -- Restart ---------------------------------------------------------------
 
     def restart(self) -> dict[str, Any]:
         """POST /server/restart. Returns {"message": "Restarting in 1s"}."""
-        response = self._client.post("/server/restart")
+        response = self.restart_response()
         response.raise_for_status()
         return response.json()
+
+    def restart_response(self) -> httpx.Response:
+        """POST /server/restart without raising."""
+        return self._client.post("/server/restart")

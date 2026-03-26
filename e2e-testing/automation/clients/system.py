@@ -7,6 +7,8 @@ Pydantic models use aliases for the API's camelCase where needed.
 
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -93,20 +95,37 @@ class SystemClient:
 
     def authorize(self, registration_token: str) -> AuthorizeResponse:
         """POST /system/authorize. Exchange registration token for authorization token."""
-        response = self._client.post(
-            "/system/authorize",
-            headers={AUTHENTICATION_BEARER_HEADER: registration_token},
-        )
+        response = self.post_authorize_response(registration_token)
         response.raise_for_status()
         return AuthorizeResponse.model_validate(response.json())
 
     def check_authorization(self, authorization_token: str) -> None:
         """GET /system/authorize. Verify an authorization token (200 if valid)."""
-        response = self._client.get(
+        response = self.get_authorize_response(authorization_token)
+        response.raise_for_status()
+
+    def post_authorize_response(self, registration_token: str) -> httpx.Response:
+        """POST /system/authorize without raising for status assertions."""
+        return self._client.post(
+            "/system/authorize",
+            headers={AUTHENTICATION_BEARER_HEADER: registration_token},
+        )
+
+    def get_authorize_response(
+        self,
+        authorization_token: str,
+        *,
+        scopes: list[str] | None = None,
+    ) -> httpx.Response:
+        """GET /system/authorize without raising for status assertions."""
+        params: dict[str, Any] | None = None
+        if scopes is not None:
+            params = {"scopes": scopes}
+        return self._client.get(
             "/system/authorize",
             headers={AUTHENTICATION_BEARER_HEADER: authorization_token},
+            params=params,
         )
-        response.raise_for_status()
 
     # -- Connected (deprecated) ------------------------------------------------
 
@@ -115,6 +134,12 @@ class SystemClient:
         response = self._client.get("/system/connected")
         response.raise_for_status()
         return GetConnectedResponse.model_validate(response.json())
+
+    def get_openapi(self) -> dict[str, Any]:
+        """GET /system/openapi.json and return the parsed OpenAPI document."""
+        response = self._client.get("/system/openapi.json")
+        response.raise_for_status()
+        return response.json()
 
     # -- OEM mode (requires ROBOT_SETTINGS_WRITE when auth is enabled) --------
 
@@ -129,3 +154,21 @@ class SystemClient:
             headers=headers or None,
         )
         return response
+
+    def upload_splash_image(
+        self,
+        *,
+        file_name: str,
+        content: bytes,
+        content_type: str = "image/png",
+        token: str | None = None,
+    ) -> httpx.Response:
+        """POST /system/oem_mode/upload_splash with a multipart upload."""
+        headers: dict[str, str] = {}
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        return self._client.post(
+            "/system/oem_mode/upload_splash",
+            files={"file": (file_name, content, content_type)},
+            headers=headers or None,
+        )

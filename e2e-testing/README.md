@@ -1,6 +1,6 @@
 # E2E Testing
 
-End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, **Auth Server**, and **System Server** using Playwright (PD/LL) and httpx (Auth/System) with pytest.
+End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, **Auth Server**, **System Server**, **Update Server**, and **robot-server HTTP smoke** using Playwright (PD/LL) and httpx (server HTTP suites) with pytest.
 
 ## Prerequisites
 
@@ -87,6 +87,34 @@ The system tests use **httpx** to exercise the deprecated register/authorize/con
 
 **Auto-start behavior:** When no `SYSTEM_SERVER_URL` is set and nothing is already listening on `:32950`, the test fixture runs `make -C ../system-server dev` (with a temporary persistence directory), waits for the server, and tears it down after the session.
 
+### Update Server
+
+```bash
+make test-update                                     # Auto-starts update-server if needed
+make test-update PYTEST_ARGS="-k test_name"          # Run one test
+UPDATE_SERVER_URL=http://host:34000 make test-update  # Point at a remote server
+```
+
+The update tests use **httpx** to exercise non-destructive update-server endpoints like health, session lifecycle, and invalid name payload handling.
+
+**Auto-start behavior:** When no `UPDATE_SERVER_URL` is set and nothing is already listening on `:34000`, the test fixture runs `make -C ../update-server dev`, waits for the server, and tears it down after the session.
+
+**Safety note:** A valid `POST /server/name` can mutate host machine naming state. That coverage is opt-in only:
+
+```bash
+UPDATE_SERVER_ALLOW_NAME_MUTATION=true make test-update PYTEST_ARGS="-k valid_set_name"
+```
+
+### Robot HTTP Smoke
+
+```bash
+make test-robot-http
+ROBOT_SERVER_URL=http://robot-or-host:31950 make test-robot-http
+ROBOT_SERVER_URL=http://robot-or-host:31950 AUTH_SERVER_URL=http://robot-or-host:33950 make test-robot-http
+```
+
+The robot smoke tests auto-start a local dev `robot-server` when `ROBOT_SERVER_URL` is unset. They also auto-start a local `auth-server` for token-backed checks when `ROBOT_AUTH_SERVER_URL` / `AUTH_SERVER_URL` is unset.
+
 ### Other Targets
 
 ```bash
@@ -160,6 +188,8 @@ Gets a token from the auth-server (admin user), then calls robot-server `GET /he
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
   - `auth/` — Auth Server tests (marked `@pytest.mark.authE2E`)
   - `system/` — System Server tests (marked `@pytest.mark.systemE2E`)
+  - `update/` — Update Server tests (marked `@pytest.mark.updateE2E`)
+  - `robot/` — Robot HTTP smoke tests (marked `@pytest.mark.robotHTTP`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
 - `eyes.py` — Applitools Eyes wrapper and pytest fixture
@@ -190,19 +220,27 @@ Tests use the **Page Object Model** pattern for maintainability:
 | `auth_base_url` | session  | Resolves auth-server URL; auto-starts `make -C ../auth-server dev` if nothing is running       |
 | `auth_client`   | session  | Shared `AuthClient` (httpx) instance pointed at `auth_base_url`                                |
 | `admin_token`   | function | Fresh admin access token for tests that need one                                               |
+| `system_client` | session  | Shared `SystemClient` pointed at `system_base_url`                                             |
+| `update_client` | session  | Shared `UpdateClient` pointed at `update_base_url`                                             |
+| `robot_client`  | session  | `RobotClient` pointed at `ROBOT_SERVER_URL` or an auto-started local dev robot-server          |
 
 ### Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `AUTH_SERVER_URL`    | auto    | Override auth-server URL              |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| Variable                            | Default | Notes                                                       |
+| ----------------------------------- | ------- | ----------------------------------------------------------- |
+| `TEST_ENV`                          | `local` | `local`, `staging`, `prod`, `sandbox`                       |
+| `HEADLESS`                          | (unset) | `true` / `false`; overrides default                         |
+| `SKIP_SERVER_START`                 | `false` | Skip automatic server build+serve                           |
+| `PD_SERVER_URL`                     | auto    | Override PD URL                                             |
+| `LL_SERVER_URL`                     | auto    | Override LL URL                                             |
+| `LL_SERVER_PORT`                    | `4176`  | Preferred port for LL local server                          |
+| `AUTH_SERVER_URL`                   | auto    | Override auth-server URL                                    |
+| `SYSTEM_SERVER_URL`                 | auto    | Override system-server URL                                  |
+| `UPDATE_SERVER_URL`                 | auto    | Override update-server URL                                  |
+| `ROBOT_SERVER_URL`                  | auto    | Override robot-server URL, otherwise local dev server starts |
+| `ROBOT_AUTH_SERVER_URL`             | auto    | Override auth-server URL for robot token-backed smoke tests |
+| `UPDATE_SERVER_ALLOW_NAME_MUTATION` | `false` | Opt in to valid `POST /server/name` coverage                |
+| `APPLITOOLS_API_KEY`                | (unset) | Enable Applitools visual checks                             |
 
 ## Development Workflow
 
@@ -252,6 +290,9 @@ make troubleshoot
 - **PD tests** (`tests/pd/`) — Onboarding, imports, protocol steps, settings, drag-and-drop, URL navigation, etc.
 - **LL tests** (`tests/ll/`) — Navigation, labware creator forms for well plates, reservoirs, tube racks, etc.
 - **Auth tests** (`tests/auth/`) — OAuth 2 password grant, token refresh, introspection, settings endpoints, error cases
+- **System tests** (`tests/system/`) — Register / authorize / connected flow, OpenAPI, OEM mode, splash upload
+- **Update tests** (`tests/update/`) — Health, name, and update session lifecycle smoke coverage
+- **Robot tests** (`tests/robot/`) — OpenAPI, health, runs, and token-backed robot HTTP smoke coverage
 - **Unit tests** — `test_testfiles.py` validates fixture JSON files
 
 ### Test Reports and Artifacts
@@ -281,7 +322,7 @@ All tests automatically generate comprehensive reports and recordings:
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document test steps with comments and print statements so agents can maintain them
-8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E`, Auth tests `@pytest.mark.authE2E`, System tests `@pytest.mark.systemE2E`
+8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E`, Auth tests `@pytest.mark.authE2E`, System tests `@pytest.mark.systemE2E`, Update tests `@pytest.mark.updateE2E`, and robot HTTP smoke tests `@pytest.mark.robotHTTP`
 
 ## Visual Snapshots (Applitools Eyes)
 
@@ -341,4 +382,7 @@ Notes:
 - **`.github/workflows/pd-e2e-test.yaml`** — PD E2E tests
 - **`.github/workflows/ll-e2e-test.yaml`** — LL E2E tests
 - **`.github/workflows/auth-server-e2e-test.yaml`** — Auth Server E2E tests
+- **`.github/workflows/system-server-e2e-test.yaml`** — System Server E2E tests
+- **`.github/workflows/update-server-e2e-test.yaml`** — Update Server E2E tests
+- **`.github/workflows/robot-server-http-e2e-test.yaml`** — Robot-server HTTP smoke tests
 - **`.github/workflows/e2e-test-checks.yaml`** — Lint + typecheck

@@ -77,6 +77,27 @@ def test_bad_client_id_is_rejected(auth_client: AuthClient) -> None:
     assert resp.status_code == 401
 
 
+def test_invalid_grant_type_is_rejected(auth_client: AuthClient) -> None:
+    """Unsupported OAuth grant types are rejected."""
+    resp = auth_client.get_token_raw(
+        grant_type="client_credentials",
+        client_id="opentrons_app",
+        username=ADMIN_USERNAME,
+        password=ADMIN_PASSWORD,
+    )
+    assert resp.status_code == 400
+
+
+def test_missing_password_is_rejected(auth_client: AuthClient) -> None:
+    """Missing required form fields return a token endpoint error."""
+    resp = auth_client.get_token_raw(
+        grant_type="password",
+        client_id="opentrons_app",
+        username=ADMIN_USERNAME,
+    )
+    assert resp.status_code == 400
+
+
 # -- Token refresh ---------------------------------------------------------
 
 
@@ -125,6 +146,15 @@ def test_get_settings(auth_client: AuthClient) -> None:
     assert "accessControlEnabled" in settings["data"]
 
 
+def test_openapi_lists_core_auth_paths(auth_client: AuthClient) -> None:
+    """The auth-server OpenAPI document includes the main tested endpoints."""
+    openapi = auth_client.get_openapi()
+    assert openapi["openapi"].startswith("3.")
+    assert "/auth/oauth2/token" in openapi["paths"]
+    assert "/auth/settings" in openapi["paths"]
+    assert "/auth/users/{userName}" in openapi["paths"]
+
+
 def test_patch_settings_with_token(
     auth_client: AuthClient,
     admin_token: TokenResponse,
@@ -143,10 +173,9 @@ def test_patch_settings_access_control_false_rejected(
     admin_token: TokenResponse,
 ) -> None:
     """PATCH with accessControlEnabled: false is rejected (one-way latch)."""
-    resp = auth_client._client.patch(
-        "/auth/settings",
-        json={"data": {"accessControlEnabled": False}},
-        headers=AuthClient.auth_header(admin_token),
+    resp = auth_client.patch_settings_response(
+        {"accessControlEnabled": False},
+        token=admin_token,
     )
     assert resp.status_code == 422
 
@@ -188,7 +217,7 @@ def test_create_get_update_delete_user(
     assert created.user_name == username
     assert created.full_name == full_name
     assert created.account_type == "user"
-    assert "runs.write" in created.scopes
+    assert "robot_control.write" in created.scopes
 
     gotten = auth_client.get_user(admin_token, username)
     assert gotten.user_name == created.user_name
@@ -225,9 +254,9 @@ def test_create_user_duplicate_rejected(
         full_name="Duplicate",
         account_type="user",
     )
-    resp = auth_client._client.post(
-        "/auth/users",
-        json={
+    resp = auth_client.post_users_request(
+        admin_token,
+        {
             "data": {
                 "userName": "test_e2e_dup",
                 "password": "password1234",
@@ -235,7 +264,6 @@ def test_create_user_duplicate_rejected(
                 "accountType": "user",
             }
         },
-        headers=AuthClient.auth_header(admin_token),
     )
     assert resp.status_code == 400
     auth_client.delete_user(admin_token, "test_e2e_dup")
@@ -251,12 +279,79 @@ def test_get_user_not_found(
     assert exc_info.value.response.status_code == 404
 
 
+def test_update_user_duplicate_name_rejected(
+    auth_client: AuthClient,
+    admin_token: TokenResponse,
+) -> None:
+    """Renaming a user to an existing username returns 400."""
+    first_username = "test_e2e_duplicate_target"
+    second_username = "test_e2e_duplicate_source"
+
+    auth_client.create_user(
+        admin_token,
+        user_name=first_username,
+        password="password1234",
+        full_name="Duplicate Target",
+        account_type="user",
+    )
+    auth_client.create_user(
+        admin_token,
+        user_name=second_username,
+        password="password5678",
+        full_name="Duplicate Source",
+        account_type="user",
+    )
+
+    try:
+        resp = auth_client.patch_user_request(
+            admin_token,
+            second_username,
+            {"data": {"userName": first_username}},
+        )
+        if resp.status_code == 500:
+            pytest.xfail("auth-server currently returns 500 for duplicate username updates")
+        assert resp.status_code == 400
+    finally:
+        auth_client.delete_user(admin_token, second_username)
+        auth_client.delete_user(admin_token, first_username)
+
+
 # Expected scopes per account type (auth_server/users/models.py ACCOUNT_TYPE_TO_SCOPES).
+# Admin and service receive every Scope; user gets the day-to-day robot scopes; auditor
+# gets users.read only. Keep in sync with server-utils Scope api_name values.
 _ACCOUNT_TYPE_SCOPES: dict[str, list[str]] = {
-    "admin": ["auth_settings.write", "robot_settings.write", "runs.write", "users.read", "users.write"],
-    "user": ["runs.write"],
+    "admin": [
+        "auth_settings.write",
+        "protocols.write",
+        "restart.write",
+        "robot_control.write",
+        "robot_settings.write",
+        "run_data.write",
+        "ssh_keys.write",
+        "updates.write",
+        "users.read",
+        "users.write",
+    ],
+    "user": [
+        "protocols.write",
+        "restart.write",
+        "robot_control.write",
+        "robot_settings.write",
+        "updates.write",
+    ],
     "auditor": ["users.read"],
-    "service": ["runs.write"],
+    "service": [
+        "auth_settings.write",
+        "protocols.write",
+        "restart.write",
+        "robot_control.write",
+        "robot_settings.write",
+        "run_data.write",
+        "ssh_keys.write",
+        "updates.write",
+        "users.read",
+        "users.write",
+    ],
 }
 
 

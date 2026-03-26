@@ -1,13 +1,13 @@
 ---
 name: e2e-testing
-description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
+description: E2E testing conventions for Protocol Designer, Labware Library, and HTTP server smoke suites in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, httpx clients, or pytest fixtures in e2e-testing/.
 ---
 
 # E2E Testing Instructions
 
 ## Project Overview
 
-The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (PD)** and **Labware Library (LL)** using:
+The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (PD)**, **Labware Library (LL)**, and HTTP smoke suites for **auth-server**, **system-server**, **update-server**, and **robot-server** using:
 
 - **Playwright** — Browser automation (Chromium)
 - **pytest** — Test framework
@@ -18,15 +18,22 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 ## Directory Layout
 
 - `automation/base_page.py` — Shared `BasePage` class inherited by all page objects
+- `automation/clients/` — Shared httpx clients for auth/server smoke suites
 - `automation/pd_pages/` — PD page objects (import from `automation.pd_pages`)
 - `automation/ll_pages/` — LL page objects (import from `automation.ll_pages`)
 - `tests/pd/` — PD E2E tests (marked `@pytest.mark.pdE2E`)
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
+- `tests/auth/` — Auth server smoke tests (marked `@pytest.mark.authE2E`)
+- `tests/system/` — System server smoke tests (marked `@pytest.mark.systemE2E`)
+- `tests/update/` — Update server smoke tests (marked `@pytest.mark.updateE2E`)
+- `tests/robot/` — Robot HTTP smoke tests (marked `@pytest.mark.robotHTTP`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 
 ## Architecture — Page Object Model
 
 **ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests.
+
+For the HTTP suites under `tests/auth/`, `tests/system/`, `tests/update/`, and `tests/robot/`, use the typed clients in `automation/clients/` instead of raw `httpx` calls inside tests whenever practical.
 
 ### Shared Base (`automation/base_page.py`)
 
@@ -127,6 +134,11 @@ Tests run against different environments via `TEST_ENV`:
 | `browser_type_launch_args` | session  | Headless/headed, slow_mo                                                                       |
 | `eyes`                     | function | Applitools Eyes session (or None)                                                              |
 | `eyes_singleton`           | session  | Shared Applitools Eyes instance                                                                |
+| `auth_base_url`            | session  | Resolves auth-server URL; auto-starts local auth-server if needed                              |
+| `system_base_url`          | session  | Resolves system-server URL; auto-starts local system-server if needed                          |
+| `update_base_url`          | session  | Resolves update-server URL; auto-starts local update-server if supported on the host           |
+| `robot_base_url`           | session  | Resolves robot-server URL; auto-starts local robot-server if needed                            |
+| `robot_auth_base_url`      | session  | Resolves auth-server URL used by robot token-backed smoke tests                                |
 
 ### Key Environment Variables
 
@@ -138,6 +150,12 @@ Tests run against different environments via `TEST_ENV`:
 | `PD_SERVER_URL`      | auto    | Override PD URL                       |
 | `LL_SERVER_URL`      | auto    | Override LL URL                       |
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
+| `AUTH_SERVER_URL`    | auto    | Override auth-server URL              |
+| `SYSTEM_SERVER_URL`  | auto    | Override system-server URL            |
+| `UPDATE_SERVER_URL`  | auto    | Override update-server URL            |
+| `ROBOT_SERVER_URL`   | auto    | Override robot-server URL             |
+| `ROBOT_AUTH_SERVER_URL` | auto | Override auth-server URL for robot smoke tests |
+| `UPDATE_SERVER_ALLOW_NAME_MUTATION` | `false` | Opt in to valid `POST /server/name` update coverage |
 | `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
 
 ## Development Commands
@@ -174,6 +192,10 @@ make test-ll-prod                                # Against prod
 **Other targets:**
 
 ```bash
+make test-auth      # Auth server smoke tests
+make test-system    # System server smoke tests
+make test-update    # Update server smoke tests
+make test-robot-http # Robot-server HTTP smoke tests
 make test-unit      # Unit tests only
 make troubleshoot   # Re-run last failures in headed mode
 make codegen        # Playwright Inspector/recorder (default localhost:4173)
@@ -253,7 +275,7 @@ self.page.get_by_role("button", name="Submit").click()
 
 ### Test Markers
 
-Every PD test **must** have `@pytest.mark.pdE2E`. Every LL test **must** have `@pytest.mark.llE2E`. A test cannot have both markers.
+Every PD test **must** have `@pytest.mark.pdE2E`. Every LL test **must** have `@pytest.mark.llE2E`. HTTP suites should use the matching marker (`authE2E`, `systemE2E`, `updateE2E`, or `robotHTTP`). A test cannot have both PD and LL markers.
 
 ## Visual Snapshots (Applitools Eyes)
 
@@ -290,6 +312,14 @@ def test_my_feature(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
 4. Run locally: `make test-ll-local PYTEST_ARGS="-k test_name"`
 5. Check code quality: `make check`
 
+### Adding a New HTTP Smoke Test
+
+1. Add or extend a typed helper in `automation/clients/` instead of reaching into a private `httpx` client from the test
+2. Write the test in the matching suite under `tests/auth/`, `tests/system/`, `tests/update/`, or `tests/robot/`
+3. Add the matching pytest marker and type annotations
+4. Prefer auto-start fixtures for local services; only require explicit env vars when the service truly cannot be started locally
+5. Run the focused suite locally, for example `make test-system PYTEST_ARGS="-k oem"` or `make test-robot-http`
+
 ### Chaining Page Objects
 
 ```python
@@ -304,6 +334,10 @@ def navigate_and_configure(self) -> "NextPage":
 
 - **`.github/workflows/pd-e2e-test.yaml`** — PD E2E tests
 - **`.github/workflows/ll-e2e-test.yaml`** — LL E2E tests
+- **`.github/workflows/auth-server-e2e-test.yaml`** — Auth server E2E tests
+- **`.github/workflows/system-server-e2e-test.yaml`** — System server E2E tests
+- **`.github/workflows/update-server-e2e-test.yaml`** — Update server E2E tests
+- **`.github/workflows/robot-server-http-e2e-test.yaml`** — Robot-server HTTP smoke tests
 - **`.github/workflows/e2e-test-checks.yaml`** — Lint + typecheck
 
 ## Troubleshooting

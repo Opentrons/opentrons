@@ -139,3 +139,13 @@ def system_client(system_base_url: str) -> Generator[SystemClient, None, None]:
     """Session-scoped system-server client."""
     with SystemClient(base_url=system_base_url) as client:
         yield client
+
+
+@pytest.fixture()
+def oem_mode_disabled(system_client: SystemClient) -> Generator[None, None, None]:
+    """Ensure OEM mode is disabled before and after a test."""
+    system_client.enable_oem_mode(False)
+    try:
+        yield
+    finally:
+        system_client.enable_oem_mode(False)

@@ -137,6 +137,21 @@ check-auth:
 test-system:
 	uv run pytest -m systemE2E $(PYTEST_ARGS)
 
+# ── Update-server E2E tests ──────────────────────────────────────────────────
+# Auto-starts a local update-server if one isn't already running.
+# Point UPDATE_SERVER_URL at a remote server to skip local startup.
+
+.PHONY: test-update
+test-update:
+	uv run pytest -m updateE2E $(PYTEST_ARGS)
+
+# ── Robot HTTP smoke tests ───────────────────────────────────────────────────
+# Requires ROBOT_SERVER_URL and optionally AUTH_SERVER_URL / ROBOT_AUTH_SERVER_URL.
+
+.PHONY: test-robot-http
+test-robot-http:
+	uv run pytest -m robotHTTP $(PYTEST_ARGS)
+
 .PHONY: test-compare
 test-compare:
 	@if [ "$(HEADLESS)" = "false" ]; then \

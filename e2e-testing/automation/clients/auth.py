@@ -201,6 +201,12 @@ class AuthClient:
         response.raise_for_status()
         return response.json()
 
+    def get_openapi(self) -> dict[str, Any]:
+        """GET /auth/openapi.json and return the parsed OpenAPI document."""
+        response = self._client.get("/auth/openapi.json")
+        response.raise_for_status()
+        return response.json()
+
     # -- Auth Settings -------------------------------------------------------------
 
     def get_settings(self) -> dict[str, Any]:
@@ -215,14 +221,22 @@ class AuthClient:
         token: TokenResponse | None = None,
     ) -> dict[str, Any]:
         """PATCH /auth/settings. Requires auth when access control is enabled."""
+        response = self.patch_settings_response(data, token=token)
+        response.raise_for_status()
+        return response.json()
+
+    def patch_settings_response(
+        self,
+        data: dict[str, Any],
+        token: TokenResponse | None = None,
+    ) -> httpx.Response:
+        """PATCH /auth/settings without raising (for asserting error status codes)."""
         headers = AuthClient.auth_header(token) if token else {}
-        response = self._client.patch(
+        return self._client.patch(
             "/auth/settings",
             json={"data": data},
             headers=headers,
         )
-        response.raise_for_status()
-        return response.json()
 
     def reset_settings(
         self,
@@ -252,13 +266,24 @@ class AuthClient:
             full_name=full_name,
             account_type=account_type,
         )
-        response = self._client.post(
-            "/auth/users",
-            json={"data": payload_data.model_dump(by_alias=True)},
-            headers=AuthClient.auth_header(token),
+        response = self.post_users_request(
+            token,
+            {"data": payload_data.model_dump(by_alias=True)},
         )
         response.raise_for_status()
         return UserResponse.model_validate(response.json()["data"])
+
+    def post_users_request(
+        self,
+        token: TokenResponse,
+        body: dict[str, Any],
+    ) -> httpx.Response:
+        """POST /auth/users with a full JSON body (for success and error cases)."""
+        return self._client.post(
+            "/auth/users",
+            json=body,
+            headers=AuthClient.auth_header(token),
+        )
 
     def get_user(self, token: TokenResponse, user_name: str) -> UserResponse:
         """GET /auth/users/{user_name} (requires USERS_READ scope)."""
@@ -295,6 +320,19 @@ class AuthClient:
         )
         response.raise_for_status()
         return UserResponse.model_validate(response.json()["data"])
+
+    def patch_user_request(
+        self,
+        token: TokenResponse,
+        user_name: str,
+        body: dict[str, Any],
+    ) -> httpx.Response:
+        """PATCH /auth/users/{user_name} with a raw request body."""
+        return self._client.patch(
+            f"/auth/users/{user_name}",
+            json=body,
+            headers=AuthClient.auth_header(token),
+        )
 
     def delete_user(self, token: TokenResponse, user_name: str) -> None:
         """DELETE /auth/users/{user_name} (requires USERS_WRITE scope). Returns 200 with empty body."""

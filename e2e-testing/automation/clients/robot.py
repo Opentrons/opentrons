@@ -17,13 +17,16 @@ from pydantic import BaseModel, ConfigDict, Field
 
 # Default port for robot-server (e.g. Opentrons App, port 31950).
 DEFAULT_ROBOT_SERVER_PORT = 31950
+DEFAULT_OPENTRONS_VERSION = "*"
 
 
 def _headers(access_token: str | None) -> dict[str, str]:
     """Build request headers; add Bearer token when provided."""
+    headers = {"Opentrons-Version": DEFAULT_OPENTRONS_VERSION}
     if not access_token:
-        return {}
-    return {"Authorization": f"Bearer {access_token}"}
+        return headers
+    headers["Authorization"] = f"Bearer {access_token}"
+    return headers
 
 
 # -- Response models (robot-server uses camelCase in JSON) --------------------
@@ -127,6 +130,12 @@ class RobotClient:
 
     def close(self) -> None:
         self._client.close()
+
+    def get_openapi(self) -> dict[str, Any]:
+        """GET /openapi.json and return the parsed OpenAPI document."""
+        response = self._client.get("/openapi.json")
+        response.raise_for_status()
+        return response.json()
 
     def get_health(self, access_token: str | None = None) -> HealthResponse:
         """GET /health. Returns parsed health (name, robot_model, api_version, etc.)."""

@@ -1,23 +1,23 @@
-# Auth Server E2E Tests
-# The e2e-testing conftest auto-starts the auth-server when no
-# AUTH_SERVER_URL is set, so we just need both Python environments
-# installed and let pytest handle the rest.
+# Robot Server HTTP Smoke Tests
+# The e2e-testing robot conftest auto-starts auth-server and robot-server
+# when no ROBOT_SERVER_URL / AUTH_SERVER_URL are set, so we only need the
+# project environments installed and let pytest handle the rest.
 
-name: 'Auth Server E2E Tests'
+name: 'Robot Server HTTP Smoke Tests'
 
 on:
   pull_request:
     paths:
+      - 'robot-server/**'
       - 'auth-server/**'
       - 'server-utils/**'
-      - 'e2e-testing/tests/auth/**'
+      - 'e2e-testing/tests/robot/**'
       - 'e2e-testing/automation/clients/**'
-      - 'e2e-testing/scripts/check_auth.py'
       - 'e2e-testing/scripts/check_robot_auth.py'
       - 'e2e-testing/uv.lock'
       - 'e2e-testing/pyproject.toml'
       - 'e2e-testing/pytest.ini'
-      - '.github/workflows/auth-server-e2e-test.yaml'
+      - '.github/workflows/robot-server-http-e2e-test.yaml'
       - '.github/actions/python/**'
       - 'Makefile'
       - 'scripts/**.mk'
@@ -37,25 +37,27 @@ env:
 
 jobs:
   e2e-test:
-    name: 'auth-server E2E tests'
+    name: 'robot-server HTTP smoke tests'
     runs-on: 'ubuntu-24.04'
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: 'actions/checkout@v6'
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      # -- Auth-server setup (so `make -C ../auth-server dev` works) ---
       - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.22.0'
 
       - uses: './.github/actions/python/setup-uv'
         with:
+          project: 'robot-server'
+
+      - uses: './.github/actions/python/setup-uv'
+        with:
           project: 'auth-server'
 
-      # -- E2E test runner setup ---------------------------------------
       - name: 'Setup UV for E2E tests'
         uses: astral-sh/setup-uv@v7
         with:
@@ -68,17 +70,15 @@ jobs:
         working-directory: e2e-testing
         run: make setup
 
-      # -- Run tests (conftest auto-starts auth-server) ----------------
-      - name: 'Run auth E2E tests'
+      - name: 'Run robot HTTP smoke tests'
         working-directory: e2e-testing
-        run: make test-auth
+        run: make test-robot-http
 
-      # -- Artifacts ---------------------------------------------------
       - name: 'Upload test results'
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: auth-e2e-results
+          name: robot-http-e2e-results
           path: |
             e2e-testing/test-results/
           retention-days: 7

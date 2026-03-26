@@ -6,11 +6,17 @@ register -> authorize -> connected flow works end-to-end.
 
 from __future__ import annotations
 
+import base64
+
 import pytest
 
 from automation.clients.system import SystemClient
 
 pytestmark = pytest.mark.systemE2E
+
+_ONE_BY_ONE_PNG = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W4H0AAAAASUVORK5CYII="
+)
 
 
 # -- Register ------------------------------------------------------------------
@@ -86,10 +92,7 @@ def test_authorize_exchanges_registration_for_auth_token(
 
 def test_authorize_invalid_token_rejected(system_client: SystemClient) -> None:
     """POST /system/authorize with invalid token returns 401."""
-    resp = system_client._client.post(
-        "/system/authorize",
-        headers={"authenticationbearer": "invalid-token"},
-    )
+    resp = system_client.post_authorize_response("invalid-token")
     assert resp.status_code == 401
 
 
@@ -113,10 +116,7 @@ def test_check_authorization_registration_token_rejected(
         agent="wrong-token-agent",
         agent_id="wrong-token-agent-id",
     )
-    resp = system_client._client.get(
-        "/system/authorize",
-        headers={"authenticationbearer": reg.token},
-    )
+    resp = system_client.get_authorize_response(reg.token)
     assert resp.status_code == 403
 
 
@@ -140,3 +140,64 @@ def test_register_authorize_then_connected_list_includes_entry(
     found = [c for c in resp.connections if c.subject == subject and c.agent == agent]
     assert found
     assert found[0].agent_id == agent_id
+
+
+def test_system_openapi_lists_core_paths(system_client: SystemClient) -> None:
+    """The system-server OpenAPI document includes the tested endpoints."""
+    openapi = system_client.get_openapi()
+    assert openapi["openapi"].startswith("3.")
+    assert "/system/register" in openapi["paths"]
+    assert "/system/authorize" in openapi["paths"]
+    assert "/system/connected" in openapi["paths"]
+    assert "/system/oem_mode/enable" in openapi["paths"]
+
+
+def test_enable_oem_mode_toggles(
+    system_client: SystemClient,
+    oem_mode_disabled: None,
+) -> None:
+    """OEM mode can be enabled and disabled."""
+    enable_resp = system_client.enable_oem_mode(True)
+    assert enable_resp.status_code == 200
+
+    disable_resp = system_client.enable_oem_mode(False)
+    assert disable_resp.status_code == 200
+
+
+def test_upload_splash_requires_oem_enabled(
+    system_client: SystemClient,
+    oem_mode_disabled: None,
+) -> None:
+    """Splash upload is forbidden unless OEM mode is enabled first."""
+    resp = system_client.upload_splash_image(
+        file_name="splash.png",
+        content=_ONE_BY_ONE_PNG,
+    )
+    assert resp.status_code == 403
+
+
+def test_upload_splash_rejects_invalid_type(
+    system_client: SystemClient,
+    oem_mode_disabled: None,
+) -> None:
+    """Only PNG uploads are accepted."""
+    system_client.enable_oem_mode(True)
+    resp = system_client.upload_splash_image(
+        file_name="not-a-png.txt",
+        content=b"plain text",
+        content_type="text/plain",
+    )
+    assert resp.status_code == 415
+
+
+def test_upload_splash_accepts_png(
+    system_client: SystemClient,
+    oem_mode_disabled: None,
+) -> None:
+    """A small PNG can be uploaded when OEM mode is enabled."""
+    system_client.enable_oem_mode(True)
+    resp = system_client.upload_splash_image(
+        file_name="splash.png",
+        content=_ONE_BY_ONE_PNG,
+    )
+    assert resp.status_code == 201
