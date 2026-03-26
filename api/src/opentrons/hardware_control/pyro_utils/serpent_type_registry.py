@@ -13,7 +13,6 @@ from opentrons.util.pyro.pyro_serialization import (
 )
 
 
-
 # Estop Overall Status registry
 def _estop_overall_status_dict_to_class(  # type: ignore
     classname, d
