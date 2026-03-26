@@ -351,7 +351,7 @@ class MixStepForm(BasePage):
         self.page.get_by_role("button", name="Rename").click()
         modal = self._modal_area()
         modal.locator('input[name="stepName_input"]').fill(name)
-        modal.locator('[data-testid="TextAreaField"]').fill(notes)
+        modal.get_by_role("textbox", name="Step Notes").fill(notes)
         modal.get_by_role("button", name="Save").click()
 
     def save_step(self) -> None:
