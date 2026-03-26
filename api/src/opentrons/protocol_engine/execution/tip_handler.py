@@ -415,6 +415,7 @@ class HardwareTipHandler(TipHandler):
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """See documentation on abstract base class."""
+        return
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._get_hw_mount(pipette_id)

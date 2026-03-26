@@ -637,7 +637,7 @@ class PipetteView:
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""
         attached_tip = self.get_attached_tip(pipette_id)
-        return True
+        return
         if expected_has_tip is True and attached_tip is None:
             raise errors.TipNotAttachedError(
                 "Pipette should have a tip attached, but does not."
