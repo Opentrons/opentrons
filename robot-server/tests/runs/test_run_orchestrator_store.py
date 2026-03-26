@@ -230,7 +230,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    engine = subject._run_orchestrator._protocol_engine
+    engine = subject._run_orchestrator._protocol_engine  # type: ignore[union-attr]
     engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
     assert (
