@@ -5,7 +5,11 @@ from typing import Generator
 import pytest
 
 from auth_server.persistence.database import create_schema, sql_engine_ctx
-from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
+from auth_server.settings.models import (
+    PatchAccessControlRequestData,
+    PatchSettingsRequestData,
+    SettingsResponseData,
+)
 from auth_server.settings.store import SettingsStore
 
 _DEFAULTS: dict[str, object] = SettingsResponseData().model_dump(
@@ -124,7 +128,9 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
 def test_get_access_control_settings(settings_store: SettingsStore) -> None:
     """get_access_control_settings should return the current access control settings."""
     fetched = settings_store.get_access_control_settings()
-    assert fetched is False
-    settings_store.patch_access_control(True)
+    assert fetched.accessControlEnabled is False
+    settings_store.patch_access_control(
+        PatchAccessControlRequestData(accessControlEnabled=True)
+    )
     fetched = settings_store.get_access_control_settings()
-    assert fetched is True
+    assert fetched.accessControlEnabled is True

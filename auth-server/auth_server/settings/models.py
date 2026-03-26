@@ -119,3 +119,21 @@ class PatchSettingsRequestData(_PatchSettingsBase):  # type: ignore[valid-type,m
                 if field in data and data[field] is None:
                     raise ValueError(f"{field} cannot be null")
         return data
+
+
+class PatchAccessControlRequestData(_StrictBaseModel):
+    """A request to change the access control settings."""
+
+    accessControlEnabled: Annotated[
+        Literal[True] | None,
+        pydantic.Field(
+            description="Set to `true` to enable access control. "
+            "Once enabled, access control cannot be disabled without assistance from Opentrons."
+        ),
+    ] = None
+
+
+class AccessControlResponseData(pydantic.BaseModel):
+    """A response with the current access control settings."""
+
+    accessControlEnabled: bool

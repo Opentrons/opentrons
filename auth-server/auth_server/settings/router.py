@@ -10,8 +10,13 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleBody,
 )
 
-from .models import PatchSettingsRequestData, SettingsResponseData
+from .models import (
+    AccessControlResponseData,
+    PatchSettingsRequestData,
+    SettingsResponseData,
+)
 from .store import SettingsStore, get_settings_store
+from auth_server.settings.models import PatchAccessControlRequestData
 
 router = fastapi.APIRouter()
 
@@ -36,9 +41,23 @@ async def get_settings(  # noqa: D103
 )
 async def get_access_control_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
-) -> SimpleBody[bool]:
+) -> SimpleBody[AccessControlResponseData]:
     accessControlEnabled = settings_store.get_access_control_settings()
     return SimpleBody.model_construct(data=accessControlEnabled)
+
+
+@router.patch(
+    "/auth/settings/access-control",
+    summary="Change access control settings",
+    description="Change the access control settings.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+)
+async def patch_access_control_settings(  # noqa: D103
+    request_body: RequestModel[PatchAccessControlRequestData],
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+) -> SimpleBody[AccessControlResponseData]:
+    accessControlResponseData = settings_store.patch_access_control(request_body.data)
+    return SimpleBody.model_construct(data=accessControlResponseData)
 
 
 @router.patch(

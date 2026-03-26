@@ -1,6 +1,6 @@
 """User store – pure data access layer for user persistence."""
 
-from typing import Annotated, cast
+from typing import Annotated
 
 import fastapi
 from sqlalchemy.engine import Engine as SQLEngine
@@ -14,7 +14,12 @@ from server_utils.fastapi_utils.app_state import (
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
 from auth_server.persistence.orm_models import AccessControlEnabled, Setting
-from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
+from auth_server.settings.models import (
+    AccessControlResponseData,
+    PatchAccessControlRequestData,
+    PatchSettingsRequestData,
+    SettingsResponseData,
+)
 
 
 class SettingsStore:
@@ -40,7 +45,7 @@ class SettingsStore:
             parsed = {row.key: row.value for row in rows}
             return SettingsResponseData.model_validate(parsed, strict=False)
 
-    def get_access_control_settings(self) -> bool:
+    def get_access_control_settings(self) -> AccessControlResponseData:
         """Get the current access control settings."""
         with self._session() as session:
             row = (
@@ -49,10 +54,10 @@ class SettingsStore:
                 .first()
             )
             if row is None:
-                return False
-            return cast(bool, row.enabled)
+                return AccessControlResponseData(accessControlEnabled=False)
+            return AccessControlResponseData(accessControlEnabled=row.enabled)
 
-    def update_access_control_table(self, enabled: bool) -> None:
+    def update_access_control_table(self, accessControlEnabled: bool) -> None:
         """Update the access control enabled setting."""
         with self._session() as session:
             row = (
@@ -61,15 +66,19 @@ class SettingsStore:
                 .first()
             )
             if row is None:
-                session.add(AccessControlEnabled(id=1, enabled=enabled))
+                session.add(AccessControlEnabled(id=1, enabled=accessControlEnabled))
             else:
-                row.enabled = enabled
+                row.enabled = accessControlEnabled
             session.commit()
 
-    def patch_access_control(self, enabled: bool) -> SettingsResponseData:
+    def patch_access_control(
+        self, patch: PatchAccessControlRequestData
+    ) -> AccessControlResponseData:
         """Patch the access control enabled setting."""
-        self.update_access_control_table(enabled)
-        return self.get_settings()
+        if patch.accessControlEnabled is None:
+            return self.get_access_control_settings()
+        self.update_access_control_table(patch.accessControlEnabled)
+        return self.get_access_control_settings()
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""

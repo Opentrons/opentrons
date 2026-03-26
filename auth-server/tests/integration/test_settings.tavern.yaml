@@ -285,3 +285,27 @@ stages:
           idleLogout: PT3M
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
+
+---
+test_name: PATCH to enable access control
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: PATCH to enable access control
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/access-control'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
