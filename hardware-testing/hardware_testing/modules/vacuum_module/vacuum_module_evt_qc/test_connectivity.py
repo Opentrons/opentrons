@@ -26,7 +26,7 @@ async def test_gcode(vacuum: VacuumModule, report: CSVReport) -> None:
     """Send and receive response for GCODE M115."""
     success = True
     info = await vacuum._driver.get_device_info()
-    target_rev = HardwareRevision.NFF
+    target_rev = HardwareRevision.EVT
     hw = info["model"]
     fw = info["version"]
     sn = info["serial"]
@@ -48,6 +48,7 @@ async def test_eeprom(vacuum: VacuumModule, report: CSVReport) -> None:
         serial = "VACUUM-SIMULATOR-SN"
     await vacuum._driver.set_serial_number(serial)
     report.set_tag(serial)
+    info = await vacuum._driver.get_device_info()
     info = await vacuum._driver.get_device_info()
     sn = info["serial"]
     if sn != serial:
