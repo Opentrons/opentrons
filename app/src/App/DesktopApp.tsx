@@ -49,22 +49,6 @@ export const DesktopApp = (): JSX.Element => {
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
 
-  // note for react-scan
-  const enableReactScan = useFeatureFlag('reactScan')
-  // Dynamically import `react-scan` to avoid build errors
-  if (typeof window !== 'undefined' && enableReactScan) {
-    import('react-scan')
-      .then(({ scan }) => {
-        scan({
-          enabled: enableReactScan,
-          log: true,
-        })
-      })
-      .catch(error => {
-        console.error('Failed to load react-scan:', error)
-      })
-  }
-
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
