@@ -54,7 +54,7 @@ import type {
   WorkingOffset,
 } from './types'
 
-const PROBE_LENGTH_MM = 44.5
+const PROBE_LENGTH_MM = 49.5
 
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'CHECK_POSITIONS'
