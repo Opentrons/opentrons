@@ -12,10 +12,11 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.10.01!**
 
-This release improves partial tip pickup in Protocol Designer and includes other bug fixes and improvements.
+This release adds full support for Flex 20 µL pipette tips and all available partial tip pickup configurations in Protocol Designer, and includes other bug fixes and improvements.
 
 ### New Features
 
+- Use Flex 20 µL pipette tips in your Protocol Designer protocols, including with liquid class transfers.
 - Choose from additional partial tip pickup options in Protocol Designer:
   - Flex 96-channel pipette single column (column 1), single row (row A or H), or single nozzle (A1, A12, or H1) tip pickup.
   - Flex 8-channel pipette partial column pickup (2–7 consecutive nozzles ending at H1).
@@ -29,8 +30,8 @@ This release improves partial tip pickup in Protocol Designer and includes other
 ### Bug Fixes
 
 - Use partial tip pickup for a transfer or mix step in a tube rack without errors.
-- Place at least one labware without a lid, accessible to the attached pipette, on the deck to add a transfer step.
-- Place compatible Opentrons Tough Universal Lids on custom well plates or reservoirs on the deck.
+- Protocol Designer only lets you add a transfer step when the deck contains at least one labware without a lid, accessible to your attached pipette.
+- Protocol Designer lets you add compatible Opentrons Tough Universal Lids on custom well plates or reservoirs without errors.
 - Labware nicknames now apply to the topmost labware that is not a lid.
 
 ## Opentrons Protocol Designer Changes in 8.9.1
