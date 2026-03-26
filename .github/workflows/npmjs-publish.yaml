@@ -95,4 +95,4 @@ jobs:
 
       - name: publish packages
         working-directory: scripts/npmjs-publish
-        run: make run-ci VERSION=${{ github.ref }}
+        run: make publish-ci VERSION=${{ github.ref }}

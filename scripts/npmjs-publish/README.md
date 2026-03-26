@@ -34,10 +34,10 @@ Validates a target version against the **public** npm registry for all four pack
 
 ```bash
 # Interactive (prompts for version; shows registry snapshot first)
-make run-local
+make publish-local
 
 # CI-style (needs VERSION)
-make run-ci
+make publish-ci
 # equivalent: uv run python publish.py --version "$VERSION" --non-interactive
 ```
 

@@ -1,4 +1,4 @@
-.PHONY: setup teardown format lint test run-ci run-local build-packages build-packages-manifests-only
+.PHONY: setup teardown format lint test publish-ci publish-local build-packages build-packages-manifests-only
 
 setup:
 	uv sync --frozen
@@ -17,11 +17,11 @@ lint:
 test:
 	uv run pytest tests/ -v
 
-run-ci:
+publish-ci:
 	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or npmjs-publish tag ref"; exit 1; fi
 	uv run python publish.py --version "$(VERSION)" --non-interactive
 
-run-local:
+publish-local:
 	uv run python publish.py --interactive
 
 # With VERSION: build then rewrite package.json. Without VERSION: build only (verify release pipeline).
