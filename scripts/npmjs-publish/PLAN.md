@@ -29,7 +29,7 @@ todos:
 - **Tag:** `npmjs-publish@<semver>` for workflow and version parsing.
 - **Preflight:** rejects invalid semver and wrong tag prefixes; partial and full “already on registry” cases are **errors** (npm cannot overwrite an existing version).
 - **Build chain:** `build_packages.py` runs `make build-ts`, `shared-data lib-js`, `step-generation lib`, components `build-ts` + `lib`, protocol-visualization `build-ts` + `lib`, then optional manifest rewrite.
-- **Workflow** [`.github/workflows/npmjs-publish.yaml`](../../.github/workflows/npmjs-publish.yaml): PR path filters run lint + test; tag push runs publish preflight job with version from ref.
+- **Workflow** [`.github/workflows/npmjs-publish.yaml`](../../.github/workflows/npmjs-publish.yaml): PR path filters run lint + test; tag push runs **publish** preflight only (no lint or unit tests on the tag).
 - **step-generation:** npm-oriented `package.json` and `Makefile` targets (`build-ts`, `lib`, `pack`).
 
 **Not done yet:**

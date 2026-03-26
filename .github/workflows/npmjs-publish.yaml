@@ -1,6 +1,6 @@
 name: npmjs publish
 
-# PR: lint and unit tests only (file-filtered). Tag push: same jobs plus publish (tag-only).
+# PR: lint and unit tests only (file-filtered). Tag push: publish only (no lint/tests).
 on:
   pull_request:
     paths:
@@ -24,6 +24,7 @@ env:
 jobs:
   lint:
     name: Lint npmjs-publish
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
@@ -44,6 +45,7 @@ jobs:
 
   test:
     name: Unit test npmjs-publish
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository

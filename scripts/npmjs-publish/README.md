@@ -75,7 +75,7 @@ make build-packages-manifests-only VERSION=1.2.3
 Workflow: [`.github/workflows/npmjs-publish.yaml`](../../.github/workflows/npmjs-publish.yaml)
 
 - **pull_request** (paths: this workflow + `scripts/npmjs-publish/**`): **lint** and **unit test** jobs (parallel, no `needs`).
-- **push** tags `npmjs-publish@*`: same jobs plus **publish** job: resolve version from tag, run preflight (`publish.py`).
+- **push** tags `npmjs-publish@*`: **publish** job only: resolve version from tag, run preflight (`publish.py`). Lint and unit tests do not run on tag push.
 
 Tag pushes use the full ref as `--version` so `publish_core.resolve_version_input` accepts it.
 

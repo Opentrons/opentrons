@@ -41,7 +41,7 @@ Do not duplicate version parsing: import **`resolve_version_input`** (or helpers
 `.github/workflows/npmjs-publish.yaml`:
 
 - **PR** (paths): lint + test jobs, no `needs` between them
-- **push** `npmjs-publish@*`: publish job runs preflight with version from `github.ref`
+- **push** `npmjs-publish@*`: **publish** job only (preflight with version from `github.ref`), no lint or unit test jobs
 
 ## Monorepo build order
 
