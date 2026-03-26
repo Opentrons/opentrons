@@ -61,12 +61,10 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
         ),
         pytest.param(
             {
-                "accessControlEnabled": True,
                 "idleLogout": "PT30M",
                 "passwordResetTime": "P90D",
             },
             {
-                "accessControlEnabled": True,
                 "idleLogout": timedelta(minutes=30),
                 "passwordResetTime": timedelta(days=90),
             },
@@ -101,13 +99,11 @@ def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
     _upsert_defaults(settings_store)
     settings_store.patch_settings(
         PatchSettingsRequestData(
-            accessControlEnabled=True,
             idleLogout=timedelta(minutes=30),
             passwordResetTime=timedelta(days=90),
         )
     )
     fetched = settings_store.get_settings()
-    assert fetched.accessControlEnabled is True
     assert fetched.idleLogout == timedelta(minutes=30)
     assert fetched.passwordResetTime == timedelta(days=90)
 
@@ -121,8 +117,8 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
         )
     )
     fetched = settings_store.get_settings()
-    assert fetched.accessControlEnabled is False
     assert fetched.idleLogout == timedelta(minutes=30)
+    assert fetched.passwordResetTime is None
 
 
 def test_get_access_control_settings(settings_store: SettingsStore) -> None:

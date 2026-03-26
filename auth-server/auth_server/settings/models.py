@@ -18,14 +18,6 @@ class _BaseSettings(_StrictBaseModel):
     Do not change them without coordinating.
     """
 
-    # TODO(tz, 2026-03-24): https://opentrons.atlassian.net/browse/EXEC-2468
-    accessControlEnabled: bool = pydantic.Field(
-        default=False,
-        description="When enabled, authorization is enforced throughout the robot's HTTP APIs. "
-        "Protected endpoints are blocked unless the request carries an OAuth 2 access token "
-        "with the appropriate scopes. See the `/auth/oauth2` endpoints. "
-        "When disabled (the default), all endpoints allow unauthenticated access.",
-    )
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
         description="Max number of login attempts before account deactivation.",
@@ -93,14 +85,6 @@ class PatchSettingsRequestData(_PatchSettingsBase):  # type: ignore[valid-type,m
     All fields default to ``None``, meaning "leave unchanged".
     Only fields explicitly provided in the request body will be updated.
     """
-
-    accessControlEnabled: Annotated[
-        Literal[True] | None,
-        pydantic.Field(
-            description="Set to `true` to enable access control. "
-            "Once enabled, access control cannot be disabled without assistance from Opentrons."
-        ),
-    ] = None
 
     _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
         {
