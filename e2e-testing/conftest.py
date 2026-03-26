@@ -25,6 +25,12 @@ from utility import troubleshoot_and_pause
 pytest_plugins = ["eyes"]
 
 
+@pytest.fixture(scope="session")
+def anyio_backend() -> str:
+    """Use asyncio for session-scoped async fixtures and tests."""
+    return "asyncio"
+
+
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
     is_headed = bool(config.getoption("--headed", False)) or os.getenv("HEADLESS") == "false"
 

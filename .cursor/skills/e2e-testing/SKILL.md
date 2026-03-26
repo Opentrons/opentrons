@@ -33,7 +33,41 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 
 **ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests.
 
-For the HTTP suites under `tests/auth/`, `tests/system/`, `tests/update/`, and `tests/robot/`, use the typed clients in `automation/clients/` instead of raw `httpx` calls inside tests whenever practical.
+For the HTTP suites under `tests/auth/`, `tests/system/`, `tests/update/`, and `tests/robot/`, use the typed async clients in `automation/clients/` instead of raw `httpx` calls inside tests whenever practical.
+
+### HTTP Smoke Pattern
+
+The server HTTP suites use:
+
+- `httpx.AsyncClient` inside `automation/clients/`
+- `async def` pytest tests and fixtures
+- `pytest.mark.anyio` on async suites
+- `await` on client calls
+- `asyncio.gather()` when multiple independent endpoints should be checked concurrently
+- higher-level client helpers for repeated workflows, for example create -> play -> wait -> final run record
+
+Example:
+
+```python
+import asyncio
+import pytest
+
+
+pytestmark = [pytest.mark.robotHTTP, pytest.mark.anyio]
+
+
+async def test_core_endpoints(robot_client: RobotClient) -> None:
+    openapi, health, runs = await asyncio.gather(
+        robot_client.get_openapi(),
+        robot_client.get_health(),
+        robot_client.get_runs(page_length=5),
+    )
+    assert "/health" in openapi["paths"]
+    assert health.api_version
+    assert isinstance(runs.data, list)
+```
+
+Avoid using a client's private `_client` in tests unless there is a very strong reason and no good helper method.
 
 ### Shared Base (`automation/base_page.py`)
 
@@ -142,21 +176,21 @@ Tests run against different environments via `TEST_ENV`:
 
 ### Key Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `AUTH_SERVER_URL`    | auto    | Override auth-server URL              |
-| `SYSTEM_SERVER_URL`  | auto    | Override system-server URL            |
-| `UPDATE_SERVER_URL`  | auto    | Override update-server URL            |
-| `ROBOT_SERVER_URL`   | auto    | Override robot-server URL             |
-| `ROBOT_AUTH_SERVER_URL` | auto | Override auth-server URL for robot smoke tests |
+| Variable                            | Default | Notes                                               |
+| ----------------------------------- | ------- | --------------------------------------------------- |
+| `TEST_ENV`                          | `local` | `local`, `staging`, `prod`, `sandbox`               |
+| `HEADLESS`                          | (unset) | `true` / `false`; overrides default                 |
+| `SKIP_SERVER_START`                 | `false` | Skip automatic server build+serve                   |
+| `PD_SERVER_URL`                     | auto    | Override PD URL                                     |
+| `LL_SERVER_URL`                     | auto    | Override LL URL                                     |
+| `LL_SERVER_PORT`                    | `4176`  | Preferred port for LL local server                  |
+| `AUTH_SERVER_URL`                   | auto    | Override auth-server URL                            |
+| `SYSTEM_SERVER_URL`                 | auto    | Override system-server URL                          |
+| `UPDATE_SERVER_URL`                 | auto    | Override update-server URL                          |
+| `ROBOT_SERVER_URL`                  | auto    | Override robot-server URL                           |
+| `ROBOT_AUTH_SERVER_URL`             | auto    | Override auth-server URL for robot smoke tests      |
 | `UPDATE_SERVER_ALLOW_NAME_MUTATION` | `false` | Opt in to valid `POST /server/name` update coverage |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| `APPLITOOLS_API_KEY`                | (unset) | Enable Applitools visual checks                     |
 
 ## Development Commands
 
@@ -314,11 +348,12 @@ def test_my_feature(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
 
 ### Adding a New HTTP Smoke Test
 
-1. Add or extend a typed helper in `automation/clients/` instead of reaching into a private `httpx` client from the test
+1. Add or extend an async typed helper in `automation/clients/` instead of reaching into a private `httpx` client from the test
 2. Write the test in the matching suite under `tests/auth/`, `tests/system/`, `tests/update/`, or `tests/robot/`
-3. Add the matching pytest marker and type annotations
+3. Use the matching pytest marker plus `pytest.mark.anyio`
 4. Prefer auto-start fixtures for local services; only require explicit env vars when the service truly cannot be started locally
-5. Run the focused suite locally, for example `make test-system PYTEST_ARGS="-k oem"` or `make test-robot-http`
+5. Use `asyncio.gather()` when multiple independent endpoint checks can happen in parallel
+6. Run the focused suite locally, for example `make test-system PYTEST_ARGS="-k oem"` or `make test-robot-http`
 
 ### Chaining Page Objects
 

@@ -18,7 +18,7 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from applitools.playwright import Eyes as ApplitoolsEyes
+from applitools.playwright import Eyes as ApplitoolsEyes  # type: ignore[import-untyped]
 from applitools.playwright import Target
 from dotenv import find_dotenv, load_dotenv
 from playwright.sync_api import Locator, Page
@@ -34,7 +34,7 @@ class Eyes(ApplitoolsEyes):
     The original Applitools signature is still supported via the optional `target`.
     """
 
-    def check(self, checkpoint_name: str, target: object | None = None) -> None:  # type: ignore[override]
+    def check(self, checkpoint_name: str, target: object | None = None) -> None:
         """Run a window check by default, or a raw Applitools check when `target` is provided."""
 
         if target is None:

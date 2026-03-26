@@ -12,7 +12,16 @@ from .auth import (
     TokenResponse,
     UserResponse,
 )
-from .robot import HealthResponse, RobotClient, RunResponse, RunsResponse
+from .robot import (
+    HealthResponse,
+    ProtocolResponse,
+    ProtocolRunExecutionResult,
+    RobotClient,
+    RunActionResponse,
+    RunExecutionResult,
+    RunResponse,
+    RunsResponse,
+)
 from .system import SystemClient
 from .update import UpdateClient
 
@@ -24,7 +33,11 @@ __all__ = [
     "AccountType",
     "AuthClient",
     "HealthResponse",
+    "ProtocolResponse",
+    "ProtocolRunExecutionResult",
     "RobotClient",
+    "RunActionResponse",
+    "RunExecutionResult",
     "RunResponse",
     "RunsResponse",
     "SystemClient",

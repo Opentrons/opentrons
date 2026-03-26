@@ -2,10 +2,12 @@
 
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
+export UV_PYTHON = 3.12
+TYPECHECK_PATHS = automation tests scripts conftest.py eyes.py run_many_tests.py utility.py
 
 .PHONY: setup
 setup:
-	uv sync --frozen
+	uv sync --frozen --python 3.12
 
 .PHONY: test-setup
 test-setup:
@@ -23,7 +25,7 @@ lint:
 
 .PHONY: typecheck
 typecheck:
-	uv run mypy automation tests scripts conftest.py
+	uv run mypy $(TYPECHECK_PATHS)
 
 .PHONY: prep
 prep: 

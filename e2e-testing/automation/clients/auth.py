@@ -102,19 +102,14 @@ class _UserUpdatePayload(BaseModel):
 class AuthClient:
     """E2E test client for the auth-server.
 
-    Wraps httpx.Client to provide typed helpers for the OAuth 2 password-grant
+    Wraps httpx.AsyncClient to provide typed helpers for the OAuth 2 password-grant
     flow, token refresh, introspection, and auth-settings management.
 
     Usage::
 
-        with AuthClient(base_url="http://localhost:33950") as client:
-            token = client.get_token("test_admin", "test_admin_password")
+        async with AuthClient(base_url="http://localhost:33950") as client:
+            token = await client.get_token("test_admin", "test_admin_password")
             assert token.access_token
-            # Use the token to hit robot-server
-            resp = client.get(
-                "/some/protected/endpoint",
-                headers=client.auth_header(token),
-            )
     """
 
     def __init__(
@@ -125,22 +120,22 @@ class AuthClient:
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.client_id = client_id
-        self._client = httpx.Client(base_url=self.base_url, timeout=timeout)
+        self._client = httpx.AsyncClient(base_url=self.base_url, timeout=timeout)
 
     # -- Context-manager support ---------------------------------------------------
 
-    def __enter__(self) -> AuthClient:
+    async def __aenter__(self) -> AuthClient:
         return self
 
-    def __exit__(self, *args: object) -> None:
-        self.close()
+    async def __aexit__(self, *args: object) -> None:
+        await self.close()
 
-    def close(self) -> None:
-        self._client.close()
+    async def close(self) -> None:
+        await self._client.aclose()
 
     # -- OAuth 2 Password Grant ----------------------------------------------------
 
-    def get_token(
+    async def get_token(
         self,
         username: str,
         password: str,
@@ -160,11 +155,11 @@ class AuthClient:
         if scope is not None:
             data["scope"] = scope
 
-        response = self._client.post("/auth/oauth2/token", data=data)
+        response = await self._client.post("/auth/oauth2/token", data=data)
         response.raise_for_status()
         return TokenResponse.model_validate(response.json())
 
-    def refresh_token(
+    async def refresh_token(
         self,
         refresh_token: str,
         *,
@@ -182,75 +177,75 @@ class AuthClient:
         if scope is not None:
             data["scope"] = scope
 
-        response = self._client.post("/auth/oauth2/token", data=data)
+        response = await self._client.post("/auth/oauth2/token", data=data)
         response.raise_for_status()
         return TokenResponse.model_validate(response.json())
 
     # -- Token Introspection -------------------------------------------------------
 
-    def introspect(self, token: str) -> dict[str, Any]:
+    async def introspect(self, token: str) -> dict[str, Any]:
         """Introspect a token (RFC 7662).
 
         Returns the parsed JSON body. Check ``result["active"]`` to see if the
         token is still valid.
         """
-        response = self._client.post(
+        response = await self._client.post(
             "/auth/oauth2/introspect",
             data={"token": token, "client_id": self.client_id},
         )
         response.raise_for_status()
         return response.json()
 
-    def get_openapi(self) -> dict[str, Any]:
+    async def get_openapi(self) -> dict[str, Any]:
         """GET /auth/openapi.json and return the parsed OpenAPI document."""
-        response = self._client.get("/auth/openapi.json")
+        response = await self._client.get("/auth/openapi.json")
         response.raise_for_status()
         return response.json()
 
     # -- Auth Settings -------------------------------------------------------------
 
-    def get_settings(self) -> dict[str, Any]:
+    async def get_settings(self) -> dict[str, Any]:
         """GET /auth/settings (no auth required)."""
-        response = self._client.get("/auth/settings")
+        response = await self._client.get("/auth/settings")
         response.raise_for_status()
         return response.json()
 
-    def patch_settings(
+    async def patch_settings(
         self,
         data: dict[str, Any],
         token: TokenResponse | None = None,
     ) -> dict[str, Any]:
         """PATCH /auth/settings. Requires auth when access control is enabled."""
-        response = self.patch_settings_response(data, token=token)
+        response = await self.patch_settings_response(data, token=token)
         response.raise_for_status()
         return response.json()
 
-    def patch_settings_response(
+    async def patch_settings_response(
         self,
         data: dict[str, Any],
         token: TokenResponse | None = None,
     ) -> httpx.Response:
         """PATCH /auth/settings without raising (for asserting error status codes)."""
         headers = AuthClient.auth_header(token) if token else {}
-        return self._client.patch(
+        return await self._client.patch(
             "/auth/settings",
             json={"data": data},
             headers=headers,
         )
 
-    def reset_settings(
+    async def reset_settings(
         self,
         token: TokenResponse | None = None,
     ) -> dict[str, Any]:
         """DELETE /auth/settings (reset to defaults). Requires auth when access control is enabled."""
         headers = AuthClient.auth_header(token) if token else {}
-        response = self._client.delete("/auth/settings", headers=headers)
+        response = await self._client.delete("/auth/settings", headers=headers)
         response.raise_for_status()
         return response.json()
 
     # -- Users (protected; require Bearer token) -----------------------------------
 
-    def create_user(
+    async def create_user(
         self,
         token: TokenResponse,
         *,
@@ -266,35 +261,35 @@ class AuthClient:
             full_name=full_name,
             account_type=account_type,
         )
-        response = self.post_users_request(
+        response = await self.post_users_request(
             token,
             {"data": payload_data.model_dump(by_alias=True)},
         )
         response.raise_for_status()
         return UserResponse.model_validate(response.json()["data"])
 
-    def post_users_request(
+    async def post_users_request(
         self,
         token: TokenResponse,
         body: dict[str, Any],
     ) -> httpx.Response:
         """POST /auth/users with a full JSON body (for success and error cases)."""
-        return self._client.post(
+        return await self._client.post(
             "/auth/users",
             json=body,
             headers=AuthClient.auth_header(token),
         )
 
-    def get_user(self, token: TokenResponse, user_name: str) -> UserResponse:
+    async def get_user(self, token: TokenResponse, user_name: str) -> UserResponse:
         """GET /auth/users/{user_name} (requires USERS_READ scope)."""
-        response = self._client.get(
+        response = await self._client.get(
             f"/auth/users/{user_name}",
             headers=AuthClient.auth_header(token),
         )
         response.raise_for_status()
         return UserResponse.model_validate(response.json()["data"])
 
-    def update_user(
+    async def update_user(
         self,
         token: TokenResponse,
         user_name: str,
@@ -313,7 +308,7 @@ class AuthClient:
         )
         # Drop unset fields so we only send provided ones
         data = {k: v for k, v in payload_data.model_dump(by_alias=True).items() if v is not None}
-        response = self._client.patch(
+        response = await self._client.patch(
             f"/auth/users/{user_name}",
             json={"data": data},
             headers=AuthClient.auth_header(token),
@@ -321,22 +316,22 @@ class AuthClient:
         response.raise_for_status()
         return UserResponse.model_validate(response.json()["data"])
 
-    def patch_user_request(
+    async def patch_user_request(
         self,
         token: TokenResponse,
         user_name: str,
         body: dict[str, Any],
     ) -> httpx.Response:
         """PATCH /auth/users/{user_name} with a raw request body."""
-        return self._client.patch(
+        return await self._client.patch(
             f"/auth/users/{user_name}",
             json=body,
             headers=AuthClient.auth_header(token),
         )
 
-    def delete_user(self, token: TokenResponse, user_name: str) -> None:
+    async def delete_user(self, token: TokenResponse, user_name: str) -> None:
         """DELETE /auth/users/{user_name} (requires USERS_WRITE scope). Returns 200 with empty body."""
-        response = self._client.delete(
+        response = await self._client.delete(
             f"/auth/users/{user_name}",
             headers=AuthClient.auth_header(token),
         )
@@ -355,7 +350,7 @@ class AuthClient:
         """
         return {"Authorization": f"Bearer {token.access_token}"}
 
-    def get_token_raw(
+    async def get_token_raw(
         self,
         *,
         grant_type: str = "password",
@@ -367,4 +362,4 @@ class AuthClient:
         useful for testing error cases.
         """
         data: dict[str, str] = {"grant_type": grant_type, **form_fields}
-        return self._client.post("/auth/oauth2/token", data=data)
+        return await self._client.post("/auth/oauth2/token", data=data)

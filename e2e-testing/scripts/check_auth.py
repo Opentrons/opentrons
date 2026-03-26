@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 import time
@@ -78,11 +79,11 @@ def check_reachable(ip: str, port: int, label: str, timeout: float = 3.0) -> boo
         return False
 
 
-def check_auth_settings(client: AuthClient) -> None:
+async def check_auth_settings(client: AuthClient) -> None:
     """Fetch and display auth settings."""
     console.print("\n[bold]Auth Settings[/bold]")
     try:
-        settings = client.get_settings()
+        settings = await client.get_settings()
         data = settings.get("data", settings)
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Key", style="cyan")
@@ -94,11 +95,11 @@ def check_auth_settings(client: AuthClient) -> None:
         console.print(f"  [red]Failed to get settings:[/red] {exc}")
 
 
-def check_token_exchange(client: AuthClient, username: str, password: str, label: str) -> None:
+async def check_token_exchange(client: AuthClient, username: str, password: str, label: str) -> None:
     """Try a password-grant token exchange and display the result."""
     try:
         start = time.monotonic()
-        token = client.get_token(username, password)
+        token = await client.get_token(username, password)
         elapsed_ms = (time.monotonic() - start) * 1000
         console.print(f"  [green]:heavy_check_mark:[/green] {label}  [dim]({elapsed_ms:.0f}ms)[/dim]")
 
@@ -112,7 +113,7 @@ def check_token_exchange(client: AuthClient, username: str, password: str, label
         table.add_row("scope", token.scope)
         console.print(table)
 
-        introspect = client.introspect(token.access_token)
+        introspect = await client.introspect(token.access_token)
         active = introspect.get("active", False)
         status = "[green]active[/green]" if active else "[red]inactive[/red]"
         console.print(f"  Introspection: {status}  user=[bold]{introspect.get('username', '?')}[/bold]")
@@ -125,7 +126,7 @@ def check_token_exchange(client: AuthClient, username: str, password: str, label
         console.print(f"  [red]:cross_mark:[/red] {label}  [dim]{exc}[/dim]")
 
 
-def main() -> None:
+async def main() -> None:
     console.print(
         Panel(
             "[bold]Opentrons Auth Server Check[/bold]\n"
@@ -151,17 +152,17 @@ def main() -> None:
 
     # -- Auth settings ---------------------------------------------------------
     auth_url = f"http://{ip}:{AUTH_SERVER_PORT}"
-    with AuthClient(base_url=auth_url) as client:
-        check_auth_settings(client)
+    async with AuthClient(base_url=auth_url) as client:
+        await check_auth_settings(client)
 
         # -- Token exchange ----------------------------------------------------
         console.print("\n[bold]Token Exchange (password grant)[/bold]")
-        check_token_exchange(client, ADMIN_USERNAME, ADMIN_PASSWORD, f"admin ({ADMIN_USERNAME})")
+        await check_token_exchange(client, ADMIN_USERNAME, ADMIN_PASSWORD, f"admin ({ADMIN_USERNAME})")
         console.print()
-        check_token_exchange(client, USER_USERNAME, USER_PASSWORD, f"user  ({USER_USERNAME})")
+        await check_token_exchange(client, USER_USERNAME, USER_PASSWORD, f"user  ({USER_USERNAME})")
 
     console.print("\n[green bold]Done.[/green bold]")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

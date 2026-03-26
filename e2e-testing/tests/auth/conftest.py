@@ -6,7 +6,7 @@ import os
 import subprocess
 import time
 import urllib.request
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 
@@ -139,17 +139,17 @@ def auth_base_url() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def auth_client(auth_base_url: str) -> Generator[AuthClient, None, None]:
+async def auth_client(auth_base_url: str) -> AsyncGenerator[AuthClient, None]:
     """Session-scoped auth-server client.
 
     The client is shared across all tests in a session so we don't
     open/close connections per test.
     """
-    with AuthClient(base_url=auth_base_url) as client:
+    async with AuthClient(base_url=auth_base_url) as client:
         yield client
 
 
 @pytest.fixture()
-def admin_token(auth_client: AuthClient) -> TokenResponse:
+async def admin_token(auth_client: AuthClient) -> TokenResponse:
     """A fresh admin access token for each test that requests it."""
-    return auth_client.get_token(ADMIN_USERNAME, ADMIN_PASSWORD)
+    return await auth_client.get_token(ADMIN_USERNAME, ADMIN_PASSWORD)

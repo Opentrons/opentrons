@@ -6,7 +6,7 @@ import os
 import subprocess
 import time
 import urllib.request
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 
@@ -115,17 +115,17 @@ def update_base_url() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def update_client(update_base_url: str) -> Generator[UpdateClient, None, None]:
+async def update_client(update_base_url: str) -> AsyncGenerator[UpdateClient, None]:
     """Session-scoped update-server client."""
-    with UpdateClient(base_url=update_base_url) as client:
+    async with UpdateClient(base_url=update_base_url) as client:
         yield client
 
 
 @pytest.fixture()
-def clean_update_session(update_client: UpdateClient) -> Generator[None, None, None]:
+async def clean_update_session(update_client: UpdateClient) -> AsyncGenerator[None, None]:
     """Cancel any leftover update session before and after a test."""
-    update_client.cancel_update()
+    await update_client.cancel_update()
     try:
         yield
     finally:
-        update_client.cancel_update()
+        await update_client.cancel_update()

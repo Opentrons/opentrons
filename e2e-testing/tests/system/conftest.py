@@ -6,7 +6,7 @@ import os
 import subprocess
 import time
 import urllib.request
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 
@@ -135,17 +135,17 @@ def system_base_url() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def system_client(system_base_url: str) -> Generator[SystemClient, None, None]:
+async def system_client(system_base_url: str) -> AsyncGenerator[SystemClient, None]:
     """Session-scoped system-server client."""
-    with SystemClient(base_url=system_base_url) as client:
+    async with SystemClient(base_url=system_base_url) as client:
         yield client
 
 
 @pytest.fixture()
-def oem_mode_disabled(system_client: SystemClient) -> Generator[None, None, None]:
+async def oem_mode_disabled(system_client: SystemClient) -> AsyncGenerator[None, None]:
     """Ensure OEM mode is disabled before and after a test."""
-    system_client.enable_oem_mode(False)
+    await system_client.enable_oem_mode(False)
     try:
         yield
     finally:
-        system_client.enable_oem_mode(False)
+        await system_client.enable_oem_mode(False)

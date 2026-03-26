@@ -115,6 +115,36 @@ ROBOT_SERVER_URL=http://robot-or-host:31950 AUTH_SERVER_URL=http://robot-or-host
 
 The robot smoke tests auto-start a local dev `robot-server` when `ROBOT_SERVER_URL` is unset. They also auto-start a local `auth-server` for token-backed checks when `ROBOT_AUTH_SERVER_URL` / `AUTH_SERVER_URL` is unset.
 
+The intended focus of this suite is `robot-server` behavior with access control enabled. Local auto-start now brings up an auth-enabled stack and turns on auth-server access control so the suite can validate protected write paths with real Bearer tokens and assert that missing-token requests fail where expected.
+
+Auth-disabled behavior is still supported by the shared clients, but broad coverage for that mode is intentionally kept shallow here because `robot-server` integration tests already cover the no-access-control path more thoroughly.
+
+### Async HTTP Pattern
+
+The server HTTP suites use **async `httpx.AsyncClient`** wrappers and **`pytest.mark.anyio`** tests.
+
+```python
+pytestmark = [pytest.mark.systemE2E, pytest.mark.anyio]
+
+
+async def test_example(system_client: SystemClient) -> None:
+    response = await system_client.get_openapi()
+    assert "/system/register" in response["paths"]
+```
+
+Prefer:
+
+- typed helpers in `automation/clients/`
+- `async def` tests and fixtures
+- `await` on client calls
+- `asyncio.gather()` when checking multiple independent endpoints concurrently
+- higher-level client utilities for multi-step flows like create -> play -> wait -> final run record
+
+Avoid:
+
+- raw `httpx` calls inside tests when a client helper can express the intent
+- reaching into a client's private `_client` from tests
+
 ### Other Targets
 
 ```bash
@@ -174,10 +204,10 @@ Gets a token from the auth-server (admin user), then calls robot-server `GET /he
 
 - `automation/` — Page objects, clients, and shared helpers
   - `base_page.py` — Shared `BasePage` class inherited by all page objects
-  - `clients/auth.py` — httpx-based OAuth 2 client for auth-server E2E tests
-  - `clients/system.py` — httpx-based client for system-server E2E tests
-  - `clients/update.py` — httpx-based client for update-server (health, name, update session)
-  - `clients/robot.py` — httpx-based client for robot-server GET endpoints (health, runs)
+  - `clients/auth.py` — async `httpx` OAuth 2 client for auth-server E2E tests
+  - `clients/system.py` — async `httpx` client for system-server E2E tests
+  - `clients/update.py` — async `httpx` client for update-server (health, name, update session)
+  - `clients/robot.py` — async `httpx` client for robot-server GET endpoints (health, runs)
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
 - `scripts/` — Interactive CLI tools for probing live robots
@@ -226,21 +256,21 @@ Tests use the **Page Object Model** pattern for maintainability:
 
 ### Environment Variables
 
-| Variable                            | Default | Notes                                                       |
-| ----------------------------------- | ------- | ----------------------------------------------------------- |
-| `TEST_ENV`                          | `local` | `local`, `staging`, `prod`, `sandbox`                       |
-| `HEADLESS`                          | (unset) | `true` / `false`; overrides default                         |
-| `SKIP_SERVER_START`                 | `false` | Skip automatic server build+serve                           |
-| `PD_SERVER_URL`                     | auto    | Override PD URL                                             |
-| `LL_SERVER_URL`                     | auto    | Override LL URL                                             |
-| `LL_SERVER_PORT`                    | `4176`  | Preferred port for LL local server                          |
-| `AUTH_SERVER_URL`                   | auto    | Override auth-server URL                                    |
-| `SYSTEM_SERVER_URL`                 | auto    | Override system-server URL                                  |
-| `UPDATE_SERVER_URL`                 | auto    | Override update-server URL                                  |
-| `ROBOT_SERVER_URL`                  | auto    | Override robot-server URL, otherwise local dev server starts |
-| `ROBOT_AUTH_SERVER_URL`             | auto    | Override auth-server URL for robot token-backed smoke tests |
-| `UPDATE_SERVER_ALLOW_NAME_MUTATION` | `false` | Opt in to valid `POST /server/name` coverage                |
-| `APPLITOOLS_API_KEY`                | (unset) | Enable Applitools visual checks                             |
+| Variable                            | Default | Notes                                        |
+| ----------------------------------- | ------- | -------------------------------------------- |
+| `TEST_ENV`                          | `local` | `local`, `staging`, `prod`, `sandbox`        |
+| `HEADLESS`                          | (unset) | `true` / `false`; overrides default          |
+| `SKIP_SERVER_START`                 | `false` | Skip automatic server build+serve            |
+| `PD_SERVER_URL`                     | auto    | Override PD URL                              |
+| `LL_SERVER_URL`                     | auto    | Override LL URL                              |
+| `LL_SERVER_PORT`                    | `4176`  | Preferred port for LL local server           |
+| `AUTH_SERVER_URL`                   | auto    | Override auth-server URL                     |
+| `SYSTEM_SERVER_URL`                 | auto    | Override system-server URL                   |
+| `UPDATE_SERVER_URL`                 | auto    | Override update-server URL                   |
+| `ROBOT_SERVER_URL`                  | auto    | Override robot-server URL                    |
+| `ROBOT_AUTH_SERVER_URL`             | auto    | Override robot auth-server URL               |
+| `UPDATE_SERVER_ALLOW_NAME_MUTATION` | `false` | Opt in to valid `POST /server/name` coverage |
+| `APPLITOOLS_API_KEY`                | (unset) | Enable Applitools visual checks              |
 
 ## Development Workflow
 
@@ -289,10 +319,10 @@ make troubleshoot
 
 - **PD tests** (`tests/pd/`) — Onboarding, imports, protocol steps, settings, drag-and-drop, URL navigation, etc.
 - **LL tests** (`tests/ll/`) — Navigation, labware creator forms for well plates, reservoirs, tube racks, etc.
-- **Auth tests** (`tests/auth/`) — OAuth 2 password grant, token refresh, introspection, settings endpoints, error cases
-- **System tests** (`tests/system/`) — Register / authorize / connected flow, OpenAPI, OEM mode, splash upload
-- **Update tests** (`tests/update/`) — Health, name, and update session lifecycle smoke coverage
-- **Robot tests** (`tests/robot/`) — OpenAPI, health, runs, and token-backed robot HTTP smoke coverage
+- **Auth tests** (`tests/auth/`) — Async OAuth 2 password grant, token refresh, introspection, settings endpoints, error cases
+- **System tests** (`tests/system/`) — Async register / authorize / connected flow, OpenAPI, OEM mode, splash upload
+- **Update tests** (`tests/update/`) — Async health, name, and update session lifecycle smoke coverage
+- **Robot tests** (`tests/robot/`) — Async OpenAPI, auth-enabled health and runs checks, protected-write access control coverage, and concurrent robot HTTP smoke coverage
 - **Unit tests** — `test_testfiles.py` validates fixture JSON files
 
 ### Test Reports and Artifacts

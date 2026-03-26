@@ -50,7 +50,7 @@ class GetConnectedResponse(BaseModel):
 class SystemClient:
     """E2E test client for the system-server.
 
-    Wraps httpx.Client for the register/authorize/connected flow and OEM mode.
+    Wraps httpx.AsyncClient for the register/authorize/connected flow and OEM mode.
     """
 
     def __init__(
@@ -59,20 +59,20 @@ class SystemClient:
         timeout: float = 30.0,
     ) -> None:
         self.base_url = base_url.rstrip("/")
-        self._client = httpx.Client(base_url=self.base_url, timeout=timeout)
+        self._client = httpx.AsyncClient(base_url=self.base_url, timeout=timeout)
 
-    def __enter__(self) -> SystemClient:
+    async def __aenter__(self) -> SystemClient:
         return self
 
-    def __exit__(self, *args: object) -> None:
-        self.close()
+    async def __aexit__(self, *args: object) -> None:
+        await self.close()
 
-    def close(self) -> None:
-        self._client.close()
+    async def close(self) -> None:
+        await self._client.aclose()
 
     # -- Register (deprecated) -------------------------------------------------
 
-    def register(
+    async def register(
         self,
         *,
         subject: str,
@@ -80,7 +80,7 @@ class SystemClient:
         agent_id: str,
     ) -> RegisterResponse:
         """POST /system/register. Returns a registration token."""
-        response = self._client.post(
+        response = await self._client.post(
             "/system/register",
             params={
                 "subject": subject,
@@ -93,25 +93,25 @@ class SystemClient:
 
     # -- Authorize (deprecated) ------------------------------------------------
 
-    def authorize(self, registration_token: str) -> AuthorizeResponse:
+    async def authorize(self, registration_token: str) -> AuthorizeResponse:
         """POST /system/authorize. Exchange registration token for authorization token."""
-        response = self.post_authorize_response(registration_token)
+        response = await self.post_authorize_response(registration_token)
         response.raise_for_status()
         return AuthorizeResponse.model_validate(response.json())
 
-    def check_authorization(self, authorization_token: str) -> None:
+    async def check_authorization(self, authorization_token: str) -> None:
         """GET /system/authorize. Verify an authorization token (200 if valid)."""
-        response = self.get_authorize_response(authorization_token)
+        response = await self.get_authorize_response(authorization_token)
         response.raise_for_status()
 
-    def post_authorize_response(self, registration_token: str) -> httpx.Response:
+    async def post_authorize_response(self, registration_token: str) -> httpx.Response:
         """POST /system/authorize without raising for status assertions."""
-        return self._client.post(
+        return await self._client.post(
             "/system/authorize",
             headers={AUTHENTICATION_BEARER_HEADER: registration_token},
         )
 
-    def get_authorize_response(
+    async def get_authorize_response(
         self,
         authorization_token: str,
         *,
@@ -121,7 +121,7 @@ class SystemClient:
         params: dict[str, Any] | None = None
         if scopes is not None:
             params = {"scopes": scopes}
-        return self._client.get(
+        return await self._client.get(
             "/system/authorize",
             headers={AUTHENTICATION_BEARER_HEADER: authorization_token},
             params=params,
@@ -129,33 +129,33 @@ class SystemClient:
 
     # -- Connected (deprecated) ------------------------------------------------
 
-    def get_connected(self) -> GetConnectedResponse:
+    async def get_connected(self) -> GetConnectedResponse:
         """GET /system/connected. List active authorizations."""
-        response = self._client.get("/system/connected")
+        response = await self._client.get("/system/connected")
         response.raise_for_status()
         return GetConnectedResponse.model_validate(response.json())
 
-    def get_openapi(self) -> dict[str, Any]:
+    async def get_openapi(self) -> dict[str, Any]:
         """GET /system/openapi.json and return the parsed OpenAPI document."""
-        response = self._client.get("/system/openapi.json")
+        response = await self._client.get("/system/openapi.json")
         response.raise_for_status()
         return response.json()
 
     # -- OEM mode (requires ROBOT_SETTINGS_WRITE when auth is enabled) --------
 
-    def enable_oem_mode(self, enable: bool, token: str | None = None) -> httpx.Response:
+    async def enable_oem_mode(self, enable: bool, token: str | None = None) -> httpx.Response:
         """PUT /system/oem_mode/enable. Enable or disable OEM mode."""
         headers: dict[str, str] = {}
         if token:
             headers["Authorization"] = f"Bearer {token}"
-        response = self._client.put(
+        response = await self._client.put(
             "/system/oem_mode/enable",
             json={"enable": enable},
             headers=headers or None,
         )
         return response
 
-    def upload_splash_image(
+    async def upload_splash_image(
         self,
         *,
         file_name: str,
@@ -167,7 +167,7 @@ class SystemClient:
         headers: dict[str, str] = {}
         if token:
             headers["Authorization"] = f"Bearer {token}"
-        return self._client.post(
+        return await self._client.post(
             "/system/oem_mode/upload_splash",
             files={"file": (file_name, content, content_type)},
             headers=headers or None,

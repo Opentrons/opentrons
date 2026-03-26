@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 import time
@@ -79,7 +80,7 @@ def check_reachable(ip: str, port: int, label: str, timeout: float = 3.0) -> boo
         return False
 
 
-def main() -> None:
+async def main() -> None:
     console.print(
         Panel(
             "[bold]Robot-server authenticated endpoint check[/bold]\n"
@@ -113,9 +114,9 @@ def main() -> None:
 
     # Get token
     console.print("\n[bold]Token (password grant)[/bold]")
-    with AuthClient(base_url=auth_url) as auth_client:
+    async with AuthClient(base_url=auth_url) as auth_client:
         try:
-            token = auth_client.get_token(ADMIN_USERNAME, ADMIN_PASSWORD)
+            token = await auth_client.get_token(ADMIN_USERNAME, ADMIN_PASSWORD)
             console.print(
                 f"  [green]:heavy_check_mark:[/green] Got token for [bold]{ADMIN_USERNAME}[/bold] "
                 f"[dim](expires_in={token.expires_in}s)[/dim]"
@@ -130,10 +131,10 @@ def main() -> None:
 
     # Call robot-server with token
     console.print("\n[bold]Robot-server GET /health (with token)[/bold]")
-    with RobotClient(base_url=robot_url) as robot_client:
+    async with RobotClient(base_url=robot_url) as robot_client:
         try:
             start = time.monotonic()
-            health = robot_client.get_health(access_token=access_token)
+            health = await robot_client.get_health(access_token=access_token)
             elapsed_ms = (time.monotonic() - start) * 1000
             console.print(f"  [green]:heavy_check_mark:[/green] 200  [dim]({elapsed_ms:.0f}ms)[/dim]")
 
@@ -156,10 +157,10 @@ def main() -> None:
             console.print(f"  [red]:cross_mark:[/red] {exc}")
 
     console.print("\n[bold]Robot-server GET /runs (with token)[/bold]")
-    with RobotClient(base_url=robot_url) as robot_client:
+    async with RobotClient(base_url=robot_url) as robot_client:
         try:
             start = time.monotonic()
-            runs = robot_client.get_runs(access_token=access_token)
+            runs = await robot_client.get_runs(access_token=access_token)
             elapsed_ms = (time.monotonic() - start) * 1000
             console.print(f"  [green]:heavy_check_mark:[/green] 200  [dim]({elapsed_ms:.0f}ms)[/dim]")
 
@@ -199,4 +200,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
