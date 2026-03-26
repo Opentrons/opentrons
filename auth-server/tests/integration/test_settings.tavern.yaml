@@ -50,7 +50,7 @@ stages:
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
 
-  - name: PATCH to enable access control
+  - name: PATCH more settings
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -224,7 +224,7 @@ stages:
           minLengthOfReasonForInteraction: 10
 
 
-  - name: DELETE /auth/settings resets everything except accessControlEnabled to its default
+  - name: DELETE resets everything except accessControlEnabled to its default
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
@@ -253,7 +253,7 @@ marks:
       - admin_access_token
 
 stages:
-  - name: PATCH to enable access control
+  - name: PATCH to enable maxNumberOfLoginAttempts
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'

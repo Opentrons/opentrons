@@ -13,10 +13,6 @@ _DEFAULTS: dict[str, object] = SettingsResponseData().model_dump(
 )
 
 
-def _upsert_defaults(store: SettingsStore) -> None:
-    store._upsert_many(_DEFAULTS)
-
-
 @pytest.fixture()
 def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
     """Provide a UserStore backed by a fresh SQLite DB with seed users."""
@@ -29,7 +25,7 @@ def settings_store(tmp_path: Path) -> Generator[SettingsStore, None, None]:
 
 def test_reset_settings(settings_store: SettingsStore) -> None:
     """reset should delete the settings record and force settings to defaults."""
-    _upsert_defaults(settings_store)
+    settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.reset_settings()
     fetched = settings_store.get_settings()
     assert fetched == SettingsResponseData()
@@ -64,7 +60,7 @@ def test_update_changes_only_specified_fields(
     expected_changes: SettingsResponseData,
 ) -> None:
     """update should change only the specified fields and leave the rest unchanged."""
-    _upsert_defaults(settings_store)
+    settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.patch_settings(updates)
     fetched = settings_store.get_settings()
     assert fetched == expected_changes
@@ -72,7 +68,7 @@ def test_update_changes_only_specified_fields(
 
 def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
     """patch should transfer data to the settings store."""
-    _upsert_defaults(settings_store)
+    settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.patch_settings(
         PatchSettingsRequestData(
             accessControlEnabled=True,
@@ -88,7 +84,7 @@ def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
 
 def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> None:
     """patch should ignore unset fields."""
-    _upsert_defaults(settings_store)
+    settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.patch_settings(
         PatchSettingsRequestData(
             idleLogout=timedelta(minutes=30),
