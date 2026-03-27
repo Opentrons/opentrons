@@ -74,6 +74,7 @@ import {
   transferVolumeMin,
   vacuumDurationRequired,
   vacuumModeRequired,
+  vacuumModuleIdRequired,
   vacuumProfileRequired,
   vacuumProgramRequired,
   vacuumStateRequired,
@@ -303,7 +304,8 @@ const stepFormHelperMap: {
       vacuumModeRequired,
       gaugePressureRequired,
       vacuumDurationRequired,
-      vacuumProfileRequired
+      vacuumProfileRequired,
+      vacuumModuleIdRequired
     ),
   },
 }

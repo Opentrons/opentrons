@@ -12,14 +12,21 @@ import type {
 } from './constants'
 
 export interface UsbDevice {
-  vendorId: number
-  productId: number
+  vendorId: number | null
+  productId: number | null
   identifier: string
-  productName?: string
-  manufacturerName?: string
-  serialNumber?: string
+  productName?: string | null
+  manufacturerName?: string | null
+  serialNumber?: string | null
   windowsDriverVersion?: string | null
   systemIdentifier?: string
+  location?: string | null
+}
+
+export interface UsbDeviceDisplayRow {
+  id: string
+  device: string
+  location: string
 }
 
 // based on built-in type os$NetIFAddr
