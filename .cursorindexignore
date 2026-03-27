@@ -1,5 +1,9 @@
 # Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
 
+# NOTE: This is .cursorindexignore, not .cursorignore, to NOT prevent agent tools
+# from accessing these files. We want agents to be able to e.g. run tests that write
+# to the ignored `coverage` directory.
+
 # Generated files for local API server config paths
 api/.env
 api/index.json
