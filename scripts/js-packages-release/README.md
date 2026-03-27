@@ -9,10 +9,9 @@ See [PLAN.md](./PLAN.md) for the full roadmap and what is still open.
 ## Layout
 
 - `publish_core.py`: shared `PACKAGES` list, version and tag parsing (`js-packages-release@`, `refs/tags/...`), `prior_packages()` pin order
-- `publish.py`: preflight CLI, registry checks, Rich table, job summary, `--interactive` / `--non-interactive`
+- `publish.py`: small stdlib CLI for registry checks, preflight validation, and current-version inspection
 - `build_packages.py`: monorepo **make** build chain, then optional `package.json` version and internal pin rewrites
 - `manifests.py`: `apply_release_versions(repo_root, version)`
-- `github_summary.py`: append markdown to `GITHUB_STEP_SUMMARY` in GitHub Actions
 - `tests/`: pytest
 
 ## Setup
@@ -28,15 +27,15 @@ Requires **Node** with `npm` on `PATH` when running preflight (uses `npm view` a
 
 ## Preflight (`publish.py`)
 
-Validates a target version against the **GitHub Packages npm registry** for all four packages (404 / empty history treated as unpublished).
+Validates a target version against the **GitHub Packages npm registry** for all four packages (404 / empty history treated as unpublished). It is intentionally non-interactive and prints plain-text status only.
 
 ```bash
-# Interactive (prompts for version; shows registry snapshot first)
-make publish-local
+# Show current published versions
+make publish-current
 
-# CI-style (needs VERSION)
+# Preflight a target release version
 make publish-ci
-# equivalent: uv run python publish.py --version "$VERSION" --non-interactive
+# equivalent: uv run python publish.py --version "$VERSION"
 ```
 
 Version input may be:
@@ -46,8 +45,6 @@ Version input may be:
 - `refs/tags/js-packages-release@1.2.3`
 
 **Note:** If every package already has that version on the registry, preflight **fails**. Partial publish (subset only) also fails.
-
-Job summary: preflight writes markdown to **`GITHUB_STEP_SUMMARY`** when set unless `--no-write-summary`.
 
 ## Build and manifests (`build_packages.py`)
 
@@ -65,8 +62,6 @@ make build-packages VERSION=1.2.3
 # Manifests only (requires VERSION)
 make build-packages-manifests-only VERSION=1.2.3
 ```
-
-`--write-summary` / `--no-write-summary` control **`GITHUB_STEP_SUMMARY`** output (default: write).
 
 ## GitHub Actions
 

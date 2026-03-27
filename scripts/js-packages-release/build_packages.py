@@ -1,22 +1,19 @@
-"""Build monorepo JS packages and apply release versions to package.json (CI-parity)."""
+"""Build monorepo JS packages and apply release versions to package.json."""
 
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
+import sys
 from pathlib import Path
-from typing import Annotated, Optional
 
-import typer
-from github_summary import append_job_summary
 from manifests import apply_release_versions
 from publish_core import PACKAGES, resolve_version_input
-from rich.console import Console
 
-app = typer.Typer(no_args_is_help=True)
-console = Console()
-
-# Make invocations in publish order (keep in sync with _run_build).
+# Build in release order, because these packages are not independent:
+# later packages consume earlier ones and the release process pins them to the
+# same version as a synchronized set. Keep this in dependency/release order.
 _BUILD_COMMANDS: tuple[tuple[str, ...], ...] = (
     ("make", "build-ts"),
     ("make", "-C", "shared-data", "lib-js"),
@@ -33,13 +30,13 @@ def _default_repo_root() -> Path:
     return Path(__file__).resolve().parent.parent.parent
 
 
-def _run(cmd: list[str], *, cwd: Path, env: Optional[dict[str, str]] = None) -> None:
+def _run(cmd: list[str], *, cwd: Path, env: dict[str, str] | None = None) -> None:
     """Run a command and fail with a clear message on non-zero exit."""
     merged_env = {**os.environ, **(env or {})}
-    console.print(f"[blue]$[/blue] {' '.join(cmd)} [dim](cwd={cwd})[/dim]")
+    print(f"$ {' '.join(cmd)} (cwd={cwd})")
     result = subprocess.run(cmd, cwd=cwd, env=merged_env, check=False)
     if result.returncode != 0:
-        raise typer.Exit(code=result.returncode)
+        raise subprocess.CalledProcessError(result.returncode, cmd)
 
 
 def _run_build(repo_root: Path) -> None:
@@ -48,15 +45,15 @@ def _run_build(repo_root: Path) -> None:
         _run(list(cmd_tuple), cwd=repo_root)
 
 
-def _build_job_summary_markdown(
+def _print_build_summary(
     *,
     root: Path,
     ran_build: bool,
-    version_raw: Optional[str],
-    resolved_version: Optional[str],
+    version_raw: str | None,
+    resolved_version: str | None,
     skip_build: bool,
-) -> str:
-    """Markdown for GITHUB_STEP_SUMMARY (and console)."""
+) -> None:
+    """Print a readable build summary."""
     if skip_build and resolved_version is not None:
         mode = "Manifests only (`--skip-build`)"
     elif resolved_version is not None:
@@ -64,95 +61,76 @@ def _build_job_summary_markdown(
     else:
         mode = "Build only (no `package.json` release rewrite)"
 
-    lines = [
-        "## js-packages-release build",
-        "",
-        f"- **Repo root:** `{root}`",
-        f"- **Mode:** {mode}",
-    ]
+    print(f"Repo root: {root}")
+    print(f"Mode: {mode}")
     if version_raw is not None:
-        lines.append(f"- **Version input:** `{version_raw}`")
+        print(f"Version input: {version_raw}")
     if resolved_version is not None:
-        lines.append(f"- **Resolved version:** `{resolved_version}`")
+        print(f"Resolved version: {resolved_version}")
 
-    lines.extend(["", "### Build steps"])
+    print("Build steps:")
     if ran_build:
         for cmd in _BUILD_COMMANDS:
-            lines.append(f"- `{' '.join(cmd)}`")
+            print(f"- {' '.join(cmd)}")
     else:
-        lines.append("- *(skipped, `--skip-build`)*")
+        print("- skipped (`--skip-build`)")
 
     if resolved_version is not None:
-        lines.extend(["", "### `package.json` targets"])
+        print("package.json targets:")
         for pkg in PACKAGES:
-            lines.append(f"- `{pkg}`")
+            print(f"- {pkg}")
 
-    status = "success"
-    lines.extend(["", "### Result", f"- **Status:** {status}"])
-
-    return "\n".join(lines)
+    print("Status: success")
 
 
-@app.command()
-def run(
-    version: Annotated[
-        Optional[str],
-        typer.Option("--version", "-v", help="Release version, tag ref, or js-packages-release@... (omit for build only)"),
-    ] = None,
-    repo_root: Annotated[
-        Optional[Path],
-        typer.Option("--repo-root", help="Monorepo root (default: infer from script location)"),
-    ] = None,
-    skip_build: Annotated[bool, typer.Option("--skip-build", help="Only rewrite package.json files, do not run make")] = False,
-    write_summary: Annotated[
-        bool,
-        typer.Option("--write-summary/--no-write-summary", help="Append markdown to GITHUB_STEP_SUMMARY if set"),
-    ] = True,
-) -> None:
-    """Run production builds. With --version, also set version and internal @opentrons/* pins like CI."""
-    root = repo_root or _default_repo_root()
+def _build_parser() -> argparse.ArgumentParser:
+    """Create the CLI parser."""
+    parser = argparse.ArgumentParser(description="Run synchronized JS package builds and manifest rewrites.")
+    parser.add_argument("--version", "-v", help="Release version, tag ref, or js-packages-release@<semver>.")
+    parser.add_argument("--repo-root", type=Path, help="Monorepo root (default: infer from script location).")
+    parser.add_argument("--skip-build", action="store_true", help="Only rewrite package.json files, do not run make.")
+    return parser
 
-    if skip_build and not version:
-        console.print("--skip-build requires --version.", style="red")
-        raise typer.Exit(code=1)
 
-    ran_build = not skip_build
-    if ran_build:
-        _run_build(root)
+def main(argv: list[str] | None = None) -> int:
+    """Run the build/manifests CLI."""
+    args = _build_parser().parse_args(argv)
+    root = args.repo_root or _default_repo_root()
 
-    if version is None:
-        markdown = _build_job_summary_markdown(
-            root=root,
-            ran_build=ran_build,
-            version_raw=None,
-            resolved_version=None,
-            skip_build=skip_build,
-        )
-        console.print(markdown, style="blue")
-        if write_summary:
-            append_job_summary(markdown)
-        console.print(f"Build finished under {root} (no package.json release rewrite).", style="green bold")
-        return
+    if args.skip_build and not args.version:
+        print("--skip-build requires --version.", file=sys.stderr)
+        return 1
 
+    ran_build = not args.skip_build
     try:
-        resolved = resolve_version_input(version)
-    except ValueError as error:
-        console.print(str(error), style="red")
-        raise typer.Exit(code=1) from error
+        if ran_build:
+            _run_build(root)
+    except subprocess.CalledProcessError as error:
+        return error.returncode
 
-    apply_release_versions(root, resolved)
-    markdown = _build_job_summary_markdown(
+    resolved_version: str | None = None
+    if args.version is not None:
+        try:
+            resolved_version = resolve_version_input(args.version)
+        except ValueError as error:
+            print(str(error), file=sys.stderr)
+            return 1
+        apply_release_versions(root, resolved_version)
+
+    _print_build_summary(
         root=root,
         ran_build=ran_build,
-        version_raw=version,
-        resolved_version=resolved,
-        skip_build=skip_build,
+        version_raw=args.version,
+        resolved_version=resolved_version,
+        skip_build=args.skip_build,
     )
-    console.print(markdown, style="blue")
-    if write_summary:
-        append_job_summary(markdown)
-    console.print(f"Applied release version [green]{resolved}[/green] under {root}", style="green bold")
+
+    if resolved_version is None:
+        print(f"Build finished under {root} (no package.json release rewrite).")
+    else:
+        print(f"Applied release version {resolved_version} under {root}")
+    return 0
 
 
 if __name__ == "__main__":
-    app()
+    raise SystemExit(main())

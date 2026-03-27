@@ -25,7 +25,7 @@ clean:
 # Declarations go to lib/ via tsc; JS entrypoints are lib/index.mjs and lib/index.cjs from Vite.
 .PHONY: build-ts
 build-ts:
-	cd .. && yarn tsc --build step-generation/tsconfig.json
+	cd .. && yarn tsc --build --force step-generation/tsconfig.json
 
 .PHONY: lib
 lib: export NODE_ENV := production

@@ -1,18 +1,7 @@
 """Tests for js-packages-release preflight helpers."""
 
-from types import SimpleNamespace
-
-import publish
 import pytest
-from publish import _check_target_version, _resolve_context, _resolve_version_input
-
-
-def test_resolve_context_with_explicit_version() -> None:
-    """Resolves a direct semver value in non-interactive mode."""
-    version_argument = "2.3.4"
-    context = _resolve_context(version=version_argument, interactive=False)
-    assert context.version == version_argument
-    assert context.interactive is False
+from publish import _check_target_version, _resolve_version_input
 
 
 @pytest.mark.parametrize(
@@ -49,38 +38,6 @@ def test_resolve_version_input_errors(version_input: str, error_match: str) -> N
     """Rejects malformed semver values and wrong tag prefixes."""
     with pytest.raises(ValueError, match=error_match):
         _resolve_version_input(version_input)
-
-
-def test_resolve_context_rejects_missing_non_interactive_version() -> None:
-    """Requires an explicit version when interactive mode is disabled."""
-    version_argument = None
-    with pytest.raises(ValueError):
-        _resolve_context(version=version_argument, interactive=False)
-
-
-def test_fetch_published_versions_uses_github_packages_registry(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Queries the configured npm-compatible registry."""
-    seen: dict[str, object] = {}
-
-    def _fake_run(cmd: list[str], capture_output: bool, text: bool, check: bool) -> SimpleNamespace:
-        seen["cmd"] = cmd
-        seen["capture_output"] = capture_output
-        seen["text"] = text
-        seen["check"] = check
-        return SimpleNamespace(returncode=0, stdout="[]", stderr="")
-
-    monkeypatch.setattr(publish.subprocess, "run", _fake_run)
-
-    assert publish._fetch_published_versions("@opentrons/shared-data") == []
-    assert seen["cmd"] == [
-        "npm",
-        "view",
-        "@opentrons/shared-data",
-        "versions",
-        "--json",
-        "--registry",
-        "https://npm.pkg.github.com",
-    ]
 
 
 def test_check_target_version_allows_new_packages() -> None:

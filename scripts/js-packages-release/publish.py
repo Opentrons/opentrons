@@ -1,46 +1,18 @@
-"""JS packages release preflight CLI."""
+"""Validate synchronized JS package release versions against GitHub Packages."""
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
-from dataclasses import dataclass
-from typing import Optional
+import sys
 
-import typer
-from github_summary import append_job_summary
 from publish_core import DEFAULT_NPM_REGISTRY, PACKAGES, parse_semver, resolve_version_input
-from rich.console import Console
-from rich.prompt import Confirm, Prompt
-from rich.table import Table
 
 # Tests import these names from publish.
 _resolve_version_input = resolve_version_input
 _parse_semver = parse_semver
-
-app = typer.Typer(no_args_is_help=True)
-console = Console()
-
-
-@dataclass(frozen=True)
-class ReleaseContext:
-    """Computed release values for one run."""
-
-    version: str
-    interactive: bool
-
-
-def _resolve_context(version: Optional[str], interactive: bool) -> ReleaseContext:
-    """Resolve the release version from args or prompt."""
-    requested_version = version
-    if requested_version is None and interactive:
-        requested_version = Prompt.ask("Release version (semver)")
-
-    if requested_version is None:
-        raise ValueError("Missing release version. Provide --version or run with --interactive.")
-
-    return ReleaseContext(version=resolve_version_input(requested_version), interactive=interactive)
 
 
 def _npm_registry() -> str:
@@ -76,7 +48,7 @@ def _fetch_published_versions(package_name: str) -> list[str]:
     raise RuntimeError(f"Unexpected npm response for {package_name}: {parsed!r}")
 
 
-def _latest_semver(versions: list[str]) -> Optional[str]:
+def _latest_semver(versions: list[str]) -> str | None:
     """Return latest semver from npm version list."""
     parsed_versions = []
     for version in versions:
@@ -114,103 +86,80 @@ def _check_target_version(version: str, package_versions: dict[str, list[str]]) 
     return issues
 
 
-def _summary_markdown(context: ReleaseContext, package_versions: dict[str, list[str]]) -> str:
-    """Render markdown summary for GitHub job summary output."""
-    interaction_text = "interactive" if context.interactive else "non-interactive"
-    package_lines = []
+def _load_package_versions() -> dict[str, list[str]]:
+    """Load all package versions or raise a readable error."""
+    return {package_name: _fetch_published_versions(package_name) for package_name in PACKAGES}
+
+
+def _print_preflight_summary(version: str, package_versions: dict[str, list[str]]) -> None:
+    """Print a readable preflight summary."""
+    print(f"Requested version: {version}")
+    print(f"Registry: {_npm_registry()}")
     for package_name in PACKAGES:
         versions = package_versions[package_name]
         latest = _latest_semver(versions) or "none"
-        target_exists = "yes" if context.version in versions else "no"
-        package_lines.append(f"- `{package_name}`: latest=`{latest}`, target_exists=`{target_exists}`")
+        target_exists = "yes" if version in versions else "no"
+        print(f"{package_name}: latest={latest} target_exists={target_exists}")
 
-    return "\n".join(
-        [
-            "## js-packages-release preflight",
-            "",
-            f"- Requested version: `{context.version}`",
-            f"- Interaction: `{interaction_text}`",
-            f"- Registry: `{_npm_registry()}`",
-            "",
-            "### Package registry state",
-            *package_lines,
-        ]
+
+def _print_current_versions(package_versions: dict[str, list[str]]) -> None:
+    """Print a simple registry snapshot for local inspection."""
+    print(f"Registry: {_npm_registry()}")
+    for package_name in PACKAGES:
+        versions = package_versions[package_name]
+        latest = _latest_semver(versions) or "none"
+        print(f"{package_name}: latest={latest} published_count={len(versions)}")
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    """Create the CLI parser."""
+    parser = argparse.ArgumentParser(description="Validate synchronized JS package release versions.")
+    parser.add_argument("--version", help="Release version, tag ref, or js-packages-release@<semver>.")
+    parser.add_argument(
+        "--current",
+        action="store_true",
+        help="Print current published versions from the configured registry and exit.",
     )
+    return parser
 
 
-def _print_registry_snapshot(package_versions: dict[str, list[str]]) -> None:
-    """Print a readable registry snapshot before interactive prompts."""
-    table = Table(title=f"Current package versions ({_npm_registry()})")
-    table.add_column("Package", style="cyan")
-    table.add_column("Latest", style="green")
-    table.add_column("Published count", justify="right")
-    for package_name in PACKAGES:
-        versions = package_versions[package_name]
-        latest = _latest_semver(versions) or "none"
-        table.add_row(package_name, latest, str(len(versions)))
-    console.print(table)
+def main(argv: list[str] | None = None) -> int:
+    """Run the preflight CLI."""
+    parser = _build_parser()
+    args = parser.parse_args(argv)
 
+    if args.current and args.version is not None:
+        parser.error("--current cannot be combined with --version.")
+    if not args.current and args.version is None:
+        parser.error("either --version or --current is required.")
 
-def _load_package_versions_or_exit() -> dict[str, list[str]]:
-    """Load all package versions and exit on lookup errors."""
     try:
-        return {package_name: _fetch_published_versions(package_name) for package_name in PACKAGES}
+        package_versions = _load_package_versions()
     except RuntimeError as error:
-        console.print(str(error), style="red")
-        raise typer.Exit(code=1) from error
+        print(str(error), file=sys.stderr)
+        return 1
 
+    if args.current:
+        _print_current_versions(package_versions)
+        return 0
 
-def _resolve_context_or_exit(version: Optional[str], interactive: bool) -> ReleaseContext:
-    """Resolve context and exit with readable errors."""
     try:
-        return _resolve_context(version=version, interactive=interactive)
+        resolved_version = resolve_version_input(args.version)
     except ValueError as error:
-        console.print(str(error), style="red")
-        raise typer.Exit(code=1) from error
+        print(str(error), file=sys.stderr)
+        return 1
 
+    _print_preflight_summary(resolved_version, package_versions)
 
-@app.command()
-def run(
-    version: Optional[str] = typer.Option(None, help="Release semver value, for example 1.2.3."),
-    interactive: bool = typer.Option(True, "--interactive/--non-interactive", help="Enable or disable prompts."),
-    write_summary: bool = typer.Option(
-        True,
-        "--write-summary/--no-write-summary",
-        help="Write markdown output to GITHUB_STEP_SUMMARY if available.",
-    ),
-) -> None:
-    """Validate the requested release version against package registry state."""
-    package_versions: Optional[dict[str, list[str]]] = None
-
-    if interactive and version is None:
-        package_versions = _load_package_versions_or_exit()
-        _print_registry_snapshot(package_versions)
-
-    context = _resolve_context_or_exit(version=version, interactive=interactive)
-
-    if context.interactive:
-        proceed = Confirm.ask("Proceed with js-packages-release preflight?", default=True)
-        if not proceed:
-            console.print("Cancelled by user.", style="yellow")
-            raise typer.Exit(code=0)
-
-    if package_versions is None:
-        package_versions = _load_package_versions_or_exit()
-
-    issues = _check_target_version(version=context.version, package_versions=package_versions)
-    markdown = _summary_markdown(context=context, package_versions=package_versions)
-    console.print(markdown, style="blue")
-
-    if write_summary:
-        append_job_summary(markdown)
-
+    issues = _check_target_version(resolved_version, package_versions)
     if issues:
         for issue in issues:
-            console.print(issue, style="red")
-        raise typer.Exit(code=1)
+            print(issue, file=sys.stderr)
+        return 1
 
-    console.print("Preflight checks passed.", style="green bold")
+    print("Preflight checks passed.")
+    return 0
 
 
 if __name__ == "__main__":
-    app()
+    raise SystemExit(main())

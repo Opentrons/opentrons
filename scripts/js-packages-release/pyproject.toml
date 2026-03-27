@@ -10,9 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "pytest>=8.4.1",
-    "rich>=14.1.0",
     "semver>=3.0.4",
-    "typer>=0.17.4",
     "ruff>=0.12.11",
 ]
 
