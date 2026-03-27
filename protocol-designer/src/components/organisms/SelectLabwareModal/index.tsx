@@ -189,7 +189,6 @@ export function SelectLabwareModal(
       const isSmallYDimension = yDimension < STANDARD_Y_DIMENSION
       const isIrregularSize = isSmallXDimension && isSmallYDimension
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
-      const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
       return (
         (filterRecommended &&
@@ -204,7 +203,7 @@ export function SelectLabwareModal(
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
-        (slot === 'offDeck' && (isAdapter || isLid)) ||
+        (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
         parameters.loadName === TIPRACK_LID_LOADNAME
@@ -285,6 +284,7 @@ export function SelectLabwareModal(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
+
   const handleCategoryClick = (category: string, expand?: boolean): void => {
     const updatedExpandState = {
       ...userCategoryExpandState,
