@@ -13,7 +13,9 @@ from robot_server.versioning import API_VERSION, API_VERSION_HEADER
 @pytest.fixture
 def mock_log_control() -> Iterator[MagicMock]:
     """Patch out the log retrieval logic."""
-    with patch("opentrons.system.log_control.get_records_dumb") as p:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as p:
         p.return_value = b""
         yield p
 

@@ -3,7 +3,10 @@ import json
 import pytest
 from mock import patch
 
-from opentrons.system.log_control import DEFAULT_RECORDS, MAX_RECORDS
+from robot_server.service.legacy.routers._log_control import (
+    DEFAULT_RECORDS,
+    MAX_RECORDS,
+)
 
 
 def test_get_serial_log_with_defaults(api_client):
@@ -14,7 +17,9 @@ def test_get_serial_log_with_defaults(api_client):
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get("/logs/serial.log")
         body = response.text
@@ -45,7 +50,9 @@ def test_get_serial_log_with_params(
     async def mock_get_records_dumb(identifier, records, mode):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
             f"/logs/serial.log?format={format_param}&records={records_param}"
@@ -71,7 +78,9 @@ def test_get_serial_log_with_invalid_params(api_client, format_param, records_pa
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
             f"/logs/serial.log?format={format_param}&records={records_param}"
@@ -88,7 +97,9 @@ def test_get_api_log_with_defaults(api_client):
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get("/logs/api.log")
         body = response.text
@@ -117,7 +128,9 @@ def test_get_api_log_with_params(api_client, format_param, records_param, mode_p
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
             f"/logs/api.log?format={format_param}&records={records_param}"
@@ -151,7 +164,9 @@ def test_get_odd_log_with_params(api_client, format_param, records_param, mode_p
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
             f"/logs/touchscreen.log?format={format_param}&records={records_param}"
@@ -173,7 +188,9 @@ def test_get_odd_log_with_defaults(api_client):
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get("/logs/touchscreen.log")
         body = response.text
@@ -195,7 +212,9 @@ def test_get_api_log_with_invalid_params(api_client, format_param, records_param
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
-    with patch("opentrons.system.log_control.get_records_dumb") as m:
+    with patch(
+        "robot_server.service.legacy.routers._log_control.get_records_dumb"
+    ) as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
             f"/logs/api.log?format={format_param}&records={records_param}"

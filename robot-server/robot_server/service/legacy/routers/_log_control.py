@@ -1,9 +1,4 @@
-"""
-opentrons.system.log_control: functions for talking to syslog and journald
-
-This is the implementation of the endpoints in
-:py:mod:`opentrons.server.endpoints.logs` and friends.
-"""
+"""Get system logs from journald."""
 
 import asyncio
 import logging
