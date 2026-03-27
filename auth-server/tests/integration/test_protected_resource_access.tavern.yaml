@@ -8,7 +8,7 @@ stages:
   - name: Enable access control so protected resources require a valid token
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings'
+      url: '{run_server.base_url}/auth/settings/access-control'
       json:
         data:
           accessControlEnabled: true
