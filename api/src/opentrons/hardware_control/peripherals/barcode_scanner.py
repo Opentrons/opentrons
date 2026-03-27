@@ -99,3 +99,7 @@ class BarcodeScanner(AbstractPeripheral):
     def name(cls) -> str:
         """A shortname used for matching usb ports, among other things"""
         return "barcodescanner"
+
+    async def scan_barcode(self) -> Optional[str]:
+        """Attempt to scan a barcode."""
+        return await self._driver.scan_barcode()

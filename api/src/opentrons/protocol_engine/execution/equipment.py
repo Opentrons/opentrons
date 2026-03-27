@@ -45,6 +45,7 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.peripherals import (
     AbstractPeripheral,
+    BarcodeScanner,
 )
 from opentrons.protocol_engine.state.module_substates import (
     AbsorbanceReaderId,
@@ -54,6 +55,9 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
     VacuumModuleId,
+)
+from opentrons.protocol_engine.state.peripheral_substates import (
+    BarcodeScannerPeripheralId,
 )
 from opentrons.types import MountType
 
@@ -786,6 +790,27 @@ class EquipmentHandler:
             f'No module attached with serial number "{serial_number}"'
             f' for module ID "{module_id}".'
         )
+
+    """
+    This method doesn't work right now because @overload requires multiple functions with @overload
+    Once we add a second peripheral use the get_peripheral_hardware_api with overloads like modules
+    and delete get_barcode_hardware_api
+
+    @overload
+    def get_peripheral_hardware_api(
+        self,
+        peripheral_id: BarcodeScannerPeripheralId,
+    ) -> Optional[BarcodeScanner]: ...
+
+    """
+
+    def get_barcode_hardware_api(
+        self, peripheral_id: BarcodeScannerPeripheralId
+    ) -> Optional[BarcodeScanner]:
+        """Get the hardware API for a barcode scanenr."""
+        scanner = self.get_peripheral_hardware_api(peripheral_id)
+        assert isinstance(scanner, BarcodeScanner)
+        return scanner
 
     def get_peripheral_hardware_api(
         self, peripheral_id: str

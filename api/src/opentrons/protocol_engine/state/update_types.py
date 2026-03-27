@@ -413,6 +413,25 @@ class VacuumModuleStateUpdate:
 
 
 @dataclasses.dataclass
+class BarcodeScannerPeripheralStateUpdate:
+    """An update to the Barcode Scanner Peripheral state."""
+
+    peripheral_id: str
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: BarcodeScannerPeripheralStateUpdate | NoChangeType,
+        peripheral_id: str,
+    ) -> BarcodeScannerPeripheralStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return BarcodeScannerPeripheralStateUpdate(peripheral_id=peripheral_id)
+        else:
+            return maybe_inst
+
+
+@dataclasses.dataclass
 class LiquidClassLoadedUpdate:
     """The state update from loading a liquid class."""
 
