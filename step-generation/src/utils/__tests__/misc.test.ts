@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  getFullStackFromLabwares,
   getIsRetractSafeForAirGap,
   getTransferPlanAndReferenceVolumes,
 } from '../misc'
@@ -435,5 +436,21 @@ describe('getIsRetractSafeForAirGap', () => {
     vi.mocked(getMmFromBottom).mockReturnValue(11)
     const result = getIsRetractSafeForAirGap(args)
     expect(result).toBe(false)
+  })
+})
+
+describe('getFullStackFromLabwares', () => {
+  it('return the top stack of labwares', () => {
+    const labware = {
+      labwareId1: {
+        stack: ['labwareId1', 'D3'],
+      },
+      labwareId2: {
+        stack: ['labwareId2', 'labwareId1', 'D3'],
+      },
+    }
+    const slot = 'D3'
+    const largestStack = getFullStackFromLabwares(labware, slot, undefined)
+    expect(largestStack).toEqual(['labwareId2', 'labwareId1', 'D3'])
   })
 })
