@@ -207,7 +207,7 @@ def install_tls_cert(tls_cert_dir: Path, tls_cert: SignedCert) -> X509Pair:
     return X509Pair(
         keypath=tls_cert.keypath,
         certpath=file_utils.save_cert(
-            tls_cert_dir, tls_cert.cert, "ot-robot-tls-cert.cer", "TLS cert"
+            tls_cert_dir, tls_cert.cert, "ot-robot-tls-cert.cer", "TLS cert", "PEM"
         ),
         key=tls_cert.key,
         cert=tls_cert.cert,

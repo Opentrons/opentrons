@@ -35,7 +35,8 @@ CA_NAME = x509.Name(
 
 # the names of our CA keys and certs, both as a regex for parsing from directories and a format
 # for saving
-CA_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.(pem|cer)$")
+CA_CERT_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.cer$")
+CA_KEY_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-ca-(\d{4}-\d{2}-\d{2})\.pem$")
 
 CA_CERT_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.cer"
 CA_KEY_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.pem"

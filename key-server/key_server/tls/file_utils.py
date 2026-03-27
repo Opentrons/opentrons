@@ -160,7 +160,7 @@ def ca_keys_from_dir(
 
     If a candidate key can't be loaded, delete it.
     """
-    return keys_from_dir(key_dir, constants.CA_NAME_PATTERN)
+    return keys_from_dir(key_dir, constants.CA_KEY_NAME_PATTERN)
 
 
 def ca_certs_from_dir(ca_cert_dir: Path) -> Iterator[tuple[Path, x509.Certificate]]:
@@ -169,7 +169,7 @@ def ca_certs_from_dir(ca_cert_dir: Path) -> Iterator[tuple[Path, x509.Certificat
     If any cert that is named like one of our CAs is not one of our CAs, delete it.
     """
     for maybe_cert in ca_cert_dir.iterdir():
-        if constants.CA_NAME_PATTERN.match(maybe_cert.name):
+        if constants.CA_CERT_NAME_PATTERN.match(maybe_cert.name):
             # loading the cert requires that it be a valid x509 cert in DER
             cert = load_ca_cert(maybe_cert)
             if cert:
