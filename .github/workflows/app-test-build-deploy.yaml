@@ -373,7 +373,7 @@ jobs:
       - name: 'configure s3 deploy creds (GitHub OIDC)'
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }}
+          role-to-assume: ${{ vars.OT_APP_OT3_DEPLOY_ROLE }}
           aws-region: us-east-2
       - name: 'deploy release builds to s3'
         run: |
