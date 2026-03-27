@@ -1,6 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
+} from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -158,6 +165,23 @@ const mockThermocyclerGen2LidClosed = {
   moduleType: 'thermocyclerModuleType',
   data: {
     lidStatus: 'closed',
+  },
+} as any
+
+const mockFlexStacker = {
+  id: 'flex_stacker_id',
+  moduleModel: FLEX_STACKER_MODULE_V1,
+  moduleType: FLEX_STACKER_MODULE_TYPE,
+  data: {
+    status: 'idle',
+  },
+} as any
+const mockVacuumModule = {
+  id: 'vacuum_id',
+  moduleModel: VACUUM_MODULE_V1,
+  moduleType: VACUUM_MODULE_TYPE,
+  data: {
+    status: 'idle',
   },
 } as any
 
@@ -508,6 +532,18 @@ describe('ModuleOverflowMenu', () => {
     const calibrate = screen.queryByRole('button', { name: 'Calibrate' })
     expect(calibrate).not.toBeInTheDocument()
   })
+  ;[mockFlexStacker, mockVacuumModule].forEach(module =>
+    it('not render calibrate button when a module is no-calibration required', () => {
+      props = {
+        ...props,
+        module,
+      }
+      render(props)
+
+      const calibrate = screen.queryByRole('button', { name: 'Calibrate' })
+      expect(calibrate).not.toBeInTheDocument()
+    })
+  )
 
   it('renders a disabled calibrate button if the pipettes are not attached or need a firmware update', () => {
     vi.mocked(useIsFlex).mockReturnValue(true)

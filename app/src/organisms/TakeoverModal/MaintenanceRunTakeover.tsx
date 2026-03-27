@@ -50,13 +50,18 @@ export function MaintenanceRunTakeoverModal(
     }
   }
 
-  useEffect(() => {
-    if (currentRunId == null) {
-      setIsLoading(false)
-      setShowConfirmTerminateModal(false)
-      reset()
-    }
-  }, [currentRunId])
+  useEffect(
+    () => {
+      if (currentRunId == null) {
+        setIsLoading(false)
+        setShowConfirmTerminateModal(false)
+        reset()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRunId]
+  )
 
   return (
     <>

@@ -28,8 +28,8 @@ class FlexStackerPage(BasePage):
             message: message to display in message box
         """
 
-        self.page.get_by_test_id("TextAreaField").click()
-        self.page.get_by_test_id("TextAreaField").fill(message)
+        self.page.get_by_role("textbox").click()
+        self.page.get_by_role("textbox").fill(message)
 
     def refill_stacker(self, stacker: str, refill_num: int, message: str) -> None:
         """
@@ -81,7 +81,7 @@ class FlexStackerPage(BasePage):
     ##TODO: move to utility page, and update plate reader page as well
     def wait_for_save_banner_gone(self) -> None:
         """Wait for the save banner to disappear."""
-        banner_message = "Flex Stacker has been saved"
+        banner_message = "Stacker has been saved"
         banner = self.page.get_by_test_id("Snackbar").get_by_text(banner_message, exact=True).first
         banner.wait_for(state="visible")
         banner.wait_for(state="detached")

@@ -46,12 +46,11 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
-  const wellGroup: WellGroup | null =
-    activeWellName != null
-      ? {
-          [activeWellName]: null,
-        }
-      : null
+
+  const wellGroup: WellGroup =
+    activeWellName != null && labwareDef.wells[activeWellName] != null
+      ? { [activeWellName]: null }
+      : {}
 
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
     liquidState,

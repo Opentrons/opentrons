@@ -110,7 +110,7 @@ class BaseCommandCreate(
         ),
         json_schema_extra=_pop_default,
     )
-    commandAnnotations: List[str] = Field(
+    commandAnnotationIds: List[str] = Field(
         default_factory=list,
         description="A list of command annotation IDs (if any) that apply to this command.",
     )
@@ -287,7 +287,7 @@ class BaseCommand(
             " the command's execution or the command's generation."
         ),
     )
-    commandAnnotations: List[str] = Field(
+    commandAnnotationIds: List[str] = Field(
         default_factory=list,
         description="A list of command annotation IDs (if any) that apply to this command.",
     )

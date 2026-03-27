@@ -260,9 +260,9 @@ export function DefineLiquidsModal(
                   gridGap={SPACING.spacing4}
                 >
                   <TextAreaField
-                    title={t('description')}
+                    label={t('description')}
                     {...register('description')}
-                    value={watch('description')}
+                    value={watch('description') ?? ''}
                     height="4.75rem"
                   />
                 </Flex>

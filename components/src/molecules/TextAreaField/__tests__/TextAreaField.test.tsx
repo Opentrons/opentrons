@@ -15,17 +15,19 @@ describe('TextAreaField', () => {
 
   beforeEach(() => {
     props = {
-      title: 'TextAreaField',
+      label: 'textAreaField',
       placeholder: 'Enter text...',
       value: '',
       onChange: vi.fn(),
+      id: 'textAreaField',
     }
   })
 
   it('renders the TextAreaField component', () => {
     render(props)
-    screen.getByText('TextAreaField')
-    expect(screen.getByTestId('TextAreaField')).toBeInTheDocument()
+    screen.getByText('textAreaField')
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
+    expect(textarea).toBeInTheDocument()
   })
 
   it('displays the correct placeholder text', () => {
@@ -35,7 +37,7 @@ describe('TextAreaField', () => {
 
   it('updates value when user types', () => {
     render(props)
-    const textarea = screen.getByTestId('TextAreaField')
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
 
     fireEvent.change(textarea, { target: { value: 'Hello, world!' } })
 
@@ -45,7 +47,8 @@ describe('TextAreaField', () => {
   it('disables the textarea when disabled prop is true', () => {
     props.disabled = true
     render(props)
-    expect(screen.getByTestId('TextAreaField')).toBeDisabled()
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
+    expect(textarea).toBeDisabled()
   })
 
   it('displays an error message when error prop is provided', () => {
@@ -62,8 +65,8 @@ describe('TextAreaField', () => {
   })
 
   it('display left icon when leftIcon prop is provided', () => {
-    props.leftIcon = 'information'
+    props.leftElement = 'information'
     render(props)
-    screen.getByTestId('left-icon')
+    screen.getByText('information')
   })
 })

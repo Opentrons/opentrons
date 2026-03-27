@@ -53,24 +53,34 @@ export function Designer(): JSX.Element {
     Object.values(additionalEquipmentOnDeck).length > 1
 
   // only display toast if its a newly made protocol and has hardware
-  useEffect(() => {
-    if (hasHardware && isNewProtocol) {
-      bakeToast(t('add_rest') as string, INFO_TOAST, {
-        heading: t('we_added_hardware'),
-        closeButton: true,
-      })
-      dispatch(generateNewProtocol({ isNewProtocol: false }))
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (hasHardware && isNewProtocol) {
+        bakeToast(t('add_rest') as string, INFO_TOAST, {
+          heading: t('we_added_hardware'),
+          closeButton: true,
+        })
+        dispatch(generateNewProtocol({ isNewProtocol: false }))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
-  useEffect(() => {
-    if (fileMetadata?.created == null) {
-      console.warn(
-        'fileMetadata was refreshed while on the designer page, redirecting to landing page'
-      )
-      navigate('/')
-    }
-  }, [fileMetadata])
+  useEffect(
+    () => {
+      if (fileMetadata?.created == null) {
+        console.warn(
+          'fileMetadata was refreshed while on the designer page, redirecting to landing page'
+        )
+        navigate('/')
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fileMetadata]
+  )
 
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {

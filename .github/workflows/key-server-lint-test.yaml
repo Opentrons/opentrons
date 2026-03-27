@@ -1,0 +1,81 @@
+# This workflow runs tests and lint on non-release branches pushed that alter
+# the key-server subpackage
+
+name: 'key-server test/lint'
+
+on:
+  push:
+    paths:
+      - 'key-server/**'
+      - 'Makefile'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+      - '.github/workflows/key-server-lint-test.yaml'
+      - '.github/actions/python/**'
+      - 'server-utils/**'
+    branches: # ignore any release-related thing (handled elsewhere)
+      - 'edge'
+    tags-ignore:
+      - '*'
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - 'key-server/**'
+      - 'Makefile'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+      - '.github/workflows/key-server-lint-test.yaml'
+      - '.github/actions/python/**'
+      - 'server-utils/**'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'key-server linting'
+    timeout-minutes: 10
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v6'
+        with:
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'key-server'
+      - name: Lint
+        run: make -C key-server lint
+  test:
+    name: 'key-server tests'
+    timeout-minutes: 10
+    needs: [lint]
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v6'
+        with:
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'key-server'
+      - name: Test
+        run: make -C key-server test
+      - uses: 'codecov/codecov-action@v3'
+        with:
+          files: ./key-server/coverage.xml
+          flags: key-server

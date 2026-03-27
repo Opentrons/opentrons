@@ -82,37 +82,41 @@ export function ProtocolSetupCamera(
   }
 
   const onConfirmPreferences = (): void => {
-    setIsConfirmPending(true)
+    if (!cameraEnabled && props.isCameraRequired) {
+      makeSnackbar(t('camera_required') as string, TOAST_DURATION_MS)
+    } else {
+      setIsConfirmPending(true)
 
-    addCameraSettingsToRunAsync({
-      runId,
-      settings: {
-        cameraEnabled,
-        liveStreamEnabled,
-        errorRecoveryCameraEnabled: recoveryEnabled,
-      },
-    })
-      .then(() =>
-        cameraImageSettings != null
-          ? addCameraImageSettingsToRunAsync(cameraImageSettings)
-          : Promise.resolve(null)
-      )
-      .then(confirmCameraSettings)
-      .catch(() => {
-        // This request only fails if the camera is not connected to the robot.
-        // We only want to surface the error if a user expects the camera to be enabled.
-        if (cameraEnabled) {
-          makeSnackbar(
-            t('error_confirming_camera') as string,
-            TOAST_DURATION_MS
-          )
-        } else {
-          confirmCameraSettings()
-        }
+      addCameraSettingsToRunAsync({
+        runId,
+        settings: {
+          cameraEnabled,
+          liveStreamEnabled,
+          errorRecoveryCameraEnabled: recoveryEnabled,
+        },
       })
-      .finally(() => {
-        setIsConfirmPending(false)
-      })
+        .then(() =>
+          cameraImageSettings != null
+            ? addCameraImageSettingsToRunAsync(cameraImageSettings)
+            : Promise.resolve(null)
+        )
+        .then(confirmCameraSettings)
+        .catch(() => {
+          // This request only fails if the camera is not connected to the robot.
+          // We only want to surface the error if a user expects the camera to be enabled.
+          if (cameraEnabled) {
+            makeSnackbar(
+              t('error_confirming_camera') as string,
+              TOAST_DURATION_MS
+            )
+          } else {
+            confirmCameraSettings()
+          }
+        })
+        .finally(() => {
+          setIsConfirmPending(false)
+        })
+    }
   }
 
   return (

@@ -1,13 +1,12 @@
 """Systemd bindings with fallbacks for test."""
 
 import logging.config
-from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
     import systemd.journal  # noqa: F401
 
-    def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
+    def log_handler(topic_name: str, log_level: int) -> dict[str, int | str]:
         """Initialize log handler."""
         return {
             "class": "systemd.journal.JournalHandler",
@@ -21,7 +20,7 @@ try:
 except ImportError:
     # systemd journal isn't available, probably running tests
 
-    def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
+    def log_handler(topic_name: str, log_level: int) -> dict[str, int | str]:
         """Initialize log handler."""
         return {
             "class": "logging.StreamHandler",

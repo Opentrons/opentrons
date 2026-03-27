@@ -61,7 +61,6 @@ const getHealthStatus = (
 }
 
 export const robotsByNameReducer = (
-  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: RobotsByNameMap = INITIAL_STATE.robotsByName,
   action: Action
 ): RobotsByNameMap => {
@@ -115,7 +114,6 @@ export const robotsByNameReducer = (
 }
 
 export const hostsByIpReducer = (
-  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: HostsByIpMap = INITIAL_STATE.hostsByIp,
   action: Action
 ): HostsByIpMap => {
@@ -232,7 +230,6 @@ export const hostsByIpReducer = (
 }
 
 export const manualAddressesReducer = (
-  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: Address[] = INITIAL_STATE.manualAddresses,
   action: Action
 ): Address[] => {

@@ -140,13 +140,18 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
     },
   }
 
-  useEffect(() => {
-    if (orderedCycleStepIds.length === 0) {
-      // prepopulate with blank step on mount if not editing
-      handleAddCycleStep()
-      setIsInEdit(true)
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (orderedCycleStepIds.length === 0) {
+        // prepopulate with blank step on mount if not editing
+        handleAddCycleStep()
+        setIsInEdit(true)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const handleAddCycleStep = (): void => {
     const newStepId = uuid()

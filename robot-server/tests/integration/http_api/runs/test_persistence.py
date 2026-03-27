@@ -269,7 +269,7 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
         {
             k: v
             for k, v in expected_command.items()
-            if k != "result" and k != "commandAnnotations"
+            if k != "result" and k != "commandAnnotationIds"
         }
     ]
     assert get_persisted_command_response.json()["data"] == expected_command

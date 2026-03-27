@@ -61,7 +61,7 @@
   "waste_chute": "WASTE CHUTE",
   "wavelengths": "Wavelengths",
   "well_dimension": "{{number}} mm",
-  "well_name": "WELL {{wellName}}",
+  "well_name": "Well {{wellName}}",
   "well_view": "Well view",
   "well_volume": "{{volume}} µL"
 }

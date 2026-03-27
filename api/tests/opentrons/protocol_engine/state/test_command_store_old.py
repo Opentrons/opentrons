@@ -181,7 +181,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.QUEUED,
         intent=commands.CommandIntent.SETUP,
-        commandAnnotations=[],
+        commandAnnotationIds=[],
     )
 
     subject = CommandStore(

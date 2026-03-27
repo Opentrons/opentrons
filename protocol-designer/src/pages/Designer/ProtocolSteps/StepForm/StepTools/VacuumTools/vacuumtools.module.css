@@ -1,0 +1,135 @@
+.vacuum_tools_container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16) 0;
+  gap: var(--spacing-12);
+}
+
+.section_divider {
+  margin: 0;
+}
+
+/* VacuumControls root (state/profile/mode selection + pump controls) */
+.vacuum_controls_root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.vacuum_state_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.state_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.state_list_item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-16);
+}
+
+/* Pump duration field (shared by power and pressure controls) */
+.pump_duration_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.pump_duration_header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pump_duration_check_button {
+  padding: 0;
+  border: none;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pump_duration_content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+/* Vacuum pump controls root (mode label + power/pressure + ending hold) */
+.pump_controls_root {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-12);
+}
+
+/* Pump power / pressure controls (shared layout) */
+.pump_controls_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.pump_controls_list_item {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+  gap: var(--spacing-8);
+}
+
+/* Ending hold vent (shown when pump duration is enabled) */
+.ending_hold_section {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.ending_hold_row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-12);
+  border: none;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+  cursor: pointer;
+}
+
+/* Controls group (radio groups for state/profile/mode selection) */
+.controls_group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.controls_group_title_row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.controls_group_options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.controls_group_option_label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}

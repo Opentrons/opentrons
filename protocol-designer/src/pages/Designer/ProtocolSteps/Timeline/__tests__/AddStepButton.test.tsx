@@ -10,12 +10,18 @@ import {
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
+import { makeContext, makeInitialRobotState } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { OFFDECK } from '/protocol-designer/constants'
-import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
+import {
+  getEnableComment,
+  getEnableVacuumModule,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
@@ -107,6 +113,14 @@ const MOCK_TUBERACK_ENTITY = {
     } as LabwareParameters,
   } as LabwareDefinition2,
 } as LabwareEntity
+
+const MOCK_INITIAL_INVARIANT_CONTEXT = makeContext()
+const MOCK_INITIAL_DECK_SETUP = makeInitialRobotState({
+  invariantContext: MOCK_INITIAL_INVARIANT_CONTEXT,
+  labwareLocations: {},
+  moduleLocations: {},
+  pipetteLocations: {},
+})
 
 describe('AddStepButton', () => {
   let props: ComponentProps<typeof AddStepButton>
@@ -239,5 +253,41 @@ describe('AddStepButton', () => {
     screen.getByText('Heater-Shaker')
     screen.getByText('Temperature')
     screen.getByText('Magnet')
+  })
+
+  it('should not render vacuum step if vacuum module is not enabled', () => {
+    vi.mocked(getEnableVacuumModule).mockReturnValue(false)
+    render(props)
+    fireEvent.click(screen.getByText('Add Step'))
+    expect(screen.queryByText('Vacuum')).not.toBeInTheDocument()
+  })
+
+  it('should render vacuum step if vacuum module is enabled', () => {
+    vi.mocked(getEnableVacuumModule).mockReturnValue(true)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      ...MOCK_INITIAL_DECK_SETUP,
+      modules: {
+        ...MOCK_INITIAL_DECK_SETUP.modules,
+        vacuum: {
+          model: VACUUM_MODULE_V1,
+          type: VACUUM_MODULE_TYPE,
+          id: 'vacuumId',
+          moduleState: {} as any,
+          slot: 'E1',
+          pythonName: 'mockPythonName',
+        },
+      } as any,
+    } as any)
+    render(props)
+    fireEvent.click(screen.getByText('Add Step'))
+    screen.getByText('Vacuum')
+  })
+
+  it('should not render vacuum step if vacuum module is not on deck', () => {
+    vi.mocked(getEnableVacuumModule).mockReturnValue(true)
+    vi.mocked(getInitialRobotState).mockReturnValue(MOCK_INITIAL_ROBOT_STATE)
+    render(props)
+    fireEvent.click(screen.getByText('Add Step'))
+    expect(screen.queryByText('Vacuum')).not.toBeInTheDocument()
   })
 })

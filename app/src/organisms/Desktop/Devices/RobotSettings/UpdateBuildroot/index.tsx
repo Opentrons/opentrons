@@ -39,18 +39,28 @@ const UpdateBuildroot = NiceModal.create(
     if (!hasSeenSessionOnce.current && session)
       hasSeenSessionOnce.current = true
 
-    useEffect(() => {
-      if (robotName.current) {
-        dispatch(setRobotUpdateSeen(robotName.current))
-      }
-    }, [robotName])
+    useEffect(
+      () => {
+        if (robotName.current) {
+          dispatch(setRobotUpdateSeen(robotName.current))
+        }
+      },
+      // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [robotName]
+    )
 
-    const ignoreUpdate = useCallback(() => {
-      if (robotName.current) {
-        dispatch(robotUpdateIgnored(robotName.current))
-      }
-      modal.remove()
-    }, [robotName, close])
+    const ignoreUpdate = useCallback(
+      () => {
+        if (robotName.current) {
+          dispatch(robotUpdateIgnored(robotName.current))
+        }
+        modal.remove()
+      },
+      // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [robotName, close]
+    )
 
     if (hasSeenSessionOnce.current)
       return (

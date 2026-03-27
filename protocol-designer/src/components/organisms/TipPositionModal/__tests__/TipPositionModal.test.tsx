@@ -133,11 +133,11 @@ describe('TipPositionModal', () => {
   })
   it('renders a custom input field and clicks on it, calling the mock updates', () => {
     render(props)
-    const xInputField = screen.getAllByRole('textbox', { name: '' })[0]
+    const xInputField = screen.getByRole('textbox', { name: 'X position' })
     fireEvent.change(xInputField, { target: { value: 3 } })
-    const yInputField = screen.getAllByRole('textbox', { name: '' })[1]
+    const yInputField = screen.getByRole('textbox', { name: 'Y position' })
     fireEvent.change(yInputField, { target: { value: -2 } })
-    const zInputField = screen.getAllByRole('textbox', { name: '' })[2]
+    const zInputField = screen.getByRole('textbox', { name: 'Z position' })
     fireEvent.change(zInputField, { target: { value: 10 } })
     fireEvent.click(screen.getByText('Save'))
     expect(props.closeModal).toHaveBeenCalled()
@@ -168,7 +168,7 @@ describe('TipPositionModal', () => {
     }
     render(props)
     fireEvent.click(screen.getByText('Save'))
-    const xInputField = screen.getAllByRole('textbox', { name: '' })[0]
+    const xInputField = screen.getByRole('textbox', { name: 'X position' })
     fireEvent.change(xInputField, { target: { value: 3.55555 } })
     fireEvent.click(screen.getByText('Save'))
     //   display too many decimals error

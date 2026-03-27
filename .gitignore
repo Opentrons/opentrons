@@ -1,3 +1,8 @@
+# Local development scratch directories (protocols, custom labware, CSV inputs)
+tmp-protocols/
+tmp-custom-labware/
+tmp-csv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -155,3 +160,4 @@ api/docs/dist/v2/
 
 package-testing/results
 all_analysis_results/
+auth-server/.env

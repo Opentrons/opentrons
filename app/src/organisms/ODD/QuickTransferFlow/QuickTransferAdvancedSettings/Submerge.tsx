@@ -7,10 +7,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
@@ -281,7 +281,18 @@ function SubmergeSettingComponent({
           <StyledText oddStyle="level4HeaderRegular">
             {t(`submerge_${kind}_description`)}
           </StyledText>
-          <InputField type="number" value={speed} title={t('speed')} readOnly />
+          <TouchInputField
+            autoFocus
+            type="number"
+            value={speed}
+            label={t('speed')}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handleSpeedChange(e.target.value as string)
+            }}
+          />
         </Flex>
         <Flex
           paddingX={SPACING.spacing24}
@@ -311,11 +322,17 @@ function SubmergeSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
+            autoFocus
             type="number"
             value={delayDuration}
-            title={t('delay_duration_s')}
-            readOnly
+            label={t('delay_duration_s')}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handleDelayDurationChange(e.target.value as string)
+            }}
           />
         </Flex>
         <Flex
@@ -350,12 +367,18 @@ function SubmergeSettingComponent({
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
+            autoFocus
             type="text"
             value={position}
             error={positionError}
-            title={positionText}
-            readOnly
+            label={positionText}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handlePositionChange(e.target.value as string)
+            }}
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>

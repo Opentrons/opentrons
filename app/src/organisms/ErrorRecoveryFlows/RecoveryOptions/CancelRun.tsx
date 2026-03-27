@@ -127,19 +127,24 @@ export function useOnCancelRun({
 
   const showBtnLoadingState = hasUserClicked && isLoadingTipStatus
 
-  useEffect(() => {
-    if (hasUserClicked) {
-      if (!isLoadingTipStatus) {
-        if (areTipsAttached) {
-          void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
-        } else {
-          void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
-            cancelRun()
-          })
+  useEffect(
+    () => {
+      if (hasUserClicked) {
+        if (!isLoadingTipStatus) {
+          if (areTipsAttached) {
+            void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
+          } else {
+            void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
+              cancelRun()
+            })
+          }
         }
       }
-    }
-  }, [hasUserClicked, isLoadingTipStatus, areTipsAttached])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasUserClicked, isLoadingTipStatus, areTipsAttached]
+  )
 
   const handleCancelRunClick = (): void => {
     setHasUserClicked(true)

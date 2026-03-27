@@ -1,105 +1,34 @@
 {
   "$id": "opentronsCommandAnnotationSchemaV2#",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$defs": {
-    "baseAnnotation": {
-      "description": "Things all annotations have",
-      "type": "object",
-      "required": ["annotationType", "annotationId"],
-      "properties": {
-        "annotationId": {
-          "description": "A unique identifier for a command annotation.",
-          "type": "string"
-        },
-        "annotationType": {
-          "description": "The type of annotation (for machine parsing)",
-          "type": "string"
-        },
-        "parentAnnotation": {
-          "description": "The parent annotation of this annotation, if any.",
-          "type": "string"
-        }
-      }
+  "title": "Command Annotation Schema V2",
+  "description": "Schema for defining annotations that group an arbitrary number of commands together.",
+  "type": "object",
+  "required": ["id", "source", "params", "userSpecifiedName"],
+  "properties": {
+    "id": {
+      "description": "A unique identifier for a command annotation.",
+      "type": "string"
     },
-    "secondOrderCommand": {
-      "description": "Annotates a group of atomic commands which were the direct result of a second order command (e.g. transfer, consolidate, mix)",
-      "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
-      "type": "object",
-      "required": [
-        "annotationType",
-        "annotationId",
-        "params",
-        "machineReadableName"
-      ],
-      "properties": {
-        "annotationType": {
-          "type": "string",
-          "enum": ["secondOrderCommand"]
-        },
-        "params": {
-          "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
-          "type": "object"
-        },
-        "machineReadableName": {
-          "description": "The name of the second order command in the form that the generating software refers to it. (e.g. 'transfer', 'thermocyclerStep')",
-          "type": "string"
-        },
-        "userSpecifiedName": {
-          "description": "The optional user-specified name of the second order command",
-          "type": "string"
-        },
-        "userSpecifiedDescription": {
-          "description": "The optional user-specified description of the second order command",
-          "type": "string"
-        }
-      }
+    "source": {
+      "description": "The type of annotation (for machine parsing)",
+      "type": "string"
     },
-    "userCommand": {
-      "description": "A user generated command annotation as opposed to one generated automatically.",
-      "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
-      "type": "object",
-      "required": [
-        "annotationType",
-        "annotationId",
-        "params",
-        "userSpecifiedName"
-      ],
-      "properties": {
-        "annotationType": {
-          "type": "string",
-          "enum": ["userCommand"]
-        },
-        "params": {
-          "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
-          "type": "object"
-        },
-        "userSpecifiedName": {
-          "description": "The optional user-specified name of the second order command",
-          "type": "string"
-        },
-        "userSpecifiedDescription": {
-          "description": "The optional user-specified description of the second order command",
-          "type": "string"
-        }
-      }
+    "parent": {
+      "description": "The parent annotation of this annotation, if any.",
+      "type": "string"
     },
-    "custom": {
-      "description": "Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate",
-      "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
-      "type": "object",
-      "required": ["annotationType", "annotationId"],
-      "properties": {
-        "annotationType": {
-          "type": "string",
-          "enum": ["custom"]
-        }
-      },
-      "additionalProperties": true
+    "params": {
+      "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
+      "type": "object"
+    },
+    "name": {
+      "description": "Required name of the command annotation.",
+      "type": "string"
+    },
+    "description": {
+      "description": "The optional description of the command annotation.",
+      "type": "string"
     }
-  },
-  "oneOf": [
-    { "$ref": "#/$defs/secondOrderCommand" },
-    { "$ref": "#/$defs/userCommand" },
-    { "$ref": "#/$defs/custom" }
-  ]
+  }
 }

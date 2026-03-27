@@ -58,32 +58,37 @@ export function Landing(): JSX.Element {
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
     hasOptedIn != null
 
-  useEffect(() => {
-    if (
-      userHasNotSeenAnnouncement &&
-      appVersion != null &&
-      hasOptedIn != null
-    ) {
-      const toastId = bakeToast(
-        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
-        INFO_TOAST,
-        {
-          heading: t('updated_protocol_designer'),
-          closeButton: true,
-          linkText: t('view_release_notes'),
-          onClose: () => {
-            setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
-          },
-          onLinkClick: () => {
-            eatToast(toastId)
-            setShowAnnouncementModal(true)
-          },
-          disableTimeout: true,
-          justifyContent: JUSTIFY_CENTER,
-        }
-      )
-    }
-  }, [userHasNotSeenAnnouncement, appVersion, hasOptedIn])
+  useEffect(
+    () => {
+      if (
+        userHasNotSeenAnnouncement &&
+        appVersion != null &&
+        hasOptedIn != null
+      ) {
+        const toastId = bakeToast(
+          t('learn_more', { version: _OT_PD_VERSION_ }) as string,
+          INFO_TOAST,
+          {
+            heading: t('updated_protocol_designer'),
+            closeButton: true,
+            linkText: t('view_release_notes'),
+            onClose: () => {
+              setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
+            },
+            onLinkClick: () => {
+              eatToast(toastId)
+              setShowAnnouncementModal(true)
+            },
+            disableTimeout: true,
+            justifyContent: JUSTIFY_CENTER,
+          }
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userHasNotSeenAnnouncement, appVersion, hasOptedIn]
+  )
 
   useEffect(() => {
     if (metadata?.created != null) {

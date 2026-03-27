@@ -106,46 +106,7 @@ describe('Update Protocol', () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it.skip('should call navigate to the chat page when the submit prompt button is clicked when progress is 1.0', async () => {
-    render()
-
-    // upload file
-    const blobParts: BlobPart[] = [
-      'x = 1\n',
-      'x = 2\n',
-      'x = 3\n',
-      'x = 4\n',
-      'print("x is 1.")\n',
-    ]
-    const file = new File(blobParts, 'test-file.py', { type: 'text/python' })
-    fireEvent.drop(screen.getByTestId('file_drop_zone'), {
-      dataTransfer: {
-        files: [file],
-      },
-    })
-
-    // input description
-    const describeInput = screen.getByRole('textbox')
-    fireEvent.change(describeInput, { target: { value: 'Test description' } })
-
-    expect(screen.getByDisplayValue('Test description')).toBeInTheDocument()
-
-    // select update type
-    const applicationDropdown = screen.getByText('Select an option')
-    fireEvent.click(applicationDropdown)
-
-    const basicOtherOption = screen.getByText('Other')
-    fireEvent.click(basicOtherOption)
-
-    const submitPromptButton = screen.getByText('Submit prompt')
-    await waitFor(() => {
-      expect(submitPromptButton).toBeEnabled()
-      submitPromptButton.click()
-    })
-    expect(mockNavigate).toHaveBeenCalledWith('/chat')
-  })
-
-  it.only('should call trackEvent when submit prompt button is clicked', async () => {
+  it('should call trackEvent when submit prompt button is clicked', async () => {
     render()
 
     // upload file

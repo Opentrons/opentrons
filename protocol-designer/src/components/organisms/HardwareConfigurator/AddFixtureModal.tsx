@@ -39,6 +39,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
+import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -133,22 +134,34 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
     []
   )
-  useEffect(() => {
-    const options = [
-      ...getAllFixtureOptions(
-        cutoutId,
-        addressableAreaId,
-        fixtures,
-        existingCutoutFixtureId
-      ),
-      ...getWasteChuteOptions(cutoutId),
-    ]
-    setAllFixtureOptions(options)
-    const moduleOptions = [
-      ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
-    ]
-    setAllModuleOptions(moduleOptions)
-  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
+  const enableVacuumModule = useSelector(getEnableVacuumModule)
+  useEffect(
+    () => {
+      const options = [
+        ...getAllFixtureOptions(
+          cutoutId,
+          addressableAreaId,
+          fixtures,
+          existingCutoutFixtureId
+        ),
+        ...getWasteChuteOptions(cutoutId),
+      ]
+      setAllFixtureOptions(options)
+      const moduleOptions = [
+        ...getModuleOptions(
+          cutoutId,
+          addressableAreaId,
+          deckDef,
+          fixtures,
+          enableVacuumModule
+        ),
+      ]
+      setAllModuleOptions(moduleOptions)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cutoutId, addressableAreaId, existingCutoutFixtureId]
+  )
 
   const modalProps: ModalProps = {
     title: t('add_to_slot', {
@@ -166,6 +179,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     deckDefinition: deckDef,
     addressableAreaId,
     fixtures,
+    enableVacuumModule,
   })
 
   let nextStageOptions = null

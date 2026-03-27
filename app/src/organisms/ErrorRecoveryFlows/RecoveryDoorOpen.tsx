@@ -81,7 +81,7 @@ export function RecoveryDoorOpen({
       case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         return t('close_robot_and_stacker_door')
       default:
-        return t('robot_door_is_open')
+        return t('confirm_robot_door_is_closed')
     }
   }
 
@@ -97,7 +97,7 @@ export function RecoveryDoorOpen({
       case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         return t('continue')
       default:
-        return t('resume')
+        return t('confirm')
     }
   }
 

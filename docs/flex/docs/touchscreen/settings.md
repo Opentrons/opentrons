@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Settings"
+description: "Touchscreen settings for network, display, and robot configuration."
 ---
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.

@@ -10,7 +10,7 @@ export function MessageField(props: { fieldProps: FieldProps }): JSX.Element {
   const { t } = useTranslation('form')
   return (
     <TextAreaField
-      title={t('step_edit_form.flex_stacker.fields.interventionMessage.title')}
+      label={t('step_edit_form.flex_stacker.fields.interventionMessage.title')}
       {...fieldProps}
       value={fieldProps.value as string}
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {

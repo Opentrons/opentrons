@@ -13,27 +13,70 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = "api_name", "description"
+    # PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
 
-    # todo(mm, 2026-01-28): Replace these placeholder scopes with real ones.
+    AUTH_SETTINGS_WRITE = (
+        "auth_settings.write",
+        "Edit settings related to authentication, authorization, and access control.",
+    )
+
+    PROTOCOLS_WRITE = (
+        "protocols.write",
+        "Upload or delete protocols.",
+    )
+
+    RESTART_WRITE = (
+        "restart.write",
+        "Restart the robot.",
+    )
+
+    ROBOT_CONTROL_WRITE = (
+        "robot_control.write",
+        (
+            "Run a protocol, move pipettes, control hardware modules,"
+            " or otherwise make the robot do something physical."
+        ),
+    )
+
+    ROBOT_SETTINGS_WRITE = (
+        "robot_settings.write",
+        "Edit robot settings for which there is no more specific scope.",
+    )
+
+    RUN_DATA_WRITE = (
+        "run_data.write",
+        (
+            "Create, update, or delete data that's the input or output of a run,"
+            " such as images and CSV files."
+        ),
+    )
+
+    # We actually want access control mode to totally disable SSH, so this scope is
+    # kind of moot. At some point, we might delete this, and replace the SSH endpoints'
+    # use of `require_scopes(SSH_KEYS_WRITE)` with something like
+    # `require_access_control_disabled()`.
+    SSH_KEYS_WRITE = (
+        "ssh_keys.write",
+        "Edit the robot's authorized SSH keys, allowing access to the robot's shell.",
+    )
+
+    UPDATES_WRITE = (
+        "updates.write",
+        "Update the robot's software.",
+    )
+
+    USERS_READ = (
+        "users.read",
+        "Read users.",
+    )
 
     USERS_WRITE = (
         "users.write",
-        "Read, write, and edit users.",
-    )
-
-    RUNS_READ = (
-        "runs.read",
-        "Retrieve information about protocol runs.",
-    )
-
-    RUNS_WRITE = (
-        "runs.write",
-        "Create and control protocol runs.",
+        "Create, update, and delete users.",
     )
 
     _description: str

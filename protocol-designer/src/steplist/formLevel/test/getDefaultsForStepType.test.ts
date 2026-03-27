@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { ALL } from '@opentrons/shared-data'
+
 import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -17,7 +19,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
-        nozzles: null,
+        nozzles: ALL,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
@@ -84,6 +86,10 @@ describe('getDefaultsForStepType', () => {
 
         blowout_checkbox: false,
         blowout_location: null,
+        blowout_mmFromBottom: null,
+        blowout_x_position: null,
+        blowout_y_position: null,
+        blowout_position_reference: 'well-top',
         blowout_flowRate: null,
         preWetTip: false,
         pushOut_checkbox: null,
@@ -135,7 +141,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_checkbox: false,
         pipette: null,
         nozzles: null,
-        primaryNozzle: null,
+        primaryNozzle: 'A1',
         volume: undefined,
         times: null,
         wells: [],
@@ -242,6 +248,23 @@ describe('getDefaultsForStepType', () => {
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,
+      })
+    })
+  })
+  describe('vacuum step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('vacuum')).toEqual({
+        moduleId: null,
+        programType: null,
+        stateType: null,
+        modeType: null,
+        orderedProfileIds: [],
+        profileItemsById: {},
+        pressureMbar: null,
+        powerPercent: null,
+        pumpDurationCheckbox: null,
+        pumpDurationTime: null,
+        endingHoldVentCheckbox: null,
       })
     })
   })

@@ -30,6 +30,18 @@ class PipetteModal(BasePage):
         self.page.get_by_text(channels).click()
         self.page.get_by_text(volume).click()
 
+    def ot2_select_pipette_type(self, channels: str, gen: str, volume: str) -> None:
+        """Select pipette for OT-2 by channels and volume.
+
+        Args:
+            channels: e.g., "1-Channel", "8-Channel"
+            gen: e.g., "GEN1", "GEN2"
+            volume: e.g., "1000 µL", "300 µL"
+        """
+        self.page.get_by_text(channels).click()
+        self.page.get_by_text(gen).click()
+        self.page.get_by_text(volume).click()
+
     def select_tip_racks(self, tip_racks: list[str]) -> None:
         """Select multiple tip racks by their names.
 
@@ -37,7 +49,7 @@ class PipetteModal(BasePage):
             tip_racks: List of tip rack names, e.g., ["Filter Tip Rack 1000 µL"]
         """
         for tip_rack in tip_racks:
-            self.page.get_by_role("checkbox", name=tip_rack, exact=True).click()
+            self.click_checkbox_label(tip_rack)
 
     def save_pipette_selection(self) -> None:
         """Save the pipette configuration."""

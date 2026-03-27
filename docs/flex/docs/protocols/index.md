@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Development"
+description: "Ways to create protocols: Protocol Designer, Python API, OpentronsAI, and services."
 ---
 
 The Opentrons Flex system can run a wide variety of automated protocols, for tasks such as PCR, NGS, ELISA, and many more. There are several ways to get the protocol you need:
