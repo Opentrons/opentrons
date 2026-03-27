@@ -56,6 +56,7 @@ async def patch_access_control_settings(  # noqa: D103
     request_body: RequestModel[PatchAccessControlRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[AccessControlResponseData]:
+    """Change the access control settings."""
     accessControlResponseData = settings_store.patch_access_control(request_body.data)
     return SimpleBody.model_construct(data=accessControlResponseData)
 

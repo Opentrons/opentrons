@@ -55,7 +55,7 @@ class SettingsStore:
             )
             if row is None:
                 return AccessControlResponseData(accessControlEnabled=False)
-            return AccessControlResponseData(accessControlEnabled=row.enabled)
+            return AccessControlResponseData(accessControlEnabled=row.enabled or False)
 
     def update_access_control_table(self, accessControlEnabled: bool) -> None:
         """Update the access control enabled setting."""
