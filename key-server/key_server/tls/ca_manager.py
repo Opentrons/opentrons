@@ -169,3 +169,9 @@ class TLSCAManager:
             if self.must_rotate(now):
                 self.rotate(now)
             await asyncio.sleep(self.CA_EXPIRY_CHECK_POLL_PERIOD.total_seconds())
+
+    def sign_precert(
+        self, precert: cryptography_utils.CertWithSigningRequired
+    ) -> cryptography_utils.SignedCert:
+        """Sign a TLS end-entity certificate that needs signing."""
+        return cryptography_utils.seal_cert_builder_with_ca(precert, self._current_ca)

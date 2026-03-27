@@ -5,6 +5,7 @@ from shutil import rmtree
 from typing import Any, AsyncIterator, Iterator
 
 import pytest
+from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 
 from key_server.tls import ca_manager, cryptography_utils
@@ -211,3 +212,24 @@ async def test_rotates_ca_while_live(
     ) != current.cert.fingerprint(hashes.SHA256())
     assert not current.certpath.exists()
     assert not current.keypath.exists()
+
+
+async def test_signs_ee_certificates(
+    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
+) -> None:
+    """The manager should sign end-entity certificates with its current CA."""
+    subject = subject_factory.create()
+    now = datetime.now(timezone.utc)
+    precert = cryptography_utils.build_tls_precert(
+        key_dir, now, timedelta(hours=1), "hello", ["12.13.14.15"]
+    )
+    signed = subject.sign_precert(precert)
+    aki = signed.cert.extensions.get_extension_for_class(x509.AuthorityKeyIdentifier)
+    # note: this is not a secure way to do tls signature verification in practice. however
+    # it is really good for unit tests that make sure we didn't use the wrong cert
+    assert (
+        aki.value.key_identifier
+        == subject._current_ca.cert.extensions.get_extension_for_class(
+            x509.SubjectKeyIdentifier
+        ).value.key_identifier
+    )
