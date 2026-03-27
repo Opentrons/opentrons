@@ -1,5 +1,8 @@
-"""Tests for npmjs-publish preflight helpers."""
+"""Tests for js-packages-release preflight helpers."""
 
+from types import SimpleNamespace
+
+import publish
 import pytest
 from publish import _check_target_version, _resolve_context, _resolve_version_input
 
@@ -16,30 +19,30 @@ def test_resolve_context_with_explicit_version() -> None:
     ("version_input", "expected"),
     [
         ("1.2.3", "1.2.3"),
-        ("npmjs-publish@1.2.3", "1.2.3"),
-        ("refs/tags/npmjs-publish@1.2.3", "1.2.3"),
-        (" refs/tags/npmjs-publish@2.0.0 ", "2.0.0"),
-        ("npmjs-publish@1.2.3-alpha.1", "1.2.3-alpha.1"),
-        ("refs/tags/npmjs-publish@2.0.0-beta.2", "2.0.0-beta.2"),
+        ("js-packages-release@1.2.3", "1.2.3"),
+        ("refs/tags/js-packages-release@1.2.3", "1.2.3"),
+        (" refs/tags/js-packages-release@2.0.0 ", "2.0.0"),
+        ("js-packages-release@1.2.3-alpha.1", "1.2.3-alpha.1"),
+        ("refs/tags/js-packages-release@2.0.0-beta.2", "2.0.0-beta.2"),
     ],
 )
 def test_resolve_version_input_success(version_input: str, expected: str) -> None:
-    """Accepts plain semver and supported npmjs-publish tag formats."""
+    """Accepts plain semver and supported js-packages-release tag formats."""
     assert _resolve_version_input(version_input) == expected
 
 
 @pytest.mark.parametrize(
     ("version_input", "error_match"),
     [
-        ("refs/tags/npmjs-publish@abc", "Invalid semver version"),
-        ("refs/tags/npmjs-publish@1.2.3-beta.", "Invalid semver version"),
-        ("refs/tags/npmjs-publish@1.2.3-beta..2", "Invalid semver version"),
-        ("refs/tags/npmjs-publish@1.2.3-alpha.1.3.", "Invalid semver version"),
+        ("refs/tags/js-packages-release@abc", "Invalid semver version"),
+        ("refs/tags/js-packages-release@1.2.3-beta.", "Invalid semver version"),
+        ("refs/tags/js-packages-release@1.2.3-beta..2", "Invalid semver version"),
+        ("refs/tags/js-packages-release@1.2.3-alpha.1.3.", "Invalid semver version"),
         ("refs/tags/components@1.2.3", "Invalid tag prefix"),
         ("refs/tags/components@1.2.3-alpha.1", "Invalid tag prefix"),
         ("components@1.2.3", "Invalid tag prefix"),
         ("shared-data@2.0.0-beta.2", "Invalid tag prefix"),
-        ("refs/tags/not-npmjs@2.0.0", "Invalid tag prefix"),
+        ("refs/tags/not-js-packages@2.0.0", "Invalid tag prefix"),
     ],
 )
 def test_resolve_version_input_errors(version_input: str, error_match: str) -> None:
@@ -53,6 +56,31 @@ def test_resolve_context_rejects_missing_non_interactive_version() -> None:
     version_argument = None
     with pytest.raises(ValueError):
         _resolve_context(version=version_argument, interactive=False)
+
+
+def test_fetch_published_versions_uses_github_packages_registry(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Queries the configured npm-compatible registry."""
+    seen: dict[str, object] = {}
+
+    def _fake_run(cmd: list[str], capture_output: bool, text: bool, check: bool) -> SimpleNamespace:
+        seen["cmd"] = cmd
+        seen["capture_output"] = capture_output
+        seen["text"] = text
+        seen["check"] = check
+        return SimpleNamespace(returncode=0, stdout="[]", stderr="")
+
+    monkeypatch.setattr(publish.subprocess, "run", _fake_run)
+
+    assert publish._fetch_published_versions("@opentrons/shared-data") == []
+    assert seen["cmd"] == [
+        "npm",
+        "view",
+        "@opentrons/shared-data",
+        "versions",
+        "--json",
+        "--registry",
+        "https://npm.pkg.github.com",
+    ]
 
 
 def test_check_target_version_allows_new_packages() -> None:

@@ -1,23 +1,23 @@
 ---
-name: npmjs-publish
-description: Conventions for unified NPM release tooling in scripts/npmjs-publish/ (preflight registry checks, build_packages make chain, manifest pins, GitHub workflow npmjs-publish@ tags, uv and pytest). Use when working in that directory, editing publish.py, build_packages.py, manifests.py, publish_core.py, or .github/workflows/npmjs-publish.yaml.
+name: js-packages-release
+description: Conventions for unified GitHub Packages release tooling in scripts/js-packages-release/ (preflight registry checks, build_packages make chain, manifest pins, GitHub workflow js-packages-release@ tags, uv and pytest). Use when working in that directory, editing publish.py, build_packages.py, manifests.py, publish_core.py, or .github/workflows/js-packages-release.yaml.
 ---
 
-# npmjs-publish
+# js-packages-release
 
 ## Scope
 
-Python CLIs and helpers under **`scripts/npmjs-publish/`** for releasing four scoped packages together:
+Python CLIs and helpers under **`scripts/js-packages-release/`** for releasing four scoped packages together via **GitHub Packages**:
 
 `@opentrons/shared-data`, `@opentrons/step-generation`, `@opentrons/components`, `@opentrons/protocol-visualization`.
 
-**Tags:** `npmjs-publish@<semver>` (see workflow and `publish_core.TAG_PREFIX`).
+**Tags:** `js-packages-release@<semver>` (see workflow and `publish_core.TAG_PREFIX`).
 
 ## Tooling
 
-- **uv:** `make setup`, `uv run python ...` (see `scripts/npmjs-publish/Makefile`)
-- **Ruff / pytest:** `make lint`, `make test` from `scripts/npmjs-publish/`
-- **Node:** `npm` required for `publish.py` (`npm view`). **yarn** + root **make** required for `build_packages.py`
+- **uv:** `make setup`, `uv run python ...` (see `scripts/js-packages-release/Makefile`)
+- **Ruff / pytest:** `make lint`, `make test` from `scripts/js-packages-release/`
+- **Node:** `npm` required for `publish.py` (`npm view` against GitHub Packages). **yarn** + root **make** required for `build_packages.py`
 
 ## Modules (single responsibility)
 
@@ -33,15 +33,15 @@ Do not duplicate version parsing: import **`resolve_version_input`** (or helpers
 
 ## CLI behavior
 
-- **`publish.py`:** `--interactive` / `--non-interactive`; `--version` optional in interactive mode. Full tag ref allowed. Fails on partial or complete “already published” for the target version (no npm republish).
+- **`publish.py`:** `--interactive` / `--non-interactive`; `--version` optional in interactive mode. Full tag ref allowed. Defaults to `https://npm.pkg.github.com` and fails on partial or complete “already published” for the target version.
 - **`build_packages.py`:** Omit `--version` for **build only**. `--skip-build` requires `--version`. `--write-summary` mirrors preflight (default on).
 
 ## CI
 
-`.github/workflows/npmjs-publish.yaml`:
+`.github/workflows/js-packages-release.yaml`:
 
 - **PR** (paths): lint + test jobs, no `needs` between them
-- **push** `npmjs-publish@*`: **publish** job only (preflight with version from `github.ref`), no lint or unit test jobs
+- **push** `js-packages-release@*`: **publish** job only (preflight with version from `github.ref`), no lint or unit test jobs
 
 ## Monorepo build order
 
@@ -59,4 +59,4 @@ Release-oriented **`package.json`** (`lib` entry points, `files`, `exports`) and
 
 ## Roadmap
 
-See **`scripts/npmjs-publish/PLAN.md`** for remaining work (npm publish wiring, removing legacy workflow publish jobs, components-testing).
+See **`scripts/js-packages-release/PLAN.md`** for remaining work (`npm publish` wiring to GitHub Packages, removing legacy workflow publish jobs, components-testing).

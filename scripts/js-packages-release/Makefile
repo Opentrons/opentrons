@@ -15,10 +15,10 @@ lint:
 	uv run ruff format --check
 
 test:
-	uv run pytest tests/ -v
+	uv run python -m pytest tests/ -v
 
 publish-ci:
-	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or npmjs-publish tag ref"; exit 1; fi
+	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or js-packages-release tag ref"; exit 1; fi
 	uv run python publish.py --version "$(VERSION)" --non-interactive
 
 publish-local:
@@ -33,5 +33,5 @@ build-packages:
 	fi
 
 build-packages-manifests-only:
-	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or npmjs-publish tag ref"; exit 1; fi
+	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or js-packages-release tag ref"; exit 1; fi
 	uv run python build_packages.py --version "$(VERSION)" --skip-build

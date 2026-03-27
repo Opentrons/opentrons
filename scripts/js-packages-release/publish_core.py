@@ -1,4 +1,4 @@
-"""Shared npmjs-publish helpers (version resolution, package identifiers)."""
+"""Shared js-packages-release helpers (version resolution, package identifiers)."""
 
 from __future__ import annotations
 
@@ -11,8 +11,9 @@ PACKAGES: tuple[str, ...] = (
     "@opentrons/protocol-visualization",
 )
 
-TAG_PREFIX = "npmjs-publish@"
+TAG_PREFIX = "js-packages-release@"
 REF_PREFIX = "refs/tags/"
+DEFAULT_NPM_REGISTRY = "https://npm.pkg.github.com"
 
 # Monorepo directory names (relative to repo root) for each scoped package name.
 PACKAGE_REL_DIRS: dict[str, str] = {

@@ -65,7 +65,7 @@ def _build_job_summary_markdown(
         mode = "Build only (no `package.json` release rewrite)"
 
     lines = [
-        "## npmjs-publish build",
+        "## js-packages-release build",
         "",
         f"- **Repo root:** `{root}`",
         f"- **Mode:** {mode}",
@@ -97,7 +97,7 @@ def _build_job_summary_markdown(
 def run(
     version: Annotated[
         Optional[str],
-        typer.Option("--version", "-v", help="Release version, tag ref, or npmjs-publish@... (omit for build only)"),
+        typer.Option("--version", "-v", help="Release version, tag ref, or js-packages-release@... (omit for build only)"),
     ] = None,
     repo_root: Annotated[
         Optional[Path],

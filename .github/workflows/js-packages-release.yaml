@@ -1,14 +1,14 @@
-name: npmjs publish
+name: js-packages-release
 
 # PR: lint and unit tests only (file-filtered). Tag push: publish only (no lint/tests).
 on:
   pull_request:
     paths:
-      - '.github/workflows/npmjs-publish.yaml'
-      - 'scripts/npmjs-publish/**'
+      - '.github/workflows/js-packages-release.yaml'
+      - 'scripts/js-packages-release/**'
   push:
     tags:
-      - 'npmjs-publish@*'
+      - 'js-packages-release@*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -20,10 +20,15 @@ defaults:
 
 env:
   CI: true
+  OT_NPM_REGISTRY: https://npm.pkg.github.com
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   lint:
-    name: Lint npmjs-publish
+    name: Lint js-packages-release
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
@@ -36,15 +41,15 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make setup
 
       - name: Lint
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make lint
 
   test:
-    name: Unit test npmjs-publish
+    name: Unit test js-packages-release
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
@@ -57,18 +62,18 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make setup
 
       - name: Unit tests
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make test
 
   publish:
     name: Publish preflight (tag only)
     runs-on: ubuntu-24.04
-    # Only tag pushes matching npmjs-publish@* (not PRs).
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/npmjs-publish@')
+    # Only tag pushes matching js-packages-release@* (not PRs).
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/js-packages-release@')
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -85,16 +90,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Setup npmjs-publish dependencies
-        working-directory: scripts/npmjs-publish
+      - name: Setup js-packages-release dependencies
+        working-directory: scripts/js-packages-release
         run: make setup
 
       - uses: ./.github/actions/js/setup
 
+      # This job currently runs build + preflight only. Add GitHub Packages auth
+      # when the script actually performs publish.
       - name: build packages
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make build-packages VERSION=${{ github.ref }}
 
       - name: publish packages
-        working-directory: scripts/npmjs-publish
+        working-directory: scripts/js-packages-release
         run: make publish-ci VERSION=${{ github.ref }}

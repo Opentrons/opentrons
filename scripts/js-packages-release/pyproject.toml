@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "npmjs-publish"
+name = "js-packages-release"
 version = "0.0.0"
-description = "NPMJS publish workflow scaffold and release planning helpers."
+description = "GitHub Packages JS release workflow scaffold and release planning helpers."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

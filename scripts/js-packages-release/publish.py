@@ -1,15 +1,16 @@
-"""NPMJS publish preflight CLI."""
+"""JS packages release preflight CLI."""
 
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from dataclasses import dataclass
 from typing import Optional
 
 import typer
 from github_summary import append_job_summary
-from publish_core import PACKAGES, parse_semver, resolve_version_input
+from publish_core import DEFAULT_NPM_REGISTRY, PACKAGES, parse_semver, resolve_version_input
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
@@ -42,10 +43,16 @@ def _resolve_context(version: Optional[str], interactive: bool) -> ReleaseContex
     return ReleaseContext(version=resolve_version_input(requested_version), interactive=interactive)
 
 
+def _npm_registry() -> str:
+    """Resolve the npm-compatible registry used for preflight lookups."""
+    return os.environ.get("OT_NPM_REGISTRY", DEFAULT_NPM_REGISTRY)
+
+
 def _fetch_published_versions(package_name: str) -> list[str]:
-    """Fetch all public npm versions for a package."""
+    """Fetch published versions for a package from the configured registry."""
+    registry = _npm_registry()
     result = subprocess.run(
-        ["npm", "view", package_name, "versions", "--json"],
+        ["npm", "view", package_name, "versions", "--json", "--registry", registry],
         capture_output=True,
         text=True,
         check=False,
@@ -55,7 +62,7 @@ def _fetch_published_versions(package_name: str) -> list[str]:
         # New packages can return E404 until first publish.
         if "E404" in stderr or "is not in this registry" in stderr:
             return []
-        raise RuntimeError(f"Failed reading versions for {package_name}: {stderr}")
+        raise RuntimeError(f"Failed reading versions for {package_name} from {registry}: {stderr}")
 
     output = result.stdout.strip()
     if output == "":
@@ -119,12 +126,13 @@ def _summary_markdown(context: ReleaseContext, package_versions: dict[str, list[
 
     return "\n".join(
         [
-            "## npmjs-publish preflight",
+            "## js-packages-release preflight",
             "",
             f"- Requested version: `{context.version}`",
             f"- Interaction: `{interaction_text}`",
+            f"- Registry: `{_npm_registry()}`",
             "",
-            "### Public npm package state",
+            "### Package registry state",
             *package_lines,
         ]
     )
@@ -132,7 +140,7 @@ def _summary_markdown(context: ReleaseContext, package_versions: dict[str, list[
 
 def _print_registry_snapshot(package_versions: dict[str, list[str]]) -> None:
     """Print a readable registry snapshot before interactive prompts."""
-    table = Table(title="Current public npm versions")
+    table = Table(title=f"Current package versions ({_npm_registry()})")
     table.add_column("Package", style="cyan")
     table.add_column("Latest", style="green")
     table.add_column("Published count", justify="right")
@@ -171,7 +179,7 @@ def run(
         help="Write markdown output to GITHUB_STEP_SUMMARY if available.",
     ),
 ) -> None:
-    """Validate the requested release version against public npm package state."""
+    """Validate the requested release version against package registry state."""
     package_versions: Optional[dict[str, list[str]]] = None
 
     if interactive and version is None:
@@ -181,7 +189,7 @@ def run(
     context = _resolve_context_or_exit(version=version, interactive=interactive)
 
     if context.interactive:
-        proceed = Confirm.ask("Proceed with npmjs-publish preflight?", default=True)
+        proceed = Confirm.ask("Proceed with js-packages-release preflight?", default=True)
         if not proceed:
             console.print("Cancelled by user.", style="yellow")
             raise typer.Exit(code=0)
