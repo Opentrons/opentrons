@@ -60,11 +60,7 @@ class SettingsStore:
     def update_access_control_table(self, accessControlEnabled: bool) -> None:
         """Update the access control enabled setting."""
         with self._session() as session:
-            row = (
-                session.query(AccessControlEnabled)
-                .filter(AccessControlEnabled.id == 1)
-                .first()
-            )
+            row = session.query(AccessControlEnabled).first()
             if row is None:
                 session.add(AccessControlEnabled(id=1, enabled=accessControlEnabled))
             else:

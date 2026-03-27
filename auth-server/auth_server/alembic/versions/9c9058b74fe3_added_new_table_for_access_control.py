@@ -1,9 +1,8 @@
-"""added new table for access control
+"""added new table for access control.
 
 Revision ID: 9c9058b74fe3
 Revises: 5b9c2800c491
 Create Date: 2026-03-27 12:08:11.287730
-
 """
 
 from typing import Sequence, Union
