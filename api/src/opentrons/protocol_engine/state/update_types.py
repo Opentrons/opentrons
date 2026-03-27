@@ -26,6 +26,8 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     OnLabwareLocation,
+    PeripheralDefinition,
+    PeripheralModel,
     PreconditionTypes,
     StackerStoredLabwareGroup,
     TipGeometry,
@@ -459,6 +461,16 @@ class LoadModuleUpdate:
 
 
 @dataclasses.dataclass
+class LoadPeripheralUpdate:
+    """An update that loads a module."""
+
+    peripheral_id: str
+    definition: PeripheralDefinition
+    requested_model: PeripheralModel
+    serial_number: typing.Optional[str]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -467,6 +479,8 @@ class StateUpdate:
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
 
     loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
+
+    loaded_peripheral: LoadPeripheralUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 

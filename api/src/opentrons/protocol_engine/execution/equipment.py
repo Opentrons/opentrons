@@ -10,6 +10,7 @@ from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
+    PeripheralNotAttachedError,
 )
 from ..resources import (
     LabwareDataProvider,
@@ -42,6 +43,9 @@ from opentrons.hardware_control.modules import (
     VacuumModule,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.peripherals import (
+    AbstractPeripheral,
+)
 from opentrons.protocol_engine.state.module_substates import (
     AbsorbanceReaderId,
     FlexStackerId,
@@ -781,6 +785,25 @@ class EquipmentHandler:
         raise ModuleNotAttachedError(
             f'No module attached with serial number "{serial_number}"'
             f' for module ID "{module_id}".'
+        )
+
+    def get_peripheral_hardware_api(
+        self, peripheral_id: str
+    ) -> Optional[AbstractPeripheral]:
+        """Get the hardware API for a given module."""
+        use_virtual_peripheral = self._state_store.config.use_virtual_peripherals
+        if use_virtual_peripheral:
+            return None
+
+        attached_peripherals = self._hardware_api.attached_peripherals
+        serial_number = self._state_store.peripherals.get_serial_number(peripheral_id)
+        for perf in attached_peripherals:
+            if perf.device_info["serial"] == serial_number:
+                return perf
+
+        raise PeripheralNotAttachedError(
+            f'No peripheral attached with serial number "{serial_number}"'
+            f' for peripheral ID "{peripheral_id}".'
         )
 
     def find_applicable_labware_offset_id(

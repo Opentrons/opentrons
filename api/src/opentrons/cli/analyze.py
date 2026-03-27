@@ -356,6 +356,7 @@ async def _do_analyze(
                 labware=[],
                 pipettes=[],
                 modules=[],
+                peripherals=[],
                 labwareOffsets=[],
                 liquids=[],
                 wells=[],
