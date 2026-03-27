@@ -1,19 +1,15 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { RobotInfoLabel, StyledText } from '@opentrons/components'
 
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getUsbDeviceDisplayRows } from '/app/redux/system-info/selectors'
 
 import styles from './devices.module.css'
 
 import type { SetSettingOption } from '../types'
-
-// ToDo update the interface when implemented lsusb info function
-interface DeviceInformation {
-  device: string
-  location: string
-}
 
 interface DevicesProps {
   robotName: string
@@ -25,24 +21,10 @@ export function Devices({
   setCurrentOption,
 }: DevicesProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  // ToDo replace dummy data with the actual data
-  const dummyDeviceRows = [
-    {
-      device: 'External keyboard',
-      location: 'USB-1',
-    },
-    {
-      device: 'USB drive',
-      location: 'USB-2',
-    },
-    {
-      device: 'Rear panel',
-      location: 'INTERNAL',
-    },
-  ] as const
+  const deviceRows = useSelector(getUsbDeviceDisplayRows)
 
   return (
-    <div className={styles.devices_contaienr}>
+    <div className={styles.devices_container}>
       <ChildNavigation
         header={t('devices')}
         onClickBack={() => {
@@ -50,7 +32,7 @@ export function Devices({
         }}
       />
       <div className={styles.devices_content_container}>
-        {dummyDeviceRows.length > 0 ? (
+        {deviceRows.length > 0 ? (
           <>
             <div className={styles.devices_table_header_container}>
               <StyledText oddStyle="bodyTextSemiBold">{t('device')}</StyledText>
@@ -59,13 +41,15 @@ export function Devices({
               </StyledText>
             </div>
             <div className={styles.devices_rows}>
-              {dummyDeviceRows.map((row: DeviceInformation) => (
-                <div key={row.device} className={styles.device_row}>
+              {deviceRows.map(row => (
+                <div key={row.id} className={styles.device_row}>
                   <StyledText oddStyle="bodyTextRegular">
                     {row.device}
                   </StyledText>
                   <div className={styles.location_cell}>
-                    <RobotInfoLabel deckLabel={row.location} />
+                    <RobotInfoLabel
+                      deckLabel={row.location !== '' ? row.location : t('na')}
+                    />
                   </div>
                 </div>
               ))}
