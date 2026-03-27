@@ -33,11 +33,7 @@ export function LiquidButton({
         showLiquidOverflowMenu(true)
       }}
     >
-      <Icon
-        size={isInToolbox ? '1.25rem' : '1rem'}
-        name="water-drop"
-        data-testid="water-drop"
-      />
+      <Icon size={isInToolbox ? '1.25rem' : '1rem'} name="water-drop" />
       <StyledText
         desktopStyle={
           isInToolbox ? 'bodyDefaultRegular' : 'bodyDefaultSemiBold'
