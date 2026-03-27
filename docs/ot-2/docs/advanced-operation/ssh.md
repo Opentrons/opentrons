@@ -49,7 +49,7 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 6. Type the command shown below in the terminal window. Replace `ROBOT_IP` with the IP address of your OT-2.
 
-    ```
+    
     curl \
     -H "Content-Type: application/json" \
     -d "{\"key\":\"$(cat ot2_ssh_key.pub)\"}" \
