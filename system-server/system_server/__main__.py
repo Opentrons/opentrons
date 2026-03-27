@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     log_config: dict[str, object] | None
     try:
-        log_config = logging_utils.get_dictconfig(
+        log_config = logging_utils.get_dict_config(
             log_level, syslog_id="opentrons-system-server"
         )
         dictConfig(log_config)

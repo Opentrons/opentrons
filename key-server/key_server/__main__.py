@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     log_config: dict[str, object] | None
     try:
-        log_config = logging_utils.get_dictconfig(
+        log_config = logging_utils.get_dict_config(
             args.log_level, syslog_id="opentrons-key-server"
         )
         dictConfig(log_config)

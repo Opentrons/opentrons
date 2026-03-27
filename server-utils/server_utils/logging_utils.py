@@ -10,7 +10,7 @@ _ROOT_HANDLER_KEY = "root_handler"
 _ROOT_FORMATTER_KEY = "root_formatter"
 
 
-def get_dictconfig(log_level: str | int, syslog_id: str) -> dict[str, object]:
+def get_dict_config(log_level: str | int, syslog_id: str) -> dict[str, object]:
     """Return a logging configuration suitable for most Opentrons servers.
 
     On robots, this will send logs to systemd. On dev machines, this will send logs
