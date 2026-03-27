@@ -115,6 +115,7 @@ def create_ca(
             cert,
             constants.CA_CERT_NAME_FORMAT.format(expiry=expiry.strftime("%Y-%m-%d")),
             "CA",
+            "DER",
         ),
         key=key,
         cert=cert,
@@ -196,7 +197,7 @@ def build_tls_precert(
     key_path = file_utils.save_key(
         key_dir,
         key,
-        "ot-robot-tls-key.pem",
+        constants.TLS_KEY_NAME,
         "<under construction>",
     )
     return CertWithSigningRequired(keypath=key_path, key=key, builder=builder)
@@ -207,7 +208,7 @@ def install_tls_cert(tls_cert_dir: Path, tls_cert: SignedCert) -> X509Pair:
     return X509Pair(
         keypath=tls_cert.keypath,
         certpath=file_utils.save_cert(
-            tls_cert_dir, tls_cert.cert, "ot-robot-tls-cert.cer", "TLS cert", "PEM"
+            tls_cert_dir, tls_cert.cert, constants.TLS_CERT_NAME, "TLS cert", "PEM"
         ),
         key=tls_cert.key,
         cert=tls_cert.cert,

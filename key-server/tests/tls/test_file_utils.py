@@ -266,3 +266,15 @@ def test_load_cert_loads_cert(tmp_path: Path) -> None:
     assert loaded_valid.fingerprint(hashes.SHA256()) == constructed_valid.fingerprint(
         hashes.SHA256()
     )
+
+
+def test_save_cert_handles_multiple_formats(tmp_path: Path) -> None:
+    cert = _build_cert()
+    pem = file_utils.save_cert(tmp_path, cert, "cert.pem", "test", "PEM")
+    der = file_utils.save_cert(tmp_path, cert, "cert.der", "test", "DER")
+    loaded_pem = file_utils.load_cert(pem, "PEM")
+    loaded_der = file_utils.load_cert(der, "DER")
+    assert loaded_pem
+    assert loaded_der
+    assert loaded_pem.fingerprint(hashes.SHA256()) == cert.fingerprint(hashes.SHA256())
+    assert loaded_der.fingerprint(hashes.SHA256()) == cert.fingerprint(hashes.SHA256())

@@ -73,4 +73,6 @@ END_ENTITY_EKU = x509.ExtendedKeyUsage(
 )
 
 TLS_KEY_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-key.pem$")
-TLS_CERT_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-cert.cer$")
+TLS_CERT_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-cert.crt$")
+TLS_KEY_NAME: Final = "ot-robot-tls-key.pem"
+TLS_CERT_NAME: Final = "ot-robot-tls-cert.crt"

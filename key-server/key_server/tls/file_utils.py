@@ -3,7 +3,7 @@
 import re
 from logging import getLogger
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Literal
 
 from cryptography import x509
 from cryptography.exceptions import UnsupportedAlgorithm
@@ -92,7 +92,11 @@ def save_key(
 
 
 def save_cert(
-    cert_dir: Path, cert: x509.Certificate, cert_name: str, kind: str
+    cert_dir: Path,
+    cert: x509.Certificate,
+    cert_name: str,
+    kind: str,
+    format: Literal["DER", "PEM"] = "DER",
 ) -> Path:
     """Save an x509 cert to a cert directory."""
     if not cert_dir.exists():
@@ -108,7 +112,13 @@ def save_cert(
         )
     cert_path = cert_dir / cert_name
     try:
-        cert_path.write_bytes(cert.public_bytes(serialization.Encoding.DER))
+        cert_path.write_bytes(
+            cert.public_bytes(
+                serialization.Encoding.DER
+                if format == "DER"
+                else serialization.Encoding.PEM
+            )
+        )
         LOG.info(
             f"Wrote {kind} cert for {cert.fingerprint(hashes.SHA256()).hex()} to {str(cert_path)}"
         )
@@ -119,7 +129,9 @@ def save_cert(
     return cert_path
 
 
-def load_cert(maybe_cert: Path) -> x509.Certificate | None:
+def load_cert(
+    maybe_cert: Path, format: Literal["PEM", "DER"]
+) -> x509.Certificate | None:
     """Load a prospective x509 cert from a path.
 
     If the cert can't be loaded, returns None.
@@ -129,12 +141,24 @@ def load_cert(maybe_cert: Path) -> x509.Certificate | None:
     except Exception:
         LOG.exception(f"Failed to read CA cert bytes from {str(maybe_cert)}")
         return None
-    try:
-        cert = x509.load_der_x509_certificate(cert_bytes)
-    except ValueError:
-        LOG.exception(f"Failed to parse x509 cert from {str(maybe_cert)}")
-        return None
-    return cert
+    if format == "DER":
+        try:
+            cert = x509.load_der_x509_certificate(cert_bytes)
+        except ValueError:
+            LOG.exception(
+                f"Failed to parse x509 cert from DER-encoded {str(maybe_cert)}"
+            )
+            return None
+        return cert
+    else:
+        try:
+            cert = x509.load_pem_x509_certificate(cert_bytes)
+        except ValueError:
+            LOG.exception(
+                f"Failed to parse x509 cert from PEM-encoded {str(maybe_cert)}"
+            )
+            return None
+        return cert
 
 
 def keys_from_dir(
@@ -183,7 +207,7 @@ def load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
 
     This is like load_cert but checks to see if this is one of our CA certs as well as being a valid cert in general.
     """
-    cert = load_cert(maybe_cert)
+    cert = load_cert(maybe_cert, "DER")
     if cert is None:
         return None
     # if a cert doesn't have valid extensions, it's not one of ours
