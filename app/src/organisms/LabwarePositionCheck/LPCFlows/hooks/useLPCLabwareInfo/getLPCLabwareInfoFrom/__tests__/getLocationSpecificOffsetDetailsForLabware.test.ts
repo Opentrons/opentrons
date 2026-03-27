@@ -56,6 +56,13 @@ describe('getLocationSpecificOffsetDetailsForLabware', () => {
         offsetId: OFFSET_ID,
       },
     ],
+    labwareOffsets: [
+      {
+        id: OFFSET_ID,
+        definitionUri: LABWARE_URI,
+        locationSequence: MOCK_OFFSET_LOC_SEQ,
+      },
+    ],
     commands: [MOCK_LOAD_COMMAND],
     modules: [],
   } as any
@@ -152,13 +159,30 @@ describe('getLocationSpecificOffsetDetailsForLabware', () => {
     expect(result[0].locationDetails.hardCodedOffsetId).toBe(null)
   })
 
-  it('should handle when no labware has offsetId', () => {
-    const protocolDataWithoutOffsetId = {
+  it('should handle when no labwareOffsets exist', () => {
+    const protocolDataWithoutLabwareOffsets = {
       ...MOCK_PROTOCOL_DATA,
-      labware: [
+      labwareOffsets: [],
+    }
+
+    const result = getLocationSpecificOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      protocolData: protocolDataWithoutLabwareOffsets,
+    } as any)
+
+    expect(result[0].locationDetails.hardCodedOffsetId).toBe(null)
+  })
+
+  it('should handle when labwareOffsets uri does not match', () => {
+    const protocolDataWithDifferentUri = {
+      ...MOCK_PROTOCOL_DATA,
+      labwareOffsets: [
         {
-          id: LABWARE_ID,
-          definitionUri: LABWARE_URI,
+          id: OFFSET_ID,
+          definitionUri: 'different-uri',
+          locationSequence: MOCK_OFFSET_LOC_SEQ,
         },
       ],
     }
@@ -167,7 +191,31 @@ describe('getLocationSpecificOffsetDetailsForLabware', () => {
       uri: LABWARE_URI,
       lwLocInfo: MOCK_LW_LOC_COMBOS,
       currentOffsets: [],
-      protocolData: protocolDataWithoutOffsetId,
+      protocolData: protocolDataWithDifferentUri,
+    } as any)
+
+    expect(result[0].locationDetails.hardCodedOffsetId).toBe(null)
+  })
+
+  it('should handle when labwareOffsets locationSequence does not match', () => {
+    const protocolDataWithDifferentLocSeq = {
+      ...MOCK_PROTOCOL_DATA,
+      labwareOffsets: [
+        {
+          id: OFFSET_ID,
+          definitionUri: LABWARE_URI,
+          locationSequence: [
+            { kind: 'onAddressableArea', addressableAreaName: 'B1' },
+          ],
+        },
+      ],
+    }
+
+    const result = getLocationSpecificOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      protocolData: protocolDataWithDifferentLocSeq,
     } as any)
 
     expect(result[0].locationDetails.hardCodedOffsetId).toBe(null)
