@@ -135,13 +135,6 @@ export function pipetteVolumeExceeded(args: {
   }
 }
 
-export const moveLocationNotSpecified = (): CommandCreatorError => {
-  return {
-    type: 'MOVE_LOCATION_NOT_SPECIFIED',
-    message: 'This step is missing a move location.',
-  }
-}
-
 export const modulePipetteCollisionDanger = (): CommandCreatorError => {
   return {
     type: 'MODULE_PIPETTE_COLLISION_DANGER',

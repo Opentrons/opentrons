@@ -264,10 +264,6 @@
         "body": "This step uses labware that has previously been discarded into a trash.",
         "title": "Labware not available"
       },
-      "MOVE_LOCATION_NOT_SPECIFIED": {
-        "body": "This step is missing a move location.",
-        "title": "Move location not defined."
-      },
       "LABWARE_OFF_DECK": {
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step.",
         "title": "Labware not on deck"
