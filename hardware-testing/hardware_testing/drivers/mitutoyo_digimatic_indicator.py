@@ -81,6 +81,7 @@ class Mitutoyo_Digimatic_Indicator:
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
+        time.sleep(1)
         then = time.monotonic()
         values = [
             self.read(timeout),
