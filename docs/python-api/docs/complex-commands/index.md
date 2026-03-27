@@ -1,6 +1,5 @@
 ---
 title: "Python API: Complex Commands"
-description: "High-level transfer, distribute, and consolidate commands."
 ---
 
 Complex liquid handling commands combine multiple [building block commands](../building-block-commands/index.md) into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids.

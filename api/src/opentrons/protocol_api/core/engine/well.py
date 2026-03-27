@@ -1,8 +1,6 @@
 """ProtocolEngine-based Well core implementations."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
@@ -20,9 +18,6 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
 from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Mount, MountType, Point
 
-if TYPE_CHECKING:
-    from .protocol import ProtocolCore
-
 
 class WellCore(AbstractWellCore):
     """Well API core using a ProtocolEngine.
@@ -33,16 +28,9 @@ class WellCore(AbstractWellCore):
         engine_client: Synchronous ProtocolEngine client.
     """
 
-    def __init__(
-        self,
-        name: str,
-        labware_id: str,
-        engine_client: EngineClient,
-        protocol_core: ProtocolCore,
-    ) -> None:
+    def __init__(self, name: str, labware_id: str, engine_client: EngineClient) -> None:
         self._labware_id = labware_id
         self._engine_client = engine_client
-        self._protocol_core = protocol_core
         self._definition = engine_client.state.labware.get_well_definition(
             labware_id=labware_id, well_name=name
         )
@@ -173,8 +161,7 @@ class WellCore(AbstractWellCore):
                 labwareId=self._labware_id,
                 liquidId=liquid._id,
                 volumeByWell={self._name: volume},
-            ),
-            command_annotations=self._protocol_core.annotation_ids,
+            )
         )
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

@@ -43,7 +43,6 @@ from .module_contexts import (
     ModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
-    VacuumModuleContext,
 )
 from .protocol_context import ProtocolContext
 from .robot_context import RobotContext
@@ -74,7 +73,6 @@ __all__ = [
     "MagneticBlockContext",
     "AbsorbanceReaderContext",
     "FlexStackerContext",
-    "VacuumModuleContext",
     "ParameterContext",
     "Labware",
     "TrashBin",

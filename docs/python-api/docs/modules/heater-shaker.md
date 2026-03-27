@@ -1,6 +1,5 @@
 ---
 title: "Python API: Heater-Shaker"
-description: "Control the Heater-Shaker: temperature, speed, and latch position in protocols."
 ---
 
 The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.

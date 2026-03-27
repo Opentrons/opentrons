@@ -112,9 +112,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     def reset_tips(self) -> None: ...
 
     @abstractmethod
-    def set_empty(self) -> None: ...
-
-    @abstractmethod
     def get_next_tip(
         self,
         num_tips: int,

@@ -1,6 +1,5 @@
 ---
 title: "Python API: Partial Tip Pickup"
-description: "Pick up tips with a subset of channels on multi-channel pipettes."
 ---
 
 By default, multi-channel pipettes always use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. Partial tip pickup lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the Flex 96-Channel Pipette, which occupies both pipette mounts.
@@ -83,7 +82,7 @@ pipette.pick_up_tip()  # picks up A2-H2 from tip rack
 ```
 
 !!! warning
-    [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more tips in the rack than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
+    [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more unused tips than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
 
 ### Row layout
 

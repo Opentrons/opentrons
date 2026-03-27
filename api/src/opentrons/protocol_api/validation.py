@@ -33,7 +33,6 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
-    VacuumModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import APIVersionError
@@ -412,7 +411,6 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
     "absorbanceReaderV1": AbsorbanceReaderModel.ABSORBANCE_READER_V1,
     "flexStackerModuleV1": FlexStackerModuleModel.FLEX_STACKER_V1,
-    "vacuumModuleV1": VacuumModuleModel.VACUUM_MODULE_V1,
 }
 
 

@@ -24,6 +24,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -1375,21 +1376,6 @@ class Labware:
         on a labware that isn't a tip rack. Formerly, it would do nothing.
         """
         self._core.reset_tips()
-
-    @requires_version(2, 28)
-    def set_empty(self) -> None:
-        """Mark a tip rack as completely empty of tips.
-
-        When this is called, all tip wells in the tip rack will be marked as empty. Any tips
-        that are dropped into this empty tip rack will be marked as used, and therefore will not
-        be available to pick up via automatic tip tracking. If an empty well is filled with tips,
-        [`reset()`][opentrons.protocol_api.Labware.reset] can be called to treat it as
-        a fresh tip rack.
-        be available to pick up via automatic tip tracking.
-
-        The API will raise an error if the labware is not a tip rack.
-        """
-        self._core.set_empty()
 
     @requires_version(2, 22)
     def load_liquid(
