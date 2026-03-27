@@ -44,7 +44,6 @@ For each step, additional protocol details appear on the right side of the scree
 - **Tip pickup**: a closer look at where tips will be picked up for this step, including the number of remaining tips in the rack.
 - **Well view**: well dimensions, the position of the pipette's attached tip, and a side view of liquids in the well. Hover over liquid in the well to view volumes.
 - **Labware**: top-down view liquid and well changes in labware like well plates and reservoirs.
-- **Disposal**: where the pipette will dispose of attached tips and the number of tips currently in the default trash container.
 
 <figure class="screenshot" markdown>
 ![Protocol viz details](../images/viz-details.png)
@@ -57,7 +56,7 @@ At any point in your protocol, hover over labware on the deck to see labware nam
 
 <figure class="screenshot" markdown>
 ![Image showing slot spotlight view.](../images/slot-spotlight.png)
-<figcaption>Open a slot spotlight for C1 to view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
+<figcaption>A slot spotlight for C1, showing changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
 </figure>
 
 Open a slot spotlight to see changes over the course of your protocol. For example, spotlight a slot with a tip rack and drag the blue bar to see how quickly tips from that rack are used. Or spotlight a slot with a module to see changes in temperature, lid position, or other status.
