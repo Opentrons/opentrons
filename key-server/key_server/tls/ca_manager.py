@@ -174,4 +174,11 @@ class TLSCAManager:
         self, precert: cryptography_utils.CertWithSigningRequired
     ) -> cryptography_utils.SignedCert:
         """Sign a TLS end-entity certificate that needs signing."""
-        return cryptography_utils.seal_cert_builder_with_ca(precert, self._current_ca)
+        LOG.info(
+            f"Sealing TLS EE precertificate with current ca {cryptography_utils.fingerprint(self._current_ca.cert)}"
+        )
+        sealed = cryptography_utils.seal_cert_builder_with_ca(precert, self._current_ca)
+        LOG.info(
+            f"Sealed TLS EE precertificate with fingerprint {cryptography_utils.fingerprint(sealed.cert)}"
+        )
+        return sealed

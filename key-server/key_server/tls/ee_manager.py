@@ -58,6 +58,7 @@ class TLSEEManager:
 
     def generate_precert(self) -> cryptography_utils.CertWithSigningRequired:
         """Generate a new precertificate for signing."""
+        LOG.info("Generating precertificate")
         return cryptography_utils.build_tls_precert(
             self._key_dir,
             datetime.now(timezone.utc),
@@ -75,6 +76,9 @@ class TLSEEManager:
 
     def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
         """Install a signed EE cert."""
+        LOG.info(
+            f"Installing TLS certificate with fingerprint {cryptography_utils.fingerprint(cert.cert)}"
+        )
         self.remove_cert("EE cert outdated")
         self._ee_pair = cryptography_utils.install_tls_cert(self._ee_cert_dir, cert)
 
@@ -82,6 +86,9 @@ class TLSEEManager:
         """Remove the currently-managed certificate, if there is one."""
         if not self._ee_pair:
             return
+        LOG.info(
+            f"Removing EE cert {cryptography_utils.fingerprint(self._ee_pair.cert)} because {reason}"
+        )
         pair = self._ee_pair
         self._ee_pair = None
         cryptography_utils.delete_certpair(pair, reason)
