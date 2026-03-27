@@ -9,13 +9,30 @@ tests ?=
 cov_opts ?= --coverage --pool=threads
 test_opts ?=
 
-# TypeScript project references emit JS and declarations to lib/ (see tsconfig.json).
+# standard targets
+#####################################################################
+
+.PHONY: all
+all: lib
+
+.PHONY: clean
+clean:
+	yarn shx rm -rf lib
+
+# artifacts
+#####################################################################
+
+# Declarations go to lib/ via tsc; JS entrypoints are lib/index.mjs and lib/index.cjs from Vite.
 .PHONY: build-ts
 build-ts:
 	cd .. && yarn tsc --build step-generation/tsconfig.json
 
 .PHONY: lib
-lib: build-ts
+lib: export NODE_ENV := production
+lib:
+	$(MAKE) clean
+	$(MAKE) build-ts
+	yarn vite build
 
 .PHONY: pack
 pack: lib
