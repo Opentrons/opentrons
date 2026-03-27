@@ -66,6 +66,7 @@ def _parse_args() -> _ParsedArgs:
 if __name__ == "__main__":
     args = _parse_args()
 
+    log_config: dict[str, object] | None
     try:
         log_config = logging_utils.get_dictconfig(args.log_level)
         dictConfig(log_config)

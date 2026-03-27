@@ -19,6 +19,7 @@ if __name__ == "__main__":
     args = build_root_parser().parse_args()
     log_level = logging.getLevelNamesMapping()[args.log_level.upper()]
 
+    log_config: dict[str, object] | None
     try:
         log_config = logging_utils.get_dictconfig(log_level)
         dictConfig(log_config)
