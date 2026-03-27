@@ -87,7 +87,7 @@ The pipette's API load name (`instrument_name`) is the first parameter of the `l
 
     See the [OT-2 Pipette Generations](characteristics.md#ot-2-pipette-generations) section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
 
-Use the [tip-pipette compatibility](loading.md#tip-pipette-compatibility) section below to choose compatible pipette tips. 
+Use the [tip–pipette compatibility](loading.md#tip-pipette-compatibility) section below to choose compatible pipette tips. 
 
 ## Loading Flex 1- and 8-Channel Pipettes
 
@@ -216,11 +216,11 @@ right_pipette.drop_tip()
 
 See also [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
-### Tip-pipette compatibility
+### Tip–pipette compatibility
 
 Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
 
-| Pipette capacity | Pipettes {width="40%"} | Compatible tips {width="110%"}|
+| Pipette capacity {width="17%"}| Pipettes {width="31%"} | Compatible tips |
 |--------------|--------------|-----------------------------|
 | 1–50 µL    | <ul><li><code>flex_1channel_50</code></li><li><code>flex_8channel_50</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li></ul> |
 | 1–200 µL | <ul><li><code>flex_96channel_200</code></li></ul> |<ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li></ul> |
