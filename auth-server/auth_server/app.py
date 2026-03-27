@@ -65,7 +65,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(user_store=user_store)
         user_service.seed_initial_users()
-        settings_store = SettingsStore(sql_engine=engine)
         install_settings_store(app.state, settings_store)
         authorization_checker = build_authorization_checker(
             settings_store, oauth2_backend

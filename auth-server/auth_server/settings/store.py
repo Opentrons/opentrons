@@ -97,7 +97,5 @@ def get_settings_store(
 ) -> SettingsStore:
     """Return the server's singleton SettingsStore."""
     settings_store = _accessor.get_from(app_state)
-    if settings_store is None:
-        settings_store = SettingsStore(sql_engine=sql_engine)
-        _accessor.set_on(app_state, settings_store)
+    assert settings_store is not None
     return settings_store
