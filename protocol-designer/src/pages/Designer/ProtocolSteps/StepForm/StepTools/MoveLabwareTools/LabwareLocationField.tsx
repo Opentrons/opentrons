@@ -97,7 +97,7 @@ export function LabwareLocationField(
   if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
-        option => option.value !== 'offDeck' && option.deckLabel !== 'offDeck'
+        option => option.value !== 'offDeck'
       )
   }
 
@@ -171,7 +171,6 @@ export function LabwareLocationField(
           robotType
         )
       : unoccupiedLabwareLocationsOptions
-
   return (
     <DropdownStepFormField
       {...props}
