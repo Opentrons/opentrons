@@ -1,6 +1,6 @@
 ---
 title: "Opentrons OT-2: Command Line Operation Over SSH"
-description: "SSH access instructions"
+description: "Learn how to create SSH keys and connect to an OT-2 robot via the terminal."
 ---
 
 The OT-2 gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
