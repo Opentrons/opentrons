@@ -94,11 +94,13 @@ describe('FlowRate', () => {
     screen.getByTestId('ChildNavigation_Primary_Button')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Aspirate flow rate (µL/s)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 35,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -116,11 +118,13 @@ describe('FlowRate', () => {
     screen.getByText('Dispense flow rate')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Dispense flow rate (µL/s)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 62,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -133,11 +137,13 @@ describe('FlowRate', () => {
     fireEvent.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Aspirate flow rate (µL/s)',
         error: 'Value must be between 1 to 92',
-        readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

@@ -1,7 +1,9 @@
+
 include ../scripts/push.mk
 include ../scripts/python.mk
 
 SHX := npx shx
+slack_sdk_version := 3.39.0
 
 package_name = abr_testing
 package_version = $(call python_package_version,abr-testing,$(project_rs_default))
@@ -73,6 +75,10 @@ test:
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: wheel Pipfile.lock
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/opt/opentrons-robot-server/)
+	ssh $(ssh_helper_ot3) root@$(host) \
+		'set -e; mount -o remount,rw /; pip3 config --global unset install.root; \
+		pip3 install --upgrade --ignore-installed -t /opt/opentrons-robot-server/ "slack-sdk==$(slack_sdk_version)"; \
+		pip3 config --global set install.root /var/user-packages; mount -o remount,ro /'
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

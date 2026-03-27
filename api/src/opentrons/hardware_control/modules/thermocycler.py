@@ -23,6 +23,10 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
 )
 from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
+)
 
 log = logging.getLogger(__name__)
 
@@ -170,6 +174,7 @@ class Thermocycler(mod_abc.AbstractModule):
             self._enter_error_state
         )
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task."""
         self._unsubscribe_reader()

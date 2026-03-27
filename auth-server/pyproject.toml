@@ -52,7 +52,7 @@ dev = [
     "types-requests==2.27.1",
     "tavern>=3.0.2",
     "types-oauthlib==3.3.0.20250822",
-    "sqlalchemy2-stubs==0.0.2a21",
+    "sqlalchemy2-stubs==0.0.2a38",
 ]
 
 [tool.ruff.lint]
@@ -72,6 +72,9 @@ convention = "google"
 
 [tool.ruff.lint.mccabe]
 max-complexity = 9
+
+[tool.ruff.format]
+exclude = ["auth_server/_version.py"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]

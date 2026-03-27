@@ -285,7 +285,7 @@ function StartingWell({
             key={well}
             isChecked={startingWellState[well]}
             labelText={well}
-            onClick={() => {
+            onChange={() => {
               if (channels === 96) {
                 if (startingWellState[well]) {
                   deselectWells([well])

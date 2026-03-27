@@ -1,5 +1,6 @@
 """Request and response models for the `/settings` endpoints."""
 
+from textwrap import dedent
 from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
@@ -123,6 +124,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
 
     _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
         {
+            "accessControlEnabled",
             "idleLogout",
             "requireAdminCredsWhenUpdatingRobotSoftware",
             "requireAdminCredsWhenSendingProtocolToRobot",
@@ -160,4 +162,18 @@ class PatchAccessControlRequestData(_StrictBaseModel):
 class AccessControlResponseData(pydantic.BaseModel):
     """A response with the current access control settings."""
 
-    accessControlEnabled: bool
+    accessControlEnabled: Annotated[
+        bool,
+        pydantic.Field(
+            description=dedent(
+                """\
+                When enabled, authorization is enforced throughout the robot's HTTP APIs.
+                Protected endpoints are blocked unless the request carries an
+                OAuth 2 access token with the appropriate scopes. See the `/auth/oauth2`
+                endpoints.
+
+                When disabled (the default), all endpoints allow unauthenticated access.
+                """
+            )
+        ),
+    ]

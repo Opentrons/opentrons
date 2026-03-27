@@ -107,6 +107,67 @@ stages:
           minLengthOfReasonForInteraction: null
 
 ---
+test_name: PATCH with accessControlEnabled null field leaves value unchanged
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: PATCH to enable access control
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+
+  - name: PATCH with accessControlEnabled null is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: null
+    response:
+      status_code: 422
+
+  - name: GET settings unchanged after rejected PATCH
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+
+---
 test_name: DELETE resets to defaults
 
 marks:

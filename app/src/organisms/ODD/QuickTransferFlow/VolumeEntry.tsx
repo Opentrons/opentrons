@@ -51,6 +51,10 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
 
   const volumeAsNumber = Number(volume)
 
+  const handleVolumeChange = (input: string): void => {
+    setVolume(input)
+  }
+
   const handleClickNext = (): void => {
     // the button will be disabled if this values is null
     if (volumeAsNumber != null) {
@@ -105,11 +109,17 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            autoFocus
             type="text"
             value={volume}
             label={textEntryCopy}
             error={error}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setVolume(e.target.value as string)
+            }}
           />
         </Flex>
         <Flex
@@ -120,9 +130,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            onChange={e => {
-              setVolume(e)
-            }}
+            onChange={handleVolumeChange}
           />
         </Flex>
       </Flex>

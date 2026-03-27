@@ -219,11 +219,17 @@ export function Mix(props: MixProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={mixVolume}
               label={t('mix_volume_µL')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setMixVolume(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex
@@ -260,11 +266,17 @@ export function Mix(props: MixProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={mixReps}
               error={repititionError}
               label={t('mix_repetitions')}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setMixReps(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

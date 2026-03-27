@@ -130,11 +130,17 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            autoFocus
             type="text"
             value={tipPosition}
             label={textEntryCopy}
             error={error}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setTipPosition(Number(e.target.value))
+            }}
           />
         </Flex>
         <Flex

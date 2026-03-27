@@ -214,7 +214,7 @@ const mockVacuumModule = {
   id: 'vacuum_module_id',
   serialNumber: 'vm123',
   hardwareRevision: 'vacuum_module_v1.0',
-  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleModel: 'vacuumModuleV1',
   moduleType: 'vacuumModuleType',
   firmwareVersion: 'v1.0.0',
   hasAvailableUpdate: false,
@@ -597,6 +597,6 @@ describe('ModuleCard', () => {
 
     screen.getByText('Vacuum Module GEN1')
     screen.getByText('Mock Vacuum Module Data')
-    screen.getByAltText('vacuumModuleMilliporeV1')
+    screen.getByAltText('vacuumModuleV1')
   })
 })

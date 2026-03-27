@@ -172,11 +172,13 @@ describe('PipettePath', () => {
 
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Disposal volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 20,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -203,11 +205,13 @@ describe('PipettePath', () => {
     fireEvent.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Disposal volume (µL)',
         error: 'Value must be between 1 to 160',
-        readOnly: true,
         type: 'number',
         value: 201,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

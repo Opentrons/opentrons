@@ -21,6 +21,7 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
+  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
@@ -79,6 +80,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
 
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
+
+  const enableExternalKeyboardTest = useFeatureFlag('externalKeyboardTest')
 
   return (
     <div className={styles.main_content}>
@@ -177,6 +180,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="camera"
         />
         <RobotSettingButton
+          settingName={t('devices')}
+          dataTestId="RobotSettingButton_devices"
+          onClick={() => {
+            setCurrentOption('Devices')
+          }}
+          iconName="device"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
           settingInfo={t('branded:choose_what_data_to_share')}
@@ -232,6 +243,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="update-channel"
         />
+        {enableExternalKeyboardTest ? (
+          <RobotSettingButton
+            settingName={t('documentation_required')}
+            onClick={() => {
+              setCurrentOption('ExternalKeyboardTest')
+            }}
+            iconName="acm"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"

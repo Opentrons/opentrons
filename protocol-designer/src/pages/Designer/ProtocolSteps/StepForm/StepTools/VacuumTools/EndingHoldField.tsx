@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Check, COLORS, StyledText } from '@opentrons/components'
+import { VACUUM_PROGRAM_STATE } from '@opentrons/step-generation'
 
 import styles from './vacuumtools.module.css'
 
@@ -18,7 +19,10 @@ export function EndingHoldField(
   const { formData, propsForFields } = props
   const { t } = useTranslation('protocol_steps')
 
-  if (formData.pumpDurationCheckbox !== true) {
+  if (
+    formData.programType === VACUUM_PROGRAM_STATE &&
+    formData.pumpDurationCheckbox !== true
+  ) {
     return null
   }
 

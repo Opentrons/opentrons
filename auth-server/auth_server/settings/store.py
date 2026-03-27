@@ -13,13 +13,9 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
-from auth_server.persistence.orm_models import AccessControlEnabled, Setting
-from auth_server.settings.models import (
-    AccessControlResponseData,
-    PatchAccessControlRequestData,
-    PatchSettingsRequestData,
-    SettingsResponseData,
-)
+
+from auth_server.persistence.orm_models import Setting
+from auth_server.settings.models import AccessControlResponseData, PatchAccessControlRequestData, PatchSettingsRequestData, SettingsResponseData
 
 
 class SettingsStore:
@@ -75,6 +71,7 @@ class SettingsStore:
             return self.get_access_control_settings()
         self.update_access_control_table(patch.accessControlEnabled)
         return self.get_access_control_settings()
+
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""
@@ -133,7 +130,5 @@ def get_settings_store(
 ) -> SettingsStore:
     """Return the server's singleton SettingsStore."""
     settings_store = _accessor.get_from(app_state)
-    if settings_store is None:
-        settings_store = SettingsStore(sql_engine=sql_engine)
-        _accessor.set_on(app_state, settings_store)
+    assert settings_store is not None
     return settings_store

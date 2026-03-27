@@ -194,11 +194,17 @@ export function Delay(props: DelayProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="number"
               value={delayDuration}
               error={durationError}
               label={t('delay_duration_s')}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setDelayDuration(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

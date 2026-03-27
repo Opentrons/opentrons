@@ -96,11 +96,13 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: null,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -127,11 +129,13 @@ describe('AirGap', () => {
     fireEvent.click(screen.getByText('0'))
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: 'Value must be between 0 to 195',
-        readOnly: true,
         type: 'number',
         value: 200,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -156,11 +160,13 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -183,11 +189,13 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -208,11 +216,13 @@ describe('AirGap', () => {
     fireEvent.click(numButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -245,11 +255,13 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 4,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -270,11 +282,13 @@ describe('AirGap', () => {
     fireEvent.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Air gap volume (µL)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 16,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

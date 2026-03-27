@@ -72,6 +72,11 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "level": log_level,
                 "propagate": False,
             },
+            "server_utils": {
+                "handlers": ["syslog_plus_unit"],
+                "level": log_level,
+                "propagate": False,
+            },
             "uvicorn.error": {
                 "handlers": ["syslog_plus_unit"],
                 "level": log_level,
@@ -125,6 +130,11 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
         },
         "loggers": {
             "robot_server": {
+                "handlers": ["robot_server"],
+                "level": log_level,
+                "propagate": False,
+            },
+            "server_utils": {
                 "handlers": ["robot_server"],
                 "level": log_level,
                 "propagate": False,

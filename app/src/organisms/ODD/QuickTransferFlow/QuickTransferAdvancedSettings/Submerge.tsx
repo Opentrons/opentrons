@@ -282,10 +282,16 @@ function SubmergeSettingComponent({
             {t(`submerge_${kind}_description`)}
           </StyledText>
           <TouchInputField
+            autoFocus
             type="number"
             value={speed}
             label={t('speed')}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handleSpeedChange(e.target.value as string)
+            }}
           />
         </Flex>
         <Flex
@@ -317,10 +323,16 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            autoFocus
             type="number"
             value={delayDuration}
             label={t('delay_duration_s')}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handleDelayDurationChange(e.target.value as string)
+            }}
           />
         </Flex>
         <Flex
@@ -356,11 +368,17 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            autoFocus
             type="text"
             value={position}
             error={positionError}
             label={positionText}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              handlePositionChange(e.target.value as string)
+            }}
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>

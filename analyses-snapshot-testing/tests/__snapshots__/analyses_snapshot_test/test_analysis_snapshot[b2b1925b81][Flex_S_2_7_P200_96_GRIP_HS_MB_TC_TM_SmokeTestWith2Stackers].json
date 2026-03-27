@@ -2946,8 +2946,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -3191,8 +3190,7 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
@@ -3218,8 +3216,7 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
@@ -3249,51 +3246,11 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
           [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "addressableAreaName": "A4",
-              "kind": "onAddressableArea"
-            },
-            {
-              "cutoutId": "cutoutA3",
-              "kind": "onCutoutFixture",
-              "possibleCutoutFixtureIds": [
-                "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
-              ]
-            }
-          ],
-          [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
             {
               "kind": "onLabware",
               "labwareId": "UUID"
@@ -3323,8 +3280,45 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "addressableAreaName": "A4",
+              "kind": "onAddressableArea"
+            },
+            {
+              "cutoutId": "cutoutA3",
+              "kind": "onCutoutFixture",
+              "possibleCutoutFixtureIds": [
+                "stagingAreaRightSlot",
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ]
@@ -3344,8 +3338,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -13600,8 +13593,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
