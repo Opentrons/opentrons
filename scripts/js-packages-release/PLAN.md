@@ -1,9 +1,9 @@
 ---
 name: GitHub Packages release + component testing
-overview: Unified GitHub Packages release for four scoped packages via `scripts/js-packages-release/` (uv, Typer, Rich), tag `js-packages-release@*`, registry preflight, manifest rewrites, ordered builds. Old `shared-data@` / `components@` NPM jobs to be removed from legacy workflows. Extend `components-testing` for step-generation and protocol-visualization.
+overview: Unified GitHub Packages release prep for four scoped packages via `scripts/js-packages-release/` (uv + small stdlib Python CLIs), tag `js-packages-release@*`, registry preflight, manifest rewrites, ordered builds. Old `shared-data@` / `components@` NPM jobs to be removed from legacy workflows. Extend `components-testing` for step-generation and protocol-visualization.
 todos:
   - id: scaffold-cli
-    content: 'scripts/js-packages-release uv project: preflight (registry + semver), manifest rewrite, build orchestration; wired job summaries. Remaining: npm publish orchestration in CLI or workflow, optional dry-run.'
+    content: 'scripts/js-packages-release uv project: preflight (registry + semver), manifest rewrite, build orchestration. Remaining: npm publish orchestration in CLI or workflow, optional dry-run.'
     status: in_progress
   - id: step-gen-shippable
     content: 'step-generation publishable (private removed, lib exports/files, Makefile build-ts lib pack).'
@@ -15,7 +15,7 @@ todos:
     content: 'Extend components-testing to pack/link step-generation and protocol-visualization; paths and SKILL.'
     status: pending
   - id: tests-docs
-    content: 'pytest for version parsing and registry rules; document tag and local workflow. Partially done: tests under scripts/js-packages-release/tests; README and Cursor skill added.'
+    content: 'pytest for version parsing/validation rules; document tag and local workflow. Partially done: tests under scripts/js-packages-release/tests; README and Cursor skill added.'
     status: in_progress
 ---
 
@@ -25,9 +25,9 @@ todos:
 
 **Delivered in repo (ongoing work):**
 
-- **`scripts/js-packages-release/`** (not `npm-release`): `publish_core.py`, `publish.py`, `build_packages.py`, `manifests.py`, `github_summary.py`, Makefile, pytest.
+- **`scripts/js-packages-release/`** (not `npm-release`): `publish_core.py`, `publish.py`, `build_packages.py`, `manifests.py`, Makefile, pytest.
 - **Tag:** `js-packages-release@<semver>` for workflow and version parsing.
-- **Preflight:** rejects invalid semver and wrong tag prefixes; queries GitHub Packages and treats partial and full “already on registry” cases as **errors**.
+- **Preflight:** non-interactive stdlib Python CLI; rejects invalid semver and wrong tag prefixes; queries GitHub Packages and treats partial and full “already on registry” cases as **errors**.
 - **Build chain:** `build_packages.py` runs `make build-ts`, `shared-data lib-js`, `step-generation lib`, components `build-ts` + `lib`, protocol-visualization `build-ts` + `lib`, then optional manifest rewrite.
 - **Workflow** [`.github/workflows/js-packages-release.yaml`](../../.github/workflows/js-packages-release.yaml): PR path filters run lint + test; tag push runs **publish** preflight only (no lint or unit tests on the tag).
 - **step-generation:** npm-oriented `package.json` and `Makefile` targets (`build-ts`, `lib`, `pack`).
@@ -76,7 +76,7 @@ flowchart TD
 
 The sections below are the **original** design notes. Treat the **Implementation status** block at the top as the source of truth for what is merged today. Path names in older bullets may say `scripts/npm-release/`; the actual directory is **`scripts/js-packages-release/`**.
 
-### 1. CLI package (uv + Rich + Typer)
+### 1. CLI package (uv + stdlib argparse)
 
 Mirror [scripts/static-deploy/](../static-deploy/): `pyproject.toml`, `Makefile`, README.
 
@@ -102,10 +102,10 @@ In the build train after components; pins come from `manifests.apply_release_ver
 
 ### 6. Local developer workflow
 
-Use **`publish.py`** with `--version` / interactive; **`build_packages.py`** with or without `--version`; **`make build-packages`** from `scripts/js-packages-release`.
+Use **`publish.py`** with `--version` or `--current`; **`build_packages.py`** with or without `--version`; **`make build-packages`** from `scripts/js-packages-release`.
 
 ### 7. Testing and verification
 
-**Ongoing:** expand mocks for registry edge cases if needed; run **`make -C components-testing test`** after components-testing Makefile changes.
+**Ongoing:** keep tests focused on parsing and validation helpers; run **`make -C components-testing test`** after components-testing Makefile changes.
 
 When legacy NPM jobs are removed, **`components@`** / **`shared-data@`** tag pushes should **not** drive the four-package NPM release (migration to **`js-packages-release@`**).

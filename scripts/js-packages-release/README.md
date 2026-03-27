@@ -1,6 +1,6 @@
 # js-packages-release
 
-uv-managed Python tooling for **unified GitHub Packages releases** of four scoped packages:
+uv-managed Python tooling for **unified GitHub Packages release prep** of four scoped packages:
 
 `@opentrons/shared-data`, `@opentrons/step-generation`, `@opentrons/components`, `@opentrons/protocol-visualization`.
 
@@ -68,7 +68,7 @@ make build-packages-manifests-only VERSION=1.2.3
 Workflow: [`.github/workflows/js-packages-release.yaml`](../../.github/workflows/js-packages-release.yaml)
 
 - **pull_request** (paths: this workflow + `scripts/js-packages-release/**`): **lint** and **unit test** jobs (parallel, no `needs`).
-- **push** tags `js-packages-release@*`: **publish** job only: resolve version from tag, run preflight (`publish.py`). Lint and unit tests do not run on tag push.
+- **push** tags `js-packages-release@*`: **publish** job only: build the package set in order and run preflight (`publish.py`). Lint and unit tests do not run on tag push.
 
 Tag pushes use the full ref as `--version` so `publish_core.resolve_version_input` accepts it.
 
@@ -86,7 +86,7 @@ always-auth=true
 EOF
 ```
 
-In GitHub Actions, use **`GITHUB_TOKEN`** (or a PAT) with package permissions and set `NODE_AUTH_TOKEN` before running `publish.py`.
+If GitHub Packages reads require auth in your environment, set `NODE_AUTH_TOKEN` before running `publish.py`. The current workflow does not perform `npm publish` yet.
 
 ## Tests
 
