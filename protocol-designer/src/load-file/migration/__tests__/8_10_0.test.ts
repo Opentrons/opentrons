@@ -282,6 +282,59 @@ describe('v8.10.0 migration', () => {
       )
     )
   })
+  it('should remove lids loaded off deck at the beginning of a run', () => {
+    const lidId = 'lid-id'
+    const nonLidId = 'plate-id'
+
+    const initialDeckSetupStep: LegacyFormData = {
+      labwareLocationUpdate: {
+        [lidId]: 'offDeck',
+        [nonLidId]: 'offDeck',
+        onDeckLabware: 'A1',
+      },
+      moduleLocationUpdate: {},
+      pipetteLocationUpdate: {},
+      trashBinLocationUpdate: {},
+      wasteChuteLocationUpdate: {},
+      stagingAreaLocationUpdate: {},
+      gripperLocationUpdate: {},
+      stepType: 'manualIntervention',
+      id: '__INITIAL_DECK_SETUP_STEP__',
+    }
+
+    const input = createFile({
+      orderedStepIds: [],
+      savedStepForms: {
+        [initialDeckSetupStep.id]: initialDeckSetupStep,
+      },
+      pipettes: {},
+    })
+
+    // 👇 Inject labware into the file (since migrateFile reads from it)
+    input.designerApplication!.data!.labware = {
+      [lidId]: {
+        id: lidId,
+        displayName: 'Opentrons Tough Universal Lid',
+      },
+      [nonLidId]: {
+        id: nonLidId,
+        displayName: '96 Well Plate',
+      },
+    } as any
+
+    const result = migrateFile(input)
+
+    const { savedStepForms: resultSavedStepForms } =
+      result.designerApplication!.data!
+
+    const updatedInitialDeckSetupStep =
+      resultSavedStepForms[initialDeckSetupStep.id]
+
+    expect(updatedInitialDeckSetupStep.labwareLocationUpdate).toStrictEqual({
+      [nonLidId]: 'offDeck',
+      onDeckLabware: 'A1',
+    })
+  })
 })
 
 /** Create a mock protocol file with the given commands. */
