@@ -1,41 +1,49 @@
 # js-packages-release
 
-uv-managed Python tooling for **unified GitHub Packages release prep** of four scoped packages:
+TypeScript tooling for **unified GitHub Packages release prep** of four scoped
+packages:
 
-`@opentrons/shared-data`, `@opentrons/step-generation`, `@opentrons/components`, `@opentrons/protocol-visualization`.
+`@opentrons/shared-data`, `@opentrons/step-generation`,
+`@opentrons/components`, `@opentrons/protocol-visualization`.
 
 See [PLAN.md](./PLAN.md) for the full roadmap and what is still open.
 
 ## Layout
 
-- `publish_core.py`: shared `PACKAGES` list, version and tag parsing (`js-packages-release@`, `refs/tags/...`), `prior_packages()` pin order
-- `publish.py`: small stdlib CLI for registry checks, preflight validation, and current-version inspection
-- `build_packages.py`: monorepo **make** build chain, then optional `package.json` version and internal pin rewrites
-- `manifests.py`: `apply_release_versions(repo_root, version)`
-- `tests/`: pytest
+- `src/publish_core.mts`: shared `PACKAGES` list, version and tag parsing
+  (`js-packages-release@`, `refs/tags/...`), `priorPackages()` pin order
+- `src/publish.mts`: small Node CLI for registry checks, preflight validation,
+  and current-version inspection
+- `src/build_packages.mts`: monorepo **make** build chain, then optional
+  `package.json` version and internal pin rewrites
+- `src/manifests.mts`: `applyReleaseVersions(repoRoot, version)`
+- `tests/`: Vitest
 
 ## Setup
 
-From **monorepo root** or this directory:
+This directory uses the monorepo's root JS toolchain. From the repo root:
 
 ```bash
-cd scripts/js-packages-release
-make setup
+make setup-js
 ```
 
-Requires **Node** with `npm` on `PATH` when running preflight (uses `npm view` against GitHub Packages). Release builds use **yarn** and **make** at the repo root.
+Commands below can then be run from `scripts/js-packages-release/`.
 
-## Preflight (`publish.py`)
-
-Validates a target version against the **GitHub Packages npm registry** for all four packages (404 / empty history treated as unpublished). It is intentionally non-interactive and prints plain-text status only.
+## Commands
 
 ```bash
-# Show current published versions
-make publish-current
+make clean
+make build
+make format
+make lint
+make test
 
-# Preflight a target release version
-make publish-ci
-# equivalent: uv run python publish.py --version "$VERSION"
+make publish-current
+make publish-ci VERSION=1.2.3
+
+make build-packages
+make build-packages VERSION=1.2.3
+make build-packages-manifests-only VERSION=1.2.3
 ```
 
 Version input may be:
@@ -44,37 +52,41 @@ Version input may be:
 - `js-packages-release@1.2.3`
 - `refs/tags/js-packages-release@1.2.3`
 
-**Note:** If every package already has that version on the registry, preflight **fails**. Partial publish (subset only) also fails.
+## Preflight
 
-## Build and manifests (`build_packages.py`)
+`make publish-ci` builds the local CLI and validates a target version against
+the **GitHub Packages npm registry** for all four packages. 404 or empty
+history is treated as unpublished.
 
-Runs the same **make** sequence as the release build path, then optionally rewrites the four `package.json` files (version + pinned `@opentrons/*` deps in publish order).
+If every package already has that version on the registry, preflight fails.
+Partial publish also fails.
 
-```bash
-# Build only (sanity check; no manifest changes)
-make build-packages
-# or: uv run python build_packages.py
+## Build and manifests
 
-# Build + apply release manifests
-make build-packages VERSION=1.2.3
-# or: uv run python build_packages.py --version "refs/tags/js-packages-release@1.2.3"
+`make build-packages` runs the same ordered **make** sequence as the release
+build path, then optionally rewrites the four `package.json` files (version and
+pinned internal `@opentrons/*` deps in publish order).
 
-# Manifests only (requires VERSION)
-make build-packages-manifests-only VERSION=1.2.3
-```
+`make build-packages-manifests-only VERSION=...` skips the build and only
+applies the manifest rewrite.
 
 ## GitHub Actions
 
-Workflow: [`.github/workflows/js-packages-release.yaml`](../../.github/workflows/js-packages-release.yaml)
+Workflow:
+[`.github/workflows/js-packages-release.yaml`](../../.github/workflows/js-packages-release.yaml)
 
-- **pull_request** (paths: this workflow + `scripts/js-packages-release/**`): **lint** and **unit test** jobs (parallel, no `needs`).
-- **push** tags `js-packages-release@*`: **publish** job only: build the package set in order and run preflight (`publish.py`). Lint and unit tests do not run on tag push.
+- **pull_request** (paths: this workflow + `scripts/js-packages-release/**`):
+  **lint** and **unit test** jobs
+- **push** tags `js-packages-release@*`: **publish** job only, which builds the
+  package set in order and runs preflight
 
-Tag pushes use the full ref as `--version` so `publish_core.resolve_version_input` accepts it.
+Tag pushes use the full ref as `--version` so
+`resolveVersionInput()` accepts it.
 
 ## Registry configuration
 
-The preflight defaults to **`https://npm.pkg.github.com`**. Override with `OT_NPM_REGISTRY` if needed.
+The preflight defaults to **`https://npm.pkg.github.com`**. Override with
+`OT_NPM_REGISTRY` if needed.
 
 For local runs, configure npm auth for the `@opentrons` scope:
 
@@ -86,15 +98,12 @@ always-auth=true
 EOF
 ```
 
-If GitHub Packages reads require auth in your environment, set `NODE_AUTH_TOKEN` before running `publish.py`. The current workflow does not perform `npm publish` yet.
-
-## Tests
-
-```bash
-make test
-make lint
-```
+If GitHub Packages reads require auth in your environment, set
+`NODE_AUTH_TOKEN` before running `make publish-ci`. The current workflow does
+not perform `npm publish` yet.
 
 ## Related monorepo changes
 
-`step-generation` includes **`build-ts`**, **`lib`**, and **`pack`** Makefile targets and npm-oriented **`exports`** / **`files`** / **`main`** pointing at `lib/`. See `step-generation/Makefile` and `step-generation/package.json`.
+`step-generation` includes **`build-ts`**, **`lib`**, and **`pack`** Makefile
+targets and npm-oriented **`exports`** / **`files`** / **`main`** pointing at
+`lib/`. See `step-generation/Makefile` and `step-generation/package.json`.

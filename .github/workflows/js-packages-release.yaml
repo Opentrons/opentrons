@@ -35,14 +35,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        working-directory: scripts/js-packages-release
-        run: make setup
+      - uses: ./.github/actions/js/setup
 
       - name: Lint
         working-directory: scripts/js-packages-release
@@ -56,14 +49,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        working-directory: scripts/js-packages-release
-        run: make setup
+      - uses: ./.github/actions/js/setup
 
       - name: Unit tests
         working-directory: scripts/js-packages-release
@@ -84,15 +70,6 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: '3.12'
-
-      - name: Setup js-packages-release dependencies
-        working-directory: scripts/js-packages-release
-        run: make setup
 
       - uses: ./.github/actions/js/setup
 

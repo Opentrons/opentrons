@@ -1,44 +1,43 @@
-.PHONY: setup
-setup:
-	uv sync --frozen
+.PHONY: clean
+clean:
+	yarn shx rm -rf dist
 
-.PHONY: teardown
-teardown:
-	rm -rf .venv
+.PHONY: build
+build:
+	cd ../.. && yarn tsc -p scripts/js-packages-release/tsconfig.json
 
 .PHONY: format
 format:
-	uv run ruff format
-	uv run ruff check --fix
+	cd ../.. && yarn prettier --ignore-path .eslintignore --write "scripts/js-packages-release/**/*.@(ts|mts|md|json)"
 
 .PHONY: lint
 lint:
-	uv run ruff check
-	uv run ruff format --check
+	cd ../.. && yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" "scripts/js-packages-release/**/*.@(ts|mts)"
+	cd ../.. && yarn prettier --ignore-path .eslintignore --check "scripts/js-packages-release/**/*.@(ts|mts|md|json)"
 
 .PHONY: test
 test:
-	uv run python -m pytest tests/ -v
+	cd ../.. && yarn vitest --config scripts/js-packages-release/vitest.config.mts run
 
 .PHONY: publish-ci
-publish-ci:
+publish-ci: build
 	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or js-packages-release tag ref"; exit 1; fi
-	uv run python publish.py --version "$(VERSION)"
+	node dist/publish.mjs --version "$(VERSION)"
 
 .PHONY: publish-current
-publish-current:
-	uv run python publish.py --current
+publish-current: build
+	node dist/publish.mjs --current
 
-# With VERSION: build then rewrite package.json. Without VERSION: build only (verify release pipeline).
+# With VERSION: build then rewrite package.json. Without VERSION: build only.
 .PHONY: build-packages
-build-packages:
+build-packages: build
 	@if [ -n "$(VERSION)" ]; then \
-		uv run python build_packages.py --version "$(VERSION)"; \
+		node dist/build_packages.mjs --version "$(VERSION)"; \
 	else \
-		uv run python build_packages.py; \
+		node dist/build_packages.mjs; \
 	fi
 
 .PHONY: build-packages-manifests-only
-build-packages-manifests-only:
+build-packages-manifests-only: build
 	@if [ -z "$(VERSION)" ]; then echo "Set VERSION= to semver or js-packages-release tag ref"; exit 1; fi
-	uv run python build_packages.py --version "$(VERSION)" --skip-build
+	node dist/build_packages.mjs --version "$(VERSION)" --skip-build

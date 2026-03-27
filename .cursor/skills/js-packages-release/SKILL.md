@@ -1,13 +1,13 @@
 ---
 name: js-packages-release
-description: Conventions for unified GitHub Packages release-prep tooling in scripts/js-packages-release/ (preflight registry checks, build_packages make chain, manifest pins, GitHub workflow js-packages-release@ tags, uv and pytest). Use when working in that directory, editing publish.py, build_packages.py, manifests.py, publish_core.py, or .github/workflows/js-packages-release.yaml.
+description: Conventions for unified GitHub Packages release-prep tooling in scripts/js-packages-release/ (preflight registry checks, build_packages make chain, manifest pins, GitHub workflow js-packages-release@ tags, TypeScript .mts source, and Vitest). Use when working in that directory, editing src/*.mts files, tests, or .github/workflows/js-packages-release.yaml.
 ---
 
 # js-packages-release
 
 ## Scope
 
-Python CLIs and helpers under **`scripts/js-packages-release/`** for preparing four scoped packages to release together via **GitHub Packages**:
+TypeScript CLIs and helpers under **`scripts/js-packages-release/`** for preparing four scoped packages to release together via **GitHub Packages**:
 
 `@opentrons/shared-data`, `@opentrons/step-generation`, `@opentrons/components`, `@opentrons/protocol-visualization`.
 
@@ -15,25 +15,25 @@ Python CLIs and helpers under **`scripts/js-packages-release/`** for preparing f
 
 ## Tooling
 
-- **uv:** `make setup`, `uv run python ...` (see `scripts/js-packages-release/Makefile`)
-- **Ruff / pytest:** `make lint`, `make test` from `scripts/js-packages-release/`
-- **Node:** `npm` required for `publish.py` (`npm view` against GitHub Packages). **yarn** + root **make** required for `build_packages.py`
+- **Root JS toolchain:** run `make setup-js` at the monorepo root
+- **TypeScript / Vitest:** `make clean`, `make build`, `make format`, `make lint`, `make test` from `scripts/js-packages-release/`
+- **Node:** `npm` required for `src/publish.mts` (`npm view` against GitHub Packages). **yarn** + root **make** required for `src/build_packages.mts`
 
 ## Modules (single responsibility)
 
-| Module              | Purpose                                                                                                 |
-| ------------------- | ------------------------------------------------------------------------------------------------------- |
-| `publish_core.py`   | `PACKAGES`, `PACKAGE_REL_DIRS`, semver and tag parsing, `prior_packages()` for pin order                |
-| `publish.py`        | Small stdlib CLI for preflight and current-version inspection                                            |
-| `build_packages.py` | Ordered `make` invocations; optional `--version`; manifest apply                                         |
-| `manifests.py`      | `apply_release_versions(repo_root, semver)` only                                                        |
+| Module                   | Purpose                                                                                 |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| `src/publish_core.mts`   | `PACKAGES`, `PACKAGE_REL_DIRS`, semver and tag parsing, `priorPackages()` for pin order |
+| `src/publish.mts`        | Small Node CLI for preflight and current-version inspection                             |
+| `src/build_packages.mts` | Ordered `make` invocations; optional `--version`; manifest apply                        |
+| `src/manifests.mts`      | `applyReleaseVersions(repoRoot, semver)` only                                           |
 
-Do not duplicate version parsing: import **`resolve_version_input`** (or helpers) from **`publish_core`**.
+Do not duplicate version parsing: import **`resolveVersionInput`** (or helpers) from **`src/publish_core.mts`**.
 
 ## CLI behavior
 
-- **`publish.py`:** non-interactive only; use `--version` for preflight or `--current` to inspect the current published versions. Full tag ref allowed. Defaults to `https://npm.pkg.github.com` and fails on partial or complete “already published” for the target version.
-- **`build_packages.py`:** Omit `--version` for **build only**. `--skip-build` requires `--version`.
+- **`src/publish.mts`:** non-interactive only; use `--version` for preflight or `--current` to inspect the current published versions. Full tag ref allowed. Defaults to `https://npm.pkg.github.com` and fails on partial or complete “already published” for the target version.
+- **`src/build_packages.mts`:** Omit `--version` for **build only**. `--skip-build` requires `--version`.
 
 ## CI
 
@@ -41,10 +41,11 @@ Do not duplicate version parsing: import **`resolve_version_input`** (or helpers
 
 - **PR** (paths): lint + test jobs, no `needs` between them
 - **push** `js-packages-release@*`: **publish** job only (preflight with version from `github.ref`), no lint or unit test jobs
+- CI uses `./.github/actions/js/setup`, not uv
 
 ## Monorepo build order
 
-`build_packages.py` uses a fixed tuple of make commands: root **`build-ts`**, **`shared-data lib-js`**, **`step-generation lib`**, components **`build-ts`** + **`lib`**, protocol-visualization **`build-ts`** + **`lib`**. Keep this in sync with **`PACKAGES`** publish order in `publish_core.py`.
+`src/build_packages.mts` uses a fixed tuple of make commands: root **`build-ts`**, **`shared-data lib-js`**, **`step-generation lib`**, components **`build-ts`** + **`lib`**, protocol-visualization **`build-ts`** + **`lib`**. Keep this in sync with **`PACKAGES`** publish order in `src/publish_core.mts`.
 
 ## step-generation
 
@@ -52,8 +53,8 @@ Release-oriented **`package.json`** (`lib` entry points, `files`, `exports`) and
 
 ## Tests
 
-- Preflight parsing and version validation: **`tests/test_publish.py`**
-- Manifests: **`tests/test_manifests.py`**
+- Preflight parsing and version validation: **`tests/publish.test.ts`**
+- Manifests: **`tests/manifests.test.ts`**
 
 ## Roadmap
 
