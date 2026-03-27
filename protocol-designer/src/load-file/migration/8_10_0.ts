@@ -17,26 +17,32 @@ export const migrateFile = (
     throw Error('The designerApplication key in your file is corrupt.')
   }
   const { savedStepForms, pipettes, labware } = designerApplication.data
+  const initialDeckSetupStep = Object.values(savedStepForms).find(
+    step => step.id === '__INITIAL_DECK_SETUP_STEP__'
+  )
 
+  const labwareLocationUpdate = (initialDeckSetupStep?.labwareLocationUpdate ??
+    {}) as Record<string, string>
+
+  const offDeckLabwareIds = Object.entries(labwareLocationUpdate)
+    .filter(([_, location]) => location === 'offDeck')
+    .map(([labwareId]) => labwareId)
+
+  const offDeckLids = offDeckLabwareIds.filter(labwareId => {
+    const lw = labware[labwareId]
+    return lw?.displayName?.toLowerCase().includes('lid') ?? false
+  })
+
+  const offDeckLidSet = new Set(offDeckLids)
+  const cleanedLabware = Object.fromEntries(
+    Object.entries(labware).filter(
+      ([labwareId]) => !offDeckLidSet.has(labwareId)
+    )
+  )
   const savedStepsWithUpdatedFields = Object.values(savedStepForms).reduce(
     (acc, form) => {
       const { stepType, id } = form
       if (id === '__INITIAL_DECK_SETUP_STEP__') {
-        const labwareLocationUpdate = form.labwareLocationUpdate as Record<
-          string,
-          string
-        >
-        const offDeckLabwareIds = Object.entries(labwareLocationUpdate)
-          .filter(([_, location]) => location === 'offDeck')
-          .map(([labwareId]) => labwareId)
-
-        const offDeckLids = offDeckLabwareIds.filter(labwareId => {
-          const lw = labware[labwareId]
-          return lw?.displayName?.toLowerCase().includes('lid')
-        })
-
-        const offDeckLidSet = new Set(offDeckLids)
-
         const cleanedLabwareLocationUpdate = Object.fromEntries(
           Object.entries(labwareLocationUpdate).filter(
             ([labwareId]) => !offDeckLidSet.has(labwareId)
@@ -48,6 +54,19 @@ export const migrateFile = (
             ...form,
             labwareLocationUpdate: cleanedLabwareLocationUpdate,
           },
+        }
+      }
+      if (stepType === 'moveLabware' || stepType === 'manualIntervention') {
+        const { labware } = form
+        if (offDeckLids.includes(labware as string)) {
+          return {
+            ...acc,
+            [id]: {
+              ...form,
+              labwareId: null,
+              newLocation: null,
+            },
+          }
         }
       }
       if (stepType === 'moveLiquid' || stepType === 'mix') {
@@ -96,6 +115,7 @@ export const migrateFile = (
           ...designerApplication.data.savedStepForms,
           ...savedStepsWithUpdatedFields,
         },
+        labware: cleanedLabware,
       },
     },
   }
