@@ -11,13 +11,13 @@ title: "Vacuum Module: Product Specifications"
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum pump unit](images/vacuum-pump.png "Vacuum pump")
-<figcaption>(1) Vacuum pump</figcaption>
+![Waste collection jar](images/waste-jar-line.png "Waste collection jar")
+<figcaption>(1) GL60 collection jar</figcaption>
 </figure>
 
 <figure markdown>
-![Waste collection jar](images/waste-jar-line.png "Waste collection jar")
-<figcaption>(1) GL60 waste collection jar</figcaption>
+![Vacuum pump unit](images/vacuum-pump.png "Vacuum pump")
+<figcaption>(1) Vacuum pump</figcaption>
 </figure>
 
 <figure markdown>
@@ -31,17 +31,17 @@ title: "Vacuum Module: Product Specifications"
 </figure>
 
 <figure markdown>
-![Bag of screws](images/part-placeholder.png "Deck caddy screws")
-<figcaption>(4) Mx screws</figcaption>
+![Bag of screws](images/deck-plate-screw.svg "Deck slot screws")
+<figcaption>( ) M4x10 Deck slot screws</figcaption>
 </figure>
 
 <figure markdown>
-![USB type A cable](images/part-placeholder.png "USB A cable")
+![USB type A cable](images/usb-a-cable.png "USB A cable")
 <figcaption>(1) USB A cable</figcaption>
 </figure>
 
 <figure markdown>
-![Power cable](images/part-placeholder.png "Region-specific power cable")
+![Power cable](images/iec-plugs.png "Region-specific power cable")
 <figcaption>(1) Region specific power cable</figcaption>
 </figure>
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 284 284" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+    <g id="Spare-Deck-Plate-Screws" serif:id="Spare Deck Plate Screws">
+        <g transform="matrix(1,0,0,1,141.732,177.7)">
+            <path d="M0,-71.935C-9.55,-71.935 -17.292,-67.484 -17.292,-61.994L-17.292,-46.037C-17.292,-42.656 -14.35,-39.674 -9.864,-37.878L-9.881,-37.878L-9.881,-5.68C-9.881,-2.543 -5.457,0 0,0C5.457,0 9.882,-2.543 9.882,-5.68L9.882,-37.878L9.864,-37.878C14.35,-39.674 17.292,-42.656 17.292,-46.037L17.292,-61.994C17.292,-67.484 9.55,-71.935 0,-71.935" style="fill:white;fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,148.613,114.624)">
+            <path d="M0,2.091L-1.831,-1.883L-8.717,-2.919L-13.761,0.02L-11.907,3.974L-5.021,5.01L0,2.091Z" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+        <g transform="matrix(0,-1,-1,0,143.57,115.379)">
+            <path d="M-3.675,3.675L3.675,3.675" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+        <g transform="matrix(0,1,1,0,149.297,115.256)">
+            <path d="M-2.515,-2.515L2.515,-2.515" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,159.024,125.647)">
+            <path d="M0,-9.941C0,-4.451 -7.742,0 -17.292,0C-26.842,0 -34.585,-4.451 -34.585,-9.941" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,159.024,131.663)">
+            <path d="M0,-15.957C0,-21.447 -7.742,-25.898 -17.292,-25.898C-26.842,-25.898 -34.585,-21.447 -34.585,-15.957L-34.585,0C-34.585,5.49 -26.842,9.941 -17.292,9.941C-7.742,9.941 0,5.49 0,0L0,-15.957Z" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+        <g transform="matrix(0,1,1,0,160.671,168.643)">
+            <path d="M-28.821,-9.058L3.378,-9.058C6.515,-9.058 9.058,-13.482 9.058,-18.939C9.058,-24.397 6.515,-28.821 3.378,-28.821L-28.821,-28.821" style="fill:none;fill-rule:nonzero;stroke:rgb(22,33,45);stroke-width:1px;"/>
+        </g>
+    </g>
+</svg>
