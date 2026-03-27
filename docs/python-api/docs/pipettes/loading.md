@@ -226,7 +226,7 @@ Flex pipettes only accept tips with capacities less than or equal to the pipette
 | 1–200 µL | <ul><li><code>flex_96channel_200</code></li></ul> |<ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li></ul> |
 | 5–1000 µL | <ul><li><code>flex_1channel_1000</code></li><li><code>flex_8channel_1000</code></li><li><code>flex_96channel_1000</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li><li><code>opentrons_flex_96_tiprack_1000ul</code></li><li><code>opentrons_flex_96_filtertiprack_1000ul</code></li></ul> |
 
-*Changed in version 2.28*: Use 20 µL pipette tips in your Flex protocols. 
+*New in version 2.28*: Use 20 µL pipette tips in your Flex protocols. 
 
 The API includes less restrictions for OT-2 pipettes. We recommend choosing tips with capacities less than or equal to pipette capacity for the most accurate liquid handling.
 
