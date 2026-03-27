@@ -49,7 +49,6 @@ async def test_eeprom(vacuum: VacuumModule, report: CSVReport) -> None:
     await vacuum._driver.set_serial_number(serial)
     report.set_tag(serial)
     info = await vacuum._driver.get_device_info()
-    info = await vacuum._driver.get_device_info()
     sn = info["serial"]
     if sn != serial:
         ui.print_error("Serial number is not set properly")
