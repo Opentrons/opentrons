@@ -15,10 +15,15 @@ Insert deck map here.
 
 ### Filter to waste
 
+Some text here.
+
+![Filter to waste container](./images/filter-to-waste.png){ width="60%" }
 
 ### Filter between plates
 
+Some text here.
 
+![Filter between plates](./images/filter-between-plates.png){ width="60%" }
 
 ## Section placeholder
 
