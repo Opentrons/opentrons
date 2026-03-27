@@ -220,43 +220,14 @@ See also [Building Block Commands](../building-block-commands/index.md) and [Com
 
 Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
 
-<table>
-    <thead>
-        <tr>
-            <th>Pipette capacity</th>
-            <th>Pipettes</th>
-            <th>Compatible tips</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td rowspan="4">1–50 µL</td>
-                <td>
-                  <ul>
-                    <li>
-                      <code>flex_1channel_50</code></li>
-                    <li>
-                      <code>flex_8channel_50</code></li>
-                  </ul>
-                </td>
-                <td>
-                  <ul>
-                    <li>
-                      <code>opentrons_flex_96_tiprack_20ul</code></li>
-                    <li>
-                      <code>opentrons_flex_96_filtertiprack_20ul</code></li>
-                    <li>
-                      <code>opentrons_flex_96_tiprack_50ul</code></li>
-                    <li>
-                      <code>opentrons_flex_96_filtertiprack_50ul</code></li>
-                  </ul>
-                </td>    
-            </tr>
-            <tr>
-        </tbody>
-    </table>
+| Pipette capacity | Pipettes {width="40%"} | Compatible tips {width="110%"}|
+|--------------|--------------|-----------------------------|
+| 1–50 µL    | <ul><li><code>flex_1channel_50</code></li><li><code>flex_8channel_50</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li></ul> |
+| 1–200 µL | <ul><li><code>flex_96channel_200</code></li></ul> |<ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li></ul> |
+| 5–1000 µL | <ul><li><code>flex_1channel_1000</code></li><li><code>flex_8channel_1000</code></li><li><code>flex_96channel_1000</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li><li><code>opentrons_flex_96_tiprack_1000ul</code></li><li><code>opentrons_flex_96_filtertiprack_1000ul</code></li></ul> |
 
-The API includes less restrictions for OT-2 pipettes. Like the Flex, we recommend choosing tips with capacities less than or equal to pipette capacity for the most accurate liquid handling.
+
+The API includes less restrictions for OT-2 pipettes. We recommend choosing tips with capacities less than or equal to pipette capacity for the most accurate liquid handling.
 
 
 
