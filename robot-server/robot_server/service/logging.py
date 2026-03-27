@@ -72,7 +72,7 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "level": log_level,
                 "propagate": False,
             },
-             "server_utils": {
+            "server_utils": {
                 "handlers": ["syslog_plus_unit"],
                 "level": log_level,
                 "propagate": False,
