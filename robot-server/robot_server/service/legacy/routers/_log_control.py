@@ -1,43 +1,34 @@
 """Get system logs from journald."""
 
 import asyncio
-import logging
 import subprocess
-from typing import List
-
-LOG = logging.getLogger(__name__)
-
-MAX_RECORDS = 100000
-DEFAULT_RECORDS = 50000
-
-UNIT_SELECTORS = [
-    "opentrons-robot-server",
-    "opentrons-update-server",
-    "opentrons-robot-app",
-]
-SERIAL_SPECIAL = "ALL_SERIAL"
-SERIAL_SELECTORS = [
-    "opentrons-api-serial",
-    "opentrons-api-serial-can",
-    "opentrons-api-serial-usbbin",
-]
 
 
-async def get_records_dumb(selector: str, records: int, mode: str) -> bytes:
-    """Dump the log files.
+async def get_records_dumb(
+    units: list[str],
+    syslog_ids: list[str],
+    records: int,
+    mode: str,
+) -> bytes:
+    """Get system logs from journalctl.
 
-    :param selector: The syslog selector to limit responses to
-    :param records: The maximum number of records to print
-    :param mode: A journalctl dump mode. Should be either "short-precise" or "json".
+    Params:
+        units: Limit output to just records from these systemd units.
+        syslog_ids: Limit output to just records from these syslog identifiers.
+        records: The maximum number of records to extract.
+        mode: A journalctl dump mode, like "short-precise" or "json".
+
+    When multiple `units` or `syslog_ids` are specified, journalctl's filtering behavior acts like:
+
+        (unit_1_match or unit_2_match or ...) and (syslog_id_1_match or syslog_id_2_match or ...)
+
+    An empty  `units` means all units, and an empty `syslog_ids` means all syslog IDs.
     """
-    selector_array: List[str] = []
-    if selector == SERIAL_SPECIAL:
-        for serial_selector in SERIAL_SELECTORS:
-            selector_array.extend(["-t", serial_selector])
-    elif selector in UNIT_SELECTORS:
-        selector_array.extend(["-u", selector])
-    else:
-        selector_array.extend(["-t", selector])
+    selector_array: list[str] = []
+    for unit in units:
+        selector_array.extend(["-u", unit])
+    for syslog_id in syslog_ids:
+        selector_array.extend(["-t", syslog_id])
 
     proc = await asyncio.create_subprocess_exec(
         "journalctl",

@@ -3,7 +3,7 @@ import json
 import pytest
 from mock import patch
 
-from robot_server.service.legacy.routers._log_control import (
+from robot_server.service.legacy.routers.logs import (
     DEFAULT_RECORDS,
     MAX_RECORDS,
 )
@@ -14,7 +14,7 @@ def test_get_serial_log_with_defaults(api_client):
     res_bytes = logs.encode("utf-8")
     expected = res_bytes.decode("utf-8")
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -25,7 +25,16 @@ def test_get_serial_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("ALL_SERIAL", DEFAULT_RECORDS, "short-precise")
+        m.assert_called_once_with(
+            units=[],
+            syslog_ids=[
+                "opentrons-api-serial",
+                "opentrons-api-serial-can",
+                "opentrons-api-serial-usbbin",
+            ],
+            records=DEFAULT_RECORDS,
+            mode="short-precise",
+        )
 
 
 @pytest.mark.parametrize(
@@ -47,7 +56,7 @@ def test_get_serial_log_with_params(
     else:
         expected = logs
 
-    async def mock_get_records_dumb(identifier, records, mode):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -64,7 +73,16 @@ def test_get_serial_log_with_params(
         assert body == expected
         assert response.status_code == 200
 
-        m.assert_called_once_with("ALL_SERIAL", records_param, mode_param)
+        m.assert_called_once_with(
+            units=[],
+            syslog_ids=[
+                "opentrons-api-serial",
+                "opentrons-api-serial-can",
+                "opentrons-api-serial-usbbin",
+            ],
+            records=records_param,
+            mode=mode_param,
+        )
 
 
 @pytest.mark.parametrize(
@@ -75,7 +93,7 @@ def test_get_serial_log_with_invalid_params(api_client, format_param, records_pa
     logs = '{"serial": "serial logs"}'
     res_bytes = logs.encode("utf-8")
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -94,7 +112,7 @@ def test_get_api_log_with_defaults(api_client):
     res_bytes = logs.encode("utf-8")
     expected = res_bytes.decode("utf-8")
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -105,7 +123,12 @@ def test_get_api_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api", DEFAULT_RECORDS, "short-precise")
+        m.assert_called_once_with(
+            units=[],
+            syslog_ids=["opentrons-api"],
+            records=DEFAULT_RECORDS,
+            mode="short-precise",
+        )
 
 
 @pytest.mark.parametrize(
@@ -125,7 +148,7 @@ def test_get_api_log_with_params(api_client, format_param, records_param, mode_p
     else:
         expected = logs
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -141,7 +164,12 @@ def test_get_api_log_with_params(api_client, format_param, records_param, mode_p
             body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api", records_param, mode_param)
+        m.assert_called_once_with(
+            units=[],
+            syslog_ids=["opentrons-api"],
+            records=records_param,
+            mode=mode_param,
+        )
 
 
 @pytest.mark.parametrize(
@@ -161,7 +189,7 @@ def test_get_odd_log_with_params(api_client, format_param, records_param, mode_p
     else:
         expected = logs
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -177,7 +205,12 @@ def test_get_odd_log_with_params(api_client, format_param, records_param, mode_p
             body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-robot-app", records_param, mode_param)
+        m.assert_called_once_with(
+            units=["opentrons-robot-app"],
+            syslog_ids=[],
+            records=records_param,
+            mode=mode_param,
+        )
 
 
 def test_get_odd_log_with_defaults(api_client):
@@ -185,7 +218,7 @@ def test_get_odd_log_with_defaults(api_client):
     res_bytes = logs.encode("utf-8")
     expected = res_bytes.decode("utf-8")
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
@@ -197,7 +230,10 @@ def test_get_odd_log_with_defaults(api_client):
         assert response.status_code == 200
         assert body == expected
         m.assert_called_once_with(
-            "opentrons-robot-app", DEFAULT_RECORDS, "short-precise"
+            units=["opentrons-robot-app"],
+            syslog_ids=[],
+            records=DEFAULT_RECORDS,
+            mode="short-precise",
         )
 
 
@@ -209,7 +245,7 @@ def test_get_api_log_with_invalid_params(api_client, format_param, records_param
     logs = '{"api": "application programing interface logs"}'
     res_bytes = logs.encode("utf-8")
 
-    async def mock_get_records_dumb(identifier, records, format_type):
+    async def mock_get_records_dumb(units, syslog_ids, records, mode):
         return res_bytes
 
     with patch(
