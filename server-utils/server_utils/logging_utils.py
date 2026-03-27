@@ -10,7 +10,7 @@ _ROOT_HANDLER_KEY = "root_handler"
 _ROOT_FORMATTER_KEY = "root_formatter"
 
 
-def get_dictconfig(log_level: str | int) -> dict[str, object]:
+def get_dictconfig(log_level: str | int, syslog_id: str) -> dict[str, object]:
     """Return a logging configuration suitable for most Opentrons servers.
 
     On robots, this will send logs to systemd. On dev machines, this will send logs
@@ -18,11 +18,13 @@ def get_dictconfig(log_level: str | int) -> dict[str, object]:
 
     Params:
         log_level: The minimum log level to output.
+        syslog_id: On robots, the syslog identifier to use. For clean journalctl
+            output, this should generally match the service name, like "opentrons-system-server".
 
     Returns:
         A logging configuration that can be passed to `logging.config.dictConfig()`.
     """
-    root_formatter, root_handler = _get_root_formatter_and_handler_for_system()
+    root_formatter, root_handler = _get_root_formatter_and_handler_for_system(syslog_id)
     return {
         "version": 1,
         # Fix up 3rd-party packages to make sure their logs propagate up to our root
@@ -43,21 +45,21 @@ def get_dictconfig(log_level: str | int) -> dict[str, object]:
     }
 
 
-def _get_root_formatter_and_handler_for_system() -> tuple[
-    _FormatterConfig, _HandlerConfig
-]:
+def _get_root_formatter_and_handler_for_system(
+    syslog_id: str,
+) -> tuple[_FormatterConfig, _HandlerConfig]:
     # todo(mm, 2026-03-26): On dev machines that happen to be running systemd,
     # this will accidentally send dev server logs to systemd instead of the terminal.
     return (
-        _get_systemd_formatter_and_handler()
+        _get_systemd_formatter_and_handler(syslog_id)
         or _get_uvicorn_formatter_and_handler()
         or _get_fallback_formatter_and_handler()
     )
 
 
-def _get_systemd_formatter_and_handler() -> (
-    tuple[_FormatterConfig, _HandlerConfig] | None
-):
+def _get_systemd_formatter_and_handler(
+    syslog_id: str,
+) -> tuple[_FormatterConfig, _HandlerConfig] | None:
     try:
         from systemd.journal import JournalHandler  # type: ignore
     except ImportError:
@@ -66,6 +68,7 @@ def _get_systemd_formatter_and_handler() -> (
     handler: _HandlerConfig = {
         "formatter": _ROOT_FORMATTER_KEY,
         "class": JournalHandler,
+        "SYSLOG_IDENTIFIER": syslog_id,
     }
     return formatter, handler
 
