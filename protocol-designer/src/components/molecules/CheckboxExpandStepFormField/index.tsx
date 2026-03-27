@@ -26,7 +26,7 @@ interface CheckboxExpandStepFormFieldProps {
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps
 ): JSX.Element {
-  const { children, title, tooltipOverride, testId, fieldProps } = props
+  const { children, title, tooltipOverride, fieldProps } = props
 
   const {
     value,
