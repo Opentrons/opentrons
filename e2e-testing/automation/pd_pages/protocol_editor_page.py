@@ -160,7 +160,7 @@ class ProtocolEditorPage(BasePage):
 
         try:
             target.wait_for(state="visible", timeout=1000)
-        except TimeoutError as error:
+        except TimeoutError:
             fallback_target = modal.get_by_text(pattern, exact=False).first
             try:
                 fallback_target.wait_for(state="visible", timeout=1000)
