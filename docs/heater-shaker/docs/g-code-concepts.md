@@ -7,7 +7,7 @@ G-codes are machine-readable instructions used to control hardware. You do not n
 
 ## G-Code command syntax
 
-Heater-Shaker G-codes are strings starting with `M` followed by an integer. Arguments are formatted as letter-number combinations without separators. Each command must end with a new line character; Opentrons modules do not support multiple commands on a single line. For a complete list of codes and examples see <font color="red">LINK PLACEHOLDER</font>
+Heater-Shaker G-codes are strings starting with `M` followed by an integer. Arguments are formatted as letter-number combinations without separators. Each command must end with a new line character; Opentrons modules do not support multiple commands on a single line. For a complete list of codes and examples see [Heater-Shaker G-codes](./g-codes.md).
 
 - **Syntax:** `MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR`
 - **Examples:** `M115 \n` or `M104 S25 \n`

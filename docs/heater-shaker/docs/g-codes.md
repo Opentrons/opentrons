@@ -100,16 +100,6 @@ The Thermocycler accepts the G-code commands listed below.
       </td>
     </tr>
     <tr>
-      <td><code>M204</code></td>
-      <td>
-        <font color="red">NOT IN `driver.py` FOR MODULE</font></p>
-        <strong>Command:</strong> set acceleration [cite: 4]<br>
-        <strong>Arguments:</strong> <code>S</code>: sets acceleration rate [cite: 5]<br>
-        <strong>Example:</strong> <code>M204 S1000</code> sets the acceleration to 1000 rpm/s [cite: 5]<br>
-        <strong>Response:</strong> <code>M204 OK</code> (acknowledge only or error) [cite: 5]
-      </td>
-    </tr>
-    <tr>
       <td><code>M241</code></td>
       <td>
         <strong>Command:</strong> get labware latch state [cite: 5]<br>
@@ -148,16 +138,6 @@ The Thermocycler accepts the G-code commands listed below.
         <strong>Arguments:</strong> none [cite: 10]<br>
         <strong>Example:</strong> <code>M411</code> [cite: 10]<br>
         <strong>Response:</strong> <code>M411 OK</code> (acknowledge only or error) [cite: 11]
-      </td>
-    </tr>
-    <tr>
-      <td><code>M413</code></td>
-      <td>
-        <font color="red">NOT IN `driver.py` FOR MODULE</font></p>
-        <strong>Command:</strong> clear error state (available in robot software 8.8.0 and later) [cite: 12]<br>
-        <strong>Arguments:</strong> none [cite: 13]<br>
-        <strong>Example:</strong> <code>M413</code> [cite: 14]<br>
-        <strong>Response:</strong> <code>M413 OK</code> (acknowledge only or error) [cite: 15]
       </td>
     </tr>
     <tr>
