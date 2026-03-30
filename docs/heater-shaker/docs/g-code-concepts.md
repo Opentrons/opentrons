@@ -67,7 +67,7 @@ Every Opentrons module returns a response after executing a command. A response 
     </tr>
     <tr>
       <td>Error</td>
-      <td>An error indicates a command failed and does not echo the command code.<br><br>Error responses are strings formatted as <code>ERRNNN:error</code>, where <code>N</code> is an integer followed by a plain text description. For example, sending too many commands to a module too quickly might result in the response <code>ERR004:G-code cache full</code>.<br><br>See the <font color="red">PLACEHOLDER</font> for a complete list.</td>
+      <td>An error indicates a command failed and does not echo the command code.<br><br>Error responses are strings formatted as <code>ERRNNN:error</code>, where <code>N</code> is an integer followed by a plain text description. For example, sending too many commands to a module too quickly might result in the response <code>ERR004:G-code cache full</code>.<br><br>See the <a href="../error-codes/">Heater-Shaker Error Codes section</a> for a complete list.</td>
     </tr>
   </tbody>
 </table>
