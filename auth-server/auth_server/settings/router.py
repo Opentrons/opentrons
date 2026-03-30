@@ -43,10 +43,7 @@ async def get_access_control_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[AccessControlResponseData]:
     accessControlEnabled = settings_store.get_access_control_settings()
-    return SimpleBody.model_construct(
-        data=accessControlEnabled
-        or AccessControlResponseData(accessControlEnabled=False)
-    )
+    return SimpleBody.model_construct(data=accessControlEnabled)
 
 
 @router.patch(
