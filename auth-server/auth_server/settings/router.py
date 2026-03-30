@@ -57,8 +57,11 @@ async def patch_access_control_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[AccessControlResponseData]:
     """Change the access control settings."""
-    accessControlResponseData = settings_store.patch_access_control(request_body.data)
-    return SimpleBody.model_construct(data=accessControlResponseData)
+    try:
+        accessControlResponseData = settings_store.patch_access_control(request_body.data)
+        return SimpleBody.model_construct(data=accessControlResponseData)
+    except ValueError as e:
+        raise fastapi.HTTPException(status_code=422, detail=str(e)) from e
 
 
 @router.patch(
