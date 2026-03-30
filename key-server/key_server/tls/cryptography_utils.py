@@ -27,7 +27,7 @@ class X509Pair:
 
 
 @dataclass
-class CertWithSigningRequired:
+class PartialCertWithSigningRequired:
     """Partial certificate that needs signing."""
 
     keypath: Path
@@ -130,7 +130,7 @@ def delete_certpair(pair: X509Pair, reason: str) -> None:
 
 
 def seal_cert_builder_with_ca(
-    precert: CertWithSigningRequired, ca: X509Pair
+    precert: PartialCertWithSigningRequired, ca: X509Pair
 ) -> SignedCert:
     """Take an unsealed certificate builder, tag the issuer, and sign with a CA."""
     return SignedCert(
@@ -157,7 +157,7 @@ def build_tls_precert(
     duration: timedelta,
     robot_hostname: str,
     robot_ips: list[str],
-) -> CertWithSigningRequired:
+) -> PartialCertWithSigningRequired:
     """Build a precertificate (ish) for TLS termination.
 
     The precertificate has a private key generated and a cryptography.x509.CertificateBuilder with
@@ -200,7 +200,7 @@ def build_tls_precert(
         constants.TLS_KEY_NAME,
         "<under construction>",
     )
-    return CertWithSigningRequired(keypath=key_path, key=key, builder=builder)
+    return PartialCertWithSigningRequired(keypath=key_path, key=key, builder=builder)
 
 
 def install_tls_cert(tls_cert_dir: Path, tls_cert: SignedCert) -> X509Pair:

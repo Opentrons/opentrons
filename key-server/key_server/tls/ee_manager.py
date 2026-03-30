@@ -56,7 +56,7 @@ class TLSEEManager:
         self._robot_hostname = robot_hostname
         self._robot_ips = robot_ips
 
-    def generate_precert(self) -> cryptography_utils.CertWithSigningRequired:
+    def generate_precert(self) -> cryptography_utils.PartialCertWithSigningRequired:
         """Generate a new precertificate for signing."""
         LOG.info("Generating precertificate")
         return cryptography_utils.build_tls_precert(

@@ -171,7 +171,7 @@ class TLSCAManager:
             await asyncio.sleep(self.CA_EXPIRY_CHECK_POLL_PERIOD.total_seconds())
 
     def sign_precert(
-        self, precert: cryptography_utils.CertWithSigningRequired
+        self, precert: cryptography_utils.PartialCertWithSigningRequired
     ) -> cryptography_utils.SignedCert:
         """Sign a TLS end-entity certificate that needs signing."""
         LOG.info(
