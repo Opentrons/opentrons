@@ -67,12 +67,18 @@ class TLSEEManager:
             self._robot_ips,
         )
 
-    def ready(self) -> bool:
+    def ready(self, now: datetime) -> bool:
         """True if the system is ready; False otherwise.
 
-        For now, this only handles the case where the certificate is not generated yet.
+        The system is ready if it has a certificate and the certificate expires in more than 1 hour.
+
+        There are circumstances beyond this that would make this cert a bad choice to terminate TLS
+        with - for instance, the robot's hostname or IP has changed, or the CA has rotated - but this
+        system is only checking the validity of the certificate itself.
         """
-        return self._ee_pair is not None
+        return self._ee_pair is not None and (
+            now + timedelta(hours=1) < self._ee_pair.cert.not_valid_after_utc
+        )
 
     def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
         """Install a signed EE cert."""

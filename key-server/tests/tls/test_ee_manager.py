@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes
 
 from key_server.tls import constants, cryptography_utils, file_utils
 from key_server.tls.ee_manager import TLSEEManager
@@ -70,19 +69,19 @@ def test_subject_does_not_reuse_certs(
     cryptography_utils.install_tls_cert(ee_dir, signed)
     subject = TLSEEManager(ee_dir, ee_dir, hostname, ip_addresses)
     assert subject._ee_pair is None
-    assert not subject.ready()
+    assert not subject.ready(now)
 
 
 def test_subject_not_born_ready(subject: TLSEEManager) -> None:
     """It should start life unready, as do we all."""
-    assert not subject.ready()
+    assert not subject.ready(datetime.now(timezone.utc))
 
 
 def test_subject_becomes_ready_after_generating_a_cert(
     initialized_subject: TLSEEManager,
 ) -> None:
     """It should become ready when generating a certificate."""
-    assert initialized_subject.ready()
+    assert initialized_subject.ready(datetime.now(timezone.utc))
 
 
 def test_subject_becomes_unready_after_removing_a_cert(
@@ -90,7 +89,7 @@ def test_subject_becomes_unready_after_removing_a_cert(
 ) -> None:
     """It should stop being ready after removing a certificate."""
     initialized_subject.remove_cert("test")
-    assert not initialized_subject.ready()
+    assert not initialized_subject.ready(datetime.now(timezone.utc))
 
 
 def test_subject_uses_robot_details(
@@ -130,6 +129,6 @@ def test_install_cert_saves_cert(
     cert = file_utils.load_cert(ee_dir / constants.TLS_CERT_NAME, "PEM")
     assert cert
     assert initialized_subject._ee_pair
-    assert cert.fingerprint(
-        hashes.SHA256()
-    ) == initialized_subject._ee_pair.cert.fingerprint(hashes.SHA256())
+    assert cryptography_utils.fingerprint(cert) == cryptography_utils.fingerprint(
+        initialized_subject._ee_pair.cert
+    )
