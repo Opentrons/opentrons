@@ -1295,6 +1295,24 @@ importers:
         specifier: ^2.35.6
         version: 2.35.6
 
+  protocol-visualization:
+    dependencies:
+      '@opentrons/components':
+        specifier: link:../components
+        version: link:../components
+      '@opentrons/shared-data':
+        specifier: link:../shared-data
+        version: link:../shared-data
+      '@opentrons/step-generation':
+        specifier: link:../step-generation
+        version: link:../step-generation
+      react:
+        specifier: 18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: 18.2.0
+        version: 18.2.0(react@18.2.0)
+
   react-api-client:
     dependencies:
       '@opentrons/api-client':
