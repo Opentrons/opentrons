@@ -34,9 +34,9 @@ def load_definition(
     model_or_loadname: Union[str, PeripheralModel],
 ) -> Union[PeripheralDefinitionV1]:
     """Load a definition file for a peripheral."""
-    path = Path("peripheral") / "definitions" / "1.json"
+    path = Path(f"module/definitions/{version}/{model_or_loadname}.json")
     data = json.loads(load_shared_data(path))
     try:
         return cast(PeripheralDefinitionV1, data[model_or_loadname])
     except KeyError:
-        raise PeripheralNotFoundError("1", model_or_loadname)
+        raise PeripheralNotFoundError(version, model_or_loadname)

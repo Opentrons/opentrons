@@ -1,0 +1,8 @@
+{
+  "$otSharedSchema": "peripheral/schemas/2",
+  "moduleType": "barcodeScannerPeripheralType",
+  "model": "barcodeScannerPeripheralV1",
+  "displayName": "Barcode Scanner Peripheral GEN1",
+  "quirks": [],
+  "compatibleWith": []
+}
