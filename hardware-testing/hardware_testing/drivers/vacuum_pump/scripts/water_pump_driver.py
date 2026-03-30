@@ -1,6 +1,6 @@
 """Fixture Pump Driver"""
 
-from serial import Serial  # ignore type[import]
+from serial import Serial  # type: ignore[import-untyped]
 from typing import Optional, Set, Protocol
 import asyncio
 import time

@@ -167,7 +167,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
 
     if not ctx.is_simulating():
-        from hardware_testing.drivers import vacuum_pump  # type: ignore[attr-defined]
+        from hardware_testing.drivers import vacuum_pump
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(

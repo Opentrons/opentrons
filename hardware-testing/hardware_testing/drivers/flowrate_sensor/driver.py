@@ -3,7 +3,8 @@ from typing import Optional, Protocol
 from abc import abstractmethod
 import serial  # type: ignore[import]
 import logging
-import datetime
+
+# import datetime
 import asyncio
 import time
 import csv
@@ -128,11 +129,11 @@ class MassFlowSensor(AbstractMassFlowSensor):
         start_time = time.monotonic()
         while time.monotonic() - start_time < timeout:
             data = await self._get_packet()
-            data = data.strip().split(",")
-            logging.info(f"{data}")
-            if len(data) >= 2:
+            fields = data.strip().split(",")
+            logging.info(f"{fields}")
+            if len(fields) >= 2:
                 try:
-                    return float(data[1])
+                    return float(fields[1])
                 except ValueError:
                     logging.warning("Invalid data received: %s", data)
                     continue
