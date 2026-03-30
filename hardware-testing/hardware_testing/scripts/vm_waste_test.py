@@ -59,9 +59,6 @@ async def _write_to_csv(
     Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
     Adds the current `pressure_set` as the last column (may be None).
     """
-    if len(data) < 7:
-        # Skip malformed/short lines quietly; caller should already filter, but be defensive
-        return
 
     def _append() -> None:
         with open(f_name, "a", newline="") as f:

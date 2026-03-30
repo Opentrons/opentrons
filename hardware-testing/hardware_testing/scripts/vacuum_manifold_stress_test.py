@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api
 import os
+import serial.tools.list_ports
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
@@ -20,6 +21,20 @@ DISPENSE_OFFSET_MM = 8
 
 OUTPUT_DIR = "/data/vacuum_manifold_life_test_Brayans_FW/"
 
+Ard_idVendor = 9025
+Ard_idProduct = 32858
+
+VM_idVendor = 1155
+VM_idProduct = 61248
+
+async def find_port_by_id(vendorId, productId):
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        print(f"port_vid: {port.vid}, port_pid: {port.pid}")
+        if port.vid == vendorId and port.pid == productId:
+            print(f"port: {port.device}")
+            return port.device
+    return None
 
 def add_parameters(parameters):
     parameters.add_int(
@@ -59,42 +74,6 @@ def add_parameters(parameters):
         minimum=0.1,
         maximum=5.0,
         description="Pressure sampling interval during pump run",
-    )
-    parameters.add_str(
-        "port",
-        "vacuum_port",
-        description="Pick the port that it's connnected too",
-        choices=[
-            {
-                "display_name": "/dev/ttyACM1",
-                "value": "/dev/ttyACM1",
-            },
-            {
-                "display_name": "/dev/ttyACM2",
-                "value": "/dev/ttyACM2",
-            },
-            {
-                "display_name": "/dev/ttyACM3",
-                "value": "/dev/ttyACM3",
-            },
-        ],
-        default="/dev/ttyACM1",
-    )
-    parameters.add_str(
-        "Driver",
-        "driver_select",
-        description="Pick the driver that the manifold would be using",
-        choices=[
-            {
-                "display_name": "api",
-                "value": "api",
-            },
-            {
-                "display_name": "carlos",
-                "value": "carlos",
-            },
-        ],
-        default="api",
     )
     parameters.add_int(
         "offset",
@@ -195,9 +174,12 @@ async def _run_single_pump_api_cycle(
     """
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    asyncio.create_task(
-        water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time)
-    )
+    # asyncio.create_task(
+    #     water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time)
+    # )
+    if cycle_index == 1:
+        await water_pump_fixture.connect()
+    await water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
@@ -232,7 +214,7 @@ async def _run_single_pump_api_cycle(
         ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
 
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(False)
+    await pump.set_vent_state(True)
     await asyncio.sleep(VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(
@@ -243,7 +225,7 @@ async def _run_single_pump_api_cycle(
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(True)
+    await pump.set_vent_state(False)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -253,11 +235,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     driver_select = ctx.params.driver_select
 
     if not ctx.is_simulating():
-        if driver_select == "carlos":
-            from hardware_testing.drivers import vacuum_pump
-        else:
-            from opentrons.drivers import vacuum_module
-            from hardware_testing.drivers import vacuum_pump
+        from opentrons.drivers import vacuum_module
+        from hardware_testing.drivers import vacuum_pump
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
@@ -280,23 +259,26 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pump_fixture = None
     if not ctx.is_simulating():
         try:
-            if driver_select == "api":
-                # Vacuum Manifold Driver
-                pump = loop.run_until_complete(
-                    vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
-                )
-            else:
-                pump = loop.run_until_complete(
-                    vacuum_pump.VacuumModule.create(port=port)
-                )
+            
+            # Vacuum Manifold Driver
+            port = loop.run_until_complete(
+                find_port_by_id(VM_idVendor, VM_idProduct)
+            )
+            pump = loop.run_until_complete(
+                vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
+            )
+
             # Arduino Water pump Driver
+            m_port = loop.run_until_complete(
+                find_port_by_id(Ard_idVendor, Ard_idProduct)
+            )
             pump_fixture = loop.run_until_complete(
                 vacuum_pump.WaterPump.create(
-                    port="/dev/ttyACM2", baudrate=115200, loop=loop
+                    port=m_port, baudrate=115200, loop=loop
                 )
             )
-            loop.run_until_complete(pump_fixture.connect())
-            ctx.comment("Pump connected.")
+            # loop.run_until_complete(pump_fixture.connect())
+            # ctx.comment("Pump connected.")
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
 
@@ -313,30 +295,17 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
         pip.move_to(filter_plate["A1"].top(10))  # Move away again
         if not ctx.is_simulating():
-            if driver_select == "carlos":
-                loop.run_until_complete(
-                    _run_single_pump_cycle(
-                        pump,
-                        pump_fixture,
-                        pressure,
-                        cycle,
-                        sample_interval,
-                        output_dir,
-                        ctx,
-                    )
+            loop.run_until_complete(
+                _run_single_pump_api_cycle(
+                    pump,
+                    pump_fixture,
+                    pressure,
+                    cycle,
+                    sample_interval,
+                    output_dir,
+                    ctx,
                 )
-            else:
-                loop.run_until_complete(
-                    _run_single_pump_api_cycle(
-                        pump,
-                        pump_fixture,
-                        pressure,
-                        cycle,
-                        sample_interval,
-                        output_dir,
-                        ctx,
-                    )
-                )
+            )
     pip.return_tip()
     if pump:
         try:

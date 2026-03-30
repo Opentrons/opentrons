@@ -42,6 +42,8 @@ class WaterPump:
         try:
             if self.connection.is_open:
                 self._log("state", "Connection open")
+            else:
+                self.connection.open()
         except Exception as e:
             raise e
 
