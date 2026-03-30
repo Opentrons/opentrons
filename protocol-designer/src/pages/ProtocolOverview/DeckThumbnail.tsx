@@ -129,7 +129,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
         height="100%"
         width="100%"
         deckDef={deckDef}
-        adjustViewBoxForStacker={hasFlexStacker}
         viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
           hasWasteChute
             ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE

@@ -11,10 +11,10 @@ export interface RobotCoordinateSpaceWithRefRenderProps {
 }
 
 interface RobotCoordinateSpaceWithRefProps extends SvgProps {
-  adjustViewBoxForStacker: boolean
   viewBox?: string
   deckDef?: DeckDefinition
   zoomed?: boolean
+  adjustViewBoxForStacker?: boolean
   children?: (props: RobotCoordinateSpaceWithRefRenderProps) => ReactNode
 }
 
@@ -34,7 +34,7 @@ export function RobotCoordinateSpaceWithRef(
     children,
     deckDef,
     viewBox,
-    adjustViewBoxForStacker,
+    adjustViewBoxForStacker = false,
     zoomed = false,
     ...restProps
   } = props
@@ -59,9 +59,9 @@ export function RobotCoordinateSpaceWithRef(
       deckYDimension,
     ] as const
     const adj = [
-      base[0] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginX + 260,
+      base[0] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginX,
       base[1] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginY,
-      base[2] + STACKER_VIEWBOX_ADJUSTMENTS.deckXDimension + 260,
+      base[2] + STACKER_VIEWBOX_ADJUSTMENTS.deckXDimension,
       base[3] + STACKER_VIEWBOX_ADJUSTMENTS.deckYDimension,
     ] as const
 
