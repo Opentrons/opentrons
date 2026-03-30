@@ -1,4 +1,4 @@
-"""Fixture Pump Driver"""
+"""Fixture Pump Driver."""
 
 from serial import Serial  # type: ignore[import-untyped]
 from typing import Optional, Set, Protocol
@@ -29,24 +29,27 @@ class AbstractWaterPump(Protocol):
         ...
 
     async def disconnect(self) -> None:
-        """Disconnect from sensor"""
+        """Disconnect from sensor."""
         ...
 
-    async def turn_motor_on(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_on(self) -> str:
+        """Change the state of the Pump to on."""
         ...
 
-    async def turn_motor_off(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_off(self) -> str:
+        """Change the state of the Pump to off."""
         ...
 
-    async def check_water_level(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def check_water_level(self) -> None:
+        """Check the current water level."""
         ...
 
 
 class WaterPump(AbstractWaterPump):
-    def __init__(self, connection: Serial):
+    """Concrete implementation of the water pump driver over serial."""
+
+    def __init__(self, connection: Serial) -> None:
+        """Initialize WaterPump with a serial connection."""
         self.connection = connection
         self.st = time.perf_counter()
         # Logging controls
@@ -57,11 +60,12 @@ class WaterPump(AbstractWaterPump):
     async def create(
         cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]
     ) -> "WaterPump":
-        """Create a connection"""
+        """Create a connection."""
         conn = Serial(port=port, baudrate=baudrate, timeout=1.0)
         return WaterPump(connection=conn)
 
     async def connect(self) -> None:
+        """Open the serial connection if not already open."""
         try:
             if self.connection.is_open:
                 self._log("state", "Connection open")

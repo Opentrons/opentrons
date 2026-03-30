@@ -182,7 +182,8 @@ async def vacuum_manifold(target_pressure: int) -> None:
     await pump.set_vent_state(True)
 
 
-async def main(args):
+async def main(args: argparse.Namespace) -> None:
+    """Run flow rate and vacuum manifold tasks concurrently."""
     thread_1 = asyncio.create_task(flow_rate_thread(args.target_pressure))
     thread_2 = asyncio.create_task(vacuum_manifold(args.target_pressure))
     await asyncio.gather(thread_1, thread_2)

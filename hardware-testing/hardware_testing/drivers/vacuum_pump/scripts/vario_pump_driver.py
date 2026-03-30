@@ -109,7 +109,7 @@ class VarioPump:
             return ""
         return b"".join(lines).decode("utf-8", errors="ignore")
 
-    async def _read_response(self):
+    async def _read_response(self) -> str:
         try:
             output_lines = await asyncio.to_thread(self.connection.readlines)
             decoded = self._decode_lines(output_lines)
@@ -120,7 +120,7 @@ class VarioPump:
         except Exception as e:
             raise e
 
-    async def _read_pressure_response(self):
+    async def _read_pressure_response(self) -> str:
         try:
             output_lines = await asyncio.to_thread(self.connection.readlines)
             decoded = self._decode_lines(output_lines)
@@ -132,85 +132,95 @@ class VarioPump:
             raise e
         # self.connection.flush()
 
-    async def _set_vacuum_pressure(self, setpoint):
+    async def _set_vacuum_pressure(self, setpoint: float) -> str:
         await self._send_command(f"OUT_SP_1 {setpoint}")
         response = await self._read_response()
         print(response)
         return response
 
-    async def _set_pump_speed(self, speed):  # speed in percent (ex. 85.3)
+    async def _set_pump_speed(self, speed: float) -> str:  # speed in percent (ex. 85.3)
         await self._send_command(f"OUT_SP_2 {speed}")
         response = await self._read_response()
         return response
 
-    async def _select_pumpdown(self):
+    async def _select_pumpdown(self) -> str:
         await self._send_command("OUT_APP 0")
         response = await self._read_response()
         return response
 
-    async def _select_pumpdown_and_hold(self):
+    async def _select_pumpdown_and_hold(self) -> str:
         await self._send_command("OUT_APP 4")
         response = await self._read_response()
         return response
 
-    async def change_pressure_units(self):
+    async def change_pressure_units(self) -> None:
+        """Change the pressure unit configuration on the pump."""
         pass
         # await self._send_command("OUT_CFG_")
 
-    async def _start_process(self):
+    async def _start_process(self) -> str:
         await self._send_command("START")
         response = await self._read_response()
         print(f"Start: {response}", flush=True)
         return response
 
-    async def _stop_process(self):
+    async def _stop_process(self) -> str:
         await self._send_command("STOP")
         response = await self._read_response()
         return response
 
-    async def read_pressure_sensor(self):
+    async def read_pressure_sensor(self) -> str:
+        """Read the current pressure sensor value."""
         await self._send_command("IN_PV_1")
         response = await self._read_response()
         return response
 
-    async def echo_mode(self):
+    async def echo_mode(self) -> str:
+        """Set the pump echo mode."""
         await self._send_command("ECHO 0")
         response = await self._read_response()
         return response
 
-    async def set_comms_mode(self):
+    async def set_comms_mode(self) -> str:
+        """Set the pump communication mode."""
         await self._send_command("CVC 4")
         response = await self._read_response()
         return response
 
-    async def set_remote_control(self):
+    async def set_remote_control(self) -> str:
+        """Enable remote control mode on the pump."""
         await self._send_command("REMOTE 2")
         response = await self._read_response()
         return response
 
-    async def pump_down(self):
+    async def pump_down(self) -> str:
+        """Start a pumpdown sequence."""
         await self._select_pumpdown()
         await self._start_process()
         response = await self._read_response()
         return response
 
-    async def open_vent(self):
+    async def open_vent(self) -> str:
+        """Open the vent valve."""
         await self._send_command("OUT_VENT 1")
         response = await self._read_response()
 
         return response
 
-    async def close_vent(self):
+    async def close_vent(self) -> str:
+        """Close the vent valve."""
         await self._send_command("OUT_VENT 2")
         response = await self._read_response()
         return response
 
-    async def initiate_pump_control(self):
+    async def initiate_pump_control(self) -> None:
+        """Initialize pump control by setting echo, comms, and remote modes."""
         await self.echo_mode()
         await self.set_comms_mode()
         await self.set_remote_control()
 
-    async def vacuum_program(self, speed=100, seconds=10):
+    async def vacuum_program(self, speed: float = 100, seconds: float = 10) -> None:
+        """Run a full vacuum program at the given speed for the given duration."""
         await self.close_vent()
         await self._select_pumpdown()
         await self._set_pump_speed(speed)
@@ -271,7 +281,7 @@ class VarioPump:
         # Keep the first 4 values in expected order
         return nums
 
-    async def read_continuous_data(self):
+    async def read_continuous_data(self) -> None:
         """Read and print continuous data from the vacuum pump for the specified timeout duration."""
         try:
             while True:
