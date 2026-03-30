@@ -10,10 +10,11 @@ async def main(file_name: str, loop: asyncio.AbstractEventLoop) -> None:
     sensor = await driver.MassFlowSensor.create(
         port="/dev/ttyACM1", csv_path=file_name, loop=loop
     )
+    run_time = 30
     try:
-        sensor.set_csv_filename(file_name)
-        await sensor.read_continuous_data()
-        await loop.sleep(10)
+        await sensor.set_csv_filename(file_name)
+        await sensor.read_continuous_data(run_time)
+        await asyncio.sleep(10)
         await sensor.stop()
     except Exception as e:
         logging.critical("Critical failure: %s", e)
