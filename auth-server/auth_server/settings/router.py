@@ -34,7 +34,7 @@ async def get_settings(  # noqa: D103
 
 
 @router.get(
-    "/auth/settings/access-control",
+    "/auth/settings/accessControl",
     summary="Get access control settings",
     description="Get the current access control settings.\
     This is seperated from the main settings endpoint because it is a special case that we do not want to change often.",
@@ -47,7 +47,7 @@ async def get_access_control_settings(  # noqa: D103
 
 
 @router.patch(
-    "/auth/settings/access-control",
+    "/auth/settings/accessControl",
     summary="Change access control settings",
     description="Change the access control settings.",
     dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],

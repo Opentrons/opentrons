@@ -222,7 +222,7 @@ stages:
   - name: PATCH to enable access control
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings/access-control'
+      url: '{run_server.base_url}/auth/settings/accessControl'
       headers:
         Authorization: '{admin_access_token}'
       json:
