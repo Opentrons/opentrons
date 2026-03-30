@@ -95,7 +95,12 @@ async def _write_to_csv(
     await asyncio.to_thread(_append)
 
 
-async def read_continuous_data(f_name: str, pump: vacuum_module.VacuumModuleDriver, start_time: float, run_time: float) -> None:
+async def read_continuous_data(
+    f_name: str,
+    pump: vacuum_module.VacuumModuleDriver,
+    start_time: float,
+    run_time: float,
+) -> None:
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
@@ -113,7 +118,12 @@ async def read_continuous_data(f_name: str, pump: vacuum_module.VacuumModuleDriv
         raise (e)
 
 
-async def read_data(f_name: str, pump: vacuum_module.VacuumModuleDriver, start_time: float, duration: int) -> None:
+async def read_data(
+    f_name: str,
+    pump: vacuum_module.VacuumModuleDriver,
+    start_time: float,
+    duration: int,
+) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
         await read_continuous_data(f_name, pump, start_time, duration)
