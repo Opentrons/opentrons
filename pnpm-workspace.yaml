@@ -8,6 +8,7 @@ packages:
   - 'labware-library'
   - 'opentrons-ai-client'
   - 'protocol-designer'
+  - 'protocol-visualization'
   - 'shared-data'
   - 'step-generation'
   - 'api-client'

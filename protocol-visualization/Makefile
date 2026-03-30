@@ -16,11 +16,11 @@ dist: lib
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	yarn vite build
+	pnpm exec vite build
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build --emitDeclarationOnly
+	pnpm exec tsc --build --emitDeclarationOnly
 
 # Same lint surface as monorepo JS checks (see root Makefile).
 .PHONY: lint
@@ -29,7 +29,7 @@ lint:
 
 .PHONY: check-ts
 check-ts:
-	cd .. && yarn tsc --build protocol-visualization/tsconfig.json
+	cd .. && pnpm exec tsc --build protocol-visualization/tsconfig.json
 
 .PHONY: test
 test:
@@ -43,4 +43,4 @@ test-cov:
 
 .PHONY: pack
 pack: build-ts lib
-	yarn pack
+	pnpm pack
