@@ -57,9 +57,7 @@ class SettingsStore:
     def _upsert(self, key: str, value: str | None) -> None:
         """Insert or update a single setting."""
         with self._session() as session:
-            row = session.scalars(
-                select(Setting).where(Setting.key == key)
-            ).first()
+            row = session.scalars(select(Setting).where(Setting.key == key)).first()
             if row is None:
                 session.add(Setting(key=key, value=value))
             else:
@@ -70,9 +68,7 @@ class SettingsStore:
         """Insert or update multiple settings at once."""
         with self._session() as session:
             for key, value in settings.items():
-                row = session.scalars(
-                    select(Setting).where(Setting.key == key)
-                ).first()
+                row = session.scalars(select(Setting).where(Setting.key == key)).first()
                 if row is None:
                     session.add(Setting(key=key, value=value))
                 else:

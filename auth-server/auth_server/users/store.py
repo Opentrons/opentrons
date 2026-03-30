@@ -36,9 +36,7 @@ class UserStore:
     def get(self, username: str) -> User | None:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:
-            user = session.scalar(
-                select(User).where(User.username == username)
-            )
+            user = session.scalar(select(User).where(User.username == username))
             if user is not None:
                 session.expunge(user)
             return user
@@ -69,9 +67,7 @@ class UserStore:
         Raises ``ValueError`` if the user does not exist.
         """
         with self._session() as session:
-            user = session.scalar(
-                select(User).where(User.username == username)
-            )
+            user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             session.delete(user)
@@ -90,9 +86,7 @@ class UserStore:
         Raises ``ValueError`` if the user does not exist.
         """
         with self._session() as session:
-            user = session.scalar(
-                select(User).where(User.username == username)
-            )
+            user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             updates: dict[str, object] = {
