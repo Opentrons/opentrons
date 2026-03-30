@@ -13,7 +13,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
-from auth_server.persistence.orm_models import Setting
+from auth_server.persistence.orm_models import JsonPythonValue, Setting
 from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 
 
@@ -42,9 +42,10 @@ class SettingsStore:
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""
-        updates = patch.model_dump(mode="json", exclude_unset=True)
-        db_updates: dict[str, object] = {k: v for k, v in updates.items()}
-        self._upsert_many(db_updates)
+        updates: dict[str, JsonPythonValue] = patch.model_dump(
+            mode="json", exclude_unset=True
+        )
+        self._upsert_many(updates)
         return self.get_settings()
 
     def reset_settings(self) -> SettingsResponseData:
@@ -62,7 +63,7 @@ class SettingsStore:
                 row.value = value
             session.commit()
 
-    def _upsert_many(self, settings: dict[str, object]) -> None:
+    def _upsert_many(self, settings: dict[str, JsonPythonValue]) -> None:
         """Insert or update multiple settings at once."""
         with self._session() as session:
             for key, value in settings.items():
