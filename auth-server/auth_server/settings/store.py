@@ -45,17 +45,22 @@ class SettingsStore:
             parsed = {row.key: row.value for row in rows}
             return SettingsResponseData.model_validate(parsed, strict=False)
 
-    def get_access_control_settings(self) -> AccessControlResponseData:
-        """Get the current access control settings."""
+    def _get_access_control_enabled(self) -> bool | None:
+        """Return the raw access-control value, or None if it has never been set."""
         with self._session() as session:
             row = (
                 session.query(AccessControlEnabled)
                 .filter(AccessControlEnabled.id == 1)
                 .first()
             )
-            if row is None:
-                return AccessControlResponseData(accessControlEnabled=False)
-            return AccessControlResponseData(accessControlEnabled=row.enabled or False)
+            if row is None or row.enabled is None:
+                return None
+            return bool(row.enabled)
+
+    def get_access_control_settings(self) -> AccessControlResponseData:
+        """Get the current access control settings."""
+        enabled = self._get_access_control_enabled()
+        return AccessControlResponseData(accessControlEnabled=enabled or False)
 
     def update_access_control_table(self, accessControlEnabled: bool) -> None:
         """Update the access control enabled setting."""
@@ -73,6 +78,9 @@ class SettingsStore:
         """Patch the access control enabled setting."""
         if patch.accessControlEnabled is None:
             return self.get_access_control_settings()
+        current = self._get_access_control_enabled()
+        if current is not None:
+            raise ValueError("Access control cannot be modified once set.")
         self.update_access_control_table(patch.accessControlEnabled)
         return self.get_access_control_settings()
 
