@@ -1,12 +1,20 @@
 """ORM table definitions and supporting column types."""
 
 import json
-from typing import Any
+from typing import Any, TypeAlias
 
-from sqlalchemy import Column, Integer, String, TypeDecorator
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import String, TypeDecorator
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """The base of all of this server's ORM models.
+
+    Subclassing this does SQLAlchemy magic to keep track of all the ORM models that
+    exist in our server.
+    """
+
+    pass
 
 
 class User(Base):
@@ -14,14 +22,26 @@ class User(Base):
 
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
-    account_type = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(unique=True)
+    hashed_password: Mapped[str]
+    full_name: Mapped[str]
+    account_type: Mapped[str]
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
+
+
+JsonPythonValue: TypeAlias = (
+    str
+    | int
+    | float
+    | bool
+    | None
+    | list["JsonPythonValue"]
+    | dict[str, "JsonPythonValue"]
+)
+"""The output of `json.dumps()` / the input of `json.loads()`."""
 
 
 class JsonValue(TypeDecorator[object]):
@@ -47,6 +67,6 @@ class Setting(Base):
 
     __tablename__ = "setting"
 
-    key = Column(String, primary_key=True)
+    key: Mapped[str] = mapped_column(primary_key=True)
     # todo(tz, 2026-03-25): change type to Json https://docs.sqlalchemy.org/en/21/core/type_basics.html#sqlalchemy.types.JSON
-    value = Column(JsonValue, nullable=False)
+    value: Mapped[JsonPythonValue] = mapped_column(JsonValue)
