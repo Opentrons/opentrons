@@ -46,7 +46,9 @@ export function getRequiredLabwareDetailsFromLoadCommands(
 
   const stackerStoredLabwareIds = new Set(
     loadLabwareCommands.flatMap(command => {
-      if (command.commandType !== 'flexStacker/setStoredLabware') return []
+      if (command.commandType !== 'flexStacker/setStoredLabware') {
+        return []
+      }
       return (
         command.result?.storedLabware.flatMap(storedLabwareGroup =>
           [

@@ -40,9 +40,7 @@ export const LabwareDetailOverflowMenu = ({
   }
   return (
     <div className={styles.menu_item_container}>
-      <div>
-        <OverflowBtn onClick={handleOverflowClick} />
-      </div>
+      <OverflowBtn onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <div className={styles.menu_item_wrapper}>
           <MenuItem onClick={handleClickMenuItem}>
