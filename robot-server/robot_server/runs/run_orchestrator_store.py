@@ -59,7 +59,7 @@ from opentrons.protocol_runner import (
     RunOrchestrator,
     RunResult,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
 from opentrons_shared_data.errors.exceptions import ModuleNotPresent

@@ -27,7 +27,7 @@ from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
