@@ -95,6 +95,7 @@ describe('v8.10.0 migration', () => {
           pipetteName: 'p1000_96',
         },
       },
+      labware: {},
     })
     const result = migrateFile(input)
     const { savedStepForms: resultSavedStepForms } =
@@ -229,6 +230,7 @@ describe('v8.10.0 migration', () => {
           pipetteName: 'p1000_96',
         },
       },
+      labware: {},
     })
     const result = migrateFile(input)
     const { savedStepForms: resultSavedStepForms } =
@@ -308,19 +310,17 @@ describe('v8.10.0 migration', () => {
         [initialDeckSetupStep.id]: initialDeckSetupStep,
       },
       pipettes: {},
+      labware: {
+        [lidId]: {
+          displayName: 'Opentrons Tough Universal Lid',
+          labwareDefURI: 'lid',
+        },
+        [nonLidId]: {
+          displayName: '96 Well Plate',
+          labwareDefURI: 'labware',
+        },
+      },
     })
-
-    // 👇 Inject labware into the file (since migrateFile reads from it)
-    input.designerApplication!.data!.labware = {
-      [lidId]: {
-        id: lidId,
-        displayName: 'Opentrons Tough Universal Lid',
-      },
-      [nonLidId]: {
-        id: nonLidId,
-        displayName: '96 Well Plate',
-      },
-    } as any
 
     const result = migrateFile(input)
 
@@ -342,9 +342,10 @@ function createFile({
   orderedStepIds,
   savedStepForms,
   pipettes,
+  labware,
 }: Pick<
   PDMetadata,
-  'orderedStepIds' | 'savedStepForms' | 'pipettes'
+  'orderedStepIds' | 'savedStepForms' | 'pipettes' | 'labware'
 >): ProtocolFile<PDMetadata> {
   return {
     designerApplication: {
@@ -352,6 +353,7 @@ function createFile({
         orderedStepIds,
         savedStepForms,
         pipettes,
+        labware,
       },
     },
   } as any
