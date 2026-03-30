@@ -1,4 +1,4 @@
-"""Vacuum Pump Driver"""
+"""Vacuum Pump Driver."""
 
 import serial  # type: ignore[import]
 from serial import Serial  # type: ignore[import]
@@ -33,9 +33,10 @@ WRITE_TIMEOUT = 0.5
 
 
 class VarioPump:
-    """Vario Pump Driver"""
+    """Vario Pump Driver."""
 
-    def __init__(self, connection: Serial, csv_path: str = "pump_test.csv"):
+    def __init__(self, connection: Serial, csv_path: str = "pump_test.csv") -> None:
+        """Initialize VarioPump with a serial connection and optional CSV path."""
         self.connection = connection
         self._stop_requested = False
         self._csv_initialized = False
@@ -47,7 +48,7 @@ class VarioPump:
     async def create(
         cls, port: str, baudrate: int, loop: Optional[asyncio.AbstractEventLoop]
     ) -> "VarioPump":
-        """Create a Vacuum Pump Driver"""
+        """Create a Vacuum Pump Driver."""
         conn = Serial(
             port=port,
             baudrate=baudrate,
@@ -61,6 +62,7 @@ class VarioPump:
         return VarioPump(connection=conn)
 
     async def connect(self) -> None:
+        """Open the serial connection if not already open."""
         try:
             if self.connection.is_open:
                 print("Connection Connected")
@@ -76,11 +78,11 @@ class VarioPump:
         except Exception as e:
             raise RuntimeError(f"Unable to connect: {e}") from e
 
-    async def _reset_buffers(self):
+    async def _reset_buffers(self) -> None:
         self.connection.reset_input_buffer()
         self.connection.reset_output_buffer()
 
-    async def _send_command(self, my_command: str):
+    async def _send_command(self, my_command: str) -> None:
         await self._reset_buffers()
         command = my_command
         command += SERIAL_ACK
@@ -92,7 +94,7 @@ class VarioPump:
             raise (e)
         self.connection.flush()
 
-    async def _select_vacuum_control(self):
+    async def _select_vacuum_control(self) -> str:
         await self._send_command("OUT_APP 6")
         response = await self._read_response()
         return response

@@ -45,7 +45,7 @@ class AbstractMassFlowSensor(Protocol):
         ...
 
     async def get_flow_rate(self, timeout: float = 1.0) -> float:
-        """Read flow rate in sLm"""
+        """Read flow rate in sLm."""
         ...
 
     async def set_csv_filename(self, new_path: str) -> None:
@@ -66,7 +66,7 @@ class MassFlowSensor(AbstractMassFlowSensor):
 
     @classmethod
     async def create(
-        cls, port: str, csv_path, loop: Optional[asyncio.AbstractEventLoop]
+        cls, port: str, csv_path: str, loop: Optional[asyncio.AbstractEventLoop]
     ) -> "MassFlowSensor":
         """Create a Vacuum Module driver."""
         sensor = serial.Serial(port=port, baudrate=BAUDRATE, timeout=TIMEOUT)
@@ -174,7 +174,7 @@ class MassFlowSensor(AbstractMassFlowSensor):
         print(f"file_name: {self.csv_path}")
         logging.info("CSV file path updated to %s", self.csv_path)
 
-    async def read_continuous_data(self, run_time):
+    async def read_continuous_data(self, run_time: float) -> None:
         """Read and print continuous data from the vacuum pump."""
         start_time = time.perf_counter()
         try:
@@ -192,12 +192,13 @@ class MassFlowSensor(AbstractMassFlowSensor):
             logging.exception("Unexpected error: %s", e)
             raise
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Signal to stop continuous data reading."""
         self._stop_requested = True
 
 
-async def find_port_by_id(vendorId, productId):
+async def find_port_by_id(vendorId: int, productId: int) -> str:
+    """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
         print(f"port_vid: {port.vid}, port_pid: {port.pid}")

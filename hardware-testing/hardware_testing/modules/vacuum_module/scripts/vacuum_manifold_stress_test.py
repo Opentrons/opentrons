@@ -1,5 +1,5 @@
+"""Vacuum manifold 400mbar stress test protocol for the Opentrons Flex."""
 import asyncio
-import time
 from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api  # type: ignore[import]
@@ -30,17 +30,19 @@ VM_idVendor = 1155
 VM_idProduct = 61248
 
 
-async def find_port_by_id(vendorId, productId):
+async def find_port_by_id(vendorId: int, productId: int) -> str:
+    """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
         print(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
             print(f"port: {port.device}")
             return port.device
-    return None
+    return ""
 
 
-def add_parameters(parameters: ParameterContext):
+def add_parameters(parameters: ParameterContext) -> None:
+    """Add runtime parameters for this protocol."""
     parameters.add_int(
         "cycles",
         "cycles",
@@ -83,23 +85,24 @@ def add_parameters(parameters: ParameterContext):
     )
 
 
-async def water_pump_timer(w_pump, run_time):
+async def water_pump_timer(w_pump: object, run_time: float) -> None:
+    """Run the water pump for a fixed duration then turn it off."""
     await w_pump.turn_motor_on()
     await asyncio.sleep(run_time)
     await w_pump.turn_motor_off()
 
 
 async def _run_single_pump_api_cycle(
-    pump,
-    water_pump_fixture,
+    pump: object,
+    water_pump_fixture: object,
     target_pressure: int,
     trough_fill_time: int,
     cycle_index: int,
     output_dir: Path,
     ctx: protocol_api.ProtocolContext,
-):
-    """
-    Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
+) -> None:
+    """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
+
     Relies on the driver's internal CSV logging (e.g. pump_test.csv) instead of
     creating a per-cycle CSV here.
     """
@@ -160,6 +163,7 @@ async def _run_single_pump_api_cycle(
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
+    """Execute the vacuum manifold stress test protocol."""
     z_offset = ctx.params.offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]

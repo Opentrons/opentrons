@@ -1,9 +1,10 @@
+"""Vacuum module waste and leak test script."""
 import asyncio
 import logging
 import datetime
 import time
 from opentrons.drivers import vacuum_module
-from typing import Optional, Dict
+from typing import Dict
 from hardware_testing.drivers.flowrate_sensor import driver
 import dataclasses
 import argparse
@@ -41,18 +42,19 @@ logger = logging.getLogger(__name__)
 logger.info(f"continuous read error: {12}")
 
 
-async def find_port_by_id(vendorId, productId):
+async def find_port_by_id(vendorId: int, productId: int) -> str:
+    """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
         print(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
             print(f"port: {port.device}")
             return port.device
-    return None
+    return ""
 
 
 async def _write_to_csv(
-    f_name, header_write: bool, timestamp: float, data: Dict
+    f_name: str, header_write: bool, timestamp: float, data: Dict
 ) -> None:
     """Append a data line to the CSV file (offloaded to a thread).
 
@@ -92,7 +94,7 @@ async def _write_to_csv(
     await asyncio.to_thread(_append)
 
 
-async def read_continuous_data(f_name, pump, start_time, run_time):
+async def read_continuous_data(f_name: str, pump: object, start_time: float, run_time: float) -> None:
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
@@ -110,7 +112,8 @@ async def read_continuous_data(f_name, pump, start_time, run_time):
         raise (e)
 
 
-async def read_data(f_name, pump, start_time, duration: int):
+async def read_data(f_name: str, pump: object, start_time: float, duration: int) -> None:
+    """Run continuous data read and handle expected timeout and errors."""
     try:
         await read_continuous_data(f_name, pump, start_time, duration)
     except asyncio.TimeoutError:
@@ -120,13 +123,14 @@ async def read_data(f_name, pump, start_time, duration: int):
         logging.info(f"continuous read error: {e}")
 
 
-async def flow_rate_thread(target_pressure):
+async def flow_rate_thread(target_pressure: int) -> None:
+    """Concurrently read flow rate sensor data during a vacuum test run."""
     m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
     if m_port is None:
         logging.error("Could not find mass flow sensor port")
         return
     loop = asyncio.get_running_loop()
-    path = f"/data/testing_data/test-data/"
+    path = "/data/testing_data/test-data/"
     f_name = f"FlowrateData_{target_pressure}_{current_datetime}_{args.test_name}.csv"
     file_name = path + f_name
     sensor = await driver.MassFlowSensor.create(
@@ -142,13 +146,14 @@ async def flow_rate_thread(target_pressure):
         logging.critical("Critical failure: %s", e)
 
 
-async def vacuum_manifold(target_pressure):
+async def vacuum_manifold(target_pressure: int) -> None:
+    """Run a full vacuum manifold pressure hold/decay cycle."""
     port = await find_port_by_id(VM_idVendor, VM_idProduct)
     if port is None:
         logging.error("Could not find vacuum module port")
         return
     loop = asyncio.get_running_loop()
-    path = f"/data/testing_data/test-data/"
+    path = "/data/testing_data/test-data/"
     f_name = f"PressureData_{target_pressure}_{current_datetime}_{args.test_name}.csv"
     file_name = path + f_name
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)

@@ -79,8 +79,8 @@ class WaterPump(AbstractWaterPump):
         except Exception as e:
             raise RuntimeError(f"Unable to connect: {e}") from e
 
-    async def turn_motor_on(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_on(self) -> str:
+        """Change the state of the Pump to on."""
         command = f"{COMMANDS['pumpOn']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -95,8 +95,8 @@ class WaterPump(AbstractWaterPump):
             self._log("error", f"Continuous read error: {e}")
             raise (e)
 
-    async def turn_motor_off(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def turn_motor_off(self) -> str:
+        """Change the state of the Pump to off."""
         command = f"{COMMANDS['pumpOff']}{V_ACK}"
         await asyncio.to_thread(self.connection.reset_input_buffer)
         await asyncio.to_thread(self.connection.reset_output_buffer)
@@ -111,8 +111,8 @@ class WaterPump(AbstractWaterPump):
             self._log("error", f"Continuous read error: {e}")
             raise (e)
 
-    async def check_water_level(self):
-        """ "Change the state of the Pump, either on or off"""
+    async def check_water_level(self) -> None:
+        """Check the current water level."""
         command = f"{COMMANDS['CHECK']}{V_ACK}"
         await self._write(command.encode())
         try:
