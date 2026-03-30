@@ -4,6 +4,7 @@ import logging
 import datetime
 import time
 from opentrons.drivers import vacuum_module
+from opentrons.drivers.vacuum_module.types import VentState
 from typing import Dict
 from hardware_testing.drivers.flowrate_sensor import driver
 import dataclasses
@@ -94,7 +95,7 @@ async def _write_to_csv(
     await asyncio.to_thread(_append)
 
 
-async def read_continuous_data(f_name: str, pump: object, start_time: float, run_time: float) -> None:
+async def read_continuous_data(f_name: str, pump: vacuum_module.VacuumModuleDriver, start_time: float, run_time: float) -> None:
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
@@ -112,7 +113,7 @@ async def read_continuous_data(f_name: str, pump: object, start_time: float, run
         raise (e)
 
 
-async def read_data(f_name: str, pump: object, start_time: float, duration: int) -> None:
+async def read_data(f_name: str, pump: vacuum_module.VacuumModuleDriver, start_time: float, duration: int) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
         await read_continuous_data(f_name, pump, start_time, duration)
@@ -126,7 +127,7 @@ async def read_data(f_name: str, pump: object, start_time: float, duration: int)
 async def flow_rate_thread(target_pressure: int) -> None:
     """Concurrently read flow rate sensor data during a vacuum test run."""
     m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
-    if m_port is None:
+    if not m_port:
         logging.error("Could not find mass flow sensor port")
         return
     loop = asyncio.get_running_loop()
@@ -149,7 +150,7 @@ async def flow_rate_thread(target_pressure: int) -> None:
 async def vacuum_manifold(target_pressure: int) -> None:
     """Run a full vacuum manifold pressure hold/decay cycle."""
     port = await find_port_by_id(VM_idVendor, VM_idProduct)
-    if port is None:
+    if not port:
         logging.error("Could not find vacuum module port")
         return
     loop = asyncio.get_running_loop()
@@ -159,13 +160,13 @@ async def vacuum_manifold(target_pressure: int) -> None:
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
     start_time = time.perf_counter()
     target_to_pump = target_pressure - atm_pressure
-    await pump.set_vent_state(True)
+    await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(1)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
         guage_pressure_mbar=target_to_pump,
-        duration=None,
+        duration_s=None,
     )
     logging.info(f"pump started at target {target_pressure} mbar")
     # Run the continuous data reader for RUN_SEC seconds.
@@ -174,12 +175,12 @@ async def vacuum_manifold(target_pressure: int) -> None:
     await pump.set_vacuum_state(
         enable_vacuum=False,
         guage_pressure_mbar=target_to_pump,
-        duration=None,
+        duration_s=None,
     )
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(False)
+    await pump.set_vent_state(VentState.CLOSED)
     await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
-    await pump.set_vent_state(True)
+    await pump.set_vent_state(VentState.OPENED)
 
 
 async def main(args: argparse.Namespace) -> None:

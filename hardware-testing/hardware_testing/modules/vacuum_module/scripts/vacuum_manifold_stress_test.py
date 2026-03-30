@@ -1,11 +1,13 @@
 """Vacuum manifold 400mbar stress test protocol for the Opentrons Flex."""
 import asyncio
+from typing import Any
 from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
 import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
+from opentrons.drivers.vacuum_module.types import VentState
 
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
@@ -85,7 +87,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-async def water_pump_timer(w_pump: object, run_time: float) -> None:
+async def water_pump_timer(w_pump: Any, run_time: float) -> None:
     """Run the water pump for a fixed duration then turn it off."""
     await w_pump.turn_motor_on()
     await asyncio.sleep(run_time)
@@ -93,8 +95,8 @@ async def water_pump_timer(w_pump: object, run_time: float) -> None:
 
 
 async def _run_single_pump_api_cycle(
-    pump: object,
-    water_pump_fixture: object,
+    pump: Any,
+    water_pump_fixture: Any,
     target_pressure: int,
     trough_fill_time: int,
     cycle_index: int,
@@ -118,7 +120,7 @@ async def _run_single_pump_api_cycle(
     await pump.set_vacuum_state(
         enable_vacuum=True,
         guage_pressure_mbar=target_to_pump,
-        duration=None,
+        duration_s=None,
     )
 
     await asyncio.sleep(SETTLE_SEC)
@@ -148,18 +150,18 @@ async def _run_single_pump_api_cycle(
         ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
 
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(True)
+    await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(
         enable_vacuum=False,
         guage_pressure_mbar=target_to_pump,
-        duration=None,
+        duration_s=None,
     )
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(False)
+    await pump.set_vent_state(VentState.CLOSED)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:

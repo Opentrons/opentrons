@@ -205,7 +205,7 @@ async def find_port_by_id(vendorId: int, productId: int) -> str:
         if port.vid == vendorId and port.pid == productId:
             print(f"port: {port.device}")
             return port.device
-    return None
+    return ""
 
 
 # async def main(loop):
