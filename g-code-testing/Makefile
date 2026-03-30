@@ -106,7 +106,7 @@ update-g-code-configuration-comparison:
 check-for-missing-comparison-files:
 	$(python) cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
 
-FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
+FORMAT_FILE_GLOB = "g-code-testing/**/*.{json,md,yml,yaml}"
 
 .PHONY: format-other
 format-other:
