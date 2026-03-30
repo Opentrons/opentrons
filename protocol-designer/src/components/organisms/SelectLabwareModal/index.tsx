@@ -204,7 +204,7 @@ export function SelectLabwareModal(
           isIrregularSize &&
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
-        // NOTE (2026-03-30, RC): this is a temporary filter until this is allowed in PAPI
+        // NOTE (2026-03-30, RC): this is a temporary filter to prevent loading lids off deck until this is allowed in PAPI
         (slot === 'offDeck' && (isAdapter || isLid)) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
