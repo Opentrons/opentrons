@@ -238,7 +238,7 @@ $(SHARED_DATA_DIR)-py-lint:
 .PHONY: lint-js
 lint-js: lint-js-eslint lint-js-prettier
 
-	.PHONY: lint-js-eslint
+.PHONY: lint-js-eslint
 lint-js-eslint:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
@@ -249,7 +249,7 @@ lint-js-prettier:
 	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
-	.PHONY: lint-json
+.PHONY: lint-json
 lint-json:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
