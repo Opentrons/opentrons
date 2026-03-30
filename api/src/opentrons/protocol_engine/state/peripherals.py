@@ -7,6 +7,7 @@ from typing import (
     Dict,
     List,
     Optional,
+    Sequence,
     Type,
     TypeVar,
 )
@@ -293,3 +294,37 @@ class PeripheralView:
             ):
                 return True
         return False
+
+    def select_hardware_peripheral_to_load(
+        self,
+        model: PeripheralModel,
+        attached_peripherals: Sequence[HardwarePeripheral],
+        expected_serial_number: Optional[str] = None,
+    ) -> HardwarePeripheral:
+        """Get the next matching hardware peripheral for the given model and serial.
+
+        Args:
+            model: The requested peripheral model. The selected peripheral may have a
+                different model if the definition lists the model as compatible.
+            attached_peripherals: All attached peripherals as reported by the HardwareAPI,
+                in the order in which they should be used.
+            expected_serial_number: An optional variable containing the serial number
+                expected of the peripheral identified.
+
+        Raises:
+            PeripheralNotAttachedError: A not-yet-assigned peripheral matching the requested
+                parameters could not be found in the attached peripheral list.
+        """
+        for p in attached_peripherals:
+            if p not in self._state.hardware_by_peripheral_id.values():
+                if model == p.definition.model or model in p.definition.compatibleWith:
+                    if expected_serial_number is not None:
+                        if p.serial_number == expected_serial_number:
+                            return p
+                    else:
+                        return p
+
+        raise errors.PeripheralNotAttachedError(
+            f"No available {model.value} with {expected_serial_number or 'any'}"
+            " serial found."
+        )
