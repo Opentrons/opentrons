@@ -223,3 +223,10 @@ disallow_incomplete_defs = false
 [[tool.mypy.overrides]]
 module = "tests.service.test_logging"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "Pyro5.*",
+    "serpent"
+]
+follow_untyped_imports = true
