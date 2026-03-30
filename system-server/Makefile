@@ -26,6 +26,9 @@ version_file = $(call python_get_git_version,system-server,$(project_rs_default)
 # specified test
 tests ?= tests
 test_opts ?=
+
+files_to_check := system_server tests
+
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
@@ -66,13 +69,14 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy system_server tests
-	$(ruff) check system_server tests
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(ruff) format system_server tests
-	$(ruff) check --select I --fix system_server tests
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

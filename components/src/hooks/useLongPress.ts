@@ -61,7 +61,6 @@ export const useLongPress = (): UseLongPressResult => {
       disable()
     }
     return disable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEnabled])
 
   return {

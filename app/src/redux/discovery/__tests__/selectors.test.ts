@@ -25,6 +25,9 @@ import * as discovery from '../selectors'
 import type { State } from '../../types'
 
 const MOCK_STATE: State = {
+  config: {
+    devInternal: {},
+  },
   discovery: {
     robotsByName: {
       foo: {
@@ -261,6 +264,17 @@ const EXPECTED_FIZZBUZZ = {
   robotModel: ROBOT_MODEL_OT3,
 }
 
+const MOCK_STATE_WITH_IGNORE_OT2: State = {
+  config: {
+    devInternal: {
+      ignoreOT2App: true,
+    },
+  },
+  discovery: {
+    ...MOCK_STATE.discovery,
+  },
+} as any
+
 describe('discovery selectors', () => {
   const SPECS: Array<{
     name: string
@@ -296,6 +310,36 @@ describe('discovery selectors', () => {
       ],
     },
     {
+      name: 'getDiscoveredRobots filters out OT-2 robots when ignoreOT2App is true',
+      selector: discovery.getDiscoveredRobots,
+      state: MOCK_STATE_WITH_IGNORE_OT2,
+      expected: [EXPECTED_QUX, EXPECTED_FIZZBUZZ],
+    },
+    {
+      name: 'getConnectableRobots filters out OT-2 robots when ignoreOT2App is true',
+      selector: discovery.getConnectableRobots,
+      state: MOCK_STATE_WITH_IGNORE_OT2,
+      expected: [EXPECTED_FIZZBUZZ],
+    },
+    {
+      name: 'getReachableRobots filters out OT-2 robots when ignoreOT2App is true',
+      selector: discovery.getReachableRobots,
+      state: MOCK_STATE_WITH_IGNORE_OT2,
+      expected: [EXPECTED_QUX],
+    },
+    {
+      name: 'getUnreachableRobots filters out OT-2 robots when ignoreOT2App is true',
+      selector: discovery.getUnreachableRobots,
+      state: MOCK_STATE_WITH_IGNORE_OT2,
+      expected: [],
+    },
+    {
+      name: 'getViewableRobots filters out OT-2 robots when ignoreOT2App is true',
+      selector: discovery.getViewableRobots,
+      state: MOCK_STATE_WITH_IGNORE_OT2,
+      expected: [EXPECTED_FIZZBUZZ, EXPECTED_QUX],
+    },
+    {
       name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
       state: MOCK_STATE,
@@ -317,6 +361,7 @@ describe('discovery selectors', () => {
       name: 'display name removes opentrons- from connectable robot names',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {
@@ -337,6 +382,7 @@ describe('discovery selectors', () => {
       name: 'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {
@@ -372,6 +418,7 @@ describe('discovery selectors', () => {
       name: 'handles opentrons-usb robots by setting as local',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {

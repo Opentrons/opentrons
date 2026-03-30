@@ -104,6 +104,16 @@ describe('getErrorKind', () => {
       expectedError: ERROR_KINDS.GENERAL_ERROR,
     },
     {
+      commandType: 'vacuumCarboyFull',
+      errorType: DEFINED_ERROR_TYPES.VACUUM_CARBOY_FULL,
+      expectedError: ERROR_KINDS.VACUUM_CARBOY_FULL,
+    },
+    {
+      commandType: 'vacuumPressureNotReached',
+      errorType: DEFINED_ERROR_TYPES.VACUUM_PRESSURE_NOT_REACHED,
+      expectedError: ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED,
+    },
+    {
       commandType: 'aspirate',
       errorType: 'someHithertoUnknownDefinedErrorType',
       expectedError: ERROR_KINDS.GENERAL_ERROR,

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-default-export */
 import pick from 'lodash/pick'
 
 import { getDefaultsForStepType } from '../getDefaultsForStepType'

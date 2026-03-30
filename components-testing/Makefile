@@ -53,7 +53,7 @@ clean-local-packages:
 	@rm -rf $(PACK_DIR)
 	@echo "Local packages cleaned!"
 
-# Run Playwright tests
+# Run Playwright tests (visual checkpoints go to Applitools Eyes; set APPLITOOLS_API_KEY)
 .PHONY: test
 test:
 	pnpm playwright test --config=playwright.config.ts
@@ -62,8 +62,3 @@ test:
 .PHONY: test-setup
 test-setup: setup
 	pnpm exec playwright install --with-deps chromium
-
-# Update Playwright snapshots (use after intentional style changes)
-.PHONY: test-update-snapshots
-test-update-snapshots:
-	pnpm playwright test --config=playwright.config.ts --update-snapshots

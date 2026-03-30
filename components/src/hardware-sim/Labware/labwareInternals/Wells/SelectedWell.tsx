@@ -2,19 +2,20 @@ import { COLORS } from '../../../../helix-design-system'
 import { getWidthAndHeightOfWellSVG } from './utils'
 import styles from './wells.module.css'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
-export function SelectedWell(props: {
-  labwareDefinition: LabwareDefinition
+interface SelectedWellProps {
+  wellMap: LabwareWellMap
   size?: string
   textInsideTip?: string
   isUsed?: boolean
   isError?: boolean
   isSelected?: boolean
   showStroke?: boolean
-}): JSX.Element {
+}
+export function SelectedWell(props: SelectedWellProps): JSX.Element {
   const {
-    labwareDefinition,
+    wellMap,
     size,
     textInsideTip,
     isUsed = false,
@@ -23,9 +24,9 @@ export function SelectedWell(props: {
     showStroke,
   } = props
 
-  const firstWell = labwareDefinition.wells.A1
+  const firstWell = wellMap.A1
   const isWellCircular = firstWell.shape === 'circular'
-  const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
+  const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
   const getFillColor = (
     isSelected: boolean,
     isError: boolean,
@@ -70,7 +71,6 @@ export function SelectedWell(props: {
           y={shouldShowStroke ? 1 : 0}
           width={width}
           height={height}
-          rx={2} // subtle rounding; remove if you want sharp corners
           fill={getFillColor(isSelected, isError, isUsed)}
           stroke={shouldShowStroke ? COLORS.black90 : undefined}
           strokeWidth={shouldShowStroke ? 2 : undefined}

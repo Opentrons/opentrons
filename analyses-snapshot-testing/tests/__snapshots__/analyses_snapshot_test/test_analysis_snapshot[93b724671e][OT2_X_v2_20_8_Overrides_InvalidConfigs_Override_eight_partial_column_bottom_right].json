@@ -5,7 +5,7 @@
   },
   "commands": [
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +18,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1184,7 +1184,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2350,7 +2350,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2370,7 +2370,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2498,6 +2498,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

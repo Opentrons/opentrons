@@ -38,9 +38,14 @@ export function OnDeviceDisplayAppFallback({
   useSentryReport(error)
 
   // immediately report to robot logs that something fatal happened
-  useEffect(() => {
-    dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
-  }, [])
+  useEffect(
+    () => {
+      dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <OddModal header={modalHeader}>

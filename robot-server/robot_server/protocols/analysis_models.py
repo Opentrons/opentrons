@@ -9,6 +9,7 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
+    LabwareOffset,
     Liquid,
     LiquidClassRecordWithId,
     LoadedLabware,
@@ -16,11 +17,11 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CommandPreconditions,
     CSVRunTimeParamFilesType,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.util import StrEnum
@@ -201,13 +202,17 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
-    commandAnnotations: List[UserCommandAnnotation] = Field(
+    commandAnnotations: List[CommandAnnotation] = Field(
         default_factory=list,
         description="Optional annotations for commands in this run.",
     )
     commandPreconditions: Optional[CommandPreconditions] = Field(
         default=None,
         description="Optional preconditions for commands used in this run.",
+    )
+    labwareOffsets: List[LabwareOffset] = Field(
+        default_factory=list,
+        description="List of loaded labware offsets (since this is an analysis, only those set by the protocol).",
     )
 
 

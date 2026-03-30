@@ -49,6 +49,10 @@ build-staging:
 	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
 
+.PHONY: build
+build:
+	vite build
+
 # development
 #####################################################################
 

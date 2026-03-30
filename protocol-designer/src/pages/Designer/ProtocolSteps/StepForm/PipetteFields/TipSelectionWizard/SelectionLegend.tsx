@@ -1,5 +1,6 @@
 import {
   COLORS,
+  LABWARE,
   StyledText,
   TipStatus,
   WellStatus,
@@ -10,23 +11,23 @@ import styles from './tipselectionwizard.module.css'
 import { useLegendItems } from './useLegendItems'
 
 import type { TipType, WellType } from '@opentrons/components'
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectionLegendProps {
   selectionType: 'tip' | 'well'
-  size?: string
+  size: string
 }
 
 export function SelectionLegend({
   selectionType,
   size,
 }: SelectionLegendProps): JSX.Element {
-  let labwareDefinition: LabwareDefinition
+  let labwareWellMap: LabwareWellMap
   const isTipSelection = selectionType === 'tip'
   if (isTipSelection) {
-    labwareDefinition = fixtureTiprack1000ul as LabwareDefinition
+    labwareWellMap = fixtureTiprack1000ul.wells as LabwareWellMap
   } else {
-    labwareDefinition = fixture96Plate as LabwareDefinition
+    labwareWellMap = fixture96Plate.wells as LabwareWellMap
   }
   const legendItems = useLegendItems(selectionType)
 
@@ -37,15 +38,18 @@ export function SelectionLegend({
           {isTipSelection ? (
             <TipStatus
               type={type as TipType}
-              labwareDefinition={labwareDefinition}
               size={size}
+              wellMap={labwareWellMap}
             />
           ) : (
-            <WellStatus
-              type={type as WellType}
-              labwareDefinition={labwareDefinition}
-              size={size}
-            />
+            <div className={styles.well_legend_item}>
+              <WellStatus
+                type={type as WellType}
+                size={size}
+                parentType={LABWARE}
+                wellMap={labwareWellMap}
+              />
+            </div>
           )}
 
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

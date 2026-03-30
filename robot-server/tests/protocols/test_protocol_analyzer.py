@@ -170,15 +170,27 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    legacy_command_annotation = pe_types.CustomCommandAnnotationLegacy(
-        commandKeys=["abc", "xyz"]
-    )
-    new_command_annotation = pe_types.UserCommandAnnotation(
-        annotationId="annotation-id",
-        userSpecifiedName="My command annotation",
+    new_command_annotation = pe_types.CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="My command annotation",
         params={},
     )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
+    offset = pe_types.LabwareOffset(
+        id="1234123",
+        createdAt=datetime.now(),
+        definitionUri="opentrons/abcxyz/1",
+        location=pe_types.LegacyLabwareOffsetLocation(
+            slotName=DeckSlotName.SLOT_A1, moduleModel=None, definitionUri=None
+        ),
+        locationSequence=[
+            pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
+                addressableAreaName="A1"
+            )
+        ],
+        vector=pe_types.LabwareOffsetVector(x=1.0, y=2.0, z=3.0),
+    )
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -206,16 +218,15 @@ async def test_analyze(
                 labware=[analysis_labware],
                 pipettes=[analysis_pipette],
                 modules=[],
-                labwareOffsets=[],
+                labwareOffsets=[offset],
                 liquids=[],
                 liquidClasses=[],
                 wells=[],
                 files=[],
                 hasEverEnteredErrorRecovery=False,
-                commandAnnotations=[new_command_annotation],
             ),
             parameters=[bool_parameter],
-            command_annotations=[legacy_command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )
@@ -237,6 +248,7 @@ async def test_analyze(
             liquidClasses=[],
             command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
+            labware_offsets=[offset],
         )
     )
 
@@ -322,5 +334,6 @@ async def test_analyze_updates_pending_on_error(
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         ),
     )

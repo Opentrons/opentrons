@@ -18,6 +18,8 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.system import camera
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -62,6 +64,7 @@ camera_router = LightRouter()
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def add_camera_settings(
     request_body: RequestModel[CameraEnable],
@@ -146,6 +149,7 @@ async def add_camera_settings(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def add_camera_capture_image_settings(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -242,6 +246,7 @@ async def get_camera_capture_image_settings(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],

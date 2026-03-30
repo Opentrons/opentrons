@@ -3,6 +3,8 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     RequestModel,
     SimpleBody,
@@ -20,9 +22,9 @@ router = fastapi.APIRouter()
     description="Get the current authorization and authentication setings.",
 )
 async def get_settings(  # noqa: D103
-    store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[SettingsResponseData]:
-    settings = store.get()
+    settings = settings_store.get_settings()
     return SimpleBody.model_construct(data=settings)
 
 
@@ -36,13 +38,13 @@ async def get_settings(  # noqa: D103
         The new settings are returned.
         """
     ),
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
 )
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
-    store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)]
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[SettingsResponseData]:
-    store.patch(request_body.data)
-    new_settings = store.get()
+    new_settings = settings_store.patch_settings(request_body.data)
     return SimpleBody.model_construct(data=new_settings)
 
 
@@ -56,10 +58,11 @@ async def patch_settings(  # noqa: D103
         The new settings are returned.
         """
     ),
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
 )
 async def delete_settings(  # noqa: D103
-    store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[SettingsResponseData]:
-    store.reset()
-    new_settings = store.get()
+    settings_store.reset_settings()
+    new_settings = settings_store.get_settings()
     return SimpleBody.model_construct(data=new_settings)

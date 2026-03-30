@@ -4,6 +4,7 @@ Thanks for your interest in contributing to the Opentrons platform! This Contrib
 
 - [Opening Issues](#opening-issues)
 - [Opening Pull Requests](#opening-pull-requests)
+- [PR Etiquette](#pr-etiquette)
 - [Commit Guidelines](#commit-guidelines)
 - [Project and Repository Structure](#project-and-repository-structure)
 - [Development Setup](#development-setup)
@@ -73,6 +74,26 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 ### Deciding What to Work On
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
+
+## PR Etiquette
+
+Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?**
+
+### Before Marking a PR "Ready for Review"
+
+- **Proofread the code.** Present a best-effort, functional solution.
+- **Add appropriate tests.** Include tests as appropriate for the scope of the PR.
+- **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
+
+### While Opening a PR
+
+- **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
+- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
+
+### After Receiving PR Approval
+
+- **Perform a final smoke test** before merging, to confirm nothing regressed after approval.
+- **Truncate the commit message before merging.** Keep only the ticket reference and a concise Overview snippet—avoid long, unwieldy merge messages.
 
 ## Commit Guidelines
 

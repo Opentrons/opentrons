@@ -3,7 +3,7 @@ from dataclasses import asdict
 from typing import Annotated, Any, Dict, List, Optional, Union, cast
 
 import aiohttp
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from starlette import status
 
 from opentrons.config import (
@@ -36,6 +36,9 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
@@ -52,7 +55,6 @@ from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
-from robot_server.persistence.persistence_directory import PersistenceResetter
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -76,13 +78,19 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
-# the servers instead of one off endpoint calls like these.
-async def _set_oem_mode_request(enable: bool) -> int:
+async def _set_oem_mode_request(enable: bool, authorization_header: str | None) -> int:
     """PUT request to set the OEM Mode for the system server."""
+    headers = (
+        {"Authorization": authorization_header}
+        if authorization_header is not None
+        else None
+    )
+
     async with aiohttp.ClientSession() as session:
         async with session.put(
-            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
+            "http://127.0.0.1:31950/system/oem_mode/enable",
+            headers=headers,
+            json={"enable": enable},
         ) as resp:
             return resp.status
 
@@ -97,11 +105,13 @@ async def _set_oem_mode_request(enable: bool) -> int:
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    authorization: Annotated[str | None, Header()] = None,
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
@@ -111,7 +121,9 @@ async def post_settings(
                 # Unlike opentrons.advanced_settings, system-server cannot store
                 # `None`/`null` to restore to default. Storing `False` instead is close
                 # enough.
-                update.value if update.value is not None else False
+                update.value if update.value is not None else False,
+                # Forward along the client's authorization, if it has authorization.
+                authorization_header=authorization,
             )
             if resp != 200:
                 # TODO: raise correct error here
@@ -179,6 +191,7 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_log_level_local(
     log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
@@ -212,6 +225,7 @@ async def post_log_level_local(
     ),
     response_model=LegacyErrorResponse,
     deprecated=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     raise LegacyErrorResponse(
@@ -253,6 +267,7 @@ async def get_settings_reset_options(
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
@@ -394,6 +409,7 @@ async def get_pipette_setting(
     responses={
         status.HTTP_412_PRECONDITION_FAILED: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def patch_pipette_setting(
     pipette_id: str,

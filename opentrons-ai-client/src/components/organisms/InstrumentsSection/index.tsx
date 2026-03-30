@@ -101,30 +101,35 @@ export function InstrumentsSection(): JSX.Element | null {
     { name: t('96_channel_1000ul'), value: 'Flex 96-Channel 1000uL pipette' },
   ]
 
-  const pipetteOptions = useMemo(() => {
-    const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
-      .filter(name =>
-        (robotType === OPENTRONS_OT2 ? OT2_PIPETTES : OT3_PIPETTES).includes(
-          name
+  const pipetteOptions = useMemo(
+    () => {
+      const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
+        .filter(name =>
+          (robotType === OPENTRONS_OT2 ? OT2_PIPETTES : OT3_PIPETTES).includes(
+            name
+          )
         )
-      )
-      .filter(name => {
-        const specs = getPipetteSpecsV2(name)
-        return !specs?.displayName?.includes('GEN1')
-      })
-      .map(name => ({
-        value: name,
-        name: getPipetteSpecsV2(name)?.displayName ?? '',
-      }))
-      .filter(o => {
-        return (
-          o.value !== 'p1000_96' &&
-          o.value !== 'p1000_multi_em_flex' &&
-          o.value !== 'p200_96'
-        )
-      })
-    return [{ name: t('none'), value: NO_PIPETTES }, ...allPipetteOptions]
-  }, [robotType])
+        .filter(name => {
+          const specs = getPipetteSpecsV2(name)
+          return !specs?.displayName?.includes('GEN1')
+        })
+        .map(name => ({
+          value: name,
+          name: getPipetteSpecsV2(name)?.displayName ?? '',
+        }))
+        .filter(o => {
+          return (
+            o.value !== 'p1000_96' &&
+            o.value !== 'p1000_multi_em_flex' &&
+            o.value !== 'p200_96'
+          )
+        })
+      return [{ name: t('none'), value: NO_PIPETTES }, ...allPipetteOptions]
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [robotType]
+  )
 
   return (
     <Flex

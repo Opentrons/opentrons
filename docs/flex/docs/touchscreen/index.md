@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Touchscreen"
+description: "On-device touchscreen for running protocols and managing Flex."
 ---
 
 This chapter focuses on operating Flex from its on-device touchscreen. You can use the touchscreen to control Flex whenever the robot is on. If your robot is on and the touchscreen is off, tap it once to wake the screen.

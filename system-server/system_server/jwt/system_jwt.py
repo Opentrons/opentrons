@@ -3,7 +3,6 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 import jwt
 
@@ -57,8 +56,8 @@ def create_jwt(
     duration: timedelta,
     registrant: Registrant,
     audience: str,
-    now: Optional[datetime] = None,
-    id: Optional[str] = None,
+    now: datetime | None = None,
+    id: str | None = None,
 ) -> str:
     """Generate a signed JWT with the specified parameters.
 

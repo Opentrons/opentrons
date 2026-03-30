@@ -81,11 +81,16 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
-  useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (createdMaintenanceRunId == null) {
+        createMaintenanceRun({})
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },

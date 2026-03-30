@@ -39,6 +39,10 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('stacker_error')
     case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
       return t('stacker_shuttle_store_empty')
+    case ERROR_KINDS.VACUUM_CARBOY_FULL:
+      return t('waste_carboy_full')
+    case ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED:
+      return t('vacuum_failure')
     default:
       return t('error')
   }

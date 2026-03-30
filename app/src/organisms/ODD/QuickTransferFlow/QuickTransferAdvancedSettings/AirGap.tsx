@@ -7,11 +7,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -202,12 +202,18 @@ export function AirGap(props: AirGapProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
+              autoFocus
               type="number"
               value={volume}
-              title={t('air_gap_volume_µL')}
+              label={t('air_gap_volume_µL')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setVolume(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

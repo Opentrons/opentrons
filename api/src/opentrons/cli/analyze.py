@@ -47,12 +47,13 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CommandPreconditions,
     CSVRuntimeParamPaths,
     EngineStatus,
+    LabwareOffset,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    UserCommandAnnotation,
 )
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
@@ -361,7 +362,6 @@ async def _do_analyze(
                 hasEverEnteredErrorRecovery=False,
                 files=[],
                 liquidClasses=[],
-                commandAnnotations=[],
             ),
             parameters=[],
             command_annotations=[],
@@ -462,9 +462,10 @@ async def _analyze(  # noqa: C901
         pipettes=analysis.state_summary.pipettes,
         modules=analysis.state_summary.modules,
         liquids=analysis.state_summary.liquids,
-        commandAnnotations=analysis.state_summary.commandAnnotations,
+        commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
+        labwareOffsets=analysis.state_summary.labwareOffsets,
     )
 
     _call_for_output_of_kind(
@@ -554,5 +555,6 @@ class AnalyzeResults(BaseModel):
     liquids: List[Liquid]
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
-    commandAnnotations: List[UserCommandAnnotation]
+    commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
+    labwareOffsets: List[LabwareOffset]

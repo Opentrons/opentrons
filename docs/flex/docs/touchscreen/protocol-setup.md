@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Setup"
+description: "Configure labware and liquids, and prepare to run a protocol on the touchscreen."
 ---
 
 When you start setup for a protocol, you'll see the "Prepare to run" screen, which summarizes all of the requirements for the protocol.

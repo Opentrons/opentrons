@@ -12,8 +12,10 @@ APP_SHELL_ODD_DIR := app-shell-odd
 AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+DOCS_DIR := docs
 G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_DIR := hardware
+KEY_SERVER_DIR := key-server
 LABWARE_LIBRARY_DIR := labware-library
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 PROTOCOL_DESIGNER_DIR := protocol-designer
@@ -26,7 +28,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -179,6 +181,7 @@ push-ot3:
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
 	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
+	$(MAKE) -C $(KEY_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -237,7 +240,9 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	pnpm eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -246,7 +251,9 @@ lint-js-prettier:
 
 .PHONY: lint-json
 lint-json:
-	pnpm eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:

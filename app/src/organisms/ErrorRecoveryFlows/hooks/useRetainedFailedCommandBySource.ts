@@ -25,25 +25,30 @@ export function useRetainedFailedCommandBySource(
   const [retainedFailedCommand, setRetainedFailedCommand] =
     useState<FailedCommandBySource | null>(null)
 
-  useLayoutEffect(() => {
-    if (failedCommandByRunRecord !== null) {
-      const failedCommandByAnalysis =
-        protocolAnalysis?.commands.find(
-          command => command.key === failedCommandByRunRecord?.key
-        ) ?? null
+  useLayoutEffect(
+    () => {
+      if (failedCommandByRunRecord !== null) {
+        const failedCommandByAnalysis =
+          protocolAnalysis?.commands.find(
+            command => command.key === failedCommandByRunRecord?.key
+          ) ?? null
 
-      if (failedCommandByAnalysis != null) {
-        setRetainedFailedCommand({
-          byRunRecord: failedCommandByRunRecord,
-          byAnalysis: failedCommandByAnalysis,
-        })
+        if (failedCommandByAnalysis != null) {
+          setRetainedFailedCommand({
+            byRunRecord: failedCommandByRunRecord,
+            byAnalysis: failedCommandByAnalysis,
+          })
+        }
       }
-    }
-  }, [
-    failedCommandByRunRecord?.key,
-    failedCommandByRunRecord?.error?.errorType,
-    protocolAnalysis?.id,
-  ])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      failedCommandByRunRecord?.key,
+      failedCommandByRunRecord?.error?.errorType,
+      protocolAnalysis?.id,
+    ]
+  )
 
   return retainedFailedCommand
 }

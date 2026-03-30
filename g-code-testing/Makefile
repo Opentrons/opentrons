@@ -15,6 +15,8 @@ test_opts ?=  --cov=g_code_parsing --cov-report term-missing:skip-covered --cov-
 tests_to_typecheck := \
 	tests/g_code_parsing
 
+files_to_check := g_code_parsing tests cli.py
+
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
@@ -68,12 +70,13 @@ test-g-code-omega:
 .PHONY: lint
 lint: lint-other
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
-	$(ruff) check g_code_parsing tests cli.py
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format: format-other
-	$(ruff) format g_code_parsing tests cli.py
-	$(ruff) check --select I --fix g_code_parsing tests cli.py
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: get-g-code-configurations
 get-g-code-configurations:

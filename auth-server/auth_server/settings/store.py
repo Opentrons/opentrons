@@ -1,6 +1,10 @@
+"""Settings store – pure data access layer for settings persistence."""
+
 from typing import Annotated
 
 import fastapi
+from sqlalchemy.engine import Engine as SQLEngine
+from sqlalchemy.orm import Session, sessionmaker
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -8,51 +12,90 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .models import PatchSettingsRequestData, SettingsResponseData
-
-_DEFAULT_SETTINGS = SettingsResponseData.model_construct(accessControlEnabled=False)
+from auth_server.persistence.fastapi_dependencies import get_sql_engine
+from auth_server.persistence.orm_models import Setting
+from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
 
 
 class SettingsStore:
-    """Stores and retrieves the current authorization and authentication settings."""
+    """Manages settings CRUD operations against the database."""
 
-    def __init__(self) -> None:
-        self._settings = _DEFAULT_SETTINGS
+    def __init__(self, sql_engine: SQLEngine) -> None:
+        """Initialize with a SQLAlchemy engine."""
+        self._sql_engine = sql_engine
+        self._session_factory = sessionmaker(
+            bind=sql_engine,
+            expire_on_commit=False,
+        )
 
-    def get(self) -> SettingsResponseData:
+    def _session(self) -> Session:
+        return self._session_factory()
+
+    def get_settings(self) -> SettingsResponseData:
         """Get the current settings."""
-        return self._settings
+        with self._session() as session:
+            rows = session.query(Setting).all()
+            if not rows:
+                return SettingsResponseData()
+            parsed = {row.key: row.value for row in rows}
+            return SettingsResponseData.model_validate(parsed, strict=False)
 
-    def patch(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
-        """Update the settings."""
-        new_settings = self._settings.model_copy()
+    def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
+        """Patch the settings."""
+        updates = patch.model_dump(mode="json", exclude_unset=True)
+        db_updates: dict[str, object] = {k: v for k, v in updates.items()}
+        self._upsert_many(db_updates)
+        return self.get_settings()
 
-        # Pydantic will already have validated that `patch.accessControlEnabled` is
-        # `True | None`, not `False`, so this is a one-way latch.
-        if patch.accessControlEnabled is not None:
-            new_settings.accessControlEnabled = patch.accessControlEnabled
-
-        self._settings = new_settings
-        return self.get()
-
-    def reset(self) -> SettingsResponseData:
+    def reset_settings(self) -> SettingsResponseData:
         """Reset all settings to their defaults."""
-        new_settings = _DEFAULT_SETTINGS.model_copy()
-        # accessControlEnabled is special and is excluded from the reset.
-        new_settings.accessControlEnabled = self._settings.accessControlEnabled
-        self._settings = new_settings
-        return self.get()
+        self._delete_all()
+        return self.get_settings()
+
+    def _upsert(self, key: str, value: str | None) -> None:
+        """Insert or update a single setting."""
+        with self._session() as session:
+            row = session.query(Setting).filter(Setting.key == key).first()
+            if row is None:
+                session.add(Setting(key=key, value=value))
+            else:
+                row.value = value
+            session.commit()
+
+    def _upsert_many(self, settings: dict[str, object]) -> None:
+        """Insert or update multiple settings at once."""
+        with self._session() as session:
+            for key, value in settings.items():
+                row = session.query(Setting).filter(Setting.key == key).first()
+                if row is None:
+                    session.add(Setting(key=key, value=value))
+                else:
+                    row.value = value
+            session.commit()
+
+    def _delete_all(self) -> None:
+        """Delete all settings (for reset)."""
+        with self._session() as session:
+            # todo(tz, 2026-03-24): this is a hack to prevent the accessControlEnabled setting from being deleted
+            session.query(Setting).filter(
+                Setting.key != "accessControlEnabled"
+            ).delete()
+            session.commit()
 
 
 _accessor = AppStateAccessor[SettingsStore]("settings_store")
 
 
-async def get_settings_store(
+def install_settings_store(app_state: AppState, settings_store: SettingsStore) -> None:
+    """Place the server's singleton SettingsStore in server state, for later retrieval by get_settings_store()."""
+    _accessor.set_on(app_state, settings_store)
+
+
+def get_settings_store(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    sql_engine: Annotated[SQLEngine, fastapi.Depends(get_sql_engine)],
 ) -> SettingsStore:
     """Return the server's singleton SettingsStore."""
     settings_store = _accessor.get_from(app_state)
-    if settings_store is None:
-        settings_store = SettingsStore()
-        _accessor.set_on(app_state, settings_store)
+    assert settings_store is not None
     return settings_store

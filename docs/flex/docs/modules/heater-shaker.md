@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Heater-Shaker Module"
+description: "Heater-Shaker on Flex: on-deck heating and orbital shaking."
 ---
 
 ![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../images/heater-shaker-module.png "Heater-Shaker Module")
@@ -71,7 +72,7 @@ You can purchase adapters directly from Opentrons:
 
 ### Software control
 
-The Heater-Shaker is fully programmable in Protocol Designer and the Python Protocol API. The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See [Non-blocking commands](../../python-api/modules/heater-shaker.md#non-blocking-commands) in the API documentation for details on adding parallel steps to your protocols.
+The Heater-Shaker is fully programmable in Protocol Designer and the Python Protocol API. The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. Read about [concurrent commands](../../python-api/modules/heater-shaker.md#heating-and-shaking) in the API documentation for details on adding parallel steps to your protocols.
 
 Outside of protocols, the Opentrons App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
 
