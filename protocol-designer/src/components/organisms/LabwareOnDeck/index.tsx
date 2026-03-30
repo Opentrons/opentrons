@@ -54,7 +54,6 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     inWellSelectionModal = false,
     wellLabelOptions,
   } = props
-
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
   )

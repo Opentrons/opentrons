@@ -33,7 +33,7 @@ describe('TipStatus', () => {
       <TipStatus
         type="new"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
-        wellName={'A1'}
+        wellName="A1"
       />
     )
     screen.getByText('New tip')
@@ -44,7 +44,7 @@ describe('TipStatus', () => {
       <TipStatus
         type="used"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
-        wellName={'A1'}
+        wellName="A1"
       />
     )
     screen.getByText('Used tip')
@@ -55,7 +55,7 @@ describe('TipStatus', () => {
       <TipStatus
         type="selected"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
-        wellName={'A1'}
+        wellName="A1"
       />
     )
     screen.getByText('Selected well')
@@ -66,7 +66,7 @@ describe('TipStatus', () => {
       <TipStatus
         type="no"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
-        wellName={'A1'}
+        wellName="A1"
       />
     )
     screen.getByText('Empty well')
@@ -77,7 +77,7 @@ describe('TipStatus', () => {
       <TipStatus
         type="inaccessible"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
-        wellName={'A1'}
+        wellName="A1"
       />
     )
     screen.getByText('Inaccessible tip')
