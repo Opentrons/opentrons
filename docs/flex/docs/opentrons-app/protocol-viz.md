@@ -56,7 +56,7 @@ At any point in your protocol, hover over labware on the deck to see labware nam
 
 <figure class="screenshot" markdown>
 ![Image showing slot spotlight view.](../images/slot-spotlight.png)
-<figcaption>A slot spotlight for C1, showing changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
+<figcaption>A slot spotlight for C1, showing view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
 </figure>
 
 Open a slot spotlight to see changes over the course of your protocol. For example, spotlight a slot with a tip rack and drag the blue bar to see how quickly tips from that rack are used. Or spotlight a slot with a module to see changes in temperature, lid position, or other status.
