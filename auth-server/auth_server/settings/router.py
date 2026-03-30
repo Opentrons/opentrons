@@ -15,7 +15,7 @@ from .models import (
     PatchSettingsRequestData,
     SettingsResponseData,
 )
-from .store import SettingsStore, get_settings_store
+from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
 from auth_server.settings.models import PatchAccessControlRequestData
 
 router = fastapi.APIRouter()
@@ -58,10 +58,15 @@ async def patch_access_control_settings(  # noqa: D103
 ) -> SimpleBody[AccessControlResponseData]:
     """Change the access control settings."""
     try:
-        accessControlResponseData = settings_store.patch_access_control(request_body.data)
-        return SimpleBody.model_construct(data=accessControlResponseData)
-    except ValueError as e:
-        raise fastapi.HTTPException(status_code=422, detail=str(e)) from e
+        accessControlResponseData = settings_store.patch_access_control(
+            request_body.data
+        )
+    except AccessControlAlreadySetError:
+        raise fastapi.HTTPException(
+            status_code=422,
+            detail="Access control cannot be modified once enabled.",
+        )
+    return SimpleBody.model_construct(data=accessControlResponseData)
 
 
 @router.patch(

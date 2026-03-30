@@ -22,6 +22,10 @@ from auth_server.settings.models import (
 )
 
 
+class AccessControlAlreadySetError(Exception):
+    """Raised when attempting to modify access control after it has already been set."""
+
+
 class SettingsStore:
     """Manages settings CRUD operations against the database."""
 
@@ -80,7 +84,7 @@ class SettingsStore:
             return self.get_access_control_settings()
         current = self._get_access_control_enabled()
         if current is not None:
-            raise ValueError("Access control cannot be modified once set.")
+            raise AccessControlAlreadySetError()
         self.update_access_control_table(patch.accessControlEnabled)
         return self.get_access_control_settings()
 
