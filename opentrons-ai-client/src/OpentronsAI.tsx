@@ -28,9 +28,7 @@ import {
   mixpanelAtom,
 } from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
-import {
-  isEmailVerifiedFromUser,
-} from './resources/emailVerifiedClaim'
+import { isEmailVerifiedFromUser } from './resources/emailVerifiedClaim'
 import { useGetAccessToken } from './resources/hooks/useGetAccessToken'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
