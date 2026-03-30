@@ -36,12 +36,12 @@ class AbstractMassFlowSensor(Protocol):
         ...
 
     async def disconnect(self) -> None:
-        """Disconnect from sensor"""
+        """Disconnect from sensor."""
         ...
 
     @abstractmethod
     async def is_simulator(self) -> bool:
-        """Is this a simulation"""
+        """Is this a simulation?"""
         ...
 
     async def get_flow_rate(self, timeout: float = 1.0) -> float:
@@ -49,15 +49,15 @@ class AbstractMassFlowSensor(Protocol):
         ...
 
     async def set_csv_filename(self, new_path: str) -> None:
-        """Name the csv file"""
+        """Name the csv file."""
         ...
 
-    async def read_continuous_data(self, run_time):
-        """Record flow rate in sLm"""
+    async def read_continuous_data(self, run_time: float) -> None:
+        """Record flow rate in sLm."""
         ...
 
-    async def stop(self):
-        """Stop Recording Process"""
+    async def stop(self) -> None:
+        """Stop recording process."""
         ...
 
 

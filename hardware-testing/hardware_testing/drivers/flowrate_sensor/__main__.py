@@ -1,10 +1,12 @@
+"""Entry point for running the flow rate sensor standalone."""
 from hardware_testing.drivers.flowrate_sensor import driver
 import asyncio
 import logging
 import datetime
 
 
-async def main(file_name, loop):
+async def main(file_name: str, loop: asyncio.AbstractEventLoop) -> None:
+    """Initialize and run the flow rate sensor, logging data to a CSV file."""
     sensor = await driver.MassFlowSensor.create(
         port="/dev/ttyACM1", csv_path=file_name, loop=loop
     )
