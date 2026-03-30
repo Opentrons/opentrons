@@ -43,6 +43,7 @@ CA_KEY_NAME_FORMAT: Final = "ot-robot-tls-ca-{expiry}.pem"
 
 END_ENTITY_BASIC_CONSTRAINTS = x509.BasicConstraints(ca=False, path_length=None)
 
+# our TLS certificate entity name (this would be displayed in a browser)
 END_ENTITY_NAME = x509.Name(
     [
         x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "US"),
@@ -53,6 +54,7 @@ END_ENTITY_NAME = x509.Name(
     ]
 )
 
+# standard TLS end entity key usage
 END_ENTITY_KU = x509.KeyUsage(
     digital_signature=True,
     content_commitment=False,
@@ -65,6 +67,7 @@ END_ENTITY_KU = x509.KeyUsage(
     decipher_only=False,
 )
 
+# standard TLS EKU
 END_ENTITY_EKU = x509.ExtendedKeyUsage(
     [
         x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
