@@ -43,7 +43,6 @@ from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.types import NozzleMapInterface
-from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     serpent_enum_registration,
@@ -53,6 +52,7 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
 
+# register_process_types runs for both the robot server process and the run subprocess
 def register_process_types() -> None:
     """Register classes and types sent and received by the protocol subprocess."""
     with serpent_enum_registration():
@@ -90,18 +90,7 @@ def register_process_types() -> None:
         OpentronsPyroSerializer.register_pydantic_model(command_create)
 
 
-def create_directed_run_process(
-    robot_type: RobotType,
-    deck_type: DeckType,
-) -> None:
-    """Build an instance of the DirectedRunProcess and provide it to Pyro Daemon Factory as a resource."""
-    directed_run_process = DirectedRunProcess(robot_type, deck_type)
-    try:
-        create_pyro_daemon("ot-protocol", directed_run_process, register_process_types)
-    finally:
-        pass
-
-
+# DirectedRunProcess is created and run as a pyro daemon in its own subprocess
 class DirectedRunProcess(AbstractRunCoordinator):
     """A wrapper of the engine and run orchestrator for a pyro process."""
 
@@ -406,7 +395,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self,
         protocol_source: ProtocolSource,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
-        # TODO maybe serialized CSV runtime params, def ParseMode
+        # TODO maybe serialized CSV runtime params
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         parse_mode: ParseMode,
     ) -> None:
@@ -449,8 +438,3 @@ class DirectedRunProcess(AbstractRunCoordinator):
     def clear_command_history(self) -> None:
         """Force cleanup of command history."""
         pass
-
-
-if __name__ == "__main__":
-    # TODO hard coding this for now since it's only gonna be on Flex
-    create_directed_run_process("OT-3 Standard", DeckType.OT3_STANDARD)

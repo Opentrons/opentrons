@@ -67,8 +67,8 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
-from . import run_director
-from .run_director import DirectedRunProcess, register_process_types
+from . import run_process_entry_point
+from .run_process import DirectedRunProcess, register_process_types
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -381,7 +381,7 @@ class RunOrchestratorStore:
             raise RunConflictError("Another run is currently active.")
 
         self._run_process = subprocess.Popen(
-            args=[sys.executable, "-m", run_director.__name__],
+            args=[sys.executable, "-m", run_process_entry_point.__name__],
             env={k: v for k, v in os.environ.items()},
             # user="ot-protocol"  # TODO how do we make sure this works locally?
         )
