@@ -82,13 +82,4 @@ At the time of purchase, each Temperature Module includes your choice of one (1)
 
 Thermal blocks are available for purchase from the [Modules section](https://opentrons.com/products/categories/modules) of the Opentrons website.
 
-## Flex caddies
-
-When used with a Flex robot, the Temperature Module fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing.
-
-![Module caddy with labels](images/temp-mod-caddy.png)
-
-The OT-2 does not use caddies. Modules clip directly to the deck.
-
 The [Temperature Module caddy](https://opentrons.com/products/opentrons-flex-temperature-module-gen2-caddy-and-calibration-adapter) is available for purchase from Opentrons.
-
