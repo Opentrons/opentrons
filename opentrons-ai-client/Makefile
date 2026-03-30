@@ -51,7 +51,7 @@ build-staging:
 
 .PHONY: build
 build:
-	vite build
+	pnpm exec vite build
 
 # development
 #####################################################################
@@ -65,7 +65,7 @@ dev:
 # production assets server
 .PHONY: serve
 serve: all
-	vite preview
+	pnpm exec vite preview
 
 .PHONY: test
 test:
