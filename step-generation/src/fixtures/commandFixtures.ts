@@ -25,6 +25,7 @@ import type {
   DispenseInPlaceParams,
   DispenseParams,
   MoveToWellParams,
+  NozzleConfigurationParams,
   TouchTipParams,
   WellLocation,
 } from '@opentrons/shared-data'
@@ -1133,6 +1134,19 @@ export const dropTipIntoWasteChuteHelper = (
     },
   },
 ]
+
+export const configureNozzleLayoutHelper = (
+  pipetteId: string,
+  configurationParams: NozzleConfigurationParams
+): CreateCommand => ({
+  commandType: 'configureNozzleLayout',
+  key: expect.any(String),
+  params: {
+    pipetteId,
+    configurationParams,
+  },
+})
+
 export const pickUpTipHelper = (
   tip: number | string,
   params?: {

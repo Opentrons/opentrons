@@ -103,7 +103,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('form:step_edit_form.field.step_notes.label')}
+              label={t('form:step_edit_form.field.step_notes.label')}
               value={stepDetails}
               onChange={e => {
                 setStepDetails(e.target.value as string)

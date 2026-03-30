@@ -275,7 +275,7 @@ async def test_create(
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
-    protocol_source = ProtocolSource(
+    protocol_source = ProtocolSource.model_construct(
         directory=sentinel.directory,
         main_file=sentinel.main_file,
         content_hash=sentinel.content_hash,

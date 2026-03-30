@@ -71,8 +71,14 @@ export function FlexStackerSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey={`protocol_steps:flex_stacker.${FLEX_STACKER_FILL}`}
-          tagText={labwareNameString}
-          tagText2={fillLabwareIds?.length ?? 0}
+          tagInfos={[
+            {
+              text: labwareNameString,
+            },
+            {
+              text: fillLabwareIds?.length ?? 0,
+            },
+          ]}
         />
       )
       break
@@ -91,7 +97,11 @@ export function FlexStackerSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey={`protocol_steps:flex_stacker.${FLEX_STACKER_RETRIEVE}`}
-          tagText={labwareNames}
+          tagInfos={[
+            {
+              text: labwareNames,
+            },
+          ]}
         />
       )
       break
@@ -109,7 +119,11 @@ export function FlexStackerSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey={`protocol_steps:flex_stacker.${FLEX_STACKER_STORE}`}
-          tagText={labwareNames}
+          tagInfos={[
+            {
+              text: labwareNames,
+            },
+          ]}
         />
       )
       break

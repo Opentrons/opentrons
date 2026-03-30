@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,10 +16,10 @@ vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -100,13 +100,15 @@ describe('Delay', () => {
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        autoFocus: true,
+        label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: null,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -130,13 +132,15 @@ describe('Delay', () => {
     fireEvent.click(continueBtn)
     const oneButton = screen.getByText('0')
     fireEvent.click(oneButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        autoFocus: true,
+        label: 'Delay duration (seconds)',
         error: 'Value must be between 0.1 to 9999999999',
-        readOnly: true,
         type: 'number',
         value: 0,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -175,13 +179,15 @@ describe('Delay', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        autoFocus: true,
+        label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 15,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -201,13 +207,15 @@ describe('Delay', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Delay duration (seconds)',
+        autoFocus: true,
+        label: 'Delay duration (seconds)',
         error: null,
-        readOnly: true,
         type: 'number',
         value: 20,
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

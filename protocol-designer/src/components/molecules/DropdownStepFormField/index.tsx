@@ -131,9 +131,7 @@ export function DropdownStepFormField(
           flexDirection={DIRECTION_COLUMN}
           width="100%"
         >
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-            {title}
-          </StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">{title}</StyledText>
           <ListItem type="default">
             <Flex
               gridGap={SPACING.spacing8}

@@ -51,6 +51,7 @@ from opentrons.protocol_engine.types import (
     CommandPreconditions,
     CSVRuntimeParamPaths,
     EngineStatus,
+    LabwareOffset,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
@@ -464,6 +465,7 @@ async def _analyze(  # noqa: C901
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
+        labwareOffsets=analysis.state_summary.labwareOffsets,
     )
 
     _call_for_output_of_kind(
@@ -555,3 +557,4 @@ class AnalyzeResults(BaseModel):
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
+    labwareOffsets: List[LabwareOffset]

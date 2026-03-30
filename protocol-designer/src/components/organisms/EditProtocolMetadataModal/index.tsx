@@ -96,7 +96,7 @@ export function EditProtocolMetadataModal(
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               value={description ?? ''}
               {...register('description')}
               height="6rem"

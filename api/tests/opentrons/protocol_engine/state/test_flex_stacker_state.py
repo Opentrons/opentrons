@@ -166,7 +166,7 @@ def test_get_labware_definition_list(
     result: list[LabwareDefinition] | None,
 ) -> None:
     """It should return definitions in proper order."""
-    subject = FlexStackerSubState(
+    subject = FlexStackerSubState.model_construct(
         module_id=FlexStackerId("someModuleId"),
         pool_primary_definition=primary_def,
         pool_adapter_definition=adapter_def,
@@ -181,7 +181,7 @@ def test_get_labware_definition_list(
 
 def test_get_contained_labware() -> None:
     """It should present a list of contained labware."""
-    subject = FlexStackerSubState(
+    subject = FlexStackerSubState.model_construct(
         module_id=FlexStackerId("someModuleId"),
         pool_primary_definition=sentinel.primary_def,
         pool_adapter_definition=sentinel.adapter_def,

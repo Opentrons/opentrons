@@ -3837,8 +3837,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -17880,6 +17879,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [
     {

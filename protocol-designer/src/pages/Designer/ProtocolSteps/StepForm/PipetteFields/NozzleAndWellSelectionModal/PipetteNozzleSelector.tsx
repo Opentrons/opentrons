@@ -8,11 +8,16 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import { A1_NOZZLE, ALL, G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  ALL,
+  G1_NOZZLE,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+} from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { PARTIAL_NOZZLE_MAP } from './constants'
 import styles from './nozzleandwellwizard.module.css'
 import { NozzleRender } from './NozzleRender'
 import {
@@ -43,9 +48,8 @@ export function PipetteNozzleSelector(
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
-
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
+  const nozzleConfiguration =
+    (propsForFields.nozzles?.value as NozzleConfigurationStyle) ?? ALL
   const primaryNozzle =
     (propsForFields.primaryNozzle?.value as PrimaryNozzleConfigurationStyle) ??
     A1_NOZZLE
@@ -69,7 +73,7 @@ export function PipetteNozzleSelector(
     column => column.orderedNozzles
   )
 
-  const isPartialNozzle = nozzleConfiguration === PARTIAL
+  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
 
   const [selectedNozzle, setSelectedNozzle] = useState<string[]>([])
 
@@ -127,7 +131,7 @@ export function PipetteNozzleSelector(
               onChange={() => {
                 propsForFields.nozzles.updateValue(value)
                 propsForFields.primaryNozzle.updateValue(
-                  value === PARTIAL ? G1_NOZZLE : null
+                  value === PARTIAL_COLUMN ? G1_NOZZLE : A1_NOZZLE
                 )
                 setSelectedNozzle([])
               }}

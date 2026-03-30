@@ -4,17 +4,18 @@ import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
 import { makeEvent } from '../make-event'
 
+import type { U2EAnalyticsProps } from '../../system-info/types'
 import type { State } from '../../types'
 
 vi.mock('../../system-info/selectors')
 
 const MOCK_STATE: State = { mockState: true } as any
-const MOCK_ANALYTICS_PROPS = {
-  'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
-  'U2E Product ID': Fixtures.mockRealtekDevice.productId,
-  'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber,
-  'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturerName,
-  'U2E Device Name': Fixtures.mockRealtekDevice.productName,
+const MOCK_ANALYTICS_PROPS: U2EAnalyticsProps = {
+  'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId ?? 0,
+  'U2E Product ID': Fixtures.mockRealtekDevice.productId ?? 0,
+  'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber ?? undefined,
+  'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturerName ?? undefined,
+  'U2E Device Name': Fixtures.mockRealtekDevice.productName ?? undefined,
   'U2E IPv4 Address': '10.0.0.1',
 }
 

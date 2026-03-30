@@ -22,8 +22,10 @@ class AuthServerSettings(BaseSettings):
     ``OT_AUTH_SERVER_``, e.g. ``OT_AUTH_SERVER_persistence_directory``.
     """
 
-    model_config = SettingsConfigDict(env_prefix="OT_AUTH_SERVER_")
-
+    model_config = SettingsConfigDict(
+        env_prefix="OT_AUTH_SERVER_",
+        env_file=Path(__file__).resolve().parent.parent / ".env",
+    )
     persistence_directory: typing.Union[
         typing_extensions.Literal["automatically_make_temporary"],
         Path,
@@ -36,4 +38,9 @@ class AuthServerSettings(BaseSettings):
             " the server will use a fresh temporary directory"
             " (effectively not persisting anything)."
         ),
+    )
+    alembic_config: Path = Field(
+        default_factory=lambda: Path(__file__).resolve().parent / "alembic.ini",
+        description="Path to Alembic config file.",
+        validation_alias="ALEMBIC_CONFIG",  # read ALEMBIC_CONFIG from env (no OT_ prefix)
     )

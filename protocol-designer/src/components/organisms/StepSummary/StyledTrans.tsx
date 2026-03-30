@@ -10,15 +10,20 @@ import {
   WRAP,
 } from '@opentrons/components'
 
+import type { IconName } from '@opentrons/components'
+
+interface TagInfo {
+  text: string
+  iconName?: IconName
+}
 interface StyledTransProps {
   i18nKey: string
-  tagText?: string
-  tagText2?: string
+  tagInfos?: TagInfo[]
   values?: object
 }
 
 export function StyledTrans(props: StyledTransProps): JSX.Element {
-  const { i18nKey, tagText, tagText2, values } = props
+  const { i18nKey, tagInfos, values } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
 
   return (
@@ -39,8 +44,25 @@ export function StyledTrans(props: StyledTransProps): JSX.Element {
               style={{ whiteSpace: NO_WRAP }}
             />
           ),
-          tag: <Tag type="default" text={tagText ?? ''} />,
-          tag2: <Tag type="default" text={tagText2 ?? ''} />,
+          ...(tagInfos ?? []).reduce<Record<string, JSX.Element>>(
+            (acc, { text, iconName }, index) => {
+              // to preserve old behavior as best as possible, we don't index the first `tag` in the translation
+              const key = index === 0 ? 'tag' : `tag${index + 1}`
+              return {
+                ...acc,
+                [key]: (
+                  <Tag
+                    key={index}
+                    type="default"
+                    text={text}
+                    iconName={iconName}
+                    iconPosition="left"
+                  />
+                ),
+              }
+            },
+            {}
+          ),
         }}
         values={values}
       />

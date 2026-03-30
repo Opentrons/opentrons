@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import Literal
 
 from opentrons_shared_data.robot.types import RobotType
@@ -94,8 +95,7 @@ Metadata must be a simple JSON-serializable dictionary.
 """
 
 
-@dataclass(frozen=True)
-class ProtocolSource:
+class ProtocolSource(BaseModel):
     """A value object representing a protocol and its source files on disk.
 
     This includes pointers to the files,
@@ -116,6 +116,8 @@ class ProtocolSource:
             This is not necessarily the same set of labware definitions
             that the protocol will actually attempt to load.
     """
+
+    model_config = ConfigDict(frozen=True)
 
     directory: Optional[Path]
     main_file: Path

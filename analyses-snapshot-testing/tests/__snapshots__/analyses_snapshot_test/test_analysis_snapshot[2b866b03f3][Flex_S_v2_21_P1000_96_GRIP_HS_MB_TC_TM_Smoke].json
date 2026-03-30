@@ -91,8 +91,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -378,8 +377,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -560,8 +558,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -746,8 +743,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -936,8 +932,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -1130,8 +1125,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -10101,7 +10095,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.31,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10436,7 +10430,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.26499999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10952,7 +10946,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.72399999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -13492,8 +13486,7 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -15172,6 +15165,46 @@
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
       "location": "offDeck"
+    }
+  ],
+  "labwareOffsets": [
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
+      "id": "UUID",
+      "location": {
+        "slotName": "C2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "C2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    },
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
+      "id": "UUID",
+      "location": {
+        "slotName": "D2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "D2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
     }
   ],
   "liquidClasses": [],

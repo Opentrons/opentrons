@@ -1359,7 +1359,7 @@ def test_get_errors_slice() -> None:
     result = subject_view.get_errors_slice(cursor=1, length=3)
 
     assert result == CommandErrorSlice(
-        [
+        commands_errors=[
             ErrorOccurrence(
                 id="error-id",
                 createdAt=datetime(2023, 3, 3, 0, 0),

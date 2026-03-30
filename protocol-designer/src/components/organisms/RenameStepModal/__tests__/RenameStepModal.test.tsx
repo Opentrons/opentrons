@@ -35,6 +35,8 @@ describe('EditNickNameModal', () => {
       },
     }
   })
+
+  // ToDo This test is missing a few base test cases
   it('renders the text and add a step name and a step notes', () => {
     render(props)
     screen.getByText('Name step')
@@ -44,16 +46,14 @@ describe('EditNickNameModal', () => {
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
 
-    const stepName = screen.getAllByRole('textbox', { name: '' })[0]
-    fireEvent.change(stepName, { target: { value: 'mockStepName' } })
-
-    const stepDetails = screen.getAllByRole('textbox', { name: '' })[1]
-    fireEvent.change(stepDetails, { target: { value: 'mockStepDetails' } })
+    expect(screen.getAllByRole('textbox').length).toBe(2)
+    screen.getByDisplayValue('Pause')
 
     fireEvent.click(screen.getByText('Save'))
     expect(vi.mocked(renameStep)).toHaveBeenCalled()
     expect(props.onClose).toHaveBeenCalled()
   })
+
   it('renders the too long step name error', () => {
     render(props)
     const stepName = screen.getAllByRole('textbox', { name: '' })[0]

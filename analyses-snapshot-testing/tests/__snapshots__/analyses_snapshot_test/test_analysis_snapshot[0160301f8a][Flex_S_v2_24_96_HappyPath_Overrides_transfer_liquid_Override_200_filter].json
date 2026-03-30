@@ -12342,6 +12342,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [
     {
       "aspirate": {

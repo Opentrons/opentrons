@@ -55,8 +55,10 @@ const CARD_BUTTON_STYLE = css`
 `
 
 const CARD_BUTTON_TEXT_STYLE = css`
-  word-wrap: break-word;
-  overflow: hidden;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: normal;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;

@@ -20,7 +20,8 @@ import { migrateFile as migrateFileEightFiveFive } from './8_5_5'
 import { migrateFile as migrateFileEightSix } from './8_6_0'
 import { migrateFile as migrateFileEightSeven } from './8_7_0'
 import { migrateFile as migrateFileEightEight } from './8_8_0'
-import { migrateFile as migrateFileEightNine } from './8_9_0'
+import { isBroken890Export, migrateFile as migrateFileEightNine } from './8_9_0'
+import { migrateFile as migrateFileEightTen } from './8_10_0'
 
 import type {
   PDProtocolFile,
@@ -48,7 +49,7 @@ export const getMigrationVersionsToRunFromVersion = (
   )
 }
 
-const allMigrationsByVersion: MigrationsByVersion = {
+export const allMigrationsByVersion: MigrationsByVersion = {
   // @ts-expect-error file types are incompatible
   '1.1.0': migrateFileOne,
   // @ts-expect-error file types are incompatible
@@ -83,6 +84,8 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '8.8.0': migrateFileEightEight,
   // @ts-expect-error
   '8.9.0': migrateFileEightNine,
+  // @ts-expect-error
+  '8.10.0': migrateFileEightTen,
 }
 export const migration = (
   file: any
@@ -93,15 +96,26 @@ export const migration = (
 } => {
   const designerApplication =
     file.designerApplication || file['designer-application'] || file
+
   // NOTE: default exists because any protocol that doesn't include the application version
   // key will be treated as the oldest migrateable version ('1.0.0')
   const applicationVersion: string =
     designerApplication.applicationVersion ||
     designerApplication.version ||
     OLDEST_MIGRATEABLE_VERSION
+
+  // v8.9.0 released with a bug where it would export files that were mostly correctly
+  // v8.9.0-shaped, except that their version was incorrectly declared as '8.8.0'. If
+  // we're dealing with such a file, we need to treat it as v8.9.0, to avoid running
+  // the v8.8.0->v8.9.0 migration on a file that's already effectively v8.9.0. That
+  // migration is not idempotent.
+  const empiricalApplicationVersion = isBroken890Export(file)
+    ? '8.9.0'
+    : applicationVersion
+
   const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(
     allMigrationsByVersion,
-    applicationVersion
+    empiricalApplicationVersion
   )
   const migratedFile = flow(
     migrationVersionsToRun.map(version => allMigrationsByVersion[version])

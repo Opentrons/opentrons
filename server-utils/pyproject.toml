@@ -40,7 +40,7 @@ dev = [
     "httpx==0.26.0",
     "types-requests~=2.31.0",
     "types-mock~=5.1.0",
-    "sqlalchemy2-stubs==0.0.2a21",
+    "sqlalchemy2-stubs==0.0.2a38",
     "build~=1.2.0",
     "setuptools==80.9.0",
 ]
@@ -59,6 +59,9 @@ max-complexity = 9
 "tests/*" = ["D"]
 [tool.ruff.lint.isort]
 known-local-folder = ["server_utils"]
+
+[tool.ruff.format]
+exclude = ["server_utils/_version.py"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
