@@ -57,12 +57,10 @@ class SettingsStore:
     def _get_access_control_enabled(self) -> bool | None:
         """Return the raw access-control value, or None if it has never been set."""
         with self._session() as session:
-            row = (
-                session.query(AccessControlEnabled)
-                .filter(AccessControlEnabled.id == 1)
-                .first()
-            )
-            if row is None or row.enabled is None:
+            row = session.execute(
+                select(AccessControlEnabled).filter(AccessControlEnabled.id == 1)
+            ).scalar_one_or_none()
+            if row is None:
                 return None
             return bool(row.enabled)
 
@@ -74,7 +72,9 @@ class SettingsStore:
     def update_access_control_table(self, accessControlEnabled: bool) -> None:
         """Update the access control enabled setting."""
         with self._session() as session:
-            row = session.query(AccessControlEnabled).first()
+            row = session.execute(
+                select(AccessControlEnabled).filter(AccessControlEnabled.id == 1)
+            ).scalar_one_or_none()
             if row is None:
                 session.add(AccessControlEnabled(id=1, enabled=accessControlEnabled))
             else:
