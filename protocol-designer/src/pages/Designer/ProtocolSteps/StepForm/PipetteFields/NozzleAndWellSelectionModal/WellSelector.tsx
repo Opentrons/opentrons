@@ -114,6 +114,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const getSelectedWells = (): string[][] => {
     const wellsField = getWellsField()
     const wells = (wellsField?.value as string[]) || []
+    if (!hasMoreThanOneWell) {
+      return allWells
+    }
     return wells.map(well =>
       getEntireWellSelection(
         well,
