@@ -148,21 +148,15 @@ describe('ProtocolList', () => {
     screen.getByText('Oldest updates')
   })
 
-  it('renders Flex as the sort key when flex was selected last time', () => {
-    when(vi.mocked(useSortedProtocols))
-      .calledWith('flex', [storedProtocolData, storedProtocolDataTwo])
-      .thenReturn([storedProtocolData, storedProtocolDataTwo])
-    vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('flex')
-    render(props)
-    screen.getByText('Flex protocols first')
-  })
+  it('falls back to alphabetical when the stored sort key is invalid', () => {
+    vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('newest' as any)
 
-  it('renders ot2 as the sort key when ot2 was selected last time', () => {
-    when(vi.mocked(useSortedProtocols))
-      .calledWith('ot2', [storedProtocolData, storedProtocolDataTwo])
-      .thenReturn([storedProtocolData, storedProtocolDataTwo])
-    vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('ot2')
     render(props)
-    screen.getByText('OT-2 protocols first')
+
+    expect(vi.mocked(useSortedProtocols)).toHaveBeenCalledWith('alphabetical', [
+      storedProtocolData,
+      storedProtocolDataTwo,
+    ])
+    screen.getByText('Alphabetical')
   })
 })
