@@ -51,6 +51,7 @@ from opentrons.protocol_engine.types import (
     CommandPreconditions,
     CSVRuntimeParamPaths,
     EngineStatus,
+    LabwareOffset,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
@@ -66,7 +67,7 @@ from opentrons.protocol_runner import RunResult
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 
 OutputKind = Literal["json", "human-json"]
@@ -464,6 +465,7 @@ async def _analyze(  # noqa: C901
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
+        labwareOffsets=analysis.state_summary.labwareOffsets,
     )
 
     _call_for_output_of_kind(
@@ -555,3 +557,4 @@ class AnalyzeResults(BaseModel):
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
+    labwareOffsets: List[LabwareOffset]

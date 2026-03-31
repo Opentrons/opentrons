@@ -3,6 +3,7 @@
 from typing import Annotated
 
 import fastapi
+from sqlalchemy import delete, select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -13,7 +14,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
-from auth_server.persistence.orm_models import AccessControlEnabled, Setting
+from auth_server.persistence.orm_models import JsonPythonValue, Setting
 from auth_server.settings.models import (
     AccessControlResponseData,
     PatchAccessControlRequestData,
@@ -43,7 +44,7 @@ class SettingsStore:
     def get_settings(self) -> SettingsResponseData:
         """Get the current settings."""
         with self._session() as session:
-            rows = session.query(Setting).all()
+            rows = session.scalars(select(Setting)).all()
             if not rows:
                 return SettingsResponseData()
             parsed = {row.key: row.value for row in rows}
@@ -90,9 +91,10 @@ class SettingsStore:
 
     def patch_settings(self, patch: PatchSettingsRequestData) -> SettingsResponseData:
         """Patch the settings."""
-        updates = patch.model_dump(mode="json", exclude_unset=True)
-        db_updates: dict[str, object] = {k: v for k, v in updates.items()}
-        self._upsert_many(db_updates)
+        updates: dict[str, JsonPythonValue] = patch.model_dump(
+            mode="json", exclude_unset=True
+        )
+        self._upsert_many(updates)
         return self.get_settings()
 
     def reset_settings(self) -> SettingsResponseData:
@@ -103,18 +105,18 @@ class SettingsStore:
     def _upsert(self, key: str, value: str | None) -> None:
         """Insert or update a single setting."""
         with self._session() as session:
-            row = session.query(Setting).filter(Setting.key == key).first()
+            row = session.scalars(select(Setting).where(Setting.key == key)).first()
             if row is None:
                 session.add(Setting(key=key, value=value))
             else:
                 row.value = value
             session.commit()
 
-    def _upsert_many(self, settings: dict[str, object]) -> None:
+    def _upsert_many(self, settings: dict[str, JsonPythonValue]) -> None:
         """Insert or update multiple settings at once."""
         with self._session() as session:
             for key, value in settings.items():
-                row = session.query(Setting).filter(Setting.key == key).first()
+                row = session.scalars(select(Setting).where(Setting.key == key)).first()
                 if row is None:
                     session.add(Setting(key=key, value=value))
                 else:
@@ -125,9 +127,9 @@ class SettingsStore:
         """Delete all settings (for reset)."""
         with self._session() as session:
             # todo(tz, 2026-03-24): this is a hack to prevent the accessControlEnabled setting from being deleted
-            session.query(Setting).filter(
-                Setting.key != "accessControlEnabled"
-            ).delete()
+            session.execute(
+                delete(Setting).where(Setting.key != "accessControlEnabled")
+            )
             session.commit()
 
 

@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate, fixtureLid } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -49,7 +49,7 @@ describe('LabwareCardOverflowMenu', () => {
   beforeEach(() => {
     props = {
       setShowOverflowMenu: vi.fn(),
-      labwareIds: ['mockLabwareId'],
+      labwareIds: ['labId3'],
     }
     vi.mocked(EditNickNameModal).mockReturnValue(
       <div>mock EditNickNameModal</div>
@@ -57,11 +57,18 @@ describe('LabwareCardOverflowMenu', () => {
     vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {
-        mockLabwareId: {
-          id: 'mockLabwareId',
-          def: fixture96Plate as LabwareDefinition2,
-          stack: ['mockLabwareId', 'A1'],
+        labId3: {
+          stack: ['labId3', 'D2'],
+          id: 'labId3',
           labwareDefURI: 'mockUri',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+        },
+        lid1: {
+          stack: ['lid1', 'labId3', 'D2'],
+          id: 'lid1',
+          labwareDefURI: 'mockUri',
+          def: fixtureLid as LabwareDefinition2,
           pythonName: 'mockPythonName',
         },
       },
@@ -89,5 +96,16 @@ describe('LabwareCardOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByText('Delete labware'))
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
+  })
+
+  it('nicknames the labware, not the lid', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
+    expect(EditNickNameModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        labwareId: 'labId3',
+      }),
+      {}
+    )
   })
 })
