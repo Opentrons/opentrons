@@ -77,4 +77,4 @@ class AccessControlEnabled(Base):
     __tablename__ = "access_control_enabled"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    enabled: Mapped[bool] = mapped_column(nullable=True, default=None)
+    enabled: Mapped[bool]
