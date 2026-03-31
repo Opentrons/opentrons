@@ -15,7 +15,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot.types import RobotType
 
@@ -108,6 +108,7 @@ class ProtocolAnalyzer:
             liquidClasses=result.state_summary.liquidClasses,
             command_annotations=result.command_annotations,
             command_preconditions=result.command_preconditions,
+            labware_offsets=result.state_summary.labwareOffsets,
         )
 
     async def update_to_failed_analysis(
@@ -139,6 +140,7 @@ class ProtocolAnalyzer:
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         )
 
     def __del__(self) -> None:

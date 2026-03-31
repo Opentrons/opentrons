@@ -1235,6 +1235,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           engageHeight: '4',
         },
       },
+      {
+        testName: 'vacuum step',
+        step: {
+          id: stepId,
+          stepType: 'vacuum',
+          moduleId,
+        },
+      },
     ]
     testCases.forEach(({ testName, step }) => {
       it(testName, () => {

@@ -27,7 +27,7 @@ from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
@@ -177,6 +177,20 @@ async def test_analyze(
         params={},
     )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
+    offset = pe_types.LabwareOffset(
+        id="1234123",
+        createdAt=datetime.now(),
+        definitionUri="opentrons/abcxyz/1",
+        location=pe_types.LegacyLabwareOffsetLocation(
+            slotName=DeckSlotName.SLOT_A1, moduleModel=None, definitionUri=None
+        ),
+        locationSequence=[
+            pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
+                addressableAreaName="A1"
+            )
+        ],
+        vector=pe_types.LabwareOffsetVector(x=1.0, y=2.0, z=3.0),
+    )
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -204,7 +218,7 @@ async def test_analyze(
                 labware=[analysis_labware],
                 pipettes=[analysis_pipette],
                 modules=[],
-                labwareOffsets=[],
+                labwareOffsets=[offset],
                 liquids=[],
                 liquidClasses=[],
                 wells=[],
@@ -234,6 +248,7 @@ async def test_analyze(
             liquidClasses=[],
             command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
+            labware_offsets=[offset],
         )
     )
 
@@ -319,5 +334,6 @@ async def test_analyze_updates_pending_on_error(
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         ),
     )

@@ -2139,7 +2139,7 @@ def test_build_retrieve_labware_move_updates(
     decoy: Decoy,
 ) -> None:
     """It should build appropriate data for batch labware location."""
-    stacker = FlexStackerSubState(
+    stacker = FlexStackerSubState.model_construct(
         module_id=FlexStackerId("stacker-id"),
         pool_primary_definition=sentinel.pool_primary_definition,
         pool_adapter_definition=sentinel.pool_adapter_definition,

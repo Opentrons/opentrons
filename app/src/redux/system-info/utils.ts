@@ -21,6 +21,10 @@ const REALTEK_VID = parseInt('0BDA', 16)
 const RE_REALTEK_PID = /^8[0|1]5[0-9]$/
 
 export const isRealtekU2EAdapter = (device: UsbDevice): boolean => {
+  if (device.vendorId == null || device.productId == null) {
+    return false
+  }
+
   return (
     device.vendorId === REALTEK_VID &&
     RE_REALTEK_PID.test(device.productId.toString(16))
@@ -56,4 +60,17 @@ export const getDriverStatus = (device: UsbDevice): DriverStatus => {
   )
 
   return upToDate ? UP_TO_DATE : OUTDATED
+}
+
+export const compareUsbDevicesByLocation = (
+  a: UsbDevice,
+  b: UsbDevice
+): number => {
+  const aIsInternal = a.location === 'INTERNAL'
+  const bIsInternal = b.location === 'INTERNAL'
+
+  if (aIsInternal && !bIsInternal) return 1
+  if (!aIsInternal && bIsInternal) return -1
+
+  return 0
 }

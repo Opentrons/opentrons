@@ -103,7 +103,7 @@ class MixStepForm(BasePage):
                 "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
             ).first
         )
-        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
+        self.wait_for_visible(modal.get_by_role("button", name="Save"))
 
     def select_wells(self, wells: Iterable[str]) -> None:
         """Select each well in the provided iterable."""
@@ -111,7 +111,7 @@ class MixStepForm(BasePage):
         for well in wells:
             self.page.locator(f"#{well}").click()
         modal = self._modal_area()
-        modal.get_by_role("button", name="Continue").click()
+        modal.get_by_role("button", name="Save").click()
 
     def save_modal(self) -> None:
         """Click the Save button within the currently open modal."""
@@ -351,7 +351,7 @@ class MixStepForm(BasePage):
         self.page.get_by_role("button", name="Rename").click()
         modal = self._modal_area()
         modal.locator('input[name="stepName_input"]').fill(name)
-        modal.locator('[data-testid="TextAreaField"]').fill(notes)
+        modal.get_by_role("textbox", name="Step Notes").fill(notes)
         modal.get_by_role("button", name="Save").click()
 
     def save_step(self) -> None:
