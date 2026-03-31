@@ -309,7 +309,7 @@ export function SelectTips(
       },
       {}
     )
-
+    const is96Channel = channels === 96
     const tipStatusByWellName =
       tipState != null
         ? Object.entries(tipState).reduce<Record<string, TipType>>(
@@ -380,6 +380,7 @@ export function SelectTips(
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
             nozzles={nozzles}
+            rotate={is96Channel}
           />
         ) : null}
       </>
