@@ -34,12 +34,12 @@ async def get_settings(  # noqa: D103
 
 
 @router.get(
-    "/auth/settings/accessControl",
-    summary="Get access control settings",
-    description="Get the current access control settings.\
+    "/auth/settings/accessControlEnabled",
+    summary="Get access control enabled settings",
+    description="Get the current access control enabled settings.\
     This is seperated from the main settings endpoint because it is a special case that we do not want to change often.",
 )
-async def get_access_control_settings(  # noqa: D103
+async def get_access_control_enabled_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[AccessControlResponseData]:
     accessControlEnabled = settings_store.get_access_control_settings()
@@ -47,16 +47,16 @@ async def get_access_control_settings(  # noqa: D103
 
 
 @router.patch(
-    "/auth/settings/accessControl",
-    summary="Change access control settings",
-    description="Change the access control settings.",
+    "/auth/settings/accessControlEnabled",
+    summary="Change access control enabled settings",
+    description="Change the access control enabled settings.",
     dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
 )
 async def patch_access_control_settings(  # noqa: D103
     request_body: RequestModel[PatchAccessControlRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
 ) -> SimpleBody[AccessControlResponseData]:
-    """Change the access control settings."""
+    """Change the access control enabled settings."""
     try:
         accessControlResponseData = settings_store.patch_access_control(
             request_body.data
@@ -64,7 +64,7 @@ async def patch_access_control_settings(  # noqa: D103
     except AccessControlAlreadySetError:
         raise fastapi.HTTPException(
             status_code=422,
-            detail="Access control cannot be modified once enabled.",
+            detail="Access control enabled cannot be modified once enabled.",
         )
     return SimpleBody.model_construct(data=accessControlResponseData)
 

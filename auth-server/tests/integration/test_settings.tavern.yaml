@@ -219,10 +219,10 @@ marks:
       - admin_access_token
 
 stages:
-  - name: PATCH to enable access control
+  - name: PATCH to enable access control enabled
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings/accessControl'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -234,10 +234,10 @@ stages:
         data:
           accessControlEnabled: true
 
-  - name: PATCH to enable access control to false fails
+  - name: PATCH to enable access control enabled to false fails
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings/accessControl'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -247,7 +247,7 @@ stages:
       status_code: 422
 
 ---
-test_name: PATCH to enable access control when its set raises an error
+test_name: PATCH to enable access control enabled when its set raises an error
 
 marks:
   - usefixtures:
@@ -255,10 +255,10 @@ marks:
       - admin_access_token
 
 stages:
-  - name: PATCH to enable access control
+  - name: PATCH to enable access control enabled
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings/accessControl'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -267,10 +267,10 @@ stages:
     response:
       status_code: 200
 
-  - name: PATCH to enable access control again raises an error
+  - name: PATCH to enable access control enabled again raises an error
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings/accessControl'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       headers:
         Authorization: '{admin_access_token}'
       json:
