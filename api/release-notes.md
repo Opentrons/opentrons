@@ -29,7 +29,7 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 
 ### Known Issues
 
-- Returning Flex 20 µL pipette tips to a tip rack  with a pipette configured for partial tip pickup can result in incorrect placement in the tip rack.
+- Returning a full rack of Flex 20 µL pipette tips can result in incorrect placement in the tip rack.
 
 ---
 
