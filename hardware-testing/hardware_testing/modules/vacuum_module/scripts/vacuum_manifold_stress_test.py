@@ -7,7 +7,11 @@ from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
 import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
-from opentrons.drivers.vacuum_module.types import VentState
+import dataclasses
+import time
+import logging
+import csv
+from typing import Dict
 
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
@@ -41,6 +45,86 @@ async def find_port_by_id(vendorId: int, productId: int) -> str:
             print(f"port: {port.device}")
             return port.device
     return ""
+
+
+async def _write_to_csv(
+    f_name: str, header_write: bool, timestamp: float, data: Dict
+) -> None:
+    """Append a data line to the CSV file (offloaded to a thread).
+
+    Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
+    Adds the current `pressure_set` as the last column (may be None).
+    """
+
+    def _append() -> None:
+        with open(f_name, "a", newline="") as f:
+            writer = csv.writer(f)
+            if header_write:
+                writer.writerow(
+                    [
+                        "Time(s)",
+                        "target_guage_pressure",
+                        "current_guage_pressure",
+                        "pressure_abs_a",
+                        "pressure_abs_b",
+                        "pressure_atm",
+                        "vacuum_enabled",
+                        "vent_state",
+                    ]
+                )
+            writer.writerow(
+                [
+                    f"{timestamp:.2f}",
+                    f"{data['target_guage_pressure']}",
+                    f"{data['current_guage_pressure']}",
+                    f"{data['pressure_abs_a']}",
+                    f"{data['pressure_abs_b']}",
+                    f"{data['pressure_atm']}",
+                    f"{data['vacuum_enabled']}",
+                    f"{data['vent_state']}",
+                ]
+            )
+
+    await asyncio.to_thread(_append)
+
+
+async def read_continuous_data(
+    f_name: str,
+    pump: vacuum_module.VacuumModuleDriver,
+    start_time: float,
+    run_time: float,
+) -> None:
+    """Read and print continuous data from the vacuum pump for the specified timeout duration."""
+    loop_st = time.perf_counter()
+    head_writer = True
+    try:
+        while time.perf_counter() - loop_st < run_time:
+            line = await pump.get_vacuum_state()
+            await asyncio.sleep(0.1)
+            pressure_dict = dataclasses.asdict(line)
+            # Timestamp
+            ts = time.perf_counter() - start_time
+            # Record Pressure Data
+            await _write_to_csv(f_name, head_writer, ts, pressure_dict)
+            head_writer = False
+    except Exception as e:
+        raise (e)
+
+
+async def read_data(
+    f_name: str,
+    pump: vacuum_module.VacuumModuleDriver,
+    start_time: float,
+    duration: int,
+) -> None:
+    """Run continuous data read and handle expected timeout and errors."""
+    try:
+        await read_continuous_data(f_name, pump, start_time, duration)
+    except asyncio.TimeoutError:
+        # Expected: we stop after RUN_SEC
+        logging.info(f"continuous read duration reached ({duration}s)")
+    except Exception as e:
+        logging.info(f"continuous read error: {e}")
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -80,7 +164,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "tough_fill_time",
         "trough_fill_time",
-        default=87,
+        default=1,
         minimum=1,
         maximum=120,
         description="Reservoir water fill time",
@@ -114,13 +198,15 @@ async def _run_single_pump_api_cycle(
     #     water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time)
     # )
     if cycle_index == 1:
+        connection = await pump.is_connected()
+        if connection == False:
+            await pump.connect()
         await water_pump_fixture.connect()
-    await water_pump_timer(water_pump_fixture, trough_fill_time)
+    await water_pump_fixture.water_fill_timer(trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
         guage_pressure_mbar=target_to_pump,
-        duration_s=None,
     )
 
     await asyncio.sleep(SETTLE_SEC)
@@ -129,18 +215,18 @@ async def _run_single_pump_api_cycle(
     # Dynamic CSV naming per trial (date + trial index + pressure)
     date_str = datetime.utcnow().strftime("%y-%m-%d %H:%M:%S")
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"output_dir: {output_dir}")
+    ctx.comment(f"output_dir: {output_dir}")
     trial_csv = (
         output_dir / f"{date_str}_trial_{cycle_index:02d}_{target_pressure}mbar.csv"
     )
     try:
-        pump.set_csv_filename(str(trial_csv))
         ctx.comment(f"[cycle {cycle_index}] logging to {trial_csv.name}")
     except Exception as e:
         ctx.comment(f"[cycle {cycle_index}] failed to set CSV filename: {e}")
     # Run the continuous data reader for RUN_SEC seconds.
+    start_time = time.perf_counter()
     try:
-        await pump.read_continuous_data(RUN_SEC)
+        await read_data(trial_csv.name, pump, start_time, RUN_SEC)
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         ctx.comment(
@@ -150,18 +236,26 @@ async def _run_single_pump_api_cycle(
         ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
 
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(VentState.OPENED)
+    await pump.set_vent_state(True)
     await asyncio.sleep(VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(
         enable_vacuum=False,
         guage_pressure_mbar=target_to_pump,
-        duration_s=None,
     )
+    try:
+        await read_data(trial_csv.name, pump, start_time, DECAY_SEC)
+    except asyncio.TimeoutError:
+        # Expected: we stop after RUN_SEC
+        ctx.comment(
+            f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
+        )
+    except Exception as e:
+        ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
-    await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(VentState.CLOSED)
+    # await asyncio.sleep(DECAY_SEC)
+    await pump.set_vent_state(False)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:

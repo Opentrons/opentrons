@@ -44,6 +44,10 @@ class AbstractWaterPump(Protocol):
         """Check the current water level."""
         ...
 
+    async def water_fill_timer(self, run_time: int) -> None:
+        """Check the current water level."""
+        ...
+
 
 class WaterPump(AbstractWaterPump):
     """Concrete implementation of the water pump driver over serial."""
@@ -85,32 +89,34 @@ class WaterPump(AbstractWaterPump):
 
     async def turn_motor_on(self) -> str:
         """Change the state of the Pump to on."""
-        command = f"{COMMANDS['pumpOn']}{V_ACK}"
-        await asyncio.to_thread(self.connection.reset_input_buffer)
-        await asyncio.to_thread(self.connection.reset_output_buffer)
-        await self._write(command.encode())
         try:
-            while True:
-                line = await self._readline()
-                self._log("Motor:", line)
-                if line != "":
-                    return line
+            command = f"{COMMANDS['pumpOn']}{V_ACK}"
+            await asyncio.to_thread(self.connection.reset_input_buffer)
+            await asyncio.to_thread(self.connection.reset_output_buffer)
+            await self._write(command.encode())
         except Exception as e:
             self._log("error", f"Continuous read error: {e}")
             raise (e)
 
     async def turn_motor_off(self) -> str:
         """Change the state of the Pump to off."""
-        command = f"{COMMANDS['pumpOff']}{V_ACK}"
-        await asyncio.to_thread(self.connection.reset_input_buffer)
-        await asyncio.to_thread(self.connection.reset_output_buffer)
-        await self._write(command.encode())
         try:
-            while True:
-                line = await self._readline()
-                self._log("Motor:", line)
-                if line != "":
-                    return line
+            command = f"{COMMANDS['pumpOff']}{V_ACK}"
+            await asyncio.to_thread(self.connection.reset_input_buffer)
+            await asyncio.to_thread(self.connection.reset_output_buffer)
+            await self._write(command.encode())
+        except Exception as e:
+            self._log("error", f"Continuous read error: {e}")
+            raise (e)
+
+    async def water_fill_timer(self, run_time: int) -> None:
+        """Change the state of the Pump to off."""
+        loop_st = time.perf_counter()
+        try:
+            while time.perf_counter() - loop_st < run_time:
+                await self.turn_motor_on()
+                await asyncio.sleep(0.1)
+            await self.turn_motor_off()
         except Exception as e:
             self._log("error", f"Continuous read error: {e}")
             raise (e)
@@ -170,10 +176,10 @@ class WaterPump(AbstractWaterPump):
 
 
 # async def main():
-#     pump = await WaterPump.create(port ='COM10', baudrate = 115200, loop = None)
+#     pump = await WaterPump.create(port ='/dev/ttyACM1', baudrate = 115200, loop = None)
 #     await pump.connect()
-#     total_time = 90
-#     off_time = 120-total_time + 35 + 5 + 12
+#     total_time = 3
+#     off_time = 5
 #     t=1
 #     while True:
 #         await pump.turn_motor_on()
@@ -188,6 +194,6 @@ class WaterPump(AbstractWaterPump):
 #             t+= 1
 #             print(f"\rTime(s): {t}", end="", flush=True)
 #         t=0
-# if __name__ =='__main__':
+if __name__ =='__main__':
 
-#     asyncio.run(main())
+    asyncio.run(main())
