@@ -35,7 +35,9 @@ def test_migration_orm_parity(
     normalized_from_migration_path = set(
         _normalize_statement(s) for s in schema_from_migration_path
     )
-    normalized_from_orm_models = set(_normalize_statement(s) for s in schema_from_orm_models)
+    normalized_from_orm_models = set(
+        _normalize_statement(s) for s in schema_from_orm_models
+    )
 
     assert normalized_from_migration_path == normalized_from_orm_models
 
