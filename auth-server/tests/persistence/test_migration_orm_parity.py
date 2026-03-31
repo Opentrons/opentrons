@@ -65,7 +65,7 @@ def _get_schema(connection: sqlalchemy.engine.Connection) -> list[str]:
     The schema is returned in the form of DDL statements
     (like `CREATE TABLE ...`, etc.).
     """
-    return (
+    return list(
         connection.execute(
             # `alembic_version` is bookkeeping added by Alembic, naturally only present
             # when we're using the Alembic migration path. Exclude it from the comparison.
