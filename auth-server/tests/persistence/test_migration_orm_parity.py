@@ -26,8 +26,8 @@ def test_migration_orm_parity(
     schema_from_migration_path = _get_schema_from_migration_path(
         tmp_path_factory.mktemp("from_migrations", numbered=True)
     )
-    schema_from_scratch = _get_schema_from_scratch(
-        tmp_path_factory.mktemp("from_scratch", numbered=True)
+    schema_from_orm_models = _get_schema_from_orm_models(
+        tmp_path_factory.mktemp("from_orm_models", numbered=True)
     )
 
     # SQLAlchemy may emit CREATE INDEX statements in a nondeterministic
@@ -35,9 +35,9 @@ def test_migration_orm_parity(
     normalized_from_migration_path = set(
         _normalize_statement(s) for s in schema_from_migration_path
     )
-    normalized_from_scratch = set(_normalize_statement(s) for s in schema_from_scratch)
+    normalized_from_orm_models = set(_normalize_statement(s) for s in schema_from_orm_models)
 
-    assert normalized_from_migration_path == normalized_from_scratch
+    assert normalized_from_migration_path == normalized_from_orm_models
 
 
 def _get_schema_from_migration_path(temp_dir: Path) -> list[str]:
@@ -50,7 +50,7 @@ def _get_schema_from_migration_path(temp_dir: Path) -> list[str]:
         return _get_schema(connection)
 
 
-def _get_schema_from_scratch(temp_dir: Path) -> list[str]:
+def _get_schema_from_orm_models(temp_dir: Path) -> list[str]:
     with (
         sql_engine_ctx(temp_dir / "test.db") as sql_engine,
         sql_engine.begin() as connection,
