@@ -711,7 +711,13 @@ class PipetteView:
             tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
                 max_volume
             ]
-        return tip_lookup.default_return_tip_height
+        if (
+            self.get_active_channels(pipette_id) == 96
+            and tip_lookup.full_rack_return_tip_height
+        ):
+            return tip_lookup.full_rack_return_tip_height
+        else:
+            return tip_lookup.default_return_tip_height
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""

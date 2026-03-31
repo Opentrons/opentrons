@@ -134,6 +134,11 @@ class SupportedTipsDefinition(BaseModel):
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
     )
+    full_rack_return_tip_height: Optional[float] = Field(
+        default=None,
+        description="The height to return a tip to its tiprack when doing a full-rack return tip.",
+        alias="fullRackReturnTipHeight",
+    )
     aspirate: ulPerMMDefinition = Field(
         ..., description="The default pipetting functions list for aspirate."
     )

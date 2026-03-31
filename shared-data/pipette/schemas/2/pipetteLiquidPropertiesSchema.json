@@ -87,6 +87,10 @@
               "defaultReturnTipHeight": {
                 "$ref": "#/definitions/positiveNumber"
               },
+              "fullRackReturnTipHeight": {
+                "$ref": "#/definitions/positiveNumber",
+                "description": "An optional number to change the height to return tips when doing a full rack."
+              },
               "aspirate": {
                 "type": "array",
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }

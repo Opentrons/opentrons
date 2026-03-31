@@ -18,6 +18,7 @@
       "defaultFlowAcceleration": 3160.0,
       "defaultTipLength": 52.0,
       "defaultReturnTipHeight": 0.48,
+      "fullRackReturnTipHeight": 0.6,
       "aspirate": {
         "default": {
           "1": [
@@ -77,6 +78,7 @@
       "defaultFlowAcceleration": 3160.0,
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.53,
+      "fullRackReturnTipHeight": 0.6,
       "aspirate": {
         "default": {
           "1": [
@@ -140,6 +142,7 @@
       "defaultFlowAcceleration": 3160.0,
       "defaultTipLength": 58.35,
       "defaultReturnTipHeight": 0.53,
+      "fullRackReturnTipHeight": 0.6,
       "aspirate": {
         "default": {
           "1": [

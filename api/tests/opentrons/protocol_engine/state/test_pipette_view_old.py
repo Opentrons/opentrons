@@ -573,6 +573,15 @@ def test_get_static_config(
         volume_mode=VolumeModes.default,
         available_volume_modes_min_vol={},
     )
+    nozzle_map = NozzleMap.build(
+        physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+        physical_rows=OrderedDict({"A": ["A1"]}),
+        physical_columns=OrderedDict({"1": ["A1"]}),
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A1",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
+    )
 
     subject = get_pipette_view(
         pipettes_by_id={
@@ -586,6 +595,7 @@ def test_get_static_config(
             "pipette-id": TipGeometry(length=1, volume=4.56, diameter=3),
         },
         static_config_by_id={"pipette-id": config},
+        nozzle_layout_by_id= {"pipette-id": nozzle_map}
     )
 
     assert subject.get_config("pipette-id") == config
