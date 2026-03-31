@@ -179,57 +179,62 @@ export function useReleaseLabware({
     }
   }
 
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null
-    switch (recoveryMap.route) {
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
-      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
-        intervalId = setInterval(() => {
-          setCountdown(prevCountdown => {
-            const updatedCountdown = prevCountdown - 1
+  useEffect(
+    () => {
+      let intervalId: NodeJS.Timeout | null = null
+      switch (recoveryMap.route) {
+        case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
+        case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
+          intervalId = setInterval(() => {
+            setCountdown(prevCountdown => {
+              const updatedCountdown = prevCountdown - 1
 
-            if (updatedCountdown === 0) {
-              if (intervalId != null) {
-                clearInterval(intervalId)
-              }
-              if (
-                recoveryMap.route ===
-                RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
-              ) {
-                void releaseLabwareLatch().then(() => {
-                  return handleMotionRouting(false).then(() => {
-                    proceedToValidNextStep()
-                  })
-                })
-              } else {
-                void releaseGripperJaws().then(() => {
-                  if (isDoorOpen) {
+              if (updatedCountdown === 0) {
+                if (intervalId != null) {
+                  clearInterval(intervalId)
+                }
+                if (
+                  recoveryMap.route ===
+                  RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
+                ) {
+                  void releaseLabwareLatch().then(() => {
                     return handleMotionRouting(false).then(() => {
-                      proceedToDoorStep()
-                    })
-                  }
-
-                  return handleMotionRouting(true)
-                    .then(() => homeExceptPlungers())
-                    .then(() => handleMotionRouting(false))
-                    .then(() => {
                       proceedToValidNextStep()
                     })
-                })
-              }
-            }
-            return updatedCountdown
-          })
-        }, 1000)
-        break
-    }
+                  })
+                } else {
+                  void releaseGripperJaws().then(() => {
+                    if (isDoorOpen) {
+                      return handleMotionRouting(false).then(() => {
+                        proceedToDoorStep()
+                      })
+                    }
 
-    return () => {
-      if (intervalId != null) {
-        clearInterval(intervalId)
+                    return handleMotionRouting(true)
+                      .then(() => homeExceptPlungers())
+                      .then(() => handleMotionRouting(false))
+                      .then(() => {
+                        proceedToValidNextStep()
+                      })
+                  })
+                }
+              }
+              return updatedCountdown
+            })
+          }, 1000)
+          break
       }
-    }
-  }, [recoveryMap.route])
+
+      return () => {
+        if (intervalId != null) {
+          clearInterval(intervalId)
+        }
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recoveryMap.route]
+  )
 
   return countdown
 }

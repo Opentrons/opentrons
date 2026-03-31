@@ -10,6 +10,7 @@ import {
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getDeckConfiguration,
@@ -28,7 +29,7 @@ vi.mock('@opentrons/components', async importOriginal => {
     DeckConfigurator: vi.fn(),
   }
 })
-
+vi.mock('/protocol-designer/feature-flags/selectors')
 const render = () => {
   return renderWithProviders(<FlexHardware />, {
     i18nInstance: i18n,
@@ -63,6 +64,7 @@ describe('FlexHardware', () => {
     vi.mocked(DeckConfigurator).mockReturnValue(
       <div>mock DeckConfigurator</div>
     )
+    vi.mocked(getEnableVacuumModule).mockReturnValue(true)
   })
 
   it('should render the deck configurator', () => {

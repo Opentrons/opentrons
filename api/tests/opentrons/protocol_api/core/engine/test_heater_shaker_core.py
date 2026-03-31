@@ -36,7 +36,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncHeaterShakerHardware:
 @pytest.fixture
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolCore)
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
 
 
 @pytest.fixture
@@ -81,7 +83,8 @@ def test_set_target_temperature(
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
-            cmd.heater_shaker.SetTargetTemperatureParams(moduleId="1234", celsius=42.0)
+            cmd.heater_shaker.SetTargetTemperatureParams(moduleId="1234", celsius=42.0),
+            command_annotations=[],
         )
     ).then_return(cmd.heater_shaker.SetTargetTemperatureResult(taskId="taskId"))
     task_mock._id = "taskId"
@@ -98,7 +101,8 @@ def test_wait_for_target_temperature(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.WaitForTemperatureParams(moduleId="1234")
+            cmd.heater_shaker.WaitForTemperatureParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -112,7 +116,8 @@ def test_set_and_wait_for_shake_speed(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.SetAndWaitForShakeSpeedParams(moduleId="1234", rpm=1337)
+            cmd.heater_shaker.SetAndWaitForShakeSpeedParams(moduleId="1234", rpm=1337),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -125,7 +130,8 @@ def test_shake_speed(
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
-            cmd.heater_shaker.SetShakeSpeedParams(moduleId="1234", rpm=1337)
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId="1234", rpm=1337),
+            command_annotations=[],
         )
     ).then_return(
         cmd.heater_shaker.SetShakeSpeedResult(taskId="taskId", pipetteRetracted=True)
@@ -144,7 +150,8 @@ def test_open_labware_latch(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.OpenLabwareLatchParams(moduleId="1234")
+            cmd.heater_shaker.OpenLabwareLatchParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -158,7 +165,8 @@ def test_close_labware_latch(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.CloseLabwareLatchParams(moduleId="1234")
+            cmd.heater_shaker.CloseLabwareLatchParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -172,7 +180,8 @@ def test_deactivate_shaker(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.DeactivateShakerParams(moduleId="1234")
+            cmd.heater_shaker.DeactivateShakerParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -186,7 +195,8 @@ def test_deactivate_heater(
 
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.heater_shaker.DeactivateHeaterParams(moduleId="1234")
+            cmd.heater_shaker.DeactivateHeaterParams(moduleId="1234"),
+            command_annotations=[],
         ),
         times=1,
     )

@@ -7,6 +7,7 @@ import orderBy from 'lodash/orderBy'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
+import { getFeatureFlags } from '../config/selectors'
 import {
   CONNECTABLE,
   HEALTH_STATUS_OK,
@@ -84,11 +85,24 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
+const getRobotModelDisplayName = (robot: DiscoveredRobot): string | null => {
+  const robotModelName = robot.robotModel?.split(/\s/)[0] ?? null
+
+  return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
+}
+
+const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
+  const displayName = getRobotModelDisplayName(robot)
+
+  return displayName !== 'OT-2' && displayName !== null
+}
+
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
     state => state.discovery.robotsByName,
-    robotsMap => {
-      return Object.keys(robotsMap).map((robotName: string) => {
+    state => getFeatureFlags(state).ignoreOT2App ?? false,
+    (robotsMap, ignoreOT2App) => {
+      const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
         const { health, serverHealth } = robotState
@@ -149,6 +163,10 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
           status: UNREACHABLE,
         }
       })
+
+      return ignoreOT2App
+        ? robots.filter(robot => isNotOT2Robot(robot))
+        : robots
     }
   )
 
@@ -276,9 +294,8 @@ export const getRobotModelByName = (
   robotName: string
 ): string | null => {
   const robot = getDiscoverableRobotByName(state, robotName)
-  const robotModelName =
-    robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
-  return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
+
+  return robot != null ? getRobotModelDisplayName(robot) : null
 }
 
 export const getRobotAddressesByName: (

@@ -26,24 +26,29 @@ export const useResetFormOnSecurityChange = (): void => {
   const securityType = getValues('securityType')
   const prevSecurityType = usePrevious(securityType)
 
-  useEffect(() => {
-    if (prevSecurityType && securityType !== prevSecurityType) {
-      clearErrors('ssid')
-      clearErrors('securityType')
-      setValue('ssid', ssid)
-      setValue('securityType', securityType)
-      trigger(['ssid', 'securityType'])
-    }
-  }, [
-    ssid,
-    ssidTouched,
-    ssidError,
-    securityType,
-    prevSecurityType,
-    control,
-    setValue,
-    trigger,
-  ])
+  useEffect(
+    () => {
+      if (prevSecurityType && securityType !== prevSecurityType) {
+        clearErrors('ssid')
+        clearErrors('securityType')
+        setValue('ssid', ssid)
+        setValue('securityType', securityType)
+        trigger(['ssid', 'securityType'])
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      ssid,
+      ssidTouched,
+      ssidError,
+      securityType,
+      prevSecurityType,
+      control,
+      setValue,
+      trigger,
+    ]
+  )
 }
 
 export const useConnectFormField = (

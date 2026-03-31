@@ -17,11 +17,13 @@ import type {
   PipetteName,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   ShakeSpeedParams,
   StackerStoredLabwareDefinitionURIs,
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -33,6 +35,10 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
+  VACUUM_MODE_POWER,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_VENT_CLOSED,
+  VACUUM_VENT_OPEN,
 } from './constants'
 
 // Copied from PD
@@ -66,6 +72,8 @@ export interface PipetteTemporalProperties {
   tiprackId?: string
   //  last primary tip well accessed (used for return tip)
   tipWell?: string
+  // primary nozzle to use
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -165,6 +173,25 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
+interface VacuumModulePressureState {
+  modeType: typeof VACUUM_MODE_PRESSURE
+  currentPressure: number | null
+  targetPressure: number | null
+}
+
+interface VacuumModulePowerState {
+  modeType: typeof VACUUM_MODE_POWER
+  currentPower: number | null
+  targetPower: number | null
+}
+
+export type VentStatus = typeof VACUUM_VENT_OPEN | typeof VACUUM_VENT_CLOSED
+export interface VacuumModuleState {
+  type: typeof VACUUM_MODULE_TYPE
+  vacuumState: VacuumModulePressureState | VacuumModulePowerState | null
+  ventStatus: VentStatus | null
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -173,6 +200,7 @@ export type ModuleState =
   | MagneticBlockState
   | AbsorbanceReaderState
   | FlexStackerModuleState
+  | VacuumModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -231,6 +259,7 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
+
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
@@ -343,7 +372,9 @@ interface CommonArgs {
 export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
+  primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
+
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -404,6 +435,11 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
 
+  /** additional blowout params if the position needs to be more refined */
+  blowoutOffsetFromTopMm: number | null
+  blowoutXPosition: number | null
+  blowoutYPosition: number | null
+  blowoutPositionReference: string | null
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
@@ -483,7 +519,7 @@ export type MixArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   labware: string
   pipette: string
-  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number
@@ -520,6 +556,7 @@ export type MixArgs = CommonArgs & {
   tipTracking: TipTrackingOption
   tipsSelected: string[][]
   tiprackSelected: string | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export type PauseArgs = CommonArgs & {

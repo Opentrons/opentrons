@@ -7,13 +7,16 @@ export { Breadcrumbs } from './Breadcrumbs'
 export function Nav(): JSX.Element {
   return (
     <>
-      <nav className={styles.nav}>
-        <div className={styles.subdomain_nav_wrapper}>
+      <nav className={styles.nav} aria-label="Main site navigation">
+        <div
+          className={styles.subdomain_nav_wrapper}
+          data-testid="SubdomainNavWrapper"
+        >
           <div className={styles.nav_container}>
             <SubdomainNav />
           </div>
         </div>
-        <div className={styles.main_nav_wrapper}>
+        <div className={styles.main_nav_wrapper} data-testid="MainNavWrapper">
           <div className={styles.nav_container}>
             <MainNav />
           </div>

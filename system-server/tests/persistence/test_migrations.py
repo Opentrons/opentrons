@@ -46,11 +46,13 @@ def subject(database_path: Path) -> Generator[sqlalchemy.engine.Engine, None, No
 )
 def test_migration(subject: sqlalchemy.engine.Engine) -> None:
     """It should migrate a table if necessary."""
-    migrations = subject.execute(sqlalchemy.select(migration_table)).all()
+    with subject.begin() as connection:
+        migrations = connection.execute(sqlalchemy.select(migration_table)).all()
 
     assert [m.version for m in migrations] == [0]
 
     # all table queries work without raising
-    for table in TABLES:
-        values = subject.execute(sqlalchemy.select(table)).all()
-        assert values == []
+    with subject.begin() as connection:
+        for table in TABLES:
+            values = connection.execute(sqlalchemy.select(table)).all()
+            assert values == []

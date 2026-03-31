@@ -121,6 +121,7 @@ def get_command_view(  # noqa: C901
         is_stopping_because_of_async_error=False,
         has_entered_error_recovery=has_entered_error_recovery,
         error_recovery_policy=_placeholder_error_recovery_policy,
+        command_annotations={},
     )
 
     return CommandView(state=state)
@@ -905,18 +906,18 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
 
-    command_1 = create_succeeded_command(
+    command_3 = create_succeeded_command(
         "command-id-1",
         command_key="key-1",
         created_at=datetime(year=2021, month=1, day=1),
     )
-    command_2 = create_failed_command(
+    command_4 = create_failed_command(
         "command-id-2",
         command_key="key-2",
         created_at=datetime(year=2022, month=2, day=2),
     )
-    subject = get_command_view(commands=[command_1, command_2])
-    subject._state.command_history._set_most_recently_completed_command_id(command_1.id)
+    subject = get_command_view(commands=[command_3, command_4])
+    subject._state.command_history._set_most_recently_completed_command_id(command_3.id)
 
     assert subject.get_current() == CommandPointer(
         index=1,

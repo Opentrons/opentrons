@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
+  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,12 +15,16 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
+  TIP,
   USED,
 } from '@opentrons/components'
 import {
   ALL,
   COLUMN,
   getPositionFromSlotId,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
   SINGLE,
 } from '@opentrons/shared-data'
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
@@ -29,6 +34,8 @@ import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
+import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
@@ -38,11 +45,11 @@ import {
 } from './constants'
 import { DeckOverlay } from './DeckOverlay'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
-import { TipLegend } from './TipLegend'
+import { SelectionLegend } from './SelectionLegend'
 import styles from './tipselectionwizard.module.css'
 import {
-  getAffectedWells,
   getAllWellsInColumn,
+  getAllWellsInRow,
   getViewboxFromSelectedLabware,
 } from './utils'
 
@@ -50,7 +57,9 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AccessibilityStatus,
@@ -68,7 +77,7 @@ export function SelectTips(
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowErrorBanner: Dispatch<SetStateAction<boolean>>
-    primaryNozzle: string
+    primaryNozzle: PrimaryNozzleConfigurationStyle
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
 ): JSX.Element {
@@ -117,12 +126,13 @@ export function SelectTips(
       ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
       : {}
 
-  const allWellsAffectedByHover = getAffectedWells({
-    wellName: hoveredWell,
-    labwareDef,
-    channels,
+  const allWellsAffectedByHover = getEntireWellSelection(
+    hoveredWell,
+    labwareDef.ordering,
     nozzles,
-  })
+    primaryNozzle,
+    channels
+  )
 
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
     well =>
@@ -135,6 +145,7 @@ export function SelectTips(
     INACCESSIBLE_COLLISION,
     INACCESSIBLE_INCOMPLETE,
     INACCESSIBLE_TOO_MANY_PICKUPS,
+    INACCESSIBLE_PARTIAL_TIP,
   ]
 
   const hoveredWellsInaccessibilityStatus =
@@ -189,7 +200,25 @@ export function SelectTips(
       } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, [wellName]])
       }
-    } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+    } else if (nozzles === PARTIAL_COLUMN) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
+        const totalTipSelection =
+          PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles] ?? 0
+        const allWellsinColumn = getAllWellsInColumn(wellName, labwareDef)
+        const lengthOfColumn = allWellsinColumn.length
+        const allWellsInPartialColumn = allWellsinColumn.slice(
+          0,
+          lengthOfColumn - totalTipSelection
+        )
+        setSelectedTips(prevTips => [...prevTips, allWellsInPartialColumn])
+      }
+    } else if (
+      (channels === 8 && nozzles === ALL) ||
+      (channels === 96 && nozzles === COLUMN)
+    ) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
@@ -201,7 +230,19 @@ export function SelectTips(
           return newTips
         })
       }
-    } else if (channels === 96) {
+    } else if (channels === 96 && nozzles === ROW) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
+        const allWellsInRow = getAllWellsInRow(wellName, labwareDef)
+        setSelectedTips(prevTips => {
+          const newTips = [...prevTips]
+          newTips.push(allWellsInRow)
+          return newTips
+        })
+      }
+    } else if (channels === 96 && nozzles === ALL) {
       const allWells = Object.keys(labwareDef.wells)
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
@@ -223,6 +264,9 @@ export function SelectTips(
       transformedWellName = `A${column}`
     } else if (channels === 96 && nozzles === ALL) {
       transformedWellName = NINETY_SIX_ALL_TARGET_WELL
+    } else if (channels === 96 && nozzles === ROW) {
+      const rowName = wellName.slice(0, 1)
+      transformedWellName = `${rowName}1`
     }
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
@@ -312,7 +356,7 @@ export function SelectTips(
           selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
-                tipStatusByWellName,
+                statusByWellName: tipStatusByWellName,
               }
             : {})}
           fill={COLORS.white}
@@ -325,7 +369,7 @@ export function SelectTips(
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
-            selectedTiprackId={selectedTiprackId}
+            selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()
@@ -341,7 +385,6 @@ export function SelectTips(
       </>
     )
   }
-
   return (
     <div className={styles.modal_body}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
@@ -367,7 +410,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <TipLegend />
+        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
       </div>
     </div>
   )

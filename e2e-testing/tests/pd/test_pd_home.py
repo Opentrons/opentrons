@@ -5,7 +5,7 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.mark.pdE2E
-def test_home_page_loads_successfully(page: Page, base_url: str) -> None:
+def test_home_page_loads_successfully(page: Page, pd_base_url: str) -> None:
     """Test that the home page loads successfully with all expected elements.
 
     This test verifies:

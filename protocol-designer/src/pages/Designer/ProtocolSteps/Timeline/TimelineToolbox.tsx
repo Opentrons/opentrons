@@ -83,17 +83,22 @@ export function TimelineToolbox({
     }
   }
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent): void => {
-      handleKeyDown(e)
-    }
+  useEffect(
+    () => {
+      const onKeyDown = (e: KeyboardEvent): void => {
+        handleKeyDown(e)
+      }
 
-    global.addEventListener('keydown', onKeyDown, false)
+      global.addEventListener('keydown', onKeyDown, false)
 
-    return () => {
-      global.removeEventListener('keydown', onKeyDown, false)
-    }
-  }, [])
+      return () => {
+        global.removeEventListener('keydown', onKeyDown, false)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const handleGoBack = (): void => {
     if (hasTrash) {
@@ -121,6 +126,7 @@ export function TimelineToolbox({
       height="100%"
       maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
       width={`${sidebarWidth / 16}rem`}
+      childrenContainerTestId="TimelineToolbox_scrollContainer"
       title={
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText

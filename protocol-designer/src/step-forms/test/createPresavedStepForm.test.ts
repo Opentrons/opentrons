@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
   fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -195,6 +196,10 @@ describe('createPresavedStepForm', () => {
       aspirate_wells_grouped: false,
       blowout_checkbox: false,
       blowout_location: null,
+      blowout_mmFromBottom: null,
+      blowout_x_position: null,
+      blowout_y_position: null,
+      blowout_position_reference: 'well-top',
       changeTip: 'always',
       dispense_airGap_checkbox: false,
       dispense_airGap_volume: '1',
@@ -228,6 +233,7 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      primaryNozzle: null,
       pushOut_checkbox: null,
       pushOut_volume: null,
       conditioning_checkbox: false,
@@ -266,6 +272,7 @@ describe('createPresavedStepForm', () => {
         dropTip_location: 'mockTrash',
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
+        primaryNozzle: A1_NOZZLE,
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,

@@ -77,7 +77,6 @@ function createTransports(config: Config['log']): Transport[] {
           const { level, message, timestamp, label } = info
           const time =
             typeof timestamp === 'string' ? timeFromStamp(timestamp) : ''
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           const print = `${time} [${label}] ${level}: ${message}`
           const meta = inspect(info.meta, { depth: 6 })
 

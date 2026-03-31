@@ -660,6 +660,19 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class CommandAnnotationNotFoundError(ProtocolEngineError):
+    """Raised when command annotation cannot be found or resolved."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandAnnotationNotFoundError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class ResumeFromRecoveryNotAllowedError(ProtocolEngineError):
     """Raised when attempting to resume a run from recovery that has a fixit command in the queue."""
 
@@ -1301,6 +1314,19 @@ class FileNameInvalidError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an FileNameInvalidError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
+
+
+class CSVFileNotFoundError(ProtocolEngineError):
+    """Raise when attempting to reference a file that has not been created."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an CSVFileNotFoundError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
 
 

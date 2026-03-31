@@ -8,7 +8,10 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -46,11 +49,13 @@ export const getMagneticLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getInitialDeckSetup,
     getLabwareNicknamesById,
-    (initialDeckSetup, nicknamesById) => {
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
       return getModuleLabwareOptions(
         initialDeckSetup,
         nicknamesById,
-        MAGNETIC_MODULE_TYPE
+        MAGNETIC_MODULE_TYPE,
+        robotType
       )
     }
   )
@@ -60,11 +65,13 @@ export const getTemperatureLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getInitialDeckSetup,
     getLabwareNicknamesById,
-    (initialDeckSetup, nicknamesById) => {
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
       const temperatureModuleOptions = getModuleLabwareOptions(
         initialDeckSetup,
         nicknamesById,
-        TEMPERATURE_MODULE_TYPE
+        TEMPERATURE_MODULE_TYPE,
+        robotType
       )
       return temperatureModuleOptions
     }
@@ -75,11 +82,13 @@ export const getHeaterShakerLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getInitialDeckSetup,
     getLabwareNicknamesById,
-    (initialDeckSetup, nicknamesById) => {
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
       const heaterShakerModuleOptions = getModuleLabwareOptions(
         initialDeckSetup,
         nicknamesById,
-        HEATERSHAKER_MODULE_TYPE
+        HEATERSHAKER_MODULE_TYPE,
+        robotType
       )
       return heaterShakerModuleOptions
     }
@@ -90,11 +99,13 @@ export const getAbsorbanceReaderLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getDeckSetupForActiveItem,
     getLabwareNicknamesById,
-    (deckSetup, nicknamesById) => {
+    getRobotType,
+    (deckSetup, nicknamesById, robotType) => {
       const absorbanceReaderModuleOptions = getModuleLabwareOptions(
         deckSetup,
         nicknamesById,
-        ABSORBANCE_READER_TYPE
+        ABSORBANCE_READER_TYPE,
+        robotType
       )
       return absorbanceReaderModuleOptions
     }
@@ -105,13 +116,31 @@ export const getFlexStackerLabwareOptions: Selector<DropdownOption[]> =
   createSelector(
     getInitialDeckSetup,
     getLabwareNicknamesById,
-    (initialDeckSetup, nicknamesById) => {
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
       const flexStackerModuleOptions = getModuleLabwareOptions(
         initialDeckSetup,
         nicknamesById,
-        FLEX_STACKER_MODULE_TYPE
+        FLEX_STACKER_MODULE_TYPE,
+        robotType
       )
       return flexStackerModuleOptions
+    }
+  )
+
+export const getVacuumLabwareOptions: Selector<DropdownOption[]> =
+  createSelector(
+    getInitialDeckSetup,
+    getLabwareNicknamesById,
+    getRobotType,
+    (initialDeckSetup, nicknamesById, robotType) => {
+      const vacuumModuleOptions = getModuleLabwareOptions(
+        initialDeckSetup,
+        nicknamesById,
+        VACUUM_MODULE_TYPE,
+        robotType
+      )
+      return vacuumModuleOptions
     }
   )
 

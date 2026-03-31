@@ -10,9 +10,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -70,44 +68,17 @@ export function FlexHardware(): JSX.Element {
     additionalEquipmentOnDeck,
     labware: labwareOnDeck,
   } = initialDeckSetup
-  const hasStagingAreaAndWasteChute =
-    Object.values(additionalEquipmentOnDeck).filter(
-      ae => ae.location === WASTE_CHUTE_CUTOUT
-    )?.length === 2
 
   const fixtures: Fixtures = Object.values(additionalEquipmentOnDeck).reduce(
     (acc: Fixtures, fixture) => {
       let cutoutFixtureId: CutoutFixtureId = TRASH_BIN_ADAPTER_FIXTURE
 
-      //  the stagingArea + magneticBlock combo is added to the modules and
-      //  filtered out here
-      if (
-        fixture.name === 'stagingArea' &&
-        Object.values(moduleOnDeck).some(
-          module =>
-            module.type === MAGNETIC_BLOCK_TYPE &&
-            fixture.location.includes(module.slot)
-        )
-      ) {
-        return acc
-      }
-      //  the stagingArea + wasteChute combo is added only once through wasteChute
-      //  and filtered out the 2nd time for stagingArea here
-      if (
-        hasStagingAreaAndWasteChute &&
-        fixture.name === 'stagingArea' &&
-        fixture.location === WASTE_CHUTE_CUTOUT
-      ) {
-        return acc
-      }
-      if (hasStagingAreaAndWasteChute && fixture.name === 'wasteChute') {
-        cutoutFixtureId =
-          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-      } else if (fixture.name === 'stagingArea') {
+      if (fixture.name === 'stagingArea') {
         cutoutFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
       } else if (fixture.name === 'wasteChute') {
         cutoutFixtureId = WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
       }
+
       acc[fixture.id] = {
         cutoutId: fixture.location as CutoutId,
         name: fixture.name as FixtureName,

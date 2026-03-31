@@ -7,7 +7,14 @@ import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from . import models, validation, validation_mapping
 from .fastapi_dependencies import get_deck_configuration_store
@@ -15,7 +22,6 @@ from .store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.hardware import get_deck_definition
 from robot_server.service.dependencies import get_current_time
-from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
 
 router = LightRouter()
 
@@ -55,6 +61,7 @@ router = LightRouter()
             "model": ErrorBody[models.InvalidDeckConfiguration]
         },
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],

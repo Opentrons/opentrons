@@ -221,7 +221,7 @@ export const MagneticModuleSlideout = (
         </LegacyStyledText>
         <form id="MagneticModuleSlideout_submitValue">
           <InputField
-            data-testid={`${String(module.moduleModel)}`}
+            title={`${String(module.moduleModel)}`}
             id={`${String(module.moduleModel)}`}
             units={info.units}
             value={engageHeightValue}

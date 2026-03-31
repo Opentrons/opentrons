@@ -176,8 +176,8 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO: Change platformState to specific key
-        return data is not None and "platformState" in data.keys()
+        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
+        return data is not None
 
 
 class LiveData(TypedDict):
@@ -230,7 +230,7 @@ class ModuleType(StrEnum):
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
         if module_type == ModuleType.VACUUM_MODULE:
-            return "vacuumModuleMilliporeV1"
+            return "vacuumModuleV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -269,7 +269,7 @@ class FlexStackerModuleModel(StrEnum):
 
 
 class VacuumModuleModel(StrEnum):
-    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
+    VACUUM_MODULE_V1 = "vacuumModuleV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

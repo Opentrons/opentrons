@@ -55,6 +55,43 @@ export const migrateFile = (
     return draft
   })
 
+/**
+ * v8.9.0 released with a bug where it would export a file that was mostly correctly
+ * v8.9.0-shaped, except that designerApplication.version was incorrectly set to '8.8.0'.
+ * This function detects such files.
+ */
+export function isBroken890Export(
+  // This is `unknown` so this is safe to call on potentially ancient or invalid files,
+  // where we can't assume much about their structure.
+  appData: unknown
+): boolean {
+  // Inspect .designerApplication.version if it exists,
+  // paranoically accounting for unknown input file shapes.
+  const isDeclared880 =
+    typeof appData === 'object' &&
+    appData != null &&
+    'designerApplication' in appData &&
+    typeof appData.designerApplication === 'object' &&
+    appData.designerApplication != null &&
+    'version' in appData.designerApplication &&
+    appData.designerApplication.version === '8.8.0'
+
+  if (isDeclared880) {
+    const trustedAppData = appData as ProtocolFile<PDMetadata>
+    const savedStepForms = Object.values(
+      trustedAppData.designerApplication?.data?.savedStepForms ?? {}
+    )
+    const fileContains890Structures = savedStepForms.some(
+      savedStepForm =>
+        savedStepForm.stepType === 'pause' &&
+        savedStepForm.pauseAction === 'untilThermocyclerProfileComplete'
+    )
+    return fileContains890Structures
+  } else {
+    return false
+  }
+}
+
 function migrateForm(originalForm: FormData): FormData[] {
   if (isThermocyclerProfileForm(originalForm)) {
     return migrateThermocyclerProfileForm(originalForm)

@@ -13,7 +13,16 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
 from ..dependencies import (
     get_maintenance_run_data_manager,
@@ -31,13 +40,6 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
-from robot_server.service.json_api import (
-    MultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-)
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
@@ -99,6 +101,7 @@ async def get_current_run_from_url(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[CommandNotAllowed]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],

@@ -59,7 +59,7 @@ endef
 # argument 4 is the unit file path
 define push-systemd-unit
 	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
-	ssh $(call id-file-arg,$(2)) "$(3)" root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
+	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
 
 # id-file-arg: Internal helper for generating the -i arg for ssh/scp commands
@@ -89,7 +89,7 @@ define sync-version-file
 	@echo package-version: $(4)
 	$(shell python -c '$(VERSION_HELPER)')
 	$(eval filepath=$(shell find . -type f -name new_version_file.json))
-	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) "$(3)" "${filepath} root@$(1):/data/VERSION.json
+	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "${filepath}" root@$(1):/data/VERSION.json
 	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && cp /data/VERSION.json /etc/VERSION.json && mount -o remount,ro / || mount -o remount,ro /"
 	rm -rf "${filepath}"
 endef

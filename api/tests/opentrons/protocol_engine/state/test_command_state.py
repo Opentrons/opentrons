@@ -28,6 +28,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state.commands import (
+    CommandAnnotationsSlice,
     CommandErrorSlice,
     CommandStore,
     CommandView,
@@ -35,6 +36,7 @@ from opentrons.protocol_engine.state.commands import (
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
+from opentrons.protocol_engine.types.command_annotations import CommandAnnotation
 
 
 def _make_config() -> Config:
@@ -76,6 +78,7 @@ def test_queue_command_action() -> None:
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
         params=params,
+        commandAnnotationIds=[],
     )
 
     subject.handle_action(action)
@@ -191,6 +194,7 @@ def test_command_failure(error_recovery_type: ErrorRecoveryType) -> None:
         result=None,
         error=expected_error_occurrence,
         notes=notes,
+        commandAnnotationIds=[],
     )
 
     assert subject_view.get("command-id") == expected_failed_command
@@ -1355,7 +1359,7 @@ def test_get_errors_slice() -> None:
     result = subject_view.get_errors_slice(cursor=1, length=3)
 
     assert result == CommandErrorSlice(
-        [
+        commands_errors=[
             ErrorOccurrence(
                 id="error-id",
                 createdAt=datetime(2023, 3, 3, 0, 0),
@@ -1369,4 +1373,211 @@ def test_get_errors_slice() -> None:
         ],
         cursor=0,
         total_length=1,
+    )
+
+
+def test_handle_create_command_annotation_action() -> None:
+    """It should handle a create command annotation action."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+
+    subject_view = CommandView(subject.state)
+
+    subject.handle_action(
+        actions.CreateUserCommandAnnotation(
+            annotation_id="abc123",
+            name="bar",
+            description="foo",
+            params={"a": 1},
+        )
+    )
+
+    annotation = subject_view.get_command_annotation("abc123")
+    assert annotation == CommandAnnotation(
+        id="abc123",
+        source="userCommand",
+        name="bar",
+        description="foo",
+        params={"a": 1},
+    )
+
+
+def test_get_all_command_annotations() -> None:
+    """It should get all command annotations in state."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+
+    for ann_id in ["ann_id_1", "ann_id_2"]:
+        subject.handle_action(
+            actions.CreateUserCommandAnnotation(
+                annotation_id=ann_id,
+                name="bar",
+                description="foo",
+                params={"a": 1},
+            )
+        )
+    assert subject_view.get_all_command_annotations() == [
+        CommandAnnotation(
+            id="ann_id_1",
+            source="userCommand",
+            name="bar",
+            description="foo",
+            params={"a": 1},
+        ),
+        CommandAnnotation(
+            id="ann_id_2",
+            source="userCommand",
+            name="bar",
+            description="foo",
+            params={"a": 1},
+        ),
+    ]
+
+
+def test_get_command_annotations_slice_empty() -> None:
+    """It should return an empty slice when there are no annotations."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+
+    result = subject_view.get_command_annotations_slice(cursor=0, length=10)
+
+    assert result == CommandAnnotationsSlice(
+        command_annotations=[],
+        cursor=0,
+        total_length=0,
+    )
+
+
+_sample_command_annotations = [
+    CommandAnnotation(
+        id="annotation-1",
+        source="userCommand",
+        name="Step 1",
+        description="Step 1 description",
+        params={},
+    ),
+    CommandAnnotation(
+        id="annotation-2",
+        source="userCommand",
+        name="Step 2",
+        description="Step 2 description",
+        params={},
+    ),
+    CommandAnnotation(
+        id="annotation-3",
+        source="userCommand",
+        name="Step 3",
+        description="Step 3 description",
+        params={},
+    ),
+    CommandAnnotation(
+        id="annotation-4",
+        source="userCommand",
+        name="Step 4",
+        description="Step 4 description",
+        params={},
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    argnames=["cursor", "length", "expected_slice"],
+    argvalues=[
+        (
+            0,
+            2,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[0],
+                    _sample_command_annotations[1],
+                ],
+                cursor=0,
+                total_length=4,
+            ),
+        ),
+        (
+            1,
+            2,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[1],
+                    _sample_command_annotations[2],
+                ],
+                cursor=1,
+                total_length=4,
+            ),
+        ),
+        (
+            2,
+            4,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[2],
+                    _sample_command_annotations[3],
+                ],
+                cursor=2,
+                total_length=4,
+            ),
+        ),
+        (
+            4,
+            10,
+            CommandAnnotationsSlice(
+                command_annotations=[_sample_command_annotations[3]],
+                cursor=3,
+                total_length=4,
+            ),
+        ),
+        (
+            -4,
+            10,
+            CommandAnnotationsSlice(
+                command_annotations=[
+                    _sample_command_annotations[0],
+                    _sample_command_annotations[1],
+                    _sample_command_annotations[2],
+                    _sample_command_annotations[3],
+                ],
+                cursor=0,
+                total_length=4,
+            ),
+        ),
+    ],
+)
+def test_get_command_annotations_slice_with_annotations(
+    cursor: int, length: int, expected_slice: CommandAnnotationsSlice
+) -> None:
+    """It should return the expected slice of command annotations."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+
+    # Create multiple annotations (refer to _sample_command_annotations for the actual annotations)
+    for i in range(1, 5):
+        subject.handle_action(
+            actions.CreateUserCommandAnnotation(
+                annotation_id=f"annotation-{i}",
+                name=f"Step {i}",
+                description=f"Step {i} description",
+                params={},
+            )
+        )
+
+    assert (
+        subject_view.get_command_annotations_slice(cursor=cursor, length=length)
+        == expected_slice
     )

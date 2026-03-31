@@ -27,13 +27,18 @@ export function useToastOnErrorImage(runId: string): void {
     mostRecentImg?.commandId ?? null
   )
 
-  useEffect(() => {
-    if (mostRecentImg != null && cmdDetails?.data.error != null) {
-      makeToast(t('image_in_gallery') as string, INFO_TOAST, {
-        duration: TOAST_DURATION_MS,
-        closeButton: true,
-        heading: t('image_during_error'),
-      })
-    }
-  }, [cmdDetails?.data.id])
+  useEffect(
+    () => {
+      if (mostRecentImg != null && cmdDetails?.data.error != null) {
+        makeToast(t('image_in_gallery') as string, INFO_TOAST, {
+          duration: TOAST_DURATION_MS,
+          closeButton: true,
+          heading: t('image_during_error'),
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cmdDetails?.data.id]
+  )
 }

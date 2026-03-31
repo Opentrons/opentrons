@@ -20,6 +20,7 @@ from tests.opentrons.protocol_api import (
     versions_between,
 )
 
+from opentrons.config import feature_flags as ff
 from opentrons.hardware_control.modules.types import (
     FlexStackerModuleModel,
     MagneticBlockModel,
@@ -2257,6 +2258,38 @@ def test_capture_image(
             saturation=52,
         )
     )
+
+
+def test_group_steps(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    mock_feature_flags: None,
+) -> None:
+    """It should create a command annotation during the lifetime of the context."""
+    decoy.when(ff.allow_step_grouping()).then_return(True)
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
+        "my-annotation-id"
+    )
+    with subject.group_steps("name", "desc"):
+        subject.comment("I'm being annotated!")
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
+
+
+def test_create_and_start_step_group(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+    mock_feature_flags: None,
+) -> None:
+    """It should create a command annotation and return a step group object, which can close the annotation."""
+    decoy.when(ff.allow_step_grouping()).then_return(True)
+    decoy.when(mock_core.start_step_grouping("name", "desc")).then_return(
+        "my-annotation-id"
+    )
+    step_group = subject.create_and_start_step_group("name", "desc")
+    step_group.end_group()
+    decoy.verify(mock_core.end_step_grouping("my-annotation-id"))
 
 
 def test_bundled_data(

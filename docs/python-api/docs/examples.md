@@ -1,5 +1,6 @@
 ---
 title: "Python API: Protocol Examples"
+description: "Example protocols for transfers, mixes, and common workflows."
 ---
 
 This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the [tutorial](tutorial.md). Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.

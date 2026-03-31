@@ -602,6 +602,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        blowout_mmFromBottom: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_position_reference: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_x_position: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        blowout_y_position: {
+          value: undefined,
+          isIndeterminate: false,
+        },
         changeTip: {
           isIndeterminate: false,
           value: 'always',
@@ -620,6 +636,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         pipette: {
           isIndeterminate: false,
           value: 'some_pipette_id',
+        },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
         },
         nozzles: {
           isIndeterminate: false,
@@ -815,6 +835,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         preWetTip: {
           isIndeterminate: true,
         },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         pushOut_checkbox: {
           isIndeterminate: false,
           value: undefined,
@@ -989,6 +1013,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_location: {
           isIndeterminate: false,
           value: 'fixedTrash',
+        },
+        blowout_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         aspirate_wells: {
           isIndeterminate: true,
@@ -1180,6 +1220,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        primaryNozzle: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         pushOut_checkbox: {
           isIndeterminate: false,
           value: undefined,
@@ -1294,6 +1338,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         liquidClassesSupported: { isIndeterminate: false },
         liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        primaryNozzle: {
           isIndeterminate: false,
           value: undefined,
         },

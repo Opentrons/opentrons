@@ -7,11 +7,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -184,12 +184,18 @@ export function Condition(props: DelayProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
+              autoFocus
               type="number"
               value={conditionVolume}
-              title={t('condition_volume')}
+              label={t('condition_volume')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setConditionVolume(Number(e.target.value))
+              }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {t('condition_max_volume', { max: maxConditioningVolume })}

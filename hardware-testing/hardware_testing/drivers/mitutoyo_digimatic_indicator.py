@@ -2,6 +2,8 @@
 import time
 import numpy
 import serial  # type: ignore[import]
+from typing import Optional
+from serial.tools.list_ports import comports  # type: ignore[import]
 
 
 class Mitutoyo_Digimatic_Indicator:
@@ -56,14 +58,17 @@ class Mitutoyo_Digimatic_Indicator:
             packet = self.gauge.readline().decode("utf-8")
         return packet
 
-    def read(self) -> float:
+    def read(self, timeout: Optional[float] = None) -> float:
         """Reads dial indicator."""
         self.packet = self.GCODE["READ"]
         self._send_packet(self.packet)
         time.sleep(0.001)
+        then = time.monotonic()
         reading = True
         value = 0.0  # Initialize value to avoid unbound error
         while reading:
+            if timeout and (time.monotonic() - then) > timeout:
+                raise RuntimeError("Timeout reading")
             data = self._get_packet()
             time.sleep(0.01)
             if data != "":
@@ -77,12 +82,33 @@ class Mitutoyo_Digimatic_Indicator:
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
         then = time.monotonic()
-        values = [self.read(), self.read(), self.read(), self.read(), self.read()]
+        values = [
+            self.read(timeout),
+            self.read(timeout),
+            self.read(timeout),
+            self.read(timeout),
+            self.read(timeout),
+        ]
         while (time.monotonic() - then) < timeout:
             if numpy.allclose(values, list(reversed(values))):
                 return values[-1]
-            values = values[1:] + [self.read()]
+            values = values[1:] + [self.read(timeout)]
         raise RuntimeError("Couldn't settle")
+
+
+def find_dial() -> Optional[Mitutoyo_Digimatic_Indicator]:
+    """Search system for dial indicator."""
+    ports = comports()
+    for _port in ports:
+        try:
+            port = _port.device  # type: ignore[attr-defined]
+            dial = Mitutoyo_Digimatic_Indicator(port)
+            dial.connect()
+            dial.read(1)
+            return dial
+        except Exception:
+            pass
+    return None
 
 
 if __name__ == "__main__":

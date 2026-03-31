@@ -2,7 +2,7 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import AsyncGenerator, Callable, Dict, Optional, Tuple, Union
+from typing import Any, AsyncGenerator, Callable, Dict, Optional, Tuple, Union
 
 from opentrons_shared_data.errors import (
     EnumeratedError,
@@ -20,6 +20,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLiquidAction,
     AddModuleAction,
+    CreateUserCommandAnnotation,
     FinishAction,
     FinishErrorDetails,
     HardwareStoppedAction,
@@ -762,6 +763,26 @@ class ProtocolEngine:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Replace the run's error recovery policy with a new one."""
         self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str],
+        params: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """Creates a new user generated command annotation."""
+        if annotation_id is None:
+            annotation_id = self._model_utils.generate_id()
+        self._action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id=annotation_id,
+                name=annotation_name,
+                description=description,
+                params=params or {},
+            )
+        )
+        return annotation_id
 
     def clear_command_history(self) -> None:
         """Clear command history."""

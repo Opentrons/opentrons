@@ -15,13 +15,13 @@ def _build_hash_url(base_url: str, fragment: str) -> str:
 
 
 @pytest.mark.pdE2E
-def test_navigate_to_settings_directly(page: Page, base_url: str) -> None:
+def test_navigate_to_settings_directly(page: Page, pd_base_url: str) -> None:
     """Test direct navigation to settings page via URL.
 
     Cypress uses hash routing: cy.visit('#/settings')
     """
     # Protocol Designer uses hash routing
-    settings_url = _build_hash_url(base_url, "settings")
+    settings_url = _build_hash_url(pd_base_url, "settings")
     page.goto(settings_url)
 
     # Verify we're on the settings page - matches cy.verifySettingsPage()
@@ -33,14 +33,14 @@ def test_navigate_to_settings_directly(page: Page, base_url: str) -> None:
 
 
 @pytest.mark.pdE2E
-def test_navigate_to_create_new_directly(page: Page, base_url: str) -> None:
+def test_navigate_to_create_new_directly(page: Page, pd_base_url: str) -> None:
     """Test direct navigation to create new protocol page via URL.
 
     Cypress notes: directly navigating sends you back to the home page.
     This test verifies cy.verifyOnboardingPage() behavior.
     """
     # Protocol Designer uses hash routing
-    create_new_url = _build_hash_url(base_url, "createNew")
+    create_new_url = _build_hash_url(pd_base_url, "createNew")
     page.goto(create_new_url)
 
     # Directly navigating to createNew shows the onboarding/create new page
@@ -55,14 +55,14 @@ def test_navigate_to_create_new_directly(page: Page, base_url: str) -> None:
 
 
 @pytest.mark.pdE2E
-def test_navigate_to_overview_directly(page: Page, base_url: str) -> None:
+def test_navigate_to_overview_directly(page: Page, pd_base_url: str) -> None:
     """Test direct navigation to protocol overview page via URL.
 
     Cypress notes: directly navigating sends you back to the home page.
     This test verifies cy.verifyHomePage() behavior.
     """
     # Protocol Designer uses hash routing
-    overview_url = _build_hash_url(base_url, "overview")
+    overview_url = _build_hash_url(pd_base_url, "overview")
     page.goto(overview_url)
 
     # Dismiss welcome modal if this test runs before any onboarding flow clears it

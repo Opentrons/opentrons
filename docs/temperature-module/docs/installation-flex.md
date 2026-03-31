@@ -1,5 +1,6 @@
 ---
 title: "Temperature Module: Flex Installation Steps"
+description: "Attach to caddy, mount on deck, and calibrate the Temperature Module on Flex."
 ---
 
 Installing the Temperature Module on your robot includes attaching it to the deck and calibrating it for the first time. The instructions here and on the touchscreen will help you get started. The tools you need are included in the User Kit that came with your Flex.

@@ -7,7 +7,15 @@ from fastapi import Depends, Request, Response, status
 from typing_extensions import Literal
 
 from opentrons.hardware_control import ThreadManagedHardware
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleMultiBody,
+)
 
 from .firmware_update_manager import (
     FirmwareUpdateManager,
@@ -42,12 +50,6 @@ from robot_server.hardware import (
     get_thread_manager,
 )
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleBody,
-    SimpleMultiBody,
-)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -340,6 +342,7 @@ async def get_update_process(
             "model": ErrorBody[FirmwareUpdateFailed]
         },
     },
+    dependencies=[Depends(require_scopes(Scope.UPDATES_WRITE))],
 )
 async def begin_subsystem_update(
     subsystem: SubSystem,

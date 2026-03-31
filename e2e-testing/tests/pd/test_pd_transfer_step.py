@@ -10,23 +10,27 @@ from automation.pd_pages import (
     ProtocolEditorPage,
     TransferPage,
 )
+from eyes import Eyes
 from utility import _import_protocol_and_open_editor
 
 SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
+DESTINATION_LABWARE = "Greiner 384 Well Plate 240 µL"
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_96_channel_workflow(page: Page) -> None:
+def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
     _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py", migration=True)
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
     editor.add_step()
     transfer_page = TransferPage(page)
-    # transfer_page.tip_rack_page_1_transfer_select()
     transfer_page.source_labware_select(SOURCE_LABWARE)
-    transfer_page.destination_labware_select("Greiner 384 Well Plate 240 µL")
-    transfer_page.wells_select("Destination", "A1")
+    transfer_page.destination_labware_select(DESTINATION_LABWARE)
+    transfer_page.open_nozzle_and_well_selector()
+    transfer_page.select_nozzles()
+    transfer_page.wells_select("Source", SOURCE_LABWARE, [], False)
+    transfer_page.wells_select("Destination", DESTINATION_LABWARE, "A1", True)
     transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("30")
     transfer_page.transfer_continue_to_next_step()
@@ -87,6 +91,8 @@ def test_96_channel_workflow(page: Page) -> None:
         blowout_location="Source well",
         blowout_flow_rate=150,
     )
+    if eyes is not None:
+        eyes.check(checkpoint_name="Dispense Advanced Settings")
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
     transfer_page.transfer_continue_to_next_step()
     transfer_page.tip_change_strategy("Once", drop_location="Tip rack")

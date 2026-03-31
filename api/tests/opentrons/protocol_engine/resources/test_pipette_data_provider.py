@@ -135,8 +135,8 @@ def test_configure_virtual_pipette_for_volume(
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
         available_volume_modes_min_vol={
-           VolumeModes.default: 5.0,
-           VolumeModes.lowVolumeDefault: 0.5,
+            VolumeModes.default: 5.0,
+            VolumeModes.lowVolumeDefault: 0.5,
         },
     )
     subject_instance.configure_virtual_pipette_for_volume(
@@ -177,8 +177,8 @@ def test_configure_virtual_pipette_for_volume(
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
         available_volume_modes_min_vol={
-           VolumeModes.default: 5.0,
-           VolumeModes.lowVolumeDefault: 0.5,
+            VolumeModes.default: 5.0,
+            VolumeModes.lowVolumeDefault: 0.5,
         },
     )
 

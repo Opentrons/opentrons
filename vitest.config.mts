@@ -76,7 +76,6 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
         '**/lib/**',
-        'labware-library/cypress/**/*',
         ...configDefaults.exclude,
       ],
       provider: 'v8',
@@ -140,6 +139,9 @@ export default defineConfig({
       ),
       '@opentrons/labware-library': path.resolve(
         './labware-library/src/labware-creator/index.tsx'
+      ),
+      '@opentrons/protocol-visualization': path.resolve(
+        './protocol-visualization/src/index.ts'
       ),
       // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
       // https://nodejs.org/api/path.html#pathresolvepaths

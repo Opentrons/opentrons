@@ -27,7 +27,7 @@ from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
@@ -170,7 +170,12 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    new_command_annotation = pe_types.CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="My command annotation",
+        params={},
+    )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
     offset = pe_types.LabwareOffset(
         id="1234123",
@@ -221,7 +226,7 @@ async def test_analyze(
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
-            command_annotations=[command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )
@@ -241,7 +246,7 @@ async def test_analyze(
             errors=[],
             liquids=[],
             liquidClasses=[],
-            command_annotations=[command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
             labware_offsets=[offset],
         )

@@ -50,6 +50,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
 import type {
+  ActiveNozzleNumber,
   AddressableAreaName,
   BlowoutParams,
   CutoutFixtureId,
@@ -59,9 +60,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLidParams,
   LoadLidStackRunTimeCommand,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { HopperLocationMapKey } from '../constants'
@@ -338,7 +341,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8 | 96,
+  channels: ActiveNozzleNumber,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -598,6 +601,8 @@ interface DispenseLocationHelperArgs {
   xOffset: number
   yOffset: number
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -614,6 +619,8 @@ export const dispenseLocationHelper: CommandCreator<
     xOffset,
     yOffset,
     tipRack,
+    primaryNozzle,
+    nozzles,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -646,6 +653,8 @@ export const dispenseLocationHelper: CommandCreator<
           },
         },
         tipRack,
+        primaryNozzle,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -676,6 +685,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (
@@ -1038,7 +1048,7 @@ export const getModuleIdFromRobotStateStack = (
  * @param labware - The labware object containing all labware entities
  * @param slot - The slot to get the full stack from
  * @param offDeckOverrideId - Labware ID for an offDeck stack
- * @returns The full stack from the labware object
+ * @returns The top full stack from the labware object
  */
 export const getFullStackFromLabwares = (
   labware: {
@@ -1057,15 +1067,17 @@ export const getFullStackFromLabwares = (
   const mappedLocation = isOnHopper
     ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
     : slot
+  const labwareStack = Object.values(labware).filter(
+    lw =>
+      lw.stack.includes(mappedLocation) &&
+      (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
+  )
+  if (isOnHopper) {
+    return labwareStack.reverse()[0].stack ?? []
+  }
   return (
-    Object.values(labware)
-      .filter(
-        lw =>
-          lw.stack.includes(mappedLocation) &&
-          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
-          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
-      )
-      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+    labwareStack.sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )
 }
 

@@ -2,6 +2,7 @@
 
 from typing_extensions import Final
 
+from .csv import CSVCore
 from .instrument import InstrumentCore
 from .labware import LabwareCore
 from .module_core import ModuleCore
@@ -19,4 +20,5 @@ __all__ = [
     "LabwareCore",
     "WellCore",
     "ModuleCore",
+    "CSVCore",
 ]

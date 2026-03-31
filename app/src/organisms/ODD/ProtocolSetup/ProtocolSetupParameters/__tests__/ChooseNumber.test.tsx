@@ -76,7 +76,6 @@ describe('ChooseNumber', () => {
       min: -10.2,
     }
     props = { ...props, parameter: mockNegativeFloatNumberParameterData }
-    console.log(mockNegativeFloatNumberParameterData)
     render(props)
     expect(screen.getByRole('button', { name: '.' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '-' })).toBeInTheDocument()

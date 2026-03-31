@@ -1,5 +1,6 @@
 ---
 title: Python Protocol API Documentation
+description: "Write Python protocols for Opentrons liquid handling robots."
 ---
 
 The Opentrons Python Protocol API is a Python framework designed to make it easy to write automated biology lab protocols. Python protocols can control Opentrons Flex and OT-2 robots, their pipettes, and optional hardware modules. We've designed the API to be accessible to anyone with basic Python and wet-lab skills.
@@ -140,7 +141,7 @@ The [Opentrons App](https://opentrons.com/ot-app/) is the easiest way to run you
 
 ### Support
 
-Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](/) or [contact Opentrons Support directly](mailto:support@opentrons.com).
+Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](../index.md) or [contact Opentrons Support directly](mailto:support@opentrons.com).
 
 ### Custom protocol service
 

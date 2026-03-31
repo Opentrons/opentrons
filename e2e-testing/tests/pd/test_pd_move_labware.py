@@ -11,7 +11,7 @@ PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_move_labware_flex(page: Page, base_url: str) -> None:
+def test_move_labware_flex(page: Page, pd_base_url: str) -> None:
     """Test manual and gripper move functionality with Lids and Labware.
 
     This test tests moving labware using the gripper and manual moves for the flex:

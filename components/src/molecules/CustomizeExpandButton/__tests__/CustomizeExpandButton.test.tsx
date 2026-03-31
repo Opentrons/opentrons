@@ -49,7 +49,9 @@ describe('CustomizeExpandButton', () => {
     render(props)
     screen.getByText('mock inputTitle')
     screen.getByText('mock inputCaption')
-    const input = screen.getByTestId('CustomizeExpandButton_inputField')
+    const input = screen.getByRole('spinbutton', {
+      name: 'mock inputTitle',
+    })
     fireEvent.change(input, { target: { value: 4 } })
     expect(props.stackingProps?.onInputFieldChange).toHaveBeenCalled()
   })

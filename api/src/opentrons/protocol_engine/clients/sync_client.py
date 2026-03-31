@@ -49,114 +49,163 @@ class SyncClient:
         """
         self._transport = transport
 
-    def execute_command(self, params: commands.CommandParams) -> None:
+    def execute_command(
+        self, params: commands.CommandParams, command_annotations: list[str]
+    ) -> None:
         """Execute a ProtocolEngine command, including error recovery.
 
         See `ChildThreadTransport.execute_command_wait_for_recovery()` for exact
         behavior.
         """
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
-        create_request = CreateType(params=cast(Any, params))
+        create_request = CreateType(
+            params=cast(Any, params),
+            commandAnnotationIds=command_annotations
+            if command_annotations is not None
+            else [],
+        )
         self._transport.execute_command_wait_for_recovery(create_request)
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadLabwareParams
+        self,
+        params: commands.LoadLabwareParams,
+        command_annotations: list[str],
     ) -> commands.LoadLabwareResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.CreateTimerParams
+        self,
+        params: commands.CreateTimerParams,
+        command_annotations: list[str],
     ) -> commands.CreateTimerResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.temperature_module.SetTargetTemperatureParams
+        self,
+        params: commands.temperature_module.SetTargetTemperatureParams,
+        command_annotations: list[str],
     ) -> commands.temperature_module.SetTargetTemperatureResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.thermocycler.StartRunExtendedProfileParams
+        self,
+        params: commands.thermocycler.StartRunExtendedProfileParams,
+        command_annotations: list[str],
     ) -> commands.thermocycler.StartRunExtendedProfileResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.heater_shaker.SetTargetTemperatureParams
+        self,
+        params: commands.heater_shaker.SetTargetTemperatureParams,
+        command_annotations: list[str],
     ) -> commands.heater_shaker.SetTargetTemperatureResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.heater_shaker.SetShakeSpeedParams
+        self,
+        params: commands.heater_shaker.SetShakeSpeedParams,
+        command_annotations: list[str],
     ) -> commands.heater_shaker.SetShakeSpeedResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.thermocycler.SetTargetBlockTemperatureParams
+        self,
+        params: commands.thermocycler.SetTargetBlockTemperatureParams,
+        command_annotations: list[str],
     ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.thermocycler.SetTargetLidTemperatureParams
+        self,
+        params: commands.thermocycler.SetTargetLidTemperatureParams,
+        command_annotations: list[str],
     ) -> commands.thermocycler.SetTargetLidTemperatureResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadModuleParams
+        self,
+        params: commands.LoadModuleParams,
+        command_annotations: list[str],
     ) -> commands.LoadModuleResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadPipetteParams
+        self,
+        params: commands.LoadPipetteParams,
+        command_annotations: list[str],
     ) -> commands.LoadPipetteResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadLidStackParams
+        self,
+        params: commands.LoadLidStackParams,
+        command_annotations: list[str],
     ) -> commands.LoadLidStackResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadLidParams
+        self,
+        params: commands.LoadLidParams,
+        command_annotations: list[str],
     ) -> commands.LoadLidResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LiquidProbeParams
+        self,
+        params: commands.LiquidProbeParams,
+        command_annotations: list[str],
     ) -> commands.LiquidProbeResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.TryLiquidProbeParams
+        self,
+        params: commands.TryLiquidProbeParams,
+        command_annotations: list[str],
     ) -> commands.TryLiquidProbeResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.LoadLiquidClassParams
+        self,
+        params: commands.LoadLiquidClassParams,
+        command_annotations: list[str],
     ) -> commands.LoadLiquidClassResult:
         pass
 
     @overload
     def execute_command_without_recovery(
-        self, params: commands.GetNextTipParams
+        self,
+        params: commands.GetNextTipParams,
+        command_annotations: list[str],
     ) -> commands.GetNextTipResult:
         pass
 
+    @overload
     def execute_command_without_recovery(
-        self, params: commands.CommandParams
+        self,
+        params: commands.CreateCSVParams,
+        command_annotations: list[str],
+    ) -> commands.CreateCSVResult:
+        pass
+
+    def execute_command_without_recovery(
+        self,
+        params: commands.CommandParams,
+        command_annotations: list[str],
     ) -> commands.CommandResult:
         """Execute a ProtocolEngine command.
 
@@ -164,7 +213,12 @@ class SyncClient:
         behavior.
         """
         CreateType = CREATE_TYPES_BY_PARAMS_TYPE[type(params)]
-        create_request = CreateType(params=cast(Any, params))
+        create_request = CreateType(
+            params=cast(Any, params),
+            commandAnnotationIds=command_annotations
+            if command_annotations is not None
+            else [],
+        )
         return self._transport.execute_command(create_request)
 
     @property
@@ -208,4 +262,18 @@ class SyncClient:
             "set_pipette_movement_speed",
             pipette_id=pipette_id,
             speed=speed,
+        )
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str] = None,
+    ) -> str:
+        """Creates a command annotation and returns the annotation ID."""
+        return self._transport.call_method(  # type: ignore[no-any-return]
+            "create_user_command_annotation",
+            annotation_name=annotation_name,
+            description=description,
+            annotation_id=annotation_id,
         )

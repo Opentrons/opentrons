@@ -1,7 +1,6 @@
-name,gravimetric-ot3-p200-96,,,
+name,gravimetric-ot3-p50-single,,,
 increment,FALSE,,,
 mount,left,,,
-<<<<<<<< HEAD:hardware-testing/hardware_testing/gravimetric/protocol_replacement/cavity/1ch50_50ultip_cavity.csv
 pipette,50,1,,
 tips,50,,,
 trials,240,,,
@@ -10,27 +9,12 @@ touch_tip,FALSE,,,
 liquid,water,Deionized water,#0000ff,100000
 tipracks_20ul,,,,
 tipracks_50ul,D2,D3,C2,
-========
-pipette,200,96,,
-tips,20,,,
-trials,10,,,
-return_tip,FALSE,,,
-touch_tip,FALSE,,,
-liquid,water,Deionized water,#0000ff,100000
-tipracks_20ul,C2,,,
-tipracks_50ul,,,,
->>>>>>>> chore_release-8.9.0:hardware-testing/hardware_testing/gravimetric/protocol_replacement/20ul_tips/96ch200_20ul_tip_1tip.csv
 tipracks_200ul,,,,
 tipracks_1000ul,,,,
 labware_on_scale,radwag_pipette_calibration_vial,A1,,
 slot_scale,C1,,,
-<<<<<<<< HEAD:hardware-testing/hardware_testing/gravimetric/protocol_replacement/cavity/1ch50_50ultip_cavity.csv
 volumes_to_test_20ul,,,,
 volumes_to_test_50ul,1,,,
-========
-volumes_to_test_20ul,1,5,20,
-volumes_to_test_50ul,,,,
->>>>>>>> chore_release-8.9.0:hardware-testing/hardware_testing/gravimetric/protocol_replacement/20ul_tips/96ch200_20ul_tip_1tip.csv
 volumes_to_test_200ul,,,,
 volumes_to_test_1000ul,,,,
 extra_volumes_to_test_20ul,,,,
@@ -45,13 +29,9 @@ retract_discontinuity,20,,,
 disc_ver_cuttoff,31,,,
 gantry_speed,40,,,
 lld_every_tip,FALSE,,,
-<<<<<<<< HEAD:hardware-testing/hardware_testing/gravimetric/protocol_replacement/cavity/1ch50_50ultip_cavity.csv
 single_tip_96,FALSE,,,
 multi_channels_to_test,NA,,,
 cavity_test,TRUE,,,
 touch_blank,FALSE,,,
 liquid_class_test,FALSE,,,
-========
-single_tip_96,TRUE,,,
-multi_channels_to_test,NA,,,
->>>>>>>> chore_release-8.9.0:hardware-testing/hardware_testing/gravimetric/protocol_replacement/20ul_tips/96ch200_20ul_tip_1tip.csv
+fail_early,FALSE,,,

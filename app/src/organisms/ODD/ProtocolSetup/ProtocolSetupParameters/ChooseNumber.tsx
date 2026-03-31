@@ -5,9 +5,9 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   LegacyStyledText,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -38,12 +38,17 @@ export function ChooseNumber({
   // same length as the initial parameter value (as string) when the component mounts
   // so that the delete button operates properly on the exisiting input field value.
   const [prevKeyboardValue, setPrevKeyboardValue] = useState<string>('')
-  useEffect(() => {
-    const arbitraryInput = new Array(paramValue).join('*')
-    // @ts-expect-error keyboard should expose for `setInput` method
-    keyboardRef.current?.setInput(arbitraryInput)
-    setPrevKeyboardValue(arbitraryInput)
-  }, [])
+  useEffect(
+    () => {
+      const arbitraryInput = new Array(paramValue).join('*')
+      // @ts-expect-error keyboard should expose for `setInput` method
+      keyboardRef.current?.setInput(arbitraryInput)
+      setPrevKeyboardValue(arbitraryInput)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
     console.log(`Incorrect parameter type: ${parameter.type as string}`)
@@ -123,13 +128,13 @@ export function ChooseNumber({
           >
             {parameter.description}
           </LegacyStyledText>
-          <InputField
+          <TouchInputField
             autoFocus
             type="text"
             units={parameter.suffix}
             placeholder={parameter.default.toString()}
             value={paramValue}
-            title={parameter.displayName}
+            label={parameter.displayName}
             caption={
               parameter.type === 'int'
                 ? `${parameter.min}-${parameter.max}`
@@ -140,12 +145,11 @@ export function ChooseNumber({
               e.target.focus()
             }}
             onChange={e => {
-              const updatedValue =
-                parameter.type === 'int'
-                  ? Math.round(e.target.valueAsNumber)
-                  : e.target.valueAsNumber
+              const inputValue = Number(e.target.value as string)
+              const modifiedValue =
+                parameter.type === 'int' ? Math.round(inputValue) : inputValue
               setParamValue(
-                Number.isNaN(updatedValue) ? '' : String(updatedValue)
+                Number.isNaN(modifiedValue) ? '' : String(modifiedValue)
               )
             }}
           />

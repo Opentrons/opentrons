@@ -48,7 +48,7 @@ import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { WellStroke } from '@opentrons/components'
+import type { WellStrokeByName } from '@opentrons/components'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 
@@ -89,20 +89,25 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     useState<VectorOffset>(initialPosition)
   const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = useState(false)
-  useEffect(() => {
-    //  NOTE: this will perform a "null" jog when the jog controls mount so
-    //  if a user reaches the "confirm exit" modal (unmounting this component)
-    //  and clicks "go back" we are able so initialize the live offset to whatever
-    //  distance they had already jogged before clicking exit.
-    // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
-    let mounted = true
-    if (mounted) {
-      handleJog('x', 1, 0, setJoggedPosition)
-    }
-    return () => {
-      mounted = false
-    }
-  }, [])
+  useEffect(
+    () => {
+      //  NOTE: this will perform a "null" jog when the jog controls mount so
+      //  if a user reaches the "confirm exit" modal (unmounting this component)
+      //  and clicks "go back" we are able so initialize the live offset to whatever
+      //  distance they had already jogged before clicking exit.
+      // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
+      let mounted = true
+      if (mounted) {
+        handleJog('x', 1, 0, setJoggedPosition)
+      }
+      return () => {
+        mounted = false
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   let wellsToHighlight: string[] = []
   if (
@@ -114,7 +119,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     wellsToHighlight = ['A1']
   }
 
-  const wellStroke: WellStroke = wellsToHighlight.reduce(
+  const wellStroke: WellStrokeByName = wellsToHighlight.reduce(
     (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
