@@ -7,9 +7,13 @@ Opentrons recommends that you follow the safe use specifications listed in this 
 !!! warning "Writer's note"
     <p style="color: red"><strong>ALL CONTENT AND COMPLIANCE RULES ARE EXAMPLE/SAMPLE PLACEHOLDERS PENDING VERIFICATION AND CERTIFICATION</strong></p>
 
+
 ## General safety guidelines
 
-The vacuum module is designed for laboratory use by trained personnel only. Use this product only as specified. Review the safety information before installing or operating this module. This information can help you operate the vacuum module safely and avoid damage to it or any other attached equipment. If the vacuum module is used in a manner not specified by Opentrons, the protection provided by the equipment may be impaired.
+Use this product only as specified. Review the safety information before installing or operating this module. This information can help you operate the vacuum module safely and avoid damage to it or any other attached equipment. If the vacuum module is used in a manner not specified by Opentrons, the protection provided by the equipment may be impaired.
+
+!!! note
+    The Opentrons Vacuum Module should be used by trained personnel only. It is designed for laboratory research and other non-in-vitro diagnostic analyses.
 
 ## Instrument safety warnings
 
