@@ -33,7 +33,7 @@
 
 .select_tips_deck_container {
   display: flex;
-  width: 714px;
+  width: 100%;
   height: 536px;
   align-self: center;
 }
