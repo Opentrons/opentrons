@@ -85,7 +85,19 @@ cd api && make test  # or: make -C api test
 
 Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=verbose"`
 
-### Lint & Type-Check
+### Frontend Lint & Format — Always Use These Three
+
+All frontend (TS/TSX/JS/CSS) lint and format commands run from the **monorepo root** via these three Make targets. Do not call ESLint, Prettier, or Stylelint directly.
+
+```bash
+make format-js    # Prettier auto-format (all TS/TSX/JS/MD/JSON)
+make lint-js      # ESLint + Prettier check (run after format-js to confirm clean)
+make lint-css     # Stylelint check for all CSS Modules
+```
+
+Run `format-js` first to auto-fix, then `lint-js` and `lint-css` to verify nothing remains.
+
+### Lint & Type-Check (full reference)
 
 | Target | Description |
 | --- | --- |
@@ -98,13 +110,22 @@ Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=ver
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
 | `make circular-dependencies-js` | Check for circular imports (madge) |
 
-### Format (auto-fix)
+### Format (auto-fix, full reference)
 
 | Target | Description |
 | --- | --- |
 | `make format-js` | Prettier auto-format |
 | `make format-py` | ruff format for all robot Python projects |
 | `make format-css` | Stylelint auto-fix |
+
+### opentrons-ai-server Lint & Format
+
+`opentrons-ai-server/` is a standalone Python project with its own Makefile. Run from inside that directory:
+
+```bash
+make format   # ruff format + ruff check --fix + prettier for MD/JSON
+make lint     # ruff format --check + ruff check + mypy
+```
 
 ## Standalone Python Projects
 

@@ -4,17 +4,17 @@ export const STAGING_END_POINT =
 export const STAGING_FEEDBACK_END_POINT =
   'https://staging.opentrons.ai/api/chat/feedback'
 export const STAGING_CREATE_PROTOCOL_END_POINT =
-  'https://staging.opentrons.ai/api/chat/createProtocol'
+  'https://staging.opentrons.ai/api/chat/create-protocol'
 export const STAGING_UPDATE_PROTOCOL_END_POINT =
-  'https://staging.opentrons.ai/api/chat/updateProtocol'
+  'https://staging.opentrons.ai/api/chat/update-protocol'
 
 export const PROD_END_POINT = 'https://ai.opentrons.com/api/chat/completion'
 export const PROD_FEEDBACK_END_POINT =
   'https://ai.opentrons.com/api/chat/feedback'
 export const PROD_CREATE_PROTOCOL_END_POINT =
-  'https://ai.opentrons.com/api/chat/createProtocol'
+  'https://ai.opentrons.com/api/chat/create-protocol'
 export const PROD_UPDATE_PROTOCOL_END_POINT =
-  'https://ai.opentrons.com/api/chat/updateProtocol'
+  'https://ai.opentrons.com/api/chat/update-protocol'
 
 // auth0 domain
 export const AUTH0_DOMAIN = 'identity.auth.opentrons.com'
@@ -33,9 +33,9 @@ export const LOCAL_AUTH0_AUDIENCE = 'sandbox-ai-api'
 export const LOCAL_AUTH0_DOMAIN = 'identity.auth-dev.opentrons.com'
 export const LOCAL_END_POINT = 'http://localhost:8000/api/chat/completion'
 export const LOCAL_CREATE_PROTOCOL_END_POINT =
-  'http://localhost:8000/api/chat/createProtocol'
+  'http://localhost:8000/api/chat/create-protocol'
 export const LOCAL_UPDATE_PROTOCOL_END_POINT =
-  'http://localhost:8000/api/chat/updateProtocol'
+  'http://localhost:8000/api/chat/update-protocol'
 export const LOCAL_FEEDBACK_END_POINT =
   'http://localhost:8000/api/chat/feedback'
 
