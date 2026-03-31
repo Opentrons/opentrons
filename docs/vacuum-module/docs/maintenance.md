@@ -24,3 +24,6 @@ The following table lists the chemicals you can use to clean the exterior of the
     - Do not clean the vacuum module with acetone.
     - Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
+## Emptying the air/liquid separator
+
+
