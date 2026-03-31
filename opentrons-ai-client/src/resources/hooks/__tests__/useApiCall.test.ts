@@ -40,14 +40,14 @@ describe('useApiCall', () => {
     expect(result.current.data).toBe(null)
     expect(result.current.error).toEqual({
       message: 'Network Error',
-      error_type: 'network_error',
+      errorType: 'network_error',
     })
   })
 
-  it('should extract structured error from API error response body', async () => {
+  it('should use API error response body (camelCase) as ApiErrorResponse', async () => {
     mock.onPost('/test').reply(400, {
       message: 'Your request is too large.',
-      error_type: 'context_length_exceeded',
+      errorType: 'context_length_exceeded',
     })
 
     const { result } = renderHook(() => useApiCall())
@@ -60,7 +60,27 @@ describe('useApiCall', () => {
     expect(result.current.data).toBe(null)
     expect(result.current.error).toEqual({
       message: 'Your request is too large.',
-      error_type: 'context_length_exceeded',
+      errorType: 'context_length_exceeded',
+    })
+  })
+
+  it('should use 504 timeout error (camelCase) as ApiErrorResponse', async () => {
+    mock.onPost('/test').reply(504, {
+      message: 'Your request timed out.',
+      errorType: 'request_timeout',
+    })
+
+    const { result } = renderHook(() => useApiCall())
+
+    await act(async () => {
+      await result.current.callApi({ url: '/test', method: 'POST', data: {} })
+    })
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.data).toBe(null)
+    expect(result.current.error).toEqual({
+      message: 'Your request timed out.',
+      errorType: 'request_timeout',
     })
   })
 

@@ -15,7 +15,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot.types import RobotType
 
