@@ -5,13 +5,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
-export type ProtocolSort =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recent'
-  | 'oldest'
-  | 'flex'
-  | 'ot2'
+export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
 
 interface ParentNode {
   annotationIndex: number
