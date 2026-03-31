@@ -103,3 +103,12 @@ class UserStore:
             session.commit()
             session.expunge(user)
             return user
+
+    def record_failed_login(self, username: str) -> int:
+        raise NotImplementedError
+
+    def get_failed_login_count(self, username: str) -> int:
+        raise NotImplementedError
+
+    def clear_failed_logins(self, username: str) -> int:
+        raise NotImplementedError

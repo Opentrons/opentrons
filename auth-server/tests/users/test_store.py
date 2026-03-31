@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Generator
 
@@ -110,3 +111,60 @@ def test_update_persists(user_store: UserStore) -> None:
     fetched = user_store.get("persist_test")
     assert fetched is not None
     assert fetched.full_name == "After"
+
+
+def test_failed_login_counter(user_store: UserStore) -> None:
+    # All methods should raise ValueError if the given username isn't found.
+    with pytest.raises(ValueError):
+        user_store.get_failed_login_count("nonexistent_user")
+    with pytest.raises(ValueError):
+        user_store.clear_failed_logins("nonexistent_user")
+    with pytest.raises(ValueError):
+        user_store.record_failed_login("nonexistent_user", datetime.datetime.now())
+
+    # After user creation, counts should default to 0.
+    user_store.add(
+        username="user_a",
+        hashed_password=HASHED_PW,
+        full_name="User A",
+        account_type=AccountType.USER,
+    )
+    user_store.add(
+        username="user_b",
+        hashed_password=HASHED_PW,
+        full_name="User B",
+        account_type=AccountType.USER,
+    )
+    assert user_store.get_failed_login_count("user_a") == 0
+    assert user_store.get_failed_login_count("user_b") == 0
+
+    # record_failed_login() should increment the count.
+    assert (
+        user_store.record_failed_login("user_a", datetime.datetime.now(tz=datetime.UTC))
+        == 1
+    )
+    assert (
+        user_store.record_failed_login("user_a", datetime.datetime.now(tz=datetime.UTC))
+        == 2
+    )
+    assert (
+        user_store.record_failed_login("user_b", datetime.datetime.now(tz=datetime.UTC))
+        == 1
+    )
+    assert user_store.get_failed_login_count("user_a") == 2
+    assert user_store.get_failed_login_count("user_b") == 1
+
+    # record_failed_login() should reject invalid timezones.
+    with pytest.raises(Exception):
+        user_store.record_failed_login("user_a", datetime.datetime.now())
+
+    # clear_failed_logins() should reset the count back to 0, for only the affected user.
+    user_store.clear_failed_logins("user_a")
+    assert user_store.get_failed_login_count("user_a") == 0
+    assert user_store.get_failed_login_count("user_b") == 1
+
+    # A user should be allowed to be deleted even if it has failed logins.
+    # The failed logins should be deleted automatically along with the user.
+    user_store.record_failed_login("user_a", datetime.datetime.now(tz=datetime.UTC))
+    user_store.remove("user_a")
+    assert user_store.get("user_a") is None
