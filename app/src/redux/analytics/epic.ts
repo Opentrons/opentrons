@@ -25,7 +25,7 @@ const initializeAnalyticsEpic: Epic = (action$, state$) => {
     ofType<Action, ConfigInitializedAction>(Cfg.INITIALIZED),
     tap((initAction: ConfigInitializedAction) => {
       const { config } = initAction.payload
-      initializeMixpanel(config.analytics, config.isOnDevice)
+      initializeMixpanel(config.analytics)
     }),
     ignoreElements() as OperatorFunction<ConfigInitializedAction, never>
   )
@@ -67,7 +67,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
     ),
     tap(([_, state]: [State, State]) => {
       if (state.config?.analytics != null)
-        setMixpanelTracking(state.config?.analytics, state.config?.isOnDevice)
+        setMixpanelTracking(state.config?.analytics)
     }),
     ignoreElements() as OperatorFunction<[State, State], never>
   )
