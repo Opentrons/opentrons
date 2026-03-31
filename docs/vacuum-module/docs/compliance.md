@@ -41,10 +41,6 @@ Various labels on the vacuum module or in this manual warn you about sources of 
         <td><img src="../images/electrical.png" alt="Yellow electrical warning triangle"></td>
         <td><strong>Electrical shock</strong>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
     </tr>
-    <tr>
-        <td><img src="../images/biohazard.png" alt="Yellow biohazard warning triangle"></td>
-        <td><strong>Biohazard</strong>: reminds users to dispose of liquid waste and other byproducts according to the safe operating procedures of their lab, institution, and in compliance with all applicable regulations.</td>
-    </tr>
 </table>
 
 ## Standards compliance
