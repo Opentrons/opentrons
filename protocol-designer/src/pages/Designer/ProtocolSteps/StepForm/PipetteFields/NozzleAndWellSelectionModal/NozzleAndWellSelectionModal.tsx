@@ -61,9 +61,11 @@ export function NozzleAndWellSelectionModal(
 
   const handleContinue = (): void => {
     setShowError(false)
-    if (currentStepIndex === 0 && pipetteSpecs.channels === 1) {
+    if (currentStepIndex === 0 && propsForFields.primaryNozzle.value === null) {
       propsForFields.primaryNozzle.updateValue(A1_NOZZLE)
-      propsForFields.nozzles.updateValue(ALL)
+      if (pipetteSpecs.channels === 1) {
+        propsForFields.nozzles.updateValue(ALL)
+      }
     }
     if (currentStepIndex !== 0 && activeFieldKey !== null) {
       if (wellValues.length === 0) {
