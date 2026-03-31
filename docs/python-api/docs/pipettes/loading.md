@@ -216,7 +216,7 @@ right_pipette.drop_tip()
 
 See also [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
-### Tip–pipette compatibility
+### Tip-pipette compatibility
 
 Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
 
