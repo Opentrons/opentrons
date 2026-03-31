@@ -211,7 +211,7 @@ stages:
           minLengthOfReasonForInteraction: null
 
 ---
-test_name: PATCH to enable access control
+test_name: enable access control enabled
 
 marks:
   - usefixtures:
@@ -219,20 +219,17 @@ marks:
       - admin_access_token
 
 stages:
-  - name: PATCH to enable access control enabled
+  - name: GET access control enabled default
     request:
-      method: PATCH
+      method: GET
       url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       headers:
         Authorization: '{admin_access_token}'
-      json:
-        data:
-          accessControlEnabled: true
     response:
       status_code: 200
       json:
         data:
-          accessControlEnabled: true
+          accessControlEnabled: false
 
   - name: PATCH to enable access control enabled to false fails
     request:
@@ -246,15 +243,6 @@ stages:
     response:
       status_code: 422
 
----
-test_name: PATCH to enable access control enabled when its set raises an error
-
-marks:
-  - usefixtures:
-      - run_server
-      - admin_access_token
-
-stages:
   - name: PATCH to enable access control enabled
     request:
       method: PATCH
@@ -266,6 +254,18 @@ stages:
           accessControlEnabled: true
     response:
       status_code: 200
+
+  - name: GET access control enabled after PATCH
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
 
   - name: PATCH to enable access control enabled again raises an error
     request:
