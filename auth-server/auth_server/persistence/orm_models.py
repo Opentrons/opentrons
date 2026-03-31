@@ -1,4 +1,4 @@
-"""ORM table definitions and supporting column types."""
+"""SQLAlchemy ORM models, defining the current schema of our database."""
 
 import json
 from typing import Any, TypeAlias
@@ -69,4 +69,4 @@ class Setting(Base):
 
     key: Mapped[str] = mapped_column(primary_key=True)
     # todo(tz, 2026-03-25): change type to Json https://docs.sqlalchemy.org/en/21/core/type_basics.html#sqlalchemy.types.JSON
-    value: Mapped[JsonPythonValue] = mapped_column(JsonValue)
+    value: Mapped[JsonPythonValue] = mapped_column(JsonValue, nullable=False)
