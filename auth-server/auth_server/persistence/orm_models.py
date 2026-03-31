@@ -68,5 +68,13 @@ class Setting(Base):
     __tablename__ = "setting"
 
     key: Mapped[str] = mapped_column(primary_key=True)
-    # todo(tz, 2026-03-25): change type to Json https://docs.sqlalchemy.org/en/21/core/type_basics.html#sqlalchemy.types.JSON
     value: Mapped[JsonPythonValue] = mapped_column(JsonValue, nullable=False)
+
+
+class AccessControlEnabled(Base):
+    """ORM model for the access control enabled setting."""
+
+    __tablename__ = "access_control_enabled"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    enabled: Mapped[bool]

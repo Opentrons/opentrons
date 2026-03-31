@@ -18,14 +18,6 @@ class SettingsResponseData(_StrictBaseModel):
     Do not change them without coordinating.
     """
 
-    # TODO(tz, 2026-03-24): https://opentrons.atlassian.net/browse/EXEC-2468
-    accessControlEnabled: bool = pydantic.Field(
-        default=False,
-        description="When enabled, authorization is enforced throughout the robot's HTTP APIs. "
-        "Protected endpoints are blocked unless the request carries an OAuth 2 access token "
-        "with the appropriate scopes. See the `/auth/oauth2` endpoints. "
-        "When disabled (the default), all endpoints allow unauthenticated access.",
-    )
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
         description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
@@ -63,19 +55,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
     Only fields explicitly provided in the request body will be updated.
     """
 
-    accessControlEnabled: Annotated[
-        # Note: `Literal[True]` instead of `bool` to enforce one-way latching.
-        Literal[True] | None,
-        pydantic.Field(
-            description=dedent(
-                """
-                Set to `true` to enable access control. Omit or set to `null` to leave it unchanged.
-
-                **Warning:** Once enabled, access control cannot be disabled without assistance from Opentrons!
-                """
-            )
-        ),
-    ] = None
     maxNumberOfLoginAttempts: Annotated[
         int | None,
         pydantic.Field(
@@ -166,3 +145,35 @@ class PatchSettingsRequestData(_StrictBaseModel):
                 if field in data and data[field] is None:
                     raise ValueError(f"{field} cannot be null")
         return data
+
+
+class PatchAccessControlRequestData(_StrictBaseModel):
+    """A request to change the access control settings."""
+
+    accessControlEnabled: Annotated[
+        Literal[True] | None,
+        pydantic.Field(
+            description="Set to `true` to enable access control. "
+            "Once enabled, access control cannot be disabled without assistance from Opentrons."
+        ),
+    ] = None
+
+
+class AccessControlResponseData(pydantic.BaseModel):
+    """A response with the current access control settings."""
+
+    accessControlEnabled: Annotated[
+        bool,
+        pydantic.Field(
+            description=dedent(
+                """\
+                When enabled, authorization is enforced throughout the robot's HTTP APIs.
+                Protected endpoints are blocked unless the request carries an
+                OAuth 2 access token with the appropriate scopes. See the `/auth/oauth2`
+                endpoints.
+
+                When disabled (the default), all endpoints allow unauthenticated access.
+                """
+            )
+        ),
+    ]
