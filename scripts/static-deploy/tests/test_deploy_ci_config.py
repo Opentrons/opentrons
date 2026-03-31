@@ -339,6 +339,63 @@ def test_resolve_ci_config_uppercase_tag():
     assert config.relative_artifact_dir == "/build/docs"
 
 
+def test_resolve_ci_config_workflow_dispatch_branch():
+    """Test CI config resolution for workflow_dispatch on a branch deploys to sandbox."""
+    env = {
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/heads/edge",
+        "GITHUB_REF_NAME": "edge",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.application == "mkdocs"
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "edge"
+    assert config.relative_artifact_dir == "../../dist"
+
+
+def test_resolve_ci_config_workflow_dispatch_staging_tag():
+    """Test CI config resolution for workflow_dispatch on a staging tag deploys to staging."""
+    env = {
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/tags/staging-mkdocs-v1.0.0",
+        "GITHUB_REF_NAME": "staging-mkdocs-v1.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.application == "mkdocs"
+    assert config.environment == "staging"
+    assert config.sandbox_prefix == "staging-mkdocs-v1.0.0"
+
+
+def test_resolve_ci_config_workflow_dispatch_production_tag():
+    """Test CI config resolution for workflow_dispatch on a production tag deploys to production."""
+    env = {
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/tags/mkdocs-v2.0.0",
+        "GITHUB_REF_NAME": "mkdocs-v2.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.application == "mkdocs"
+    assert config.environment == "production"
+
+
 def test_resolve_ci_config_lowercase_tag():
     """Test CI config resolution handles fully lowercase tags."""
     env = {
