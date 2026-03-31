@@ -20,8 +20,8 @@ from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 
 from fastapi import Depends, status
 
+from opentrons import identify_hardware_process, should_use_ot3
 from opentrons import initialize as initialize_api
-from opentrons import should_use_ot3
 from opentrons.config import (
     ARCHITECTURE,
     IS_ROBOT,
@@ -77,6 +77,9 @@ PostInitCallback = Tuple[
 log = logging.getLogger(__name__)
 
 _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
+_hw_subprocess_accessor = AppStateAccessor[HardwareControlAPI](
+    "hardware_api_subprocess"
+)
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
@@ -116,6 +119,9 @@ async def clean_up_hardware(app_state: AppState) -> None:
     _init_task_accessor.set_on(app_state, None)
     _postinit_task_accessor.set_on(app_state, None)
     _hw_api_accessor.set_on(app_state, None)
+    # CASEY NOTE: we erase the subprocess state, but do not run clean_up() on the subprocess.
+    # This is the responsibility of it's executing service.
+    _hw_subprocess_accessor.set_on(app_state, None)
 
     if initialize_task is not None:
         initialize_task.cancel()
@@ -214,8 +220,10 @@ class FrontButtonLightBlinker:
 # with similar code used for initializing the persistence layer.
 async def get_thread_manager(
     app_state: Annotated[AppState, Depends(get_app_state)],
-) -> ThreadManagedHardware:
-    """Get the ThreadManager'd HardwareAPI as a route dependency.
+) -> ThreadManagedHardware | HardwareControlAPI:
+    """Get the ThreadManager'd HardwareAPI as a route dependency, or get the HardwareAPI Pyro proxy.
+
+    If hardware subprocessing is enabled, this will return a HardwareControlAPI directly.
 
     Arguments:
         app_state: Global app state from `app.state`, provided by
@@ -230,8 +238,12 @@ async def get_thread_manager(
     initialize_task = _init_task_accessor.get_from(app_state)
     postinit_task = _postinit_task_accessor.get_from(app_state)
     hardware_api = _hw_api_accessor.get_from(app_state)
+    hardware_api_subprocess = _hw_subprocess_accessor.get_from(app_state)
 
-    if initialize_task is None or hardware_api is None or not initialize_task.done():
+    if ff.hardware_subprocess_enabled() and hardware_api_subprocess is None:
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    elif initialize_task is None or hardware_api is None or not initialize_task.done():
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
     if initialize_task.cancelled():
@@ -253,17 +265,23 @@ async def get_thread_manager(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exc
 
+    if hardware_api_subprocess is not None:
+        return hardware_api_subprocess
+
     return hardware_api
 
 
 async def get_hardware(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+    ],
 ) -> HardwareControlAPI:
     """Get the HardwareAPI as a route dependency.
 
     Arguments:
-        thread_manager: The global thread manager singleton, provided by
-            FastAPI's dependency injection system via `fastapi.Depends`
+        hardware_resource: Either the Hardware Controller Subprocess of the global
+            thread manager singleton, provided by FastAPI's dependency injection
+            system via `fastapi.Depends`
 
     Returns:
         The same object, but this time properly typed as a hardware controller.
@@ -274,11 +292,15 @@ async def get_hardware(
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    return thread_manager.wrapped()
+    if ff.hardware_subprocess_enabled():
+        log.info("SUBPROCESS IS ENABLED")
+        return hardware_resource
+    return hardware_resource.wrapped()  # type: ignore
+    # CASEY NOTE: perhaps the answer is if the flag is on all these wrapped() references become direct hwapi references
 
 
 def get_ot3_hardware(
-    thread_manager: ThreadManagedHardware,
+    hardware_resource: ThreadManagedHardware | HardwareControlAPI,
 ) -> "OT3API":
     """Get a flex hardware controller."""
     try:
@@ -287,11 +309,17 @@ def get_ot3_hardware(
         raise NotSupportedOnOT2(detail=str(exception)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from exception
-    if not thread_manager.wraps_instance(OT3API):
+    if ff.hardware_subprocess_enabled():
+        return cast(OT3API, hardware_resource)
+    
+    # we need to fix the type checking on all this somehow, something to verify we're an isinstance of HardwareControlAPI or something
+    if not hardware_resource.wraps_instance(OT3API):
         raise NotSupportedOnOT2(
             detail="This route is only available on a Flex."
         ).as_error(status.HTTP_403_FORBIDDEN)
-    return cast(OT3API, thread_manager.wrapped())
+    return cast(OT3API, hardware_resource.wrapped())
+    # CASEY NOTE: This ^ either needs refactoring or the thing thats proxies needs to be the thread manager proper
+    # I'm actually leaning more refactor, because what would the protocol subprocess want? surely a HardwareControlAPI instance yeah?
 
 
 def get_ot2_hardware(
@@ -307,11 +335,13 @@ def get_ot2_hardware(
 
 async def get_firmware_update_manager(
     app_state: Annotated[AppState, Depends(get_app_state)],
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+    ],
     task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
 ) -> FirmwareUpdateManager:
     """Get an update manager to track firmware update statuses."""
-    hardware = get_ot3_hardware(thread_manager)
+    hardware = get_ot3_hardware(hardware_resource)
     update_manager = _firmware_update_manager_accessor.get_from(app_state)
 
     if update_manager is None:
@@ -324,10 +354,12 @@ async def get_firmware_update_manager(
 
 async def get_estop_handler(
     app_state: Annotated[AppState, Depends(get_app_state)],
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+    ],
 ) -> EstopHandler:
     """Get an Estop Handler for working with the estop."""
-    hardware = get_ot3_hardware(thread_manager)
+    hardware = get_ot3_hardware(hardware_resource)
     estop_handler = _estop_handler_accessor.get_from(app_state)
 
     if estop_handler is None:
@@ -414,18 +446,19 @@ async def _do_updates(
 
 
 async def _postinit_ot3_tasks(
-    hardware_tm: ThreadManagedHardware,
+    hardware_resource: ThreadManagedHardware | HardwareControlAPI,
     app_state: AppState,
     callbacks: Iterable[PostInitCallback],
 ) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
     update_manager = await get_firmware_update_manager(
         app_state=app_state,
-        thread_manager=hardware_tm,
+        hardware_resource=hardware_resource,
         task_runner=get_task_runner(app_state),
     )
+    # CASEY NOTE: These things should still happen mostly, but will be remote calls?
 
-    hardware = cast("OT3API", hardware_tm)
+    hardware = cast("OT3API", hardware_resource)
 
     try:
         await _do_updates(hardware, update_manager)
@@ -434,7 +467,10 @@ async def _postinit_ot3_tasks(
         await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
         for callback in callbacks:
             if not callback[1]:
-                await callback[0](app_state, hardware_tm.wrapped())
+                if ff.hardware_subprocess_enabled():
+                    await callback[0](app_state, hardware_resource)
+                else:
+                    await callback[0](app_state, hardware_resource.wrapped())
 
     except Exception:
         log.exception("Hardware initialization failure")
@@ -546,19 +582,27 @@ async def _initialize_hardware_api(
     systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
     try:
         if should_use_ot3():
-            hardware = await _initialize_ot3_robot(
-                app_state, app_settings, systemd_available
-            )
+            if ff.hardware_subprocess_enabled():
+                hardware = identify_hardware_process()
+                _hw_subprocess_accessor.set_on(app_state, hardware)
+            # Casey Note: Thread managed hardware == ThreadManager[OT3API]???
+            else:
+                hardware = await _initialize_ot3_robot(
+                    app_state, app_settings, systemd_available
+                )
+                _hw_api_accessor.set_on(app_state, hardware)
         else:
             hardware = await _initialize_ot2_robot(
                 app_state, app_settings, systemd_available
             )
-
-        _hw_api_accessor.set_on(app_state, hardware)
+            _hw_api_accessor.set_on(app_state, hardware)
 
         for callback in callbacks:
             if callback[1]:
-                await callback[0](app_state, hardware.wrapped())
+                if ff.hardware_subprocess_enabled():
+                    await callback[0](app_state, hardware)
+                else:
+                    await callback[0](app_state, hardware.wrapped())
 
         # This ties systemd notification to hardware initialization. We might want to move
         # systemd notification so it also waits for DB migration+initialization.

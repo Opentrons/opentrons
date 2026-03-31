@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 from fastapi import Depends, Request, Response, status
 from typing_extensions import Literal
 
-from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -126,10 +126,12 @@ class NoOngoingUpdate(ErrorDetails):
     },
 )
 async def get_attached_subsystems(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     """Return all subsystems currently present on the machine."""
-    hardware = get_ot3_hardware(thread_manager)
+    hardware = get_ot3_hardware(hardware_resource)
     data = [
         PresentSubsystem.model_construct(
             name=SubSystem.from_hw(subsystem_id),

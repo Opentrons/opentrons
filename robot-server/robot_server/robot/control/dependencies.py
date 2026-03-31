@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import Depends, status
 
-from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 
 from .estop_handler import EstopHandler
 from .models import (
@@ -20,7 +20,9 @@ from robot_server.hardware import get_ot3_hardware, get_thread_manager
 
 
 async def require_estop_in_good_state(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+    ],
 ) -> bool:
     """Check that the estop is in a good state.
 
@@ -35,7 +37,7 @@ async def require_estop_in_good_state(
     Returns True if the Estop state is okay. Raises an exception in any other case.
     """
     try:
-        estop_handler = EstopHandler(hw_handle=get_ot3_hardware(thread_manager))
+        estop_handler = EstopHandler(hw_handle=get_ot3_hardware(hardware_resource))
     except ApiError:
         # This is an OT-2 and there's no estop, so don't block out the endpoint
         return True

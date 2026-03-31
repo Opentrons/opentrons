@@ -38,6 +38,10 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
 from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    get_app_state,
+)
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -47,14 +51,21 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
+    clean_up_hardware,
     get_ot2_hardware,
     get_robot_type_enum,
+    get_thread_manager,
+    start_initializing_hardware,
 )
 from robot_server.persistence.fastapi_dependencies import (
     get_images_resetter,
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.runs.dependencies import (
+    mark_light_control_startup_finished,
+    start_light_control_task,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -95,6 +106,35 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
             return resp.status
 
 
+async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> None:
+    """Request to transition the source of the hardware api between inner-process and subprocess."""
+    if enable:
+        # cleanup state/kill any local hardware API
+        await clean_up_hardware(app_state)
+        # TODO send systemD socket request
+        print("SYSTEMD SOCKET TURN ON")
+
+        # what happens to get_hardware dependency for /settings here?
+        # CASEY NOTE this is where I left off^ - I think we just refresh it
+
+    else:
+        # cleanup state
+        await clean_up_hardware(app_state)
+
+        # TODO send systemD socket request to end pyro process
+        print("SYSTEMD SOCKET TURN OFF")
+        # TODO ensure the hardware controller resource is gone - how do this? pyro check maybe? hmm
+
+    # rerun the hardware API setup
+    start_initializing_hardware(
+        app_state=app_state,
+        callbacks=[
+            (start_light_control_task, True),
+            (mark_light_control_startup_finished, False),
+        ],
+    )
+
+
 @router.post(
     path="/settings",
     summary="Change a setting",
@@ -110,6 +150,7 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    app_state: Annotated[AppState, Depends(get_app_state)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     authorization: Annotated[str | None, Header()] = None,
 ) -> AdvancedSettingsResponse:
@@ -130,8 +171,20 @@ async def post_settings(
                 raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
 
         await advanced_settings.set_adv_setting(update.id, update.value)
+        if update.id == "enableHardwareSubprocess" and robot_type == RobotTypeEnum.FLEX:
+            await _hardware_subprocess_transition(
+                enable=update.value if update.value is not None else False,
+                app_state=app_state,
+            )
+
+            # Refresh the hardware dependency
+            hardware = await get_thread_manager(app_state)
+
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
+        # CASEY NOTE ^ these hardware.**whatever** functions need to move to either the ot3 process or a new endpoint
+        # maybe that endpoint can be /settings/hardware:{...} <- this seems like a good idea
+        # or the subprocess enable flag is just flipped in its own script
     except ValueError as e:
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:
