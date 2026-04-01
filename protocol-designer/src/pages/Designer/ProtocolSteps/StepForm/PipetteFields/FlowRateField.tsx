@@ -18,7 +18,7 @@ import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
 
-import { getMaxUiFlowRate } from './utils'
+import { getMaxUiFlowRate, numDispenseWells } from './utils'
 
 import type { PathOption } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
@@ -94,6 +94,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const isOT2 = robotType === OT2_ROBOT_TYPE
 
   // if form type is 'mix', we will use single path
+
   const referenceVolumesForByVolumeInterpolation =
     pipette != null && tiprackDef != null && formData != null
       ? getTransferPlanAndReferenceVolumes({
@@ -103,10 +104,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
             formData.stepType === 'moveLiquid'
               ? formData.aspirate_wells.length
               : formData.wells.length,
-          numDispenseWells:
-            formData.stepType === 'moveLiquid'
-              ? formData.dispense_wells.length
-              : formData.wells.length,
+          numDispenseWells: numDispenseWells(formData),
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDef,
           // multi-dispense is valid on OT-2, even though liquid class values are null

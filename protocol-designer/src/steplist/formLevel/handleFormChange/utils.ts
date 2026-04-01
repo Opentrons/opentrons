@@ -23,7 +23,10 @@ import {
   CHANNELS_MAPPED_TO_MAX_SPEED,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
 } from '../../../constants'
-import { getMaxUiFlowRate } from '../../../pages/Designer/ProtocolSteps/StepForm/PipetteFields/utils'
+import {
+  getMaxUiFlowRate,
+  numDispenseWells,
+} from '../../../pages/Designer/ProtocolSteps/StepForm/PipetteFields/utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import {
   canPipetteUseLabware,
@@ -669,7 +672,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       volume,
       path: rawForm.path as PathOption,
       numAspirateWells: rawForm.aspirate_wells.length,
-      numDispenseWells: rawForm.dispense_wells.length,
+      numDispenseWells: numDispenseWells(rawForm),
       aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
         [number, number]
       >,

@@ -313,3 +313,23 @@ export const getNumPickups = (args: {
     return formData.wells.length
   }
 }
+
+export const numDispenseWells = (formData: FormData): number => {
+  const stepType = formData.stepType
+  if (stepType === 'mix') {
+    return formData.wells.length
+  }
+  if (stepType === 'moveLiquid') {
+    const dispenseLabware = formData.dispense_labware.id
+      ? formData.dispense_labware.id
+      : (formData.dispense_labware as string)
+    const isDispenseLabwareAWasteChuteorTrash =
+      dispenseLabware.endsWith('wasteChute') ||
+      dispenseLabware.endsWith('trashBin')
+    const numDispenseWells = isDispenseLabwareAWasteChuteorTrash
+      ? 1
+      : formData.dispense_wells.length
+    return numDispenseWells
+  }
+  return 0
+}

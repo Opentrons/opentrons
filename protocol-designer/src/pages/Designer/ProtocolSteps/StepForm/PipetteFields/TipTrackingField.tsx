@@ -31,7 +31,7 @@ import { TipSelectionWizard } from './TipSelectionWizard'
 import { useMemoizedTipAccessibilityByTiprackIdByWellName } from './TipSelectionWizard/hooks'
 import { getValidTiprackIds } from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
-import { getNumPickups } from './utils'
+import { getNumPickups, numDispenseWells } from './utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -82,10 +82,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
             formData.stepType === 'moveLiquid'
               ? formData.aspirate_wells.length
               : formData.wells.length,
-          numDispenseWells:
-            formData.stepType === 'moveLiquid'
-              ? formData.dispense_wells.length
-              : formData.wells.length,
+          numDispenseWells: numDispenseWells(formData),
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDefinition,
           // multi-dispense is valid on OT-2, even though liquid class values are null

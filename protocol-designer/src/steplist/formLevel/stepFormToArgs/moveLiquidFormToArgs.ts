@@ -15,6 +15,7 @@ import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import { numDispenseWells } from '../../../pages/Designer/ProtocolSteps/StepForm/PipetteFields/utils'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
 import { getOrderedWells } from '../../utils/getOrderedWells'
 import { getMoveLiquidDelayData } from './getDelayData'
@@ -117,7 +118,7 @@ const getCheckedPath = (
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
-          numDispenseWells: castFormData.dispense_wells.length,
+          numDispenseWells: numDispenseWells(castFormData),
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
@@ -129,7 +130,7 @@ const getCheckedPath = (
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
-          numDispenseWells: castFormData.dispense_wells.length,
+          numDispenseWells: numDispenseWells(castFormData),
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
@@ -190,6 +191,10 @@ export const moveLiquidFormToArgs = (
   const isDispensingIntoDisposalLocation =
     'name' in destLabware &&
     (destLabware.name === 'wasteChute' || destLabware.name === 'trashBin')
+  console.log(
+    '🚀 ~ moveLiquidFormToArgs ~ isDispensingIntoDisposalLocation:',
+    isDispensingIntoDisposalLocation
+  )
 
   let def: LabwareDefinition2 | null = null
   let dispWells: string[] = []
