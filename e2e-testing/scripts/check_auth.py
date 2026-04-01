@@ -50,8 +50,7 @@ def resolve_host() -> str:
     if env_host:
         return env_host
     console.print(
-        "[yellow]Pass a host or set ROBOT_IP.[/yellow]\n"
-        "  Example: uv run python scripts/check_auth.py localhost"
+        "[yellow]Pass a host or set ROBOT_IP.[/yellow]\n  Example: uv run python scripts/check_auth.py localhost"
     )
     raise SystemExit(1)
 
@@ -90,8 +89,7 @@ async def main() -> None:
         _step(
             "0. Auth server (GET /auth/settings)",
             Text.from_markup(
-                f"[green]is_alive[/green]: validated [bold]SettingsData[/bold] from "
-                f"[dim]{base_url}/auth/settings[/dim]"
+                f"[green]is_alive[/green]: validated [bold]SettingsData[/bold] from [dim]{base_url}/auth/settings[/dim]"
             ),
         )
 
