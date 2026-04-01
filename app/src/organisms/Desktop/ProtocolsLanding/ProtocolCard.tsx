@@ -18,7 +18,6 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_ABSOLUTE,
   ProtocolDeck,
-  SIZE_2,
   SIZE_3,
   SPACING,
   StyledText,
@@ -26,7 +25,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  FLEX_STANDARD_MODEL,
   getGripperDisplayName,
   getModuleType,
   getPipetteNameSpecs,
@@ -44,7 +42,6 @@ import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { getRobotTypeDisplayName } from './utils'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
@@ -145,7 +142,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
 
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
-  const robotType = mostRecentAnalysis?.robotType ?? null
   const hasPeripherals =
     mostRecentAnalysis?.commandPreconditions?.isCameraUsed ?? false
 
@@ -246,23 +242,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex gridGap={SPACING.spacing16}>
-              <Flex
-                flex={`0 0 ${
-                  robotType === FLEX_STANDARD_MODEL ? '6.2rem' : SIZE_2
-                }`}
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-              >
-                <StyledText
-                  color={COLORS.grey60}
-                  desktopStyle="bodyDefaultRegular"
-                >
-                  {i18n.format('robot', 'capitalize')}
-                </StyledText>
-                <LegacyStyledText forwardedAs="p">
-                  {getRobotTypeDisplayName(robotType)}
-                </LegacyStyledText>
-              </Flex>
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
