@@ -1,14 +1,14 @@
 """Abstract base classes for the sensor drivers."""
+
 from abc import ABC, abstractmethod
+from contextlib import asynccontextmanager
+from typing import AsyncIterator, Optional, Sequence
 
-from typing import Optional, AsyncIterator, Sequence
+from .scheduler import SensorScheduler
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-
+from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 from opentrons_hardware.sensors.sensor_types import BaseSensorType, ThresholdSensorType
 from opentrons_hardware.sensors.types import SensorDataType, SensorReturnType
-from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
-from .scheduler import SensorScheduler
-from contextlib import asynccontextmanager
 
 
 class AbstractSensorDriver(ABC):

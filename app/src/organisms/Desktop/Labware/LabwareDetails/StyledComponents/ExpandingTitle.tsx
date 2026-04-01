@@ -35,7 +35,10 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {label}
         </LegacyStyledText>
         {diagram != null && (

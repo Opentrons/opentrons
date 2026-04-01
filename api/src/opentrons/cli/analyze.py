@@ -1,75 +1,74 @@
 """Opentrons analyze CLI."""
 
-import click
-
-from anyio import run
+import gc
+import json
+import logging
+import sys
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from enum import Enum
 from pathlib import Path
-from pydantic import BaseModel
 from typing import (
+    IO,
     Any,
+    Callable,
     Dict,
+    Iterator,
     List,
+    Literal,
     Optional,
     Sequence,
-    Union,
-    Literal,
-    Callable,
-    IO,
     TypeVar,
-    Iterator,
+    Union,
 )
-import logging
-import sys
-import json
-import gc
 
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    CSVRuntimeParamPaths,
-    PrimitiveRunTimeParamValuesType,
-    EngineStatus,
-)
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    ProtocolFileRole,
-    ProtocolType,
-    JsonProtocolConfig,
-    ProtocolFilesInvalidError,
-    ProtocolSource,
-)
-from opentrons.protocol_runner.create_simulating_orchestrator import (
-    create_simulating_orchestrator,
-)
-from opentrons.protocol_runner import RunResult
-from opentrons.protocol_runner.run_orchestrator import ParseMode
-
-from opentrons.protocol_engine import (
-    Command,
-    ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
-    Liquid,
-    LiquidClassRecordWithId,
-    StateSummary,
-)
-from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
-
-from opentrons_shared_data.robot.types import RobotType
+import click
+from anyio import run
+from pydantic import BaseModel
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     PythonException,
 )
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.util import StrEnum
 
+from opentrons.protocol_engine import (
+    Command,
+    ErrorOccurrence,
+    Liquid,
+    LiquidClassRecordWithId,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    ProtocolEngine,
+    StateSummary,
+)
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.types import (
+    CommandAnnotation,
+    CommandPreconditions,
+    CSVRuntimeParamPaths,
+    EngineStatus,
+    LabwareOffset,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
+from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    ProtocolFileRole,
+    ProtocolFilesInvalidError,
+    ProtocolReader,
+    ProtocolSource,
+    ProtocolType,
+)
+from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
+from opentrons.protocol_runner.run_coordinator import ParseMode
+from opentrons.protocols.api_support.types import APIVersion
 
 OutputKind = Literal["json", "human-json"]
 
@@ -324,7 +323,6 @@ async def _do_analyze(
     rtp_values: PrimitiveRunTimeParamValuesType,
     rtp_paths: CSVRuntimeParamPaths,
 ) -> RunResult:
-
     orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
@@ -467,6 +465,7 @@ async def _analyze(  # noqa: C901
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
         commandPreconditions=analysis.command_preconditions,
+        labwareOffsets=analysis.state_summary.labwareOffsets,
     )
 
     _call_for_output_of_kind(
@@ -510,7 +509,7 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
-class AnalysisResult(str, Enum):
+class AnalysisResult(StrEnum):
     """Result of a completed protocol analysis.
 
     The result indicates whether the protocol is expected to run successfully.
@@ -558,3 +557,4 @@ class AnalyzeResults(BaseModel):
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
     commandPreconditions: Optional[CommandPreconditions]
+    labwareOffsets: List[LabwareOffset]

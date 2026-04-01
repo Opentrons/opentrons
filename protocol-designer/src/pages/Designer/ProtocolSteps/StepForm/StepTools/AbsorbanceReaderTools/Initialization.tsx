@@ -36,9 +36,11 @@ import { maskToInteger } from '/protocol-designer/steplist/fieldLevel/processing
 import type { TFunction } from 'i18next'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
+import type { Initialization as InitializationState } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
-import type { InitializationMode } from '/protocol-designer/step-forms/types'
 import type { FieldProps, FieldPropsByName } from '../../types'
+
+type InitializationMode = InitializationState['mode']
 
 const MAX_WAVELENGTHS = 6
 const CUSTOM_OPTION: DropdownOption = { name: 'Other', value: '' }
@@ -185,7 +187,7 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
 
   const wavelengthItems: JSX.Element[] = []
   for (let i = 0; i < (mode === 'multi' ? numWavelengths : 1); i++) {
-    const wavelength = i <= wavelengths.length ? wavelengths[i] : null
+    const wavelength = i < wavelengths.length ? wavelengths[i] : null
     wavelengthItems.push(
       <ListItem
         type="default"
@@ -299,7 +301,7 @@ function WavelengthItem(props: WavelengthItemProps): JSX.Element {
               ({ value: val }) => val === wavelengthOption
             )
           ) {
-            const clone = wavelengths
+            const clone = [...wavelengths]
             clone[index] = wavelengthOption
             wavelengthsProps.updateValue(clone)
           }

@@ -1,23 +1,22 @@
 """Get next tip command request, result, and implementation models."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Type, Union
+
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Any, Optional, Type, List, Literal, Union
-
 from pydantic.json_schema import SkipJsonSchema
-
-from opentrons.types import NozzleConfigurationType
 
 from ..errors import ErrorOccurrence
 from ..types import NextTipInfo, NoTipAvailable, NoTipReason
-from .pipetting_common import PipetteIdMixin
-
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
     SuccessData,
 )
+from .pipetting_common import PipetteIdMixin
+from opentrons.types import NozzleConfigurationType
 
 if TYPE_CHECKING:
     from ..state.state import StateView

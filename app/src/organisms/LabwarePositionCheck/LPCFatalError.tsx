@@ -36,7 +36,7 @@ export function LPCFatalError(props: LPCWizardContentProps): JSX.Element {
       desktopFooterBtnCopy={t('exit')}
     >
       <Flex css={CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} />
+        <Icon name="ot-alert" css={ICON_STYLE} />
         <Flex css={TEXT_CONTAINER}>
           <StyledText
             desktopStyle="headingSmallBold"

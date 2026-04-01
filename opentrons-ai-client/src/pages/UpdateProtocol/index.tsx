@@ -129,7 +129,7 @@ export function UpdateProtocol(): JSX.Element {
     setCreateProtocolChatAtom({
       prompt: '',
       regenerate: false,
-      scientific_application_type: '',
+      scientificApplicationType: '',
       description: '',
       robots: 'opentrons_flex',
       mounts: [],
@@ -142,10 +142,10 @@ export function UpdateProtocol(): JSX.Element {
     })
     setUpdateProtocolChatAtom({
       prompt: '',
-      protocol_text: '',
+      protocolText: '',
       regenerate: false,
-      update_type: 'adapt_python_protocol',
-      update_details: '',
+      updateType: 'adapt_python_protocol',
+      updateDetails: '',
       fake: false,
     })
     setChatHistoryAtom([])
@@ -259,10 +259,10 @@ export function UpdateProtocol(): JSX.Element {
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,
-      protocol_text: pythonText,
+      protocolText: pythonText,
       regenerate: false,
-      update_type: (updateType?.value ?? 'other') as UpdateOptions,
-      update_details: detailsValue,
+      updateType: (updateType?.value ?? 'other') as UpdateOptions,
+      updateDetails: detailsValue,
       fake: false,
     })
 
@@ -321,7 +321,7 @@ export function UpdateProtocol(): JSX.Element {
               <UploadInput
                 uploadButtonText={t('choose_file')}
                 dragAndDropText={
-                  <StyledText as="p">
+                  <StyledText forwardedAs="p">
                     <Trans
                       t={t}
                       i18nKey={t('drag_and_drop')}

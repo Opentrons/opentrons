@@ -1,20 +1,22 @@
 """Tests for the /health router."""
-import pytest
-from typing import Dict, Iterator
+
 from pathlib import Path
-from mock import MagicMock, patch
+from typing import Dict, Iterator
+
+import pytest
 from decoy import Decoy
+from mock import MagicMock, patch
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.health.router import (
     ComponentVersions,
-    get_versions,
     _get_version,
     get_health,
+    get_versions,
 )
-from robot_server.disk_monitor.monitor import DiskMonitor
 
 
 @pytest.fixture

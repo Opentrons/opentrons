@@ -34,16 +34,21 @@ export function LabwareOffsetSnippet(
 
   const [snippet, setSnippet] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (labware.length > 0 && labwareOffsets != null) {
-      const generatedSnippet = createSnippet(props)
-      setSnippet(generatedSnippet)
+  useEffect(
+    () => {
+      if (labware.length > 0 && labwareOffsets != null) {
+        const generatedSnippet = createSnippet(props)
+        setSnippet(generatedSnippet)
 
-      if (onSnippetUpdate != null && generatedSnippet != null) {
-        onSnippetUpdate(generatedSnippet)
+        if (onSnippetUpdate != null && generatedSnippet != null) {
+          onSnippetUpdate(generatedSnippet)
+        }
       }
-    }
-  }, [labware, labwareOffsets, mode, onSnippetUpdate])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [labware, labwareOffsets, mode, onSnippetUpdate]
+  )
 
   return robotType === FLEX_ROBOT_TYPE ? (
     <JsonTextArea readOnly value={snippet ?? ''} spellCheck={false} />

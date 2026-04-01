@@ -1,7 +1,9 @@
 """Test the common utility functions used in transfers."""
-import pytest
+
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Any, Iterable, List, Tuple
+from typing import Any, ContextManager, Iterable, List, Tuple
+
+import pytest
 
 from opentrons.protocols.advanced_control.transfers.common import (
     Target,

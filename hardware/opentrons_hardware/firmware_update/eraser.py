@@ -1,9 +1,10 @@
 """Firmware eraser."""
+
 import asyncio
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
-from opentrons_hardware.firmware_bindings import NodeId, ErrorCode
+from opentrons_hardware.firmware_bindings import ErrorCode, NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateEraseAppRequest,
     FirmwareUpdateEraseAppResponse,

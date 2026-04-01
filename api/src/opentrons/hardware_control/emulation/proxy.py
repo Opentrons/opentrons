@@ -1,9 +1,12 @@
 """The Proxy class module."""
+
 from __future__ import annotations
+
 import asyncio
 import logging
-import uuid
 import socket
+import sys
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
@@ -59,6 +62,10 @@ class Proxy:
         self._settings = settings
         self._event_listener = listener
         self._cons: List[Connection] = []
+        self._servers: list[asyncio.Server] = []
+        self._run_tasks: list["asyncio.Future[tuple[None, None]]"] = []
+        self._serving_upstream = asyncio.Event()
+        self._serving_downstream = asyncio.Event()
 
     @property
     def name(self) -> str:
@@ -67,10 +74,56 @@ class Proxy:
 
     async def run(self) -> None:
         """Run the server."""
-        await asyncio.gather(
-            self._listen_server_connections(),
-            self._listen_client_connections(),
+        run_task = asyncio.gather(
+            self._listen_server_connections(), self._listen_client_connections()
         )
+        self._run_tasks.append(run_task)
+        await run_task
+
+    async def wait_ready(self, timeout: float | None = None) -> None:
+        await asyncio.wait_for(
+            asyncio.gather(
+                self._serving_upstream.wait(), self._serving_downstream.wait()
+            ),
+            timeout=timeout,
+        )
+
+    def stop(self) -> None:
+        """Stop the proxy.
+
+        This is a workaround for https://github.com/python/cpython/issues/123720
+
+        Note that if you have called run() multiple times on the same proxy, which _will_
+        work, this one call will stop them all.
+        """
+        # This is pretty horrible. The reason the proxy servers used to hang is that there
+        # just isn't a good way to cleanly close asyncio servers until 3.13.
+        #
+        # - Before 3.12, readers just get stranded. I don't think there's anything we can
+        #   do about this, and we're definitely not handling it here.
+        # - In 3.12, there's a change which was meant to avoid the issue by catching
+        #   cancels and waiting for the server to close... but there's no way to close any
+        #   tasks that are waiting to read/write data. you can close the socket on the
+        #   read side, but we don't want to break encapsulation like that.
+        # - In 3.13 there's just a method to close all the client connections that actually
+        #   solves the issue
+        #
+        # In 3.12, we can work around the problem by just canceling again a little later (we
+        # need to have this delayed callback to give the server code time to get into wait_closed):
+        # https://github.com/python/cpython/blob/a183a11db8bc2520c52814635de2df118d2d7e8c/Lib/asyncio/base_events.py#L372-L378
+        # and the task will actually get cancelled.
+        #
+        # In 3.13, we can solve the problem by calling the method that solves the problem.
+        relevant_version = (sys.version_info.major, sys.version_info.minor)
+        for server in self._servers:
+            server.close()
+        for run_task in self._run_tasks:
+            if relevant_version < (3, 12):
+                return
+            elif relevant_version < (3, 13):
+                asyncio.get_running_loop().call_later(0.01, run_task.cancel)
+            else:
+                server.close_clients()  # type: ignore[attr-defined]
 
     async def _listen_server_connections(self) -> None:
         """Run the server listener."""
@@ -83,6 +136,9 @@ class Proxy:
             self._settings.host,
             self._settings.emulator_port,
         )
+        self._servers.append(server)
+
+        asyncio.get_running_loop().call_soon(self._serving_upstream.set)
         await server.serve_forever()
 
     async def _listen_client_connections(self) -> None:
@@ -96,6 +152,9 @@ class Proxy:
             self._settings.host,
             self._settings.driver_port,
         )
+        self._servers.append(server)
+
+        asyncio.get_running_loop().call_soon(self._serving_downstream.set)
         await server.serve_forever()
 
     async def _handle_server_connection(

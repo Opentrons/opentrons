@@ -1,51 +1,49 @@
 """Test pipette seal commands."""
 
-import pytest
 from datetime import datetime
-
-from decoy import Decoy, matchers
 from unittest.mock import sentinel
 
+import pytest
+from decoy import Decoy, matchers
+
+from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
+from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     labware_definition_type_adapter,
 )
 
-from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
-
-from opentrons.types import MountType, Point
-
+from opentrons.hardware_control import OT3HardwareControlAPI
 from opentrons.protocol_engine import (
-    WellLocation,
-    PickUpTipWellLocation,
-    WellOffset,
     DeckPoint,
+    PickUpTipWellLocation,
+    WellLocation,
+    WellOffset,
+)
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.seal_pipette_to_tip import (
+    SealPipetteToTipImplementation,
+    SealPipetteToTipParams,
+    SealPipetteToTipResult,
 )
 from opentrons.protocol_engine.errors import PickUpTipTipNotAttachedError
-from opentrons.protocol_engine.execution import MovementHandler, GantryMover, TipHandler
+from opentrons.protocol_engine.execution import (
+    GantryMover,
+    MovementHandler,
+    PipettingHandler,
+    TipHandler,
+)
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
-    TipGeometry,
-    FluidKind,
     AspiratedFluid,
+    FluidKind,
     LabwareWellId,
+    TipGeometry,
 )
-
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.seal_pipette_to_tip import (
-    SealPipetteToTipParams,
-    SealPipetteToTipResult,
-    SealPipetteToTipImplementation,
-)
-from opentrons.protocol_engine.execution import (
-    PipettingHandler,
-)
-from opentrons.hardware_control import OT3HardwareControlAPI
-
-from opentrons_shared_data.labware import load_definition
+from opentrons.types import MountType, Point
 
 
 @pytest.fixture

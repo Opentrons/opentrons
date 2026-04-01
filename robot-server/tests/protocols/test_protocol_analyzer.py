@@ -1,40 +1,44 @@
 """Tests for the ProtocolAnalyzer."""
 
-import pytest
-from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.pipette.types import PipetteNameType
+import pytest
+from decoy import Decoy
 
-from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import (
-    StateSummary,
-    EngineStatus,
-    commands as pe_commands,
-    errors as pe_errors,
-    types as pe_types,
-)
 import opentrons.protocol_runner as protocol_runner
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
+import opentrons.util.helpers as datetime_helper
+from opentrons.protocol_engine import (
+    EngineStatus,
+    StateSummary,
+)
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
 from opentrons.protocol_reader import (
-    ProtocolSource,
     JsonProtocolConfig,
+    ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, MountType
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
-import opentrons.util.helpers as datetime_helper
-
+import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
-import robot_server.errors.error_mappers as em
-
-from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 
 
 @pytest.fixture(autouse=True)
@@ -166,8 +170,27 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    new_command_annotation = pe_types.CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="My command annotation",
+        params={},
+    )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
+    offset = pe_types.LabwareOffset(
+        id="1234123",
+        createdAt=datetime.now(),
+        definitionUri="opentrons/abcxyz/1",
+        location=pe_types.LegacyLabwareOffsetLocation(
+            slotName=DeckSlotName.SLOT_A1, moduleModel=None, definitionUri=None
+        ),
+        locationSequence=[
+            pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
+                addressableAreaName="A1"
+            )
+        ],
+        vector=pe_types.LabwareOffsetVector(x=1.0, y=2.0, z=3.0),
+    )
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -182,7 +205,11 @@ async def test_analyze(
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
-    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
+    decoy.when(
+        await orchestrator.run(
+            deck_configuration=[],
+        )
+    ).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -191,7 +218,7 @@ async def test_analyze(
                 labware=[analysis_labware],
                 pipettes=[analysis_pipette],
                 modules=[],
-                labwareOffsets=[],
+                labwareOffsets=[offset],
                 liquids=[],
                 liquidClasses=[],
                 wells=[],
@@ -199,7 +226,7 @@ async def test_analyze(
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
-            command_annotations=[command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )
@@ -219,8 +246,9 @@ async def test_analyze(
             errors=[],
             liquids=[],
             liquidClasses=[],
-            command_annotations=[command_annotation],
+            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
+            labware_offsets=[offset],
         )
     )
 
@@ -306,5 +334,6 @@ async def test_analyze_updates_pending_on_error(
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         ),
     )

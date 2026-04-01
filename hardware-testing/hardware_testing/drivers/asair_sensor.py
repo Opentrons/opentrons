@@ -102,7 +102,7 @@ def BuildAsairSensor(
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
                     sensor.close()  # 👈 防泄漏
-                
+
                 except:  # noqa: E722
                     pass
             use_sim = ui.get_user_answer("No env sensor found, use simulator?")
@@ -136,7 +136,7 @@ def BuildAsairSensorWithPort(
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor, port
                     sensor.close()  # 防泄漏
-                
+
                 except:  # noqa: E722
                     pass
             use_sim = ui.get_user_answer("No env sensor found, use simulator?")
@@ -210,27 +210,29 @@ class AsairSensor(AsairSensorBase):
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
-            self._th_sensor.flushInput()
-            self._th_sensor.flushOutput()
+            self._th_sensor.flushInput()  # type: ignore[attr-defined]
+            self._th_sensor.flushOutput()  # type: ignore[attr-defined]
+
             self._th_sensor.write(command_bytes)
             time.sleep(0.5)
             start_time = time.time()
             length = 0
-            while time.time() - start_time < 2: 
+            while time.time() - start_time < 2:
                 length = self._th_sensor.inWaiting()
                 if length > 0:
                     break
                 time.sleep(0.1)
             res = self._th_sensor.read(length)
-            log.debug(f"received {res}")
+            log.debug(f"received {res!r}")
 
-            res = codecs.encode(res, "hex")
-            relative_hum = res[6:10]
-            temp = res[10:14]
-            log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
+            res_hex = codecs.encode(res, "hex").decode("ascii")
+            relative_hum_str = res_hex[6:10]
+            temp_str = res_hex[10:14]
+            log.info(f"Temp: {temp_str!r}, RelativeHum: {relative_hum_str!r}")
 
-            temp = float(int(temp, 16)) / 10
-            relative_hum = float(int(relative_hum, 16)) / 10
+            temp = float(int(temp_str, 16)) / 10
+            relative_hum = float(int(relative_hum_str, 16)) / 10
+
             return Reading(temperature=temp, relative_humidity=relative_hum)
 
         except (IndexError, ValueError) as e:
@@ -253,15 +255,15 @@ class AsairSensor(AsairSensorBase):
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
-            self._th_sensor.flushInput()
-            self._th_sensor.flushOutput()
+            self._th_sensor.flushInput()  # type: ignore[attr-defined]
+            self._th_sensor.flushOutput()  # type: ignore[attr-defined]
             self._th_sensor.write(command_bytes)
             time.sleep(0.1)
 
-            length = self._th_sensor.inWaiting()
+            length = self._th_sensor.inWaiting()  # type: ignore[attr-defined]
             res = self._th_sensor.read(length)
             res = codecs.encode(res, "hex")
-            log.debug(f"received {res}")
+            log.debug(f"received {res!r}")
             dev_id = res[6:14]
             return dev_id.decode()
 

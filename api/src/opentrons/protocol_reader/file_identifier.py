@@ -2,22 +2,20 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Sequence, Union, Optional
+from typing import Any, Dict, Optional, Sequence, Union
 
 import anyio
 
-from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
-
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols import parse
-from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
+from opentrons_shared_data.robot.types import RobotType
 
 from .file_reader_writer import BufferedFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
 from .protocol_source import Metadata
-
+from opentrons.protocols import parse
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 JsonDict = Dict[str, Any]
 
@@ -261,9 +259,9 @@ def _analyze_python_protocol(
         ) from e
 
     # We know this should never be a JsonProtocol. Help out the type-checker.
-    assert isinstance(
-        parsed, PythonProtocol
-    ), "Parsing a Python file returned something other than a Python protocol."
+    assert isinstance(parsed, PythonProtocol), (
+        "Parsing a Python file returned something other than a Python protocol."
+    )
 
     if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(

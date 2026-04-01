@@ -1,13 +1,15 @@
 """Tests for motion methods."""
+
 from numpy import float64
+
 from opentrons_hardware.drivers.can_bus import NodeId
 from opentrons_hardware.firmware_bindings.constants import MoveStopCondition
 from opentrons_hardware.hardware_control.motion import (
-    MoveType,
-    create_step,
-    create_home_step,
-    create_backoff_step,
     MoveGroupSingleAxisStep,
+    MoveType,
+    create_backoff_step,
+    create_home_step,
+    create_step,
 )
 
 

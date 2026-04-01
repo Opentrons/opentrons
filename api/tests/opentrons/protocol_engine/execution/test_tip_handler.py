@@ -1,39 +1,39 @@
 """Pipetting execution handler."""
 
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Dict, Optional, OrderedDict
+
 import pytest
 from decoy import Decoy, matchers
 
-from typing import Dict, ContextManager, Optional, OrderedDict
-from contextlib import nullcontext as does_not_raise
-
-from opentrons.types import Mount, MountType, Point, NozzleConfigurationType
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import (
-    TipStateType,
-    TipScrapeType,
-    InstrumentProbeType,
-)
-from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
-from opentrons.protocol_engine.resources import LabwareDataProvider
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    CommandPreconditionViolated,
 )
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
 )
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
+
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.hardware_control.types import (
+    InstrumentProbeType,
+    TipScrapeType,
+    TipStateType,
+)
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.execution.tip_handler import (
     HardwareTipHandler,
     VirtualTipHandler,
     create_tip_handler,
 )
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
+from opentrons.protocol_engine.resources import LabwareDataProvider
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
+from opentrons.types import Mount, MountType, NozzleConfigurationType, Point
 
 
 @pytest.fixture
@@ -157,7 +157,7 @@ async def test_flex_pick_up_tip_state(
         decoy.verify(mock_hardware_api.cache_tip(Mount.LEFT, 42), times=1)
     else:
         decoy.when(
-            await subject.verify_tip_presence(
+            await subject.verify_tip_presence(  # type: ignore[func-returns-value]
                 pipette_id="pipette-id", expected=TipPresenceStatus.PRESENT
             )
         ).then_raise(TipNotAttachedError())

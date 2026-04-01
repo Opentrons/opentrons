@@ -64,7 +64,10 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
           </Btn>
           <Flex>
-            <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            <LegacyStyledText
+              forwardedAs="h2"
+              fontWeight={TYPOGRAPHY.fontWeightBold}
+            >
               {t('usb')}
             </LegacyStyledText>
           </Flex>

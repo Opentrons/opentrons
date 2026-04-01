@@ -7,7 +7,7 @@ from opentrons.protocol_api import (
 )
 from typing import Tuple, Optional
 from opentrons.protocol_api import COLUMN, ALL
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     ThermocyclerContext,
@@ -22,15 +22,16 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    helpers.create_dot_bottom_parameter(parameters)
-    helpers.create_deactivate_modules_parameter(parameters)
-    helpers.create_probe_liquid_height_parameter(parameters)
-    helpers.create_meniscus_z_parameter(parameters)
+    run_helpers.create_dot_bottom_parameter(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_deactivate_modules_parameter(parameters)
+    run_helpers.create_probe_liquid_height_parameter(parameters)
+    run_helpers.create_meniscus_z_parameter(parameters)
     parameters.add_bool(
         variable_name="column_tip_pickup",
         display_name="Perform Column Tip Pickup",
@@ -40,16 +41,21 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
+
     # Load Parameters
+    protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "02")
+    run_helpers.comment_protocol_version(protocol, "03")
 
     def transfer(
         pipette: InstrumentContext,
@@ -75,10 +81,15 @@ def run(protocol: ProtocolContext) -> None:
 
         # Perform transfer
         if source.current_liquid_volume() < volume:
-            src_location = source.meniscus(z=meniscus_z, target="end")
+            src_start_location = source.meniscus(z=meniscus_z, target="start")
+            src_end_location = source.meniscus(z=meniscus_z, target="end")
         else:
-            src_location = source.bottom(z=dot_bottom)
-        pipette.aspirate(volume, src_location)
+            src_start_location = source.bottom(z=dot_bottom)
+            src_end_location = source.bottom(z=dot_bottom)
+        pipette.prepare_to_aspirate()
+        pipette.aspirate(
+            volume, location=src_start_location, end_location=src_end_location
+        )
         pipette.move_to(source.top(), speed=5)
         pipette.dispense(volume, dest.bottom(z=dot_bottom))
         pipette.move_to(dest.top(), speed=5)
@@ -166,11 +177,11 @@ def run(protocol: ProtocolContext) -> None:
     pcr_mm2 = pcr_reagents_plate["A2"]
     try:
         if probe_height_bool:
-            helpers.find_liquid_height_of_loaded_liquids(
+            run_helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells=liquid_vols_and_wells, pipette=p96
             )
         else:
-            helpers.load_wells_with_custom_liquids(
+            run_helpers.load_wells_with_custom_liquids(
                 protocol, liquid_vols_and_wells=liquid_vols_and_wells
             )
         # Protocol steps
@@ -178,8 +189,9 @@ def run(protocol: ProtocolContext) -> None:
 
         # Step 1-2: Set temperatures
         thermocycler.open_lid()
-        temp_module.set_temperature(8)
-        thermocycler.set_block_temperature(8)
+        temp_mod_task = temp_module.start_set_temperature(8)
+        tc_block_task = thermocycler.start_set_block_temperature(8)
+        protocol.wait_for_tasks([tc_block_task, temp_mod_task])
 
         column_tips = partial_tiprack.rows()[0][::-1]
         if column_tip_pick_up:
@@ -347,11 +359,14 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.deactivate_block()
         # Pause for plate removal
         protocol.comment("Protocol complete!")
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            run_helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

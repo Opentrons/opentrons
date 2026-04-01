@@ -2,21 +2,20 @@
 
 import argparse
 import asyncio
-from glob import glob
 import os
 import re
 import subprocess
 import sys
+from glob import glob
 from typing import Dict, Final, List, Optional
 
 from opentrons.drivers.rpi_drivers import usb
-from opentrons.hardware_control.module_control import MODULE_PORT_REGEX
 from opentrons.hardware_control import modules
+from opentrons.hardware_control.execution_manager import ExecutionManager
+from opentrons.hardware_control.module_control import MODULE_PORT_REGEX
 from opentrons.hardware_control.modules.mod_abc import AbstractModule
 from opentrons.hardware_control.modules.update import update_firmware
 from opentrons.hardware_control.types import BoardRevision
-from opentrons.hardware_control.execution_manager import ExecutionManager
-
 
 # Constants for checking if module is back online
 ONLINE_RETRIES = 3

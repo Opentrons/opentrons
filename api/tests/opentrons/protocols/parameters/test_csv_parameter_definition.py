@@ -1,16 +1,17 @@
 """Tests for the CSV Parameter Definitions."""
+
 import inspect
 
 import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import CSVParameter, FileInfo
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import validation as mock_validation
 from opentrons.protocols.parameters.csv_parameter_definition import (
-    create_csv_parameter,
     CSVParameterDefinition,
+    create_csv_parameter,
 )
 from opentrons.protocols.parameters.exceptions import RuntimeParameterRequired
 

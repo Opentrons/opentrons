@@ -145,7 +145,7 @@ export const HeaterShakerSlideout = (
         </LegacyStyledText>
         <form id="HeaterShakerSlideout_submitValue">
           <InputField
-            data-testid={`${String(module.moduleModel)}_setTemp`}
+            title={`${String(module.moduleModel)}_setTemp`}
             id={`${String(module.moduleModel)}_setTemp`}
             units={unit}
             autoFocus
@@ -157,7 +157,7 @@ export const HeaterShakerSlideout = (
             caption={t('module_status_range', {
               min: inputMin,
               max: inputMax,
-              unit: unit,
+              unit,
             })}
             error={errorMessage}
           />

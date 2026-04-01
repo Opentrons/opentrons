@@ -1,13 +1,15 @@
 """A driver that emulates CAN over socket."""
+
 from __future__ import annotations
 
 import argparse
-import logging
 import asyncio
+import logging
 from logging.config import dictConfig
 from typing import List
 
 from opentrons_shared_data.errors.exceptions import CANBusBusError
+
 from opentrons_hardware.drivers.can_bus.socket_driver import SocketDriver
 
 log = logging.getLogger(__name__)

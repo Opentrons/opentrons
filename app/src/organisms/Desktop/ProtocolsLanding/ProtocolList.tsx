@@ -29,10 +29,10 @@ import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { useSortedProtocols } from './hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
@@ -156,7 +156,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing24}
       >
-        <LegacyStyledText as="h1">{t('protocols')}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="h1">{t('protocols')}</LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -164,7 +164,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             marginRight={SPACING.spacing16}
           >
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
@@ -180,7 +180,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               data-testid="ProtocolList_SortByMenu"
             >
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
@@ -272,15 +272,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols != null &&
-          sortedStoredProtocols.map(storedProtocol => (
-            <ProtocolCard
-              key={storedProtocol.protocolKey}
-              handleRunProtocol={handleRunProtocol}
-              handleSendProtocolToFlex={handleSendProtocolToFlex}
-              storedProtocolData={storedProtocol}
-            />
-          ))}
+        {sortedStoredProtocols?.map(storedProtocol => (
+          <ProtocolCard
+            key={storedProtocol.protocolKey}
+            handleRunProtocol={handleRunProtocol}
+            handleSendProtocolToFlex={handleSendProtocolToFlex}
+            storedProtocolData={storedProtocol}
+          />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

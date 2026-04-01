@@ -1,6 +1,7 @@
 // jog controls component
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
@@ -29,6 +30,7 @@ import {
 } from '@opentrons/components'
 
 import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { getIsOnDevice } from '/app/redux/config'
 
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import { ControlContainer } from './ControlContainer'
@@ -455,7 +457,7 @@ export function TouchDirectionControl(
     initialPlane ?? planes[0]
   )
   const { i18n, t } = useTranslation(['robot_calibration'])
-
+  const isOnDevice = useSelector(getIsOnDevice)
   return (
     <Flex
       flex="1"
@@ -479,6 +481,7 @@ export function TouchDirectionControl(
                 onClick={() => {
                   setCurrentPlane(plane)
                 }}
+                isOnDevice={isOnDevice}
                 title={CONTROLS_CONTENTS_BY_PLANE[plane].title}
               />
             )

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -10,7 +10,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
@@ -31,7 +30,6 @@ export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
   const { data: allRunsQueryData, error: allRunsQueryError } =
     useNotifyAllRunsQuery()
-  const protocols = useAllProtocolsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
@@ -40,22 +38,22 @@ export function RobotDashboard(): JSX.Element {
     unfinishedUnboxingFlowRoute !== null
   )
 
-  const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
-    .reduceRight<RunData[]>((acc, run) => {
-      if (
-        acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
-      ) {
-        return acc
-      } else if (
-        protocols?.data?.data.find(protocol => protocol.id === run.protocolId)
-          ?.protocolKind === 'quick-transfer'
-      ) {
-        return acc
-      } else {
-        return [...acc, run]
-      }
-    }, [])
-    .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
+  const recentRunsOfUniqueProtocols = useMemo(() => {
+    const runs = allRunsQueryData?.data ?? []
+    const seenProtocolIds = new Set<string>()
+    const result: RunData[] = []
+    for (let i = runs.length - 1; i >= 0; i--) {
+      const run = runs[i]
+      if (seenProtocolIds.has(run.protocolId!)) continue
+
+      seenProtocolIds.add(run.protocolId!)
+      result.push(run)
+
+      if (result.length === MAXIMUM_RECENT_RUN_PROTOCOLS) break
+    }
+
+    return result
+  }, [allRunsQueryData?.data])
 
   let contents: JSX.Element = <EmptyRecentRun />
   // GET runs query will error with 503 if database is initializing
@@ -67,7 +65,7 @@ export function RobotDashboard(): JSX.Element {
     contents = (
       <>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
         >

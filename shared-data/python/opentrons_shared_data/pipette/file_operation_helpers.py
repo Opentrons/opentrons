@@ -1,8 +1,8 @@
 import json
 from typing import Any, Dict, Union
-from .types import MutableConfig, QuirkConfig
-from .model_constants import VALID_QUIRKS
 
+from .model_constants import VALID_QUIRKS
+from .types import MutableConfig, QuirkConfig
 
 DecoderType = Union[Dict[str, Any], Dict[str, QuirkConfig], MutableConfig]
 

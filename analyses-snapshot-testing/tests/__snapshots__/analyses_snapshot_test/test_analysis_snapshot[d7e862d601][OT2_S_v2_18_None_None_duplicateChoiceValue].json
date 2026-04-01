@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -42,6 +44,7 @@
   "errors": [],
   "files": [],
   "labware": [],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,

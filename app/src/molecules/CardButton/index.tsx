@@ -55,8 +55,10 @@ const CARD_BUTTON_STYLE = css`
 `
 
 const CARD_BUTTON_TEXT_STYLE = css`
-  word-wrap: break-word;
-  overflow: hidden;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: normal;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -97,7 +99,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       />
       <Flex marginTop={SPACING.spacing16}>
         <LegacyStyledText
-          as="h4"
+          forwardedAs="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
@@ -111,7 +113,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
       >
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}

@@ -4,29 +4,41 @@ import re
 import subprocess
 from typing import Annotated, Optional
 
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Path,
+    Query,
+    Response,
+    UploadFile,
+)
 from starlette import status
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query, Response
 
-from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
+from opentrons_shared_data.errors import ErrorCodes
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
-    NetworkingStatus,
-    WifiNetworks,
-    WifiNetwork,
-    WifiConfiguration,
-    WifiConfigurationResponse,
-    WifiKeyFiles,
-    WifiKeyFile,
-    EapOptions,
-    EapVariant,
-    EapConfigOption,
-    EapConfigOptionType,
-    WifiNetworkFull,
     AddWifiKeyFileResponse,
     ConnectivityStatus,
+    EapConfigOption,
+    EapConfigOptionType,
+    EapOptions,
+    EapVariant,
+    NetworkingStatus,
+    WifiConfiguration,
+    WifiConfigurationResponse,
+    WifiKeyFile,
+    WifiKeyFiles,
+    WifiNetwork,
+    WifiNetworkFull,
+    WifiNetworks,
 )
 
 log = logging.getLogger(__name__)
@@ -107,15 +119,14 @@ def _massage_nmcli_error(error_string: str) -> str:
 @router.post(
     path="/wifi/configure",
     summary="Configure the robot's Wi-Fi",
-    description=(
-        "Configures the wireless network interface to " "connect to a network"
-    ),
+    description=("Configures the wireless network interface to connect to a network"),
     status_code=status.HTTP_201_CREATED,
     response_model=WifiConfigurationResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_401_UNAUTHORIZED: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_wifi_configure(
     configuration: WifiConfiguration,
@@ -174,6 +185,7 @@ async def get_wifi_keys() -> WifiKeyFiles:
     response_model=AddWifiKeyFileResponse,
     status_code=status.HTTP_201_CREATED,
     response_model_exclude_unset=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_wifi_key(
     response: Response,
@@ -209,6 +221,7 @@ async def post_wifi_key(
     responses={
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_wifi_key(
     key_uuid: Annotated[
@@ -233,7 +246,7 @@ async def delete_wifi_key(
 @router.get(
     "/wifi/eap-options",
     summary="Get EAP options",
-    description="Get the supported EAP variants and their " "configuration parameters",
+    description="Get the supported EAP variants and their configuration parameters",
     response_model=EapOptions,
 )
 async def get_eap_options() -> EapOptions:
@@ -248,7 +261,7 @@ async def get_eap_options() -> EapOptions:
                     name=o.get("name"),  # type: ignore[arg-type]
                     displayName=o.get("displayName"),  # type: ignore[arg-type]
                     required=o.get("required"),  # type: ignore[arg-type]
-                    type=EapConfigOptionType(o.get("type")),
+                    type=EapConfigOptionType(o.get("type")),  # type: ignore[arg-type]
                 )
                 for o in m.args()
             ],
@@ -267,6 +280,7 @@ async def get_eap_options() -> EapOptions:
     response_model=V1BasicResponse,
     responses={status.HTTP_200_OK: {"model": V1BasicResponse}},
     status_code=status.HTTP_207_MULTI_STATUS,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_wifi_disconnect(wifi_ssid: WifiNetwork) -> JSONResponse:
     ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)

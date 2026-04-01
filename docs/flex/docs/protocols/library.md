@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Library"
+description: "Pre-built protocols available for Flex and how to use them."
 ---
 
 The Opentrons Protocol Library hosts protocols authored either by Opentrons itself or by members of the Opentrons community. To find a protocol that fits your target application, use the search field at the top of the [Protocol Library homepage](https://library.opentrons.com).
@@ -40,4 +41,4 @@ Click on a protocol to go to its detail page, which provides even more informati
 
 - **Protocol steps:** A list of steps written by the protocol author, as well as a visual deck map and list of liquids specified in the protocol file.
 
-The details page also provides basic instructions for downloading and running the protocol. For more information on importing a protocol to the Opentrons App and setting up a run, see the [Transferring Protocols to Flex section][transferring-protocols-to-flex].
+The details page also provides basic instructions for downloading and running the protocol. For more information on importing a protocol to the Opentrons App and setting up a run, see [Transferring Protocols](../opentrons-app/protocol-transfer.md).

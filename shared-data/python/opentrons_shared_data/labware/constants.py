@@ -1,7 +1,7 @@
 import re
-from typing_extensions import Final
 from typing import Literal, Union
 
+from typing_extensions import Final
 
 # Regular expression to validate and extract row, column from well name
 # (ie A3, C1)

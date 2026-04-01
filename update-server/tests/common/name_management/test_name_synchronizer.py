@@ -5,13 +5,17 @@ import pytest
 from decoy import Decoy, matchers
 
 from otupdate.common.name_management import name_synchronizer
-from otupdate.common.name_management.name_synchronizer import NameSynchronizer
 from otupdate.common.name_management.avahi import (
     AvahiClient,
+)
+from otupdate.common.name_management.avahi import (
     alternative_service_name as real_alternative_service_name,
 )
+from otupdate.common.name_management.name_synchronizer import NameSynchronizer
 from otupdate.common.name_management.pretty_hostname import (
     get_pretty_hostname as real_get_pretty_hostname,
+)
+from otupdate.common.name_management.pretty_hostname import (
     persist_pretty_hostname as real_persist_pretty_hostname,
 )
 
@@ -133,7 +137,7 @@ async def test_set_does_not_persist_invalid_avahi_service_name(
     https://github.com/Opentrons/opentrons/issues/9960
     """
     decoy.when(
-        await mock_avahi_client.start_advertising("danger!", TEST_MACHINE_TYPE)
+        await mock_avahi_client.start_advertising("danger!", TEST_MACHINE_TYPE)  # type: ignore[func-returns-value]
     ).then_raise(Exception("oh the humanity"))
 
     with pytest.raises(Exception, match="oh the humanity"):

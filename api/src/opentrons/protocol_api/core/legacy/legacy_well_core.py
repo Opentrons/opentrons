@@ -1,20 +1,18 @@
 """Legacy Well core implementation."""
+
 from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocols.api_support.util import APIVersionError
-
-from opentrons.types import Point, Mount
-
-from opentrons.protocol_engine.types.liquid_level_detection import (
-    SimulatedProbeResult,
-    LiquidTrackingType,
-)
-
-from .well_geometry import WellGeometry
-from ..well import AbstractWellCore
 from ..._liquid import Liquid
+from ..well import AbstractWellCore
+from .well_geometry import WellGeometry
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    LiquidTrackingType,
+    SimulatedProbeResult,
+)
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import Mount, Point
 
 
 class LegacyWellCore(AbstractWellCore):

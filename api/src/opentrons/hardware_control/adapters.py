@@ -1,10 +1,10 @@
-""" Adapters for the :py:class:`.hardware_control.API` instances.
-"""
+"""Adapters for the :py:class:`.hardware_control.API` instances."""
+
 import asyncio
 import functools
-from typing import Generic, TypeVar, Callable, Any, cast, Awaitable
-from .protocols import AsyncioConfigurable
+from typing import Any, Callable, Coroutine, Generic, TypeVar, cast
 
+from .protocols.asyncio_configurable import AsyncioConfigurable
 
 WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 WrappedReturn = TypeVar("WrappedReturn")
@@ -53,7 +53,7 @@ class SynchronousAdapter(Generic[WrappedObj]):
     @staticmethod
     def call_coroutine_sync(
         loop: asyncio.AbstractEventLoop,
-        to_call: Callable[..., Awaitable[WrappedReturn]],
+        to_call: Callable[..., Coroutine[Any, Any, WrappedReturn]],
         *args: Any,
         **kwargs: Any,
     ) -> WrappedReturn:

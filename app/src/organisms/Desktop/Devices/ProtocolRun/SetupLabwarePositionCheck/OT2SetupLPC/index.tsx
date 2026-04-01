@@ -110,7 +110,7 @@ export function OT2SetupLPC(
           justifyContent={JUSTIFY_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}
           </LegacyStyledText>
         </Flex>

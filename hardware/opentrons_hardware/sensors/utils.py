@@ -1,19 +1,18 @@
 """Sensor helper classes."""
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from typing import Literal
 
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
     SensorThresholdMode,
 )
-from opentrons_hardware.sensors.types import SensorDataType
-from opentrons_hardware.sensors.sensor_types import SensorInformation
-
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     IncreaseEvoTipDispenseCountRequestRequest,
 )
+from opentrons_hardware.sensors.sensor_types import SensorInformation
+from opentrons_hardware.sensors.types import SensorDataType
 
 
 async def send_evo_dispense_count_increase(

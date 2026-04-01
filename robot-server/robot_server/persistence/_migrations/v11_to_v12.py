@@ -13,8 +13,9 @@ that expects this field to be present.
 
 from pathlib import Path
 
+from server_utils.persistence.folder_migrator import Migration
+
 from ._util import copy_contents
-from .._folder_migrator import Migration
 
 
 class Migration11to12(Migration):  # noqa: D101

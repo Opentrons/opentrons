@@ -4,9 +4,8 @@ import json
 
 import pytest
 
-from opentrons_shared_data.load import load_shared_data
 from opentrons_shared_data.errors.codes import ErrorCodes
-
+from opentrons_shared_data.load import load_shared_data
 
 error_json = json.loads(load_shared_data("errors/definitions/1/errors.json"))
 

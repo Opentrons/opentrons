@@ -265,6 +265,7 @@ describe('ProtocolRunSetup', () => {
       const robotCalibrationSetup = screen.getByText('Instruments')
       fireEvent.click(robotCalibrationSetup)
       expect(screen.getByText('Mock SetupRobotCalibration')).toBeVisible()
+      expect(screen.getByTestId('SetupStep_content_expanded')).toBeTruthy()
     })
     it('renders robot calibration setup for Flex', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
@@ -276,6 +277,7 @@ describe('ProtocolRunSetup', () => {
       const robotCalibrationSetup = screen.getByText('Instruments')
       fireEvent.click(robotCalibrationSetup)
       expect(screen.getByText('Mock SetupRobotCalibration')).toBeVisible()
+      expect(screen.getByTestId('SetupStep_content_expanded')).toBeTruthy()
     })
     it('renders labware and liquid setup', () => {
       render()
@@ -286,6 +288,7 @@ describe('ProtocolRunSetup', () => {
       const labwareSetup = screen.getByText('Labware & Liquids')
       fireEvent.click(labwareSetup)
       expect(screen.getByText('Mock SetupLabware')).toBeVisible()
+      expect(screen.getByTestId('SetupStep_content_expanded')).toBeTruthy()
     })
     it('renders the empty state for modules when no modules in protocol', () => {
       render()
@@ -294,7 +297,9 @@ describe('ProtocolRunSetup', () => {
 
     it('defaults to no step expanded', () => {
       render()
-      expect(screen.getByText('Mock SetupLabware')).not.toBeVisible()
+      expect(screen.getAllByTestId('SetupStep_content_collapsed').length).toBe(
+        3
+      )
     })
 
     it('renders view-only info message if run has started', async () => {
@@ -302,8 +307,9 @@ describe('ProtocolRunSetup', () => {
 
       render()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      expect(screen.getByText('Mock SetupRobotCalibration')).not.toBeVisible()
-      expect(screen.getByText('Mock SetupLabware')).not.toBeVisible()
+      expect(screen.getAllByTestId('SetupStep_content_collapsed').length).toBe(
+        3
+      )
       screen.getByText('Setup is view-only once run has started')
     })
   })

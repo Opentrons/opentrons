@@ -1,72 +1,73 @@
 """Tests for RunDataManager."""
 
 from datetime import datetime
-from typing import Optional, List, Dict
-from unittest.mock import sentinel, Mock
+from typing import Dict, List, Optional
+from unittest.mock import Mock, sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons import config
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
-    EngineStatus,
-    StateSummary,
-    commands,
-    types as pe_types,
-    CommandSlice,
     CommandErrorSlice,
     CommandPointer,
+    CommandSlice,
+    EngineStatus,
     ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
     LabwareOffset,
     Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    StateSummary,
+    commands,
 )
-from opentrons import config
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import (
     BooleanParameter,
-    CSVParameter,
+    CommandAnnotation,
     CommandPreconditions,
+    CSVParameter,
 )
+from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
+from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
+from robot_server.camera.provider import CameraProviderWrapper
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.file_provider.provider import (
+    FileProviderExecutor,
+)
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
-from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
+    PreSerializedCommandsNotAvailableError,
     RunDataManager,
     RunNotCurrentError,
-    PreSerializedCommandsNotAvailableError,
 )
-from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
+from robot_server.runs.run_models import BadRun, Run, RunDataError, RunNotFoundError
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
     RunConflictError,
+    RunOrchestratorStore,
 )
 from robot_server.runs.run_store import (
-    RunStore,
-    RunResource,
-    CommandNotFoundError,
     BadStateSummary,
+    CommandNotFoundError,
+    RunResource,
+    RunStore,
 )
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
-from opentrons.protocol_engine.resources import FileProvider
-from robot_server.file_provider.provider import (
-    FileProviderExecutor,
-)
-from opentrons.protocol_reader import ProtocolSource
-from opentrons.protocol_engine.resources import CameraProvider
-from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -164,10 +165,12 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
 def command_annotations() -> List[pe_types.CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        pe_types.SecondOrderCommandAnnotation(
-            commandKeys=["abc"],
-            params={"abc": "123"},
-            machineReadableName="hello world",
+        pe_types.CommandAnnotation(
+            id="annotation-id",
+            source="userCommand",
+            name="My command annotation",
+            description="This is a command annotation",
+            params={},
         )
     ]
 
@@ -272,7 +275,7 @@ async def test_create(
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
-    protocol_source = ProtocolSource(
+    protocol_source = ProtocolSource.model_construct(
         directory=sentinel.directory,
         main_file=sentinel.main_file,
         content_hash=sentinel.content_hash,
@@ -768,6 +771,7 @@ async def test_update_current(
             run_id=run_id,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     ).then_return(run_resource)
@@ -842,6 +846,7 @@ async def test_update_current_noop(
             run_id=run_id,
             summary=matchers.Anything(),
             commands=matchers.Anything(),
+            command_annotations=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -966,6 +971,7 @@ async def test_create_archives_existing(
             run_id=run_id_old,
             summary=engine_state_summary,
             commands=[run_command],
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
     )
@@ -1325,6 +1331,110 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
     with pytest.raises(PreSerializedCommandsNotAvailableError):
         subject.get_all_commands_as_preserialized_list("current-run-id", True)
+
+
+def test_get_command_annotations_slice_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+) -> None:
+    """It should get the specified slice of command annotations."""
+    annotations_slice = CommandAnnotationsSlice(
+        command_annotations=[
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
+                params={},
+            )
+        ],
+        cursor=2,
+        total_length=200,
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_run_orchestrator_store.get_command_annotations_slice(cursor=1, length=10)
+    ).then_return(annotations_slice)
+    result = subject.get_command_annotations_slice(
+        run_id="current-run-id", cursor=1, length=10
+    )
+    assert result == annotations_slice
+
+
+def test_get_command_annotation_from_current_run(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+) -> None:
+    """Should get the command annotation by id from run store."""
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
+        params={},
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
+    decoy.when(
+        mock_run_orchestrator_store.get_command_annotation("annotation-id")
+    ).then_return(cmd_annotation)
+    result = subject.get_command_annotation("run-id", "annotation-id")
+    assert result == cmd_annotation
+
+
+def test_get_command_annotations_slice_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """It should get the specified slice of command annotations."""
+    annotations_slice = CommandAnnotationsSlice(
+        command_annotations=[
+            CommandAnnotation(
+                id="annotation-id",
+                source="userCommand",
+                name="user-specified-name",
+                description="user-specified-description",
+                params={},
+            ),
+        ],
+        cursor=2,
+        total_length=200,
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-id")
+    decoy.when(
+        mock_run_store.get_command_annotations_slice(
+            run_id="not-current-id", cursor=1, length=10
+        )
+    ).then_return(annotations_slice)
+    result = subject.get_command_annotations_slice(
+        run_id="not-current-id", cursor=1, length=10
+    )
+    assert result == annotations_slice
+
+
+def test_get_command_annotation_from_db(
+    decoy: Decoy,
+    subject: RunDataManager,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+) -> None:
+    """Should get the command annotation by id from run store."""
+    cmd_annotation = CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="user-specified-name",
+        description="user-specified-description",
+        params={},
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
+    decoy.when(
+        mock_run_store.get_command_annotation(
+            run_id="not-current-run-id", command_annotation_id="annotation-id"
+        )
+    ).then_return(cmd_annotation)
+    result = subject.get_command_annotation("not-current-run-id", "annotation-id")
+    assert result == cmd_annotation
 
 
 async def test_get_current_run_labware_definition(

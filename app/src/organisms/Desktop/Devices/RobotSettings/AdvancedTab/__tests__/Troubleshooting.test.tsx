@@ -22,10 +22,25 @@ import type { ComponentProps } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
+const mockJSZip = vi.hoisted(() => ({
+  file: vi.fn(),
+  generateAsync: vi.fn(),
+}))
+
+const mockSaveAs = vi.hoisted(() => vi.fn())
+
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux-resources/robots')
+vi.mock('file-saver', () => ({
+  saveAs: mockSaveAs,
+}))
+vi.mock('jszip', () => {
+  return {
+    default: vi.fn(() => mockJSZip),
+  }
+})
 
 const ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
@@ -44,6 +59,14 @@ const render = (props: ComponentProps<typeof Troubleshooting>) => {
 describe('RobotSettings Troubleshooting', () => {
   let props: ComponentProps<typeof Troubleshooting>
   beforeEach(() => {
+    mockJSZip.file.mockClear()
+    mockJSZip.generateAsync.mockClear()
+    mockJSZip.generateAsync.mockResolvedValue(new Blob())
+    mockSaveAs.mockClear()
+    MOCK_MAKE_TOAST.mockClear()
+    MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
+    MOCK_EAT_TOAST.mockClear()
+
     props = {
       robotName: ROBOT_NAME,
     }
@@ -77,19 +100,32 @@ describe('RobotSettings Troubleshooting', () => {
     const downloadLogsButton = screen.getByRole('button', {
       name: 'Download logs',
     })
+
     act(() => {
       downloadLogsButton.click()
     })
+
     expect(downloadLogsButton).toBeDisabled()
     expect(MOCK_MAKE_TOAST).toBeCalledWith('Downloading logs...', 'info', {
       disableTimeout: true,
       icon: { name: 'ot-spinner', spin: true },
     })
-    await waitFor(() => {
-      expect(screen.queryByText('Downloading logs...')).toBeNull()
-    })
-    await waitFor(() => {
-      expect(downloadLogsButton).not.toBeDisabled()
-    })
+
+    await waitFor(
+      () => {
+        expect(MOCK_EAT_TOAST).toHaveBeenCalledWith('mock-toast-id')
+      },
+      { timeout: 3000 }
+    )
+
+    await waitFor(
+      () => {
+        expect(mockSaveAs).toHaveBeenCalledWith(
+          expect.any(Blob),
+          'otie_logs.zip'
+        )
+      },
+      { timeout: 3000 }
+    )
   })
 })

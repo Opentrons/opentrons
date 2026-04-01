@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -21,9 +22,11 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -37,13 +40,15 @@ interface SlotInformationProps {
   fixtures?: string[]
 }
 
+const EMPTY_ITEMS: string[] = []
+
 export const SlotInformation: FC<SlotInformationProps> = ({
   location,
   robotType,
-  liquids = [],
-  labwares = [],
-  modules = [],
-  fixtures = [],
+  liquids = EMPTY_ITEMS,
+  labwares = EMPTY_ITEMS,
+  modules = EMPTY_ITEMS,
+  fixtures = EMPTY_ITEMS,
 }) => {
   const { t } = useTranslation('shared')
   const isOffDeck = location === 'offDeck'
@@ -51,11 +56,18 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
-  const modifiedLocation =
+
+  let modifiedLocation = location
+  if (
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V2)) ||
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V1))
-      ? tcDisplayLocation
-      : location
+  ) {
+    modifiedLocation = tcDisplayLocation
+  } else if (getIsSlotAHopper(location)) {
+    modifiedLocation = t('stacker', {
+      slot: getColumnFromWellName(location),
+    })
+  }
 
   return (
     <Flex
@@ -80,7 +92,11 @@ export const SlotInformation: FC<SlotInformationProps> = ({
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   textAlign={TYPOGRAPHY.textAlignRight}
-                  css={LINE_CLAMP_TEXT_STYLE(2, true)}
+                  className={clsx(
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_normal
+                  )}
+                  style={{ WebkitLineClamp: 2 }}
                 >
                   {liquids.join(', ')}
                 </StyledText>
@@ -128,9 +144,9 @@ function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {reducedItems.length > 0 ? (
-        reducedItems.map((item, index) => (
+        reducedItems.map(item => (
           <StackInfo
-            key={`${title}_${index}`}
+            key={`${title}_${item.item}`}
             title={title}
             stackInformation={
               item.count > 1
@@ -171,7 +187,11 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
                 ? TYPOGRAPHY.textAlignLeft
                 : TYPOGRAPHY.textAlignRight
             }
-            css={LINE_CLAMP_TEXT_STYLE(3, true)}
+            className={clsx(
+              lineClampStyles.line_clamp,
+              lineClampStyles.word_normal
+            )}
+            style={{ WebkitLineClamp: 3 }}
           >
             {stackInformation ?? t('none')}
           </StyledText>

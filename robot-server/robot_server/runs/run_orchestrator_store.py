@@ -2,67 +2,75 @@
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Callable, Mapping, Sequence
+import os
+import subprocess
+import sys
+import time
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
 
-from opentrons.types import NozzleMapInterface
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import (
-    PostRunHardwareState,
-    RunTimeParameter,
-    CSVRuntimeParamPaths,
-)
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.robot.types import RobotTypeEnum
-from opentrons_shared_data.errors.exceptions import ModuleNotPresent
+import Pyro5.api
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    EstopState,
-    HardwareEvent,
-    EstopStateNotification,
-    HardwareEventHandler,
     AsynchronousModuleErrorNotification,
+    EstopState,
+    EstopStateNotification,
+    HardwareEvent,
+    HardwareEventHandler,
     ModuleDisconnectedNotification,
 )
-from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.protocol_runner import (
-    RunResult,
-    RunOrchestrator,
-)
-from opentrons.protocol_runner.run_orchestrator import ParseMode
 from opentrons.protocol_engine import (
+    Command,
+    CommandCreate,
+    CommandErrorSlice,
+    CommandPointer,
+    CommandSlice,
     DeckType,
+    ErrorOccurrence,
+    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
-    CommandSlice,
-    CommandErrorSlice,
-    CommandPointer,
-    Command,
-    CommandCreate,
-    LabwareOffset,
-    Config as ProtocolEngineConfig,
     error_recovery_policy,
 )
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine import ErrorOccurrence
-
-from robot_server.protocols.protocol_store import ProtocolResource
-from opentrons.protocol_engine.types import (
-    DeckConfigurationType,
-    PrimitiveRunTimeParamValuesType,
-    EngineStatus,
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
 )
-from opentrons_shared_data.labware.types import LabwareUri
-from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.types import (
+    CommandAnnotation,
+    CSVRuntimeParamPaths,
+    DeckConfigurationType,
+    EngineStatus,
+    PostRunHardwareState,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
+from opentrons.protocol_runner import (
+    RunOrchestrator,
+    RunResult,
+)
+from opentrons.protocol_runner.run_coordinator import ParseMode
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+from opentrons.types import NozzleMapInterface
+from opentrons_shared_data.errors.exceptions import ModuleNotPresent
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareUri
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+
+from . import run_process_entry_point
+from .run_process import DirectedRunProcess, register_process_types
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
 _log = logging.getLogger(__name__)
 
@@ -177,12 +185,18 @@ class RunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._run_orchestrator: Optional[RunOrchestrator] = None
+        # TODO come up with a better name for this.
+        self._run_orchestrator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
+            None
+        )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
+        self._run_process: Optional[subprocess.Popen[bytes]] = None
+        if feature_flags.protocol_subprocess_enabled():
+            register_process_types()
         hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
-    def run_orchestrator(self) -> RunOrchestrator:
+    def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
         """Get the "current" RunOrchestrator."""
         if self._run_orchestrator is None:
             raise NoRunOrchestrator()
@@ -249,8 +263,10 @@ class RunOrchestratorStore:
         Args:
             run_id: The run resource the run orchestrator is assigned to.
             labware_offsets: Labware offsets to create the run with.
+            initial_error_recovery_policy: How to recover from errors.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             file_provider: Wrapper to let the engine read/write data files.
+            camera_provider: Wrapper to let the engine use the camera.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
@@ -263,6 +279,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.create_pyro(run_id=run_id)
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -323,6 +342,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.clear_pyro()
+
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
@@ -335,7 +357,7 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
-        command_annotations = self.run_orchestrator.get_command_annotations()
+        command_annotations = self.run_orchestrator.get_all_command_annotations()
         preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
@@ -348,6 +370,67 @@ class RunOrchestratorStore:
             parameters=run_time_parameters,
             command_annotations=command_annotations,
             command_preconditions=preconditions,
+        )
+
+    async def create_pyro(
+        self,
+        run_id: str,
+    ) -> StateSummary:
+        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
+        if self._run_process is not None:
+            raise RunConflictError("Another run is currently active.")
+
+        self._run_process = subprocess.Popen(
+            args=[sys.executable, "-m", run_process_entry_point.__name__],
+            env={k: v for k, v in os.environ.items()},
+            # user="ot-protocol"  # TODO how do we make sure this works locally?
+        )
+
+        # TODO This timeout sucks
+        start_time = time.monotonic()
+        with Pyro5.api.locate_ns() as ns:
+            while time.monotonic() - start_time < 60:
+                if "ot-protocol" in ns.list():
+                    proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
+                    self._run_orchestrator = cast(
+                        DirectedRunProcess, cast(object, proxy)
+                    )
+                    break
+            else:
+                self._run_process.terminate()
+                self._run_process = None
+                ns.remove("ot-protocol")
+                raise ValueError("Can't find process")
+
+        proxy.create(run_id)
+        return self._run_orchestrator.get_state_summary()
+
+    async def clear_pyro(self) -> RunResult:
+        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
+        if self.run_orchestrator.get_is_okay_to_clear():
+            await self.run_orchestrator.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
+        else:
+            raise RunConflictError("Current run is not idle or stopped.")
+
+        run_data = self.run_orchestrator.get_state_summary()
+
+        assert self._run_process is not None
+        self._run_process.terminate()
+        self._run_process = None
+        self._run_orchestrator = None
+        with Pyro5.api.locate_ns() as ns:
+            ns.remove("ot-protocol")
+
+        return RunResult(
+            state_summary=run_data,
+            commands=[],
+            parameters=[],
+            command_annotations=[],
+            command_preconditions=None,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
@@ -450,6 +533,24 @@ class RunOrchestratorStore:
         """Get a run's command by ID."""
         return self.run_orchestrator.get_command(command_id=command_id)
 
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations in the run."""
+        return self.run_orchestrator.get_total_command_annotations_count()
+
+    def get_command_annotations_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of run commands."""
+        return self.run_orchestrator.get_command_annotations_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the specified command annotation."""
+        return self.run_orchestrator.get_command_annotation(annotation_id)
+
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""
         return self.run_orchestrator.get_run_status()
@@ -457,6 +558,28 @@ class RunOrchestratorStore:
     def get_is_run_terminal(self) -> bool:
         """Get whether run is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
+
+    def get_camera_capture_image_settings(
+        self, camera_id: str
+    ) -> CameraCaptureImageSettings:
+        """Get camera capture image settings to state."""
+        settings = self.run_orchestrator.get_camera_capture_image_settings()
+
+        # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
+        # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
+        if camera_id != settings["camera_id"]:
+            _log.info(
+                f"Stored camera ID does not match provided ID, returning stored data for camera ID {settings['camera_id']}."
+            )
+        return CameraCaptureImageSettings(
+            cameraId=settings["camera_id"],
+            resolution=settings["resolution"],
+            zoom=settings["zoom"],
+            pan=settings["pan"],
+            contrast=settings["contrast"],
+            brightness=settings["brightness"],
+            saturation=settings["saturation"],
+        )
 
     def run_was_started(self) -> bool:
         """Get whether the run has started."""
@@ -483,6 +606,20 @@ class RunOrchestratorStore:
     ) -> CameraSettings:
         """Add new camera enablement settings to state."""
         return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self, capture_image_settings: CameraCaptureImageSettings
+    ) -> None:
+        """Add new camera capture image settings to state."""
+        self.run_orchestrator.add_camera_capture_image_settings(
+            camera_id=capture_image_settings.cameraId,
+            resolution=capture_image_settings.resolution,
+            zoom=capture_image_settings.zoom,
+            pan=capture_image_settings.pan,
+            contrast=capture_image_settings.contrast,
+            brightness=capture_image_settings.brightness,
+            saturation=capture_image_settings.saturation,
+        )
 
     async def add_command_and_wait_for_interval(
         self,

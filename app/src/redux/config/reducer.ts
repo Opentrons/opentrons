@@ -1,4 +1,4 @@
-import { setIn } from '@thi.ng/paths'
+import { setInUnsafe } from '@thi.ng/paths'
 
 import { INITIALIZED, VALUE_UPDATED } from './constants'
 
@@ -17,7 +17,7 @@ export function configReducer(
 
     case VALUE_UPDATED: {
       if (state === null) return state
-      return setIn(state, action.payload.path, action.payload.value)
+      return setInUnsafe(state, action.payload.path, action.payload.value)
     }
   }
 

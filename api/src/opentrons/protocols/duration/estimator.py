@@ -1,20 +1,19 @@
-import logging
-from typing import Any, Optional, List, cast
-from typing_extensions import Final
-import math
 import functools
-
+import logging
+import math
 from dataclasses import dataclass
+from typing import Any, List, Optional, cast
+
+from typing_extensions import Final
 
 from opentrons.legacy_commands import types
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
-
 
 # We refer to page 3 of the GEN2 Temperature Module White-Paper
 # https://blog.opentrons.com/opentrons-technical-documentation/
@@ -211,7 +210,6 @@ class DurationEstimator:
         return duration
 
     def on_drop_tip(self, payload: types.DropTipCommandPayload) -> float:
-
         instrument = payload["instrument"]
         # We are going to once again use our "deck movement" set up. This should
         # be in pickup, drop tip, aspirate, dispense
@@ -264,7 +262,7 @@ class DurationEstimator:
         assert isinstance(aspiration_time, float)
         duration = deck_travel_time + z_total_time + aspiration_time
         logger.info(
-            f"{instrument.name} aspirate from {slot}, " f"the duration is {duration}"
+            f"{instrument.name} aspirate from {slot}, the duration is {duration}"
         )
         return duration
 

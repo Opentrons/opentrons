@@ -45,7 +45,7 @@ export function ShowLabwareOffsetSnippets(): JSX.Element {
         >
           {t('show_labware_offset_snippets')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('branded:show_labware_offset_snippets_description')}
         </LegacyStyledText>
       </Box>

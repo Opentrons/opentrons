@@ -1,4 +1,5 @@
 """Mock representations of potential rectangular frusta."""
+
 """
 These are rectangular frusta whose length and width decay regularly, though not necessarily at the same rate.
 Height always decays from the max height to 0 in increments of 1.

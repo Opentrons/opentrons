@@ -8,12 +8,12 @@ from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.module_server import ModuleStatusClient
 from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
 from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
-from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.settings import (
+    PipetteSettings,
     Settings,
     SmoothieSettings,
-    PipetteSettings,
 )
+from opentrons.hardware_control.emulation.types import ModuleType
 
 
 @pytest.fixture(scope="session")

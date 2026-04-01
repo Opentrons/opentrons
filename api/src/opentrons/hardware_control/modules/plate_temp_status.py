@@ -6,7 +6,6 @@ from opentrons.hardware_control.modules.types import TemperatureStatus
 
 
 class PlateTemperatureStatus:
-
     TEMP_THRESHOLD = 0.3
     """The threshold under which the difference between target and temperature
     is considered `holding`."""

@@ -1,5 +1,6 @@
 import re
 from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -22,8 +23,7 @@ class GetTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
             set_temp = match.groupdict()["set_temp"].strip()
             if set_temp == "none":
                 message = (
-                    f"Temp deck is disengaged. "
-                    f"Current temperature is {current_temp}C"
+                    f"Temp deck is disengaged. Current temperature is {current_temp}C"
                 )
             else:
                 message = (

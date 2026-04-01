@@ -17,8 +17,8 @@ export const thermocyclerPipetteCollision = (
   const moduleState = moduleId && modules[moduleId].moduleState
   const isTCLidClosed: boolean = Boolean(
     moduleState &&
-      moduleState.type === THERMOCYCLER_MODULE_TYPE &&
-      moduleState.lidOpen !== true
+    moduleState.type === THERMOCYCLER_MODULE_TYPE &&
+    moduleState.lidOpen !== true
   )
   return isTCLidClosed
 }

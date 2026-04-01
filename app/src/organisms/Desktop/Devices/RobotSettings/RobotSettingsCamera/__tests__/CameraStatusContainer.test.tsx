@@ -23,6 +23,7 @@ describe('CameraStatusContainer', () => {
       toggleCameraEnabled: vi.fn(),
       isCameraEnabled: false,
       toggleDisabled: false,
+      isFlex: true,
     }
   })
 
@@ -32,11 +33,19 @@ describe('CameraStatusContainer', () => {
     screen.getByText('Camera Status')
   })
 
-  it('renders camera status description', () => {
+  it('renders camera status description for the Flex', () => {
     render(mockProps)
 
     screen.getByText(
-      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
+    )
+  })
+
+  it('renders camera status description for the OT-2', () => {
+    render({ ...mockProps, isFlex: false })
+
+    screen.getByText(
+      'The deck camera can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
     )
   })
 

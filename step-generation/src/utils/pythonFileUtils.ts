@@ -2,6 +2,7 @@ import max from 'lodash/max'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
@@ -11,6 +12,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { HOPPER_STACKER_LOCATION } from '../constants'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -36,8 +38,10 @@ import type {
   LabwareEntities,
   LabwareEntity,
   LabwareLiquidState,
+  LabwareTemporalProperties,
   LiquidEntities,
   ModuleEntities,
+  ModuleTemporalProperties,
   PipetteEntities,
   Timeline,
   TimelineFrame,
@@ -45,15 +49,17 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.27' // latest version from api/src/opentrons/protocols/api_support/definitions.py
-export const PD_APPLICATION_VERSION = '8.7.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.28' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
+export const PD_APPLICATION_VERSION = '8.10.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
-  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string }
+  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string } & {
+    internalAppBuildDate?: string
+  }
 ): string {
   // FileMetadataFields has timestamps, lists, etc., but Python metadata dict can only contain strings
   function formatTimestamp(timestamp: number | null | undefined): string {
@@ -65,6 +71,7 @@ export function pythonMetadata(
       author: fileMetadata.author,
       description: fileMetadata.description,
       created: formatTimestamp(fileMetadata.created),
+      internalAppBuildDate: fileMetadata.internalAppBuildDate,
       lastModified: formatTimestamp(fileMetadata.lastModified),
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,
@@ -261,6 +268,7 @@ const getFormatLidParams = (def: LabwareDefinition2): string[] => {
 }
 
 export function getLoadLabware(
+  moduleRobotState: TimelineFrame['modules'],
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
   labwareRobotState: TimelineFrame['labware'],
@@ -274,7 +282,6 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
-
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
@@ -286,21 +293,37 @@ export function getLoadLabware(
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
+      const isLabwareOnHopper = labwareRobotState[id].stack.includes(
+        HOPPER_STACKER_LOCATION
+      )
       // 2nd item in stack is the slot the labware is on
       const labwareSlot = labwareRobotState[id].stack[1]
-      const onModule = moduleEntities[labwareSlot] != null
-      const onAdapter = allLabwareEntities[labwareSlot] != null
+      // this is the deck slot that the labware is on
+      const deckSlot = getSlotInLocationStack(labwareRobotState[id].stack)
+      const stackerOnSlot = Object.entries(moduleRobotState).find(
+        ([id, module]) =>
+          module.slot === deckSlot &&
+          module.moduleState.type === FLEX_STACKER_MODULE_TYPE
+      )
+      const onModule =
+        moduleEntities[labwareSlot] != null ||
+        (deckSlot === stackerOnSlot?.[1].slot && !isLabwareOnHopper) // special case stacker shuttle labware
+      const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
       let locationArg: string | undefined
-      if (onAdapter) {
+      if (onLabware && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
-        parentName = moduleEntities[labwareSlot].pythonName
+        const moduleId =
+          stackerOnSlot != null ? stackerOnSlot?.[0] : labwareSlot
+        parentName = moduleEntities[moduleId].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
-          labwareSlot === 'offDeck' ? OFF_DECK : formatPyStr(labwareSlot)
+          labwareSlot === 'offDeck' || isLabwareOnHopper
+            ? OFF_DECK
+            : formatPyStr(labwareSlot)
         }`
       }
       const labelArg = hasNickname
@@ -559,6 +582,7 @@ export function pythonDefRun(
     getLoadAdapters(moduleEntities, labwareEntities, labware),
     getLoadLidStacks(labwareEntities, labware),
     getLoadLabware(
+      modules,
       moduleEntities,
       labwareEntities,
       labware,
@@ -574,6 +598,13 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
+    getSetStoredLabware(
+      moduleEntities,
+      labwareEntities,
+      labware,
+      modules,
+      robotStateTimeline
+    ),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -619,4 +650,101 @@ export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
       return changeTip
     }
   }
+}
+export const getSetStoredLabware = (
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities,
+  labware: { [labwareId: string]: LabwareTemporalProperties },
+  modules: { [moduleId: string]: ModuleTemporalProperties },
+  robotStateTimeline: Timeline
+): string => {
+  const pythonSetStoredLabware = Object.values(moduleEntities).map(module => {
+    const { id, type, pythonName } = module
+
+    if (type === FLEX_STACKER_MODULE_TYPE) {
+      const moduleSlot = modules[id].slot
+      const allLabwareState = robotStateTimeline.timeline.map(
+        timeline => timeline.robotState.labware
+      )
+      const labwaresOnHopper = Object.entries(labware).filter(
+        ([_, labware]) =>
+          labware.stack.includes(id) &&
+          labware.stack.includes(HOPPER_STACKER_LOCATION)
+      )
+      // include initialDeckState and all future states in the protocol
+      const allLabwaresThatAppearOnShuttle = [
+        ...Object.entries(labware),
+        ...allLabwareState.flatMap(labwareMap => Object.entries(labwareMap)),
+      ].filter(
+        ([_, labware]) =>
+          getSlotInLocationStack(labware.stack) === moduleSlot &&
+          !labware.stack.includes(HOPPER_STACKER_LOCATION)
+      )
+
+      // TODO: this doesn't address adapters in the shuttle yet since we dont allow that
+      // as of 1/9/26
+      if (labwaresOnHopper.length === 0) {
+        if (allLabwaresThatAppearOnShuttle.length === 0) {
+          return ''
+        }
+
+        const lid = allLabwaresThatAppearOnShuttle.find(([id]) =>
+          labwareEntities[id].def.allowedRoles?.includes('lid')
+        )
+
+        const nonLid = allLabwaresThatAppearOnShuttle.find(
+          ([id]) => !labwareEntities[id].def.allowedRoles?.includes('lid')
+        )
+
+        if (nonLid == null) {
+          return ''
+        }
+
+        const pythonArgs = [
+          `load_name=${formatPyStr(
+            labwareEntities[nonLid[0]].def.parameters.loadName
+          )}`,
+          `namespace=${formatPyStr(labwareEntities[nonLid[0]].def.namespace)}`,
+          `version=${labwareEntities[nonLid[0]].def.version}`,
+          'count=0',
+          ...(lid != null
+            ? [
+                `lid=${formatPyStr(
+                  labwareEntities[lid[0]].def.parameters.loadName
+                )}`,
+              ]
+            : []),
+        ].join(',\n')
+
+        return `${pythonName}.set_stored_labware(\n${indentPyLines(pythonArgs)}\n)`
+      } else {
+        const labwarePythonNames = Object.values(labwaresOnHopper)
+          .filter(labware => {
+            const allowedRoles = labwareEntities[labware[0]]?.def.allowedRoles
+            return !allowedRoles?.includes('lid')
+          })
+          .map(labware => labwareEntities[labware[0]].pythonName)
+        const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
+
+        const indentedLabwarePythonNames = labwareChunks
+          .map(chunk => INDENT + chunk.join(', '))
+          .join(',\n')
+
+        const pythonLabwareNames =
+          labwarePythonNames.length < 4
+            ? labwarePythonNames.join(', ')
+            : `\n${indentedLabwarePythonNames}\n`
+        const pythonArgs = `labware=[${pythonLabwareNames}],\n`
+
+        return `${pythonName}.set_stored_labware_items(\n${indentPyLines(pythonArgs)})`
+      }
+    }
+  })
+
+  //  filter any empty strings
+  const pythonLines = pythonSetStoredLabware.filter(Boolean)
+
+  return pythonLines.length > 0
+    ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
+    : ''
 }

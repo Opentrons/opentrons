@@ -80,15 +80,15 @@ describe('SetupModuleAndDeck', () => {
     screen.getByRole('button', { name: 'Map View' })
   })
 
-  it('should render Proceed to labware setup CTA that is enabled', () => {
+  it('should render Proceed to labware offsets setup CTA that is enabled', () => {
     render(props)
     const button = screen.getByRole('button', {
-      name: 'Proceed to labware position check',
+      name: 'Proceed to labware offsets',
     })
     expect(button).toBeEnabled()
   })
 
-  it('should render a disabled Proceed to labware setup CTA if the protocol requests modules and they are not all attached to the robot', () => {
+  it('should render a disabled Proceed to labware offsets setup CTA if the protocol requests modules and they are not all attached to the robot', () => {
     when(useUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({
@@ -97,18 +97,18 @@ describe('SetupModuleAndDeck', () => {
       })
     render(props)
     const button = screen.getByRole('button', {
-      name: 'Proceed to labware position check',
+      name: 'Proceed to labware offsets',
     })
     expect(button).toBeDisabled()
   })
 
-  it('should render a disabled Proceed to labware setup CTA if the protocol requests modules they are not all calibrated', () => {
+  it('should render a disabled Proceed to labware offsets setup CTA if the protocol requests modules they are not all calibrated', () => {
     when(useModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({ complete: false })
     render(props)
     const button = screen.getByRole('button', {
-      name: 'Proceed to labware position check',
+      name: 'Proceed to labware offsets',
     })
     expect(button).toBeDisabled()
   })
@@ -157,7 +157,7 @@ describe('SetupModuleAndDeck', () => {
     vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
     render(props)
     const button = screen.getByRole('button', {
-      name: 'Proceed to labware position check',
+      name: 'Proceed to labware offsets',
     })
     expect(button).toBeDisabled()
   })

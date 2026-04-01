@@ -1,16 +1,17 @@
 """Test update-position-estimator commands."""
+
+import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control import OT3HardwareControlAPI
 from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
+    UnsafeUngripLabwareImplementation,
     UnsafeUngripLabwareParams,
     UnsafeUngripLabwareResult,
-    UnsafeUngripLabwareImplementation,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import GripperNotAttachedError
-from opentrons.hardware_control import OT3HardwareControlAPI
-import pytest
 
 
 async def test_ungrip_labware_implementation(

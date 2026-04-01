@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  CenterLabwareInSlot,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -25,7 +26,6 @@ import {
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.
@@ -36,16 +36,16 @@ export function LPCLabwareJogRender({
 }: EditOffsetContentProps): JSX.Element {
   const pipetteName =
     useSelector(selectActivePipette(runId))?.pipetteName ?? 'p1000_single'
-  const itemLwDef = useSelector(selectSelectedLwDef(runId)) as LabwareDefinition
+  const itemLwDef = useSelector(selectSelectedLwDef(runId))!
 
   return (
     <Flex css={RENDER_CONTAINER_STYLE}>
       <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
         {() => (
-          <>
+          <CenterLabwareInSlot definition={itemLwDef}>
             <LabwareRender
               definition={itemLwDef}
-              positioningMode="offsetInSlot"
+              positioningMode="passThrough"
               wellStroke={{ A1: COLORS.blue50 }}
               wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
               highlightedWellLabels={{ wells: ['A1'] }}
@@ -57,7 +57,7 @@ export function LPCLabwareJogRender({
               pipetteName={pipetteName}
               usingMetalProbe={true}
             />
-          </>
+          </CenterLabwareInSlot>
         )}
       </RobotWorkSpace>
       <LevelWithLabware runId={runId} />

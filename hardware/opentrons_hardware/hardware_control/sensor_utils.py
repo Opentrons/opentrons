@@ -1,12 +1,10 @@
 """Functions aiding in Liquid Level Detection."""
 
-from opentrons_shared_data.errors.exceptions import (
-    TipHitWellBottomError,
-    PipetteLiquidNotFoundError,
-)
-
-
 import numpy as np
+from opentrons_shared_data.errors.exceptions import (
+    PipetteLiquidNotFoundError,
+    TipHitWellBottomError,
+)
 
 
 def did_tip_hit_liquid(

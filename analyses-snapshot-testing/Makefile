@@ -1,4 +1,4 @@
-BASE_IMAGE_NAME ?= opentrons-python-base:3.10
+BASE_IMAGE_NAME ?= opentrons-python-base:3.12
 CACHEBUST ?= $(shell date +%s)
 ANALYSIS_REF ?= edge
 PROTOCOL_NAMES ?= all

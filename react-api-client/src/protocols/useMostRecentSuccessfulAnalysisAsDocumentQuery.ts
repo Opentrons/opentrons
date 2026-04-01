@@ -18,7 +18,7 @@ const getMostRecentSuccessfulAnalysisId = async (
 ): Promise<CompletedProtocolAnalysis | null> => {
   for (const analysisId of analysisSummaryIds) {
     const { data: analysis } = await getProtocolAnalysisAsDocument(
-      host as HostConfig,
+      host!,
       protocolId,
       analysisId
     )

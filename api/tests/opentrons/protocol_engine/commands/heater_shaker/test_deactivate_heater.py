@@ -1,19 +1,19 @@
 """Test Heater Shaker deactivate heater command implementation."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.deactivate_heater import (
     DeactivateHeaterImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 async def test_deactivate_heater(

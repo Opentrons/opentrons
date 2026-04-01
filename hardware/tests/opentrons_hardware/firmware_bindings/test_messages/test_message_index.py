@@ -1,6 +1,6 @@
 """Tests for can message_index generator."""
-from opentrons_hardware.firmware_bindings import utils
 
+from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 
 

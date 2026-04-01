@@ -50,7 +50,7 @@ export function useUploadCsvFileMutation(
     FileData
   >(
     (fileData: FileData) =>
-      uploadCsvFile(host as HostConfig, fileData).then(response => {
+      uploadCsvFile(host!, fileData).then(response => {
         queryClient
           .invalidateQueries([host, 'dataFiles'])
           .then(() =>

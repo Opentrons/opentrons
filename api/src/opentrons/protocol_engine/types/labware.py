@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .location import LabwareLocation
 from .labware_offset_location import (
-    LegacyLabwareOffsetLocation,
     LabwareOffsetLocationSequence,
+    LegacyLabwareOffsetLocation,
 )
 from .labware_offset_vector import LabwareOffsetVector
+from .location import LabwareLocation
 from .util import Vec3f
 
 

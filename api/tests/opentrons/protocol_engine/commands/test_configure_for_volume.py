@@ -1,29 +1,32 @@
 """Test load pipette commands."""
-import opentrons.protocol_engine.state.update_types as update_types
+
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import (
-    LoadedConfigureForVolumeData,
-    EquipmentHandler,
-)
-from opentrons.protocol_engine.types import FlowRates
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
-)
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.configure_for_volume import (
-    ConfigureForVolumeParams,
-    ConfigureForVolumeResult,
-    ConfigureForVolumeImplementation,
+from opentrons_shared_data.pipette.pipette_definition import AvailableSensorDefinition
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses as VolumeModes,
 )
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
-    LiquidClasses as VolumeModes,
 )
-from opentrons_shared_data.pipette.pipette_definition import AvailableSensorDefinition
+
+import opentrons.protocol_engine.state.update_types as update_types
 from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.configure_for_volume import (
+    ConfigureForVolumeImplementation,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+)
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    LoadedConfigureForVolumeData,
+)
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.types import Point
 
 

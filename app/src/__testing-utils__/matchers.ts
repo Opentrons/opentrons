@@ -18,6 +18,3 @@ export const nestedTextMatcher =
 
     return nodeHasText && childrenDontHaveText
   }
-
-// need componentPropsMatcher
-// need partialComponentPropsMatcher

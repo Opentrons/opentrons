@@ -4,17 +4,18 @@ DEPRECATED: Testing LiquidClassStore independently of LiquidClassView is no
 longer helpful. Try to add new tests to test_liquid_class_state.py, where they can be
 tested together, treating LiquidClassState as a private implementation detail.
 """
+
 import pytest
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+
+from .command_fixtures import create_comment_command
 from opentrons.protocol_engine import actions
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.liquid_classes import LiquidClassStore
 from opentrons.protocol_engine.types import LiquidClassRecord
-
-from .command_fixtures import create_comment_command
 
 
 @pytest.fixture

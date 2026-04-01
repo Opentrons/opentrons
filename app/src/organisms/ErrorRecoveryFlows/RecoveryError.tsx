@@ -193,7 +193,7 @@ export function ErrorContent({
     <RecoverySingleColumnContentWrapper>
       <Flex css={CONTAINER_STYLE}>
         <Icon
-          name="alert-circle"
+          name="ot-alert"
           color={COLORS.red50}
           data-testid="recovery_error_alert_icon"
           css={ICON_SIZE_ALERT_INFO_STYLE}

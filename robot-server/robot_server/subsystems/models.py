@@ -1,12 +1,15 @@
 """Request and response models for /subsystems endpoints."""
 
 import enum
-from typing import Optional, Dict
 from datetime import datetime
+from typing import Dict, Optional
+
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
+)
+from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
 )
 

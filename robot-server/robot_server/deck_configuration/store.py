@@ -12,15 +12,10 @@ from opentrons.calibration_storage import (
     serialize_deck_configuration,
 )
 from opentrons.calibration_storage import types as calibration_storage_types
+from opentrons.protocol_engine.types import DeckConfigurationType, DeckType
 
-from opentrons.protocol_engine.types import DeckType
-
+from . import defaults, models
 from robot_server.service.notifications import DeckConfigurationPublisher
-
-from . import defaults
-from . import models
-from opentrons.protocol_engine.types import DeckConfigurationType
-
 
 # The type used by the lower-level opentrons.calibration_storage API.
 _StorableDeckConfiguration: TypeAlias = tuple[

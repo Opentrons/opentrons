@@ -2,77 +2,64 @@
 
 from __future__ import annotations
 
-import enum
-from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping
+from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
 
-from opentrons.types import NozzleMapInterface
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
-from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
+)
+from ..hardware_control.modules import (
     ModuleModel as HardwareModuleModel,
 )
 from ..protocol_engine import (
-    ProtocolEngine,
-    CommandCreate,
     Command,
-    StateSummary,
+    CommandCreate,
+    CommandErrorSlice,
     CommandPointer,
     CommandSlice,
-    CommandErrorSlice,
     DeckType,
     ErrorOccurrence,
+    ProtocolEngine,
+    StateSummary,
 )
+from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from ..protocol_engine.errors import RunStoppedError
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
+from ..protocol_engine.state.module_substates import FlexStackerSubState
 from ..protocol_engine.types import (
-    PostRunHardwareState,
+    CommandPreconditions,
+    CSVRuntimeParamPaths,
+    DeckConfigurationType,
     EngineStatus,
+    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
-    LabwareOffset,
-    DeckConfigurationType,
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-    CommandAnnotation,
     ModuleModel,
-    CommandPreconditions,
+    PostRunHardwareState,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
 )
-from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
-from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-
-from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
+from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
-from ..protocol_engine.state.module_substates import FlexStackerSubState
+from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from .run_coordinator import (
+    AbstractRunCoordinator,
+    ParseMode,
+    RunNotFound,
+    UnknownProtocolParseMode,
+)
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.types import CommandAnnotation
+from opentrons.types import NozzleMapInterface
 
 
-class NoProtocolRunAvailable(RuntimeError):
-    """An error raised if there is no protocol run available."""
-
-
-class UnknownProtocolParseMode(RuntimeError):
-    """An error raised if given an unknown protocol parse mode."""
-
-
-class RunNotFound(GeneralError):
-    """An error raised if there is no run associated."""
-
-
-class ParseMode(enum.Enum):
-    """Configure optional rules for when `opentrons.protocols.parse.parse()` parses protocols."""
-
-    NORMAL = enum.auto()
-    ALLOW_LEGACY_METADATA_AND_REQUIREMENTS = enum.auto()
-
-
-class RunOrchestrator:
+class RunOrchestrator(AbstractRunCoordinator):
     """Provider for runners and associated protocol engine.
 
     Build runners, manage command execution, run state and in-memory protocol engine associated to the runners.
@@ -274,12 +261,20 @@ class RunOrchestrator:
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_command_annotations(self) -> List[CommandAnnotation]:
+    def get_all_command_annotations(self) -> List[CommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
-        return (
-            []
-            if self._protocol_runner is None
-            else self._protocol_runner.command_annotations
+        return self._protocol_engine.state_view.commands.get_all_command_annotations()
+
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations defined in the protocol, if any."""
+        return len(
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
+
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the command annotation by ID."""
+        return self._protocol_engine.state_view.commands.get_command_annotation(
+            annotation_id
         )
 
     def get_current_command(self) -> Optional[CommandPointer]:
@@ -288,9 +283,7 @@ class RunOrchestrator:
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        most_recently_finalized_command = (
-            self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
-        )
+        most_recently_finalized_command = self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
         return (
             CommandPointer(
                 command_id=most_recently_finalized_command.command.id,
@@ -314,6 +307,14 @@ class RunOrchestrator:
         """
         return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
+        )
+
+    def get_command_annotations_slice(
+        self, cursor: int, length: int
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of command annotations in the run."""
+        return self._protocol_engine.state_view.commands.get_command_annotations_slice(
+            cursor=cursor, length=length
         )
 
     def get_command_error_slice(
@@ -357,6 +358,20 @@ class RunOrchestrator:
         """Get whether engine is in a terminal state."""
         return self._protocol_engine.state_view.commands.get_is_terminal()
 
+    def get_camera_capture_image_settings(
+        self,
+    ) -> Dict[str, Any]:
+        """Get camera capture image settings."""
+        return {
+            "camera_id": self._protocol_engine.state_view.camera.get_camera_id(),
+            "resolution": self._protocol_engine.state_view.camera.get_resolution(),
+            "zoom": self._protocol_engine.state_view.camera.get_zoom(),
+            "pan": self._protocol_engine.state_view.camera.get_pan(),
+            "contrast": self._protocol_engine.state_view.camera.get_contrast(),
+            "brightness": self._protocol_engine.state_view.camera.get_brightness(),
+            "saturation": self._protocol_engine.state_view.camera.get_saturation(),
+        }
+
     def run_has_started(self) -> bool:
         """Get whether the run has started."""
         return self._protocol_engine.state_view.commands.has_been_played()
@@ -381,6 +396,21 @@ class RunOrchestrator:
     ) -> CameraSettings:
         """Add new camera enablement settings."""
         return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings."""
+        self._protocol_engine.add_camera_capture_image_settings_to_state(
+            camera_id, resolution, zoom, pan, contrast, brightness, saturation
+        )
 
     async def add_command_and_wait_for_interval(
         self,
@@ -505,10 +535,10 @@ class RunOrchestrator:
         stackers: Dict[str, FlexStackerSubState] = {}
         for module in modules:
             if module.model == ModuleModel.FLEX_STACKER_MODULE_V1:
-                stackers[
-                    module.id
-                ] = self._protocol_engine.state_view.modules.get_flex_stacker_substate(
-                    module.id
+                stackers[module.id] = (
+                    self._protocol_engine.state_view.modules.get_flex_stacker_substate(
+                        module.id
+                    )
                 )
         return stackers
 

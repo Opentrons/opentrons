@@ -47,11 +47,11 @@ export function CompleteConfirmation(
         ) : (
           <Icon name="ot-check" size={SIZE_3} color={COLORS.green50} />
         )}
-        <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
+        <LegacyStyledText forwardedAs="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}
         </LegacyStyledText>
         {body != null ? (
-          <LegacyStyledText as="p" marginTop={SPACING.spacing8}>
+          <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing8}>
             {body}
           </LegacyStyledText>
         ) : null}

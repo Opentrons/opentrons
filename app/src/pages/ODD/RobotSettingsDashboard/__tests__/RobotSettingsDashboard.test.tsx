@@ -7,6 +7,7 @@ import { i18n } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
+  Devices,
   LanguageSetting,
   NetworkSettings,
   Privacy,
@@ -50,6 +51,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -113,7 +115,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Robot System Version')
     screen.getByText('Network Settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Recovery mode')
+    screen.getByText('Recovery Mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
@@ -123,6 +125,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device Reset')
     screen.getByText('Camera Preferences')
+    screen.getByText('Devices')
     screen.getByText('Update Channel')
     screen.getByText('Developer Tools')
     screen.getByText('Access additional logging and feature flags.')
@@ -187,9 +190,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
-    screen.getByText(
-      'Disable Stacker sensors for labware detection in z-axis and x-axis'
-    )
+    screen.getByText('Disable Stacker Sensors for Labware Detection')
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_stacker_sensors'
@@ -296,5 +297,12 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Language')
     fireEvent.click(button)
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
+  })
+
+  it('should call a mock function when tapping devices', () => {
+    render()
+    const button = screen.getByText('Devices')
+    fireEvent.click(button)
+    expect(vi.mocked(Devices)).toHaveBeenCalled()
   })
 })

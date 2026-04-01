@@ -1,15 +1,15 @@
 import json
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.liquid_classes import load_definition, definition_exists
+from opentrons_shared_data.liquid_classes import definition_exists, load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
-    PositionReference,
     Coordinate,
-    TipPosition,
-    Submerge,
     DelayParams,
     DelayProperties,
+    LiquidClassSchemaV1,
+    PositionReference,
+    Submerge,
+    TipPosition,
 )
 
 
@@ -43,3 +43,17 @@ def test_definition_exists() -> None:
     assert definition_exists(name="glycerol_50", version=1) is True
     assert definition_exists(name="glycerol_oh_no", version=1) is False
     assert definition_exists(name="glycerol_50", version=9999) is False
+
+
+def test_load_definition_with_blowout_position() -> None:
+    """It should accept and load definitions that have blowout positions."""
+    fixture_data = load_shared_data(
+        "liquid-class/fixtures/1/fixture_water_with_blowout_positions.json"
+    )
+    liquid_class_model = LiquidClassSchemaV1.model_validate_json(fixture_data)
+    liquid_class_model.byPipette[0].byTipType[
+        0
+    ].singleDispense.retract.blowout.params.blowoutPosition = TipPosition(  # type:ignore[union-attr]
+        positionReference=PositionReference.WELL_TOP,
+        offset=Coordinate(x=1, y=2, z=3),
+    )

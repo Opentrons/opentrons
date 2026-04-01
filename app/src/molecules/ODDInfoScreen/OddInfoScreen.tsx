@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { ODDStyles, StyleProps } from '@opentrons/components'
+import type { IconName, ODDStyles, StyleProps } from '@opentrons/components'
 
 export type OddInfoScreenType =
   | 'error'
@@ -26,7 +26,7 @@ interface OddInfoScreenProps extends StyleProps {
   hasIcon?: boolean
   subText?: string
   textSize?: 'small' | 'large'
-  iconName?: string
+  iconName?: IconName
 }
 
 const INFO_SCREEN_PROPS_BY_TYPE: Record<
@@ -107,7 +107,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing4}
-        widhth="100%"
+        width="100%"
       >
         <StyledText oddStyle={headerStyle}>{header}</StyledText>
         {subText != null ? (

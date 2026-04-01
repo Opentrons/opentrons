@@ -42,6 +42,13 @@ describe('getInitialSummaryState', () => {
       path: 'single',
       liquidClassValuesInitialized: false,
       changeTip: 'always',
+      blowOutDispense: {
+        flowRate: 75,
+        location: {
+          cutoutFixtureId: 'trashBinAdapter',
+          cutoutId: 'cutoutA3',
+        },
+      },
     } as any,
     deckConfig: [
       {
@@ -125,17 +132,63 @@ describe('getInitialSummaryState', () => {
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer', () => {
-    const initialSummaryState = getInitialSummaryState({
-      ...props,
+    const distributeProps = {
       state: {
-        ...props.state,
+        pipette: {
+          channels: 1,
+          liquids: {
+            default: {
+              maxVolume: 100,
+              supportedTips: {
+                t50: {
+                  defaultAspirateFlowRate: {
+                    default: 50,
+                  },
+                  defaultDispenseFlowRate: {
+                    default: 75,
+                  },
+                },
+              },
+            },
+          },
+        } as any,
+        mount: 'left',
+        tipRack: {
+          wells: {
+            A1: {
+              totalLiquidVolume: 50,
+            },
+          },
+        } as any,
+        source: {} as any,
+        sourceWells: ['A1'],
+        destination: 'source',
+        destinationWells: ['A1'],
+        transferType: 'transfer',
+        volume: 25,
+        path: 'single',
+        liquidClassValuesInitialized: false,
+        changeTip: 'always',
+      } as any,
+      deckConfig: [
+        {
+          cutoutId: 'cutoutA3',
+          cutoutFixtureId: 'trashBinAdapter',
+        },
+      ],
+    } as any
+
+    const initialSummaryState = getInitialSummaryState({
+      ...distributeProps,
+      state: {
+        ...distributeProps.state,
         volume: 1,
         path: 'multiDispense',
         transferType: 'distribute',
       },
     })
     expect(initialSummaryState).toEqual({
-      ...props.state,
+      ...distributeProps.state,
       volume: 1,
       transferType: 'distribute',
       aspirateFlowRate: 50,
@@ -148,11 +201,6 @@ describe('getInitialSummaryState', () => {
       dropTipLocation: {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
-      },
-      disposalVolume: 1,
-      blowOutDispense: {
-        location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
-        flowRate: 75,
       },
     })
   })

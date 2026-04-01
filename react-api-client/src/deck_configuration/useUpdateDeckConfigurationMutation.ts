@@ -10,7 +10,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
+import type { ErrorResponse } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export type UseUpdateDeckConfigurationMutationResult = UseMutationResult<
@@ -44,7 +44,7 @@ export function useUpdateDeckConfigurationMutation(
   >(
     [host, 'deck_configuration'],
     (deckConfig: DeckConfiguration) =>
-      updateDeckConfiguration(host as HostConfig, deckConfig).then(response => {
+      updateDeckConfiguration(host!, deckConfig).then(response => {
         queryClient
           .invalidateQueries([host, 'deck_configuration'])
           .catch((e: Error) => {

@@ -110,14 +110,14 @@ export function Troubleshooting({
     >
       <Box width="70%">
         <LegacyStyledText
-          as="h3"
+          forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing20}
         >
           {t('troubleshooting')}
         </LegacyStyledText>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="RobotSettings_Troubleshooting"
         >

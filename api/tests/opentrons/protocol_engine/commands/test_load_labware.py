@@ -9,22 +9,17 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName
-
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_labware import (
+    LoadLabwareImplementation,
+    LoadLabwareParams,
+    LoadLabwareResult,
+)
 from opentrons.protocol_engine.errors import (
     LabwareIsNotAllowedInLocationError,
     LocationIsOccupiedError,
 )
-
-from opentrons.protocol_engine.types import (
-    AddressableAreaLocation,
-    DeckSlotLocation,
-    LoadableLabwareLocation,
-    OnLabwareLocation,
-    OnLabwareLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
-)
-from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedLabwareData
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
@@ -32,13 +27,15 @@ from opentrons.protocol_engine.state.update_types import (
     LoadedLabwareUpdate,
     StateUpdate,
 )
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.load_labware import (
-    LoadLabwareParams,
-    LoadLabwareResult,
-    LoadLabwareImplementation,
+from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    LoadableLabwareLocation,
+    OnAddressableAreaLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
 )
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(autouse=True)

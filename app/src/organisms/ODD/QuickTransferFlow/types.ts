@@ -113,7 +113,6 @@ export interface QuickTransferSummaryState {
   }
   touchTipDispense?: number // specifies the tip position from the top of the well
   touchTipDispenseSpeed?: number
-  disposalVolume?: number
   blowOutDispense?: {
     location?: BlowOutLocation
     flowRate?: number
@@ -188,8 +187,6 @@ interface SetDispenseFlowRateAction {
 interface SetPipettePath {
   type: typeof ACTIONS.SET_PIPETTE_PATH
   path: PathOption
-  disposalVolume?: number
-  blowOutLocation?: BlowOutLocation
 }
 interface SetAspirateTipPosition {
   type: typeof ACTIONS.SET_ASPIRATE_TIP_POSITION

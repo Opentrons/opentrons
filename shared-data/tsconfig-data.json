@@ -20,7 +20,8 @@
     "pipette/**/*.json",
     "protocol/**/*.json",
     "errors/**/*.json",
-    "build/**/*.json"
+    "build/**/*.json",
+    "robot/**/*.json"
   ],
   "exclude": ["**/*.ts"]
 }

@@ -1,7 +1,8 @@
 from typing import List
 
 import pytest
-from opentrons.drivers.types import Temperature, PlateTemperature
+
+from opentrons.drivers.types import PlateTemperature, Temperature
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
 from opentrons.hardware_control.modules.types import TemperatureStatus
 

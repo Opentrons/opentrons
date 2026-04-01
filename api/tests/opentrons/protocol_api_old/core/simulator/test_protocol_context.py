@@ -1,13 +1,15 @@
 """Test instrument context simulation."""
+
 from typing import cast
+
 import pytest
 from _pytest.fixtures import SubRequest
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 
-from opentrons.types import Location, Mount
 from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore
+from opentrons.types import Location, Mount
 
 
 @pytest.fixture(

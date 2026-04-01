@@ -51,52 +51,60 @@ class Slack:
     def send_slack_message(
         self,
         message: str,
-        file_path: str | None = None,
+        file_paths: list[str] | None = None,
         user_id: Optional[str] = None,
     ) -> None:
-        """Send Slack message with or without a file attachment."""
-        icon = self.icon_emoji or ""
-        user = self.user_name or ""
-        if file_path:
-            full_message = f"{icon} *{user}*: {message}"
-            try:
-                if not Path(file_path.strip()).exists():
-                    print(f"File not found: {file_path}")
-                    return
+        """Send Slack message with optional multiple files in a single-threaded group."""
+        try:
+            parent = self.client.chat_postMessage(
+                channel=self.channel,
+                text=message,
+                username=self.user_name,
+                icon_emoji=self.icon_emoji,
+            )
+            parent.validate()
+            thread_ts = parent["ts"]
+        except Exception as e:
+            print(f"Failed to send primary Slack message: {e}")
+            return
 
-                with open(file_path, "rb") as file_content:
+        if not file_paths:
+            return
+
+        for file_path in file_paths:
+            cleaned = file_path.strip()
+            try:
+                if not Path(cleaned).exists():
+                    print(f"File not found: {cleaned}")
+                    continue
+
+                with open(cleaned, "rb") as file_content:
                     response = self.client.files_upload_v2(
                         file=file_content,
-                        filename=os.path.basename(file_path),
-                        title=os.path.basename(file_path).split(".")[0],
+                        filename=os.path.basename(cleaned),
+                        title=os.path.basename(cleaned).split(".")[0],
                         channel=self.channel_id,
-                        initial_comment=full_message,
+                        thread_ts=thread_ts,
                     )
                     response.validate()
+
             except Exception as e:
-                print(f"Failed to upload file to Slack: {e}")
-        else:
-            full_message = message
-            try:
-                response = self.client.chat_postMessage(
-                    channel=self.channel,
-                    text=full_message,
-                    username=self.user_name,
-                    icon_emoji=self.icon_emoji,
-                )
-                response.validate()
-            except Exception as e:
-                print(f"Failed to send message to Slack: {e}")
+                print(f"Failed to upload {cleaned} to Slack: {e}")
+                continue
 
     def send_run_completed_message(
-        self, protocol_name: str, user_id: Optional[str] = None
+        self, protocol_name: str, file_paths: list[str] | None = None
     ) -> None:
         """Send run completed message."""
         message = f"{protocol_name} has completed successfully."
-        self.send_slack_message(message)
+        if file_paths:
+            self.send_slack_message(message, file_paths)
+        else:
+            self.send_slack_message(message)
 
     def send_run_started_message(
-        self, protocol_name: str, user_id: Optional[str] = None
+        self,
+        protocol_name: str,
     ) -> None:
         """Send run started message."""
         message = f"Protocol: {protocol_name} has started."
@@ -106,10 +114,10 @@ class Slack:
         self,
         protocol_name: str,
         error_str: str,
-        image_path: Optional[str] = None,
-        user_id: Optional[str] = None,
+        ip: str,
+        file_paths: list[str] | None = None,
     ) -> None:
         """Send error message to Slack, optionally tagging a user."""
-        message = f"Protocol: {protocol_name} ended in error: {error_str}"
+        message = f"Protocol {protocol_name} on IP: {ip} ended in error: {error_str}"
         self.icon_emoji = ":alert:"
-        self.send_slack_message(message, image_path)
+        self.send_slack_message(message, file_paths)

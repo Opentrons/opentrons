@@ -1,17 +1,19 @@
-from starlette import status
-from fastapi import APIRouter, Depends
 from typing import Annotated, Optional
 
+from fastapi import APIRouter, Depends
+from starlette import status
+
 from opentrons import types as ot_types
-from opentrons.calibration_storage.ot2 import pipette_offset, models
-
-from robot_server.hardware import get_ot2_hardware
-from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.pipette_offset import models as pip_models
-from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.shared_models import calibration as cal_model
-
+from opentrons.calibration_storage.ot2 import models, pipette_offset
 from opentrons.hardware_control import API
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+
+from robot_server.errors.error_responses import ErrorBody
+from robot_server.hardware import get_ot2_hardware
+from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.pipette_offset import models as pip_models
+from robot_server.service.shared_models import calibration as cal_model
 
 router = APIRouter()
 
@@ -77,6 +79,7 @@ async def get_all_pipette_offset_calibrations(
     summary="Delete a pipette offset calibration",
     description="Delete one specific pipette calibration by pipette serial and mount.",
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_specific_pipette_offset_calibration(
     pipette_id: str,

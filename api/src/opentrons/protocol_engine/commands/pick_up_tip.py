@@ -1,24 +1,18 @@
 """Pick up tip command request, result, and implementation models."""
 
 from __future__ import annotations
-from opentrons_shared_data.errors import ErrorCodes
-from pydantic import Field
+
 from typing import TYPE_CHECKING, Optional, Type, Union
+
+from pydantic import Field
 from typing_extensions import Literal
 
+from opentrons_shared_data.errors import ErrorCodes
 
 from ..errors import ErrorOccurrence, PickUpTipTipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import PickUpTipWellLocation, LabwareWellId, TipRackWellState
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    StallOrCollisionError,
-    move_to_well,
-)
+from ..types import LabwareWellId, PickUpTipWellLocation, TipRackWellState
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -26,10 +20,18 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
+)
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
+    from ..state.state import StateView
 
 
 PickUpTipCommandType = Literal["pickUpTip"]

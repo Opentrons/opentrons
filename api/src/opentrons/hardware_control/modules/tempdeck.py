@@ -2,24 +2,29 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Optional, Callable
+from typing import Callable, Dict, Optional
 
+from typing_extensions import Final
+
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.temp_deck import (
+    AbstractTempDeckDriver,
+    SimulatingDriver,
+    TempDeckDriver,
+)
+from opentrons.drivers.types import Temperature
+from opentrons.hardware_control.execution_manager import ExecutionManager
+from opentrons.hardware_control.modules import errors, mod_abc, types, update
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     TemperatureStatus,
 )
-from opentrons.hardware_control.poller import Reader, Poller
-from typing_extensions import Final
-from opentrons.drivers.types import Temperature
-from opentrons.drivers.temp_deck import (
-    SimulatingDriver,
-    AbstractTempDeckDriver,
-    TempDeckDriver,
+from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.modules import update, mod_abc, types, errors
 
 log = logging.getLogger(__name__)
 
@@ -123,6 +128,7 @@ class TempDeck(mod_abc.AbstractModule):
         self._poller = poller
         self._reader.set_error_callback(self.error_callback)
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop()

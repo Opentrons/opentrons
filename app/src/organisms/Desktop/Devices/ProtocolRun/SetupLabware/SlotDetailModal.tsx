@@ -55,9 +55,9 @@ const LabwareThumbnail = styled.svg`
   flex-shrink: 0;
 `
 
-export const SlotDetailModal = (
+export function SlotDetailModal(
   props: SlotDetailModalProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const {
     closeModal,
     slotName,
@@ -108,13 +108,18 @@ export const SlotDetailModal = (
       : undefined
   )
 
-  useEffect(() => {
-    setSelectedLiquidId(
-      filteredLiquidsInLoadOrder.length > 0
-        ? filteredLiquidsInLoadOrder[0].id
-        : undefined
-    )
-  }, [selectedLabware])
+  useEffect(
+    () => {
+      setSelectedLiquidId(
+        filteredLiquidsInLoadOrder.length > 0
+          ? filteredLiquidsInLoadOrder[0].id
+          : undefined
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedLabware]
+  )
 
   if (protocolData == null) return null
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
@@ -148,11 +153,8 @@ export const SlotDetailModal = (
       ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
       : slotName
   const modalTitle = (
-    <Flex alignItems={ALIGN_CENTER}>
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginRight={SPACING.spacing4}
-      >
+    <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing4}>
+      <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
       {isFlex ? (
@@ -190,7 +192,7 @@ export const SlotDetailModal = (
         padding={SPACING.spacing16}
         height={selectedLiquidId != null || isVariedStack ? '28rem' : '25rem'}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+        <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
           {isVariedStack ? (
             <LabwareStackContents
               labwareInStack={labwareInStack}
@@ -202,7 +204,7 @@ export const SlotDetailModal = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             height="24rem"
-            gridGap={SPACING.spacing16}
+            gap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             width={isVariedStack ? '' : '100%'}

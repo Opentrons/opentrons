@@ -32,7 +32,7 @@ def test_access_pipette_offset_calibration(
     assert data == expected
 
     resp = api_client.get(
-        f"/calibration/pipette_offset?mount={MOUNT}&" f"pipette_id={FAKE_PIPETTE_ID}"
+        f"/calibration/pipette_offset?mount={MOUNT}&pipette_id={FAKE_PIPETTE_ID}"
     )
     assert resp.status_code == 200
     assert resp.json()["data"] == []
@@ -42,11 +42,11 @@ def test_delete_pipette_offset_calibration(
     api_client, set_up_pipette_offset_temp_directory
 ):
     resp = api_client.delete(
-        f"/calibration/pipette_offset?pipette_id={PIPETTE_ID}&" f"mount={WRONG_MOUNT}"
+        f"/calibration/pipette_offset?pipette_id={PIPETTE_ID}&mount={WRONG_MOUNT}"
     )
     assert resp.status_code == 200
 
     resp = api_client.delete(
-        f"/calibration/pipette_offset?pipette_id={PIPETTE_ID}&" f"mount={MOUNT}"
+        f"/calibration/pipette_offset?pipette_id={PIPETTE_ID}&mount={MOUNT}"
     )
     assert resp.status_code == 200

@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -6,6 +6,7 @@ import {
   absorbanceReaderCollision,
   formatPyStr,
   formatPyWellLocation,
+  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
@@ -42,8 +43,17 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
   const labwareState = prevRobotState.labware
+
   const { pipetteEntities, labwareEntities } = invariantContext
   const pipetteSpec = pipetteEntities[pipetteId]?.spec
+  const nozzleConfiguration = prevRobotState.pipettes[pipetteId]?.nozzles ?? ALL
+  const primaryNozzle =
+    prevRobotState.pipettes[pipetteId]?.primaryNozzle ??
+    getDefaultPrimaryNozzle({
+      nozzles: nozzleConfiguration,
+      channels: pipetteSpec?.channels,
+    })
+
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
@@ -190,6 +200,8 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         z: 0,
       },
       wellTargetName: wellName,
+      nozzleConfiguration,
+      primaryNozzle,
     })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())

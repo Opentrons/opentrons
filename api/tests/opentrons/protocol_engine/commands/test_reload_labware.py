@@ -7,30 +7,27 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName
-
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.reload_labware import (
+    ReloadLabwareImplementation,
+    ReloadLabwareParams,
+    ReloadLabwareResult,
+)
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedError,
 )
-
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    OnAddressableAreaLocationSequenceComponent,
-)
-from opentrons.protocol_engine.execution import ReloadedLabwareData, EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, ReloadedLabwareData
 from opentrons.protocol_engine.resources import labware_validation
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
     LabwareLocationUpdate,
     StateUpdate,
 )
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.reload_labware import (
-    ReloadLabwareParams,
-    ReloadLabwareResult,
-    ReloadLabwareImplementation,
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    OnAddressableAreaLocationSequenceComponent,
 )
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(autouse=True)
@@ -55,7 +52,11 @@ async def test_reload_labware_implementation(
         labwareId="my-labware-id",
     )
 
-    decoy.when(await equipment.reload_labware(labware_id="my-labware-id",)).then_return(
+    decoy.when(
+        await equipment.reload_labware(
+            labware_id="my-labware-id",
+        )
+    ).then_return(
         ReloadedLabwareData(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
             offsetId="labware-offset-id",

@@ -1,6 +1,14 @@
-from typing import Protocol, Optional
+from typing import Dict, Optional, Protocol
 
-from .types import VacuumModuleInfo, LEDColor, LEDPattern
+from opentrons.drivers.vacuum_module.types import (
+    LEDColor,
+    LEDPattern,
+    PressureControlTunings,
+    PumpState,
+    VacuumState,
+    VentState,
+    WasteConfigParameters,
+)
 
 
 class AbstractVacuumModuleDriver(Protocol):
@@ -18,7 +26,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Check connection to vacuum module."""
         ...
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         ...
 
@@ -26,50 +34,12 @@ class AbstractVacuumModuleDriver(Protocol):
         """Set Serial Number."""
         ...
 
-    async def enable_pump(self) -> None:
-        """Enable the vacuum pump."""
+    async def enter_programming_mode(self) -> None:
+        """Reboot into programming mode"""
         ...
 
-    async def disable_pump(self) -> None:
-        """Disable the vacuum pump."""
-        ...
-
-    async def get_pump_motor_register(self) -> None:
-        """Get the register value of the pump motor driver."""
-        ...
-
-    async def get_pressure_sensor_register(self) -> None:
-        """Get the register value of the pressure sensor driver."""
-        ...
-
-    async def get_pressure_sensor_reading_psi(self) -> float:
-        """Get a reading from the pressure sensor."""
-        ...
-
-    async def set_vacuum_chamber_pressure(
-        self,
-        gage_pressure_mbarg: float,
-        duration: Optional[float],
-        rate: Optional[float],
-    ) -> None:
-        """Engage or release the vacuum until a desired internal pressure is reached."""
-        ...
-
-    async def get_gage_pressure_reading_mbarg(self) -> float:
-        """Read each pressure sensor and return the pressure difference."""
-        return 0.0
-
-    # TODO: change pump power to be more specific when we find out how were gonna operate that
-    async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
-        """Engage the vacuum without regard to chamber pressure."""
-        ...
-
-    async def disengage_vacuum_pump(self) -> None:
-        """Stops the vacuum pump, doesn't vent air or disable the motor."""
-        ...
-
-    async def vent(self) -> None:
-        """Release the vacuum in the module chamber."""
+    def reset_serial_buffers(self) -> None:
+        """Reset the input and output serial buffers."""
         ...
 
     async def set_led(
@@ -84,10 +54,73 @@ class AbstractVacuumModuleDriver(Protocol):
         """Set LED Status bar color and pattern."""
         ...
 
-    async def enter_programming_mode(self) -> None:
-        """Reboot into programming mode"""
+    async def set_vacuum_state(
+        self,
+        enable_vacuum: bool,
+        guage_pressure_mbar: Optional[float] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def reset_serial_buffers(self) -> None:
-        """Reset the input and output serial buffers."""
+    async def get_vacuum_state(self) -> VacuumState:
+        """Get the pressure state."""
+        ...
+
+    async def set_pump_state(
+        self,
+        start_pump: bool,
+        target_rpm: Optional[int] = None,
+        duty_cycle: Optional[int] = None,
+    ) -> None:
+        """Start or the stop the pump at a given rpm or duty cycle."""
+        ...
+
+    async def get_pump_state(self) -> PumpState:
+        """Get the pump state."""
+        ...
+
+    async def set_vent_state(self, state: VentState) -> None:
+        """Opens/Closes the vent, which release the vacuum in the module chamber."""
+        ...
+
+    async def set_pressure_control_tunings(
+        self,
+        kp: Optional[float] = None,
+        ki: Optional[float] = None,
+        kd: Optional[float] = None,
+        overshoot: Optional[float] = None,
+        k_velocity: Optional[float] = None,
+        k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
+        reset: bool = False,
+    ) -> None:
+        """Sets the PID tuning parameters for the pressure control."""
+        ...
+
+    async def get_pressure_control_tunings(self) -> PressureControlTunings:
+        """Get the pressure control pid tunings."""
+        ...
+
+    async def set_waste_configs(
+        self,
+        enable_waste_full_detection: bool,
+        p_window_start: Optional[float] = None,
+        p_window_end: Optional[float] = None,
+        baseline_fast_factor: Optional[float] = None,
+        max_delta_per_tick: Optional[float] = None,
+        max_rise_per_tick: Optional[float] = None,
+        max_cummulative_rise: Optional[float] = None,
+        p_filter_alpha: Optional[float] = None,
+        min_window_time: Optional[float] = None,
+        max_window_time: Optional[float] = None,
+    ) -> None:
+        """Sets the Waste Full detection algorithm parameters"""
+        ...
+
+    async def get_waste_configs(self) -> WasteConfigParameters:
+        """Get the waste full detection configs"""
         ...

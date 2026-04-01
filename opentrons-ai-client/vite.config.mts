@@ -44,7 +44,9 @@ export default defineConfig({
   },
   define: {
     // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
-    _OT_AI_CLIENT_MIXPANEL_ID_: JSON.stringify(process.env.OT_AI_CLIENT_MIXPANEL_ID),
+    _OT_AI_CLIENT_MIXPANEL_ID_: JSON.stringify(
+      process.env.OT_AI_CLIENT_MIXPANEL_ID
+    ),
     _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
@@ -58,6 +60,7 @@ export default defineConfig({
         '../components/src/styles/global.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
+      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '/ai-client/': path.resolve('./src/') + '/',
     },
   },

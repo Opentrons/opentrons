@@ -73,7 +73,7 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       ref={labelContainerRef}
       deckLabels={deckLabels}
       x={
-        position[0] -
+        position[0] +
         labwareDef.cornerOffsetFromSlot.x -
         (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
       }

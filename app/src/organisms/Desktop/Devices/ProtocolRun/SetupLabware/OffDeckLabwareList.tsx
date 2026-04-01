@@ -36,7 +36,7 @@ export function OffDeckLabwareList(
   return (
     <>
       <LegacyStyledText
-        as="h3"
+        forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         margin={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing8}`}

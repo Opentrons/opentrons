@@ -1,12 +1,12 @@
 import pytest
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.module_validation_and_errors import (
-    validate_heater_shaker_temperature,
-    validate_heater_shaker_speed,
-    InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
+    InvalidTargetTemperatureError,
+    validate_heater_shaker_speed,
+    validate_heater_shaker_temperature,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.mark.parametrize("valid_celsius_value", [37.0, 37.1, 50, 94.99, 95])

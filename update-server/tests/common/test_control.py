@@ -1,4 +1,4 @@
-""" test the endpoints in otupdate.common.control """
+"""test the endpoints in otupdate.common.control"""
 
 import asyncio
 from typing import Tuple

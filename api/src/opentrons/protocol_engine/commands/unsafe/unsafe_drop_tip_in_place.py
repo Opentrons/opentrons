@@ -1,20 +1,20 @@
 """Command models to drop tip in place while plunger positions are unknown."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
 
-from pydantic import Field, BaseModel
+from typing import TYPE_CHECKING, Any, Optional, Type
+
+from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import Axis
-
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from ..pipetting_common import PipetteIdMixin
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..pipetting_common import PipetteIdMixin
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ...execution import TipHandler
@@ -107,9 +107,9 @@ class UnsafeDropTipInPlace(
     params: UnsafeDropTipInPlaceParams
     result: Optional[UnsafeDropTipInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeDropTipInPlaceImplementation] = (
         UnsafeDropTipInPlaceImplementation
-    ] = UnsafeDropTipInPlaceImplementation
+    )
 
 
 class UnsafeDropTipInPlaceCreate(BaseCommandCreate[UnsafeDropTipInPlaceParams]):

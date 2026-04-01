@@ -1,18 +1,22 @@
 """
 ssh_key_management: Endpoints for managing SSH keys on the robot
 """
+
 import contextlib
 import functools
 import hashlib
 import ipaddress
 import logging
 import os
-from aiohttp import web
 from pathlib import Path
-from typing import Any, Generator, IO, List, Tuple
+from typing import IO, Any, Generator, List, Tuple
 
+from aiohttp import web
+
+from server_utils.auth.scopes import Scope
+
+from . import auth
 from .handler_type import Handler
-
 
 LOG = logging.getLogger(__name__)
 SSH_DIR = Path(os.path.expanduser("~/.ssh"))
@@ -124,6 +128,7 @@ async def list_keys(request: web.Request) -> web.Response:
     )
 
 
+@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def add(request: web.Request) -> web.Response:
     """Add a public key to the authorized_keys file.
@@ -172,6 +177,7 @@ async def add(request: web.Request) -> web.Response:
     )
 
 
+@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def clear(request: web.Request) -> web.Response:
     """Clear all public keys from authorized_keys
@@ -186,13 +192,14 @@ async def clear(request: web.Request) -> web.Response:
 
     return web.json_response(
         data={
-            "message": "Keys cleared. " "Restart robot to take effect",
+            "message": "Keys cleared. Restart robot to take effect",
             "restart_url": "/server/restart",
         },
         status=200,
     )
 
 
+@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def remove(request: web.Request) -> web.Response:
     """Remove a public key from authorized_keys
@@ -224,13 +231,14 @@ async def remove(request: web.Request) -> web.Response:
 
     return web.json_response(
         data={
-            "message": f"Key {requested_hash} deleted. " "Restart robot to take effect",
+            "message": f"Key {requested_hash} deleted. Restart robot to take effect",
             "restart_url": "/server/restart",
         },
         status=200,
     )
 
 
+@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 async def add_from_local(request: web.Request) -> web.Response:
     """Add a public keys from usb device to the authorized_keys file.
 

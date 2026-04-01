@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -27,7 +29,7 @@
         "errorInfo": {
           "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
           "class": "ValueError",
-          "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
+          "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
         },
         "errorType": "PythonException",
         "id": "UUID",
@@ -88,7 +90,7 @@
               "errorInfo": {
                 "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
                 "class": "ValueError",
-                "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
+                "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
               },
               "errorType": "PythonException",
               "id": "UUID",
@@ -102,6 +104,7 @@
   ],
   "files": [],
   "labware": [],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

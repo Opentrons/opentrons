@@ -5,8 +5,8 @@ from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
     TextMode,
-    default_builder,
     concise_builder,
+    default_builder,
 )
 
 

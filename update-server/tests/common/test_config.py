@@ -1,4 +1,5 @@
-""" Tests for config file loading and backup """
+"""Tests for config file loading and backup"""
+
 import copy
 import json
 import os

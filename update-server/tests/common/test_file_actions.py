@@ -1,6 +1,6 @@
-from unittest import mock
 import os
 import zipfile
+from unittest import mock
 
 import pytest
 

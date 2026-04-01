@@ -35,16 +35,16 @@ Database schema versions:
     It then populates the column with data converted from elsewhere in the table,
     so entries should never be NULL in practice even though nullable=True.
 """
+
 import logging
 from datetime import datetime, timezone
 from typing import Optional
-from typing_extensions import Final
 
 import sqlalchemy
+from typing_extensions import Final
 
-from ..tables.schema_02 import analysis_table, migration_table, run_table
 from .. import _legacy_pickle
-
+from ..tables.schema_02 import analysis_table, migration_table, run_table
 
 _LATEST_SCHEMA_VERSION: Final = 2
 
@@ -212,7 +212,7 @@ def _migrate_data_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
 
     for index, row in enumerate(rows_needing_migration):
         _log.info(
-            f"Migrating analysis {index+1}/{len(rows_needing_migration)}, {row.id}..."
+            f"Migrating analysis {index + 1}/{len(rows_needing_migration)}, {row.id}..."
         )
 
         v1_completed_analysis = CompletedAnalysis.model_validate(

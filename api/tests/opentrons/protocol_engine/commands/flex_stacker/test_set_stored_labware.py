@@ -1,30 +1,15 @@
 """Test Flex Stacker set stored labware command implementation."""
 
+from contextlib import nullcontext as does_not_raise
+from typing import Any, ContextManager, cast
+from unittest.mock import sentinel
+
 import pytest
 from decoy import Decoy
-from typing import Any, cast, ContextManager
-from unittest.mock import sentinel
-from contextlib import nullcontext as does_not_raise
 
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    FlexStackerPoolConstraint,
-    BatchLabwareLocationUpdate,
-    BatchLoadedLabwareUpdate,
-    LabwareLidUpdate,
-)
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution.equipment import (
-    EquipmentHandler,
-    LoadedLabwarePoolData,
-)
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.flex_stacker.set_stored_labware import (
     SetStoredLabwareImpl,
@@ -32,24 +17,39 @@ from opentrons.protocol_engine.commands.flex_stacker.set_stored_labware import (
     SetStoredLabwareResult,
     StackerStoredLabwareDetails,
 )
+from opentrons.protocol_engine.errors import (
+    FlexStackerNotLogicallyEmptyError,
+)
+from opentrons.protocol_engine.execution.equipment import (
+    EquipmentHandler,
+    LoadedLabwarePoolData,
+)
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    BatchLabwareLocationUpdate,
+    BatchLoadedLabwareUpdate,
+    FlexStackerPoolConstraint,
+    FlexStackerStateUpdate,
+    LabwareLidUpdate,
+    StateUpdate,
+)
 from opentrons.protocol_engine.types import (
-    OverlapOffset,
-    StackerStoredLabwareGroup,
-    NotOnDeckLocationSequenceComponent,
-    SYSTEM_LOCATION,
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
     InStackerHopperLocation,
-    OnLabwareLocationSequenceComponent,
-    OnLabwareLocation,
     LabwareLocation,
     LabwareLocationSequence,
     LoadedLabware,
-)
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-from opentrons.protocol_engine.errors import (
-    FlexStackerNotLogicallyEmptyError,
+    NotOnDeckLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OverlapOffset,
+    StackerStoredLabwareGroup,
 )
 
 
@@ -644,7 +644,7 @@ async def test_set_stored_labware_limits_count(
         poolOverlapOverride=overlap_override,
     )
     for i in range(len(output_labware)):
-        decoy.when(model_utils.generate_id()).then_return(f"labware-{i+1}")
+        decoy.when(model_utils.generate_id()).then_return(f"labware-{i + 1}")
 
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
@@ -787,17 +787,17 @@ async def test_set_stored_labware_limits_count(
             ),
             batch_loaded_labware=BatchLoadedLabwareUpdate(
                 new_locations_by_id={
-                    f"labware-{i+1}": InStackerHopperLocation(moduleId="module-id")
+                    f"labware-{i + 1}": InStackerHopperLocation(moduleId="module-id")
                     for i, _ in enumerate(output_labware)
                 },
                 offset_ids_by_id={
-                    f"labware-{i+1}": None for i, _ in enumerate(output_labware)
+                    f"labware-{i + 1}": None for i, _ in enumerate(output_labware)
                 },
                 display_names_by_id={
-                    f"labware-{i+1}": None for i, _ in enumerate(output_labware)
+                    f"labware-{i + 1}": None for i, _ in enumerate(output_labware)
                 },
                 definitions_by_id={
-                    f"labware-{i+1}": flex_50uL_tiprack
+                    f"labware-{i + 1}": flex_50uL_tiprack
                     for i, _ in enumerate(output_labware)
                 },
             ),

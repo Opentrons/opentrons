@@ -3,8 +3,8 @@
 
 import time
 from typing import Union, Optional, Any, List
-import serial  # type: ignore[import-untyped]
-from serial.tools.list_ports import comports  # type: ignore[import-untyped]
+import serial  # type: ignore[import]
+from serial.tools.list_ports import comports  # type: ignore[import]
 
 ReceiveBuffer = 100
 
@@ -42,7 +42,7 @@ class SerialDriver:
             bytesize=serial.EIGHTBITS,
             timeout=1,
         )
-        if self.com.isOpen():
+        if self.com.isOpen():  # type: ignore[attr-defined]
             print(f"{self.device} Opened! \n")
         # settings
         self.com.bytesize = serial.EIGHTBITS  # 数据位 8
@@ -75,9 +75,9 @@ class SerialDriver:
             return None
         if not isinstance(send, bytes):
             send = (str(send) + "\r\n").encode("utf-8")
-        self.com.flushInput()  # type: ignore [union-attr]
-        self.com.flushOutput()  # type: ignore [union-attr]
-        self.com.write(send)  # type: ignore [union-attr]
+        self.com.flushInput()  # type: ignore[attr-defined]
+        self.com.flushOutput()  # type: ignore[attr-defined]
+        self.com.write(send)  # type: ignore[attr-defined]
         time.sleep(0.1)
         if delay is None:
             pass
@@ -86,7 +86,7 @@ class SerialDriver:
         if only_write is True:
             return None
         for i in range(times):
-            data = self.com.read(ReceiveBuffer)  # type: ignore [union-attr]
+            data = self.com.read(ReceiveBuffer)  # type: ignore[attr-defined]
             if type(data) is not bytes:
                 if "OK" not in data.decode("utf-8") or "busy" in data.decode("utf-8"):
                     time.sleep(1)

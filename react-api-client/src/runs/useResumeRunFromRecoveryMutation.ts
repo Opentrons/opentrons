@@ -13,7 +13,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { HostConfig, RunAction } from '@opentrons/api-client'
+import type { RunAction } from '@opentrons/api-client'
 
 export type UseResumeRunFromRecoveryMutationResult = UseMutationResult<
   RunAction,
@@ -36,7 +36,7 @@ export const useResumeRunFromRecoveryMutation = (
   const mutation = useMutation<RunAction, AxiosError, string>(
     [host, 'runs', RUN_ACTION_TYPE_RESUME_FROM_RECOVERY],
     (runId: string) =>
-      createRunAction(host as HostConfig, runId, {
+      createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
       })
         .then(response => response.data)

@@ -1,11 +1,18 @@
-""" update-server implementation for buildroot systems """
+"""update-server implementation for buildroot systems"""
+
 import asyncio
 import logging
 from typing import Any, Mapping, Optional
 
 from aiohttp import web
 
+from server_utils.auth.resource_server.authorization_checker import (
+    AuthorizationChecker,
+)
+
+from . import update_actions
 from otupdate.common import (
+    auth,
     config,
     constants,
     control,
@@ -13,9 +20,7 @@ from otupdate.common import (
     ssh_key_management,
     update,
 )
-from . import update_actions
 from otupdate.common.file_actions import load_version_file
-
 
 BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 #: Location of the builtin system version
@@ -35,6 +40,7 @@ async def log_error_middleware(request, handler):
 
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
+    authorization_checker: AuthorizationChecker,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
@@ -58,6 +64,7 @@ async def get_app(
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
     update_actions.OT2UpdateActions.build_and_insert(app)
     name_management.install_name_synchronizer(name_synchronizer, app)
+    auth.install_authorization_checker(app, authorization_checker)
 
     app.router.add_routes(
         [
@@ -86,16 +93,14 @@ async def get_app(
             [
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                f"{version.get('buildroot_version', 'unknown')}",
+                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
                 "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
+                f"{version.get('opentrons_api_version', 'unknown')}",
+                f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",
                 "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
+                f"{version.get('update_server_version', 'unknown')}",
+                f"\t(from git sha      {version.get('update_server_sha', 'unknown')}",
                 "Smoothie firmware version: TODO",
             ]
         )

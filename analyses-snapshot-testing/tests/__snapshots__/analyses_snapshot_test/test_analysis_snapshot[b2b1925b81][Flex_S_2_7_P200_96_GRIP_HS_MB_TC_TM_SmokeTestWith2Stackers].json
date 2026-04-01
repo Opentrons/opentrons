@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -38,6 +40,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/setStoredLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1205,6 +1208,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1226,6 +1230,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/setStoredLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2759,6 +2764,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2780,6 +2786,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2800,6 +2807,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2821,6 +2829,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2842,6 +2851,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2863,6 +2873,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2944,6 +2955,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLidStack",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3335,6 +3347,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3349,6 +3362,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3365,6 +3379,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3379,6 +3394,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/initialize",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3398,6 +3414,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3412,6 +3429,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4594,6 +4612,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5776,6 +5795,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7104,6 +7124,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7239,6 +7260,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7352,6 +7374,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7434,6 +7457,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8753,6 +8777,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8771,6 +8796,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8790,6 +8816,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8807,6 +8834,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/setTargetTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8825,6 +8853,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetBlockTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8844,6 +8873,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8862,6 +8892,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/startRunExtendedProfile",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8894,6 +8925,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8960,6 +8992,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9022,6 +9055,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9036,6 +9070,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9102,6 +9137,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9116,6 +9152,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9178,6 +9215,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9192,6 +9230,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9206,6 +9245,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9274,6 +9314,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9288,6 +9329,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9351,6 +9393,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9365,6 +9408,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/retrieve",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9442,6 +9486,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9503,6 +9548,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9573,6 +9619,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/retrieve",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9648,6 +9695,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9714,6 +9762,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9772,6 +9821,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9790,6 +9840,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "captureImage",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9813,6 +9864,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9846,6 +9898,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9860,6 +9913,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9874,6 +9928,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9888,6 +9943,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9902,6 +9958,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9916,6 +9973,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9930,6 +9988,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9944,6 +10003,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9958,6 +10018,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9972,6 +10033,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "liquidProbe",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10004,6 +10066,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10047,6 +10110,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10090,6 +10154,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10118,6 +10183,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10132,6 +10198,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10150,6 +10217,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10183,6 +10251,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "liquidProbe",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10215,6 +10284,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10258,6 +10328,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10301,6 +10372,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10315,6 +10387,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10358,6 +10431,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10401,6 +10475,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10429,6 +10504,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10443,6 +10519,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10457,6 +10534,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10471,6 +10549,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10485,6 +10564,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10499,6 +10579,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10513,6 +10594,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10527,6 +10609,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10541,6 +10624,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10555,6 +10639,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10569,6 +10654,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10637,6 +10723,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/store",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10678,6 +10765,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/retrieve",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10753,6 +10841,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10813,6 +10902,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10879,6 +10969,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10897,6 +10988,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10930,6 +11022,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "liquidProbe",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10962,6 +11055,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -10996,6 +11090,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11031,6 +11126,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11065,6 +11161,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11100,6 +11197,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11134,6 +11232,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11168,6 +11267,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11196,6 +11296,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11210,6 +11311,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11224,6 +11326,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11238,6 +11341,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11252,6 +11356,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11266,6 +11371,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11280,6 +11386,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11294,6 +11401,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11308,6 +11416,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11322,6 +11431,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11336,6 +11446,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11353,6 +11464,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11386,6 +11498,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11400,6 +11513,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11414,6 +11528,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11428,6 +11543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11442,6 +11558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11456,6 +11573,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11470,6 +11588,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11484,6 +11603,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11498,6 +11618,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11512,6 +11633,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "liquidProbe",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11544,6 +11666,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11587,6 +11710,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11619,6 +11743,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11633,6 +11758,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11651,6 +11777,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11679,6 +11806,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "blowOutInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11694,6 +11822,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11708,6 +11837,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11751,6 +11881,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11783,6 +11914,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11797,6 +11929,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11815,6 +11948,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11843,6 +11977,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "blowOutInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11858,6 +11993,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11872,6 +12008,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11915,6 +12052,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseWhileTracking",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11958,6 +12096,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -11992,6 +12131,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12027,6 +12167,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12061,6 +12202,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12096,6 +12238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12130,6 +12273,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12165,6 +12309,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12199,6 +12344,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12234,6 +12380,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12268,6 +12415,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12302,6 +12450,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12334,6 +12483,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12348,6 +12498,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12362,6 +12513,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12376,6 +12528,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12390,6 +12543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12404,6 +12558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12418,6 +12573,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12432,6 +12588,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12446,6 +12603,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12460,6 +12618,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12493,6 +12652,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "liquidProbe",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12525,6 +12685,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12559,6 +12720,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12594,6 +12756,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12628,6 +12791,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12663,6 +12827,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12697,6 +12862,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12731,6 +12897,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12765,6 +12932,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12799,6 +12967,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12833,6 +13002,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12867,6 +13037,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12900,6 +13071,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12928,6 +13100,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "blowOutInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12943,6 +13116,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12957,6 +13131,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12971,6 +13146,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12985,6 +13161,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -12999,6 +13176,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13013,6 +13191,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13027,6 +13206,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13041,6 +13221,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13055,6 +13236,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13069,6 +13251,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13102,6 +13285,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13116,6 +13300,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13130,6 +13315,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13144,6 +13330,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13158,6 +13345,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13172,6 +13360,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13186,6 +13375,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13200,6 +13390,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13214,6 +13405,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13228,6 +13420,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13242,6 +13435,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13308,6 +13502,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13407,6 +13602,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13421,6 +13617,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetBlockTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13441,6 +13638,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/waitForBlockTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13455,6 +13653,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13473,6 +13672,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/waitForLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13487,6 +13687,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13501,6 +13702,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13561,6 +13763,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13575,6 +13778,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "thermocycler/deactivateLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13589,6 +13793,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13605,6 +13810,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13683,6 +13889,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13697,6 +13904,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/setShakeSpeed",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13715,6 +13923,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13729,6 +13938,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateHeater",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13743,6 +13953,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13757,6 +13968,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13773,6 +13985,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13855,6 +14068,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "temperatureModule/deactivate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13869,6 +14083,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13943,6 +14158,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -13957,6 +14173,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/read",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14076,6 +14293,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14090,6 +14308,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14104,6 +14323,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "absorbanceReader/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14118,6 +14338,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14180,6 +14401,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14248,6 +14470,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/store",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14289,6 +14512,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14348,6 +14572,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForTasks",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14368,6 +14593,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14423,6 +14649,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/retrieve",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14498,6 +14725,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14558,6 +14786,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14628,6 +14857,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "flexStacker/retrieve",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14703,6 +14933,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14763,6 +14994,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14829,6 +15061,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14843,6 +15076,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14860,6 +15094,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -14893,6 +15128,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15228,6 +15464,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15260,6 +15497,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15276,6 +15514,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15290,6 +15529,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15322,6 +15562,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15355,6 +15596,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15374,6 +15616,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15388,6 +15631,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15421,6 +15665,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15440,6 +15685,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15454,6 +15700,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15486,6 +15733,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15506,6 +15754,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15539,6 +15788,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15559,6 +15809,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15592,6 +15843,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15606,6 +15858,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15622,6 +15875,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15957,6 +16211,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -15989,6 +16244,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16005,6 +16261,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16019,6 +16276,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16051,6 +16309,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16084,6 +16343,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16103,6 +16363,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16117,6 +16378,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16150,6 +16412,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16169,6 +16432,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16183,6 +16447,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16215,6 +16480,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16235,6 +16501,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16268,6 +16535,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16288,6 +16556,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16321,6 +16590,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16335,6 +16605,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16351,6 +16622,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16686,6 +16958,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16718,6 +16991,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16734,6 +17008,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16748,6 +17023,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16780,6 +17056,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16813,6 +17090,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16832,6 +17110,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16846,6 +17125,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16879,6 +17159,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16898,6 +17179,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16912,6 +17194,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16944,6 +17227,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16964,6 +17248,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -16997,6 +17282,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17017,6 +17303,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17050,6 +17337,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17064,6 +17352,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17080,6 +17369,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17112,6 +17402,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17126,6 +17417,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17140,6 +17432,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17158,6 +17451,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17191,6 +17485,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17526,6 +17821,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17558,6 +17854,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17574,6 +17871,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17588,6 +17886,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17620,6 +17919,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17653,6 +17953,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17672,6 +17973,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17686,6 +17988,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17719,6 +18022,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17738,6 +18042,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17752,6 +18057,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17784,6 +18090,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17804,6 +18111,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17837,6 +18145,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17857,6 +18166,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17890,6 +18200,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17904,6 +18215,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17920,6 +18232,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17948,6 +18261,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17962,6 +18276,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17979,6 +18294,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17993,6 +18309,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18010,6 +18327,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18043,6 +18361,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18410,6 +18729,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18442,6 +18762,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18458,6 +18779,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18472,6 +18794,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18504,6 +18827,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18537,6 +18861,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18556,6 +18881,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18570,6 +18896,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18603,6 +18930,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18635,6 +18963,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18668,6 +18997,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18688,6 +19018,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18702,6 +19033,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18735,6 +19067,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18749,6 +19082,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18765,6 +19099,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19132,6 +19467,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19164,6 +19500,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19180,6 +19517,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19194,6 +19532,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19226,6 +19565,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19259,6 +19599,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19278,6 +19619,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19292,6 +19634,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19325,6 +19668,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19357,6 +19701,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19390,6 +19735,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19410,6 +19756,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19424,6 +19771,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19457,6 +19805,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19471,6 +19820,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19487,6 +19837,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19854,6 +20205,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19886,6 +20238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19902,6 +20255,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19916,6 +20270,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19948,6 +20303,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -19981,6 +20337,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20000,6 +20357,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20014,6 +20372,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20047,6 +20406,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20079,6 +20439,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20112,6 +20473,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20132,6 +20494,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20146,6 +20509,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20179,6 +20543,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20193,6 +20558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20209,6 +20575,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20241,6 +20608,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20255,6 +20623,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20269,6 +20638,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20287,6 +20657,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20320,6 +20691,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20687,6 +21059,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20719,6 +21092,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20735,6 +21109,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20749,6 +21124,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20781,6 +21157,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20814,6 +21191,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20833,6 +21211,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20847,6 +21226,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20880,6 +21260,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20912,6 +21293,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20945,6 +21327,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20965,6 +21348,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -20979,6 +21363,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21012,6 +21397,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21026,6 +21412,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21042,6 +21429,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableArea",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21070,6 +21458,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21084,6 +21473,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21101,6 +21491,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21115,6 +21506,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21132,6 +21524,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21165,6 +21558,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21560,6 +21954,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21592,6 +21987,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21608,6 +22004,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21622,6 +22019,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21654,6 +22052,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21687,6 +22086,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21706,6 +22106,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21720,6 +22121,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21753,6 +22155,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21767,6 +22170,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21786,6 +22190,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21800,6 +22205,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21832,6 +22238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21852,6 +22259,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21866,6 +22274,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21899,6 +22308,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21919,6 +22329,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21933,6 +22344,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21966,6 +22378,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21980,6 +22393,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -21996,6 +22410,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22391,6 +22806,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22423,6 +22839,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22439,6 +22856,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22453,6 +22871,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22485,6 +22904,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22518,6 +22938,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22537,6 +22958,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22551,6 +22973,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22584,6 +23007,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22598,6 +23022,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22617,6 +23042,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22631,6 +23057,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22663,6 +23090,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22683,6 +23111,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22697,6 +23126,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22730,6 +23160,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22750,6 +23181,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22764,6 +23196,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22797,6 +23230,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22811,6 +23245,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -22827,6 +23262,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquidClass",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23222,6 +23658,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23254,6 +23691,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23270,6 +23708,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23284,6 +23723,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23316,6 +23756,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23349,6 +23790,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "aspirateInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23368,6 +23810,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23382,6 +23825,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23415,6 +23859,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23429,6 +23874,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "airGapInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23448,6 +23894,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23462,6 +23909,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23494,6 +23942,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23514,6 +23963,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23528,6 +23978,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23561,6 +24012,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dispenseInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23581,6 +24033,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23595,6 +24048,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23628,6 +24082,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23642,6 +24097,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23658,6 +24114,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23690,6 +24147,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23704,6 +24162,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23718,6 +24177,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23735,6 +24195,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23777,6 +24238,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23810,6 +24272,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23842,6 +24305,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23856,6 +24320,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "reloadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23886,6 +24351,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23918,6 +24384,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23932,6 +24399,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -23990,6 +24458,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24022,6 +24491,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24036,6 +24506,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "reloadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24066,6 +24537,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24098,6 +24570,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24112,6 +24585,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24171,6 +24645,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24203,6 +24678,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24217,6 +24693,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24268,6 +24745,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24300,6 +24778,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24314,6 +24793,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24346,6 +24826,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "waitForResume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24360,6 +24841,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -24574,6 +25056,46 @@
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
       "location": {
         "moduleId": "UUID"
+      }
+    }
+  ],
+  "labwareOffsets": [
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "id": "UUID",
+      "location": {
+        "slotName": "C2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "C2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    },
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "id": "UUID",
+      "location": {
+        "slotName": "D2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "D2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
       }
     }
   ],

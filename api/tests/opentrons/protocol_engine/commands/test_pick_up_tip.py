@@ -1,36 +1,33 @@
 """Test pick up tip commands."""
 
 from datetime import datetime
-
-from decoy import Decoy, matchers
 from unittest.mock import sentinel
 
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
-from opentrons.types import MountType, Point
-
 from opentrons.protocol_engine import (
-    WellLocation,
-    PickUpTipWellLocation,
-    WellOffset,
     DeckPoint,
+    PickUpTipWellLocation,
+    WellLocation,
+    WellOffset,
+)
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.pick_up_tip import (
+    PickUpTipImplementation,
+    PickUpTipParams,
+    PickUpTipResult,
+    TipPhysicallyMissingError,
 )
 from opentrons.protocol_engine.errors import PickUpTipTipNotAttachedError
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import TipGeometry, LabwareWellId, TipRackWellState
-
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.pick_up_tip import (
-    PickUpTipParams,
-    PickUpTipResult,
-    PickUpTipImplementation,
-    TipPhysicallyMissingError,
-)
+from opentrons.protocol_engine.types import LabwareWellId, TipGeometry, TipRackWellState
+from opentrons.types import MountType, Point
 
 
 async def test_success(

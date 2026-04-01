@@ -1,26 +1,26 @@
 """Thermocycler Module sub-state."""
+
 from dataclasses import dataclass
 from typing import NewType, Optional
-
-from opentrons.protocol_engine.errors import (
-    InvalidTargetTemperatureError,
-    InvalidBlockVolumeError,
-    InvalidRampRateError,
-    NoTargetTemperatureSetError,
-    InvalidHoldTimeError,
-)
 
 # TODO(mc, 2022-04-25): move to module definition
 # https://github.com/Opentrons/opentrons/issues/9800
 from opentrons.drivers.thermocycler.driver import (
-    BLOCK_TARGET_MIN,
     BLOCK_TARGET_MAX,
-    BLOCK_VOL_MIN,
+    BLOCK_TARGET_MIN,
     BLOCK_VOL_MAX,
-    LID_TARGET_MIN,
+    BLOCK_VOL_MIN,
     LID_TARGET_MAX,
+    LID_TARGET_MIN,
 )
 from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
+from opentrons.protocol_engine.errors import (
+    InvalidBlockVolumeError,
+    InvalidHoldTimeError,
+    InvalidRampRateError,
+    InvalidTargetTemperatureError,
+    NoTargetTemperatureSetError,
+)
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
 
@@ -166,10 +166,25 @@ class ThermocyclerModuleSubState:
         if ramp_rate is None:
             return ramp_rate
 
-        heating = target_temp > self.get_target_block_temperature()
-        if (heating and ramp_rate > MAX_HEATING_RATE) or (
-            not heating and ramp_rate > MAX_COOLING_RATE
-        ):
+        if self.target_block_temperature:
+            # When new target equals current target, we can't determine whether
+            # heating or cooling will occur without knowing the actual block temp.
+            # Use the max of heating and cooling rates as the limit since it's the most permissive option.
+            if target_temp == self.target_block_temperature:
+                max_ramp_rate = max(MAX_HEATING_RATE, MAX_COOLING_RATE)
+            elif target_temp > self.target_block_temperature:
+                max_ramp_rate = MAX_HEATING_RATE
+            else:
+                max_ramp_rate = MAX_COOLING_RATE
+        else:
+            # When we're simulating we don't load the TC from live data so there is no default
+            # target temperature.
+            if target_temp > 20:
+                max_ramp_rate = MAX_HEATING_RATE
+            else:
+                max_ramp_rate = MAX_COOLING_RATE
+
+        if ramp_rate > max_ramp_rate:
             raise InvalidRampRateError(
                 f"Thermocycler ramp rate cannot exceed {MAX_HEATING_RATE}°C/s"
                 f" while heating or {MAX_COOLING_RATE}°C/s when cooling."

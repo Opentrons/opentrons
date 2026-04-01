@@ -3,39 +3,38 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import Optional, Callable, Sequence
-
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
-from opentrons.protocol_engine import (
-    DeckType,
-    LabwareOffsetCreate,
-    LegacyLabwareOffsetCreate,
-    StateSummary,
-    CommandSlice,
-    CommandPointer,
-    Command,
-    CommandCreate,
-    LabwareOffset,
-    Config as ProtocolEngineConfig,
-    error_recovery_policy,
-)
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_runner import RunResult, RunOrchestrator
+from typing import Callable, Optional, Sequence
 
 from opentrons.config import feature_flags
-
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
-    HardwareEvent,
     EstopStateNotification,
+    HardwareEvent,
     HardwareEventHandler,
 )
-
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
-from opentrons_shared_data.labware.types import LabwareUri
+from opentrons.protocol_engine import (
+    Command,
+    CommandCreate,
+    CommandPointer,
+    CommandSlice,
+    DeckType,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    StateSummary,
+    error_recovery_policy,
+)
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
+)
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.types import DeckConfigurationType, PostRunHardwareState
+from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareUri
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 _log = logging.getLogger(__name__)
 
@@ -159,15 +158,16 @@ class MaintenanceRunOrchestratorStore:
             created_at: Run creation datetime
             labware_offsets: Labware offsets to create the run with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
+            deck_configuration: The deck configuration to use.
 
         Returns:
             The initial equipment and status summary of the engine.
         """
         # Because we will be clearing run orchestrator store before creating a new one,
         # the run orchestrator should be None at this point.
-        assert (
-            self._run_orchestrator is None
-        ), "There is an active maintenance run that was not cleared correctly."
+        assert self._run_orchestrator is None, (
+            "There is an active maintenance run that was not cleared correctly."
+        )
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(

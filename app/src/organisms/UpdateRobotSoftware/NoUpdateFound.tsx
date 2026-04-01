@@ -44,7 +44,10 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
           color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText
+          forwardedAs="h2"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+        >
           {t('software_is_up_to_date')}
         </LegacyStyledText>
       </Flex>

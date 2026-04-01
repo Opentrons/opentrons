@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { get96Channel384WellPlateWells, orderWells } from '..'
+import { ALL, SINGLE } from '../../../command/types'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
@@ -204,16 +205,23 @@ describe('canPipetteUseLabware', () => {
     const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10MultiV2Specs
     const pipette96 = fixtureP100096V2Specs
+    const nozzles = ALL
 
-    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
-    expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
+    expect(canPipetteUseLabware(pipette, nozzles, labwareDef)).toBe(false)
+    expect(canPipetteUseLabware(pipette96, nozzles, labwareDef)).toBe(false)
   })
 
   it('returns true when pipette is single channel', () => {
     const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10SingleV2Specs
-
-    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
+    const nozzles = ALL
+    expect(canPipetteUseLabware(pipette, nozzles, labwareDef)).toBe(true)
+  })
+  it('returns true when a multi pipette is using single channel', () => {
+    const labwareDef = fixtureOverlappyWellplate
+    const pipette = fixtureP10MultiV2Specs
+    const nozzles = SINGLE
+    expect(canPipetteUseLabware(pipette, nozzles, labwareDef)).toBe(true)
   })
 })
 

@@ -229,20 +229,20 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
                   }}
                 />
               ),
-              block: <LegacyStyledText as="p" />,
+              block: <LegacyStyledText forwardedAs="p" />,
             }}
           />
         </Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <Banner type="warning">
-            <LegacyStyledText as="p" marginRight={SPACING.spacing16}>
+            <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing16}>
               {t('branded:opentrons_tip_racks_recommended')}
             </LegacyStyledText>
           </Banner>
           <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
           <Divider marginY={SPACING.spacing8} width="100%" />
-          <LegacyStyledText as="label" color={COLORS.grey50}>
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('branded:calibration_on_opentrons_tips_is_important')}
           </LegacyStyledText>
         </Flex>

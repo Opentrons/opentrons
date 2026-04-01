@@ -1,17 +1,22 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { Chip, COLORS, StyledText } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { useMenuHandleClickOutside } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
-import { GalleryItemOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemOverflowMenu'
+import { MediaContainerContent } from '/app/molecules/MediaContainerContent'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
+import { GalleryItemErrorModal } from './GalleryItemErrorModal'
 
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
@@ -22,7 +27,7 @@ export interface GalleryItemCardProps extends UseImageGalleryDataProps {
 }
 
 export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
-  const { item, protocolAnalysis, runId } = props
+  const { item, protocolAnalysis, robotName, runId } = props
   const {
     currentCommand,
     currentCommandString,
@@ -30,19 +35,32 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     isLoading,
   } = useImageGalleryData(props)
 
+  const { setShowOverflowMenu } = useMenuHandleClickOutside()
+  const robotType = useRobotType(robotName)
+
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType,
+  })
+  const onDownloadImage = (): void => {
+    setShowOverflowMenu(false)
+    const a = document.createElement('a')
+    a.download = item.filename
+    a.href = imagePath ?? ''
+    a.click()
+    reportPhotoAccessUsage({
+      action: 'download',
+    })
+    a.remove()
+  }
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
-  const isCurrentCmdError = currentCommand?.error != null
   const { commandStep, totalSteps } = useCommandStepNumbers({
     currentCommand,
     protocolAnalysis,
   })
 
   const { t } = useTranslation(['run_details', 'branded'])
-  const dispatch = useDispatch()
-  const host = useHost()
-
-  const isSkeleton = imagePath == null || isLoading
 
   const buildStepText = (): string => {
     const totalStepStr =
@@ -53,103 +71,77 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       total: totalStepStr,
     })
   }
-
-  const onClick = (): void => {
-    if (isSkeleton || imagePath == null) return
-    const img = new Image()
-    img.src = imagePath
-    img.onload = () => {
-      if (host?.robotName) {
-        dispatch(
-          cameraPhotoOpenAction({
-            robotName: host.robotName,
-            photoUrl: imagePath,
-            windowTitle: t('branded:image_capture_window_title', {
-              step: buildStepText(),
-              timestamp,
-            }),
-          })
-        )
-      }
+  const isSkeleton = imagePath == null || isLoading
+  const isCurrentCmdError = currentCommand?.error != null
+  const state = (): 'loading' | 'error' | null => {
+    if (isSkeleton) {
+      return 'loading'
+    } else if (isCurrentCmdError) {
+      return 'error'
+    } else {
+      return null
     }
   }
+  const stepCommandText = t('step_command', {
+    step: buildStepText(),
+    command: currentCommandString,
+  })
 
+  const dispatch = useDispatch()
+  const onClick = (): void => {
+    if (isLoading) {
+      return
+    }
+    if (robotName && imagePath != null) {
+      dispatch(
+        cameraPhotoOpenAction({
+          robotName: robotName,
+          photoUrl: imagePath,
+          windowTitle: t('branded:image_capture_window_title', {
+            step: stepCommandText,
+            timestamp,
+          }),
+        })
+      )
+    }
+  }
+  const [showErrorModal, setShowErrorModal] = useState(false)
+
+  const toggleErrorModal = (): void => {
+    setShowOverflowMenu(false)
+    setShowErrorModal(!showErrorModal)
+  }
+  const actions = [{ label: t('download_image'), onClick: onDownloadImage }]
+  if (isCurrentCmdError) {
+    actions.push({ label: t('view_error_details'), onClick: toggleErrorModal })
+  }
   return (
-    <div className={styles.gallery_card}>
-      <div
-        className={styles.gallery_card_thumbnail}
-        onClick={isSkeleton ? undefined : onClick}
-        role={isSkeleton ? undefined : 'button'}
-        style={isSkeleton ? { cursor: 'default' } : undefined}
-      >
-        {isSkeleton ? (
-          <Skeleton width="100%" height="100%" backgroundSize="47rem" />
-        ) : (
+    <>
+      {state() === 'error' && showErrorModal && currentCommand != null && (
+        <GalleryItemErrorModal
+          erroredCommand={currentCommand}
+          runId={runId}
+          toggleModal={toggleErrorModal}
+          robotName={robotName}
+        />
+      )}
+      <MediaContainerContent
+        mediaContent={
           <img
             className={styles.gallery_img}
-            src={imagePath}
+            src={imagePath ?? undefined}
             alt="camera-photo"
           />
-        )}
-
-        {!isSkeleton && (
-          <div className={styles.gallery_img_overlay}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.gallery_overlay_text}
-            >
-              {t('view_image')}
-            </StyledText>
-          </div>
-        )}
-      </div>
-
-      <div className={styles.gallery_card_cmd_txt_container}>
-        {!isSkeleton && isCurrentCmdError && (
-          <Chip
-            text={t('error_event')}
-            type="error"
-            width="fit-content"
-            chipSize="small"
-          />
-        )}
-        {isSkeleton ? (
-          <Skeleton width="100%" height="1.25rem" backgroundSize="47rem" />
-        ) : (
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
-            {t('step_command', {
-              step: buildStepText(),
-              command: currentCommandString,
-            })}
-          </StyledText>
-        )}
-
-        {isSkeleton ? (
-          <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
-        ) : (
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            className={styles.gallery_cmd_txt_subtext}
-            color={COLORS.grey60}
-          >
-            {previousCommandString}
-          </StyledText>
-        )}
-      </div>
-      <div className={styles.gallery_card_timestamp}>
-        {isSkeleton ? (
-          <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
-        ) : (
-          <StyledText desktopStyle="bodyDefaultRegular">{timestamp}</StyledText>
-        )}
-      </div>
-      <GalleryItemOverflowMenu
-        runId={runId}
-        currentCommand={currentCommand}
-        imagePath={imagePath}
-        imageFilename={item.filename}
-        robotName={props.robotName}
+        }
+        centerPrimaryText={stepCommandText}
+        centerSecondaryText={previousCommandString}
+        rightPrimaryText={timestamp}
+        state={state()}
+        overflowMenu={true}
+        overflowMenuActions={actions}
+        hoverText={t('view_image')}
+        mediaContentOnClick={onClick}
       />
-    </div>
+    </>
   )
 }

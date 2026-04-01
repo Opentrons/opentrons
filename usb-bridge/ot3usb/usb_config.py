@@ -15,12 +15,13 @@ and a few kernel modules must be running before this program:
 - libcomposite (to provide the configuration filesystem)
 """
 
-from dataclasses import dataclass
 import logging
 import os
 import time
-import serial  # type: ignore[import-untyped]
 import typing
+from dataclasses import dataclass
+
+import serial  # type: ignore[import-untyped]
 
 LOG = logging.getLogger(__name__)
 

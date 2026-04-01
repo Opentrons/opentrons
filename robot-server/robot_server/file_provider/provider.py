@@ -1,44 +1,48 @@
 """Executor for Protocol Engine File Provider callbacks."""
-import os
+
 import asyncio
 import hashlib
+import logging
+import os
 from pathlib import Path
 from typing import Annotated
-from fastapi import Depends
-import logging
 
-from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.data_files.dependencies import (
-    get_data_files_directory,
-    get_data_files_store,
+from fastapi import Depends
+
+from opentrons.protocol_engine.errors import (
+    FileNameInvalidError,
+    StorageLimitReachedError,
+)
+from opentrons.protocol_engine.resources.file_provider import (
+    SPECIAL_CHARACTERS,
+    FileData,
+    ImageCaptureCmdFileNameMetadata,
+    ReadCmdFileNameMetadata,
+    UserDefinedCSVCmdFileNameMetadata,
 )
 from opentrons_shared_data.data_files import (
-    OutputDataFileInfo,
-    DataFileInfo,
     CmdDataFileInfo,
+    DataFileInfo,
     MimeType,
+    OutputDataFileInfo,
 )
-from robot_server.settings import get_settings, RobotServerSettings
+
 from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-from opentrons.protocol_engine.errors import (
-    StorageLimitReachedError,
-    FileNameInvalidError,
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
 )
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
-from opentrons.protocol_engine.resources.file_provider import (
-    FileData,
-    ReadCmdFileNameMetadata,
-    ImageCaptureCmdFileNameMetadata,
-    SPECIAL_CHARACTERS,
-)
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
     get_data_file_publisher,
 )
+from robot_server.settings import RobotServerSettings, get_settings
 
 log = logging.getLogger(__name__)
 
@@ -72,11 +76,10 @@ class FileProviderExecutor:
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
 
-    async def write_file_cb(
-        self,
-        file_data: FileData,
-    ) -> DataFileInfo:
+    async def write_file_cb(self, file_data: FileData) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file.
+
+        If file_data contains a file_id then the file is already created and we append instead of create.
 
         Raises:
             A StorageLimitReachedError on disk space limit violations.
@@ -97,7 +100,12 @@ class FileProviderExecutor:
             )
 
         async with self._lock:
-            file_id = await get_unique_id()
+            file_exists = file_data.command_metadata.file_id is not None
+            file_id = (
+                file_data.command_metadata.file_id
+                if file_data.command_metadata.file_id is not None
+                else await get_unique_id()
+            )
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
@@ -107,8 +115,10 @@ class FileProviderExecutor:
             prev_command_id = file_data.command_metadata.prev_command_id
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
-
-            with open(file=final_filepath, mode="wb") as f:
+            mode = "wb"
+            if file_exists:
+                mode = "ab"
+            with open(file=final_filepath, mode=mode) as f:
                 f.write(file_data.data)
 
             created_at = await get_current_time()
@@ -129,9 +139,9 @@ class FileProviderExecutor:
                     command_id=command_id, prev_command_id=prev_command_id
                 ),
             )
-
-            await self._data_files_store.insert(file_info)
-            await self._data_files_store.insert_output_file(output_file_info)
+            if not file_exists:
+                await self._data_files_store.insert(file_info)
+                await self._data_files_store.insert_output_file(output_file_info)
 
             if file_data.mime_type == MimeType.IMAGE_JPEG:
                 self._publisher.publish_run_images(file_data.run_metadata.run_id)
@@ -184,7 +194,11 @@ class FileProviderExecutor:
                 + str(cmd_metadata.command_timestamp.strftime("%Y%m%d-%H%M%S"))
                 + ".jpeg"
             )
-
+        elif isinstance(file_data.command_metadata, UserDefinedCSVCmdFileNameMetadata):
+            filename = file_data.command_metadata.filename
+            if not filename.endswith(".csv"):
+                filename = f"{filename}.csv"
+            return filename
         else:
             return f"{file_id}.dat"
 

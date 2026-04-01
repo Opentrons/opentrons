@@ -1,15 +1,16 @@
 """Script for starting up emulation up with module emulators."""
-import logging
+
 import asyncio
+import logging
 from argparse import ArgumentParser
 from typing import List
 
+from .run_module_emulator import run as run_module_by_name
 from opentrons.hardware_control.emulation.app import Application
 from opentrons.hardware_control.emulation.scripts.run_module_emulator import (
     emulator_builder,
 )
 from opentrons.hardware_control.emulation.settings import Settings
-from .run_module_emulator import run as run_module_by_name
 
 
 async def run(settings: Settings, modules: List[str]) -> None:

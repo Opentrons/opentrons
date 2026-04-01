@@ -1,11 +1,12 @@
 """Message types."""
+
 from functools import lru_cache
-from typing import Union, Optional, Type
+from typing import Optional, Type, Union
 
 from typing_extensions import get_args
 
-from . import message_definitions as defs
 from ..constants import MessageId
+from . import message_definitions as defs
 
 MessageDefinition = Union[
     defs.Acknowledgement,

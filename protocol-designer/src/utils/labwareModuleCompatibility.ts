@@ -7,6 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { RECOMMENDED_LABWARE_BY_MODULE } from '../pages/Designer/DeckSetup/constants'
@@ -82,6 +83,8 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [FLEX_STACKER_MODULE_TYPE]: [
     ...RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE],
   ],
+  // TODO (nd: 02/04/2026): configure this for vacuum module
+  [VACUUM_MODULE_TYPE]: [],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,

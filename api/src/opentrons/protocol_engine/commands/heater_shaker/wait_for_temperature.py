@@ -1,17 +1,19 @@
 """Command models to wait for a Heater-Shaker Module's target temperature."""
-from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Any
 
-from typing_extensions import Literal, Type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Optional
+
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 
 WaitForTemperatureCommandType = Literal["heaterShaker/waitForTemperature"]

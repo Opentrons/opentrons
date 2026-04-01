@@ -1,13 +1,14 @@
 """Protocol Engine types to do with instruments."""
-import enum
-from typing import Union
 
+import enum
 from dataclasses import dataclass
+from typing import Union
 
 from pydantic import BaseModel
 
-from opentrons.types import MountType
 from opentrons_shared_data.pipette.types import PipetteNameType
+
+from opentrons.types import MountType
 
 
 class LoadedPipette(BaseModel):

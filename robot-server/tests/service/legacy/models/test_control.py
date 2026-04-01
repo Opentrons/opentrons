@@ -1,4 +1,5 @@
 import pytest
+
 from robot_server.service.legacy.models import control
 
 

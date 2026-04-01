@@ -1,25 +1,16 @@
 """Seal tips to pipette command request, result, and implementation models."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type, Union
 
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
-from pydantic import Field, BaseModel
 
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from opentrons.types import MountType
-from opentrons.protocol_engine.types import MotorAxis
 from ..resources import ModelUtils, ensure_ot3_hardware
-from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid, LabwareWellId
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    StallOrCollisionError,
-    move_to_well,
-)
+from ..types import AspiratedFluid, FluidKind, LabwareWellId, PickUpTipWellLocation
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -27,18 +18,27 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.types import MotorAxis
+from opentrons.types import MountType
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..execution import (
-        MovementHandler,
-        TipHandler,
         GantryMover,
+        MovementHandler,
         PipettingHandler,
+        TipHandler,
     )
+    from ..state.state import StateView
 
 
 SealPipetteToTipCommandType = Literal["sealPipetteToTip"]
@@ -339,9 +339,9 @@ class SealPipetteToTip(
     params: SealPipetteToTipParams
     result: Optional[SealPipetteToTipResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[SealPipetteToTipImplementation] = (
         SealPipetteToTipImplementation
-    ] = SealPipetteToTipImplementation
+    )
 
 
 class SealPipetteToTipCreate(BaseCommandCreate[SealPipetteToTipParams]):

@@ -1,9 +1,8 @@
 """Validate a deck configuration."""
 
-
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional
+from typing import DefaultDict, FrozenSet, List, Optional, Set, Tuple, Union
 
 from opentrons_shared_data.deck import types as deck_types
 

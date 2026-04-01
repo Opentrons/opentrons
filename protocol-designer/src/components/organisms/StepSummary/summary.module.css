@@ -8,5 +8,5 @@
 .absorbance_reader {
   display: flex;
   align-items: center;
-  grid-gap: var(--spacing-4);
+  gap: var(--spacing-4);
 }

@@ -24,7 +24,6 @@ import {
 } from '@opentrons/components'
 import {
   useAddCameraSettingsToRunMutation,
-  useCamera,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -89,9 +88,10 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
-  updateCameraEnablement,
+  updateCameraUsageSettings,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -103,7 +103,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
@@ -199,14 +198,19 @@ function PrepareToRun({
       source: SOURCE_RUN_RECORD,
       robotType: robotType,
     })
-  useEffect(() => {
-    if (storageInfo.isImageStorageLow) {
-      reportPhotoAccessUsage({
-        action: 'storageWarning',
-        transactionId: runId,
-      })
-    }
-  }, [storageInfo.isImageStorageLow != null])
+  useEffect(
+    () => {
+      if (storageInfo.isImageStorageLow) {
+        reportPhotoAccessUsage({
+          action: 'storageWarning',
+          transactionId: runId,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [storageInfo.isImageStorageLow != null]
+  )
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -626,13 +630,13 @@ function PrepareToRun({
             {!isLoading ? (
               <>
                 <LegacyStyledText
-                  as="h4"
+                  forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {t('prepare_to_run')}
                 </LegacyStyledText>
                 <LegacyStyledText
-                  as="h4"
+                  forwardedAs="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -739,9 +743,6 @@ function PrepareToRun({
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
           runId={runId}
-          isQuickTransfer={
-            protocolRecord?.data.protocolKind === 'quick-transfer'
-          }
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
           protocolId={protocolId}
@@ -762,6 +763,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const runStatus = runRecord?.data.status ?? null
   const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -793,7 +795,7 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }
@@ -851,16 +853,29 @@ export function ProtocolSetup(): JSX.Element {
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const { data: initialRobotCameraSettings } = useCamera()
+  const { data: initialRobotCameraSettings } = useNotifyCamera({
+    staleTime: Infinity,
+  })
 
   // The initial app-internal camera state should match the server state.
-  useEffect(() => {
-    if (initialRobotCameraSettings != null) {
-      dispatch(
-        updateCameraEnablement(runId, initialRobotCameraSettings.cameraEnabled)
-      )
-    }
-  }, [initialRobotCameraSettings])
+  useEffect(
+    () => {
+      if (initialRobotCameraSettings != null) {
+        dispatch(
+          updateCameraUsageSettings({
+            runId,
+            cameraEnabled: initialRobotCameraSettings.cameraEnabled,
+            recoveryEnabled:
+              initialRobotCameraSettings.errorRecoveryCameraEnabled,
+            liveStreamEnabled: initialRobotCameraSettings.liveStreamEnabled,
+          })
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [initialRobotCameraSettings]
+  )
 
   const appCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)

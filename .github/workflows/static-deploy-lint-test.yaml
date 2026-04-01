@@ -16,11 +16,11 @@ jobs:
 
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: 'scripts/static-deploy/uv.lock'
       - name: Setup Deploy Dependencies

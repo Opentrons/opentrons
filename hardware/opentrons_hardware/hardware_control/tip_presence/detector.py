@@ -2,23 +2,22 @@
 
 import asyncio
 import logging
-from typing import List, Callable, Set
+from typing import Callable, List, Set
 
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
+
+from .types import TipChangeListener, TipNotification
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
-
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    TipStatusQueryRequest,
     PushTipPresenceNotification,
+    TipStatusQueryRequest,
 )
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
-from opentrons_shared_data.errors.exceptions import CommandTimedOutError
-
-from .types import TipChangeListener, TipNotification
 
 log = logging.getLogger(__name__)
 

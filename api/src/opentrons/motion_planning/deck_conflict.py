@@ -5,17 +5,18 @@ from __future__ import annotations
 from collections.abc import Container
 from dataclasses import dataclass
 from typing import List, Mapping, NamedTuple, Optional, Set, Union
+
 from typing_extensions import Final
 
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
+
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_south_slot,
     get_adjacent_slots,
     get_adjacent_staging_slot,
+    get_east_west_slots,
+    get_south_slot,
 )
-
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.types import DeckSlotName, StagingSlotName
 
@@ -220,7 +221,7 @@ def check(
     new_item: DeckItem,
     new_location: Union[DeckSlotName, StagingSlotName],
     robot_type: RobotType,
-) -> None:
+) -> bool:
     """Check a deck layout for conflicts.
 
     Args:
@@ -231,6 +232,9 @@ def check(
 
     Raises:
         DeckConflictError: Adding this item should not be allowed.
+
+    Returns:
+        True if this item can be added (it will raise rather than return False)
     """
     restrictions: List[_DeckRestriction] = []
     # build restrictions driven by existing items
@@ -261,6 +265,7 @@ def check(
                     existing_item=existing_item,
                 )
             )
+    return True
 
 
 def _create_ot2_restrictions(  # noqa: C901
@@ -451,9 +456,9 @@ def _create_deck_conflict_error_message(
     new_item: Optional[DeckItem] = None,
     existing_item: Optional[DeckItem] = None,
 ) -> str:
-    assert (
-        new_item is not None or existing_item is not None
-    ), "Conflict error expects either new_item or existing_item"
+    assert new_item is not None or existing_item is not None, (
+        "Conflict error expects either new_item or existing_item"
+    )
 
     if new_item is not None:
         message = (

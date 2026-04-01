@@ -2,8 +2,9 @@
 import paramiko as pmk
 import time
 import json
+import argparse
 import multiprocessing
-import os
+from pathlib import Path
 from typing import Optional, List, Any
 
 
@@ -25,13 +26,15 @@ def execute(client: pmk.SSHClient, command: str, args: list) -> Optional[int]:
                 return 1
         if stdout.channel.exit_status_ready():
             if stdout.channel.recv_exit_status() != 0:
-                print(f"{args[0]} command failed:", "".join(stderr_lines))
+                error_msg = " ".join(line.strip() for line in stderr_lines)
+                print(f"❌{args[0]} command failed: {error_msg}")
                 # Terminate process on failure.
                 raise RuntimeError(
                     f"{args[0]} encountered an error and the process will terminate."
                 )
         else:
-            print(f"{args[0]} command success:", "".join(stdout_lines))
+            success_msg = " ".join(line.strip() for line in stdout_lines)
+            print(f"✅ {args[0]} command success: {success_msg}")
             return 0
     except Exception as e:
         print(f"Error with {args[0]}:", e)
@@ -59,18 +62,17 @@ def run_command_on_ip(
         if status == 0:
             print(f"Environmental sensors for {curr_ip}, are now running")
     except Exception as e:
-        print(f"Error running command on {curr_ip}: {e}")
+        print(f"❌Error running command on {curr_ip}: {e}")
 
 
-def run(storage_directory: str) -> List[Any]:
+def run(storage_directory: Path) -> List[Any]:
     """Run asair script module."""
     # Load Robot IPs
     cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
     cd = "cd /opt/opentrons-robot-server && "
     robot_ips = []
     robot_names = []
-
-    ip_file = os.path.join(storage_directory, "IPs.json")
+    ip_file = storage_directory / "IPs.json"
     with open(ip_file) as file:
         file_dict = json.load(file)
         robot_dict = file_dict.get("ip_address_list")
@@ -89,7 +91,17 @@ def run(storage_directory: str) -> List[Any]:
 
 if __name__ == "__main__":
     # Wait for all processes to finish.
-    storage_directory = ""
+    parser = argparse.ArgumentParser(
+        description="Pulls calibration logs from ABR robots."
+    )
+    parser.add_argument(
+        "storage_directory",
+        metavar="STORAGE_DIRECTORY",
+        type=Path,
+        nargs=1,
+        help="Path to long term storage directory for run logs.",
+    )
+    storage_directory = parser.parse_args().storage_directory[0]
     processes = run(storage_directory)
     for process in processes:
         process.start()

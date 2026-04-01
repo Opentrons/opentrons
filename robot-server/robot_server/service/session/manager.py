@@ -1,24 +1,24 @@
 import logging
-from typing import Optional, Tuple, Dict, Type
+from typing import Dict, Optional, Tuple, Type
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
-from robot_server.service.errors import RobotServerError, CommonErrorDef
+from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import (
     SessionCreationException,
     SessionException,
 )
-from robot_server.service.session.session_types.base_session import BaseSession
-from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.models.common import IdentifierType
+from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.session_types import (
     CheckSession,
-    SessionMetaData,
-    TipLengthCalibration,
     DeckCalibrationSession,
     PipetteOffsetCalibrationSession,
+    SessionMetaData,
+    TipLengthCalibration,
 )
+from robot_server.service.session.session_types.base_session import BaseSession
 
 log = logging.getLogger(__name__)
 

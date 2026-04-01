@@ -19,12 +19,9 @@
 
 .icon_button:focus-visible::after {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  bottom: -8px;
-  left: -8px;
   border: 2px solid var(--variant-default);
   border-radius: 50%;
   content: '';
+  inset: -8px;
   pointer-events: none;
 }

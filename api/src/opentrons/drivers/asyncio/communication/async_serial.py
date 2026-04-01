@@ -4,10 +4,10 @@ import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, AsyncGenerator, Union
-from typing_extensions import Literal
+from typing import AsyncGenerator, Optional, Union
 
 from serial import Serial, serial_for_url  # type: ignore[import-untyped]
+from typing_extensions import Literal
 
 TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 
@@ -162,6 +162,18 @@ class AsyncSerial:
     def reset_output_buffer(self) -> None:
         """Reset the output buffer"""
         self._serial.reset_output_buffer()
+
+    async def set_timeout(
+        self, timeout_property: TimeoutProperties, timeout: Optional[float]
+    ) -> None:
+        """Permanently set timeout for this connection."""
+        default_timeout = getattr(self._serial, timeout_property)
+        override = timeout is not None and default_timeout != timeout
+        if override:
+            await self._loop.run_in_executor(
+                executor=self._executor,
+                func=lambda: setattr(self._serial, timeout_property, timeout),
+            )
 
     @contextlib.asynccontextmanager
     async def timeout_override(

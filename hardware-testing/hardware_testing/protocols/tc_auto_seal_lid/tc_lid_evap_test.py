@@ -53,7 +53,6 @@ def _fill_with_liquid_and_measure(
         volume=volumes,
         source=source_well,
         dest=locations,
-        return_tips=True,
         blow_out=False,
     )
     protocol.pause("Weight Armadillo Plate, place on thermocycler, put on lid")

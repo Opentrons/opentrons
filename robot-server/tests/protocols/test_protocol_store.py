@@ -1,31 +1,34 @@
 """Tests for the ProtocolStore interface."""
+
 import textwrap
-from opentrons.protocol_engine.types import CSVParameter, FileInfo
-import pytest
-from decoy import Decoy
 from datetime import datetime, timezone
 from pathlib import Path
 
-from opentrons.protocols.api_support.types import APIVersion
+import pytest
+from decoy import Decoy
+from sqlalchemy.engine import Engine as SQLEngine
+
+from opentrons.protocol_engine.types import CSVParameter, FileInfo
 from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    ProtocolFileRole,
     ProtocolReader,
     ProtocolSource,
     ProtocolSourceFile,
-    ProtocolFileRole,
-    JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
-    CompletedAnalysis,
-    AnalysisStatus,
     AnalysisResult,
+    AnalysisStatus,
+    CompletedAnalysis,
 )
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
@@ -33,17 +36,14 @@ from robot_server.protocols.completed_analysis_store import (
 )
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
-    ProtocolStore,
-    ProtocolResource,
-    ProtocolUsageInfo,
     ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
+    ProtocolUsageInfo,
     ProtocolUsedByRunError,
 )
 from robot_server.protocols.rtp_resources import CSVParameterResource
-
 from robot_server.runs.run_store import RunStore
-
-from sqlalchemy.engine import Engine as SQLEngine
 from robot_server.service.notifications import RunsPublisher
 
 

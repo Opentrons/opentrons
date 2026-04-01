@@ -1,30 +1,40 @@
 """Completed analysis storage and access."""
+
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, List, Optional, Union, Mapping
-from logging import getLogger
 from dataclasses import dataclass
+from logging import getLogger
+from typing import Dict, List, Mapping, Optional, Union
 
-import sqlalchemy
 import anyio.to_thread
+import sqlalchemy
+from pydantic import ValidationError
+
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
-from robot_server.persistence.database import sqlite_rowid
-from robot_server.persistence.tables import (
-    analysis_table,
-    analysis_primitive_type_rtp_table,
-    analysis_csv_rtp_table,
-)
-from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
-
-from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
+from .analysis_models import CompletedAnalysis
+from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
+from robot_server.persistence.tables import (
+    analysis_csv_rtp_table,
+    analysis_primitive_type_rtp_table,
+    analysis_table,
+)
 
 _log = getLogger(__name__)
 
 MAX_ANALYSES_TO_STORE = 5
+
+
+class UnreadableAnalysisError(ValueError):
+    """Exception raised if a given analysis is not readable."""
+
+    def __init__(self, analysis_id: str, error_msg: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f'Analysis "{analysis_id}" cannot be parsed: {error_msg}')
 
 
 @dataclass
@@ -92,7 +102,13 @@ class CompletedAnalysisResource:
         assert isinstance(protocol_id, str)
 
         def parse_completed_analysis() -> CompletedAnalysis:
-            return json_to_pydantic(CompletedAnalysis, sql_row.completed_analysis)
+            try:
+                parsed_analysis = json_to_pydantic(
+                    CompletedAnalysis, sql_row.completed_analysis
+                )
+            except ValidationError as e:
+                raise UnreadableAnalysisError(id, str(e)) from e
+            return parsed_analysis
 
         completed_analysis = await anyio.to_thread.run_sync(
             parse_completed_analysis,

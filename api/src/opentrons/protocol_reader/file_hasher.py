@@ -1,9 +1,11 @@
 """File hashing utiliy class."""
 
-from typing import Sequence
-import anyio
 import unicodedata
 from hashlib import md5
+from typing import Sequence
+
+import anyio
+
 from .file_reader_writer import BufferedFile
 
 

@@ -1,6 +1,8 @@
-import pytest
 import logging
 from typing import Optional
+
+import pytest
+
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.api_support.instrument import (
     validate_takes_liquid,

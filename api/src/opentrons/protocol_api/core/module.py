@@ -3,22 +3,22 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Optional, TypeVar, ClassVar, Sequence, Any, Generic
+from typing import Any, ClassVar, Dict, Generic, List, Optional, Sequence, TypeVar
 
+from .labware import AbstractLabware, LabwareCoreType
+from .tasks import AbstractTaskCore
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
 from opentrons.hardware_control.modules.types import (
+    MagneticStatus,
     ModuleModel,
     ModuleType,
+    SpeedStatus,
     TemperatureStatus,
     ThermocyclerStep,
-    MagneticStatus,
-    SpeedStatus,
 )
-from .labware import LabwareCoreType, AbstractLabware
-from .tasks import AbstractTaskCore
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
@@ -538,3 +538,15 @@ class AbstractFlexStackerCore(
         stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""
+
+
+class AbstractVacuumModuleCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
+    """Core control interface for an attached Vacuum Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.VACUUM_MODULE
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""

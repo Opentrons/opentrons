@@ -53,17 +53,17 @@ export function ModuleCalibrationItems({
           return (
             <StyledTableRow key={attachedModule.id}>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {getModuleDisplayName(attachedModule.moduleModel)}
                 </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {attachedModule.serialNumber}
                 </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {attachedModule.moduleOffset?.last_modified != null
                     ? formatLastCalibrated(
                         attachedModule.moduleOffset?.last_modified

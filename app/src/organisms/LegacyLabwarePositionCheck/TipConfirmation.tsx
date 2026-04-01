@@ -62,7 +62,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
+      <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
       </LegacyStyledText>
       <Flex

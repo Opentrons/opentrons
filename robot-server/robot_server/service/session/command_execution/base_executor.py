@@ -1,5 +1,5 @@
-from .command import Command, CompletedCommand
 from ..errors import UnsupportedCommandException
+from .command import Command, CompletedCommand
 
 
 class CommandExecutor:

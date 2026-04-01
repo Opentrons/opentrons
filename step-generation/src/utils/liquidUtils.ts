@@ -85,6 +85,19 @@ export const getVolumesPerLiquid = (
   return volumesPerLiquid
 }
 
+export const getLiquidIdsOnLabwareStack = (
+  wellContents: ContentsByWell[]
+): string[] => {
+  const allLiquidIdsOnLabware = wellContents.flatMap(contentsByWell =>
+    contentsByWell == null
+      ? []
+      : Object.values(contentsByWell).flatMap(contents =>
+          contents.groupIds.filter(group => group !== AIR)
+        )
+  )
+  return Array.from(new Set(allLiquidIdsOnLabware))
+}
+
 export const getLiquidIdsOnLabware = (
   wellContents: ContentsByWell
 ): string[] => {
@@ -120,12 +133,13 @@ const ingredIdsToColor = (
   displayColors: Record<string, string> // liquidGroupId -> color
 ): string | null | undefined => {
   const filteredIngredIds = groupIds.filter(id => id !== AIR)
-  if (filteredIngredIds.length === 0) return null
+  if (filteredIngredIds.length === 0) {
+    return null
+  }
 
   if (filteredIngredIds.length === 1) {
     return (
-      displayColors[Number(filteredIngredIds[0])] ??
-      swatchColors(filteredIngredIds[0])
+      displayColors[filteredIngredIds[0]] ?? swatchColors(filteredIngredIds[0])
     )
   }
 

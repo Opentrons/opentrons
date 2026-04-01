@@ -1,15 +1,16 @@
 # noqa: D100
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
-from .actions import (
-    Action,
-    ResumeFromRecoveryAction,
-    SucceedCommandAction,
-    FailCommandAction,
-)
 from ..commands.command import DefinedErrorData
 from ..error_recovery_policy import ErrorRecoveryType
+from .actions import (
+    Action,
+    FailCommandAction,
+    ResumeFromRecoveryAction,
+    SucceedCommandAction,
+)
 
 if TYPE_CHECKING:
     from ..state.update_types import StateUpdate

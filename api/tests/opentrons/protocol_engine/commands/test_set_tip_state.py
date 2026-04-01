@@ -1,14 +1,13 @@
 """Test setTipState command."""
+
 import pytest
-
 from decoy import Decoy
-
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.set_tip_state import (
+    SetTipStateImplementation,
     SetTipStateParams,
     SetTipStateResult,
-    SetTipStateImplementation,
 )
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView

@@ -6,11 +6,12 @@ a machine handy.
 
 """
 
-from argparse import ArgumentParser, FileType
-from fastapi.openapi.utils import get_openapi
 import json
-from io import TextIOBase
 import sys
+from argparse import ArgumentParser, FileType
+from io import TextIOBase
+
+from fastapi.openapi.utils import get_openapi
 
 from robot_server.app_setup import app
 from robot_server.versioning import API_VERSION

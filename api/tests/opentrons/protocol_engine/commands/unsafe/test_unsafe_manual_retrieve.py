@@ -8,44 +8,42 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from opentrons.hardware_control.modules import FlexStacker
-from opentrons.protocol_engine.resources import ModelUtils
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    BatchLabwareLocationUpdate,
-    AddressableAreaUsedUpdate,
-)
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.hardware_control.modules.types import PlatformState
 from opentrons.protocol_engine.commands import unsafe
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_manual_retrieve import (
     UnsafeFlexStackerManualRetrieveImpl,
 )
+from opentrons.protocol_engine.errors import CannotPerformModuleAction
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    AddressableAreaUsedUpdate,
+    BatchLabwareLocationUpdate,
+    FlexStackerStateUpdate,
+    StateUpdate,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    InStackerHopperLocation,
+    LabwareLocationSequence,
+    LabwareUri,
+    LoadedModule,
     ModuleLocation,
     ModuleModel,
-    LoadedModule,
-    OnModuleLocationSequenceComponent,
     OnAddressableAreaLocationSequenceComponent,
     OnCutoutFixtureLocationSequenceComponent,
-    LabwareLocationSequence,
     OnLabwareLocation,
     OnLabwareLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
     StackerStoredLabwareGroup,
-    InStackerHopperLocation,
-    LabwareUri,
 )
-from opentrons.protocol_engine.errors import CannotPerformModuleAction
 from opentrons.types import DeckSlotName
-
-from opentrons.hardware_control.modules.types import PlatformState
 
 
 def _contained_labware(
@@ -53,9 +51,9 @@ def _contained_labware(
 ) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
-            adapterLabwareId=None if not with_adapter else f"adapter-id-{i+1}",
-            lidLabwareId=None if not with_lid else f"lid-id-{i+1}",
+            primaryLabwareId=f"primary-id-{i + 1}",
+            adapterLabwareId=None if not with_adapter else f"adapter-id-{i + 1}",
+            lidLabwareId=None if not with_lid else f"lid-id-{i + 1}",
         )
         for i in range(count)
     ]

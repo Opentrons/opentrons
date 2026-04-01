@@ -1,16 +1,17 @@
-import sys
 import argparse
 import datetime
 import enum
+import sys
 
 sys.path.append("/opt/opentrons-robot-server")
 
-from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
-from opentrons.hardware_control.ot3api import OT3API  # noqa: E402
-from opentrons.hardware_control.types import Axis, OT3Mount  # noqa: E402
-from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
-from opentrons.types import Point  # noqa: E402
 from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
+
+from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
+from opentrons.hardware_control.ot3api import OT3API  # noqa: E402
+from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
+from opentrons.hardware_control.types import Axis, OT3Mount  # noqa: E402
+from opentrons.types import Point  # noqa: E402
 
 
 class InvalidInput(Exception):

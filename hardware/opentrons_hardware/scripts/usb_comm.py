@@ -1,19 +1,19 @@
 """A script for sending CAN messages."""
+
+import argparse
 import asyncio
 import dataclasses
 import logging
-import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Callable, TypeVar
+from typing import Callable, Sequence, Type, TypeVar
 
 from opentrons_hardware.drivers.binary_usb import build
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
-
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages import (
-    get_binary_definition,
     BinaryMessageDefinition,
+    get_binary_definition,
 )
 
 log = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ def prompt_payload(
     for f in payload_fields:
         try:
             if not f.name == "message_id":
-                i[f.name] = f.type.from_string(
+                i[f.name] = f.type.from_string(  # type: ignore[union-attr]
                     get_user_input(f"enter {f.name}: ").strip()
                 )
             else:
@@ -200,7 +200,7 @@ async def run_ui(driver: SerialUsbDriver) -> None:
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     async with build.usb_driver() as driver:
-        await (run_ui(driver))
+        await run_ui(driver)
 
 
 def in_red(s: str) -> str:

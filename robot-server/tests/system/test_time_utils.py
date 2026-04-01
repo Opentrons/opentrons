@@ -1,8 +1,10 @@
 """Tests for time utilities."""
-import pytest
-from mock import MagicMock, patch
+
 from datetime import datetime, timezone
 from typing import Any, Dict, Union
+
+import pytest
+from mock import MagicMock, patch
 
 from robot_server.system import errors, time_utils
 

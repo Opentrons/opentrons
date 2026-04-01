@@ -1,21 +1,21 @@
 """Test Thermocycler close lid command implementation."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.types import MotorAxis
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.close_lid import (
     CloseLidImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_close_lid(

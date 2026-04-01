@@ -1,31 +1,35 @@
 """Tests for RunController."""
+
+from datetime import datetime
 from typing import List
 
 import pytest
-from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import (
-    RunTimeParameter,
     BooleanParameter,
     CommandAnnotation,
     CommandPreconditions,
-    SecondOrderCommandAnnotation,
+    RunTimeParameter,
 )
 from opentrons.protocol_runner import RunResult
 
-from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
-from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
+from robot_server.service.notifications import MaintenanceRunsPublisher, RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 
 @pytest.fixture
@@ -100,10 +104,12 @@ def run_time_parameters() -> List[RunTimeParameter]:
 def command_annotations() -> List[CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        SecondOrderCommandAnnotation(
-            commandKeys=["abc"],
-            params={"abc": "123"},
-            machineReadableName="hello world",
+        CommandAnnotation(
+            id="annotation-id",
+            source="userCommand",
+            name="My command annotation",
+            description="This is a command annotation",
+            params={},
         )
     ]
 
@@ -227,6 +233,7 @@ async def test_create_play_action_to_start(
             run_id=run_id,
             summary=engine_state_summary,
             commands=protocol_commands,
+            command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         ),
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -357,8 +364,8 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
-    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)
-    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

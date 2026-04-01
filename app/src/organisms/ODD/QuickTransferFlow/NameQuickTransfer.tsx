@@ -6,11 +6,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
   StyledText,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -22,6 +22,8 @@ interface NameQuickTransferProps {
   onSave: (protocolName: string) => void
 }
 
+const MAX_CHARACTERS = 60
+
 export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const { onSave } = props
   const { t } = useTranslation('quick_transfer')
@@ -30,7 +32,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const [isSaving, setIsSaving] = useState<boolean>(false)
 
   let error: string | null = null
-  if (name.length > 60) {
+  if (name.length > MAX_CHARACTERS) {
     error = t('character_limit_error')
   }
 
@@ -62,10 +64,17 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
           gridGap={SPACING.spacing4}
           width="100%"
         >
-          <InputField
+          <TouchInputField
+            autoFocus
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setName(e.target.value as string)
+            }}
           />
           <StyledText
             oddStyle="bodyTextRegular"

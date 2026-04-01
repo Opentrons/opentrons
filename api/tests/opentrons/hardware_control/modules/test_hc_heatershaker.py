@@ -1,22 +1,22 @@
 import asyncio
 from typing import Any, AsyncGenerator
 
-from decoy import Decoy
 import pytest
+from decoy import Decoy
 
-from opentrons.hardware_control import modules, ExecutionManager, poller
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
+from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.hardware_control import ExecutionManager, modules, poller
 from opentrons.hardware_control.modules.heater_shaker import HeaterShakerReader
 from opentrons.hardware_control.modules.types import (
-    TemperatureStatus,
-    SpeedStatus,
     HeaterShakerStatus,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    SpeedStatus,
+    TemperatureStatus,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature, RPM
-from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.asyncio.communication.errors import UnhandledGcode, ErrorResponse
 
 
 @pytest.fixture
@@ -252,7 +252,7 @@ async def test_async_error_response(
 ) -> None:
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
     exc = Exception("Oh no, an asynchronous error!")
-    decoy.when(await mock_driver.get_error_state()).then_return(None)
+    decoy.when(await mock_driver.get_error_state()).then_return(None)  # type: ignore[func-returns-value]
     decoy.when(await mock_driver.get_rpm()).then_return(RPM(current=500, target=500))
     decoy.when(await mock_driver.get_labware_latch_status()).then_return(
         HeaterShakerLabwareLatchStatus.IDLE_OPEN
@@ -276,7 +276,7 @@ async def test_async_error_response(
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
     decoy.reset()
-    decoy.when(await mock_driver.get_error_state()).then_return(None)
+    decoy.when(await mock_driver.get_error_state()).then_return(None)  # type: ignore[func-returns-value]
     decoy.when(await mock_driver.get_temperature()).then_return(
         Temperature(current=50, target=50)
     )
@@ -298,7 +298,7 @@ async def test_reader_ignores_get_error_state_not_available(
     err = UnhandledGcode(
         "/dev/ot_module_sim_heatershaker0", "ERR:001:unhandled gcode", "M411"
     )
-    decoy.when(await mock_driver.get_error_state()).then_raise(err)
+    decoy.when(await mock_driver.get_error_state()).then_raise(err)  # type: ignore[func-returns-value]
     await reader_mocked_driver.read()
 
 
@@ -312,7 +312,7 @@ async def test_reader_raises_error_from_get_error(
     error_state_response = ErrorResponse(
         "/dev/ot_module_sim_heatershaker0", "ERR:666:you know what it is", "M411"
     )
-    decoy.when(await mock_driver.get_error_state()).then_raise(error_state_response)
+    decoy.when(await mock_driver.get_error_state()).then_raise(error_state_response)  # type: ignore[func-returns-value]
     with pytest.raises(ErrorResponse):
         await simulating_module_driver_patched._poller.wait_next_poll()
     decoy.verify(

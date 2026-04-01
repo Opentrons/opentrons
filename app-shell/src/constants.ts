@@ -225,6 +225,8 @@ export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
 export const STEP_DETAIL_VIEWER_OPEN = 'shell:STEP_DETAIL_VIEWER_OPEN' as const
 export const STEP_DETAIL_VIEWER_UPDATE =
   'shell:STEP_DETAIL_VIEWER_UPDATE' as const
+export const STEP_DETAIL_VIEWER_CLOSE =
+  'shell:STEP_DETAIL_VIEWER_CLOSE' as const
 
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'

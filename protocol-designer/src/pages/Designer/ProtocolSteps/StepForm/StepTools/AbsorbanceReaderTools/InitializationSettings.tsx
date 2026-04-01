@@ -16,7 +16,7 @@ import {
 
 import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '/protocol-designer/constants'
 
-import type { Initialization } from '/protocol-designer/step-forms/types'
+import type { Initialization } from '@opentrons/step-generation'
 
 const getWavelengthDisplay = (
   wavelength: number,

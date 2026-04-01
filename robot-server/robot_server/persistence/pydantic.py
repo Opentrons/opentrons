@@ -1,9 +1,9 @@
 """Store Pydantic objects in the SQL database."""
 
 import json
-from typing import Type, TypeVar, Sequence, overload
-from pydantic import BaseModel, TypeAdapter
+from typing import Sequence, Type, TypeVar, overload
 
+from pydantic import BaseModel, TypeAdapter
 
 _BaseModelT = TypeVar("_BaseModelT", bound=BaseModel)
 _TypeAdapterArgT = TypeVar("_TypeAdapterArgT")
@@ -27,15 +27,13 @@ def pydantic_list_to_json(obj_list: Sequence[BaseModel]) -> str:
 
 
 @overload
-def json_to_pydantic(model: Type[_BaseModelT], json_str: str) -> _BaseModelT:
-    ...
+def json_to_pydantic(model: Type[_BaseModelT], json_str: str) -> _BaseModelT: ...
 
 
 @overload
 def json_to_pydantic(
     model: TypeAdapter[_TypeAdapterArgT], json_str: str
-) -> _TypeAdapterArgT:
-    ...
+) -> _TypeAdapterArgT: ...
 
 
 def json_to_pydantic(

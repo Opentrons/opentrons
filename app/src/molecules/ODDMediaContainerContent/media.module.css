@@ -1,0 +1,31 @@
+.list_item_content_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-24);
+}
+
+.list_item_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-24);
+}
+
+.list_item_timestamp {
+  width: 15.625rem;
+}
+
+.list_item_step {
+  display: flex;
+  width: 27rem;
+  flex-direction: column;
+}
+
+.list_item_step_text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

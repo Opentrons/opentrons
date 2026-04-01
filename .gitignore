@@ -1,3 +1,8 @@
+# Local development scratch directories (protocols, custom labware, CSV inputs)
+tmp-protocols/
+tmp-custom-labware/
+tmp-csv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -96,10 +101,7 @@ api/tests/opentrons/data/labware-def/
 api/opentrons/config/*.json
 sample_protocol.py
 api/opentrons/server/endpoints/ignore.json
-labware-library/cypress/screenshots/
-labware-library/cypress/videos/
-protocol-designer/cypress/screenshots/
-protocol-designer/cypress/videos/
+
 protocol-designer/benchmarks/output
 
 # Local Calibration Data
@@ -148,6 +150,9 @@ mock_dir
 .npm-cache/
 .eslintcache
 
+# mise versions file
+mise.toml
+
 # include archived API docs
 !api/docs/dist/
 api/docs/dist/hardware/
@@ -155,3 +160,4 @@ api/docs/dist/v2/
 
 package-testing/results
 all_analysis_results/
+auth-server/.env

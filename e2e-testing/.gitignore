@@ -1,0 +1,37 @@
+# Test results and artifacts
+test-results/
+playwright-report/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# pytest cache
+.pytest_cache/
+
+# mypy cache
+.mypy_cache/
+
+# ruff cache
+.ruff_cache/
+
+# UV/venv
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+.env*
+!.env.example

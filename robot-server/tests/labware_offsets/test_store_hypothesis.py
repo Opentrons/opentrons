@@ -10,36 +10,36 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Sequence
 
-import pytest
 import hypothesis
-import hypothesis.strategies as st
 import hypothesis.stateful
+import hypothesis.strategies as st
+import pytest
 
 from opentrons.protocol_engine import (
     LabwareOffsetVector,
+    OnAddressableAreaOffsetLocationSequenceComponent,
     OnLabwareOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
 )
 from opentrons.protocol_engine.types import (
     LabwareOffsetLocationSequenceComponents,
     ModuleModel,
 )
-from robot_server.labware_offsets.store import (
-    LabwareOffsetStore,
-    LabwareOffsetNotFoundError,
-    IncomingStoredLabwareOffset,
-)
+from tests.conftest import make_sql_engine
+
 from robot_server.labware_offsets.models import (
     ANY_LOCATION,
+    DO_NOT_FILTER,
     AnyLocation,
     SearchFilter,
     StoredLabwareOffset,
-    DO_NOT_FILTER,
     StoredLabwareOffsetLocationSequenceComponents,
 )
-from tests.conftest import make_sql_engine
-
+from robot_server.labware_offsets.store import (
+    IncomingStoredLabwareOffset,
+    LabwareOffsetNotFoundError,
+    LabwareOffsetStore,
+)
 
 pytestmark = pytest.mark.slow
 

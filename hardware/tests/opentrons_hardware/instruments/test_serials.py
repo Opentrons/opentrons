@@ -1,10 +1,12 @@
 """Test serial setting."""
+
 import pytest
 from opentrons_shared_data.errors.exceptions import InvalidInstrumentData
-from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
-from opentrons_hardware.instruments.pipettes import serials as pip_serials
-from opentrons_hardware.instruments.gripper import serials as grip_serials
+
 from opentrons_hardware.firmware_bindings.constants import PipetteName
+from opentrons_hardware.instruments.gripper import serials as grip_serials
+from opentrons_hardware.instruments.pipettes import serials as pip_serials
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
 
 
 @pytest.mark.parametrize(

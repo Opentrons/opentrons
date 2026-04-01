@@ -1,35 +1,37 @@
 """Move to addressable area for drop tip command request, result, and implementation models."""
+
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
-from typing_extensions import Literal
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
 from ..errors import LocationNotAccessibleByPipetteError
-from ..types import AddressableOffsetVector
 from ..resources import fixture_validation
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .movement_common import (
-    MovementMixin,
-    DestinationPositionResult,
-    move_to_addressable_area,
-    StallOrCollisionError,
-)
+from ..types import AddressableOffsetVector
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
+)
+from .movement_common import (
+    DestinationPositionResult,
+    MovementMixin,
+    StallOrCollisionError,
+    move_to_addressable_area,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
 )
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..state.state import StateView
     from ..resources.model_utils import ModelUtils
+    from ..state.state import StateView
 
 MoveToAddressableAreaForDropTipCommandType = Literal["moveToAddressableAreaForDropTip"]
 
@@ -180,9 +182,9 @@ class MoveToAddressableAreaForDropTip(
     params: MoveToAddressableAreaForDropTipParams
     result: Optional[MoveToAddressableAreaForDropTipResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToAddressableAreaForDropTipImplementation] = (
         MoveToAddressableAreaForDropTipImplementation
-    ] = MoveToAddressableAreaForDropTipImplementation
+    )
 
 
 class MoveToAddressableAreaForDropTipCreate(

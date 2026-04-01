@@ -110,10 +110,10 @@ export function pythonDef(
     wasteChuteEntities,
     trashBinEntities,
   } = invariantContext
-  const { labware, pipettes } = initialRobotState
+  const { modules, labware, pipettes } = initialRobotState
   const sections: string[] = [
     getLoadAdapters(moduleEntities, labwareEntities, labware),
-    getLoadLabware(moduleEntities, labwareEntities, labware, {}),
+    getLoadLabware(modules, moduleEntities, labwareEntities, labware, {}),
     getLoadPipettes(pipetteEntities, pipettes),
     ...[
       getLoadTrashBins(trashBinEntities),

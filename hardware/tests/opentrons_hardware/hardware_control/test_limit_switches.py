@@ -1,7 +1,9 @@
 """Test the limit switches submodule."""
-import pytest
+
 import asyncio
-from typing import List, Callable
+from typing import Callable, List
+
+import pytest
 from mock import AsyncMock
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -10,13 +12,12 @@ from opentrons_hardware.firmware_bindings import (
     ArbitrationIdParts,
     utils,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
     message_definitions,
     payloads,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
-
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 
 

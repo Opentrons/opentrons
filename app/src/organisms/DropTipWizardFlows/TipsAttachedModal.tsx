@@ -45,6 +45,8 @@ const TipsAttachedModal = NiceModal.create(
     const modal = useModal()
 
     const { mount, specs } = aPipetteWithTip
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
@@ -81,7 +83,7 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="liquid_damages_this_pipette"

@@ -1,27 +1,28 @@
-import pytest
-from mock import AsyncMock, MagicMock
 from datetime import datetime
-from decoy import matchers
 
+import pytest
+from decoy import matchers
+from mock import AsyncMock, MagicMock
+
+from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
+from robot_server.robot.calibration.helper_classes import AttachedPipette
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
+from robot_server.service.session import router
 from robot_server.service.session.errors import (
+    CommandExecutionException,
     SessionCreationException,
     UnsupportedCommandException,
-    CommandExecutionException,
 )
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.session.models.command import (
+    CommandStatus,
     SimpleCommandRequest,
     SimpleCommandResponse,
-    CommandStatus,
 )
-from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.models.command_definitions import ProtocolCommand
-from robot_server.service.session import router
+from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types import BaseSession
-from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
-from robot_server.robot.calibration.helper_classes import AttachedPipette
 
 
 @pytest.fixture

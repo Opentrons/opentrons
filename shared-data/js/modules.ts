@@ -8,6 +8,7 @@ import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.jso
 import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
 import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
 import thermocyclerModuleV2 from '../module/definitions/3/thermocyclerModuleV2.json'
+import vacuumModuleV1 from '../module/definitions/3/vacuumModuleV1.json'
 import {
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_V1,
@@ -22,6 +23,7 @@ import {
   THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_V1,
 } from './constants'
 
 import type {
@@ -64,6 +66,9 @@ export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
 
     case FLEX_STACKER_MODULE_V1:
       return flexStackerModuleV1 as unknown as ModuleDefinition
+
+    case VACUUM_MODULE_V1:
+      return vacuumModuleV1 as unknown as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)

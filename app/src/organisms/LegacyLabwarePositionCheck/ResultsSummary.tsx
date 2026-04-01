@@ -259,7 +259,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
             <TableRow key={index}>
               <LeftRoundedTableDatum>
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   {getDisplayLocation(
@@ -271,7 +271,9 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 </LegacyStyledText>
               </LeftRoundedTableDatum>
               <TableDatum>
-                <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
+                <LegacyStyledText forwardedAs="p">
+                  {labwareDisplayName}
+                </LegacyStyledText>
               </TableDatum>
               <RightRoundedTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
@@ -281,14 +283,14 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <Fragment key={index}>
                         <LegacyStyledText
-                          as="p"
+                          forwardedAs="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
                         </LegacyStyledText>
-                        <LegacyStyledText as="p">
+                        <LegacyStyledText forwardedAs="p">
                           {axis.toFixed(1)}
                         </LegacyStyledText>
                       </Fragment>

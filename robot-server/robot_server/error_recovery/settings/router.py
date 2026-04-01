@@ -1,15 +1,20 @@
 """FastAPI endpoint functions to implement `/errorRecovery/settings`."""
 
-
 from typing import Annotated
 
 import fastapi
-from server_utils.fastapi_utils.light_router import LightRouter
 
-from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
+
 from .models import RequestData, ResponseData
 from .store import ErrorRecoverySettingStore, get_error_recovery_setting_store
-
 
 router = LightRouter()
 _PATH = "/errorRecovery/settings"
@@ -23,7 +28,7 @@ _PATH = "/errorRecovery/settings"
 async def get_error_recovery_settings(  # noqa: D103
     store: Annotated[
         ErrorRecoverySettingStore, fastapi.Depends(get_error_recovery_setting_store)
-    ]
+    ],
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
     return await _get_current_response(store)
 
@@ -32,6 +37,7 @@ async def get_error_recovery_settings(  # noqa: D103
     router.patch,
     path=_PATH,
     summary="Set error recovery settings",
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def patch_error_recovery_settings(  # noqa: D103
     request_body: RequestModel[RequestData],
@@ -48,6 +54,7 @@ async def patch_error_recovery_settings(  # noqa: D103
     router.delete,
     path=_PATH,
     summary="Reset error recovery settings to defaults",
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_error_recovery_settings(  # noqa: D103
     store: Annotated[

@@ -183,7 +183,11 @@ function RobotUpdateProgressFooter({
   const { t } = useTranslation('device_settings')
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_FLEX_END}
+      padding={`${SPACING.spacing16} 0`}
+    >
       <NewPrimaryBtn
         onClick={closeUpdateBuildroot}
         marginRight={SPACING.spacing12}
@@ -210,7 +214,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   else
     renderedImg = (
       <Icon
-        name="alert-circle"
+        name="ot-alert"
         height="40px"
         color={COLORS.red50}
         margin={SPACING.spacing24}
@@ -298,17 +302,26 @@ function useStatusBarAnimation(isError: boolean): void {
     }
   }
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(startUpdatingAnimation, [])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(startIdleAnimationIfFailed, [isError])
 }
 
 function useCleanupRobotUpdateSessionOnDismount(): void {
   const dispatch = useDispatch()
-  useEffect(() => {
-    return () => {
-      dispatch(clearRobotUpdateSession())
-    }
-  }, [])
+  useEffect(
+    () => {
+      return () => {
+        dispatch(clearRobotUpdateSession())
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 }
 
 function useGetModalText(

@@ -19,30 +19,25 @@ export interface CalibrateModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/calibrateModule'
   params: CalibrateModuleParams
 }
-export interface MoveToMaintenancePositionCreateCommand
-  extends CommonCommandCreateInfo {
+export interface MoveToMaintenancePositionCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/moveToMaintenancePosition'
   params: MoveToMaintenancePositionParams
 }
 
 export interface CalibratePipetteRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    CalibratePipetteCreateCommand {
+  extends CommonCommandRunTimeInfo, CalibratePipetteCreateCommand {
   result?: CalibratePipetteResult
 }
 export interface CalibrateGripperRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    CalibrateGripperCreateCommand {
+  extends CommonCommandRunTimeInfo, CalibrateGripperCreateCommand {
   result?: CalibrateGripperResult
 }
 export interface CalibrateModuleRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    CalibrateModuleCreateCommand {
+  extends CommonCommandRunTimeInfo, CalibrateModuleCreateCommand {
   result?: CalibrateModuleResult
 }
 export interface MoveToMaintenancePositionRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MoveToMaintenancePositionCreateCommand {
+  extends CommonCommandRunTimeInfo, MoveToMaintenancePositionCreateCommand {
   result?: {}
 }
 

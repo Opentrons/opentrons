@@ -25,6 +25,7 @@ import type { Middleware } from 'redux'
 import type {
   ConsolidateArgs,
   DistributeArgs,
+  FlexStackerFillItemsArgs,
   MixArgs,
   NormalizedPipetteById,
   TransferArgs,
@@ -35,6 +36,7 @@ import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalE
 import type { CreatePipettesAction } from '../step-forms/actions'
 import type { StepArgsAndErrors } from '../steplist'
 import type { BaseState } from '../types'
+import type { DuplicateSelectedStepsAction } from '../ui/steps'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -72,7 +74,7 @@ export const reduxActionToAnalyticsEvent = (
     const a: SaveStepFormAction = action
 
     const argsAndErrors: StepArgsAndErrors =
-      getArgsAndErrorsByStepId(state)[a.payload.id]
+      getArgsAndErrorsByStepId(state)[a.payload.form.id]
 
     const { stepArgs } = argsAndErrors
 
@@ -199,11 +201,12 @@ export const reduxActionToAnalyticsEvent = (
               dispenseFlowRate:
                 stepArgModified.dispenseFlowRateUlSec ?? DEFAULT_VALUE,
               blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
+              // TODO: Include positionReference in Mixpanel as well.
+              // TODO: Rename offsetFromBottomMm -> zOffset in Mixpanel to be consistent with our internal variable names.
               offsetFromBottomMm:
-                stepArgModified.offsetFromBottomMm ===
-                DEFAULT_MM_OFFSET_FROM_BOTTOM
+                stepArgModified.zOffset === DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
-                  : stepArgModified.offsetFromBottomMm,
+                  : stepArgModified.zOffset,
               xOffset:
                 stepArgModified.xOffset === 0
                   ? DEFAULT_VALUE
@@ -216,6 +219,29 @@ export const reduxActionToAnalyticsEvent = (
             },
           }
         }
+        case 'flexStackerEmpty':
+          return {
+            name: 'flexStackerEmptyStep',
+            properties: {},
+          }
+        case 'flexStackerRetrieve':
+          return {
+            name: 'flexStackerRetrieveStep',
+            properties: {},
+          }
+        case 'flexStackerFillItems':
+          const args = stepArgs as FlexStackerFillItemsArgs
+          return {
+            name: 'flexStackerFillItemsStep',
+            properties: {
+              labwareUri: args.fillLabwareUri,
+            },
+          }
+        case 'flexStackerStore':
+          return {
+            name: 'flexStackerStoreStep',
+            properties: {},
+          }
         default:
           return {
             name: `${modifiedStepName}Step`,
@@ -296,10 +322,13 @@ export const reduxActionToAnalyticsEvent = (
       properties: {},
     }
   }
-  if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
-    return {
-      name: 'duplicateMultipleSteps',
-      properties: {},
+  if (action.type === 'DUPLICATE_SELECTED_STEPS') {
+    const a: DuplicateSelectedStepsAction = action
+    if (a.payload.steps.length > 1) {
+      return {
+        name: 'duplicateMultipleSteps',
+        properties: {},
+      }
     }
   }
   if (action.type === 'LOAD_FILE') {

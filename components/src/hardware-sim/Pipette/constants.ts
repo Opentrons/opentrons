@@ -8,3 +8,7 @@ export const NINETY_SIX_CHANNEL_PIPETTE_WIDTH = 117.7
 
 export const MULTI_CHANNEL_CENTER_Y_NOZZLE = 13.3
 export const MULTI_CHANNEL_Y_OFFSET = -2.5
+
+export const NOZZLE_SIZE_MM = '8'
+export const NOZZLE_DIAMETER = 20
+export const NOZZLE_POSITION_IN_RENDER = 5

@@ -1,4 +1,5 @@
 """Common heatershaker base models."""
+
 from opentrons.protocol_engine.state.module_substates.heater_shaker_module_substate import (
     HeaterShakerModuleSubState,
 )

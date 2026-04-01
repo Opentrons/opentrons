@@ -1,10 +1,9 @@
 import pytest
 import typeguard
 
+from . import list_v2_defs, list_v3_defs
 from opentrons_shared_data import module
 from opentrons_shared_data.module import types
-
-from . import list_v2_defs, list_v3_defs
 
 
 @pytest.mark.parametrize("defname", list_v3_defs())

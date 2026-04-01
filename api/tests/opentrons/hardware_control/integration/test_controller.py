@@ -1,9 +1,10 @@
 from typing import AsyncGenerator, Iterator
+
 import pytest
 
-from opentrons.config.types import RobotConfig
 from opentrons import _find_smoothie_file
 from opentrons.config.robot_configs import build_config
+from opentrons.config.types import RobotConfig
 from opentrons.hardware_control import Controller
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.types import Mount

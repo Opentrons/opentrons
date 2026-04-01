@@ -31,6 +31,7 @@ import {
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
+  LabwareDef2ByDefURI,
   LabwareDefinition2,
   PipetteV2Specs,
   ProtocolFile,
@@ -71,8 +72,16 @@ const getClippedFlowRateForMoveLiquid = (args: {
   flowRateType: 'aspirate' | 'dispense' | 'blowout'
   robotType: RobotType
   pipetteSpecs: PipetteV2Specs | null
+  allLabwareDefsByURI: LabwareDef2ByDefURI
 }): number | null => {
-  const { formData, rawFlowRate, flowRateType, robotType, pipetteSpecs } = args
+  const {
+    formData,
+    rawFlowRate,
+    flowRateType,
+    robotType,
+    pipetteSpecs,
+    allLabwareDefsByURI,
+  } = args
   if (pipetteSpecs == null) {
     console.warn('No pipette specs found. Using old flow rate.')
     return null
@@ -87,8 +96,7 @@ const getClippedFlowRateForMoveLiquid = (args: {
   const tipLiquidSpecs = liquidClass?.byPipette
     .find(byPipette => byPipette.pipetteModel === pipetteName)
     ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
-  // TODO: this won't find the definition for a custom tiprack
-  const tiprackDef = getAllDefinitions()[tiprack]
+  const tiprackDef = allLabwareDefsByURI[tiprack]
   console.assert(
     tiprackDef != null,
     `could not find labware definition for ${tiprack}`
@@ -308,6 +316,7 @@ export const migrateFile = (
         flowRateType: 'aspirate',
         robotType,
         pipetteSpecs,
+        allLabwareDefsByURI,
       })
 
       const migratedDispenseFlowRate = getClippedFlowRateForMoveLiquid({
@@ -316,6 +325,7 @@ export const migrateFile = (
         flowRateType: 'dispense',
         robotType,
         pipetteSpecs,
+        allLabwareDefsByURI,
       })
 
       const migratedClippedBlowoutFlowRate = getClippedFlowRateForMoveLiquid({
@@ -328,6 +338,7 @@ export const migrateFile = (
         flowRateType: 'blowout',
         robotType,
         pipetteSpecs,
+        allLabwareDefsByURI,
       })
 
       return {
@@ -472,6 +483,7 @@ export const migrateFile = (
           flowRateType: 'aspirate',
           robotType,
           pipetteSpecs,
+          allLabwareDefsByURI,
         })
 
         const migratedDispenseFlowRate = getClippedFlowRateForMoveLiquid({
@@ -480,6 +492,7 @@ export const migrateFile = (
           flowRateType: 'dispense',
           robotType,
           pipetteSpecs,
+          allLabwareDefsByURI,
         })
 
         const migratedClippedBlowoutFlowRate = getClippedFlowRateForMoveLiquid({
@@ -492,6 +505,7 @@ export const migrateFile = (
           flowRateType: 'blowout',
           robotType,
           pipetteSpecs,
+          allLabwareDefsByURI,
         })
 
         return {

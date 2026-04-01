@@ -1,8 +1,8 @@
 """Tests for opentrons.protocol_reader.file_hasher."""
 
 from opentrons.protocol_reader import (
-    FileHasher,
     BufferedFile,
+    FileHasher,
 )
 
 

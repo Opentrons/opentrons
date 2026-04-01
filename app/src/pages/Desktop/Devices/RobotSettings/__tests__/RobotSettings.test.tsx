@@ -10,7 +10,6 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -27,7 +26,6 @@ vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/config')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -54,7 +52,6 @@ describe('RobotSettings', () => {
     when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn(mockConnectableRobot)
-    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
     vi.mocked(RobotSettingsCalibration).mockReturnValue(
       <div>Mock RobotSettingsCalibration</div>
     )

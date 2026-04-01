@@ -1,19 +1,21 @@
 """Load liquid command request, result, and implementation models."""
+
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict, Optional, Type
+
 from pydantic import BaseModel, Field
-from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
 
+from ..errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.protocol_engine.errors import InvalidLiquidError
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import LiquidId
-from opentrons.protocol_engine.errors import InvalidLiquidError
-
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 LoadLiquidCommandType = Literal["loadLiquid"]
 

@@ -10,7 +10,6 @@ import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import type {
-  HostConfig,
   Mount,
   PipetteData,
   Run,
@@ -76,9 +75,9 @@ export function useTipAttachmentStatus(
 
   const determineTipStatus = useCallback((): Promise<PipetteWithTip[]> => {
     return Promise.all([
-      getInstruments(host as HostConfig),
-      getRunCurrentState(host as HostConfig, runId),
-      getCommands(host as HostConfig, runId, {
+      getInstruments(host!),
+      getRunCurrentState(host!, runId),
+      getCommands(host!, runId, {
         includeFixitCommands: false,
         pageLength: 1,
       }),
@@ -92,7 +91,6 @@ export function useTipAttachmentStatus(
 
         const pipetteInfoById = createPipetteInfoById(runRecord, pipetteInfo)
         const pipettesWithTipsData = getPipettesWithTipsData(
-          // eslint-disable-next-line
           tipStates,
           pipetteInfoById,
           commandsData.data.data as RunCommandSummary[]

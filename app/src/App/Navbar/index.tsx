@@ -23,6 +23,8 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedNavigate = useCallback(
     debounce((path: string) => {
       navigate(path)
@@ -41,12 +43,12 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavLink
             key={name}
-            to={navLinkTo as string}
+            to={navLinkTo!}
             className={({ isActive }) =>
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }
           >
-            <LegacyStyledText as="h3" className={styles.nav_link_text}>
+            <LegacyStyledText forwardedAs="h3" className={styles.nav_link_text}>
               {t(name)}
             </LegacyStyledText>
           </NavLink>
@@ -57,7 +59,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           role="button"
           data-testid="Navbar_settingsLink"
           className={styles.nav_icon_link}
-          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
             debouncedNavigate('/app-settings')
           }}

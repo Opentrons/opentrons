@@ -309,7 +309,7 @@ export function FeatureFlagToggle({
         >
           {title}
         </LegacyStyledText>
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
       </Box>
       <ToggleButton
         label={title}

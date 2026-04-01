@@ -1,6 +1,7 @@
 """Generates a UUID in the persistence directory."""
-from uuid import UUID, uuid4
+
 from pathlib import Path
+from uuid import UUID, uuid4
 
 
 async def get_system_uuid(path: Path) -> UUID:

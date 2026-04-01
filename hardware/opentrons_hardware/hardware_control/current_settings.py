@@ -1,16 +1,17 @@
 """Utilities for updating the current settings on the OT3."""
-from typing import Tuple, Union, Type
+
 import logging
+from typing import Tuple, Type, Union
+
+from .types import NodeList, NodeMap
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.constants import ErrorCode, NodeId
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    WriteMotorCurrentRequest,
     GearWriteMotorCurrentRequest,
+    WriteMotorCurrentRequest,
 )
-from opentrons_hardware.firmware_bindings.constants import ErrorCode, NodeId
 from opentrons_hardware.firmware_bindings.utils import UInt32Field
-from .types import NodeMap, NodeList
-
 
 CompleteCurrentSettings = NodeMap[Tuple[float, float]]
 PartialCurrentSettings = NodeMap[float]

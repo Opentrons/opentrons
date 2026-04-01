@@ -1,21 +1,21 @@
 # opentrons api makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 
-# python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+# python and uv config
+sphinx_build := $(UV) run --python $(UV_PYTHON) sphinx-build -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(pipenv) run sphinx-build
+sphinx_build_allow_warnings := $(UV) run --python $(UV_PYTHON) sphinx-build
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -61,19 +61,30 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
+files_to_typecheck := src tests integration_testing
+files_to_lint := src tests integration_testing docs/v2/example_protocols
+files_to_format := src tests integration_testing docs/v2/example_protocols
+
 .PHONY: all
 all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
+
+.PHONY: setup-py
+setup-py: setup
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
+
+.PHONY: lock
+lock:
+	$(UV) lock
 
 .PHONY: clean
 clean: docs-clean
@@ -82,7 +93,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -126,13 +137,14 @@ test-ot2:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src tests integration_testing
-	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
-	$(python) -m flake8 src tests integration_testing
+	$(python) -m mypy $(files_to_typecheck)
+	$(ruff) check $(files_to_lint)
+	$(ruff) format --check $(files_to_format)
 
 .PHONY: format
 format:
-	$(python) -m black src tests integration_testing docs/v2/example_protocols
+	$(ruff) format $(files_to_format)
+	$(ruff) check --select I --fix $(files_to_format)
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -158,7 +170,7 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/v2 docs/dist/hardware
+docs: docs/dist/hardware
 
 .PHONY: docs-clean
 docs-clean:
@@ -171,7 +183,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(UV) run --python $(UV_PYTHON) bash
 
 .PHONY: push-no-restart
 push-no-restart: wheel

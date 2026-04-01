@@ -1,0 +1,1 @@
+export { PipetteLabel } from './PipetteLabel'

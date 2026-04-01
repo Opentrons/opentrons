@@ -1,9 +1,10 @@
 """Interface for interacting with JWT's."""
-import jwt
+
 import logging
-from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+
+import jwt
 
 _log = logging.getLogger(__name__)
 
@@ -55,8 +56,8 @@ def create_jwt(
     duration: timedelta,
     registrant: Registrant,
     audience: str,
-    now: Optional[datetime] = None,
-    id: Optional[str] = None,
+    now: datetime | None = None,
+    id: str | None = None,
 ) -> str:
     """Generate a signed JWT with the specified parameters.
 

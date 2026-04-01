@@ -1,14 +1,17 @@
 """Drivers for SOM gpio pins."""
-from typing import Any, Optional
-from typing_extensions import Final
-from unittest import mock
+
 from logging import getLogger
 from time import sleep
+from typing import Any, Optional
+from unittest import mock
+
+from typing_extensions import Final
+
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     EngageEstop,
-    ReleaseEstop,
     EngageSyncOut,
+    ReleaseEstop,
     ReleaseSyncOut,
 )
 

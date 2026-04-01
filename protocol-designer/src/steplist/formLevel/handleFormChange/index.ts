@@ -1,4 +1,5 @@
 import { dependentFieldsUpdateAbsorbanceReader } from './dependentFieldsUpdateAbsorbanceReader'
+import { dependentFieldsUpdateFlexStacker } from './dependentFieldsUpdateFlexStacker'
 import { dependentFieldsUpdateHeaterShaker } from './dependentFieldsUpdateHeaterShaker'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
 import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
@@ -6,6 +7,7 @@ import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiqu
 import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
 import { dependentFieldsUpdateThermocycler } from './dependentFieldsUpdateThermocycler'
+import { dependentFieldsUpdateVacuum } from './dependentFieldsUpdateVacuum'
 
 import type {
   LabwareEntities,
@@ -70,7 +72,13 @@ export function handleFormChange(
     )
     return { ...patch, ...dependentFieldsPatch }
   }
-
+  if (rawForm.stepType === 'flexStacker') {
+    const dependentFieldsPatch = dependentFieldsUpdateFlexStacker(
+      patch,
+      rawForm
+    )
+    return { ...patch, ...dependentFieldsPatch }
+  }
   if (rawForm.stepType === 'pause') {
     const dependentFieldsPatch = dependentFieldsUpdatePause(patch, rawForm)
     return { ...patch, ...dependentFieldsPatch }
@@ -83,6 +91,9 @@ export function handleFormChange(
     )
     return { ...patch, ...dependentFieldsPatch }
   }
-
+  if (rawForm.stepType === 'vacuum') {
+    const dependentFieldsPatch = dependentFieldsUpdateVacuum(patch, rawForm)
+    return { ...patch, ...dependentFieldsPatch }
+  }
   return patch
 }

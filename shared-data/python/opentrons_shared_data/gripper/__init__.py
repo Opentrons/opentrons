@@ -1,17 +1,19 @@
 """opentrons_shared_data.gripper: functions and types for gripper config."""
-from typing import cast, Any
-from typing_extensions import Literal
+
 import json
 from pathlib import Path
+from typing import Any, cast
+
+from typing_extensions import Literal
 
 from .. import load_shared_data
 from .gripper_definition import (
+    Geometry,
+    GripForceProfile,
     GripperDefinition,
+    GripperModel,
     GripperSchema,
     GripperSchemaVersion,
-    GripForceProfile,
-    GripperModel,
-    Geometry,
 )
 
 

@@ -1,11 +1,13 @@
 """Tests for eeprom."""
+
 import asyncio
 from typing import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
 
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
 from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromEEPromRequest,
@@ -17,8 +19,6 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     EEPromReadPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
-
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 @pytest.fixture(

@@ -2,7 +2,7 @@
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import styles from './Splash.module.css'
+import styles from './splash.module.css'
 
 import type { IconName } from '../icons'
 

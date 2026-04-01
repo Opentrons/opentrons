@@ -4,13 +4,13 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 import {
   mockPausedRun,
@@ -82,9 +82,17 @@ describe('useCurrentRunStatus hook', () => {
   })
 
   it('returns the run status of the current run', async () => {
-    when(useRunStatus).calledWith(RUN_ID_2).thenReturn('running')
-    const { result } = renderHook(useCurrentRunStatus)
-    expect(result.current).toBe('running')
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID_2, expect.any(Object))
+      .thenReturn({
+        data: {
+          data: {
+            ...mockRunningRun,
+          },
+        },
+      } as unknown as UseQueryResult<Run>)
+    const { result } = renderHook(() => useCurrentRunStatus({}))
+    expect(result.current).toBe(RUN_STATUS_RUNNING)
   })
 })
 

@@ -1,6 +1,7 @@
-from system_server.persistence.system_uuid import get_system_uuid
 from pathlib import Path
 from uuid import UUID, uuid4
+
+from system_server.persistence.system_uuid import get_system_uuid
 
 
 async def test_get_new_uuid(tmpdir: Path) -> None:

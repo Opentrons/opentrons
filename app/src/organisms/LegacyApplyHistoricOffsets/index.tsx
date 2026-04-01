@@ -102,7 +102,7 @@ export function LegacyApplyHistoricOffsets(
         label={
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {t(noOffsetData ? 'legacy_no_offset_data' : 'apply_offset_data')}
             </LegacyStyledText>
           </Flex>
@@ -148,14 +148,14 @@ export function LegacyApplyHistoricOffsets(
                     components={{
                       block: (
                         <LegacyStyledText
-                          as="p"
+                          forwardedAs="p"
                           marginBottom={SPACING.spacing8}
                         />
                       ),
                     }}
                   />
                 ) : (
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {t('robot_has_offsets_from_previous_runs')}
                   </LegacyStyledText>
                 )}

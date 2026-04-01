@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1193,6 +1195,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2369,6 +2372,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3562,6 +3566,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3670,6 +3675,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3931,6 +3937,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3949,6 +3956,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3967,6 +3975,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3985,6 +3994,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4004,6 +4014,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4037,6 +4048,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4051,6 +4063,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4065,6 +4078,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4122,7 +4136,7 @@
           "errorInfo": {
             "args": "('Cannot aspirate/dispense to a tip rack',)",
             "class": "ValueError",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_20_P50_LPD_wet_tip_scenarios.py\", line N, in run\n\n  File \"<PATH>\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in air_gap\n    self.aspirate(volume)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in aspirate\n    instrument.validate_takes_liquid(\n\n  File \"<PATH>\", line N, in validate_takes_liquid\n    raise ValueError(\"Cannot aspirate/dispense to a tip rack\")\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_20_P50_LPD_wet_tip_scenarios.py\", line N, in run\n\n  File \"<PATH>\", line N, in _decorated\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in air_gap\n    self.aspirate(volume)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in aspirate\n    instrument.validate_takes_liquid(\n\n  File \"<PATH>\", line N, in validate_takes_liquid\n    raise ValueError(\"Cannot aspirate/dispense to a tip rack\")\n"
           },
           "errorType": "PythonException",
           "id": "UUID",
@@ -4175,6 +4189,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [
     {

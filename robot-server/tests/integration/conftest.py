@@ -3,22 +3,22 @@ import contextlib
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Generator
-from datetime import datetime
+from typing import Any, Callable, Dict, Generator
 
 import pytest
 import requests
 
-from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
+from opentrons.calibration_storage.ot2 import (
+    clear_pipette_offset_calibrations,
+    clear_tip_length_calibration,
+)
 
 from .dev_server import DevServer
 from .robot_client import RobotClient
-
+from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"
-_OT2_SESSION_SERVER_PORT = "31950"
-_OT3_SESSION_SERVER_PORT = "31960"
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
@@ -36,8 +36,8 @@ def pytest_tavern_beta_before_every_test_run(
 def pytest_tavern_beta_after_every_response(
     expected: Any, response: requests.Response
 ) -> None:
-    print(response.url)
-    print(json.dumps(response.json(), indent=4))
+    print(response.url)  # noqa: T201
+    print(json.dumps(response.json(), indent=4))  # noqa: T201
 
 
 @pytest.fixture
@@ -60,12 +60,16 @@ def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None]:
-    base_url = (
-        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT2_SESSION_SERVER_PORT}"
-    )
+def _ot2_session_server(
+    server_temp_directory: str,
+    # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
+    # error, since it's function-scoped and we're session-scoped.
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    port = unused_tcp_port_factory()
+    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
-        port=_OT2_SESSION_SERVER_PORT,
+        port=str(port),
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
         dev_server.start()
@@ -74,12 +78,16 @@ def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None
 
 
 @pytest.fixture(scope="session")
-def _ot3_session_server(server_temp_directory: str) -> Generator[str, None, None]:
-    base_url = (
-        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
-    )
+def _ot3_session_server(
+    server_temp_directory: str,
+    # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
+    # error, since it's function-scoped and we're session-scoped.
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    port = unused_tcp_port_factory()
+    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
-        port=_OT3_SESSION_SERVER_PORT,
+        port=str(port),
         is_ot3=True,
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
@@ -97,10 +105,10 @@ def _requests_session() -> Generator[requests.Session, None, None]:
 
 def _wait_until_ready(base_url: str) -> None:
     with _requests_session() as requests_session:
-        started = datetime.now()
+        started = time.monotonic()
         while True:
-            now = datetime.now()
-            if (now - started).total_seconds() > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
+            now = time.monotonic()
+            if now - started > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
                 raise RuntimeError("Could not start dev server")
             try:
                 health_response = requests_session.get(f"{base_url}/health")
@@ -183,3 +191,9 @@ async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
 
 async def _delete_labware_offsets(robot_client: RobotClient) -> None:
     await robot_client.delete_all_labware_offsets()
+
+
+@pytest.fixture
+def clean_ot2_calibrations(server_temp_directory: str) -> None:
+    clear_tip_length_calibration()
+    clear_pipette_offset_calibrations()

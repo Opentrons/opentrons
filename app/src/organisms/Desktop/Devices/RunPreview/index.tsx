@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList } from 'react-viewport-list'
 import { css } from 'styled-components'
 
-import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -25,18 +24,18 @@ import {
 
 import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { CommandIcon } from '/app/molecules/Command'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
-import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
@@ -56,12 +55,11 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runStatus = useRunStatus(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId)
-  const isRunTerminal =
-    runStatus != null
-      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
-      : false
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
+  const isRunTerminal = isTerminalRunStatus(runStatus)
   // we only ever want one request done for terminal runs because this is a heavy request
   const {
     data: commandsFromQueryResponse,
@@ -87,6 +85,8 @@ export const RunPreviewComponent = (
       robotSideAnalysis != null
         ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
   )
 
@@ -140,14 +140,17 @@ export const RunPreviewComponent = (
     >
       <>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('run_preview')}
           </LegacyStyledText>
-          <LegacyStyledText as="label" color={COLORS.grey50}>
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('steps_total', { count: commands.length })}
           </LegacyStyledText>
         </Flex>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
         </LegacyStyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
@@ -230,7 +233,7 @@ export const RunPreviewComponent = (
           </PrimaryButton>
         ) : null}
         {currentRunCommandIndex === commands.length - 1 ? (
-          <LegacyStyledText as="h6" color={COLORS.grey60}>
+          <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
             {t('end_of_protocol')}
           </LegacyStyledText>
         ) : null}

@@ -2,28 +2,33 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, Mapping, Callable
+from typing import Callable, Mapping, Optional
+
 from typing_extensions import Final
 
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
-from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
+from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
+from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
+    HeaterShakerData,
+    HeaterShakerStatus,
+    LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     ModuleType,
-    TemperatureStatus,
     SpeedStatus,
-    HeaterShakerStatus,
+    TemperatureStatus,
     UploadFunction,
-    LiveData,
-    HeaterShakerData,
+)
+from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
 )
 
 log = logging.getLogger(__name__)
@@ -137,6 +142,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     def _handle_error(self, error: Exception) -> None:
         self.error_callback(error)
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Stop the poller task"""
         self._unsubscribe_reader()

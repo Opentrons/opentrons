@@ -1,25 +1,33 @@
 """ProtocolEngine-based Labware core implementations."""
 
-from typing import List, Optional, cast, Dict
+from __future__ import annotations
 
-from opentrons_shared_data.labware.types import (
-    LabwareParameters2 as LabwareParameters2Dict,
-    LabwareParameters3 as LabwareParameters3Dict,
-    LabwareDefinition as LabwareDefinitionDict,
-)
+from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareRole,
     LabwareDefinition,
+    LabwareRole,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition as LabwareDefinitionDict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareParameters2 as LabwareParameters2Dict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareParameters3 as LabwareParameters3Dict,
 )
 
+from ..._liquid import Liquid
+from ..labware import AbstractLabware, LabwareLoadParams
+from .well import WellCore
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotOnDeckError,
-    ModuleNotOnDeckError,
     LocationIsStagingSlotError,
+    ModuleNotOnDeckError,
 )
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
     LabwareOffsetVector,
@@ -27,12 +35,8 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import DeckSlotName, NozzleMapInterface, Point, StagingSlotName
 
-
-from ..._liquid import Liquid
-from ..labware import AbstractLabware, LabwareLoadParams
-
-from .well import WellCore
-
+if TYPE_CHECKING:
+    from .protocol import ProtocolCore
 
 _LabwareParametersDict = LabwareParameters2Dict | LabwareParameters3Dict
 
@@ -45,9 +49,15 @@ class LabwareCore(AbstractLabware[WellCore]):
         engine_client: ProtocolEngine synchronous client.
     """
 
-    def __init__(self, labware_id: str, engine_client: ProtocolEngineClient) -> None:
+    def __init__(
+        self,
+        labware_id: str,
+        engine_client: ProtocolEngineClient,
+        protocol_core: ProtocolCore,
+    ) -> None:
         self._labware_id = labware_id
         self._engine_client = engine_client
+        self._protocol_core = protocol_core
 
         labware_state = engine_client.state.labware
         self._definition = labware_state.get_definition(labware_id)
@@ -137,7 +147,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         self._engine_client.execute_command(
             cmd.ReloadLabwareParams(
                 labwareId=self._labware_id,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def get_calibrated_offset(self) -> Point:
@@ -171,7 +182,21 @@ class LabwareCore(AbstractLabware[WellCore]):
                     labwareId=self._labware_id,
                     wellNames=list(self._definition.wells),
                     tipWellState=TipRackWellState.CLEAN,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
+            )
+        else:
+            raise TypeError(f"{self.get_display_name()} is not a tip rack.")
+
+    def set_empty(self) -> None:
+        if self.is_tip_rack():
+            self._engine_client.execute_command(
+                cmd.SetTipStateParams(
+                    labwareId=self._labware_id,
+                    wellNames=list(self._definition.wells),
+                    tipWellState=TipRackWellState.EMPTY,
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
@@ -203,6 +228,7 @@ class LabwareCore(AbstractLabware[WellCore]):
             name=well_name,
             labware_id=self._labware_id,
             engine_client=self._engine_client,
+            protocol_core=self._protocol_core,
         )
 
     def get_deck_slot(self) -> Optional[DeckSlotName]:
@@ -227,7 +253,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         self._engine_client.execute_command(
             cmd.LoadLiquidParams(
                 labwareId=self._labware_id, liquidId=liquid._id, volumeByWell=volumes
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def load_empty(self, wells: List[str]) -> None:
@@ -237,7 +264,8 @@ class LabwareCore(AbstractLabware[WellCore]):
                 labwareId=self._labware_id,
                 liquidId="EMPTY",
                 volumeByWell={well: 0.0 for well in wells},
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def get_engine_definition(self) -> LabwareDefinition:

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
-from typing import List, Literal, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Literal, Union
 
 import anyio
 import pytest
@@ -183,6 +183,7 @@ snapshots: List[ParameterSet] = [
 ]
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "snapshot",
     snapshots,
@@ -272,6 +273,7 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
+@pytest.mark.slow
 async def test_rerun_flex_dev_compat() -> None:
     """Test re-running a stored protocol that has messed up requirements and metadata.
 

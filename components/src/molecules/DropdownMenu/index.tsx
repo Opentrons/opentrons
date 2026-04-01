@@ -27,7 +27,7 @@ import { LiquidIcon } from '../LiquidIcon'
 import { RobotInfoLabel } from '../RobotInfoLabel'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { FocusEventHandler } from 'react'
+import type { FocusEventHandler, MouseEvent } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -72,9 +72,9 @@ export interface DropdownMenuProps {
   /** optional error */
   error?: string | null
   /** focus handler */
-  onFocus?: FocusEventHandler<HTMLButtonElement>
+  onFocus?: FocusEventHandler<HTMLElement>
   /** blur handler */
-  onBlur?: FocusEventHandler<HTMLButtonElement>
+  onBlur?: FocusEventHandler<HTMLElement>
   /** optional disabled */
   disabled?: boolean
   /** optional placement of the menu */
@@ -83,6 +83,8 @@ export interface DropdownMenuProps {
   onEnter?: (id: string) => void
   /** optional exit handler */
   onExit?: () => void
+  /** optional test id */
+  testId?: string
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -105,6 +107,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     onEnter,
     onExit,
     menuPlacement = 'auto',
+    testId,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false)
@@ -292,7 +295,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onFocus={onFocus}
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
-          data-testid="dropdownMenu"
+          data-testid={
+            testId != null ? `${testId}_dropdownMenu` : 'dropdownMenu'
+          }
           tabIndex={tabIndex}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -396,7 +401,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <LegacyStyledText as="label" color={COLORS.grey60}>
+        <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
           {caption}
         </LegacyStyledText>
       ) : null}

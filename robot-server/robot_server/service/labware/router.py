@@ -3,18 +3,21 @@
 As of the v5 software release, these endpoints do not function.
 All labware offsets are set via `/run` endpoints.
 """
+
 from typing import Annotated, Optional
-from typing_extensions import Literal, NoReturn
 
 from fastapi import Depends, status
-from server_utils.fastapi_utils.light_router import LightRouter
+from typing_extensions import Literal, NoReturn
 
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.versioning import get_requested_version
-from robot_server.service.labware import models as lw_models
-from robot_server.service.errors import RobotServerError, CommonErrorDef
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
 
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.labware import models as lw_models
+from robot_server.versioning import get_requested_version
 
 router = LightRouter()
 
@@ -22,9 +25,9 @@ router = LightRouter()
 class LabwareCalibrationEndpointsRemoved(ErrorDetails):
     """An error if you try to use the deprecated Labware Calibration endpoints."""
 
-    id: Literal[
+    id: Literal["LabwareCalibrationEndpointsRemoved"] = (
         "LabwareCalibrationEndpointsRemoved"
-    ] = "LabwareCalibrationEndpointsRemoved"
+    )
     title: str = "Labware Calibration Endpoints Removed"
     detail: str = "Use the `/runs` endpoints to manage labware offsets."
     errorCode: str = ErrorCodes.API_REMOVED.value.code
@@ -98,6 +101,7 @@ async def get_specific_labware_calibration(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody},
         status.HTTP_410_GONE: {"model": ErrorBody[LabwareCalibrationEndpointsRemoved]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_specific_labware_calibration(
     calibrationId: str,

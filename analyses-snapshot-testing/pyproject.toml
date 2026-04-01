@@ -3,7 +3,7 @@ name = "analyses-snapshot-testing"
 version = "0.0.0"
 description = "Snapshot Testing of Opentrons Protocols"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
   "anyio>=4.9.0,<5",
   "docker>=7.1.0",
@@ -26,7 +26,7 @@ protocol-analysis-cli = "automation.protocol_analysis_cli:main"
 [tool.ruff]
 line-length = 140
 indent-width = 4
-target-version = "py310"
+target-version = "py312"
 exclude = ["files"]
 src = ["*.py", "automation", "tests", "citools"]
 

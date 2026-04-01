@@ -4,8 +4,7 @@ import type { UseLPCCommandsProps } from '.'
 
 export interface UseLPCCommandChildProps extends UseLPCCommandsProps {}
 
-export interface UseLPCCommandWithChainRunChildProps
-  extends UseLPCCommandChildProps {
+export interface UseLPCCommandWithChainRunChildProps extends UseLPCCommandChildProps {
   chainLPCCommands: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean,

@@ -62,7 +62,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
         {t('module_error')}
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText as="p" marginRight={SPACING.spacing4}>
+          <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing4}>
             {t('view')}
           </LegacyStyledText>
           <Btn
@@ -74,7 +74,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             aria-label="view_error_details"
           >
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               {t('error_details')}
@@ -95,9 +95,14 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {errorDetails != null ? (
-                  <LegacyStyledText as="p">{errorDetails}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {errorDetails}
+                  </LegacyStyledText>
                 ) : null}
-                <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+                <LegacyStyledText
+                  forwardedAs="p"
+                  marginBottom={SPACING.spacing16}
+                >
                   {t('branded:module_error_contact_support')}
                 </LegacyStyledText>
               </Flex>

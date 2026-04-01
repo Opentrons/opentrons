@@ -1,23 +1,22 @@
 import asyncio
 import inspect
 import logging
-import traceback
 import sys
+import traceback
 from types import TracebackType
 from typing import Any, Dict, Optional
 
-from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
-from opentrons.protocol_api import ProtocolContext, ParameterContext
-from opentrons.protocol_api._parameters import Parameters
-from opentrons.protocols.execution.errors import ExceptionInProtocolError
-from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
-from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-)
-
-
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
+
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
+from opentrons.protocol_api import ParameterContext, ProtocolContext
+from opentrons.protocol_api._parameters import Parameters
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
+)
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 MODULE_LOG = logging.getLogger(__name__)
 

@@ -101,6 +101,15 @@ export function FixtureListItem({
     cutoutFixtureId,
     partialRequiredCutoutFixtureId
   )
+  const requiredFixtureId =
+    partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+  const fixtureIdToDisplay = isCurrentFixtureCompatible
+    ? (partialRequiredCutoutFixtureId ?? cutoutFixtureId)
+    : requiredFixtureId
+  const fixtureDisplayName = getFixtureDisplayName(
+    t as TFunction,
+    fixtureIdToDisplay
+  )
 
   let statusLabel
   if (!isCurrentFixtureCompatible) {
@@ -152,9 +161,7 @@ export function FixtureListItem({
             setShowNotConfiguredModal(false)
           }}
           cutoutId={cutoutId}
-          requiredFixtureId={
-            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
-          }
+          requiredFixtureId={requiredFixtureId}
         />
       ) : null}
       {showLocationConflictModal ? (
@@ -164,9 +171,7 @@ export function FixtureListItem({
           }}
           cutoutId={cutoutId}
           deckDef={deckDef}
-          requiredFixtureId={
-            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
-          }
+          requiredFixtureId={requiredFixtureId}
           robotName={robotName}
         />
       ) : null}
@@ -198,11 +203,9 @@ export function FixtureListItem({
                     ? getFixtureImage(
                         partialRequiredCutoutFixtureId ?? cutoutFixtureId
                       )
-                    : getFixtureImage(
-                        partialRequiredCutoutFixtureId ??
-                          compatibleCutoutFixtureIds?.[0]
-                      )
+                    : getFixtureImage(requiredFixtureId)
                 }
+                alt={`Image of a ${fixtureDisplayName}`}
               />
             ) : null}
             <Flex
@@ -213,16 +216,7 @@ export function FixtureListItem({
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {isCurrentFixtureCompatible
-                  ? getFixtureDisplayName(
-                      t as TFunction,
-                      partialRequiredCutoutFixtureId ?? cutoutFixtureId
-                    )
-                  : getFixtureDisplayName(
-                      t as TFunction,
-                      partialRequiredCutoutFixtureId ??
-                        compatibleCutoutFixtureIds?.[0]
-                    )}
+                {fixtureDisplayName}
               </LegacyStyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
@@ -238,13 +232,13 @@ export function FixtureListItem({
                   setShowSetupInstructionsModal(true)
                 }}
               >
-                <LegacyStyledText marginLeft={SPACING.spacing4} as="p">
+                <LegacyStyledText marginLeft={SPACING.spacing4} forwardedAs="p">
                   {t('protocol_setup:view_setup_instructions')}
                 </LegacyStyledText>
               </Btn>
             </Flex>
           </Flex>
-          <LegacyStyledText as="p" width="15%">
+          <LegacyStyledText forwardedAs="p" width="15%">
             {displayLocation}
           </LegacyStyledText>
           <Flex
@@ -262,7 +256,7 @@ export function FixtureListItem({
                     : setShowNotConfiguredModal(true)
                 }}
               >
-                <LegacyStyledText as="label" cursor="pointer">
+                <LegacyStyledText forwardedAs="label" cursor="pointer">
                   {t('protocol_setup:resolve')}
                 </LegacyStyledText>
               </TertiaryButton>

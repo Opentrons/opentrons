@@ -1,16 +1,17 @@
 from __future__ import annotations
+
 import enum
-from math import sqrt, isclose
+from math import isclose, sqrt
 from typing import (
     TYPE_CHECKING,
     Any,
-    NamedTuple,
+    Dict,
     Iterator,
-    Union,
     List,
+    NamedTuple,
     Optional,
     Protocol,
-    Dict,
+    Union,
 )
 
 from opentrons_shared_data.robot.types import RobotType
@@ -18,10 +19,10 @@ from opentrons_shared_data.robot.types import RobotType
 from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
-    from .protocol_api.labware import Labware, Well
-    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
-    from .protocol_api.module_contexts import ModuleContext
     from .protocol_api._types import OffDeckType
+    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
+    from .protocol_api.labware import Labware, Well
+    from .protocol_api.module_contexts import ModuleContext
 
 
 class PipetteNotAttachedError(KeyError):
@@ -75,22 +76,19 @@ class Point(NamedTuple):
 
     @classmethod
     def from_xyz_attrs(cls, has_xyz: _HasXYZ) -> Point:
-        """Construct a Point from another object that has .x/.y/.z attributes."""
+        """Construct a `Point` from another object that has .x/.y/.z attributes."""
         return cls(has_xyz.x, has_xyz.y, has_xyz.z)
 
 
 class _HasXYZ(Protocol):
     @property
-    def x(self) -> float:
-        ...
+    def x(self) -> float: ...
 
     @property
-    def y(self) -> float:
-        ...
+    def y(self) -> float: ...
 
     @property
-    def z(self) -> float:
-        ...
+    def z(self) -> float: ...
 
 
 LocationLabware = Union[
@@ -115,31 +113,30 @@ class MeniscusTrackingTarget(enum.Enum):
 
 
 class Location:
-    """Location(point: Point, labware: Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"])
-
+    """
     A location to target as a motion.
 
-    The location contains a :py:class:`.Point` (in
-    :ref:`protocol-api-deck-coords`) and possibly an associated
-    :py:class:`.Labware` or :py:class:`.Well` instance.
+    The location contains a [`Point`][opentrons.types.Point]and possibly an associated
+    [`Labware`][opentrons.protocol_api.labware.Labware] or
+    [`Well`][opentrons.protocol_api.labware.Well] instance.
 
     It should rarely be constructed directly by the user; rather, it is the
-    return type of most :py:class:`.Well` accessors like :py:meth:`.Well.top`
-    and is passed directly into a method like ``InstrumentContext.aspirate()``.
+    return type of most [`Well`][opentrons.protocol_api.labware.Well] accessors like
+    [`Well.top()`][opentrons.protocol_api.labware.Well.top] and is passed directly into
+    a method like `InstrumentContext.aspirate()`.
 
-    .. warning::
-       The ``.labware`` attribute of this class is used by the protocol
-       API internals to, among other things, determine safe heights to retract
-       the instruments to when moving between locations. If constructing an
-       instance of this class manually, be sure to either specify ``None`` as the
-       labware (so the robot does its worst case retraction) or specify the
-       correct labware for the ``.point`` attribute.
+    !!! warning
+        The `.labware` attribute of this class is used by the protocol
+        API internals to, among other things, determine safe heights to retract
+        the instruments to when moving between locations. If constructing an
+        instance of this class manually, be sure to either specify `None` as the
+        labware (so the robot does its worst case retraction) or specify the
+        correct labware for the `.point` attribute.
 
-
-    .. warning::
-       The ``==`` operation compares both the position and associated labware.
-       If you only need to compare locations, compare the ``.point``
-       of each item.
+    !!! warning
+        The `==` operation compares both the position and associated labware.
+        If you only need to compare locations, compare the `.point`
+        of each item.
     """
 
     def __init__(
@@ -200,20 +197,19 @@ class Location:
         """
         Alter the point stored in the location while preserving the labware.
 
-        This returns a new Location and does not alter the current one. It
+        This returns a new `Location` and does not alter the current one. It
         should be used like
 
-        .. code-block:: python
+        ```python
+            loc = Location(Point(1, 1, 1), None)
+            new_loc = loc.move(Point(1, 1, 1))
 
-            >>> loc = Location(Point(1, 1, 1), None)
-            >>> new_loc = loc.move(Point(1, 1, 1))
-            >>>
-            >>> # The new point is the old one plus the given offset.
-            >>> assert new_loc.point == Point(2, 2, 2)  # True
-            >>>
-            >>> # The old point hasn't changed.
-            >>> assert loc.point == Point(1, 1, 1)  # True
+            # The new point is the old one plus the given offset.
+            assert new_loc.point == Point(2, 2, 2)  # True
 
+            # The old point hasn't changed.
+            assert loc.point == Point(1, 1, 1)  # True
+        ```
         """
 
         return Location(

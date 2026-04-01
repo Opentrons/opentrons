@@ -1,5 +1,6 @@
-from opentrons.protocol_api import ProtocolContext
 from helpers import load_config, pick_up_then_drop  # type: ignore[import]
+
+from opentrons.protocol_api import ProtocolContext
 
 metadata = {"apiLevel": "2.6"}
 

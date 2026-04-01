@@ -1,15 +1,16 @@
 import json
-import pytest
 from pathlib import Path
+
+import pytest
 import typeguard
 
+from . import list_fixtures
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.protocol.types import (
     JsonProtocolV3,
     JsonProtocolV4,
     JsonProtocolV5,
 )
-from . import list_fixtures
 
 
 @pytest.mark.parametrize("defpath", list_fixtures(3))

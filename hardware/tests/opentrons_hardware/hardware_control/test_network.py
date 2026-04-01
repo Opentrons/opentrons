@@ -1,8 +1,10 @@
 """Test the network submodule."""
-import pytest
+
 import asyncio
 import datetime
-from typing import List, Callable
+from typing import Callable, List
+
+import pytest
 from mock import AsyncMock
 
 from opentrons_hardware.drivers.binary_usb.binary_messenger import BinaryMessenger
@@ -12,16 +14,15 @@ from opentrons_hardware.firmware_bindings import (
     ArbitrationIdParts,
     utils,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId, USBTarget
 from opentrons_hardware.firmware_bindings.messages import (
+    BinaryMessageDefinition,
     MessageDefinition,
+    binary_message_definitions,
+    fields,
     message_definitions,
     payloads,
-    fields,
-    BinaryMessageDefinition,
-    binary_message_definitions,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, USBTarget
-
 from opentrons_hardware.hardware_control.network import NetworkInfo
 
 

@@ -19,7 +19,7 @@ export function CancelingRunModal(): JSX.Element {
           className={styles.icon}
           aria-label="CancelingRunModal_icon"
         />
-        <LegacyStyledText as="h4" className={styles.canceling_text}>
+        <LegacyStyledText forwardedAs="h4" className={styles.canceling_text}>
           {i18n.format(t('canceling_run_dot'), 'capitalize')}
         </LegacyStyledText>
       </div>

@@ -1,6 +1,5 @@
 """Utils for handling instrument serial."""
 
-
 DEFAULT_INSTR_SERIAL_LENGTH = 16
 
 
@@ -13,4 +12,4 @@ def ensure_serial_length(
 
 def model_versionstring_from_int(model: int) -> str:
     """Format the encoded model from an int into a dotted version string."""
-    return f"{model//10}.{model%10}"
+    return f"{model // 10}.{model % 10}"

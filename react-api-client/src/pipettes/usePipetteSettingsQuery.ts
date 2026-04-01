@@ -5,7 +5,7 @@ import { getPipetteSettings } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, PipetteSettings } from '@opentrons/api-client'
+import type { PipetteSettings } from '@opentrons/api-client'
 
 export type UsePipetteSettingsQueryOptions = UseQueryOptions<PipetteSettings>
 
@@ -15,8 +15,7 @@ export function usePipetteSettingsQuery(
   const host = useHost()
   const query = useQuery<PipetteSettings>(
     [host, 'pipettes', 'settings'],
-    () =>
-      getPipetteSettings(host as HostConfig).then(response => response.data),
+    () => getPipetteSettings(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

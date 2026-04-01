@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import enum
 import re
-from itertools import groupby
 from dataclasses import dataclass
+from itertools import groupby
 from typing import List, Optional, Tuple
+
 from opentrons.hardware_control.types import BoardRevision
 
 

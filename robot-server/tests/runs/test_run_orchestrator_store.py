@@ -1,41 +1,42 @@
 """Tests for the EngineStore interface."""
 
 from datetime import datetime
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
+
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-
-from opentrons.protocol_engine.error_recovery_policy import never_recover
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI, API
-from opentrons.hardware_control.types import (
-    EstopStateNotification,
-    EstopState,
-    AsynchronousModuleErrorNotification,
-)
+from opentrons.hardware_control import API, HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.hardware_control.types import (
+    AsynchronousModuleErrorNotification,
+    EstopState,
+    EstopStateNotification,
+)
 from opentrons.protocol_engine import (
     StateSummary,
+)
+from opentrons.protocol_engine import (
     types as pe_types,
 )
-from opentrons.protocol_runner import RunResult, RunOrchestrator
+from opentrons.protocol_engine.error_recovery_policy import never_recover
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_engine.resources import FileProvider
-from opentrons.protocol_engine.resources import CameraProvider
+from opentrons.protocol_runner import RunOrchestrator, RunResult
+from opentrons.types import DeckSlotName
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.protocols.protocol_models import ProtocolKind
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
-    RunConflictError,
     NoRunOrchestrator,
+    RunConflictError,
+    RunOrchestratorStore,
     handle_hardware_event,
 )
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_models import ProtocolKind
 
 
 def mock_notify_publishers() -> None:
@@ -229,7 +230,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    engine = subject._run_orchestrator._protocol_engine
+    engine = subject._run_orchestrator._protocol_engine  # type: ignore[union-attr]
     engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
     assert (
@@ -375,6 +376,9 @@ async def test_estop_callback(
 ) -> None:
     """The callback should stop an active engine."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     disengage_event = EstopStateNotification(
         old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
@@ -412,6 +416,9 @@ async def test_estop_callback(
 async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
     """It should noop without a run."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -440,6 +447,9 @@ async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
 async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> None:
     """It shouldn't finish if the engine doesn't want it to."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -468,6 +478,9 @@ async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> No
 async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) -> None:
     """It should finish with the error if the engine says it should."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(

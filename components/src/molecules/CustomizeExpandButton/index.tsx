@@ -2,12 +2,12 @@ import { memo } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CheckboxField } from '../../atoms/CheckboxField'
-import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { CURSOR_POINTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
+import { InputField } from '..//InputField'
 
 import type {
   ChangeEvent,
@@ -36,6 +36,8 @@ interface CustomizeExpandButtonProps extends StyleProps {
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
+  //  used for the hopper stack limit so far
+  customStackLimit?: number
   stackingProps?: StackingProps
   disabled?: boolean
   isSelected?: boolean
@@ -56,10 +58,13 @@ export function CustomizeExpandButtonComponent(
     stackingProps,
     allowInputField,
     isNestedDefALid,
+    customStackLimit,
   } = props
   const isLid =
     stackingProps != null &&
     stackingProps.definition.allowedRoles?.includes('lid')
+
+  const limit = customStackLimit ?? stackingProps?.definition.stackLimit
 
   return (
     <Flex
@@ -96,8 +101,11 @@ export function CustomizeExpandButtonComponent(
               backgroundColor={COLORS.blue10}
               padding={SPACING.spacing16}
               borderRadius={BORDERS.borderRadius4}
+              gridGap={SPACING.spacing8}
             >
-              {isLid && !isNestedDefALid ? (
+              {isLid &&
+              !isNestedDefALid &&
+              stackingProps.onCheckboxChange != null ? (
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()
@@ -109,11 +117,10 @@ export function CustomizeExpandButtonComponent(
                   padding={`0 0 0 ${SPACING.spacing8}`}
                 />
               ) : null}
-              {stackingProps.definition.stackLimit != null &&
-              stackingProps.definition.stackLimit > 1 &&
-              allowInputField ? (
+              {limit != null && limit > 1 && allowInputField ? (
                 <InputField
                   id="CustomizeExpandButton_inputField"
+                  testId="customize-expand-button-input-field"
                   title={stackingProps.inputTitle}
                   onChange={e => {
                     e.stopPropagation()
@@ -122,8 +129,7 @@ export function CustomizeExpandButtonComponent(
                   type="number"
                   error={
                     !stackingProps.inputFieldValue ||
-                    stackingProps.inputFieldValue >
-                      stackingProps.definition.stackLimit
+                    stackingProps.inputFieldValue > limit
                       ? stackingProps.errorMessage
                       : null
                   }

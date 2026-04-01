@@ -1,17 +1,16 @@
-from typing import List, Union, Sequence
+from typing import List, Sequence, Union
 
-from opentrons.protocol_api.labware import Well, Labware
-from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._types import OffDeckType
-from opentrons.types import Location, DeckLocation
-
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.types import DeckLocation, Location
 
 CommandLocation = Union[Location, Well]
 
 
 def listify(
-    location: Union[CommandLocation, List[CommandLocation]]
+    location: Union[CommandLocation, List[CommandLocation]],
 ) -> List[CommandLocation]:
     if isinstance(location, list):
         try:
@@ -84,7 +83,7 @@ def _stringify_multiple_wells_for_labware(wells: List[Well]) -> str:
 
 
 def stringify_well_list(
-    wells: Union[Well, Sequence[Well], Sequence[Sequence[Well]]]
+    wells: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
 ) -> str:
     """Takes an arbitrary sequence of wells and returns a string representation of each well, associated by labware."""
     if isinstance(wells, Well):
@@ -109,7 +108,7 @@ def stringify_well_list(
 def _stringify_labware_movement_location(
     location: Union[
         DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute, TrashBin
-    ]
+    ],
 ) -> str:
     if isinstance(location, (int, str)):
         return f"slot {location}"

@@ -1,56 +1,55 @@
 """Capacitve Sensor Driver Class."""
-import time
-import asyncio
 
-from typing import Optional, AsyncIterator, Any, Sequence, List, Union
+import asyncio
+import time
 from contextlib import asynccontextmanager, suppress
 from logging import getLogger
 from struct import unpack
+from typing import Any, AsyncIterator, List, Optional, Sequence, Union
 
+import opentrons_hardware.sensors.types as sensor_types
+from . import SENSOR_LOG_NAME
+from .scheduler import SensorScheduler
+from .sensor_abc import AbstractSensorDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
-import opentrons_hardware.sensors.types as sensor_types
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.messages import (
-    message_definitions,
-    MessageDefinition,
-)
 from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
+)
+from opentrons_hardware.firmware_bindings.messages import (
+    MessageDefinition,
+    message_definitions,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorTypeField,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    BindSensorOutputRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+)
+from opentrons_hardware.sensors.sensor_types import (
+    BaseSensorType,
+    CapacitiveSensor,
+    PressureSensor,
+    ThresholdSensorType,
 )
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     SensorReturnType,
 )
 from opentrons_hardware.sensors.utils import (
-    ReadSensorInformation,
     BaselineSensorInformation,
-    WriteSensorInformation,
+    ReadSensorInformation,
     SensorThresholdInformation,
+    WriteSensorInformation,
 )
-
-from opentrons_hardware.sensors.sensor_types import (
-    BaseSensorType,
-    ThresholdSensorType,
-    PressureSensor,
-    CapacitiveSensor,
-)
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    BindSensorOutputRequestPayload,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-    SensorTypeField,
-    SensorIdField,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    BindSensorOutputRequest,
-)
-from .sensor_abc import AbstractSensorDriver
-from .scheduler import SensorScheduler
-from . import SENSOR_LOG_NAME
 
 LOG = getLogger(__name__)
 SENSOR_LOG = getLogger(SENSOR_LOG_NAME)
@@ -290,7 +289,7 @@ class LogListener:
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             if (
                 message.payload.sensor_id.value is not self.id
-                or message.payload.sensor is not self.type
+                or message.payload.sensor.value != self.type
             ):
                 # ignore sensor responses from other sensors
                 return

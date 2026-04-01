@@ -47,14 +47,18 @@ import json
 
 from aiohttp import web
 
+from server_utils.auth.scopes import Scope
+
+from .. import auth
 from .name_synchronizer import (
     NameSynchronizer,
-    install_name_synchronizer,
     get_name_synchronizer,
+    install_name_synchronizer,
 )
 from .static_hostname import set_up_static_hostname
 
 
+@auth.require_scopes(Scope.ROBOT_SETTINGS_WRITE)
 async def set_name_endpoint(request: web.Request) -> web.Response:
     """Set the robot's name.
 

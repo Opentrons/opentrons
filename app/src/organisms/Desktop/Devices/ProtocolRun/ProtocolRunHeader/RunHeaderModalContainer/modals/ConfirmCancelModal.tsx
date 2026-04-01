@@ -3,13 +3,8 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_STOPPED,
-} from '@opentrons/api-client'
-import {
   AlertPrimaryButton,
   ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -23,6 +18,7 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { isStoppingOrStopped } from '/app/local-resources/runs/utils'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -81,10 +77,7 @@ export function ConfirmCancelModal(
   }
 
   useEffect(() => {
-    if (
-      runStatus === RUN_STATUS_STOP_REQUESTED ||
-      runStatus === RUN_STATUS_STOPPED
-    ) {
+    if (isStoppingOrStopped(runStatus)) {
       onClose()
     }
   }, [runStatus, onClose])
@@ -96,8 +89,10 @@ export function ConfirmCancelModal(
       title={t('cancel_run_modal_heading')}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <LegacyStyledText as="p">{cancelRunAlertInfo}</LegacyStyledText>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText forwardedAs="p">
+          {cancelRunAlertInfo}
+        </LegacyStyledText>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
         </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -112,7 +107,6 @@ export function ConfirmCancelModal(
             </Link>
           )}
           <AlertPrimaryButton
-            backgroundColor={COLORS.red50}
             onClick={cancelRun}
             disabled={isCanceling}
             minWidth="8rem"

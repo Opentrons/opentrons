@@ -93,6 +93,17 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
   650: 'Red',
 }
 
+// Values for flex stacker
+export const FLEX_STACKER_RETRIEVE: 'retrieve' = 'retrieve'
+export const FLEX_STACKER_STORE: 'store' = 'store'
+export const FLEX_STACKER_FILL: 'fill' = 'fill'
+export const FLEX_STACKER_EMPTY: 'empty' = 'empty'
+export const FLEX_STACKER_IN_HOPPER_ACTIONS = [
+  FLEX_STACKER_FILL,
+  FLEX_STACKER_EMPTY,
+  FLEX_STACKER_RETRIEVE,
+]
+
 export const OFFDECK: 'offDeck' = 'offDeck'
 
 export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app
@@ -157,3 +168,6 @@ export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
 export const MINIMUM_LIQUID_CLASS_VOLUME = 1
 
 export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'
+
+export const HOPPER_LABWARE_X_OFFSET = 178
+export const HOPPER_ZOOM_OFFSET_POSTITION = 230

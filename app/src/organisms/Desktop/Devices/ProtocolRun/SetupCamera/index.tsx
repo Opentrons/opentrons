@@ -10,14 +10,19 @@ import {
   PrimaryButton,
   StyledText,
 } from '@opentrons/components'
-import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
+import {
+  useAddCameraImageSettingsToRunMutation,
+  useAddCameraSettingsToRunMutation,
+} from '@opentrons/react-api-client'
+import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useFeatureFlag } from '/app/redux/config'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
+  getCameraImageSettings,
   getCameraUsageState,
   updateCameraEnablement,
   updateCameraRecoveryEnablement,
@@ -48,11 +53,14 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const { mutateAsync: addCameraSettingsToRunAsync } =
+    useAddCameraSettingsToRunMutation()
+  const { mutateAsync: addCameraImageSettingsToRunAsync } =
+    useAddCameraImageSettingsToRunMutation(runId)
+  const isFlex = useIsFlex(robotName)
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)
 
@@ -61,6 +69,9 @@ export function SetupCamera({
     enabled: cameraEnabled,
     recoveryEnabled,
   } = useSelector((state: State) => getCameraUsageState(state, runId))
+  const cameraImageSettings = useSelector((state: State) =>
+    getCameraImageSettings(state, runId, OT_SYSTEM_CAMERA)
+  )
 
   const toggleCameraEnabled = (): void => {
     dispatch(updateCameraEnablement(runId, !cameraEnabled))
@@ -77,34 +88,35 @@ export function SetupCamera({
   const onConfirmPreferences = (): void => {
     setIsConfirmPending(true)
 
-    addCameraSettingsToRun(
-      {
-        runId,
-        settings: {
-          cameraEnabled,
-          liveStreamEnabled,
-          errorRecoveryCameraEnabled: recoveryEnabled,
-        },
+    addCameraSettingsToRunAsync({
+      runId,
+      settings: {
+        cameraEnabled,
+        liveStreamEnabled,
+        errorRecoveryCameraEnabled: recoveryEnabled,
       },
-      {
-        onSuccess: confirmCameraSettings,
-        onError: () => {
-          // This request only fails if the camera is not connected to the robot.
-          // We only want to surface the error if a user expects the camera to be enabled.
-          if (cameraEnabled) {
-            makeSnackbar(
-              t('error_confirming_camera') as string,
-              TOAST_DURATION_MS
-            )
-          } else {
-            confirmCameraSettings()
-          }
-        },
-        onSettled: () => {
-          setIsConfirmPending(false)
-        },
-      }
-    )
+    })
+      .then(() =>
+        cameraImageSettings != null
+          ? addCameraImageSettingsToRunAsync(cameraImageSettings)
+          : Promise.resolve(null)
+      )
+      .then(confirmCameraSettings)
+      .catch(() => {
+        // This request only fails if the camera is not connected to the robot.
+        // We only want to surface the error if a user expects the camera to be enabled.
+        if (cameraEnabled) {
+          makeSnackbar(
+            t('error_confirming_camera') as string,
+            TOAST_DURATION_MS
+          )
+        } else {
+          confirmCameraSettings()
+        }
+      })
+      .finally(() => {
+        setIsConfirmPending(false)
+      })
   }
 
   return (
@@ -117,6 +129,7 @@ export function SetupCamera({
         toggleCameraEnabled={toggleCameraEnabled}
         isCameraEnabled={cameraEnabled}
         cameraConfirmed={cameraConfirmed}
+        isFlex={isFlex}
       />
       {cameraEnabled && (
         <>
@@ -128,7 +141,10 @@ export function SetupCamera({
             toggleLiveStreamEnabled={toggleLiveStreamEnabled}
             cameraConfirmed={cameraConfirmed}
           />
-          {isCameraSettingsEnabled && <SetupRunCameraControls />}
+          <SetupRunCameraControls
+            cameraConfirmed={cameraConfirmed}
+            runId={runId}
+          />
         </>
       )}
       <div className={styles.camera_btn_container}>
@@ -187,12 +203,14 @@ interface CameraStatusProps {
   toggleCameraEnabled: UseCameraUsageSettingsResult['toggleCameraEnabled']
   isCameraEnabled: UseCameraUsageSettingsResult['isCameraEnabled']
   cameraConfirmed: boolean
+  isFlex: boolean
 }
 
 function CameraStatus({
   toggleCameraEnabled,
   isCameraEnabled,
   cameraConfirmed,
+  isFlex,
 }: CameraStatusProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -210,7 +228,9 @@ function CameraStatus({
           )}
         </div>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('camera_status_description')}
+          {isFlex
+            ? t('camera_status_description_flex')
+            : t('camera_status_description_ot2')}
         </StyledText>
       </div>
       <div className={styles.setting_toggle_container}>

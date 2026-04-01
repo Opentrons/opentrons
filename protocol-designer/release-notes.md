@@ -8,6 +8,112 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.10.0
+
+**Welcome to Protocol Designer 8.10.0!**
+
+This release adds full support for Flex 20 µL pipette tips and all available partial tip pickup configurations in Protocol Designer, and includes other bug fixes and improvements.
+
+### New Features
+
+- Use Flex 20 µL pipette tips in your Protocol Designer protocols, including with liquid class transfers.
+- Choose from additional partial tip pickup options in Protocol Designer:
+  - Flex 96-channel pipette single column (column 1), single row (row A or H), or single nozzle (A1, A12, or H1) tip pickup.
+  - Flex 8-channel pipette partial column pickup (2–7 consecutive nozzles ending at H1).
+  - OT-2 8-channel pipette partial column pickup (2–7 consecutive nozzles ending at H1).
+- Return tips to their original position in the tip rack with a pipette configured for partial tip pickup. Tips are marked "used" and can be picked up again using manual tip tracking.
+
+### Improvements
+
+- Customize your blowout location within a source or destination well.
+
+### Bug Fixes
+
+- Use partial tip pickup for a transfer or mix step in a tube rack without errors.
+- Protocol Designer only lets you add a transfer step when the deck contains at least one labware without a lid, accessible to your attached pipette.
+- Protocol Designer lets you add compatible Opentrons Tough Universal Lids on custom well plates or reservoirs without errors.
+- Labware nicknames now apply to the topmost labware that is not a lid.
+
+## Opentrons Protocol Designer Changes in 8.9.1
+
+**Welcome to Protocol Designer 8.9.1!**
+
+This hotfix release addresses a bug to properly export, import, and update Protocol Designer protocols to the latest version.
+
+## Opentrons Protocol Designer Changes in 8.9.0
+
+**Welcome to Protocol Designer 8.9.0!**
+
+This release introduces updated Thermocycler Module steps and includes other bug fixes.
+
+### New Features
+
+- Your Protocol Designer protocol can run Thermocycler Module profiles while pipetting samples or running another module.
+
+### Bug Fixes
+
+- The Flex Stacker Module shows the correct number of labware stored inside.
+- Add or remove a Flex Stacker Module or waste chute to the robot deck without triggering protocol errors.
+
+## Opentrons Protocol Designer Changes in 8.8.1
+
+**Welcome to Protocol Designer 8.8.1!**
+
+This hotfix release addresses a bug to allow manual tip selection in any column of a well plate.
+
+## Opentrons Protocol Designer Changes in 8.8.0
+
+**Welcome to Protocol Designer 8.8.0!**
+
+This release adds support for the Flex Stacker Module in Protocol Designer, and includes other bug fixes.
+
+### New Features
+
+- Use the Flex Stacker Module to store and use multiple well plates, PCR plates, or tip racks in your Protocol Designer protocols.
+
+### Bug Fixes
+
+- Protocol Designer properly displays tip racks and their lids on the deck.
+- When you choose to mix liquids from the center of a well, Protocol Designer properly exports this location in your finished protocol.
+
+### Known Issues
+
+- Removing a Stacker Module from the deck can also remove other attached hardware. Click **Deck hardware** in the upper left to edit or re-add hardware to the Flex deck.
+- Adding a lid to a tiprack placed inside the Flex 96-channel adapter can cause your Protocol Designer protocol to fail analysis in the Opentrons App. In the starting deck, remove the lid from the tip rack before adding to the adapter.
+
+Running a protocol created in Protocol Designer requires Opentrons App version 8.8.0 or newer.
+
+## Opentrons Protocol Designer Changes in 8.7.1
+
+**Welcome to Protocol Designer 8.7.1!**
+
+This hotfix release includes internal updates for debugging.
+
+## Opentrons Protocol Designer Changes in 8.7.0
+
+**Welcome to Protocol Designer 8.7.0!**
+
+This release adds support for manual tip selection and camera steps in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Choose between automatic and manual tip tracking for transfer and mix steps in your protocols. In manual tip tracking, Protocol Designer lets you select the tip rack and individual tips the pipette will pick up to transfer or mix liquid.
+- Manual tip tracking in Protocol Designer enables reusing tips more than once in a protocol.
+- Pick up individual tips with Flex 96-channel and Flex or OT-2 8-channel pipettes.
+- Add a camera step in any Protocol Designer protocol. The Flex or OT-2's built-in camera can take a still image of your robot deck at any point during the protocol. Access your images in the Recent Protocol Runs section of the Opentrons App's robot details page.
+
+### Improved Features
+
+- Protocol Designer only shows compatible deck and labware locations to move a lid to.
+- Add Opentrons Tough Universal Lids to an available Opentrons Flex Deck Riser placed on the deck.
+- Move a tip rack lid to any tip rack on the deck without a lid.
+- When adding labware, click to add a tip rack lid to a Flex 96-channel tip rack adapter with a tip rack inside.
+- When you click **Duplicate labware**, Protocol Designer duplicates all labware, adapters, lids, and liquids in the deck slot.
+
+### Bug Fixes
+
+- Protocol Designer updates maximum flow rates to the latest version when you import an older protocol.
+
 ## Opentrons Protocol Designer Changes in 8.6.3
 
 **Welcome to Protocol Designer 8.6.3!**

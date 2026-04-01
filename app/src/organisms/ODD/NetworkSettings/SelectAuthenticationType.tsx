@@ -108,7 +108,7 @@ export function SelectAuthenticationType({
           </Flex>
           <Flex marginY={SPACING.spacing24}>
             <LegacyStyledText
-              as="h4"
+              forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               color={COLORS.grey60}
             >
@@ -126,7 +126,7 @@ export function SelectAuthenticationType({
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >

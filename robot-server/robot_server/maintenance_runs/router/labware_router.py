@@ -1,26 +1,30 @@
 """Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
 
-from typing import Annotated
 import logging
+from typing import Annotated
 
 from fastapi import Depends, status
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from server_utils.fastapi_utils.light_router import LightRouter
-
 from opentrons.protocol_engine import (
+    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
-    LabwareOffset,
+)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
 )
 
-from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
-
-from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
-from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from ..dependencies import get_maintenance_run_orchestrator_store
+from ..maintenance_run_models import LabwareDefinitionSummary, MaintenanceRun
+from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .base_router import RunNotFound, RunNotIdle, get_run_data_from_url
+from robot_server.errors.error_responses import ErrorBody
 
 log = logging.getLogger(__name__)
 labware_router = LightRouter()
@@ -48,6 +52,7 @@ labware_router = LightRouter()
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def add_labware_offset(
     request_body: RequestModel[
@@ -106,6 +111,7 @@ async def add_labware_offset(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
@@ -122,7 +128,7 @@ async def add_labware_definition(
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     uri = run_orchestrator_store.add_labware_definition(request_body.data)
-    log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
+    log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(
         content=SimpleBody.model_construct(

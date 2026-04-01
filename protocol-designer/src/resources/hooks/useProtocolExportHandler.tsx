@@ -37,9 +37,9 @@ export const useProtocolExportHandler = ({
 
   const content = (
     <StyledText desktopStyle="bodyDefaultRegular">
-      {!hasCommands
-        ? t('alert:export_warnings.redesign.no_commands.body1')
-        : t('alert:hint.has_errors.body1')}
+      {hasTimelineErrors || hasFormErrors
+        ? t('alert:hint.has_errors.body1')
+        : t('alert:export_warnings.redesign.no_commands.body1')}
     </StyledText>
   )
 

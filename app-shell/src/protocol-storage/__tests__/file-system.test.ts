@@ -4,21 +4,25 @@ import path from 'path'
 import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import uuid from 'uuid/v4'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { analyzeProtocolSource } from '../../protocol-analysis'
 import {
   addProtocolFile,
+  NOT_OT2_PROTOCOLS_DIRECTORY_NAME,
   parseProtocolDirs,
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
   readDirectoriesWithinDirectory,
   readFilesWithinDirectory,
   removeProtocolByKey,
+  shouldMigrateToNotOt2Directory,
 } from '../file-system'
 
-vi.mock('uuid/v4')
+vi.mock('uuid/v4', () => ({
+  __esModule: true,
+  default: vi.fn(),
+}))
 vi.mock('electron')
 vi.mock('electron-store')
 vi.mock('../../protocol-analysis')
@@ -49,6 +53,55 @@ describe('protocol storage directory utilities', () => {
       return expect(PROTOCOLS_DIRECTORY_PATH).toEqual(
         path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
       )
+    })
+
+    it('uses protocols-10.0-plus as NOT_OT2_PROTOCOLS_DIRECTORY_NAME', () => {
+      expect(NOT_OT2_PROTOCOLS_DIRECTORY_NAME).toBe('protocols-10.0-plus')
+    })
+  })
+
+  describe('shouldMigrateToNotOt2Directory', () => {
+    it('returns true when analysis has robotType OT-3 Standard', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.mkdir(path.join(protocolDir, 'analysis'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      await fs.writeJson(
+        path.join(protocolDir, 'analysis', '1234567890.json'),
+        { robotType: 'OT-3 Standard' }
+      )
+      expect(await shouldMigrateToNotOt2Directory(protocolDir)).toBe(true)
+    })
+
+    it('returns false when analysis has robotType OT-2 Standard', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.mkdir(path.join(protocolDir, 'analysis'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      await fs.writeJson(
+        path.join(protocolDir, 'analysis', '1234567890.json'),
+        { robotType: 'OT-2 Standard' }
+      )
+      expect(await shouldMigrateToNotOt2Directory(protocolDir)).toBe(false)
+    })
+
+    it('returns true when analysis directory is missing (migrate by default)', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      expect(await shouldMigrateToNotOt2Directory(protocolDir)).toBe(true)
+    })
+
+    it('returns true when analysis has no robotType (migrate by default)', async () => {
+      const protocolDir = makeEmptyDir()
+      await fs.mkdir(path.join(protocolDir, 'src'))
+      await fs.mkdir(path.join(protocolDir, 'analysis'))
+      await fs.writeFile(path.join(protocolDir, 'src', 'main.py'), '')
+      await fs.writeJson(
+        path.join(protocolDir, 'analysis', '1234567890.json'),
+        { metadata: {} }
+      )
+      expect(await shouldMigrateToNotOt2Directory(protocolDir)).toBe(true)
     })
   })
 
@@ -174,35 +227,28 @@ describe('protocol storage directory utilities', () => {
   })
 
   describe('addProtocolFile', () => {
-    it('writes a protocol file to a new directory', () => {
-      let count = 0
-      vi.mocked(uuid).mockImplementation(() => {
-        const nextId = `${count}abc123`
-        count = count + 1
-        return nextId
-      })
+    it('writes a protocol file to a new directory', async () => {
+      const { default: uuid } = await import('uuid/v4')
+      vi.mocked(uuid).mockReturnValue('0abc123')
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')
       const expectedProtocolDirPath = path.join(destDir, '0abc123')
 
-      return fs
-        .writeFile(sourceName, 'file contents')
-        .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readDirectoriesWithinDirectory(destDir))
-        .then(dirPaths => parseProtocolDirs(dirPaths))
-        .then(dirs => {
-          expect(dirs).toEqual([
-            {
-              dirPath: expectedProtocolDirPath,
-              srcFilePaths: [
-                path.join(expectedProtocolDirPath, 'src', 'source.py'),
-              ],
-              analysisFilePaths: [],
-              modified: expect.any(Number),
-            },
-          ])
-        })
+      await fs.writeFile(sourceName, 'file contents')
+      await addProtocolFile(sourceName, destDir)
+      const dirPaths = await readDirectoriesWithinDirectory(destDir)
+      const dirs = await parseProtocolDirs(dirPaths)
+      expect(dirs).toEqual([
+        {
+          dirPath: expectedProtocolDirPath,
+          srcFilePaths: [
+            path.join(expectedProtocolDirPath, 'src', 'source.py'),
+          ],
+          analysisFilePaths: [],
+          modified: expect.any(Number),
+        },
+      ])
     })
   })
 

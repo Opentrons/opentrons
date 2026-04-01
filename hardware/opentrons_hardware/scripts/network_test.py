@@ -8,17 +8,22 @@ logs and stats about how well the test went, and possibly augment with
 linux built-in canbus statistics from netutils.
 """
 
-from enum import Enum, auto
+import argparse
 import asyncio
 import dataclasses
 import logging
-from logging.config import dictConfig
-import argparse
-import sys
 import re
+import sys
 import time
-from typing import Optional, AsyncGenerator, TextIO, Type, Union, Set, Tuple
+from enum import Enum, auto
+from logging.config import dictConfig
+from typing import AsyncGenerator, Optional, Set, TextIO, Tuple, Type, Union
 
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
 )
@@ -28,14 +33,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HeartbeatResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.network import NetworkInfo
-
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 IS_LINUX = sys.platform.startswith("linux")
 
@@ -148,20 +147,18 @@ async def run_test(
 ) -> AsyncGenerator[StatisticElement, Optional[bool]]:
     """Run the test and yield results.
 
-    Params
-    ------
-    driver: A pre-constructed canbus driver to use
-    load_percentage: between 0 and 1, how much of the network bandwidth to use
-                     during the test.
-    bitrate: The network bitrate.
-    duration: How long to run the test for. If None, until stopped by a signal.
-    mode: The mode to run in (see the docs on StimulusMode)
+    Arguments:
+        driver: A pre-constructed canbus driver to use
+        load_percentage: between 0 and 1, how much of the network bandwidth to use
+                         during the test.
+        bitrate: The network bitrate.
+        duration: How long to run the test for. If None, until stopped by a signal.
+        mode: The mode to run in (see the docs on StimulusMode)
 
-    Returns
-    -------
-    An iterator of lists of statistic elements. Because this test may run for a long
-    time and generate a lot of data, rather than doing the test blindly it's a
-    coroutine that can be controlled by the caller.
+    Returns:
+        An iterator of lists of statistic elements. Because this test may run for a long
+        time and generate a lot of data, rather than doing the test blindly it's a
+         coroutine that can be controlled by the caller.
 
     Sending the value True into the generator will stop the test.
 
@@ -208,9 +205,9 @@ def _test_details_for_mode(
 ) -> Tuple[NodeId, Union[Type[DeviceInfoRequest], Type[HeartbeatResponse]], int]:
     if mode == StimulusMode.ONE_TO_ONE:
         target = present.pop()
-        message: Union[
-            Type[DeviceInfoRequest], Type[HeartbeatResponse]
-        ] = DeviceInfoRequest
+        message: Union[Type[DeviceInfoRequest], Type[HeartbeatResponse]] = (
+            DeviceInfoRequest
+        )
         response_size = _canbus_message_length_bits(DeviceInfoResponse)
     elif mode == StimulusMode.ONE_TO_NONE:
         target = NodeId.broadcast
@@ -299,7 +296,7 @@ async def _do_test(
             if left > 0:
                 await asyncio.sleep(left)
             else:
-                warner.warning(f"cant keep up with messages, overran by {left*-1}sec")
+                warner.warning(f"cant keep up with messages, overran by {left * -1}sec")
                 await asyncio.sleep(0)
     finally:
         await messenger.stop()

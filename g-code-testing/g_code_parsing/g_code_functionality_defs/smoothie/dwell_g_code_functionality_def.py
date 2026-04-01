@@ -1,11 +1,11 @@
 from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
 
 
 class DwellGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
     DWELL_ARG_KEY = "P"
 
     @classmethod

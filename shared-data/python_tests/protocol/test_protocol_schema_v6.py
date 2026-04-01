@@ -1,19 +1,20 @@
 import json
-import pytest
-from typing import Any, Dict
 from pathlib import Path
-from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.models import (
-    protocol_schema_v6,
-    Robot,
-    Metadata,
-    Liquid,
-    Module,
-    Pipette,
-    Labware,
-)
+from typing import Any, Dict
+
+import pytest
 
 from . import list_fixtures
+from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.protocol.models import (
+    Labware,
+    Liquid,
+    Metadata,
+    Module,
+    Pipette,
+    Robot,
+    protocol_schema_v6,
+)
 
 
 @pytest.mark.parametrize("defpath", list_fixtures(6))

@@ -44,19 +44,19 @@ function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="p" />
+  return <LegacyStyledText {...props} forwardedAs="p" />
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="h3" />
+  return <LegacyStyledText {...props} forwardedAs="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="li" />
+  return <LegacyStyledText {...props} forwardedAs="li" />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="ul" />
+  return <LegacyStyledText {...props} forwardedAs="ul" />
 }
 
 function HorizontalRule(): JSX.Element {

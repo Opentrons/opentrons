@@ -45,7 +45,10 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
       />
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {i18n.format(sectionText, 'capitalize')}
       </LegacyStyledText>
     </Flex>

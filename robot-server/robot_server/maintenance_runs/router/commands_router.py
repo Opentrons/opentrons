@@ -1,25 +1,38 @@
 """Router for /maintenance_runs commands endpoints."""
+
 import textwrap
 from typing import Annotated, Optional, Union
-from typing_extensions import Final, Literal
 
 from fastapi import Depends, Query, status
-from server_utils.fastapi_utils.light_router import LightRouter
+from typing_extensions import Final, Literal
 
 from opentrons.protocol_engine import (
     CommandPointer,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
-
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.service.json_api import (
-    SimpleBody,
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
     RequestModel,
+    SimpleBody,
 )
+
+from ..dependencies import (
+    get_maintenance_run_data_manager,
+    get_maintenance_run_orchestrator_store,
+)
+from ..maintenance_run_data_manager import MaintenanceRunDataManager
+from ..maintenance_run_models import MaintenanceRunNotFoundError
+from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from .base_router import RunNotFound
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.runs.command_models import (
     CommandCollectionLinks,
@@ -27,16 +40,6 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
-
-from ..maintenance_run_models import MaintenanceRunNotFoundError
-from ..maintenance_run_data_manager import MaintenanceRunDataManager
-from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
-from ..dependencies import (
-    get_maintenance_run_orchestrator_store,
-    get_maintenance_run_data_manager,
-)
-from .base_router import RunNotFound
-
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
@@ -98,6 +101,7 @@ async def get_current_run_from_url(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[CommandNotAllowed]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],

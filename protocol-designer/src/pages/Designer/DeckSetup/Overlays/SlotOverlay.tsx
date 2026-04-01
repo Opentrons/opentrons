@@ -14,13 +14,13 @@ import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getFlexHoverDimensions,
+  getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
-
-import { getFlexHoverDimensions, getOT2HoverDimensions } from '../utils'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type {

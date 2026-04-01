@@ -15,6 +15,7 @@ import type { LeafNode } from '/app/redux/protocol-storage'
 
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
+  listElement: HTMLElement | null
   annotationType: string
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
@@ -33,6 +34,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     handlePause,
     commandStartNumber,
     scrollTargetId,
+    listElement,
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -41,19 +43,19 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     setIsExpanded(subCommands.some(command => command.isHighlighted))
   }, [subCommands])
 
+  const handleClick = (): void => {
+    setIsExpanded(!isExpanded)
+    handlePause?.()
+  }
+
   return (
     <div className={styles.annotated_group_container}>
-      <div
-        onClick={() => {
-          setIsExpanded(!isExpanded)
-          handlePause?.()
-        }}
-        className={styles.annotated_group_header}
-      >
+      <div onClick={handleClick} className={styles.annotated_group_header}>
         <StyledText desktopStyle="bodyDefaultRegular">
           {annotationType}
         </StyledText>
         <Icon
+          data-testid={isExpanded ? 'chevron-up' : 'chevron-down'}
           name={isExpanded ? 'chevron-up' : 'chevron-down'}
           size="2rem"
           color={COLORS.black90}
@@ -65,6 +67,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
           {subCommands.map((subCommand, index) => (
             <IndividualCommand
               scrollTargetId={scrollTargetId}
+              listElement={listElement}
               fromGroup={false}
               key={`${subCommand.command.id}_${index}`}
               command={subCommand.command}

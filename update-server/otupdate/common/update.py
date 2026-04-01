@@ -3,26 +3,26 @@ endpoints for running software updates
 
 This has endpoints like update session management, validation, and execution
 """
+
 import asyncio
 import functools
 import logging
 import os
 from pathlib import Path
-
 from subprocess import CalledProcessError
-
 from typing import Optional
+
+from aiohttp import BodyPartReader, MultipartReader, web
 from typing_extensions import Protocol
 
-from aiohttp import web, BodyPartReader, MultipartReader
+from server_utils.auth.scopes import Scope
 
-from . import config, update_actions
+from . import auth, config, update_actions
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from .handler_type import Handler
-from .session import UpdateSession, Stages
-
-from otupdate.openembedded.update_actions import UPDATE_PKG_OE
+from .session import Stages, UpdateSession
 from otupdate.buildroot.update_actions import UPDATE_PKG_BR
+from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
 VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
@@ -38,8 +38,7 @@ class _HandlerWithSession(Protocol):
 
     async def __call__(
         self, request: web.Request, session: UpdateSession
-    ) -> web.Response:
-        ...
+    ) -> web.Response: ...
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
@@ -67,6 +66,7 @@ def require_session(handler: _HandlerWithSession) -> Handler:
     return decorated
 
 
+@auth.require_scopes(Scope.UPDATES_WRITE)
 async def begin(request: web.Request) -> web.Response:
     """Begin a session"""
     if None is not session_from_request(request):
@@ -84,6 +84,7 @@ async def begin(request: web.Request) -> web.Response:
     return web.json_response(data={"token": session.token}, status=201)
 
 
+@auth.require_scopes(Scope.UPDATES_WRITE)
 async def cancel(request: web.Request) -> web.Response:
     request.app.pop(SESSION_VARNAME, None)
     return web.json_response(data={"message": "Session cancelled"}, status=200)
@@ -178,7 +179,12 @@ async def _read_parts_and_find_update(
 ) -> Optional[str]:
     found: Optional[str] = None
     async for part in reader:
-        if part.name not in VALID_UPDATE_PKG:
+        if part is None:
+            return None
+        elif isinstance(part, MultipartReader):
+            LOG.info("Incorrect nested multipart in file_upload, ignoring")
+            await part.release()
+        elif part.name not in VALID_UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
@@ -188,6 +194,7 @@ async def _read_parts_and_find_update(
     return found
 
 
+@auth.require_scopes(Scope.UPDATES_WRITE)
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/file
@@ -236,6 +243,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     return web.json_response(data=session.state, status=201)
 
 
+@auth.require_scopes(Scope.UPDATES_WRITE)
 @require_session
 async def commit(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/commit"""

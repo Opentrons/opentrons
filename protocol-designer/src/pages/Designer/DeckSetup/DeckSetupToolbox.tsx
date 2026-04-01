@@ -19,7 +19,17 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
+} from '@opentrons/shared-data'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getIsSlotAHopper,
+} from '@opentrons/step-generation'
+
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 
 import {
   LINK_BUTTON_STYLE,
@@ -44,6 +54,8 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
+import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -75,7 +87,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-
   const {
     createdAdapterForSlot,
     createdModuleForSlot,
@@ -92,7 +103,7 @@ export function DeckSetupToolbox(
   if (slot == null) {
     return null
   }
-
+  const isHopperSlot = getIsSlotAHopper(slot)
   const offDeckLabware = deckSetup.labware[slot]
   const handleResetToolbox = (): void => {
     dispatch(
@@ -112,6 +123,12 @@ export function DeckSetupToolbox(
       })
     )
   }
+  const labwareInHopper =
+    createdModuleForSlot?.type === FLEX_STACKER_MODULE_TYPE &&
+    isHopperSlot &&
+    'labwareInHopper' in createdModuleForSlot.moduleState
+      ? createdModuleForSlot.moduleState.labwareInHopper
+      : null
 
   const slotFull =
     (createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -121,7 +138,17 @@ export function DeckSetupToolbox(
     (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
     (createdStackForSlot.length === 0 && deckSetup.labware[slot] != null)
   const handleClear = (): void => {
-    if (slot !== 'offDeck' && offDeckLabware == null) {
+    if (isHopperSlot) {
+      const labwareIdsToDelete = (labwareInHopper ?? []).reduce<string[]>(
+        (acc, group) => {
+          return [...acc, ...Object.values(group).filter(id => id != null)]
+        },
+        []
+      )
+      labwareIdsToDelete.forEach(labwareId => {
+        dispatch(deleteContainer({ labwareId: labwareId }))
+      })
+    } else if (slot !== 'offDeck' && offDeckLabware == null) {
       if (createdAdapterForSlot != null) {
         dispatch(deleteContainer({ labwareId: createdAdapterForSlot.id }))
       }
@@ -145,21 +172,39 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
+    const isModuleStacker =
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+    const isOnShuttle = !isHopperSlot && isModuleStacker
+
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
+    //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule) {
+      let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
+      if (isModuleStacker) {
+        flexStackerInfo = isOnShuttle
+          ? {
+              stackerPosition: 'shuttle',
+            }
+          : {
+              stackerPosition: 'hopper',
+              amount: selectedTopLabware.amount,
+            }
+      }
       dispatch(
         createContainerAboveModule({
-          slot,
-          labwareDefURIStack: [
-            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...(selectedTopLabware.labwareDefURI != null
-              ? [selectedTopLabware.labwareDefURI]
-              : []),
-            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
-          ],
+          slot: isHopperSlot
+            ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+            : slot,
+          labwareDefURIGroup: {
+            adapterDefURI: selectedAdapterDefURI,
+            topLabwareDefURI: selectedTopLabware.labwareDefURI,
+            lidDefURI: selectedLidLabware,
+          },
+          stackerInfo: flexStackerInfo,
         })
       )
     } else {
@@ -216,7 +261,9 @@ export function DeckSetupToolbox(
       handleClear()
     }
   }
-
+  const displaySlot = getIsSlotAHopper(slot)
+    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
+    : slot
   return (
     <>
       {showSelectLabwareModal ? (
@@ -248,7 +295,7 @@ export function DeckSetupToolbox(
               deckLabel={
                 slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
-                  : slot
+                  : displaySlot
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">
@@ -310,18 +357,27 @@ export function DeckSetupToolbox(
                 <LabwareCard
                   labware={
                     deckSetup.labware[
-                      createdStackForSlot[createdStackForSlot.length - 1]
+                      createdStackForSlot[0] // select top most labware in the stack
                     ]
                   }
                   {...(createdLidForSlot != null &&
                   createdStackForSlot.includes(createdLidForSlot?.id)
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
-                  quantity={createdStackForSlot.length}
+                  quantity={
+                    labwareInHopper != null
+                      ? labwareInHopper.length
+                      : createdStackForSlot.length
+                  }
+                  location={slot}
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
+                <LabwareCard
+                  labware={createdAdapterForSlot}
+                  quantity={1}
+                  location={slot}
+                />
               ) : null}
               {slotFull ? (
                 <StyledText

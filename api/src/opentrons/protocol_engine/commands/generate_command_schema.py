@@ -1,12 +1,13 @@
 """Generate a JSON schema against which all create commands statically validate."""
 
-import json
 import argparse
+import json
 import sys
-from opentrons.protocol_engine.commands.command_unions import CommandCreateAdapter
 
 from opentrons_shared_data.command import get_newest_schema_version
 from opentrons_shared_data.load import get_shared_data_root
+
+from opentrons.protocol_engine.commands.command_unions import CommandCreateAdapter
 
 
 def generate_command_schema(version: str) -> str:

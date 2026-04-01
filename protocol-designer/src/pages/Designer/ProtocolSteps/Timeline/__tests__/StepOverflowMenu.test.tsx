@@ -90,7 +90,7 @@ describe('StepOverflowMenu', () => {
     fireEvent.click(screen.getByText('Delete step'))
     expect(mockConfirm).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Duplicate step'))
-    expect(vi.mocked(stepsActions.duplicateStep)).toHaveBeenCalled()
+    expect(vi.mocked(stepsActions.duplicateSelectedSteps)).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Edit step'))
     fireEvent.click(screen.getByText('View details'))
     expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()

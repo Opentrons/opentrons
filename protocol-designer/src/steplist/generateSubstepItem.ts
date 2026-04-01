@@ -17,7 +17,7 @@ import {
   substepTimelineMultiChannel,
   substepTimelineSingleChannel,
 } from './substepTimeline'
-import * as steplistUtils from './utils'
+import { mergeWhen } from './utils/mergeWhen'
 
 import type {
   ConsolidateArgs,
@@ -118,7 +118,7 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
-  return steplistUtils.mergeWhen(
+  return mergeWhen(
     substepRows,
     (
       currentRow,
@@ -353,31 +353,8 @@ export function generateSubstepItem(
   }
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
-    const labwareNames = stepArgs.moduleId
-      ? labwareNamesByModuleId[stepArgs.moduleId]
-      : null
-
-    const {
-      blockTargetTempHold,
-      lidOpenHold,
-      lidTargetTempHold,
-      message,
-      meta,
-      profileSteps,
-      profileTargetLidTemp,
-      profileVolume,
-    } = stepArgs
     return {
       substepType: THERMOCYCLER_PROFILE,
-      blockTargetTempHold,
-      labwareNickname: labwareNames?.nickname,
-      lidOpenHold,
-      lidTargetTempHold,
-      message,
-      meta,
-      profileSteps,
-      profileTargetLidTemp,
-      profileVolume,
     }
   }
 

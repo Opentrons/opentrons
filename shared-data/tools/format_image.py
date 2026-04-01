@@ -1,11 +1,12 @@
 """Crop Images so that Labware is Centered and Change File Size and Type to JPG."""
 
+import argparse
+import io
+import os
+from typing import Optional
+
 from PIL import Image
 from PIL.Image import Image as PILImage
-from typing import Optional
-import argparse
-import os
-import io
 
 
 def rename_image_path(image_path: str, keyword: str) -> str:

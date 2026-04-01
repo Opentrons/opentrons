@@ -6,9 +6,8 @@ import {
   Flex,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
-
-import { TextAreaField } from '/protocol-designer/components/molecules'
 
 import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'

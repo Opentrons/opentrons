@@ -5,19 +5,28 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.types import (
-    LabwareDefinition as LabwareDefDict,
-    LabwareUri,
-)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
     RectangularWellDefinition2,
-    Parameters2 as LabwareDefinition2Parameters,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters2 as LabwareDefinition2Parameters,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition as LabwareDefDict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareUri,
+)
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api.core.engine import LabwareCore, ProtocolCore, WellCore
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
@@ -28,10 +37,7 @@ from opentrons.protocol_engine.types import (
     OnAddressableAreaOffsetLocationSequenceComponent,
     TipRackWellState,
 )
-from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.engine import LabwareCore, WellCore
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture
@@ -53,9 +59,23 @@ def mock_engine_client(
 
 
 @pytest.fixture
-def subject(mock_engine_client: EngineClient) -> LabwareCore:
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    mock_protocol_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_protocol_core.annotation_ids).then_return([])
+    return mock_protocol_core
+
+
+@pytest.fixture
+def subject(
+    mock_engine_client: EngineClient, mock_protocol_core: ProtocolCore
+) -> LabwareCore:
     """Get a LabwareCore test subject with mocked out dependencies."""
-    return LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+    return LabwareCore(
+        labware_id="cool-labware",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
+    )
 
 
 @pytest.mark.parametrize(
@@ -126,7 +146,8 @@ def test_set_calibration_succeeds_in_ok_location(
         mock_engine_client.execute_command(
             cmd.ReloadLabwareParams(
                 labwareId="cool-labware",
-            )
+            ),
+            command_annotations=[],
         ),
     )
 
@@ -198,13 +219,19 @@ def test_get_definition(subject: LabwareCore) -> None:
     }
 
 
-def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
+def test_get_user_display_name(
+    decoy: Decoy, mock_engine_client: EngineClient, mock_protocol_core: ProtocolCore
+) -> None:
     """It should get the labware's user-provided label, if any."""
     decoy.when(
         mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("Cool Label")
 
-    subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+    subject = LabwareCore(
+        labware_id="cool-labware",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
+    )
     result = subject.get_user_display_name()
 
     assert result == "Cool Label"
@@ -246,13 +273,19 @@ def test_get_name_load_name(subject: LabwareCore) -> None:
     assert result == "load-name"
 
 
-def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
+def test_get_name_display_name(
+    decoy: Decoy, mock_engine_client: EngineClient, mock_protocol_core: ProtocolCore
+) -> None:
     """It should get the user display name when one is defined."""
     decoy.when(
         mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("my cool display name")
 
-    subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+    subject = LabwareCore(
+        labware_id="cool-labware",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
+    )
 
     result = subject.get_name()
 
@@ -337,7 +370,10 @@ def test_get_uri(
 
 
 def test_get_next_tip(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: LabwareCore,
 ) -> None:
     """It should get the next available tip from the core."""
     decoy.when(
@@ -350,7 +386,10 @@ def test_get_next_tip(
     ).then_return("A2")
 
     starting_tip = WellCore(
-        name="B1", labware_id="cool-labware", engine_client=mock_engine_client
+        name="B1",
+        labware_id="cool-labware",
+        engine_client=mock_engine_client,
+        protocol_core=mock_protocol_core,
     )
     result = subject.get_next_tip(
         num_tips=8, starting_tip=starting_tip, nozzle_map=None
@@ -383,7 +422,8 @@ def test_reset_tips(
                 labwareId="cool-labware",
                 wellNames=["A1", "H12"],
                 tipWellState=TipRackWellState.CLEAN,
-            )
+            ),
+            command_annotations=[],
         )
     )
 
@@ -406,6 +446,56 @@ def test_reset_tips_raises_if_not_tip_rack(
     """It should raise an exception if the labware isn't a tip rack."""
     with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
         subject.reset_tips()
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            ordering=[],
+            wells={
+                "A1": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+                "H12": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+            },
+            parameters=LabwareDefinition2Parameters.model_construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_set_empty(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should set the tip states to empty."""
+    subject.set_empty()
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.SetTipStateParams(
+                labwareId="cool-labware",
+                wellNames=["A1", "H12"],
+                tipWellState=TipRackWellState.EMPTY,
+            ),
+            command_annotations=[],
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinition2Parameters.model_construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.model_construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
+        )
+    ],
+)
+def test_set_empty_raises_if_not_tip_rack(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should raise an exception if the labware isn't a tip rack."""
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
+        subject.set_empty()
 
 
 def test_get_tip_length(
@@ -495,7 +585,8 @@ def test_load_liquid(
                 labwareId="cool-labware",
                 liquidId="liquid-id",
                 volumeByWell={"A1": 20, "B1": 30, "C1": 40},
-            )
+            ),
+            command_annotations=[],
         ),
         times=1,
     )
@@ -512,6 +603,7 @@ def test_load_empty(
                 labwareId="cool-labware",
                 liquidId="EMPTY",
                 volumeByWell={"A1": 0.0, "B1": 0.0, "C1": 0.0},
-            )
+            ),
+            command_annotations=[],
         )
     )

@@ -71,16 +71,14 @@ export type OffsetLocationDetails =
   | DefaultOffsetLocationDetails
   | LocationSpecificOffsetLocationDetails
 
-export interface DefaultOffsetLocationDetails
-  extends BaseOffsetLocationDetails {
+export interface DefaultOffsetLocationDetails extends BaseOffsetLocationDetails {
   addressableAreaName: FlexAddressableAreaName
   kind: 'default'
   lwOffsetLocSeq: typeof ANY_LOCATION
   hardCodedOffsetId?: undefined
 }
 
-export interface LocationSpecificOffsetLocationDetails
-  extends BaseOffsetLocationDetails {
+export interface LocationSpecificOffsetLocationDetails extends BaseOffsetLocationDetails {
   addressableAreaName: FlexAddressableAreaName
   kind: 'location-specific'
   lwOffsetLocSeq: LabwareOffsetLocationSequence

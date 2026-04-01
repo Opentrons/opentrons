@@ -51,7 +51,7 @@ export function useCreateMaintenanceRunMutation(
   >(
     [host, 'maintenance_runs'],
     (createMaintenanceRunData = {}) =>
-      createMaintenanceRun(host as HostConfig, createMaintenanceRunData)
+      createMaintenanceRun(host!, createMaintenanceRunData)
         .then(response => response.data)
         .catch(e => {
           queryClient.invalidateQueries([host, 'robot/control/estopStatus'])

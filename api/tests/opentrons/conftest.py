@@ -1,5 +1,6 @@
 # Uncomment to enable logging during tests
 from __future__ import annotations
+
 import asyncio
 import contextlib
 import inspect
@@ -21,25 +22,25 @@ from typing import (
     cast,
 )
 
-from typing_extensions import TypedDict
-
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
+from typing_extensions import TypedDict
 
 from opentrons_shared_data.liquid_classes.types import (
-    TransferPropertiesDict,
     AspiratePropertiesDict,
-    SingleDispensePropertiesDict,
-    SubmergeDict,
+    BlowoutPropertiesDict,
+    DelayPropertiesDict,
+    MixPropertiesDict,
     RetractAspirateDict,
     RetractDispenseDict,
-    MixPropertiesDict,
-    BlowoutPropertiesDict,
-    TouchTipPropertiesDict,
+    SingleDispensePropertiesDict,
+    SubmergeDict,
     TipPositionDict,
-    DelayPropertiesDict,
+    TouchTipPropertiesDict,
+    TransferPropertiesDict,
 )
+
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 try:
@@ -47,69 +48,72 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-from opentrons_shared_data.robot.types import RobotTypeEnum
-from opentrons_shared_data.protocol.types import JsonProtocol
-from opentrons_shared_data.labware.types import LabwareDefinition, LabwareDefinition2
-from opentrons_shared_data.module.types import ModuleDefinitionV3
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
-    ByPipetteSetting,
-    ByTipTypeSetting,
-    AspirateProperties,
-    Submerge,
-    TipPosition,
-    PositionReference,
-    DelayProperties,
-    DelayParams,
-    RetractAspirate,
-    SingleDispenseProperties,
-    RetractDispense,
-    Coordinate,
-    MixProperties,
-    TouchTipProperties,
-    BlowoutProperties,
-    MixParams,
-    LiquidClassTouchTipParams,
-    MultiDispenseProperties,
-    BlowoutParams,
-    BlowoutLocation,
-)
-from opentrons_shared_data.deck.types import (
-    RobotModel,
-    DeckDefinitionV3,
-    DeckDefinitionV5,
+from opentrons_shared_data.deck import (
+    DEFAULT_DECK_DEFINITION_VERSION,
 )
 from opentrons_shared_data.deck import (
     load as load_deck,
-    DEFAULT_DECK_DEFINITION_VERSION,
 )
+from opentrons_shared_data.deck.types import (
+    DeckDefinitionV3,
+    DeckDefinitionV5,
+    RobotModel,
+)
+from opentrons_shared_data.labware.types import LabwareDefinition, LabwareDefinition2
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    AspirateProperties,
+    BlowoutLocation,
+    BlowoutParams,
+    BlowoutProperties,
+    ByPipetteSetting,
+    ByTipTypeSetting,
+    Coordinate,
+    DelayParams,
+    DelayProperties,
+    LiquidClassSchemaV1,
+    LiquidClassTouchTipParams,
+    MixParams,
+    MixProperties,
+    MultiDispenseProperties,
+    PositionReference,
+    RetractAspirate,
+    RetractDispense,
+    SingleDispenseProperties,
+    Submerge,
+    TipPosition,
+    TouchTipProperties,
+)
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.protocol.types import JsonProtocol
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons import config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
-    ThreadManager,
     ThreadManagedHardware,
+    ThreadManager,
 )
-from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api import Labware, ProtocolContext, create_protocol_context
 from opentrons.protocol_api.core.legacy.deck import (
     DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
+)
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
+)
+from opentrons.protocol_engine import (
+    DeckType,
+    error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
 )
-from opentrons.protocol_engine import (
-    Config as ProtocolEngineConfig,
-    DeckType,
-    error_recovery_policy,
-)
 from opentrons.protocols.api_support import deck_type
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
-
 
 if TYPE_CHECKING:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
@@ -398,8 +402,8 @@ async def smoothie(
     virtual_smoothie_env: None,
     monkeypatch: pytest.MonkeyPatch,
 ) -> AsyncGenerator[SmoothieDriverType, None]:
-    from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
+    from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
     driver = SmoothieDriver(
         robot_configs.load_ot2(), SimulatingGPIOCharDev("simulated")
@@ -599,7 +603,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
             result["filelike"] = binary_zipfile
         else:
             raise ValueError(
-                f"get_bundle_fixture has no case to handle " f'fixture "{fixture_name}"'
+                f'get_bundle_fixture has no case to handle fixture "{fixture_name}"'
             )
         return result
 
@@ -1165,9 +1169,9 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
 
 
 @pytest.fixture
-def custom_pip_n_tip_transfer_properties_dict() -> (
-    Dict[str, Dict[str, TransferPropertiesDict]]
-):
+def custom_pip_n_tip_transfer_properties_dict() -> Dict[
+    str, Dict[str, TransferPropertiesDict]
+]:
     """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
     return {
         "a_custom_pipette_type": {

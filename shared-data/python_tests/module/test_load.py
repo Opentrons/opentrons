@@ -1,14 +1,14 @@
 import json
+
 import pytest
 
+from . import list_v2_defs, list_v3_defs
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.module import (
+    ModuleNotFoundError,
     load_definition,
     load_schema,
-    ModuleNotFoundError,
 )
-from opentrons_shared_data import load_shared_data
-
-from . import list_v2_defs, list_v3_defs
 
 
 @pytest.mark.parametrize("def_name", list_v3_defs())

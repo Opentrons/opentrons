@@ -150,6 +150,7 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
   })
   it('select labware with multiple wells', () => {
@@ -163,6 +164,18 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
+  })
+})
+
+describe('change tip', () => {
+  it('should update the tips_selected field when the changeTip field is changed', () => {
+    const form = {
+      changeTip: 'always',
+      tips_selected: [['A1']],
+    }
+    const result = handleFormHelper({ changeTip: 'once' }, form)
+    expect(result.tips_selected).toEqual([])
   })
 })

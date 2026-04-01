@@ -30,6 +30,12 @@ from .move_g_code_functionality_def import MoveGCodeFunctionalityDef
 from .pop_speed_g_code_functionality_def import PopSpeedGCodeFunctionalityDef
 from .probe_g_code_functionality_def import ProbeGCodeFunctionalityDef
 from .push_speed_g_code_functionality_def import PushSpeedGCodeFunctionalityDef
+from .read_instrument_id_g_code_functionality_def import (
+    ReadInstrumentIDGCodeFunctionalityDef,
+)
+from .read_instrument_model_g_code_functionality_def import (
+    ReadInstrumentModelGCodeFunctionalityDef,
+)
 from .relative_coordinate_mode_g_code_functionality_def import (
     RelativeCoordinateModeGCodeFunctionalityDef,
 )
@@ -53,12 +59,6 @@ from .set_pipette_retract_g_code_functionality_def import (
 from .set_speed_g_code_functionality_def import SetSpeedGCodeFunctionalityDef
 from .steps_per_mm_g_code_functionality_def import StepsPerMMGCodeFunctionalityDef
 from .wait_g_code_functionality_def import WaitGCodeFunctionalityDef
-from .read_instrument_id_g_code_functionality_def import (
-    ReadInstrumentIDGCodeFunctionalityDef,
-)
-from .read_instrument_model_g_code_functionality_def import (
-    ReadInstrumentModelGCodeFunctionalityDef,
-)
 from .write_instrument_id_g_code_functionality_def import (
     WriteInstrumentIDGCodeFunctionalityDef,
 )

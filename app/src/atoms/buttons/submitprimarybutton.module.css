@@ -1,0 +1,29 @@
+.submit_primary_button {
+  width: 100%;
+  padding: var(--spacing-8) var(--spacing-16);
+  border: none;
+  border-radius: var(--border-radius-8);
+  background-color: var(--blue-50);
+  color: var(--white);
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-16);
+}
+
+.submit_primary_button:focus-visible {
+  box-shadow: 0 0 0 3px var(--blue-50);
+}
+
+.submit_primary_button:hover {
+  background-color: var(--blue-55);
+  box-shadow: 0 0 0;
+}
+
+.submit_primary_button:active {
+  background-color: var(--blue-60);
+}
+
+.submit_primary_button:disabled {
+  background-color: var(--grey-30);
+  color: var(--grey-40);
+}

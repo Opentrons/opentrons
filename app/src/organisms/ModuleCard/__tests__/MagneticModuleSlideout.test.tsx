@@ -85,7 +85,9 @@ describe('MagneticModuleSlideout', () => {
   it('renders the button and it is not clickable until there is something in form field', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Confirm' })
-    const input = screen.getByTestId('magneticModuleV1')
+    const input = screen.getByRole('spinbutton', {
+      name: 'magneticModuleV1',
+    })
     fireEvent.change(input, { target: { value: '10' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)

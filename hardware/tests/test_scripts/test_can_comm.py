@@ -1,22 +1,22 @@
 """Integration tests for the can_comm script."""
+
 from typing import List
 
+import pytest
 from mock import MagicMock
 
-import pytest
-
-from opentrons_hardware.firmware_bindings.message import (
-    CanMessage,
-)
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.message import (
+    CanMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     GetStatusResponsePayload,
 )
 from opentrons_hardware.scripts import can_comm
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 
 
 @pytest.fixture
@@ -73,7 +73,7 @@ def test_prompt_message_with_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"\x00\x00\x00\x01\xff\x00\xff\x00\xAA\00\xBB\x00",
+        data=b"\x00\x00\x00\x01\xff\x00\xff\x00\xaa\00\xbb\x00",
     )
 
 

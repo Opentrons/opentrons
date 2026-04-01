@@ -67,7 +67,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
                 ? t('remove_probe_before_exit')
                 : t('exit_screen_title')}
             </ConfirmationHeader>
-            <LegacyStyledText as="p" marginTop={SPACING.spacing8}>
+            <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing8}>
               {t('exit_screen_subtitle')}
             </LegacyStyledText>
           </>

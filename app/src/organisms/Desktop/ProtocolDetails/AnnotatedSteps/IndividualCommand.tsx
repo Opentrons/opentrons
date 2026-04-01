@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import clsx from 'clsx'
 
-import { COLORS, CommandText, StyledText } from '@opentrons/components'
+import { COLORS, CommandText } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
@@ -18,6 +18,7 @@ import type {
 
 interface IndividualCommandProps {
   scrollTargetId: string | null
+  listElement: HTMLElement | null
   command: RunTimeCommand
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   isHighlighted: boolean
@@ -35,22 +36,47 @@ export function IndividualCommand({
   fromGroup,
   commandNumber,
   scrollTargetId,
+  listElement,
 }: IndividualCommandProps): JSX.Element {
-  const [showNumber, setShowNumber] = useState<boolean>(false)
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
   useEffect(() => {
     if (isHighlighted && commandRef.current && command.id === scrollTargetId) {
       requestAnimationFrame(() => {
+        const container =
+          listElement ?? commandRef.current?.closest('[role="list"]')
+        if (container == null) {
+          commandRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          })
+          return
+        }
+        const containerRect = container.getBoundingClientRect()
+        const commandRect = commandRef.current?.getBoundingClientRect()
+        if (commandRect == null) return
+        const isBelow = commandRect.bottom >= containerRect.bottom - 8
+        const isAbove = commandRect.top <= containerRect.top + 1
+        if (!isBelow && !isAbove) return
+        if (container instanceof HTMLElement) {
+          const nextTop =
+            container.scrollTop + (commandRect.top - containerRect.top)
+          container.scrollTo({
+            behavior: 'smooth',
+            top: Math.max(0, nextTop),
+          })
+          return
+        }
         commandRef.current?.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest',
+          block: isBelow ? 'start' : 'nearest',
           inline: 'nearest',
         })
       })
     }
-  }, [isHighlighted, scrollTargetId, command])
+  }, [isHighlighted, scrollTargetId, command, listElement])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
     [styles.individual_command_wrap_highlighted]: isHighlighted,
@@ -64,16 +90,7 @@ export function IndividualCommand({
   )
 
   return (
-    <div
-      className={individualCommandContainerStyle}
-      ref={commandRef}
-      onMouseEnter={() => {
-        setShowNumber(true)
-      }}
-      onMouseLeave={() => {
-        setShowNumber(false)
-      }}
-    >
+    <div className={individualCommandContainerStyle} ref={commandRef}>
       <div
         className={commandWrapStyle}
         onClick={() => {
@@ -83,18 +100,15 @@ export function IndividualCommand({
         <div className={styles.individual_command} key={command.id}>
           <div className={styles.individual_command_header}>
             <CommandIcon command={command} color={iconColor} />
-            <CommandText
-              command={command}
-              robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
-              commandTextData={analysis}
-              allRunDefs={allRunDefs}
-            />
+            <div className={styles.individual_command_text}>
+              <CommandText
+                command={command}
+                robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
+                commandTextData={analysis}
+                allRunDefs={allRunDefs}
+              />
+            </div>
           </div>
-          {showNumber ? (
-            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
-              {commandNumber}
-            </StyledText>
-          ) : null}
         </div>
       </div>
     </div>

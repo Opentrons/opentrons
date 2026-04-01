@@ -5,23 +5,24 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.robot.types import RobotType
-
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import EstopStateNotification, EstopState
+from opentrons.hardware_control.types import EstopState, EstopStateNotification
 from opentrons.protocol_engine import (
     StateSummary,
+)
+from opentrons.protocol_engine import (
     types as pe_types,
 )
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_runner import RunResult
+from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
+    NoRunOrchestrator,
     RunConflictError,
     handle_estop_event,
-    NoRunOrchestrator,
 )
 
 

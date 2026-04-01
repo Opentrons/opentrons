@@ -7,13 +7,13 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
-from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
+from opentrons.hardware_control.modules.types import HeaterShakerModuleModel, ModuleType
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, ModuleContext
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
-from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture

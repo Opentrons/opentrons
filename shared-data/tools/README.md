@@ -9,7 +9,7 @@
    - Reduces the image file size
 
    In order to run this script
-   - From shard-data, then pipenv run python -m tools/format_image.py "insert image path here"
+   - From shared-data, then `uv run python -m tools.format_image "insert image path here"`
 
 2. **Name the image file**
    - Include the **labware load name** in the file name.

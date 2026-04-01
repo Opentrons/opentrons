@@ -1,5 +1,7 @@
 from typing import Annotated
+
 import fastapi
+
 from robot_server.service.notifications import topics
 from robot_server.service.notifications.notification_client import (
     NotificationClient,

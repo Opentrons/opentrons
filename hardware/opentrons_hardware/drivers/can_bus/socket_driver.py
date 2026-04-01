@@ -1,15 +1,17 @@
 """A driver that emulates CAN over socket."""
+
 from __future__ import annotations
-from typing_extensions import Final
+
+import asyncio
 import logging
 import struct
-import asyncio
 
 from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
+from typing_extensions import Final
 
 from . import ArbitrationId
-from opentrons_hardware.firmware_bindings import CanMessage
 from .abstract_driver import AbstractCanDriver
+from opentrons_hardware.firmware_bindings import CanMessage
 
 log = logging.getLogger(__name__)
 

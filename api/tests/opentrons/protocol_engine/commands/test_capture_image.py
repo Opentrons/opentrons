@@ -1,33 +1,31 @@
 """Test capture image command."""
 
-import pytest
-import mock
-from decoy import Decoy
 from typing import Tuple
 
-from opentrons.system import camera
-from opentrons.system import ffmpeg
-from opentrons.protocol_engine.resources import FileProvider, CameraProvider
-from opentrons.protocol_engine.resources.file_provider import SPECIAL_CHARACTERS
-from opentrons.protocol_engine.resources.camera_provider import CameraSettings
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import PreconditionTypes
-from opentrons.protocol_engine.commands.command import SuccessData
+import mock
+import pytest
+from decoy import Decoy
+
 from opentrons.protocol_engine.commands.capture_image import (
-    CaptureImageParams,
     CaptureImageImpl,
+    CaptureImageParams,
     CaptureImageResult,
 )
-
-
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
     FileNameInvalidError,
 )
-from opentrons.system.camera import image_capture, ZOOM_DEFAULT, RESOLUTION_DEFAULT
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine.resources.file_provider import SPECIAL_CHARACTERS
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import PreconditionTypes
+from opentrons.system import camera, ffmpeg
+from opentrons.system.camera import RESOLUTION_DEFAULT, ZOOM_DEFAULT, image_capture
 
 
 @pytest.fixture(autouse=True)

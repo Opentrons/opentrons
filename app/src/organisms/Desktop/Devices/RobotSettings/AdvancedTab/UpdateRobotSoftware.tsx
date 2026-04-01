@@ -21,7 +21,7 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
@@ -91,7 +91,7 @@ export function UpdateRobotSoftware({
           >
             {t('update_robot_software')}
           </LegacyStyledText>
-          <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
             {t('branded:update_robot_software_description')}
           </LegacyStyledText>
           <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>

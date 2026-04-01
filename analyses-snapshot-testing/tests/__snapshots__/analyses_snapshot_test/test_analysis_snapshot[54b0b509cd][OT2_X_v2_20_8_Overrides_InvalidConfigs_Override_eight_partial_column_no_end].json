@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1182,6 +1184,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2347,6 +2350,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2391,7 +2395,7 @@
           "errorInfo": {
             "args": "(\"Partial column configurations require the 'end' parameter.\",)",
             "class": "ValueError",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_20_8_Overrides_InvalidConfigs_Override_eight_partial_column_no_end.py\", line N, in run\n\n  File \"<PATH>\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in configure_nozzle_layout\n    validated_end = _check_valid_end_nozzle(validated_start, end)\n\n  File \"<PATH>\", line N, in _check_valid_end_nozzle\n    raise ValueError(\"Partial column configurations require the 'end' parameter.\")\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_20_8_Overrides_InvalidConfigs_Override_eight_partial_column_no_end.py\", line N, in run\n\n  File \"<PATH>\", line N, in _decorated\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in configure_nozzle_layout\n    validated_end = _check_valid_end_nozzle(validated_start, end)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in _check_valid_end_nozzle\n    raise ValueError(\"Partial column configurations require the 'end' parameter.\")\n"
           },
           "errorType": "PythonException",
           "id": "UUID",
@@ -2420,6 +2424,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

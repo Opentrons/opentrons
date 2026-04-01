@@ -140,7 +140,7 @@ export function Instructions(props: Props): JSX.Element {
                           marginBottom={SPACING.spacing16}
                         />
                       ),
-                      block: <LegacyStyledText as="p" />,
+                      block: <LegacyStyledText forwardedAs="p" />,
                     }}
                   />
 
@@ -160,7 +160,7 @@ export function Instructions(props: Props): JSX.Element {
                             ),
                             block: (
                               <LegacyStyledText
-                                as="p"
+                                forwardedAs="p"
                                 marginTop={SPACING.spacing16}
                               />
                             ),
@@ -168,7 +168,10 @@ export function Instructions(props: Props): JSX.Element {
                         />
                       </Flex>
                     ) : (
-                      <LegacyStyledText marginTop={SPACING.spacing16} as="p">
+                      <LegacyStyledText
+                        marginTop={SPACING.spacing16}
+                        forwardedAs="p"
+                      >
                         {t('tighten_screws_single')}
                       </LegacyStyledText>
                     )

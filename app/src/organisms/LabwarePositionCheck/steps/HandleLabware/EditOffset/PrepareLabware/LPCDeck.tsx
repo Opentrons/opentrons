@@ -21,13 +21,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type {
-  LPCWizardState,
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)
@@ -39,18 +33,13 @@ import type { State } from '/app/redux/types'
  *    location-specific offset calls for the module to be present. */
 export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   const { protocolData, deckConfig } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[runId].lpc!
   )
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
-  const labwareDef = useSelector(
-    selectSelectedLwDef(runId)
-  ) as LabwareDefinition
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
+  const labwareDef = useSelector(selectSelectedLwDef(runId))!
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
   const {
     closestBeneathModuleModel,
     closestBeneathModuleId,

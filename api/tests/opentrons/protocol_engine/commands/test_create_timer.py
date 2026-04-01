@@ -1,18 +1,21 @@
 """Test create timer command."""
-from datetime import datetime
+
 import asyncio
+from datetime import datetime
+
 from decoy import Decoy, matchers
+
+from opentrons.protocol_engine.actions import Action, ActionDispatcher, StartTaskAction
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.create_timer import (
+    CreateTimerImplementation,
     CreateTimerParams,
     CreateTimerResult,
-    CreateTimerImplementation,
 )
-from opentrons.protocol_engine.types.tasks import Task
-from opentrons.protocol_engine.execution.task_handler import TaskHandler
 from opentrons.protocol_engine.execution import RunControlHandler
-from opentrons.protocol_engine.actions import StartTaskAction, ActionDispatcher, Action
+from opentrons.protocol_engine.execution.task_handler import TaskHandler
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.types.tasks import Task
 
 
 async def test_create_timer_implementation(
@@ -43,7 +46,7 @@ async def test_create_timer_implementation(
             raise RuntimeError("Wrong kind of action.")
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             StartTaskAction(
                 task=Task(
                     id="taskid",

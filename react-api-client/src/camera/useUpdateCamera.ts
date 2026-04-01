@@ -14,7 +14,6 @@ import type {
   CameraData,
   CameraResponse,
   ErrorResponse,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateCameraMutationResult = UseMutationResult<
@@ -46,7 +45,7 @@ export function useUpdateCamera(
   >(
     [host, 'camera'],
     (data: CameraData) =>
-      createCamera(host as HostConfig, data).then(response => {
+      createCamera(host!, data).then(response => {
         queryClient.invalidateQueries([host, 'camera']).catch((e: Error) => {
           throw e
         })

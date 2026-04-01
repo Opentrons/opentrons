@@ -1,29 +1,29 @@
 """Read relevant protocol information from a set of files."""
+
 from pathlib import Path
 from typing import Optional, Sequence
 
-from opentrons.protocols.parse import PythonParseMode
-
+from .file_format_validator import FileFormatValidator
+from .file_hasher import FileHasher
 from .file_identifier import (
     FileIdentifier,
+    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    IdentifiedData,
+    IdentifiedPythonMain,
 )
-from .role_analyzer import RoleAnalyzer, RoleAnalysis
-from .file_format_validator import FileFormatValidator
-from .file_reader_writer import FileReaderWriter, BufferedFile
-from .file_hasher import FileHasher
+from .file_reader_writer import BufferedFile, FileReaderWriter
 from .protocol_source import (
-    ProtocolSource,
-    ProtocolSourceFile,
+    JsonProtocolConfig,
     ProtocolConfig,
     ProtocolFileRole,
-    JsonProtocolConfig,
+    ProtocolSource,
+    ProtocolSourceFile,
     PythonProtocolConfig,
 )
+from .role_analyzer import RoleAnalysis, RoleAnalyzer
+from opentrons.protocols.parse import PythonParseMode
 
 
 class ProtocolReader:
@@ -68,6 +68,7 @@ class ProtocolReader:
             files: List buffered files. Do not attempt to reuse any objects
                 in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
+            content_hash: A hash of the protocol contents to trigger reanalysis.
 
         Returns:
             A ProtocolSource describing the validated protocol.

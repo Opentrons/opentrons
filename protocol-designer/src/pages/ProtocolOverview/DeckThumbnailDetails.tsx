@@ -13,6 +13,8 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+
 import { LabwareOnDeck } from '../../components/organisms'
 import {
   getSlotIdsBlockedBySpanningForThermocycler,
@@ -71,10 +73,8 @@ export const DeckThumbnailDetails = (
           return null
         }
         const moduleDef = getModuleDef(model)
-        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
-          id,
-          allLabware
-        )
+        const { topMostId, rightBelowTopId, hopperTopMostId } =
+          getLabwaresOnModuleFromStack(id, allLabware)
         return (
           <Fragment key={id}>
             <Module
@@ -99,6 +99,15 @@ export const DeckThumbnailDetails = (
               }
             >
               <>
+                {hopperTopMostId != null ? (
+                  <>
+                    <LabwareOnDeck
+                      x={HOPPER_LABWARE_X_OFFSET}
+                      y={0}
+                      labwareOnDeck={initialDeckSetup.labware[hopperTopMostId]}
+                    />
+                  </>
+                ) : null}
                 {rightBelowTopId != null ? (
                   <LabwareOnDeck
                     x={0}
@@ -119,6 +128,13 @@ export const DeckThumbnailDetails = (
                   setHover={setHover}
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
+                />
+                <SlotHover
+                  robotType={robotType}
+                  hover={hover}
+                  setHover={setHover}
+                  slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                  slotId={`hopper${slotId}`}
                 />
               </>
             </Module>

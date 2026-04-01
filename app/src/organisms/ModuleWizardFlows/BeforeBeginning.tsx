@@ -75,7 +75,7 @@ export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
           t={t}
           i18nKey="branded:module_calibration_get_started"
           values={{ module: moduleDisplayName }}
-          components={{ block: <LegacyStyledText as="p" /> }}
+          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
         />
       }
       proceedButtonText={t('start_setup')}

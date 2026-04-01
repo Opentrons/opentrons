@@ -7,7 +7,7 @@ from opentrons.protocol_api import (
 )
 from opentrons import types
 import math
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers
 from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
     MagneticBlockContext,
@@ -37,10 +37,10 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="tip trashes after every use",
         default=False,
     )
-    helpers.create_disposable_lid_parameter(parameters)
-    helpers.create_tc_lid_deck_riser_parameter(parameters)
-    helpers.create_two_pipette_mount_parameters(parameters)
-    helpers.create_deactivate_modules_parameter(parameters)
+    run_helpers.create_disposable_lid_parameter(parameters)
+    run_helpers.create_tc_lid_deck_riser_parameter(parameters)
+    run_helpers.create_two_pipette_mount_parameters(parameters)
+    run_helpers.create_deactivate_modules_parameter(parameters)
     parameters.add_int(
         variable_name="num_samples",
         display_name="number of samples",
@@ -77,7 +77,7 @@ def run(protocol: ProtocolContext) -> None:
     pipette_1000_mount = protocol.params.pipette_mount_1  # type: ignore[attr-defined]
     pipette_50_mount = protocol.params.pipette_mount_2  # type: ignore[attr-defined]
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
+    run_helpers.comment_protocol_version(protocol, "01")
 
     REUSE_ETOH_TIPS = True
     REUSE_RSB_TIPS = (
@@ -114,12 +114,12 @@ def run(protocol: ProtocolContext) -> None:
 
     # Importing Labware, Modules and Instruments
     magblock: MagneticBlockContext = protocol.load_module(
-        helpers.mag_str, "D2"
+        run_helpers.mag_str, "D2"
     )  # type: ignore[assignment]
     temp_mod: TemperatureModuleContext = protocol.load_module(
-        helpers.temp_str, "B3"
+        run_helpers.temp_str, "B3"
     )  # type: ignore[assignment]
-    temp_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
+    temp_plate, temp_adapter = run_helpers.load_temp_adapter_and_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt",
         temp_mod,
         "Temp Module Reservoir Plate",
@@ -127,7 +127,9 @@ def run(protocol: ProtocolContext) -> None:
 
     if not dry_run:
         temp_mod.set_temperature(4)
-    tc_mod: ThermocyclerContext = protocol.load_module(helpers.tc_str)  # type: ignore[assignment]
+    tc_mod: ThermocyclerContext = protocol.load_module(
+        run_helpers.tc_str
+    )  # type: ignore[assignment]
     # Just in case
     tc_mod.open_lid()
 
@@ -160,7 +162,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # Load TC Lids
     if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 5, "C4", deck_riser)
+        unused_lids = run_helpers.load_disposable_lids(protocol, 5, "C4", deck_riser)
     # Import Global Variables
 
     global tip50
@@ -225,7 +227,9 @@ def run(protocol: ProtocolContext) -> None:
     waste2 = reservoir.columns()[7]
     waste2_res = waste2[0]
 
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
+    run_helpers.find_liquid_height_of_loaded_liquids(
+        protocol, liquid_vols_and_wells, p50
+    )
 
     def tip_track(pipette: InstrumentContext, tip_count: Dict) -> None:
         """Track tip usage."""
@@ -258,7 +262,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            helpers.use_disposable_lid_with_tc(
+            run_helpers.use_disposable_lid_with_tc(
                 protocol, unused_lids, sample_plate, tc_mod
             )
         else:
@@ -290,7 +294,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            helpers.use_disposable_lid_with_tc(
+            run_helpers.use_disposable_lid_with_tc(
                 protocol, unused_lids, sample_plate, tc_mod
             )
         else:
@@ -325,7 +329,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(sample_plate, tc_mod, use_gripper=USE_GRIPPER)
 
         if disposable_lid:
-            helpers.use_disposable_lid_with_tc(
+            run_helpers.use_disposable_lid_with_tc(
                 protocol, unused_lids, sample_plate, tc_mod
             )
         else:
@@ -363,13 +367,13 @@ def run(protocol: ProtocolContext) -> None:
         if not dry_run:
             tc_mod.set_lid_temperature(105)
         if disposable_lid:
-            helpers.use_disposable_lid_with_tc(
+            run_helpers.use_disposable_lid_with_tc(
                 protocol, unused_lids, sample_plate_2, tc_mod
             )
         else:
             tc_mod.close_lid()
         if not dry_run:
-            helpers.perform_pcr(
+            run_helpers.perform_pcr(
                 protocol,
                 tc_mod,
                 initial_denature_time_sec=45,
@@ -923,6 +927,6 @@ def run(protocol: ProtocolContext) -> None:
     waste2_res = waste2[0]
 
     end_probed_wells = [waste1_res, waste2_res]
-    helpers.find_liquid_height_of_all_wells(protocol, p50, end_probed_wells)
+    run_helpers.find_liquid_height_of_all_wells(protocol, p50, end_probed_wells)
     if deactivate_mods:
-        helpers.deactivate_modules(protocol)
+        run_helpers.deactivate_modules(protocol)

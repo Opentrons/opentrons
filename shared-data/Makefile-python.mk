@@ -1,6 +1,6 @@
 # shared-data python code makefile
 
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 include ../scripts/push.mk
 
 # Host key location for robot
@@ -41,6 +41,8 @@ gripper_sources = $(wildcard gripper/definitions/*.json) $(wildcard gripper/sche
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
+files_to_check := python/opentrons_shared_data python_tests tools
+
 tests ?= python_tests
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
@@ -52,20 +54,26 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
+
+
 .PHONY: setup
 setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
+
+.PHONY: lock-py
+lock-py:
+	@$(UV) lock
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 
 .PHONY: clean
@@ -93,13 +101,14 @@ sdist: $(py_sources) $(json_sources)
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy python/opentrons_shared_data python_tests tools
-	$(python) -m black --check python/opentrons_shared_data python_tests tools
-	$(python) -m flake8 python/opentrons_shared_data python_tests tools
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(python) -m black python/opentrons_shared_data python_tests tools
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: push-no-restart
 push-no-restart: wheel
@@ -123,7 +132,7 @@ deploy: wheel sdist
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
+	$(pytest) --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema

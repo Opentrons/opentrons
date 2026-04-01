@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
+  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,12 +15,16 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
+  TIP,
   USED,
 } from '@opentrons/components'
 import {
   ALL,
   COLUMN,
   getPositionFromSlotId,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
   SINGLE,
 } from '@opentrons/shared-data'
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
@@ -29,15 +34,22 @@ import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
+import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
-import { TIP_STATE_TO_TIP_TYPE } from './constants'
+import {
+  INACCESSIBLE_COLLISION,
+  INACCESSIBLE_INCOMPLETE,
+  INACCESSIBLE_TOO_MANY_PICKUPS,
+  TIP_STATE_TO_TIP_TYPE,
+} from './constants'
 import { DeckOverlay } from './DeckOverlay'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
-import { TipLegend } from './TipLegend'
+import { SelectionLegend } from './SelectionLegend'
 import styles from './tipselectionwizard.module.css'
 import {
-  getAffectedWells,
   getAllWellsInColumn,
+  getAllWellsInRow,
   getViewboxFromSelectedLabware,
 } from './utils'
 
@@ -45,9 +57,15 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { TipSelectionBaseProps } from './types'
+import type {
+  AccessibilityStatus,
+  InaccessibleReason,
+  TipSelectionBaseProps,
+} from './types'
 
 const NINETY_SIX_ALL_TARGET_WELL = 'A1'
 
@@ -58,9 +76,9 @@ export function SelectTips(
     numTotalPickups: number
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
-    setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
-    primaryNozzle: string
-    tipAccessibilityStatus: Record<string, Record<string, boolean>>
+    setShowErrorBanner: Dispatch<SetStateAction<boolean>>
+    primaryNozzle: PrimaryNozzleConfigurationStyle
+    tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
 ): JSX.Element {
   const { t } = useTranslation('tip_selection')
@@ -78,7 +96,7 @@ export function SelectTips(
     selectedTips,
     setSelectedTips,
     numTotalPickups,
-    setShowPickupsRequiredBanner,
+    setShowErrorBanner,
     tipAccessibilityStatus,
     nozzles,
     primaryNozzle,
@@ -108,33 +126,51 @@ export function SelectTips(
       ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
       : {}
 
-  const allWellsAffectedByHover = getAffectedWells({
-    wellName: hoveredWell,
-    labwareDef,
-    channels,
+  const allWellsAffectedByHover = getEntireWellSelection(
+    hoveredWell,
+    labwareDef.ordering,
     nozzles,
-  })
+    primaryNozzle,
+    channels
+  )
 
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
-    well => tipAccessibileStatusByWellName[well] && tipState?.[well] !== EMPTY
+    well =>
+      tipAccessibileStatusByWellName[well].isAccessible &&
+      tipState?.[well] !== EMPTY
   )
+
+  // lower index means higher priority
+  const inaccessibilityPriority = [
+    INACCESSIBLE_COLLISION,
+    INACCESSIBLE_INCOMPLETE,
+    INACCESSIBLE_TOO_MANY_PICKUPS,
+    INACCESSIBLE_PARTIAL_TIP,
+  ]
+
+  const hoveredWellsInaccessibilityStatus =
+    allWellsAffectedByHover.reduce<InaccessibleReason | null>((acc, well) => {
+      const { isAccessible, inaccessibleReason } =
+        tipAccessibileStatusByWellName[well]
+      if (isAccessible || inaccessibleReason == null) {
+        return acc
+      }
+      if (acc == null) {
+        return inaccessibleReason
+      }
+      return inaccessibilityPriority.indexOf(inaccessibleReason) <
+        inaccessibilityPriority.indexOf(acc)
+        ? inaccessibleReason
+        : acc
+    }, null)
   const numPickupsRemaining = numTotalPickups - selectedTips.length
+  const hasPickupsRemaining = numPickupsRemaining > 0
 
   const handleUnselectWell = (unselectIndex: number): void => {
     setSelectedTips(selectedTips.slice(0, unselectIndex))
   }
 
   const handleClickWell = (wellName: string): void => {
-    if (
-      tipState?.[wellName] === 'EMPTY' ||
-      !tipAccessibileStatusByWellName[wellName] ||
-      (allWellsAffectedByHover.includes(wellName) &&
-        !areAllHoveredWellsAccessibleAndOccupied)
-    ) {
-      return
-    }
-    setShowPickupsRequiredBanner(false)
-
     const prevSelectedTipsByIndex = selectedTips.reduce<Record<string, number>>(
       (acc, tipList, index) => {
         const innerAcc = tipList.reduce((acc, tip) => {
@@ -145,18 +181,48 @@ export function SelectTips(
       {}
     )
 
+    if (
+      // always allow tip unselection
+      !(wellName in prevSelectedTipsByIndex) &&
+      (tipState?.[wellName] === 'EMPTY' ||
+        !tipAccessibileStatusByWellName[wellName].isAccessible ||
+        (allWellsAffectedByHover.includes(wellName) &&
+          !areAllHoveredWellsAccessibleAndOccupied))
+    ) {
+      return
+    }
+    setShowErrorBanner(false)
+
     if (channels === 1 || nozzles === SINGLE) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, [wellName]])
       }
-    } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+    } else if (nozzles === PARTIAL_COLUMN) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
+        const totalTipSelection =
+          PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles] ?? 0
+        const allWellsinColumn = getAllWellsInColumn(wellName, labwareDef)
+        const lengthOfColumn = allWellsinColumn.length
+        const allWellsInPartialColumn = allWellsinColumn.slice(
+          0,
+          lengthOfColumn - totalTipSelection
+        )
+        setSelectedTips(prevTips => [...prevTips, allWellsInPartialColumn])
+      }
+    } else if (
+      (channels === 8 && nozzles === ALL) ||
+      (channels === 96 && nozzles === COLUMN)
+    ) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
         const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
         setSelectedTips(prevTips => {
           const newTips = [...prevTips]
@@ -164,12 +230,24 @@ export function SelectTips(
           return newTips
         })
       }
-    } else if (channels === 96) {
+    } else if (channels === 96 && nozzles === ROW) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        handleUnselectWell(indexToUnselect)
+      } else if (hasPickupsRemaining) {
+        const allWellsInRow = getAllWellsInRow(wellName, labwareDef)
+        setSelectedTips(prevTips => {
+          const newTips = [...prevTips]
+          newTips.push(allWellsInRow)
+          return newTips
+        })
+      }
+    } else if (channels === 96 && nozzles === ALL) {
       const allWells = Object.keys(labwareDef.wells)
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, allWells])
       }
     }
@@ -186,6 +264,9 @@ export function SelectTips(
       transformedWellName = `A${column}`
     } else if (channels === 96 && nozzles === ALL) {
       transformedWellName = NINETY_SIX_ALL_TARGET_WELL
+    } else if (channels === 96 && nozzles === ROW) {
+      const rowName = wellName.slice(0, 1)
+      transformedWellName = `${rowName}1`
     }
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
@@ -235,13 +316,22 @@ export function SelectTips(
             (acc, [wellName, state]) => {
               const rawState = TIP_STATE_TO_TIP_TYPE[state]
               let status = rawState
-              if (!tipAccessibileStatusByWellName[wellName]) {
+              if (!tipAccessibileStatusByWellName[wellName].isAccessible) {
                 status = rawState === NO ? NO : INACCESSIBLE
               }
-              if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
-                status = rawState === USED ? SELECTED_USED : SELECTED
+              if (selectedTips.flat().some(tip => tip === wellName)) {
+                const isAccessible =
+                  tipAccessibileStatusByWellName[wellName].isAccessible
+                if (!isAccessible) {
+                  status = SELECTED_ERROR
+                } else {
+                  status = rawState === USED ? SELECTED_USED : SELECTED
+                }
               } else if (allWellsAffectedByHover.includes(wellName)) {
-                if (areAllHoveredWellsAccessibleAndOccupied) {
+                if (
+                  areAllHoveredWellsAccessibleAndOccupied &&
+                  hasPickupsRemaining
+                ) {
                   status = rawState === USED ? SELECTED_USED : SELECTED
                 } else {
                   status = SELECTED_ERROR
@@ -266,7 +356,7 @@ export function SelectTips(
           selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
-                tipStatusByWellName,
+                statusByWellName: tipStatusByWellName,
               }
             : {})}
           fill={COLORS.white}
@@ -279,29 +369,37 @@ export function SelectTips(
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
-            selectedTiprackId={selectedTiprackId}
+            selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
-            isAccessible={areAllHoveredWellsAccessibleAndOccupied}
+            isHoveredWellSelected={selectedTips
+              .flat()
+              .some(tip => tip === hoveredWell)}
+            hasPickupsRemaining={hasPickupsRemaining}
+            isAccessible={hoveredWellsInaccessibilityStatus == null}
+            inaccessibleReason={hoveredWellsInaccessibilityStatus}
             primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
+            nozzles={nozzles}
           />
         ) : null}
       </>
     )
   }
-
   return (
     <div className={styles.modal_body}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <StyledText desktopStyle="headingSmallBold">
           {t('click_to_select', { labwareName })}
         </StyledText>
-        {numPickupsRemaining > 0 ? (
-          <Chip
-            text={t('pickups_remaining', { count: numPickupsRemaining })}
-            type="info"
-            hasIcon={false}
-          />
-        ) : null}
+        <Chip
+          {...(hasPickupsRemaining
+            ? {
+                text: t('pickups_remaining', { count: numPickupsRemaining }),
+                type: 'info',
+              }
+            : { text: t('all_tips_selected'), type: 'success' })}
+          hasIcon={false}
+        />
       </Flex>
       <div className={styles.modal_body_select_tips}>
         <div className={styles.select_tips_deck_container}>
@@ -312,7 +410,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <TipLegend />
+        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
       </div>
     </div>
   )

@@ -1,39 +1,40 @@
 """FastAPI endpoint functions for the `/labwareOffsets` endpoints."""
 
-from datetime import datetime
 import textwrap
+from datetime import datetime
 from typing import Annotated, Literal
 
 import fastapi
 from pydantic.json_schema import SkipJsonSchema
-from server_utils.fastapi_utils.light_router import LightRouter
 
-from robot_server.labware_offsets.models import LabwareOffsetNotFound
-from robot_server.service.dependencies import (
-    UniqueIDFactory,
-    get_current_time,
-)
-from robot_server.service.json_api.request import RequestModel
-from robot_server.service.json_api.response import (
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     PydanticResponse,
+    RequestModel,
     SimpleBody,
     SimpleEmptyBody,
     SimpleMultiBody,
 )
 
-from .store import (
-    LabwareOffsetNotFoundError,
-    LabwareOffsetStore,
-    IncomingStoredLabwareOffset,
-)
 from .fastapi_dependencies import get_labware_offset_store
 from .models import (
     SearchCreate,
     StoredLabwareOffset,
     StoredLabwareOffsetCreate,
 )
-
+from .store import (
+    IncomingStoredLabwareOffset,
+    LabwareOffsetNotFoundError,
+    LabwareOffsetStore,
+)
+from robot_server.labware_offsets.models import LabwareOffsetNotFound
+from robot_server.service.dependencies import (
+    UniqueIDFactory,
+    get_current_time,
+)
 
 router = LightRouter()
 
@@ -54,6 +55,7 @@ router = LightRouter()
         """
     ),
     status_code=201,
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def post_labware_offsets(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],
@@ -195,6 +197,7 @@ async def search_labware_offsets(  # noqa: D103
     path="/labwareOffsets/{id}",
     summary="Delete a single labware offset",
     description="Delete a single labware offset. The deleted offset is returned.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_labware_offset(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],
@@ -217,6 +220,7 @@ async def delete_labware_offset(  # noqa: D103
     router.delete,
     path="/labwareOffsets",
     summary="Delete all labware offsets",
+    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def delete_all_labware_offsets(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],

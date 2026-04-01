@@ -6,7 +6,9 @@ import {
   defaultTo,
   maskToFloat,
   maskToInteger,
+  maskToSignedDecimal,
   maskToTime,
+  maskToTimeWithPlaceholders,
   numberOrNull,
   onlyPositiveNumbers,
   trimDecimals,
@@ -69,12 +71,7 @@ const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[newLocation] == null) {
-    return false
-  }
-  return (
-    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return labwareEntities[newLocation] != null
 }
 
 const getIsAdditionalEquipmentLocation = (
@@ -381,14 +378,6 @@ const stepFieldHelperMap = {
   profileVolume: stepFieldHelpers({
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
   }),
-  blockTargetTempHold: stepFieldHelpers({
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  }),
-  lidTargetTempHold: stepFieldHelpers({
-    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
-    castValue: Number,
-  }),
   mix_mmFromBottom: stepFieldHelpers({
     castValue: numberOrNull,
   }),
@@ -454,6 +443,12 @@ const stepFieldHelperMap = {
   conditioning_volume: stepFieldHelpers({
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: numberOrNull,
+  }),
+  pumpDurationTime: stepFieldHelpers({
+    maskValue: composeMaskers(maskToTimeWithPlaceholders),
+  }),
+  pressureMbar: stepFieldHelpers({
+    maskValue: composeMaskers(maskToSignedDecimal),
   }),
 }
 

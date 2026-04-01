@@ -1,10 +1,10 @@
 """Test drop tip commands."""
 
 from datetime import datetime
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
-from unittest.mock import sentinel
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons_shared_data.labware.labware_definition import (
@@ -12,33 +12,31 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters2,
 )
 
+from opentrons.hardware_control.types import TipScrapeType
 from opentrons.protocol_engine import (
+    DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellLocation,
     WellOffset,
-    DeckPoint,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.drop_tip import (
+    DropTipImplementation,
     DropTipParams,
     DropTipResult,
-    DropTipImplementation,
 )
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.pipetting_common import (
     TipPhysicallyAttachedError,
 )
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import LabwareWellId, TipRackWellState
-from opentrons.protocol_engine.execution import MovementHandler, TipHandler
-
-
 from opentrons.types import Point
-from opentrons.hardware_control.types import TipScrapeType
 
 
 @pytest.fixture
@@ -116,15 +114,10 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -226,15 +219,10 @@ async def test_drop_tip_with_alternating_locations(
     ).then_return(drop_location)
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=drop_location,
-            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -312,15 +300,10 @@ async def test_tip_attached_error(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -353,7 +336,7 @@ async def test_tip_attached_error(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        await mock_tip_handler.drop_tip(
+        await mock_tip_handler.drop_tip(  # type: ignore[func-returns-value]
             pipette_id="abc", home_after=None, scrape_type=TipScrapeType.NONE
         )
     ).then_raise(TipAttachedError("Egads!"))
@@ -431,15 +414,10 @@ async def test_stall_error(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 

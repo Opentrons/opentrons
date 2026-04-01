@@ -1,16 +1,31 @@
 import asyncio
-from pathlib import Path
 import time
-from multiprocessing import Process
-from typing import AsyncGenerator, Callable, Iterator, Union
 from collections import namedtuple
+from contextlib import asynccontextmanager, contextmanager
+from multiprocessing import Process
+from pathlib import Path
+from typing import AsyncGenerator, Callable, Iterator, Union
 
+from g_code_parsing.g_code_program.g_code_program import (
+    GCodeProgram,
+)
+from g_code_parsing.g_code_watcher import GCodeWatcher
+from g_code_parsing.utils import get_configuration_dir
 from opentrons import APIVersion
+from opentrons.config.robot_configs import build_config
+from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control.emulation.module_server.helpers import (
+    ModuleStatusClient,
+    wait_emulators,
+)
+from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
 from opentrons.hardware_control.emulation.settings import Settings
+from opentrons.hardware_control.types import HardwareFeatureFlags
+from opentrons.protocol_api import create_protocol_context
 from opentrons.protocol_engine import (
-    create_protocol_engine,
     Config,
     DeckType,
+    create_protocol_engine,
     error_recovery_policy,
 )
 from opentrons.protocol_reader.protocol_source import (
@@ -20,24 +35,9 @@ from opentrons.protocol_reader.protocol_source import (
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner import RunOrchestrator
-from opentrons.protocols.parse import parse
-from opentrons.protocols.execution import execute
 from opentrons.protocols.api_support import deck_type
-from contextlib import asynccontextmanager, contextmanager
-from opentrons.protocol_api import create_protocol_context
-from opentrons.config.robot_configs import build_config
-from opentrons.hardware_control.emulation.module_server.helpers import (
-    wait_emulators,
-    ModuleStatusClient,
-)
-from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
-from opentrons.hardware_control import API, ThreadManager
-from opentrons.hardware_control.types import HardwareFeatureFlags
-from g_code_parsing.g_code_program.g_code_program import (
-    GCodeProgram,
-)
-from g_code_parsing.g_code_watcher import GCodeWatcher
-from g_code_parsing.utils import get_configuration_dir
+from opentrons.protocols.execution import execute
+from opentrons.protocols.parse import parse
 from opentrons_shared_data.robot.types import RobotType
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])

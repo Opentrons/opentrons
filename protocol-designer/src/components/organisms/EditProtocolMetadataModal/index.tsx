@@ -14,9 +14,9 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '/protocol-designer/components/molecules'
 import {
   actions,
   selectors as fileSelectors,
@@ -96,7 +96,7 @@ export function EditProtocolMetadataModal(
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               value={description ?? ''}
               {...register('description')}
               height="6rem"

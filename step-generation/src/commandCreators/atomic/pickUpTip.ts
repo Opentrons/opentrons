@@ -1,10 +1,14 @@
 import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
 import {
+  incompletePickup,
   pipettingIntoColumn4,
   possiblePipetteCollision,
+  tooManyTips,
 } from '../../errorCreators'
 import {
   formatPyStr,
+  getDefaultPrimaryNozzle,
+  getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   uuid,
@@ -13,6 +17,7 @@ import {
 import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   CommandCreator,
@@ -21,7 +26,8 @@ import type {
 } from '../../types'
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
-  nozzles?: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   tipTrackingOption?: TipTrackingOption
 }
 
@@ -30,25 +36,48 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, labwareId, wellName, tipTrackingOption = AUTOMATIC } = args
+  const {
+    pipetteId,
+    labwareId,
+    wellName,
+    tipTrackingOption = AUTOMATIC,
+    nozzles,
+    primaryNozzle,
+  } = args
   const errors: CommandCreatorError[] = []
+  const channels = invariantContext.pipetteEntities[pipetteId].spec.channels
+  const isSafePipetteMovement = getIsSafePipetteMovement({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    //  we don't adjust the offset when moving to the tiprack
+    wellLocationOffset: { x: 0, y: 0 },
+    wellTargetName: wellName,
+    nozzleConfiguration: nozzles,
+    primaryNozzle: primaryNozzle,
+  })
 
-  const isMultiChannelPipette =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+  const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
+    tipState: prevRobotState.tipState.tipracks[labwareId],
+    primaryNozzle:
+      primaryNozzle ?? getDefaultPrimaryNozzle({ channels, nozzles }),
+    channels,
+    nozzleConfiguration: nozzles,
+    wellName,
+    tiprackDef: invariantContext.labwareEntities[labwareId].def,
+  })
 
-  if (
-    isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      //  we don't adjust the offset when moving to the tiprack
-      wellLocationOffset: { x: 0, y: 0 },
-      wellTargetName: wellName,
-    })
-  ) {
+  if (!isSafePipetteMovement) {
     errors.push(possiblePipetteCollision())
+  }
+
+  if (!isSafeWithinTiprack.isSafe) {
+    errors.push(tooManyTips())
+  }
+
+  if (isSafeWithinTiprack.isComplete !== true) {
+    errors.push(incompletePickup())
   }
 
   const tiprackSlot = getSlotInLocationStack(

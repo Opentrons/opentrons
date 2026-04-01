@@ -42,15 +42,20 @@ export function useConfirmPosition(
     setIsRobotPipetteMoving(!isRobotPipetteMoving)
   }
 
-  useEffect(() => {
-    if (
-      isRobotPipetteMoving &&
-      currentStep !== CONFIRM_POSITION &&
-      currentStep !== CHOOSE_LOCATION_OPTION
-    ) {
-      toggleIsRobotPipetteMoving()
-    }
-  }, [currentStep, isRobotPipetteMoving])
+  useEffect(
+    () => {
+      if (
+        isRobotPipetteMoving &&
+        currentStep !== CONFIRM_POSITION &&
+        currentStep !== CHOOSE_LOCATION_OPTION
+      ) {
+        toggleIsRobotPipetteMoving()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentStep, isRobotPipetteMoving]
+  )
 
   return {
     toggleIsRobotPipetteMoving,
@@ -89,7 +94,7 @@ export function ConfirmPosition({
             : INTERVENTION_CONTAINER_STYLE
         }
       >
-        <Icon name="alert-circle" css={ICON_STYLE} />
+        <Icon name="ot-alert" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {currentRoute === DT_ROUTES.BLOWOUT
             ? t('confirm_blowout_location')

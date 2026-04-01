@@ -2,91 +2,90 @@
 
 Contains routes dealing primarily with `Run` models.
 """
+
 import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Callable, Final, Literal, Optional, Union, Dict
+from typing import Annotated, Callable, Dict, Final, Literal, Optional, Union
 
-from fastapi import Depends, status, Query
+from fastapi import Depends, Query, status
 from pydantic import BaseModel, Field
-from server_utils.fastapi_utils.light_router import LightRouter
 
-
-from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.types import EstopState
-from opentrons.protocol_engine.commands.absorbance_reader import CloseLid, OpenLid
-from opentrons.protocol_engine.commands.move_labware import MoveLabware
-from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
-
-from robot_server.data_files.models import FileIdNotFound, FileIdNotFoundError
-from robot_server.data_files.dependencies import (
-    get_data_files_directory,
-    get_data_files_store,
-)
-from robot_server.data_files.data_files_store import DataFilesStore
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.protocols.protocol_models import ProtocolKind
-from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.robot.control.dependencies import require_estop_in_good_state
-from robot_server.hardware import get_hardware, get_robot_type_enum
-
-from robot_server.service.json_api import (
+from opentrons.protocol_engine.commands.absorbance_reader import CloseLid, OpenLid
+from opentrons.protocol_engine.commands.move_labware import MoveLabware
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    Body,
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
     RequestModel,
+    ResourceLink,
     SimpleBody,
     SimpleEmptyBody,
     SimpleMultiBody,
-    MultiBody,
-    MultiBodyMeta,
-    ResourceLink,
-    PydanticResponse,
-    Body,
 )
 
-from robot_server.protocols.dependencies import get_protocol_store
-from robot_server.protocols.protocol_store import (
-    ProtocolStore,
-    ProtocolNotFoundError,
-)
-from robot_server.protocols.router import ProtocolNotFound
-
-from ..run_models import (
-    PlaceLabwareState,
-    RunNotFoundError,
-    ActiveNozzleLayout,
-    RunCurrentState,
-    CommandLinkNoMeta,
-    NozzleLayoutConfig,
-    TipState,
-    FlexStackerState,
+from ..dependencies import (
+    get_run_auto_deleter,
+    get_run_data_manager,
 )
 from ..run_auto_deleter import RunAutoDeleter
-from ..run_models import Run, BadRun, RunCreate, RunUpdate
-from ..run_orchestrator_store import RunConflictError
 from ..run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
 )
-from ..dependencies import (
-    get_run_data_manager,
-    get_run_auto_deleter,
-    get_quick_transfer_run_auto_deleter,
+from ..run_models import (
+    ActiveNozzleLayout,
+    BadRun,
+    CommandLinkNoMeta,
+    FlexStackerState,
+    NozzleLayoutConfig,
+    PlaceLabwareState,
+    Run,
+    RunCreate,
+    RunCurrentState,
+    RunNotFoundError,
+    RunUpdate,
+    TipState,
 )
-
+from ..run_orchestrator_store import RunConflictError
+from robot_server.camera.fastapi_dependencies import (
+    get_camera_provider,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
+from robot_server.data_files.dependencies import (
+    get_data_files_directory,
+    get_data_files_store,
+)
+from robot_server.data_files.models import FileIdNotFound, FileIdNotFoundError
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.camera.fastapi_dependencies import (
-    get_camera_provider,
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.hardware import get_hardware, get_robot_type_enum
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_store import (
+    ProtocolNotFoundError,
+    ProtocolStore,
 )
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from robot_server.protocols.router import ProtocolNotFound
+from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -186,6 +185,7 @@ async def get_run_data_from_url(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run(  # noqa: C901
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -195,9 +195,6 @@ async def create_run(  # noqa: C901
     run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
-    quick_transfer_run_auto_deleter: Annotated[
-        RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
-    ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
@@ -216,7 +213,6 @@ async def create_run(  # noqa: C901
         created_at: Timestamp to attach to created run.
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
-        quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
         data_files_directory: Persistence directory for data files.
         data_files_store: Database of data file resources.
         resources to make room for the new run.
@@ -263,13 +259,7 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_deleter: RunAutoDeleter = run_auto_deleter
-    if (
-        protocol_resource
-        and protocol_resource.protocol_kind == ProtocolKind.QUICK_TRANSFER
-    ):
-        run_deleter = quick_transfer_run_auto_deleter
-    run_deleter.make_room_for_new_run()
+    run_auto_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(
@@ -331,9 +321,11 @@ async def get_runs(
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
-        current=ResourceLink.model_construct(href=f"/runs/{current_run_id}")
-        if current_run_id is not None
-        else None
+        current=(
+            ResourceLink.model_construct(href=f"/runs/{current_run_id}")
+            if current_run_id is not None
+            else None
+        )
     )
 
     return await PydanticResponse.create(
@@ -375,6 +367,7 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def remove_run(
     runId: str,
@@ -411,6 +404,7 @@ async def remove_run(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def update_run(
     runId: str,
@@ -676,12 +670,14 @@ async def get_current_state(  # noqa: C901
 
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(
-        lastCompleted=CommandLinkNoMeta.model_construct(
-            id=last_completed_command.command_id,
-            href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+        lastCompleted=(
+            CommandLinkNoMeta.model_construct(
+                id=last_completed_command.command_id,
+                href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+            )
+            if last_completed_command is not None
+            else None
         )
-        if last_completed_command is not None
-        else None
     )
 
     return await PydanticResponse.create(

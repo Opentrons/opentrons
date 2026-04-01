@@ -1,6 +1,6 @@
 # opentrons g-code-testing makefile
 
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
@@ -15,14 +15,25 @@ test_opts ?=  --cov=g_code_parsing --cov-report term-missing:skip-covered --cov-
 tests_to_typecheck := \
 	tests/g_code_parsing
 
+files_to_check := g_code_parsing tests cli.py
+
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
+
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
+
+.PHONY: setup-py
+setup-py: setup
+
+.PHONY: lock
+lock:
+	$(UV) lock
 
 .PHONY: clean
 clean:
@@ -30,7 +41,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 .PHONY: test
 test:
@@ -59,41 +70,41 @@ test-g-code-omega:
 .PHONY: lint
 lint: lint-other
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
-	$(python) -m black --check g_code_parsing tests cli.py
-	$(python) -m flake8 g_code_parsing tests cli.py
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format: format-other
-	$(python) -m black g_code_parsing tests cli.py
-
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: get-g-code-configurations
 get-g-code-configurations:
-	$(pipenv) run python cli.py configurations
+	$(python) cli.py configurations
 
 .PHONY: run-g-code-configuration
 run-g-code-configuration:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py run ${name}
+	$(python) cli.py run ${name}
 
 .PHONY: load-g-code-configuration-comparison
 load-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py load-comparison ${name}
+	$(python) cli.py load-comparison ${name}
 
 .PHONY: diff-g-code-configuration-comparison
 diff-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py diff ${name}
+	$(python) cli.py diff ${name}
 
 .PHONY: update-g-code-configuration-comparison
 update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py update-comparison ${name}
+	$(python) cli.py update-comparison ${name}
 
 .PHONY: check-for-missing-comparison-files
 check-for-missing-comparison-files:
-	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
+	$(python) cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
 
 FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
 

@@ -4,6 +4,7 @@ import argparse
 import os
 import json
 import requests
+from pathlib import Path
 import sys
 from abr_testing.data_collection import read_robot_logs
 from abr_testing.automation import google_drive_tool
@@ -19,7 +20,7 @@ def get_run_ids_from_robot(ip: str) -> Set[str]:
         run_data = response.json()
         run_list = run_data.get("data", "")
     except requests.exceptions.RequestException:
-        print(f"Could not connect to robot with IP {ip}")
+        print(f"❌Could not connect to robot with IP {ip}")
         run_list = []
     for run in run_list:
         run_id = run["id"]
@@ -82,7 +83,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     return run
 
 
-def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> Set[str]:
+def save_runs(runs_to_save: Set[str], ip: str, storage_directory: Path) -> Set[str]:
     """Saves runs to user given storage directory."""
     saved_file_paths = set()
     for a_run in runs_to_save:
@@ -96,7 +97,7 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> Set[st
 
 
 def get_all_run_logs(
-    storage_directory: str, google_drive: google_drive_tool.google_drive
+    storage_directory: Path, google_drive: google_drive_tool.google_drive
 ) -> None:
     """GET ALL RUN LOGS.
 
@@ -120,7 +121,7 @@ def get_all_run_logs(
         google_drive.upload_missing_files(storage_directory)
 
 
-def run(storage_directory: str, folder_name: str, email: str) -> None:
+def run(storage_directory: Path, folder_name: str, email: str) -> None:
     """Main control function."""
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")

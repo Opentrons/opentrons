@@ -1,6 +1,5 @@
 """Dependency functions for use with `fastapi.Depends()`."""
 
-
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -24,7 +23,6 @@ from robot_server.service.notifications import (
     DeckConfigurationPublisher,
     get_deck_configuration_publisher,
 )
-
 
 _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 

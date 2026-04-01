@@ -7,29 +7,28 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.types import Point
 from opentrons.hardware_control import API as HardwareAPI
-
-from opentrons.protocol_engine.execution import PipettingHandler, GantryMover
 from opentrons.protocol_engine.commands.aspirate_in_place import (
+    AspirateInPlaceImplementation,
     AspirateInPlaceParams,
     AspirateInPlaceResult,
-    AspirateInPlaceImplementation,
 )
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirateError
+from opentrons.protocol_engine.execution import GantryMover, PipettingHandler
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.types import (
-    CurrentWell,
-    CurrentPipetteLocation,
-    CurrentAddressableArea,
     AspiratedFluid,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
     FluidKind,
 )
-from opentrons.protocol_engine.state import update_types
+from opentrons.types import Point
 
 
 @pytest.fixture

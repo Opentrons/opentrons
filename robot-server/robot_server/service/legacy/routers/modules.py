@@ -1,25 +1,27 @@
-import typing
 import asyncio
+import typing
+
+from fastapi import APIRouter, Depends, Path
 from starlette import status
-from fastapi import Path, APIRouter, Depends
 
-from opentrons.hardware_control import modules, HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, modules
 from opentrons.hardware_control.modules import AbstractModule
-
-from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
 from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
-from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.modules import (
     Module,
     Modules,
-    SerialCommandResponse,
-    SerialCommand,
     PhysicalPort,
+    SerialCommand,
+    SerialCommandResponse,
 )
+from robot_server.versioning import get_requested_version
 
 router = APIRouter()
 
@@ -75,6 +77,7 @@ async def get_modules(
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
     deprecated=True,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_serial_command(
     command: SerialCommand,
@@ -99,7 +102,7 @@ async def post_serial_command(
         ).as_error(status.HTTP_404_NOT_FOUND)
 
     # Search for the module
-    matching_mod = find_matching_module(serial, attached_modules)
+    matching_mod = _find_matching_module(serial, attached_modules)
 
     if not matching_mod:
         raise LegacyErrorResponse.from_exc(
@@ -142,6 +145,7 @@ async def post_serial_command(
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
+    dependencies=[Depends(require_scopes(Scope.UPDATES_WRITE))],
 )
 async def post_serial_update(
     serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
@@ -149,7 +153,7 @@ async def post_serial_update(
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules
-    matching_module = find_matching_module(serial, attached_modules)
+    matching_module = _find_matching_module(serial, attached_modules)
 
     if not matching_module:
         raise LegacyErrorResponse.from_exc(
@@ -183,7 +187,7 @@ async def post_serial_update(
     ).as_error(status_code)
 
 
-def find_matching_module(
+def _find_matching_module(
     serial: str, attached_modules: typing.List[AbstractModule]
 ) -> typing.Optional[AbstractModule]:
     """

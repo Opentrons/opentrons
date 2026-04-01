@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  getFullStackFromLabwares,
   getIsRetractSafeForAirGap,
   getTransferPlanAndReferenceVolumes,
 } from '../misc'
@@ -329,7 +330,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
   it('should return isSupported false for multiDispense if not enough volume', () => {
     const result = getTransferPlanAndReferenceVolumes({
       pipetteSpecs: MOCK_P10_SPECS,
-      tiprackDefinition: fixtureTiprack10ul,
+      tiprackDefinition: { ...fixtureTiprack10ul, namespace: 'opentrons' },
       volume: 6,
       path: 'multiDispense',
       numAspirateWells: 1,
@@ -435,5 +436,21 @@ describe('getIsRetractSafeForAirGap', () => {
     vi.mocked(getMmFromBottom).mockReturnValue(11)
     const result = getIsRetractSafeForAirGap(args)
     expect(result).toBe(false)
+  })
+})
+
+describe('getFullStackFromLabwares', () => {
+  it('return the top stack of labwares', () => {
+    const labware = {
+      labwareId1: {
+        stack: ['labwareId1', 'D3'],
+      },
+      labwareId2: {
+        stack: ['labwareId2', 'labwareId1', 'D3'],
+      },
+    }
+    const slot = 'D3'
+    const largestStack = getFullStackFromLabwares(labware, slot, undefined)
+    expect(largestStack).toEqual(['labwareId2', 'labwareId1', 'D3'])
   })
 })

@@ -8,10 +8,12 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   CheckboxField,
+  COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
+  Icon,
   InfoScreen,
   InlineNotification,
   InputField,
@@ -27,16 +29,18 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
+  getMaxPoolCount,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -118,25 +122,27 @@ export function SelectLabwareModal(
   const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
   const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
 
-  const [areCategoriesExpanded, setAreCategoriesExpanded] =
+  const [userCategoryExpandState, setUserCategoryExpandState] =
     useState<CategoryExpand>(allCategoriesCollapsed)
 
   const [searchTerm, setSearchTerm] = useState<string>('')
+  const areCategoriesExpanded = searchTerm
+    ? allCategoriesExpanded
+    : userCategoryExpandState
 
-  useEffect(() => {
-    setAreCategoriesExpanded(
-      searchTerm ? allCategoriesExpanded : allCategoriesCollapsed
-    )
-  }, [searchTerm, allCategoriesExpanded, allCategoriesCollapsed])
-
-  useEffect(() => {
-    if (!hasNoLabware && error != null) {
-      setError(null)
-    }
-  }, [hasNoLabware])
+  useEffect(
+    () => {
+      if (!hasNoLabware && error != null) {
+        setError(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNoLabware]
+  )
 
   const handleResetLabwareTools = (): void => {
-    setAreCategoriesExpanded(allCategoriesCollapsed)
+    setUserCategoryExpandState(allCategoriesCollapsed)
     setSearchTerm('')
   }
 
@@ -146,7 +152,7 @@ export function SelectLabwareModal(
   const modulesById = deckSetup.modules
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
-  const onFlexStacker = moduleType === FLEX_STACKER_MODULE_TYPE
+  const isOnHopper = getIsSlotAHopper(slot)
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
@@ -203,33 +209,40 @@ export function SelectLabwareModal(
         parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
   )
 
-  const labwareByCategory = useMemo(() => {
-    return reduce<
-      LabwareDefByDefURI,
-      { [category: string]: LabwareDefinition2[] }
-    >(
-      defs,
-      (acc, def: (typeof defs)[keyof typeof defs]) => {
-        const category: string = def.metadata.displayCategory
-        //  filter out non-permitted tipracks
-        if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
-        ) {
-          return acc
-        }
+  const labwareByCategory = useMemo(
+    () => {
+      return reduce<
+        LabwareDefByDefURI,
+        { [category: string]: LabwareDefinition2[] }
+      >(
+        defs,
+        (acc, def: (typeof defs)[keyof typeof defs]) => {
+          const category: string = def.metadata.displayCategory
+          //  filter out non-permitted tipracks
+          if (
+            category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))
+          ) {
+            return acc
+          }
 
-        return {
-          ...acc,
-          [category]: [...(acc[category] || []), def],
-        }
-      },
-      {}
-    )
-  }, [permittedTipracks])
+          return {
+            ...acc,
+            [category]: [...(acc[category] || []), def],
+          }
+        },
+        {}
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [permittedTipracks]
+  )
 
   const filteredLabwareByCategory: Record<string, LabwareInfo[]> = useMemo(
     () =>
@@ -267,15 +280,17 @@ export function SelectLabwareModal(
           ),
         }
       }, {}),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [labwareByCategory, getIsLabwareFiltered, searchTerm]
   )
 
   const handleCategoryClick = (category: string, expand?: boolean): void => {
     const updatedExpandState = {
-      ...areCategoriesExpanded,
-      [category]: expand ?? !areCategoriesExpanded[category],
+      ...userCategoryExpandState,
+      [category]: expand ?? !userCategoryExpandState[category],
     }
-    setAreCategoriesExpanded(updatedExpandState)
+    setUserCategoryExpandState(updatedExpandState)
   }
 
   const validateQuantity = (): boolean => {
@@ -288,7 +303,17 @@ export function SelectLabwareModal(
       customLabwareDefs[selectedTopLabware.labwareDefURI]
 
     const amount = selectedTopLabware.amount ?? 0
-    const stackLimit = selectedLabwareDef.stackLimit ?? STACK_LIMIT // the range is 1-5
+    const hopperStackLimit = getMaxPoolCount({
+      labwareDefinitions: {
+        primary: selectedLabwareDef,
+        adapter: null,
+        lid: null,
+      },
+      model: FLEX_STACKER_MODULE_V1,
+    })
+    const stackLimit = isOnHopper
+      ? hopperStackLimit
+      : (selectedLabwareDef.stackLimit ?? STACK_LIMIT)
 
     if (amount < 1 || amount > stackLimit) {
       return false
@@ -392,11 +417,18 @@ export function SelectLabwareModal(
             }}
             placeholder={t('search_labware')}
             size="medium"
-            leftIcon="search"
-            showDeleteIcon
-            onDelete={() => {
-              setSearchTerm('')
-            }}
+            leftElement={
+              <Icon name="search" size="1.25rem" color={COLORS.grey60} />
+            }
+            rightElement={
+              <Icon
+                name="close"
+                size="1.75rem"
+                onClick={() => {
+                  setSearchTerm('')
+                }}
+              />
+            }
           />
           {moduleType != null ||
           (isNextToHeaterShaker && robotType === OT2_ROBOT_TYPE) ? (
@@ -430,7 +462,7 @@ export function SelectLabwareModal(
             slot={slot}
             handleCategoryClick={handleCategoryClick}
             areCategoriesExpanded={areCategoriesExpanded}
-            onFlexStacker={onFlexStacker}
+            isOnHopper={isOnHopper}
             filteredLabwareByCategory={filteredLabwareByCategory}
             universalLid={universalLid}
           />
@@ -444,7 +476,7 @@ export function SelectLabwareModal(
               slot={slot}
               handleCategoryClick={handleCategoryClick}
               areCategoriesExpanded={areCategoriesExpanded}
-              onFlexStacker={onFlexStacker}
+              isOnHopper={isOnHopper}
               filteredLabwareByCategory={filteredLabwareByCategory}
               searchFilter={searchFilter}
               getIsLabwareFiltered={getIsLabwareFiltered}

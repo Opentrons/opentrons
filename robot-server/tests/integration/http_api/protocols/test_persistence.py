@@ -1,24 +1,24 @@
 import asyncio
-from pathlib import Path
 import secrets
-from typing import Callable, Dict, IO, List
+from pathlib import Path
+from typing import IO, Callable, Dict, List
 
 import anyio
 import pytest
 
-from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
-
 from tests.integration.dev_server import DevServer
+from tests.integration.protocol_files import get_json_protocol, get_py_protocol
 from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
-from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
+from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 pytestmark = pytest.mark.slow
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 async def test_protocols_and_analyses_persist(
-    protocol: Callable[[str], IO[bytes]]
+    protocol: Callable[[str], IO[bytes]],
 ) -> None:
     """Test protocol and analysis persistence.
 
@@ -80,6 +80,7 @@ async def test_protocols_and_analyses_persist(
             server.stop()
 
 
+@pytest.mark.slow
 async def test_protocol_labware_files_persist() -> None:
     """Upload a python protocol and 2 custom labware files.
 

@@ -1,26 +1,26 @@
+from typing import Dict, Iterator, List, Tuple, Union, cast
+
 import pytest
-from typing import Dict, List, Tuple, Union, Iterator, cast
-
-from opentrons.hardware_control import nozzle_manager
-
-from opentrons.types import Point, NozzleConfigurationType
 
 from opentrons_shared_data.pipette.load_data import load_definition
-from opentrons_shared_data.pipette.types import (
-    PipetteModelType,
-    PipetteChannelType,
-    PipetteVersionType,
-    PipetteOEMType,
-)
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     ValidNozzleMaps,
 )
-from tests.opentrons.protocol_engine.pipette_fixtures import (
-    NINETY_SIX_ROWS,
-    NINETY_SIX_COLS,
-    EIGHT_CHANNEL_COLS,
+from opentrons_shared_data.pipette.types import (
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteOEMType,
+    PipetteVersionType,
 )
+from tests.opentrons.protocol_engine.pipette_fixtures import (
+    EIGHT_CHANNEL_COLS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_ROWS,
+)
+
+from opentrons.hardware_control import nozzle_manager
+from opentrons.types import NozzleConfigurationType, Point
 
 # Ninety six channel valid nozzle maps
 NINETY_SIX_FULL: Dict[str, List[str]] = {

@@ -1,14 +1,14 @@
 from typing import Iterator
 
 import pytest
-from opentrons.hardware_control.emulation.settings import Settings
 
 from g_code_parsing import g_code_watcher
+from g_code_parsing.errors import PollingGCodeAdditionError
 from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
-from g_code_parsing.errors import PollingGCodeAdditionError
+from opentrons.hardware_control.emulation.settings import Settings
 
 
 @pytest.fixture

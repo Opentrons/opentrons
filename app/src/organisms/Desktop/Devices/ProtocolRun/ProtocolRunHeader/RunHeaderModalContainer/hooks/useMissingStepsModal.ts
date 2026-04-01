@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { useConditionalConfirm } from '@opentrons/components'
 
+import { isModuleConfirmationStatus } from '/app/local-resources/runs/utils'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   getMissingSetupSteps,
@@ -58,7 +58,7 @@ export function useMissingStepsModal({
   const shouldShowHSConfirm =
     isHeaterShakerInProtocol &&
     !isHeaterShakerShaking &&
-    (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+    isModuleConfirmationStatus(runStatus)
 
   // Certain steps are not confirmed by the app, so don't include these in the modal.
   const reportableMissingSetupSteps = missingSetupSteps.filter(

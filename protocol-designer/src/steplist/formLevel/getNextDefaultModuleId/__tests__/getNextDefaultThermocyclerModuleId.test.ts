@@ -21,9 +21,10 @@ const getThermocycler = () => ({
   slot: '_span781011',
   moduleState: {
     type: THERMOCYCLER_MODULE_TYPE,
-    blockTargetTemp: null,
+    currentBlockActivity: { type: 'blockDeactivated' as const },
     lidTargetTemp: null,
     lidOpen: null,
+    numProfilesStarted: 0,
   },
   pythonName: 'mockPythonName',
 })

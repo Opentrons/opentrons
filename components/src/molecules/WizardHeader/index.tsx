@@ -1,4 +1,5 @@
-import { LegacyStyledText, StepMeter, StyledText } from '../../atoms'
+import { StepMeter, StyledText } from '../../atoms'
+import { grey60 } from '../../helix-design-system/colors'
 import { Box, Btn, Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
@@ -45,16 +46,28 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           currentStep != null &&
           totalSteps != null &&
           currentStep > 0 ? (
-            <LegacyStyledText className={styles.step_text}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              oddStyle="bodyTextSemiBold"
+              color={grey60}
+            >
               {`Step ${currentStep} / ${totalSteps}`}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
         {onExit != null ? (
-          <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
-            <LegacyStyledText className={styles.exit_button}>
+          <Btn
+            onClick={onExit}
+            aria-label="Exit"
+            disabled={exitDisabled}
+            className={styles.exit_button}
+          >
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              oddStyle="bodyTextSemiBold"
+            >
               {exitButtonCopy ?? 'Exit'}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         ) : null}
       </Flex>

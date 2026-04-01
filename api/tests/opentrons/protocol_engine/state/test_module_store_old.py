@@ -4,61 +4,62 @@ DEPRECATED: Testing ModuleStore independently of ModuleView is no longer helpful
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
-from typing import List, Set, cast, Dict, Optional
+
+from typing import Dict, List, Optional, Set, cast
 
 import pytest
-
-from opentrons.protocol_engine.state import update_types
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.deck.types import DeckDefinitionV5
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import commands, actions
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
+
+from opentrons.hardware_control.modules.types import LiveData
+from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.commands import (
     heater_shaker as hs_commands,
+)
+from opentrons.protocol_engine.commands import (
     temperature_module as temp_commands,
+)
+from opentrons.protocol_engine.commands import (
     thermocycler as tc_commands,
 )
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleDefinition,
-    ModuleModel,
-    HeaterShakerLatchStatus,
-    DeckType,
-    AddressableArea,
-    DeckConfigurationType,
-    PotentialCutoutFixture,
+from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
 )
-
-from opentrons.protocol_engine.state.modules import (
-    ModuleStore,
-    ModuleState,
-    HardwareModule,
-)
-
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleId,
-    MagneticModuleSubState,
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
     TemperatureModuleId,
     TemperatureModuleSubState,
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
-    AbsorbanceReaderSubState,
-    AbsorbanceReaderId,
-    ModuleSubStateType,
 )
-
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
+from opentrons.protocol_engine.state.modules import (
+    HardwareModule,
+    ModuleState,
+    ModuleStore,
 )
-from opentrons.protocol_engine.state.config import Config
-from opentrons.hardware_control.modules.types import LiveData
-from opentrons.protocol_engine.resources import deck_configuration_provider
-
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    ModuleDefinition,
+    ModuleModel,
+    PotentialCutoutFixture,
+)
+from opentrons.types import DeckSlotName
 
 _OT2_STANDARD_CONFIG = Config(
     use_simulated_deck_config=False,

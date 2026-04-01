@@ -41,11 +41,14 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
         gridGap={SPACING.spacing4}
         color={COLORS.black90}
       >
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {title}
         </LegacyStyledText>
         {body != null ? (
-          <LegacyStyledText as="p">{body}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
         ) : null}
       </Flex>
     </Flex>

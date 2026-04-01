@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { BaseDeck } from '@opentrons/components'
+import { BaseDeck, LabwareInfoOverlay } from '@opentrons/components'
 import {
   fixtureTiprack300ul,
   getModuleDef,
@@ -14,7 +14,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 
-import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
 import type { ComponentProps } from 'react'
@@ -29,6 +28,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   return {
     ...actualComponents,
     BaseDeck: vi.fn(),
+    LabwareInfoOverlay: vi.fn(),
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {

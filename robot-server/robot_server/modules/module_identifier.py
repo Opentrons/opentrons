@@ -1,4 +1,5 @@
 """Identify hardware modules in the robot server."""
+
 import hashlib
 from dataclasses import dataclass
 from typing import Mapping

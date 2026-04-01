@@ -8,10 +8,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -53,7 +53,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   >(state.blowOutDispense?.location)
 
   const [disposalVolume, setDisposalVolume] = useState<number | undefined>(
-    state?.disposalVolume
+    state?.disposalVolumeDispenseSettings?.volume
   )
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
@@ -88,7 +88,8 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
 
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
-    state.transferType
+    state.transferType,
+    state.dropTipLocation
   )
 
   const handleClickBackOrExit = (): void => {
@@ -118,8 +119,6 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
       dispatch({
         type: ACTIONS.SET_PIPETTE_PATH,
         path: selectedPath as PathOption,
-        disposalVolume,
-        blowOutLocation,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -203,12 +202,18 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
+              autoFocus
               type="number"
               value={disposalVolume}
-              title={t('disposal_volume_µL')}
+              label={t('disposal_volume_µL')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setDisposalVolume(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

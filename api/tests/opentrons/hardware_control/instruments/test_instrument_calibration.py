@@ -3,25 +3,26 @@ from datetime import datetime
 from typing import Union, cast
 
 import pytest
-from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy
+from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons_shared_data.labware.types import (
-    LabwareUri,
-    LabwareDefinition2 as LabwareDef2Dict,
-)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     Parameters2,
 )
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition2 as LabwareDef2Dict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareUri,
+)
 
-
-from opentrons import calibration_storage, types as top_types
-from opentrons.config import feature_flags
-
+from opentrons import calibration_storage
+from opentrons import types as top_types
 from opentrons.calibration_storage import helpers as calibration_storage_helpers
 from opentrons.calibration_storage.ot2.models import v1 as v1_models
 from opentrons.calibration_storage.ot3.models import v1 as ot3_models
+from opentrons.config import feature_flags
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration as subject
 from opentrons.hardware_control.instruments.ot3 import (
     instrument_calibration as subject_ot3,

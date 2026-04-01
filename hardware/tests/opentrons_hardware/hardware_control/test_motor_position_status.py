@@ -1,11 +1,13 @@
 """Tests for the motor position status tools."""
-import pytest
-from typing import Tuple, List, Any
-import asyncio
 
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt32Field,
-    Int32Field,
+import asyncio
+from typing import Any, List, Tuple
+
+import pytest
+
+from opentrons_hardware.firmware_bindings.arbitration_id import (
+    ArbitrationId,
+    ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
@@ -15,11 +17,10 @@ from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFl
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     MotorPositionResponse as motor_payload,
 )
-from opentrons_hardware.firmware_bindings.arbitration_id import (
-    ArbitrationId,
-    ArbitrationIdParts,
+from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
+    UInt32Field,
 )
-
 from opentrons_hardware.hardware_control import motor_position_status
 from opentrons_hardware.hardware_control.types import MotorPositionStatus
 

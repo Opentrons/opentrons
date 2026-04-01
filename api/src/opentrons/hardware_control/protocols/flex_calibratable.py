@@ -1,24 +1,25 @@
-from typing import Optional, Tuple, List, AsyncIterator, Union
 import contextlib
+from typing import TYPE_CHECKING, AsyncIterator, List, Optional, Tuple, Union
+
 from typing_extensions import Protocol
 
 from opentrons import types as top_types
-from opentrons.config.types import (
-    CapacitivePassSettings,
-)
 from opentrons.hardware_control.types import (
     Axis,
-    OT3Mount,
-    InstrumentProbeType,
     GripperProbe,
+    InstrumentProbeType,
+    OT3Mount,
 )
-from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    GripperCalibrationOffset,
-    PipetteOffsetSummary,
-)
-from opentrons.hardware_control.modules.module_calibration import (
-    ModuleCalibrationOffset,
-)
+
+if TYPE_CHECKING:
+    from opentrons.config.types import CapacitivePassSettings
+    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+        GripperCalibrationOffset,
+        PipetteOffsetSummary,
+    )
+    from opentrons.hardware_control.modules.module_calibration import (
+        ModuleCalibrationOffset,
+    )
 
 
 class FlexCalibratable(Protocol):
@@ -29,7 +30,7 @@ class FlexCalibratable(Protocol):
         mount: OT3Mount,
         moving_axis: Axis,
         target_pos: float,
-        pass_settings: CapacitivePassSettings,
+        pass_settings: "CapacitivePassSettings",
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
     ) -> Tuple[float, bool]:
@@ -65,8 +66,7 @@ class FlexCalibratable(Protocol):
         begin: top_types.Point,
         end: top_types.Point,
         speed_mm_s: float,
-    ) -> List[float]:
-        ...
+    ) -> List[float]: ...
 
     # Note that there is a default implementation of this function to allow for
     # the asynccontextmanager decorator to propagate properly.
@@ -76,21 +76,16 @@ class FlexCalibratable(Protocol):
 
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    def add_gripper_probe(self, probe: GripperProbe) -> None:
-        ...
+    def add_gripper_probe(self, probe: GripperProbe) -> None: ...
 
-    def remove_gripper_probe(self) -> None:
-        ...
+    def remove_gripper_probe(self) -> None: ...
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary]:
-        ...
+    ) -> Union["GripperCalibrationOffset", "PipetteOffsetSummary"]: ...
 
     async def save_module_offset(
         self, module_id: str, mount: OT3Mount, slot: str, offset: top_types.Point
-    ) -> Optional[ModuleCalibrationOffset]:
-        ...
+    ) -> Optional["ModuleCalibrationOffset"]: ...

@@ -1,27 +1,29 @@
 """Tests for RunDataManager."""
 
-import pytest
 from datetime import datetime
+
+import pytest
 from decoy import Decoy
 
-from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import (
+    CommandSlice,
     EngineStatus,
+    ErrorOccurrence,
+    LabwareOffset,
+    Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
     StateSummary,
     commands,
+)
+from opentrons.protocol_engine import (
     types as pe_types,
-    CommandSlice,
-    ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
-    LabwareOffset,
 )
+from opentrons.protocol_engine.resources import CameraProvider
+from opentrons.types import DeckSlotName
 
-from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
-    MaintenanceRunOrchestratorStore,
-    RunConflictError,
-)
+from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
@@ -29,13 +31,13 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunNotFoundError,
 )
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+    RunConflictError,
+)
 from robot_server.service.notifications import (
     MaintenanceRunsPublisher,
 )
-
-from opentrons.protocol_engine import Liquid
-from opentrons.protocol_engine.resources import CameraProvider
-from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:

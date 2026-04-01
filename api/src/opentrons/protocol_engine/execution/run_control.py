@@ -1,8 +1,9 @@
 """Run control command side-effect logic."""
+
 import asyncio
 
-from ..state.state import StateStore
 from ..actions import ActionDispatcher, PauseAction, PauseSource
+from ..state.state import StateStore
 
 
 class RunControlHandler:

@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import logging
 
 from opentrons_shared_data.gripper import (
-    load_definition,
-    GripperModel,
-    GripperDefinition,
     GripForceProfile,
+    GripperDefinition,
+    GripperModel,
+    load_definition,
 )
 
 log = logging.getLogger(__name__)

@@ -1,15 +1,14 @@
 import json
-import typing
 import logging
-from pydantic import ValidationError
+import typing
 from dataclasses import asdict
 
-from opentrons import config, types
+from pydantic import ValidationError
 
-from .. import file_operators as io, types as local_types
-
+from .. import file_operators as io
+from .. import types as local_types
 from .models import v1
-
+from opentrons import config, types
 from opentrons.types import Mount, Point
 from opentrons.util.helpers import utc_now
 

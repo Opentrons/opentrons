@@ -1,5 +1,5 @@
 /* TitleBar styles */
-@import '../index.module.css';
+@import url('../index.module.css');
 
 .title_bar {
   display: flex;

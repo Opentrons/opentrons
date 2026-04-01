@@ -1,25 +1,25 @@
 """Router for /robot/control endpoints."""
-from typing import Annotated, TYPE_CHECKING
 
-from fastapi import status, Depends
+from typing import TYPE_CHECKING, Annotated
+
+from fastapi import Depends, status
+
+from opentrons.config import feature_flags as ff
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
-
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.robot.types import RobotTypeEnum
-from robot_server.hardware import get_robot_type
-
-from robot_server.errors.error_responses import ErrorBody
-from robot_server.errors.robot_errors import NotSupportedOnOT2
-from robot_server.service.json_api import (
+from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     SimpleBody,
 )
 
-from .models import EstopStatusModel, DoorStatusModel, DoorState
 from .estop_handler import EstopHandler
-from robot_server.hardware import get_estop_handler, get_hardware
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.config import feature_flags as ff
+from .models import DoorState, DoorStatusModel, EstopStatusModel
+from robot_server.errors.error_responses import ErrorBody
+from robot_server.errors.robot_errors import NotSupportedOnOT2
+from robot_server.hardware import get_estop_handler, get_hardware, get_robot_type
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -66,6 +66,7 @@ async def get_estop_status(
         status.HTTP_200_OK: {"model": SimpleBody[EstopStatusModel]},
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def put_acknowledge_estop_disengage(
     estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],
@@ -76,7 +77,7 @@ async def put_acknowledge_estop_disengage(
 
 
 def get_door_switch_required(
-    robot_type: Annotated[RobotType, Depends(get_robot_type)]
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> bool:
     return ff.enable_door_safety_switch(RobotTypeEnum.robot_literal_to_enum(robot_type))
 

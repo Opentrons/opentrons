@@ -2,11 +2,9 @@ import { useTranslation } from 'react-i18next'
 
 import { ListTable, StyledText } from '@opentrons/components'
 
-import { FloatingActionButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
-import { useFeatureFlag } from '/app/redux/config'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
@@ -31,9 +29,7 @@ export interface ImageGalleryListProps {
 }
 
 export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
-  const { t } = useTranslation('run_details')
   const { runId, protocolAnalysis, robotType, allRunDefs } = props
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
 
   const { items } = useImageInfo(runId)
 
@@ -53,13 +49,6 @@ export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
           <NoImagesAvailable />
         )}
       </div>
-      {isCameraSettingsEnabled && (
-        <FloatingActionButton
-          buttonText={t('image_capture')}
-          iconName="photo-camera"
-          onClick={() => null}
-        />
-      )}
     </div>
   )
 }

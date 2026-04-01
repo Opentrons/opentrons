@@ -1,54 +1,54 @@
 """Tests for the can messaging class."""
+
 from __future__ import annotations
+
 import asyncio
 from asyncio import Queue
+from typing import List
 
 import pytest
 from mock import AsyncMock, Mock
 
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    MessageId,
-    ErrorCode,
-)
-
-from opentrons_hardware.firmware_bindings.message import CanMessage
-from opentrons_hardware.firmware_bindings.arbitration_id import (
-    ArbitrationId,
-    ArbitrationIdParts,
-)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MessageListenerCallback,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    HeartbeatRequest,
-    MoveCompleted,
-    GetMoveGroupRequest,
-    SetBrushedMotorPwmRequest,
-    ExecuteMoveGroupRequest,
+from opentrons_hardware.firmware_bindings.arbitration_id import (
+    ArbitrationId,
+    ArbitrationIdParts,
 )
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
+    MessageId,
+    NodeId,
+)
+from opentrons_hardware.firmware_bindings.message import CanMessage
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.fields import (
-    MotorPositionFlagsField,
     ErrorCodeField,
     ErrorSeverityField,
+    MotorPositionFlagsField,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    ExecuteMoveGroupRequest,
+    GetMoveGroupRequest,
+    HeartbeatRequest,
+    MoveCompleted,
+    SetBrushedMotorPwmRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BrushedMotorPwmPayload,
+    ErrorMessagePayload,
+    ExecuteMoveGroupRequestPayload,
     MoveCompletedPayload,
     MoveGroupRequestPayload,
-    BrushedMotorPwmPayload,
-    ExecuteMoveGroupRequestPayload,
-    ErrorMessagePayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
     UInt8Field,
     UInt32Field,
-    Int32Field,
 )
-
-from typing import List
 
 
 @pytest.fixture

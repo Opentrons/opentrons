@@ -43,6 +43,7 @@ const updatePatchOnLabwareChange = (
     wells: getDefaultWells({
       labwareId: appliedPatch.labware,
       pipetteId,
+      nozzleConfiguration: patch.nozzles as NozzleConfigurationStyle,
       labwareEntities,
       pipetteEntities,
     }),
@@ -82,6 +83,7 @@ const updatePatchOnPipetteChannelChange = (
       wells: getDefaultWells({
         labwareId: appliedPatch.labware,
         pipetteId,
+        nozzleConfiguration: patch.nozzles as NozzleConfigurationStyle,
         labwareEntities,
         pipetteEntities,
       }),
@@ -132,7 +134,11 @@ const updatePatchOnPipetteChange = (
 
     return {
       ...patch,
-      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate'),
+      ...getDefaultFields(
+        'aspirate_flowRate',
+        'dispense_flowRate',
+        'tips_selected'
+      ),
       nozzles,
       tipRack: firstDefaultTiprackURIOnDeck,
     }
@@ -148,7 +154,12 @@ const updatePatchOnTiprackChange = (
   if (fieldHasChanged(rawForm, patch, 'tipRack')) {
     return {
       ...patch,
-      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate'),
+      ...getDefaultFields(
+        'aspirate_flowRate',
+        'dispense_flowRate',
+        'tiprack_selected',
+        'tips_selected'
+      ),
     }
   }
 
@@ -163,6 +174,45 @@ const updatePatchOnNozzlesChange = (
     return {
       ...patch,
       ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnChangeTipChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'changeTip')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnWellsSelectedChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'wells')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnVolumeChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'volume')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
     }
   }
   return patch
@@ -199,5 +249,8 @@ export function dependentFieldsUpdateMix(
       ),
     chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
     chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnChangeTipChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnWellsSelectedChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnVolumeChange(chainPatch, rawForm),
   ])
 }

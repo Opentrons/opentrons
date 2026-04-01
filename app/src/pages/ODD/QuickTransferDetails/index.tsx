@@ -50,8 +50,8 @@ import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
-import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
+import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 
@@ -88,14 +88,19 @@ const QuickTransferHeader = ({
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
-      properties: {
-        name: title,
-      },
-    })
-  }, [])
+  useEffect(
+    () => {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+        properties: {
+          name: title,
+        },
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <Flex
@@ -119,7 +124,7 @@ const QuickTransferHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            navigate('/quick-transfer')
+            navigate('/protocols')
           }}
           width="3rem"
         >
@@ -142,7 +147,7 @@ const QuickTransferHeader = ({
           </Flex>
           {!isTransferFetching ? (
             <LegacyStyledText
-              as="h2"
+              forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -226,7 +231,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
       paddingBottom={SPACING.spacing24}
     >
       <LegacyStyledText
-        as="p"
+        forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description}
@@ -238,7 +243,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
         }`}</LegacyStyledText>
       </Flex>

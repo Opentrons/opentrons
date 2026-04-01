@@ -3,12 +3,11 @@
 import asyncio
 import logging
 
-from opentrons_hardware.firmware_bindings.messages import message_definitions
-
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
-from opentrons_hardware.firmware_update.target import Target
+from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
+from opentrons_hardware.firmware_update.target import Target
 
 logger = logging.getLogger(__name__)
 

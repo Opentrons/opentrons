@@ -1,11 +1,14 @@
 """Tests for the emulation_pipette_provision script."""
+
 import json
 import os
 from typing import Any, Generator, Tuple
+
 import pytest
+
 from opentrons_hardware.firmware_bindings.constants import PipetteName
-from opentrons_hardware.scripts import emulation_pipette_provision
 from opentrons_hardware.instruments.pipettes.serials import serial_val_from_parts
+from opentrons_hardware.scripts import emulation_pipette_provision
 
 
 @pytest.fixture

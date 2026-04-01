@@ -115,7 +115,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         <>
           {typeof uploadText === 'string' ? (
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               textAlign={TYPOGRAPHY.textAlignCenter}
               marginTop={SPACING.spacing16}
             >

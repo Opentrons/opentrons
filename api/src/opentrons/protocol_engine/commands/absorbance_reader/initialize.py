@@ -1,22 +1,23 @@
 """Command models to initialize an Absorbance Reader."""
+
 from __future__ import annotations
-from typing import List, Optional, Literal, TYPE_CHECKING, Any
-from typing_extensions import Type
+
+from typing import TYPE_CHECKING, Any, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Type
 
+from ...errors import InvalidWavelengthError
+from ...errors.error_occurrence import ErrorOccurrence
+from ...state import update_types
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.drivers.types import ABSMeasurementMode
 from opentrons.protocol_engine.types import ABSMeasureMode
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
-from ...errors import InvalidWavelengthError
-from ...state import update_types
-
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 
 InitializeCommandType = Literal["absorbanceReader/initialize"]

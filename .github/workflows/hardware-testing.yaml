@@ -51,19 +51,15 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: 'actions/setup-node@v4'
+        uses: 'actions/setup-node@v6'
         with:
-          node-version: '12'
-
-      - name: Setup Python
-        uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.10'
+          node-version: '22.22.0'
 
       - name: Setup Project
-        uses: './.github/actions/python/setup'
+        uses: './.github/actions/python/setup-uv'
         with:
           project: 'hardware-testing'
+          python-version: '3.12'
 
       - name: Lint
         run: make -C hardware-testing lint

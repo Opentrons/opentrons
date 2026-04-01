@@ -1,24 +1,24 @@
 """Firmware download."""
+
 import asyncio
 import binascii
 import logging
-
-from opentrons_hardware.firmware_bindings import NodeId
-from opentrons_hardware.firmware_bindings.constants import ErrorCode
-from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from typing import AsyncIterator
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
-from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import ErrorCode
 from opentrons_hardware.firmware_bindings.messages import (
+    fields,
     message_definitions,
     payloads,
-    fields,
 )
-from typing import AsyncIterator
+from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
+from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor
 
 logger = logging.getLogger(__name__)
 

@@ -1,46 +1,48 @@
 """Command models to manually retrieve a labware from a Flex Stacker in an unsafe situation."""
 
 from __future__ import annotations
-from typing import Literal, TYPE_CHECKING, Any, Union, cast
-from typing_extensions import Type
+
+from typing import TYPE_CHECKING, Any, Literal, Union, cast
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Type
 
-from ..command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-    SuccessData,
-    DefinedErrorData,
-)
-from ..flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    labware_locations_for_group,
-    build_retrieve_labware_move_updates,
-    primary_location_sequence,
-    adapter_location_sequence,
-    lid_location_sequence,
-)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from ...errors import (
-    ErrorOccurrence,
     CannotPerformModuleAction,
-    LocationIsOccupiedError,
+    ErrorOccurrence,
     FlexStackerLabwarePoolNotYetDefinedError,
+    LocationIsOccupiedError,
 )
 from ...resources import ModelUtils
 from ...state import update_types
 from ...types import (
-    ModuleLocation,
-    LabwareLocationSequence,
     InStackerHopperLocation,
+    LabwareLocationSequence,
+    ModuleLocation,
+)
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
+from ..flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    adapter_location_sequence,
+    build_retrieve_labware_move_updates,
+    labware_locations_for_group,
+    lid_location_sequence,
+    primary_location_sequence,
 )
 from opentrons.hardware_control.modules.types import PlatformState
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 UnsafeFlexStackerManualRetrieveCommandType = Literal[
     "unsafe/flexStacker/manualRetrieve"
@@ -277,9 +279,9 @@ class UnsafeFlexStackerManualRetrieve(
     params: UnsafeFlexStackerManualRetrieveParams
     result: UnsafeFlexStackerManualRetrieveResult | None = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeFlexStackerManualRetrieveImpl] = (
         UnsafeFlexStackerManualRetrieveImpl
-    ] = UnsafeFlexStackerManualRetrieveImpl
+    )
 
 
 class UnsafeFlexStackerManualRetrieveCreate(

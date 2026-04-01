@@ -1,6 +1,5 @@
 """Control the Avahi daemon."""
 
-
 from __future__ import annotations
 
 import asyncio

@@ -7,28 +7,26 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName
-
-from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import (
-    OnLabwareLocation,
-    DeckSlotLocation,
-    OnLabwareLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_lid_stack import (
+    LoadLidStackImplementation,
+    LoadLidStackParams,
+    LoadLidStackResult,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedLabwareData
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
     LoadedLidStackUpdate,
     StateUpdate,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
-
-from opentrons.protocol_engine.commands.load_lid_stack import (
-    LoadLidStackParams,
-    LoadLidStackResult,
-    LoadLidStackImplementation,
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    OnAddressableAreaLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
 )
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(autouse=True)

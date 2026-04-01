@@ -21,6 +21,7 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
+  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
@@ -79,6 +80,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
 
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
+
+  const enableExternalKeyboardTest = useFeatureFlag('externalKeyboardTest')
 
   return (
     <div className={styles.main_content}>
@@ -174,7 +177,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => {
             setCurrentOption('CameraPreferences')
           }}
-          iconName="photo-camera"
+          iconName="camera"
+        />
+        <RobotSettingButton
+          settingName={t('devices')}
+          dataTestId="RobotSettingButton_devices"
+          onClick={() => {
+            setCurrentOption('Devices')
+          }}
+          iconName="device"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
@@ -186,7 +197,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="privacy"
         />
         <RobotSettingButton
-          settingName={t('app_settings:error_recovery_mode')}
+          settingName={i18n.format(
+            t('app_settings:error_recovery_mode'),
+            'titleCase'
+          )}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -217,7 +231,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('disable_stacker_sensors')}
           dataTestId="RobotSettingButton_disable_stacker_sensors"
           settingInfo={t('disable_stacker_sensors_description')}
-          iconName="stacker-sensors"
+          iconName="ot-flex-stacker"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
         />
@@ -229,6 +243,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="update-channel"
         />
+        {enableExternalKeyboardTest ? (
+          <RobotSettingButton
+            settingName={t('documentation_required')}
+            onClick={() => {
+              setCurrentOption('ExternalKeyboardTest')
+            }}
+            iconName="acm"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"
@@ -259,12 +282,15 @@ function FeatureFlags(): JSX.Element {
         >
           <div className={styles.feature_flag_content}>
             <Icon
-              name="alert-circle"
+              name="ot-alert"
               className={styles.icon_large}
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText as="h4" className={styles.feature_flag_title}>
+              <LegacyStyledText
+                forwardedAs="h4"
+                className={styles.feature_flag_title}
+              >
                 {t(`__dev_internal__${flag}`)}
               </LegacyStyledText>
             </div>

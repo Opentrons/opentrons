@@ -1,8 +1,14 @@
-@media not all and (width: 1024px) and (height: 600px) {
+@media not all and (width = 1024px) and (height = 600px) {
   .heading_small_bold {
     font-size: 1.125rem;
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-24);
+  }
+
+  .heading_large_bold {
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-32);
   }
 
   .caption_bold {
@@ -17,7 +23,7 @@
   }
 }
 
-@media (width: 1024px) and (height: 600px) {
+@media (width = 1024px) and (height = 600px) {
   .small_body_text_bold {
     font-size: var(--font-size-20);
     font-weight: var(--font-weight-bold);
