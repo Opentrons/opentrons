@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import styles from './HistoricalProtocolRun.module.css'
 
 import {
   ALIGN_CENTER,
@@ -25,12 +25,6 @@ import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDr
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 
 import type { RunData } from '@opentrons/api-client'
-
-const PROTOCOL_NAME_STYLE = css`
-  overflow: ${OVERFLOW_HIDDEN};
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`
 
 const COLUMNS = '25% 27% 5% 14% 14% 12%'
 
@@ -102,7 +96,7 @@ export function HistoricalProtocolRun(
           <StyledText
             desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
-            css={PROTOCOL_NAME_STYLE}
+            className={styles.protocol_name}
           >
             {protocolName}
           </StyledText>
