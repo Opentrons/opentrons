@@ -22,8 +22,8 @@ Values below are taken from version 3 of the liquid class definition.
                 <td>Aspirate flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1 µL: 35 µL/sec</li>
-                        <li>10 µL: 23.5 µL/sec</li>
+                        <li>1 µL: 5 µL/sec</li>
+                        <li>10 µL: 23 µL/sec</li>
                         <li>20 µL: 35 µL/sec</li>
                     </ul>
                 </td>
@@ -490,7 +490,7 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
                 <td>50 mm/sec</td>
             </tr>
             <tr>
@@ -507,14 +507,17 @@ Values below are taken from version 3 of the liquid class definition.
                 <td>Push out by volume</td>
                 <td>
                     <ul>
-                        <li>1–4.999 µL: 1.5 µL</li>
+                        <li>1 µL: 2.5 µL</li>
+                        <li>4.999 µL: 1.5 µL</li>
                         <li>5–20 µL: 1 µL</li>
                     </ul>
                 </td>
                 <td>
                     <ul>
                         <li>1–4.999 µL: 7 µL</li>
-                        <li>5–50 µL: 2 µL</li>
+                        <li>5 µL: 2 µL</li>
+                        <li>10 µL: 1.5 µL</li>
+                        <li>50 µL: 2 µL</li>
                     </ul>
                 </td>
             </tr>
@@ -554,7 +557,12 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Dispense flow rate by volume</td>
-                <td>1–20 µL: 55 µL/sec</td>
+                <td>
+                    <ul>
+                        <li>1 µL: 10 µL/sec</li>
+                        <li>9.999–20 µL: 55 µL/sec</li>
+                    </ul>
+                </td>
                 <td>50 µL/sec</td>
             </tr>
             <tr>
@@ -579,14 +587,15 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Blowout</td>
-                <td>Into destination at 50 µL/sec</td>
+                <td>—</td>
                 <td>—</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
                 <td>
                     <ul>
-                        <li>1–4.999 µL: 3.5 µL</li>
+                        <li>1 µL: 7 µL</li>
+                        <li>4.999 µL: 3.5 µL</li>
                         <li>5–20 µL: 0.5 µL</li>
                     </ul>
                 </td>
@@ -848,7 +857,7 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Blowout</td>
-                <td>Into destination at 50 µL/sec</td>
+                <td>Into destination at 10 µL/sec</td>
                 <td>Into destination at 80 µL/sec</td>
                 <td>Into destination at 80 µL/sec</td>
             </tr>
@@ -902,7 +911,7 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
-                <td>200 µL/sec</td>
+                <td>80 µL/sec</td>
                 <td>200 µL/sec</td>
                 <td>200 µL/sec</td>
             </tr>
@@ -988,8 +997,8 @@ Values below are taken from version 3 of the liquid class definition.
                 <td>Dispense flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1–9.999 µL: 22 µL/sec</li>
-                        <li>10–20 µL: 57 µL/sec</li>
+                        <li>1–10 µL: 10 µL/sec</li>
+                        <li>20 µL: 20 µL/sec</li>
                     </ul>
                 </td>
                 <td>50 µL/sec</td>
@@ -1036,7 +1045,7 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Retract speed</td>
-                <td>50 mm/sec</td>
+                <td>100 mm/sec</td>
                 <td>50 mm/sec</td>
             </tr>
             <tr>
@@ -1087,8 +1096,8 @@ Values below are taken from version 3 of the liquid class definition.
                 <td>Dispense flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1–9.999 µL: 22 µL/sec</li>
-                        <li>10–20 µL: 57 µL/sec</li>
+                        <li>1 µL: 10 µL/sec</li>
+                        <li>9.999–20 µL: 55 µL/sec</li>
                     </ul>
                 </td>
                 <td>50 µL/sec</td>
@@ -1438,8 +1447,8 @@ Values below are taken from version 3 of the liquid class definition.
                 <td>Dispense flow rate by volume</td>
                 <td>
                     <ul>
-                        <li>1–9.999 µL: 22 µL/sec</li>
-                        <li>10–20 µL: 57 µL/sec</li>
+                        <li>1–10 µL: 10 µL/sec</li>
+                        <li>20 µL: 22 µL/sec</li>
                     </ul>
                 </td>
                 <td>80 µL/sec</td>
@@ -1513,7 +1522,7 @@ Values below are taken from version 3 of the liquid class definition.
             </tr>
             <tr>
                 <td>Blowout</td>
-                <td>Into trash at 50 µL/sec</td>
+                <td>Into trash at 10 µL/sec</td>
                 <td>Into trash at 80 µL/sec</td>
                 <td>Into trash at 80 µL/sec</td>
             </tr>

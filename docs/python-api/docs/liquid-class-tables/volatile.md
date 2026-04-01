@@ -1,4 +1,4 @@
-Values below are taken from version 2 of the liquid class definition.
+Values below are taken from version 3 of the liquid class definition.
 
 ### Aspirate
 
@@ -8,6 +8,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -15,9 +16,17 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Aspirate flow rate by volume</td>
+                <td>
+                    <ul>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>5 µL: 5 µL/sec</li>
+                        <li>20 µL: 15 µL/sec</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1 µL: 7 µL/sec</li>
@@ -31,6 +40,14 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
                         <li>1 µL: -0.7 µL</li>
                         <li>10 µL: -0.2 µL</li>
                         <li>50 µL: -0.5 µL</li>
@@ -40,17 +57,26 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -67,6 +93,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -74,9 +101,17 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Aspirate flow rate by volume</td>
+                <td>
+                    <ul>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>5 µL: 5 µL/sec</li>
+                        <li>20 µL: 15 µL/sec</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1 µL: 7 µL/sec</li>
@@ -90,6 +125,14 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.6 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.9 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
                         <li>1 µL: -0.5 µL</li>
                         <li>10 µL: -0.2 µL</li>
                         <li>50 µL: -1.5 µL</li>
@@ -99,17 +142,26 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -348,6 +400,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -357,9 +410,17 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Submerge speed</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
+                <td>35 mm/sec</td>
             </tr>
             <tr>
                 <td>Aspirate flow rate by volume</td>
+                <td>
+                    <ul>
+                        <li>1 µL: 7 µL/sec</li>
+                        <li>5 µL: 5 µL/sec</li>
+                        <li>20 µL: 15 µL/sec</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1 µL: 7 µL/sec</li>
@@ -377,6 +438,14 @@ Values below are taken from version 2 of the liquid class definition.
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: -0.1 µL</li>
@@ -398,9 +467,11 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Delay after aspirating</td>
                 <td>0.2 sec</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
@@ -408,9 +479,11 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>0 µL</td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -546,6 +619,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -553,13 +627,23 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
                 <td>7 µL/sec</td>
+                <td>7 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
@@ -572,25 +656,36 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
+                <td>—</td>
                 <td>—</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
                 <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -607,6 +702,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -614,13 +710,23 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
+                <td>7 µL/sec</td>
                 <td>35 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.6 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.9 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
@@ -633,25 +739,36 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
+                <td>—</td>
                 <td>—</td>
             </tr>
             <tr>
                 <td>Push out by volume</td>
                 <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -878,6 +995,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -887,9 +1005,11 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Submerge speed</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
+                <td>35 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate by volume</td>
+                <td>7 µL/sec</td>
                 <td>
                     <ul>
                         <li>0 µL: 7 µL/sec</li>
@@ -905,6 +1025,14 @@ Values below are taken from version 2 of the liquid class definition.
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: -0.1 µL</li>
@@ -926,9 +1054,11 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
@@ -936,9 +1066,11 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
+                <td>—</td>
                 <td>—</td>
                 <td>—</td>
             </tr>
@@ -946,9 +1078,16 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Push out by volume</td>
                 <td>0 µL</td>
                 <td>0 µL</td>
+                <td>0 µL</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -1078,6 +1217,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -1085,13 +1225,23 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
                 <td>7 µL/sec</td>
+                <td>7 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
@@ -1105,6 +1255,12 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
                         <li>1–40 µL: 5 µL</li>
                         <li>45–50 µL: 0 µL</li>
                     </ul>
@@ -1112,6 +1268,12 @@ Values below are taken from version 2 of the liquid class definition.
             </tr>
             <tr>
                 <td>Disposal by volume</td>
+                <td>
+                    <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–40 µL: 5 µL</li>
@@ -1122,21 +1284,31 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
                 <td>Into trash at 7 µL/sec</td>
+                <td>Into trash at 7 µL/sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -1153,6 +1325,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
             </tr>
         </thead>
@@ -1160,13 +1333,23 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Submerge speed</td>
                 <td>100 mm/sec</td>
+                <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
+                <td>7 µL/sec</td>
                 <td>35 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.6 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.9 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
@@ -1180,6 +1363,12 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
                         <li>1–40 µL: 5 µL</li>
                         <li>45–50 µL: 0 µL</li>
                     </ul>
@@ -1187,6 +1376,12 @@ Values below are taken from version 2 of the liquid class definition.
             </tr>
             <tr>
                 <td>Disposal by volume</td>
+                <td>
+                    <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–40 µL: 5 µL</li>
@@ -1197,21 +1392,31 @@ Values below are taken from version 2 of the liquid class definition.
             <tr>
                 <td>Delay after dispensing</td>
                 <td>0.2 sec</td>
+                <td>0.2 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>100 mm/sec</td>
             </tr>
             <tr>
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
                 <td>Into trash at 35 µL/sec</td>
+                <td>Into trash at 35 µL/sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
@@ -1511,6 +1716,7 @@ Values below are taken from version 2 of the liquid class definition.
         <thead>
             <tr>
                 <th>Behavior</th>
+                <th>20 µL</th>
                 <th>50 µL</th>
                 <th>200 µL</th>
             </tr>
@@ -1518,16 +1724,26 @@ Values below are taken from version 2 of the liquid class definition.
         <tbody>
             <tr>
                 <td>Submerge speed</td>
+                <td>100 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
             <tr>
                 <td>Dispense flow rate</td>
+                <td>7 µL/sec</td>
                 <td>100 µL/sec</td>
                 <td>100 µL/sec</td>
             </tr>
             <tr>
                 <td>Correction by volume</td>
+                <td>
+                    <ul>
+                        <li>0 µL: 0 µL</li>
+                        <li>1 µL: -0.375 µL</li>
+                        <li>5 µL: -0.05 µL</li>
+                        <li>20 µL: -0.25 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>0 µL: 0 µL</li>
@@ -1549,6 +1765,12 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Conditioning by volume</td>
                 <td>
                     <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
                         <li>1–40 µL: 5 µL</li>
                         <li>45–50 µL: 0 µL</li>
                     </ul>
@@ -1564,6 +1786,12 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Disposal by volume</td>
                 <td>
                     <ul>
+                        <li>1–10 µL: 5 µL</li>
+                        <li>15–20 µL: 0 µL</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
                         <li>1–40 µL: 5 µL</li>
                         <li>45–50 µL: 0 µL</li>
                     </ul>
@@ -1577,11 +1805,13 @@ Values below are taken from version 2 of the liquid class definition.
             </tr>
             <tr>
                 <td>Delay after dispensing</td>
+                <td>0.2 sec</td>
                 <td>2 sec</td>
                 <td>1 sec</td>
             </tr>
             <tr>
                 <td>Retract speed</td>
+                <td>100 mm/sec</td>
                 <td>35 mm/sec</td>
                 <td>35 mm/sec</td>
             </tr>
@@ -1589,14 +1819,22 @@ Values below are taken from version 2 of the liquid class definition.
                 <td>Delay after retracting</td>
                 <td>0.5 sec</td>
                 <td>0.5 sec</td>
+                <td>0.5 sec</td>
             </tr>
             <tr>
                 <td>Blowout</td>
+                <td>Into trash at 7 µL/sec</td>
                 <td>Into trash at 100 µL/sec</td>
                 <td>Into trash at 100 µL/sec</td>
             </tr>
             <tr>
                 <td>Air gap by volume</td>
+                <td>
+                    <ul>
+                        <li>1–15 µL: 5 µL</li>
+                        <li>20 µL: 0 µL</li>
+                    </ul>
+                </td>
                 <td>
                     <ul>
                         <li>1–45 µL: 5 µL</li>
