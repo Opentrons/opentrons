@@ -78,7 +78,7 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          make setup-js-ci
         # Use the if to run all the lint checks even of some fail
         shell: bash
       - name: 'typechecks'

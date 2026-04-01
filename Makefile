@@ -62,6 +62,14 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
+# front-end dependencies install for CI
+.PHONY: setup-js-ci
+setup-js-ci:
+	yarn config set network-timeout 60000
+	yarn install --frozen-lockfile
+	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
+
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py
@@ -307,7 +315,7 @@ test-js-internal:
 	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
-test-js-%: 
+test-js-%:
 	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 .PHONY: validate-codecov-yml
