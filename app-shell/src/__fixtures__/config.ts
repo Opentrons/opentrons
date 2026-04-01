@@ -29,6 +29,7 @@ import type {
   ConfigV27,
   ConfigV28,
   ConfigV29,
+  ConfigV30,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -345,5 +346,14 @@ export const MOCK_CONFIG_V29: ConfigV29 = {
   protocols: {
     ...MOCK_CONFIG_V28.protocols,
     migratedOT2ProtocolsFromOldApp: false,
+  },
+}
+
+export const MOCK_CONFIG_V30: ConfigV30 = {
+  ...MOCK_CONFIG_V29,
+  version: 30,
+  labware: {
+    ...MOCK_CONFIG_V29.labware,
+    migratedOT2LabwaresFromOldApp: false,
   },
 }

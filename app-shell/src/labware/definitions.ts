@@ -1,11 +1,21 @@
 import path from 'path'
-import { shell } from 'electron'
+import { app, shell } from 'electron'
 import fs from 'fs-extra'
 
 import type { Dirent } from 'fs'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
 const RE_JSON_EXT = /\.json$/i
+
+export const LABWARE_DIRECTORY_NAME = 'labware'
+export const OLD_OPENTRONS_APP_PATH = path.join(
+  path.dirname(app.getPath('userData')),
+  'Opentrons'
+)
+export const OLD_LABWARE_DIRECTORY_PATH = path.join(
+  OLD_OPENTRONS_APP_PATH,
+  LABWARE_DIRECTORY_NAME
+)
 
 export function readLabwareDirectory(dir: string): Promise<string[]> {
   const absoluteName = (e: Dirent): string => path.join(dir, e.name)
@@ -112,4 +122,23 @@ export function addLabwareFileFromCreator(
 
 export function removeLabwareFile(file: string): Promise<void> {
   return shell.trashItem(file).catch(() => fs.unlink(file))
+}
+
+export async function copyLabwareDirectory(
+  src: string,
+  dest: string
+): Promise<void> {
+  const filePaths = await readLabwareDirectory(src)
+
+  await Promise.all(
+    filePaths.map(async filePath => {
+      const relativePath = path.relative(src, filePath)
+      const destPath = path.join(dest, relativePath)
+
+      await fs.copy(filePath, destPath, {
+        overwrite: false,
+        errorOnExist: false,
+      })
+    })
+  )
 }

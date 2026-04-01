@@ -16,6 +16,7 @@ import {
   ADD_LABWARE,
   CHANGE_CUSTOM_LABWARE_DIRECTORY,
   CHANGE_DIRECTORY,
+  CONFIG_INITIALIZED,
   DELETE_CUSTOM_LABWARE_FILE,
   DELETE_LABWARE,
   FETCH_CUSTOM_LABWARE,
@@ -42,6 +43,57 @@ import type {
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+export function migrateOT2LabwareFrom(
+  src: string,
+  dispatch: Dispatch
+): () => Promise<void> {
+  return function (): Promise<void> {
+    return new Promise(resolve => {
+      const config = getFullConfig()
+      const dest = config.labware.directory
+
+      if (config.labware.migratedOT2LabwaresFromOldApp) {
+        resolve()
+        return
+      }
+
+      fse
+        .stat(src)
+        .then(doesSrcExist => {
+          if (!doesSrcExist.isDirectory()) {
+            console.log(
+              'Old Opentrons app labware directory does not exist, skipping migration...'
+            )
+            dispatch(
+              updateConfigValue('labware.migratedOT2LabwaresFromOldApp', true)
+            )
+            resolve()
+            return
+          }
+
+          console.log('Migrating OT-2 labware from old Opentrons app...')
+
+          return ensureDir(dest)
+            .then(() => Definitions.copyLabwareDirectory(src, dest))
+            .then(() => {
+              dispatch(
+                updateConfigValue('labware.migratedOT2LabwaresFromOldApp', true)
+              )
+              console.log('OT-2 labware migration complete.')
+              resolve()
+            })
+        })
+        .catch(e => {
+          console.log(`Error migrating OT-2 labware: ${e}`)
+          dispatch(
+            updateConfigValue('labware.migratedOT2LabwaresFromOldApp', true)
+          )
+          resolve()
+        })
+    })
+  }
+}
 
 const fetchCustomLabware = (
   inMemoryFile?: string
@@ -176,6 +228,11 @@ export function registerLabware(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): Dispatch {
+  const migrateLabwareFromOldAppDirectory = migrateOT2LabwareFrom(
+    Definitions.OLD_LABWARE_DIRECTORY_PATH,
+    dispatch
+  )
+
   handleConfigChange(LABWARE_DIRECTORY_CONFIG_PATH, () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchAndValidateCustomLabware(dispatch, CHANGE_DIRECTORY)
@@ -183,6 +240,17 @@ export function registerLabware(
 
   return function handleActionForLabware(action: Action) {
     switch (action.type) {
+      case CONFIG_INITIALIZED: {
+        const config = action.payload.config
+
+        if (!config.labware.migratedOT2LabwaresFromOldApp) {
+          void migrateLabwareFromOldAppDirectory().then(() =>
+            fetchAndValidateCustomLabware(dispatch, INITIAL)
+          )
+        }
+        break
+      }
+
       case FETCH_CUSTOM_LABWARE:
       case UI_INITIALIZED: {
         const source = action.type === FETCH_CUSTOM_LABWARE ? POLL : INITIAL
