@@ -20,16 +20,12 @@ metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 # Tunables (can move some to parameters)
-SETTLE_SEC = 21
-RUN_SEC = 60 * 2
-DECAY_SEC = 10
-VENT_SEC = 5
 ASPIRATE_OFFSET_MM = 5
 # Dispense_offset_mm = 8 for the 96 deep well
 # -20 is acroprep
 DISPENSE_OFFSET_MM = 8
 
-OUTPUT_DIR = "/data/vacuum_manifold_life_test_Brayans_FW/"
+OUTPUT_DIR = "/data/vacuum_manifold_life_test_evt_v1.1/"
 
 Ard_idVendor = 9025
 Ard_idProduct = 32858
@@ -37,6 +33,81 @@ Ard_idProduct = 32858
 VM_idVendor = 1155
 VM_idProduct = 61248
 
+
+def add_parameters(parameters: ParameterContext) -> None:
+    """Add runtime parameters for this protocol."""
+    parameters.add_int(
+        "cycles",
+        "cycles",
+        default=40,
+        minimum=1,
+        maximum=1042,
+        description="Number of liquid + vacuum cycles.",
+    )
+    parameters.add_int(
+        "pressure",
+        "pressure",
+        default=400,
+        minimum=200,
+        maximum=800,
+        description="Target absolute pressure (mbar).",
+    )
+    parameters.add_int(
+        "volume",
+        "volume",
+        default=1000,
+        minimum=1,
+        maximum=1000,
+        description="Aspirate Volume.",
+    )
+    parameters.add_int(
+        "z_offset",
+        "z_offset",
+        default=8,
+        minimum=-100,
+        maximum=100,
+        description="Z offset for the acroprep or labware.",
+    )
+    parameters.add_int(
+        "vm_run_sec",
+        "vm_run_sec",
+        default=120,
+        minimum=1,
+        maximum=1000,
+        description="Amount of time to hold steady pressure.",
+    )
+    parameters.add_int(
+        "vm_settle_sec",
+        "vm_settle_sec",
+        default=21,
+        minimum=1,
+        maximum=1000,
+        description="Amount of time to ramp to target pressure.",
+    )
+    parameters.add_int(
+        "vm_decay_sec",
+        "vm_decay_sec",
+        default=10,
+        minimum=1,
+        maximum=1000,
+        description="Amount of time to wait for pressure to drop",
+    )
+    parameters.add_int(
+        "vm_vent_sec",
+        "vm_vent_sec",
+        default=5,
+        minimum=1,
+        maximum=1000,
+        description="Amount of time the vm vent is opened.",
+    )
+    parameters.add_int(
+        "tough_fill_time",
+        "trough_fill_time",
+        default=21,
+        minimum=1,
+        maximum=120,
+        description="Reservoir water fill time.",
+    )
 
 async def find_port_by_id(vendorId: int, productId: int) -> str:
     """Find a serial port by USB vendor and product ID."""
@@ -107,7 +178,7 @@ async def read_continuous_data(
             pressure_dict = dataclasses.asdict(line)
             # Timestamp
             ts = time.perf_counter() - start_time
-            ctx.comment(f"Pump time: {time.perf_counter()- loop_st}")
+            ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
             # Record Pressure Data
             await _write_to_csv(f_name, head_writer, ts, pressure_dict)
             head_writer = False
@@ -132,52 +203,7 @@ async def read_data(
         logging.error(f"continuous read error: {e}")
         raise
 
-
-def add_parameters(parameters: ParameterContext) -> None:
-    """Add runtime parameters for this protocol."""
-    parameters.add_int(
-        "cycles",
-        "cycles",
-        default=40,
-        minimum=1,
-        maximum=1042,
-        description="Number of liquid + vacuum cycles",
-    )
-    parameters.add_int(
-        "pressure",
-        "pressure",
-        default=400,
-        minimum=200,
-        maximum=800,
-        description="Target absolute pressure (mbar)",
-    )
-    parameters.add_int(
-        "volume",
-        "volume",
-        default=1000,
-        minimum=1,
-        maximum=1000,
-        description="Aspirate Volume",
-    )
-    parameters.add_int(
-        "offset",
-        "offset",
-        default=8,
-        minimum=-100,
-        maximum=100,
-        description="Z offset for the acroprep or labware",
-    )
-    parameters.add_int(
-        "tough_fill_time",
-        "trough_fill_time",
-        default=1,
-        minimum=1,
-        maximum=120,
-        description="Reservoir water fill time",
-    )
-
-
-async def _setup_devices():
+async def _setup_devices() -> tuple:  # type: ignore[type-arg]
     from hardware_testing.drivers import vacuum_pump
 
     loop = asyncio.get_event_loop()
@@ -202,6 +228,10 @@ async def _run_single_pump_api_cycle(
     trough_fill_time: int,
     cycle_index: int,
     output_dir: Path,
+    SETTLE_SEC: int,
+    RUN_SEC: int,
+    DECAY_SEC: int,
+    VENT_SEC: int,
     ctx: protocol_api.ProtocolContext,
 ) -> None:
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
@@ -237,14 +267,14 @@ async def _run_single_pump_api_cycle(
     ctx.comment(
         f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
     )
-    # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(VentState.OPENED)
-    await asyncio.sleep(VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(
         enable_vacuum=False,
         guage_pressure_mbar=target_to_pump,
     )
+    # Vent the pump system to atmospheric pressure while pump is on
+    await pump.set_vent_state(VentState.OPENED)
+    await asyncio.sleep(VENT_SEC)
     try:
         await read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
     except asyncio.TimeoutError:
@@ -262,12 +292,15 @@ async def _run_single_pump_api_cycle(
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
-    z_offset = ctx.params.offset  # type: ignore[attr-defined]
-    volume = ctx.params.volume  # type: ignore[attr-defined]
-    cycles = 5  # type: ignore[attr-defined]
+    z_offset = ctx.params.z_offset # type: ignore[attr-defined]
+    volume = ctx.params.volume # type: ignore[attr-defined]
+    cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
-
+    SETTLE_SEC = ctx.params.vm_settle_sec
+    RUN_SEC = ctx.params.vm_run_sec
+    DECAY_SEC = ctx.params.vm_decay_sec
+    VENT_SEC = ctx.params.vm_vent_sec
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
@@ -275,12 +308,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         adapter="opentrons_flex_96_tiprack_adapter",
     )
     pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
-    # source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
-    # base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
-    # manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
-    # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
+    source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
+    base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
+    manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
+    filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
 
-    # pip.pick_up_tip()
+    pip.pick_up_tip()
 
     pump = None
     pump_fixture = None
@@ -299,10 +332,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         assert pump is not None
         for cycle in range(1, cycles + 1):
             ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
-            # pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
-            # pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
-            # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
-            # pip.move_to(filter_plate["A1"].top(10))  # Move away again
+            pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
+            pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
+            pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
+            pip.move_to(filter_plate["A1"].top(10))  # Move away again
             try:
                 loop.run_until_complete(
                     _run_single_pump_api_cycle(
@@ -312,6 +345,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                         trough_fill_time,
                         cycle,
                         output_dir,
+                        SETTLE_SEC,
+                        RUN_SEC,
+                        DECAY_SEC,
+                        VENT_SEC,
                         ctx,
                     )
                 )
@@ -319,7 +356,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 tb = traceback.format_exc()
                 ctx.comment(f"[cycle {cycle}] failed ({type(e).__name__}: {e})\n{tb}")
                 raise
-        # pip.return_tip()
+        pip.return_tip()
     if not ctx.is_simulating() and loop is not None:
         try:
             if pump is not None:

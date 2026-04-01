@@ -163,7 +163,7 @@ class WaterPump(AbstractWaterPump):
         try:
             # Offload write to another thread to avoid blocking the event loop
             await asyncio.to_thread(self.connection.write, data)
-        except Exception as e:
+        except Exception:
             raise
 
     async def _readline(self) -> str:
@@ -171,7 +171,7 @@ class WaterPump(AbstractWaterPump):
         try:
             # Offload readline to another thread to avoid blocking the event loop
             return (await asyncio.to_thread(self.connection.readline)).decode("utf-8")
-        except Exception as e:
+        except Exception:
             raise
 
     # ---------------------- Logging Helpers ----------------------
