@@ -69,3 +69,8 @@
 .shadow_overlay {
   pointer-events: none;
 }
+
+.legend_box {
+  display: flex;
+  width: 10rem;
+}
