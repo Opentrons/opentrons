@@ -107,6 +107,7 @@ class UserStore:
             return user
 
     def record_failed_login(self, username: str, now: datetime.datetime) -> int:
+        """Store a failed login timestamp for the given user."""
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
             if user is None:
@@ -116,6 +117,7 @@ class UserStore:
             return len(user.failed_logins)
 
     def get_failed_login_count(self, username: str) -> int:
+        """Return how many times the given user has failed to log in."""
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
             if user is None:
@@ -123,6 +125,7 @@ class UserStore:
             return len(user.failed_logins)
 
     def clear_failed_logins(self, username: str) -> None:
+        """Reset the number of times the given user has failed to log in back to 0."""
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
             if user is None:

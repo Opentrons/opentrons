@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -12,6 +13,8 @@ import pydantic
 from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_scopes
 
 from auth_server.persistence.orm_models import User as ORMUser
+from auth_server.settings.store import SettingsStore
+from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import password_hash
@@ -39,10 +42,10 @@ credentials" grant type.
 """
 
 
-def build(user_store: UserStore) -> Backend:
+def build(user_store: UserStore, settings_store: SettingsStore) -> Backend:
     """Return a backend that our server can use to process OAuth 2 requests."""
     return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore(), user_store),
+        _RequestValidator(_TokenStore(), user_store, settings_store),
         token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
     )
 
@@ -80,9 +83,15 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     oauthlib calling us with argument types that we weren't expecting.
     """
 
-    def __init__(self, token_store: _TokenStore, user_store: UserStore) -> None:
+    def __init__(
+        self,
+        token_store: _TokenStore,
+        user_store: UserStore,
+        settings_store: SettingsStore,
+    ) -> None:
         self.__token_store = token_store
         self.__user_store = user_store
+        self.__settings_store = settings_store
         super().__init__()
 
     @override
@@ -169,10 +178,40 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         user = self.__user_store.get(username)
-        if user is not None and password_hash.verify(password, user.hashed_password):
-            request.user = user  # type: ignore[attr-defined]
-            return True
-        return False
+        max_login_attempts = (
+            self.__settings_store.get_settings().maxNumberOfLoginAttempts
+        )
+        now = datetime.now(UTC)
+
+        if user is None:
+            # Unrecognized username.
+            raise _CustomInvalidCredentialsError(login_attempts_remaining=None)
+
+        password_is_correct = password_hash.verify(password, user.hashed_password)
+
+        failed_login_count: int
+        if password_is_correct:
+            failed_login_count = self.__user_store.get_failed_login_count(username)
+        else:
+            # Only record a failed login if we have a finite limit on maximum attempts.
+            # Otherwise the list could grow unbounded.
+            if max_login_attempts is None:
+                failed_login_count = self.__user_store.get_failed_login_count(username)
+            else:
+                failed_login_count = self.__user_store.record_failed_login(username, now)
+
+        is_currently_locked, attempts_remaining = is_account_locked(
+            failed_login_count=failed_login_count,
+            max_attempts=max_login_attempts,
+        )
+
+        if is_currently_locked or not password_is_correct:
+            raise _CustomInvalidCredentialsError(attempts_remaining)
+
+        # If the credentials pass the gauntlet above, it's a successful login.
+        self.__user_store.clear_failed_logins(username)
+        request.user = user  # type: ignore[attr-defined]
+        return True
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -295,6 +334,41 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 "username": found_access_token.username,
                 # "active": True is set implicitly by oauthlib.
             }
+
+
+class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
+    """An "invalid credentials" error to return to the client, with some extra custom information.
+
+    oauthlib doesn't exactly document that we're allowed to customize error responses
+    this way, but you gotta do what you gotta do.
+    """
+
+    def __init__(self, login_attempts_remaining: int | None) -> None:
+        """Construct the error.
+
+        Params:
+            login_attempts_remaining: How many login attempts the user has left
+                before their account is locked, or `None` to omit that information.
+        """
+        self.__login_attempts_remaining = login_attempts_remaining
+        super().__init__(
+            description="Invalid credentials given.",  # Match oauthlib's default description.
+            uri=None,
+            state=None,
+            status_code=None,
+            request=None,
+        )
+
+    @property
+    @override
+    def json(self) -> str:
+        """Override oauthlib's JSON serialization to add our customizations."""
+        result = json.loads(super().json)
+        if self.__login_attempts_remaining is not None:
+            result["opentrons_login_attempts_remaining"] = (
+                self.__login_attempts_remaining
+            )
+        return json.dumps(result)
 
 
 @dataclass

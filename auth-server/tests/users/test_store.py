@@ -8,7 +8,6 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.users.models import AccountType
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
-    UserDataManager,
     password_hash,
 )
 
@@ -22,17 +21,7 @@ def user_store(tmp_path: Path) -> Generator[UserStore, None, None]:
     with sql_engine_ctx(db_path) as engine:
         create_schema(engine)
         store = UserStore(sql_engine=engine)
-        service = UserDataManager(user_store=store)
-        service.seed_initial_users()
         yield store
-
-
-def test_get_returns_existing_user(user_store: UserStore) -> None:
-    """get should return the User when the username exists."""
-    user = user_store.get("test_admin")
-    assert user is not None
-    assert user.username == "test_admin"
-    assert user.account_type == AccountType.ADMIN
 
 
 def test_get_returns_none_for_nonexistent_user(user_store: UserStore) -> None:
@@ -51,6 +40,9 @@ def test_add_and_get_user(user_store: UserStore) -> None:
     fetched = user_store.get("add_test_user")
     assert fetched is not None
     assert fetched.username == "add_test_user"
+    assert fetched.hashed_password == HASHED_PW
+    assert fetched.full_name == "Add Test"
+    assert fetched.account_type == AccountType.USER
 
 
 def test_remove_and_get_user(user_store: UserStore) -> None:

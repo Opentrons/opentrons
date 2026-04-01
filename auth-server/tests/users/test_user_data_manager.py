@@ -233,7 +233,7 @@ def test_update_user_password_is_hashed(
     decoy.when(
         mock_store.update("pw_user", None, matchers.IsA(str), None, None)
     ).then_return(_make_orm_user(username="pw_user", full_name="X"))
-    result = manager.update_user("pw_user", password="newpassword2")
+    result = manager.update_user("pw_user", new_password="newpassword2")
     assert result.userName == "pw_user"
     assert result.fullName == "X"
 
@@ -245,7 +245,7 @@ def test_update_user_not_found_raises(
         ValueError("User 'ghost' not found")
     )
     with pytest.raises(UserNotFoundError):
-        manager.update_user("ghost", full_name="Nope")
+        manager.update_user("ghost", new_full_name="Nope")
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
@@ -255,4 +255,4 @@ def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="at least 8 characters"):
-        manager.update_user("test_admin", password="short")
+        manager.update_user("test_admin", new_password="short")

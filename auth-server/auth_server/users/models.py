@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import Annotated, Literal, Optional
 
 from pydantic import BaseModel, Field, SecretStr
 
 from server_utils.auth.scopes import Scope
-
-# todo(tz, 2026-02-27): remove this when we move AccountType to its own file.
-if TYPE_CHECKING:
-    from auth_server.persistence.orm_models import User
 
 
 # leave this outside of the db. this will not change.
@@ -69,6 +65,13 @@ class UpdateUser(BaseModel):
         Optional[AccountType],
         Field(..., description="The type of account for the user."),
     ] = None
+    locked: Annotated[
+        Optional[Literal[False]],
+        Field(
+            ...,
+            description="Set to false to clear a failed-login lockout for this user.",
+        ),
+    ] = None
 
 
 class UserResponse(BaseModel):
@@ -78,20 +81,4 @@ class UserResponse(BaseModel):
     fullName: str
     accountType: AccountType
     scopes: list[str]
-
-    @classmethod
-    def from_orm_user(cls, user: User) -> UserResponse:
-        """Build a UserResponse from an ORM User."""
-        assert user.username is not None
-        assert user.full_name is not None
-        assert user.account_type is not None
-
-        account_type = AccountType(user.account_type)
-        return cls(
-            userName=user.username,
-            fullName=user.full_name,
-            accountType=account_type,
-            scopes=sorted(
-                scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
-            ),
-        )
+    locked: bool
