@@ -138,7 +138,7 @@ class WaterPump(AbstractWaterPump):
         try:
             await self.turn_motor_on()
             while time.perf_counter() - loop_st < run_time:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(1)
             self._logger.info("Water fill timer complete")
         except Exception as e:
             self._logger.error(f"Water fill timer error: {e}")

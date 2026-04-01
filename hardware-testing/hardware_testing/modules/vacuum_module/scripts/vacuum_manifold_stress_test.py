@@ -101,11 +101,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Amount of time the vm vent is opened.",
     )
     parameters.add_int(
-        "tough_fill_time",
-        "trough_fill_time",
-        default=67,
+        "perstaltic_target_volume",
+        "perstaltic_target_volume",
+        default=96000,
         minimum=1,
-        maximum=120,
+        maximum=96000,
         description="Reservoir water fill time.",
     )
 
@@ -239,7 +239,6 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    # asyncio.create_task(water_pump_fixture.water_fill_timer(trough_fill_time))
     await water_pump_fixture.water_fill_timer(trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
@@ -299,11 +298,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     volume = ctx.params.volume  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
-    trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
     SETTLE_SEC = ctx.params.vm_settle_sec  # type: ignore[attr-defined]
     RUN_SEC = ctx.params.vm_run_sec  # type: ignore[attr-defined]
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
+    perstaltic_volume_target = ctx.params.perstaltic_target_volume #  # type: ignore[attr-defined]
+    perstaltic_pump_flow_rate = 100 #mL/min
+    water_tolerance = 5
+    perstaltic_time = int(perstaltic_volume_target/perstaltic_pump_flow_rate) + water_tolerance
+
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
@@ -345,7 +348,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                         pump,
                         pump_fixture,
                         pressure,
-                        trough_fill_time,
+                        perstaltic_time,
                         cycle,
                         output_dir,
                         SETTLE_SEC,
