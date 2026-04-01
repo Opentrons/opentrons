@@ -499,8 +499,12 @@ class BooleanSettingKey(enum.Enum):
     ENABLE_CAMERA = "enable_camera"
     ENABLE_LIVE_STREAM = "enable_live_stream"
     ENABLE_ERROR_RECOVERY_CAMERA = "enable_error_recovery_camera"
-    REQUIRE_ADMIN_CREDS_WHEN_UPDATING_ROBOT_SOFTWARE = "requireAdminCredsWhenUpdatingRobotSoftware"
-    REQUIRE_ADMIN_CREDS_WHEN_SENDING_PROTOCOL_TO_ROBOT = "requireAdminCredsWhenSendingProtocolToRobot"
+    REQUIRE_ADMIN_CREDS_WHEN_UPDATING_ROBOT_SOFTWARE = (
+        "requireAdminCredsWhenUpdatingRobotSoftware"
+    )
+    REQUIRE_ADMIN_CREDS_WHEN_SENDING_PROTOCOL_TO_ROBOT = (
+        "requireAdminCredsWhenSendingProtocolToRobot"
+    )
     REQUIRE_ADMIN_CREDS_FOR_SIGNOFF_PROTOCOL = "requireAdminCredsForSignoffProtocol"
     REQUIRE_SIGNOFF_FOR_PROTOCOL_LOG = "requireSignoffForProtocolLog"
     REQUIRE_LOGS_TO_BE_SAVED_IN_APP = "requireLogsToBeSavedInApp"

@@ -1,0 +1,88 @@
+"""HTTP request/response models for access control settings."""
+
+import textwrap
+from typing import Annotated
+
+import pydantic
+
+
+class ResponseData(pydantic.BaseModel):
+    """Response body data from the `/accessControl/settings` endpoints."""
+
+    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
+        bool,
+        pydantic.Field(
+            default=False,
+            description="Whether admin credentials are required when updating robot software.",
+        ),
+    ]
+    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
+        bool,
+        pydantic.Field(
+            default=False,
+            description="Whether admin credentials are required when sending a protocol to the robot.",
+        ),
+    ]
+    requireAdminCredsForSignoffProtocol: Annotated[
+        bool,
+        pydantic.Field(
+            default=False,
+            description="Whether admin credentials are required for signing off on a protocol.",
+        ),
+    ]
+    requireSignoffForProtocolLog: Annotated[
+        bool,
+        pydantic.Field(
+            default=False,
+            description="Whether signoff is required for the protocol log.",
+        ),
+    ]
+
+
+class RequestData(pydantic.BaseModel):
+    """Request body data for `PATCH /accessControl/settings`."""
+
+    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether admin credentials are required
+                when updating robot software.
+                """
+            )
+        ),
+    ] = None
+    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether admin credentials are required
+                when sending a protocol to the robot.
+                """
+            )
+        ),
+    ] = None
+    requireAdminCredsForSignoffProtocol: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether admin credentials are required
+                for signing off on a protocol.
+                """
+            )
+        ),
+    ] = None
+    requireSignoffForProtocolLog: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether signoff is required
+                for the protocol log.
+                """
+            )
+        ),
+    ] = None
