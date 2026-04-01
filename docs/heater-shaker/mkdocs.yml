@@ -12,7 +12,6 @@ nav:
   - Software Control: software.md
   - Maintenance and Cleaning: maintenance.md
   - Heater-Shaker G-Codes:
-      - "Em—Dash Title Test": em-dash-title-test.md
       - Heater-Shaker G-Code Concepts: g-code-concepts.md
       - Heater-Shaker G-Codes: g-codes.md
       - Heater-Shaker Error Codes: error-codes.md

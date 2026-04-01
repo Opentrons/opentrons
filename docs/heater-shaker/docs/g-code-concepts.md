@@ -72,10 +72,6 @@ Every Opentrons module returns a response after executing a command. A response 
   </tbody>
 </table>
 
-## Connection em&mdash;dash parameters {: #connection-em-dash-electric-boogaloo }
-
-Now let's link to a [page title with an em—dash](./em-dash-title-test.md)
-
 To establish a serial USB connection with a Heater-Shaker, your application must specify the baud rate and identify the module using its Vendor ID (VID) and Product ID (PID).
 
 - **Baud rate**: `115200`

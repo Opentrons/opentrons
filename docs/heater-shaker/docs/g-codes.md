@@ -5,8 +5,6 @@ description: "Lists all Heater-Shaker G-codes and responses."
 
 The Thermocycler accepts the G-code commands listed below.
 
-This is my [em—dash link](./g-code-concepts.md#connection-em-dash-electric-boogaloo)
-
 !!! tip
     These commands rarely change, but you can always check for updates in the [Heater-Shaker driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/heater_shaker/driver.py).
 
