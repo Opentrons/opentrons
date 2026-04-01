@@ -7,9 +7,11 @@ from opentrons import protocol_api  # type: ignore[import]
 from opentrons.protocol_api import ParameterContext
 import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
+from opentrons.drivers.vacuum_module.types import VentState
 import dataclasses
 import time
 import logging
+import traceback
 import csv
 from typing import Dict
 
@@ -124,7 +126,8 @@ async def read_data(
         # Expected: we stop after RUN_SEC
         logging.info(f"continuous read duration reached ({duration}s)")
     except Exception as e:
-        logging.info(f"continuous read error: {e}")
+        logging.error(f"continuous read error: {e}")
+        raise
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -171,15 +174,26 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-async def water_pump_timer(w_pump: Any, run_time: float) -> None:
-    """Run the water pump for a fixed duration then turn it off."""
-    await w_pump.turn_motor_on()
-    await asyncio.sleep(run_time)
-    await w_pump.turn_motor_off()
+async def _setup_devices():
+    from hardware_testing.drivers import vacuum_pump
+
+    loop = asyncio.get_event_loop()
+    # Vacuum Manifold Driver
+    port = await find_port_by_id(VM_idVendor, VM_idProduct)
+    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
+
+    # Arduino Water pump Driver
+    m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
+
+    pump_fixture = await vacuum_pump.WaterPump.create(
+        port=m_port, baudrate=115200, loop=loop
+    )
+
+    return pump, pump_fixture
 
 
 async def _run_single_pump_api_cycle(
-    pump: Any,
+    pump: vacuum_module.VacuumModuleDriver,
     water_pump_fixture: Any,
     target_pressure: int,
     trough_fill_time: int,
@@ -187,29 +201,15 @@ async def _run_single_pump_api_cycle(
     output_dir: Path,
     ctx: protocol_api.ProtocolContext,
 ) -> None:
-    """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader.
-
-    Relies on the driver's internal CSV logging (e.g. pump_test.csv) instead of
-    creating a per-cycle CSV here.
-    """
+    """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    # asyncio.create_task(
-    #     water_pump_timer(water_pump_fixture, ctx.params.trough_fill_time)
-    # )
-    if cycle_index == 1:
-        connection = await pump.is_connected()
-        if connection == False:
-            await pump.connect()
-        await water_pump_fixture.connect()
-    await water_pump_fixture.water_fill_timer(trough_fill_time)
+    # await water_pump_fixture.water_fill_timer(trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
         guage_pressure_mbar=target_to_pump,
     )
-
-    await asyncio.sleep(SETTLE_SEC)
     ctx.comment(f"[cycle {cycle_index}] pump started at target {target_pressure} mbar")
 
     # Dynamic CSV naming per trial (date + trial index + pressure)
@@ -219,24 +219,23 @@ async def _run_single_pump_api_cycle(
     trial_csv = (
         output_dir / f"{date_str}_trial_{cycle_index:02d}_{target_pressure}mbar.csv"
     )
-    try:
-        ctx.comment(f"[cycle {cycle_index}] logging to {trial_csv.name}")
-    except Exception as e:
-        ctx.comment(f"[cycle {cycle_index}] failed to set CSV filename: {e}")
+    ctx.comment(f"[cycle {cycle_index}] logging to {trial_csv}")
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await read_data(trial_csv.name, pump, start_time, RUN_SEC)
+        await read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC)
     except asyncio.TimeoutError:
-        # Expected: we stop after RUN_SEC
         ctx.comment(
-            f"[cycle {cycle_index}] continuous read duration reached ({RUN_SEC}s)"
+            f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
         )
     except Exception as e:
-        ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
-
+        ctx.comment(f"[cycle {cycle_index}] ERROR during data read: {e}")
+        raise
+    ctx.comment(
+        f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
+    )
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(True)
+    await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     # Stop the pump
     await pump.set_vacuum_state(
@@ -244,30 +243,27 @@ async def _run_single_pump_api_cycle(
         guage_pressure_mbar=target_to_pump,
     )
     try:
-        await read_data(trial_csv.name, pump, start_time, DECAY_SEC)
+        await read_data(str(trial_csv), pump, start_time, DECAY_SEC)
     except asyncio.TimeoutError:
-        # Expected: we stop after RUN_SEC
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
         )
     except Exception as e:
-        ctx.comment(f"[cycle {cycle_index}] continuous read error: {e}")
+        ctx.comment(f"[cycle {cycle_index}] ERROR during decay read: {e}")
+        raise
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     # await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(False)
+    await pump.set_vent_state(VentState.CLOSED)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
     z_offset = ctx.params.offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
-    cycles = ctx.params.cycles  # type: ignore[attr-defined]
+    cycles = 5  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
-
-    if not ctx.is_simulating():
-        from hardware_testing.drivers import vacuum_pump
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
@@ -276,62 +272,59 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         adapter="opentrons_flex_96_tiprack_adapter",
     )
     pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
-    source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
-    base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
-    manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
-    filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
+    # source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
+    # base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
+    # manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
+    # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
 
-    pip.pick_up_tip()
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    # pip.pick_up_tip()
+    # loop = asyncio.get_event_loop()
+    # asyncio.set_event_loop(loop)
 
     pump = None
     pump_fixture = None
+    loop = None
     if not ctx.is_simulating():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
-
-            # Vacuum Manifold Driver
-            port = loop.run_until_complete(find_port_by_id(VM_idVendor, VM_idProduct))
-            pump = loop.run_until_complete(
-                vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
-            )
-
-            # Arduino Water pump Driver
-            m_port = loop.run_until_complete(
-                find_port_by_id(Ard_idVendor, Ard_idProduct)
-            )
-            pump_fixture = loop.run_until_complete(
-                vacuum_pump.WaterPump.create(port=m_port, baudrate=115200, loop=loop)
-            )
+            pump, pump_fixture = loop.run_until_complete(_setup_devices())
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
 
     output_dir = Path(OUTPUT_DIR)
+    if not ctx.is_simulating():
+        for cycle in range(1, cycles + 1):
+            ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
+            # pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
+            # pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
+            # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
+            # pip.move_to(filter_plate["A1"].top(10))  # Move away again
 
-    for cycle in range(1, cycles + 1):
-        ctx.comment(f"=== Cycle {cycle}/{cycles} ===")
-        pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
-        pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
-        # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
-        pip.move_to(filter_plate["A1"].top(10))  # Move away again
-        if not ctx.is_simulating():
-            loop.run_until_complete(
-                _run_single_pump_api_cycle(
-                    pump,
-                    pump_fixture,
-                    trough_fill_time,
-                    pressure,
-                    cycle,
-                    output_dir,
-                    ctx,
+            # ctx.comment(f"[cycle {cycle}] skipped — pump not initialised")
+            try:
+                loop.run_until_complete(
+                    _run_single_pump_api_cycle(
+                        pump,
+                        pump_fixture,
+                        pressure,
+                        trough_fill_time,
+                        cycle,
+                        output_dir,
+                        ctx,
+                    )
                 )
-            )
-    pip.return_tip()
-    if pump:
-        try:
-            loop.run_until_complete(pump.disconnect())
-            ctx.comment("Pump disconnected.")
-        except Exception:
-            pass
-    loop.close()
+            except Exception as e:
+                tb = traceback.format_exc()
+                ctx.comment(f"[cycle {cycle}] failed ({type(e).__name__}: {e})\n{tb}")
+                raise
+        # pip.return_tip()
+        if not ctx.is_simulating() and loop is not None:
+            try:
+                if pump is not None:
+                    loop.run_until_complete(pump.disconnect())
+                if pump_fixture is not None:
+                    loop.run_until_complete(pump_fixture.disconnect())
+            except Exception:
+                raise 
+            loop.close()

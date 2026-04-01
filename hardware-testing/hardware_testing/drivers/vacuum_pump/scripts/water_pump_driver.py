@@ -1,9 +1,30 @@
 """Fixture Pump Driver."""
 
 from serial import Serial  # type: ignore[import-untyped]
-from typing import Optional, Set, Protocol
+from typing import Optional, Protocol
 import asyncio
+import logging
+import os
 import time
+
+LOG_DIR = "/data"
+LOG_FILE = os.path.join(LOG_DIR, "water_pump.log")
+
+os.makedirs(LOG_DIR, exist_ok=True)
+
+_file_handler = logging.FileHandler(LOG_FILE)
+_file_handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+)
+_stream_handler = logging.StreamHandler()
+_stream_handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+)
+
+log = logging.getLogger("water_pump")
+log.setLevel(logging.DEBUG)
+log.addHandler(_file_handler)
+log.addHandler(_stream_handler)
 
 COMMANDS = {
     "pumpOn": "ON",
@@ -32,11 +53,11 @@ class AbstractWaterPump(Protocol):
         """Disconnect from sensor."""
         ...
 
-    async def turn_motor_on(self) -> str:
+    async def turn_motor_on(self) -> None:
         """Change the state of the Pump to on."""
         ...
 
-    async def turn_motor_off(self) -> str:
+    async def turn_motor_off(self) -> None:
         """Change the state of the Pump to off."""
         ...
 
@@ -56,9 +77,7 @@ class WaterPump(AbstractWaterPump):
         """Initialize WaterPump with a serial connection."""
         self.connection = connection
         self.st = time.perf_counter()
-        # Logging controls
-        self._logging_enabled: bool = True
-        self._log_categories: Optional[Set[str]] = None  # None => all
+        self._logger = logging.getLogger("water_pump")
 
     @classmethod
     async def create(
@@ -72,9 +91,10 @@ class WaterPump(AbstractWaterPump):
         """Open the serial connection if not already open."""
         try:
             if self.connection.is_open:
-                self._log("state", "Connection open")
+                self._logger.info("Connection already open")
             else:
                 self.connection.open()
+                self._logger.info("Connection opened")
         except Exception as e:
             raise e
 
@@ -83,43 +103,48 @@ class WaterPump(AbstractWaterPump):
         try:
             if self.connection.is_open:
                 self.connection.close()
-                print("Connection close")
+                self._logger.info("Connection closed")
         except Exception as e:
-            raise RuntimeError(f"Unable to connect: {e}") from e
+            raise RuntimeError(f"Unable to disconnect: {e}") from e
 
-    async def turn_motor_on(self) -> str:
+    async def turn_motor_on(self) -> None:
         """Change the state of the Pump to on."""
         try:
             command = f"{COMMANDS['pumpOn']}{V_ACK}"
             await asyncio.to_thread(self.connection.reset_input_buffer)
             await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
+            self._logger.debug("Motor turned on")
         except Exception as e:
-            self._log("error", f"Continuous read error: {e}")
-            raise (e)
+            self._logger.error(f"Failed to turn motor on: {e}")
+            raise
 
-    async def turn_motor_off(self) -> str:
+    async def turn_motor_off(self) -> None:
         """Change the state of the Pump to off."""
         try:
             command = f"{COMMANDS['pumpOff']}{V_ACK}"
             await asyncio.to_thread(self.connection.reset_input_buffer)
             await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
+            self._logger.debug("Motor turned off")
         except Exception as e:
-            self._log("error", f"Continuous read error: {e}")
-            raise (e)
+            self._logger.error(f"Failed to turn motor off: {e}")
+            raise
 
     async def water_fill_timer(self, run_time: int) -> None:
-        """Change the state of the Pump to off."""
+        """Run the pump for the specified duration in seconds."""
         loop_st = time.perf_counter()
+        self._logger.info(f"Starting water fill timer for {run_time}s")
         try:
+            await self.turn_motor_on()
             while time.perf_counter() - loop_st < run_time:
-                await self.turn_motor_on()
                 await asyncio.sleep(0.1)
-            await self.turn_motor_off()
+            self._logger.info("Water fill timer complete")
         except Exception as e:
-            self._log("error", f"Continuous read error: {e}")
-            raise (e)
+            self._logger.error(f"Water fill timer error: {e}")
+            raise
+        finally:
+            await self.turn_motor_off()
 
     async def check_water_level(self) -> None:
         """Check the current water level."""
@@ -128,10 +153,10 @@ class WaterPump(AbstractWaterPump):
         try:
             while True:
                 line = await self._readline()
-                self._log("Water Level:", line)
+                self._logger.info(f"Water level: {line.strip()}")
         except Exception as e:
-            self._log("error", f"Continuous read error: {e}")
-            raise (e)
+            self._logger.error(f"Continuous read error: {e}")
+            raise
 
     async def _write(self, data: bytes) -> None:
         """Non-blocking write operation."""
@@ -139,7 +164,7 @@ class WaterPump(AbstractWaterPump):
             # Offload write to another thread to avoid blocking the event loop
             await asyncio.to_thread(self.connection.write, data)
         except Exception as e:
-            raise (e)
+            raise
 
     async def _readline(self) -> str:
         """Non-blocking read operation."""
@@ -147,32 +172,21 @@ class WaterPump(AbstractWaterPump):
             # Offload readline to another thread to avoid blocking the event loop
             return (await asyncio.to_thread(self.connection.readline)).decode("utf-8")
         except Exception as e:
-            raise (e)
-        # ---------------------- Logging Helpers ----------------------
+            raise
 
-    def enable_logging(self, categories: Optional[Set[str]] = None) -> None:
-        """Enable logging. Pass a set of categories to filter; None => all categories.
+    # ---------------------- Logging Helpers ----------------------
 
-        Categories used: pressure, ack, io, state, error
-        """
-        self._logging_enabled = True
-        self._log_categories = categories
+    def set_log_level(self, level: int) -> None:
+        """Set the log level (e.g. logging.DEBUG, logging.INFO, logging.WARNING)."""
+        self._logger.setLevel(level)
 
     def disable_logging(self) -> None:
-        """Disable all logging output."""
-        self._logging_enabled = False
+        """Suppress all log output from this driver."""
+        self._logger.setLevel(logging.CRITICAL + 1)
 
-    def _should_log(self, category: str) -> bool:
-        if not self._logging_enabled:
-            return False
-        if self._log_categories is None:
-            return True
-        return category in self._log_categories
-
-    def _log(self, category: str, message: str) -> None:
-        if self._should_log(category):
-            # Simple format; could route to ctx.comment or standard logger.
-            print(f"[{category}] {message}")
+    def enable_logging(self) -> None:
+        """Re-enable logging at DEBUG level."""
+        self._logger.setLevel(logging.DEBUG)
 
 
 # async def main():
@@ -194,6 +208,6 @@ class WaterPump(AbstractWaterPump):
 #             t+= 1
 #             print(f"\rTime(s): {t}", end="", flush=True)
 #         t=0
-if __name__ =='__main__':
+if __name__ == "__main__":
 
     asyncio.run(main())
