@@ -53,22 +53,24 @@ class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
     userName: Annotated[
-        str | None, Field(..., description="The username of the user.")
+        str | None,
+        Field(description="The username of the user."),
     ] = None
     password: Annotated[
-        SecretStr | None, Field(..., description="The password for the user.")
+        SecretStr | None,
+        Field(description="The password for the user."),
     ] = None
     fullName: Annotated[
-        str | None, Field(..., description="The full name of the user.")
+        str | None,
+        Field(description="The full name of the user."),
     ] = None
     accountType: Annotated[
         AccountType | None,
-        Field(..., description="The type of account for the user."),
+        Field(description="The type of account for the user."),
     ] = None
     locked: Annotated[
         Literal[False] | None,
         Field(
-            ...,
             description="Set to false to clear a failed-login lockout for this user.",
         ),
     ] = None
