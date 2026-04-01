@@ -109,6 +109,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Reservoir water fill time.",
     )
 
+
 async def find_port_by_id(vendorId: int, productId: int) -> str:
     """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
@@ -203,6 +204,7 @@ async def read_data(
         logging.error(f"continuous read error: {e}")
         raise
 
+
 async def _setup_devices() -> tuple:  # type: ignore[type-arg]
     from hardware_testing.drivers import vacuum_pump
 
@@ -237,9 +239,7 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    asyncio.create_task(
-        water_pump_timer(water_pump_fixture.water_fill_timer, ctx.params.trough_fill_time)
-    )
+    asyncio.create_task(water_pump_fixture.water_fill_timer(trough_fill_time))
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
@@ -294,15 +294,15 @@ async def _run_single_pump_api_cycle(
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
-    z_offset = ctx.params.z_offset # type: ignore[attr-defined]
-    volume = ctx.params.volume # type: ignore[attr-defined]
+    z_offset = ctx.params.z_offset  # type: ignore[attr-defined]
+    volume = ctx.params.volume  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
-    SETTLE_SEC = ctx.params.vm_settle_sec
-    RUN_SEC = ctx.params.vm_run_sec
-    DECAY_SEC = ctx.params.vm_decay_sec
-    VENT_SEC = ctx.params.vm_vent_sec
+    SETTLE_SEC = ctx.params.vm_settle_sec # type: ignore[attr-defined]
+    RUN_SEC = ctx.params.vm_run_sec # type: ignore[attr-defined]
+    DECAY_SEC = ctx.params.vm_decay_sec # type: ignore[attr-defined]
+    VENT_SEC = ctx.params.vm_vent_sec # type: ignore[attr-defined]
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
