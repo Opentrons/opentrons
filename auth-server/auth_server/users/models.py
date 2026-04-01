@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, SecretStr
 
@@ -53,20 +53,20 @@ class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
     userName: Annotated[
-        Optional[str], Field(..., description="The username of the user.")
+        str | None, Field(..., description="The username of the user.")
     ] = None
     password: Annotated[
-        Optional[SecretStr], Field(..., description="The password for the user.")
+        SecretStr | None, Field(..., description="The password for the user.")
     ] = None
     fullName: Annotated[
-        Optional[str], Field(..., description="The full name of the user.")
+        str | None, Field(..., description="The full name of the user.")
     ] = None
     accountType: Annotated[
-        Optional[AccountType],
+        AccountType | None,
         Field(..., description="The type of account for the user."),
     ] = None
     locked: Annotated[
-        Optional[Literal[False]],
+        Literal[False] | None,
         Field(
             ...,
             description="Set to false to clear a failed-login lockout for this user.",
