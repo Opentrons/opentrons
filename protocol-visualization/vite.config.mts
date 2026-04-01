@@ -33,6 +33,11 @@ export default defineConfig({
         'react-dom',
         'react/jsx-runtime',
         'react-dom/client',
+        'clsx',
+        'i18next',
+        'lodash',
+        'react-i18next',
+        'react-window',
       ],
       output: {
         assetFileNames: assetInfo => {
@@ -62,7 +67,7 @@ export default defineConfig({
   },
   css: {
     modules: {
-      generateScopedName: '[local]',
+      generateScopedName: 'pv_[name]__[local]',
     },
     postcss: {
       plugins: [

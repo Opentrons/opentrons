@@ -5,8 +5,10 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@opentrons/shared-data': link:pack/opentrons-shared-data
   '@opentrons/components': link:pack/opentrons-components
+  '@opentrons/protocol-visualization': link:pack/opentrons-protocol-visualization
+  '@opentrons/shared-data': link:pack/opentrons-shared-data
+  '@opentrons/step-generation': link:pack/opentrons-step-generation
 
 importers:
 
@@ -18,9 +20,15 @@ importers:
       '@opentrons/components':
         specifier: link:pack/opentrons-components
         version: link:pack/opentrons-components
+      '@opentrons/protocol-visualization':
+        specifier: link:pack/opentrons-protocol-visualization
+        version: link:pack/opentrons-protocol-visualization
       '@opentrons/shared-data':
         specifier: link:pack/opentrons-shared-data
         version: link:pack/opentrons-shared-data
+      '@opentrons/step-generation':
+        specifier: link:pack/opentrons-step-generation
+        version: link:pack/opentrons-step-generation
       '@playwright/test':
         specifier: ^1.58.2
         version: 1.58.2
@@ -36,12 +44,18 @@ importers:
       dotenv:
         specifier: ^16.6.1
         version: 16.6.1
+      i18next:
+        specifier: ^23.11.5
+        version: 23.16.8
       react:
         specifier: 18.2.0
         version: 18.2.0
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
+      react-i18next:
+        specifier: ^14.1.2
+        version: 14.1.3(i18next@23.16.8)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       typescript:
         specifier: 5.3.3
         version: 5.3.3
@@ -1245,6 +1259,9 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
+  html-parse-stringify@3.0.1:
+    resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
+
   http-cache-semantics@4.2.0:
     resolution: {integrity: sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==}
 
@@ -1259,6 +1276,9 @@ packages:
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
+
+  i18next@23.16.8:
+    resolution: {integrity: sha512-06r/TitrM88Mg5FdUXAKL96dJMzgqLE5dv3ryBAra4KCwD9mJ4ndOTS95ZuymIGoE+2hzfdaMak2X11/es7ZWg==}
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -1491,6 +1511,19 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
+  react-i18next@14.1.3:
+    resolution: {integrity: sha512-wZnpfunU6UIAiJ+bxwOiTmBOAaB14ha97MjOEnLGac2RJ+h/maIYXZuTHlmyqQVX1UVHmU1YDTQ5vxLmwfXTjw==}
+    peerDependencies:
+      i18next: '>= 23.2.3'
+      react: '>= 16.8.0'
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
     engines: {node: '>=0.10.0'}
@@ -1702,6 +1735,10 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  void-elements@3.1.0:
+    resolution: {integrity: sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==}
+    engines: {node: '>=0.10.0'}
 
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
@@ -2087,8 +2124,7 @@ snapshots:
       '@babel/core': 7.28.5
       '@babel/helper-plugin-utils': 7.27.1
 
-  '@babel/runtime@7.29.2':
-    optional: true
+  '@babel/runtime@7.29.2': {}
 
   '@babel/template@7.27.2':
     dependencies:
@@ -2983,6 +3019,10 @@ snapshots:
 
   has-flag@4.0.0: {}
 
+  html-parse-stringify@3.0.1:
+    dependencies:
+      void-elements: 3.1.0
+
   http-cache-semantics@4.2.0: {}
 
   http-proxy-agent@5.0.0:
@@ -3004,6 +3044,10 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
+
+  i18next@23.16.8:
+    dependencies:
+      '@babel/runtime': 7.29.2
 
   iconv-lite@0.6.3:
     dependencies:
@@ -3209,6 +3253,15 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.2
+
+  react-i18next@14.1.3(i18next@23.16.8)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      '@babel/runtime': 7.29.2
+      html-parse-stringify: 3.0.1
+      i18next: 23.16.8
+      react: 18.2.0
+    optionalDependencies:
+      react-dom: 18.2.0(react@18.2.0)
 
   react-refresh@0.14.2: {}
 
@@ -3425,6 +3478,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 18.19.130
       fsevents: 2.3.3
+
+  void-elements@3.1.0: {}
 
   web-streams-polyfill@3.3.3: {}
 

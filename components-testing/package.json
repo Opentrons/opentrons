@@ -12,14 +12,18 @@
   "dependencies": {
     "@applitools/eyes-playwright": "1.46.2",
     "@opentrons/components": "link:pack/opentrons-components",
+    "@opentrons/protocol-visualization": "link:pack/opentrons-protocol-visualization",
     "@opentrons/shared-data": "link:pack/opentrons-shared-data",
+    "@opentrons/step-generation": "link:pack/opentrons-step-generation",
     "@playwright/test": "^1.58.2",
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.2.0",
     "dotenv": "^16.6.1",
+    "i18next": "^23.11.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-i18next": "^14.1.2",
     "typescript": "5.3.3",
     "vite": "7.1.1"
   },

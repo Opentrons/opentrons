@@ -16,12 +16,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@opentrons/components/styles/global': path.resolve(
-        './node_modules/@opentrons/components/lib/style.css'
+        './node_modules/@opentrons/components/src/styles/global.css'
       ),
       '@opentrons/components/styles': path.resolve(
         './node_modules/@opentrons/components/lib/style.css'
       ),
-      // Force a single instance of React
+      '@opentrons/protocol-visualization/styles': path.resolve(
+        './node_modules/@opentrons/protocol-visualization/lib/style.css'
+      ),
       react: path.resolve('./node_modules/react'),
       'react-dom': path.resolve('./node_modules/react-dom'),
     },
@@ -31,15 +33,23 @@ export default defineConfig({
     include: [
       '@opentrons/components',
       '@opentrons/shared-data',
+      '@opentrons/step-generation',
+      '@opentrons/protocol-visualization',
       'react',
       'react-dom',
       'react-query',
       'react-redux',
       'redux',
+      'i18next',
+      'react-i18next',
     ],
     exclude: ['@opentrons/labware-library'],
     entries: ['./src/main.tsx'],
     force: true,
+  },
+  define: {
+    'process.env': {},
+    global: 'globalThis',
   },
   build: {
     rollupOptions: {

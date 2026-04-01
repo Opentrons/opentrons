@@ -12,6 +12,7 @@
       "import": "./lib/index.mjs",
       "require": "./lib/index.js"
     },
+    "./styles": "./lib/style.css",
     "./package.json": "./package.json"
   },
   "repository": {
@@ -24,6 +25,9 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "files": [
+    "lib"
+  ],
   "peerDependencies": {
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -31,6 +35,15 @@
   "dependencies": {
     "@opentrons/components": "link:../components",
     "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation"
+    "@opentrons/step-generation": "link:../step-generation",
+    "clsx": "2.1.1",
+    "i18next": "^23.11.5",
+    "lodash": "4.17.21",
+    "react-i18next": "^14.1.2",
+    "react-window": "1.8.10"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.17.4",
+    "@types/react-window": "1.8.8"
   }
 }

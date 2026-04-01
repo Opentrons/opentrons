@@ -16,11 +16,12 @@
     "rootDir": "src",
     "outDir": "lib",
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "paths": {
       "@opentrons/components": ["../components/src/index.ts"],
       "@opentrons/shared-data": ["../shared-data/js/index.ts"],
       "@opentrons/step-generation": ["../step-generation/src/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*.json"]
 }
