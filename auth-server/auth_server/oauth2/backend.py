@@ -193,12 +193,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         if password_is_correct:
             failed_login_count = self.__user_store.get_failed_login_count(username)
         else:
-            # Only record a failed login if we have a finite limit on maximum attempts.
-            # Otherwise the list could grow unbounded.
-            if max_login_attempts is None:
-                failed_login_count = self.__user_store.get_failed_login_count(username)
-            else:
-                failed_login_count = self.__user_store.record_failed_login(username, now)
+            # todo(mm, 2026-04-01): To prevent this list from growing unbounded,
+            # we should hold ourselves to some reasonable upper limit (like say 100),
+            # and limit the range of the admin-tunable setting to match.
+            failed_login_count = self.__user_store.record_failed_login(username, now)
 
         is_currently_locked, attempts_remaining = is_account_locked(
             failed_login_count=failed_login_count,

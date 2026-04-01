@@ -272,7 +272,7 @@ stages:
         opentrons_login_attempts_remaining: 2
 
 ---
-test_name: Failed login attempts are only tracked when the setting is enabled
+test_name: The number of remaining attempts isn't returned when the limit is disabled.
 
 marks:
   - usefixtures:
@@ -314,7 +314,7 @@ stages:
       strict:
         - json:off
 
-  - name: Failed login attempt 1 (not tracked)
+  - name: Failed login attempt 1
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -326,19 +326,7 @@ stages:
         error_description: Invalid credentials given.
         # Note: opentrons_login_attempts_remaining should not be present here.
 
-  - name: Failed login attempt 2 (not tracked)
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/token'
-      data: *wrong_credentials
-    response:
-      status_code: 400
-      json:
-        error: invalid_grant
-        error_description: Invalid credentials given.
-        # Note: opentrons_login_attempts_remaining should not be present here.
-
-  - name: Failed login attempt 3 (not tracked)
+  - name: Failed login attempt 2
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -358,12 +346,13 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 2
+          maxNumberOfLoginAttempts: 4
     response:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 2
+
+          maxNumberOfLoginAttempts: 4
       strict:
         - json:off
 
@@ -378,4 +367,5 @@ stages:
         error: invalid_grant
         error_description: Invalid credentials given.
         # Note: opentrons_login_attempts_remaining should be present now because we enabled the limit on login attempts.
+        # We ran through 2 of our 4 attempts above, before the setting was turned on.
         opentrons_login_attempts_remaining: 1
