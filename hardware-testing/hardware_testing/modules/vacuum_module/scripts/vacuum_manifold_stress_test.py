@@ -239,7 +239,8 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    asyncio.create_task(water_pump_fixture.water_fill_timer(trough_fill_time))
+    # asyncio.create_task(water_pump_fixture.water_fill_timer(trough_fill_time))
+    await water_pump_fixture.water_fill_timer(trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
