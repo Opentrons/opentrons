@@ -302,10 +302,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     RUN_SEC = ctx.params.vm_run_sec  # type: ignore[attr-defined]
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
-    perstaltic_volume_target = ctx.params.perstaltic_target_volume #  # type: ignore[attr-defined]
-    perstaltic_pump_flow_rate = 100 #mL/min
+    perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
+    perstaltic_pump_flow_rate = 100  # mL/min
     water_tolerance = 5
-    perstaltic_time = int(perstaltic_volume_target/perstaltic_pump_flow_rate) + water_tolerance
+    perstaltic_time = (
+        int(perstaltic_volume_target / perstaltic_pump_flow_rate) + water_tolerance
+    )
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
