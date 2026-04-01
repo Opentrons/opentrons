@@ -1,10 +1,12 @@
 """User store – pure data access layer for user persistence."""
 
+import datetime
+
 from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from auth_server.persistence.orm_models import User
+from auth_server.persistence.orm_models import FailedLogin, User
 from auth_server.users.models import AccountType
 
 
@@ -104,11 +106,26 @@ class UserStore:
             session.expunge(user)
             return user
 
-    def record_failed_login(self, username: str) -> int:
-        raise NotImplementedError
+    def record_failed_login(self, username: str, now: datetime.datetime) -> int:
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.username == username))
+            if user is None:
+                raise ValueError(f"User {username!r} not found")
+            user.failed_logins.append(FailedLogin(attempted_at=now))
+            session.commit()
+            return len(user.failed_logins)
 
     def get_failed_login_count(self, username: str) -> int:
-        raise NotImplementedError
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.username == username))
+            if user is None:
+                raise ValueError(f"User {username!r} not found")
+            return len(user.failed_logins)
 
-    def clear_failed_logins(self, username: str) -> int:
-        raise NotImplementedError
+    def clear_failed_logins(self, username: str) -> None:
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.username == username))
+            if user is None:
+                raise ValueError(f"User {username!r} not found")
+            user.failed_logins.clear()
+            session.commit()
