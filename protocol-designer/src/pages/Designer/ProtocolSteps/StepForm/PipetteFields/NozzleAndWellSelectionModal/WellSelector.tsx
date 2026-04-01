@@ -95,6 +95,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
   const allWells = labwareDef.ordering
+  const hasMoreThanOneWell = allWells.length > 1
   const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
@@ -113,6 +114,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const getSelectedWells = (): string[][] => {
     const wellsField = getWellsField()
     const wells = (wellsField?.value as string[]) || []
+    if (!hasMoreThanOneWell) {
+      return allWells
+    }
     return wells.map(well =>
       getEntireWellSelection(
         well,
@@ -419,7 +423,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
-        {hoveredWells?.[0] && (
+        {hoveredWells?.[0] && hasMoreThanOneWell ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
@@ -436,7 +440,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             nozzles={nozzleConfiguration}
             rotate={is96Channel}
           />
-        )}
+        ) : null}
       </>
     )
   }
