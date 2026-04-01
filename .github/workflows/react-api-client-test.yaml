@@ -60,7 +60,7 @@ jobs:
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          make setup-js
+          make setup-js-ci
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov
       - name: 'Upload coverage report'
