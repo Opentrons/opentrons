@@ -135,4 +135,3 @@ class UTCDateTime(sqlalchemy.types.TypeDecorator[datetime]):
             assert value.tzinfo is None
             return value.replace(tzinfo=timezone.utc)
         return None
-
