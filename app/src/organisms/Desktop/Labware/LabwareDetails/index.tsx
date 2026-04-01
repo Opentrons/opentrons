@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
+import styles from './LabwareDetails.module.css'
 
 import {
   ALIGN_CENTER,
@@ -44,27 +44,6 @@ import { WellSpacing } from './WellSpacing'
 
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
-const CLOSE_ICON_STYLE = css`
-  border-radius: 50%;
-
-  &:hover {
-    background: ${COLORS.grey30};
-  }
-  &:active {
-    background: ${COLORS.grey35};
-  }
-`
-
-const COPY_ICON_STYLE = css`
-  transform: translateY(${SPACING.spacing4});
-  &:hover {
-    color: ${COLORS.blue50};
-  }
-  &:active,
-  &:focus {
-    color: ${COLORS.black90};
-  }
-`
 
 export interface LabwareDetailsProps {
   onClose: () => void
@@ -127,7 +106,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           <Icon
             name="close"
             height={SPACING.spacing24}
-            css={CLOSE_ICON_STYLE}
+            className={styles.close_icon}
           />
         </Link>
       </Flex>
@@ -186,7 +165,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
-                <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />
+                <Icon size={SIZE_1} name="copy-text" className={styles.copy_icon} />
               </span>
             </Box>
           </Flex>
