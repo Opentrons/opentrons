@@ -29,7 +29,7 @@ def test_home_page_loads_successfully(page: Page, pd_base_url: str) -> None:
     # Verify header elements (use first for elements that appear multiple times)
     expect(page.get_by_text("Protocol Designer").first).to_be_visible()
     expect(page.get_by_text("Create new")).to_be_visible()
-    expect(page.get_by_test_id("SettingsIconButton")).to_be_visible()
+    expect(page.get_by_label("Settings Icon Button")).to_be_visible()
 
     # Verify home page specific elements
     expect(page.get_by_text("Welcome to Protocol Designer!")).to_be_visible()
