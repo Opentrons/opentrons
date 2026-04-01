@@ -299,10 +299,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
     pressure = ctx.params.pressure  # type: ignore[attr-defined]
     trough_fill_time = ctx.params.trough_fill_time  # type: ignore[attr-defined]
-    SETTLE_SEC = ctx.params.vm_settle_sec # type: ignore[attr-defined]
-    RUN_SEC = ctx.params.vm_run_sec # type: ignore[attr-defined]
-    DECAY_SEC = ctx.params.vm_decay_sec # type: ignore[attr-defined]
-    VENT_SEC = ctx.params.vm_vent_sec # type: ignore[attr-defined]
+    SETTLE_SEC = ctx.params.vm_settle_sec  # type: ignore[attr-defined]
+    RUN_SEC = ctx.params.vm_run_sec  # type: ignore[attr-defined]
+    DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
+    VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
