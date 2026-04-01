@@ -1,7 +1,7 @@
 """Tests for SQL tables."""
 
+import re
 from pathlib import Path
-from typing import List, cast
 
 import pytest
 import sqlalchemy
@@ -1809,22 +1809,6 @@ EXPECTED_STATEMENTS_V2 = [
 ]
 
 
-def _normalize_statement(statement: str) -> str:
-    """Fix up the internal formatting of a single SQL statement for easier comparison."""
-    lines = statement.splitlines()
-
-    # Remove whitespace at the beginning and end of each line.
-    lines = [line.strip() for line in lines]
-
-    # Filter out blank lines.
-    lines = [line for line in lines if line != ""]
-
-    # Normalize line breaks to spaces. When we ask SQLite for its schema, it appears
-    # inconsistent in whether it uses spaces or line breaks to separate tokens.
-    # That may have to do with whether `ALTER TABLE` has been used on the table.
-    return " ".join(lines)
-
-
 @pytest.mark.parametrize(
     ("metadata", "expected_statements"),
     [
@@ -1845,7 +1829,7 @@ def _normalize_statement(statement: str) -> str:
     ],
 )
 def test_creating_from_metadata_emits_expected_statements(
-    metadata: sqlalchemy.MetaData, expected_statements: List[str]
+    metadata: sqlalchemy.MetaData, expected_statements: list[str], tmp_path: Path
 ) -> None:
     """Test that each schema compiles down to the expected SQL statements.
 
@@ -1856,16 +1840,12 @@ def test_creating_from_metadata_emits_expected_statements(
     Based on:
     https://docs.sqlalchemy.org/en/14/faq/metadata_schema.html#faq-ddl-as-string
     """
-    actual_statements: List[str] = []
-
-    def record_statement(
-        sql: sqlalchemy.schema.DDLElement, *multiparams: object, **params: object
-    ) -> None:
-        compiled_statement = str(sql.compile(dialect=engine.dialect))
-        actual_statements.append(compiled_statement)
-
-    engine = sqlalchemy.create_mock_engine("sqlite://", record_statement)
-    metadata.create_all(cast(sqlalchemy.engine.Engine, engine))
+    with (
+        sql_engine_ctx(tmp_path / "test.db") as sql_engine,
+        sql_engine.begin() as transaction,
+    ):
+        metadata.create_all(transaction)
+        actual_statements = _get_schema(transaction)
 
     normalized_actual = [_normalize_statement(s) for s in actual_statements]
     normalized_expected = [_normalize_statement(s) for s in expected_statements]
@@ -1895,13 +1875,7 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
         sql_engine_ctx(active_subdirectory / DB_FILE) as sql_engine,
         sql_engine.begin() as transaction,
     ):
-        actual_statements = (
-            transaction.execute(
-                sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")
-            )
-            .scalars()
-            .all()
-        )
+        actual_statements = _get_schema(transaction)
 
     normalized_actual = [_normalize_statement(s) for s in actual_statements]
     normalized_expected = [_normalize_statement(s) for s in expected_statements]
@@ -1910,3 +1884,32 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
     # nondeterministic order that varies across runs. Although statement order
     # theoretically matters, it's unlikely to matter in practice for our purposes here.
     assert set(normalized_actual) == set(normalized_expected)
+
+
+def _get_schema(connection: sqlalchemy.engine.Connection) -> list[str]:
+    """Return the schema of the given SQLite database.
+
+    The schema is returned in the form of DDL statements
+    (like `CREATE TABLE ...`, etc.).
+    """
+    return (
+        connection.execute(
+            sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")
+        )
+        .scalars()
+        .all()
+    )
+
+
+def _normalize_statement(statement: str) -> str:
+    """Fix up the internal formatting of a single SQL statement for easier comparison.
+
+    For example, when we ask SQLite for its schema, it appears
+    inconsistent in whether it uses spaces or line breaks to separate tokens.
+    It may have to do with whether `ALTER TABLE` has been used on the table.
+    """
+    # Replace runs of any whitespace with a single literal space.
+    statement = re.sub(r"\s+", " ", statement)
+    # Remove whitespace at the beginning and end of the statement.
+    statement = statement.strip()
+    return statement
