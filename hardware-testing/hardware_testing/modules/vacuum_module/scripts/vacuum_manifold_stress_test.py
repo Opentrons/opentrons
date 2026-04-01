@@ -103,7 +103,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "tough_fill_time",
         "trough_fill_time",
-        default=21,
+        default=67,
         minimum=1,
         maximum=120,
         description="Reservoir water fill time.",
@@ -237,7 +237,9 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    await water_pump_fixture.water_fill_timer(trough_fill_time)
+    asyncio.create_task(
+        water_pump_timer(water_pump_fixture.water_fill_timer, ctx.params.trough_fill_time)
+    )
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
@@ -334,7 +336,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
             pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
             pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
-            pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
+            # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
             pip.move_to(filter_plate["A1"].top(10))  # Move away again
             try:
                 loop.run_until_complete(
