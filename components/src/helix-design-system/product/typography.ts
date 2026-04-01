@@ -3,7 +3,7 @@
  */
 
 // Valid for most typography styles
-export const fontFamily = 'Public Sans'
+export const fontFamily = 'Comic Sans MS'
 
 export const fontWeightRegular = '400'
 export const fontWeightSemiBold = '600'
