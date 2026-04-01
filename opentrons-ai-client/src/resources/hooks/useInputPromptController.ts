@@ -9,11 +9,11 @@ import {
   chatHistoryAtom,
   createProtocolChatAtom,
   regenerateProtocolAtom,
-  tokenAtom,
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
+import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import {
   buildChatHistory,
@@ -65,7 +65,7 @@ export function useInputPromptController(
 
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
-  const [token] = useAtom(tokenAtom)
+  const { getAccessToken } = useGetAccessToken()
 
   const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
     useState<boolean>(false)
@@ -75,12 +75,8 @@ export function useInputPromptController(
   const { data, isLoading, callApi, error, clearError } = useApiCall()
 
   const pdProtocolContent: null | ProtocolFile = useMemo(() => {
-    if (
-      data != null &&
-      typeof data === 'object' &&
-      'protocol_content' in data
-    ) {
-      return (data as any).protocol_content as ProtocolFile
+    if (data != null && typeof data === 'object' && 'protocolContent' in data) {
+      return (data as any).protocolContent as ProtocolFile
     }
     return null
   }, [data])
@@ -168,7 +164,7 @@ export function useInputPromptController(
       name: ANALYTICS.CHAT_SUBMITTED,
       properties: {
         chat: userPrompt,
-        protocol_format: protocolFormat,
+        protocolFormat: protocolFormat,
       },
     })
 
@@ -189,6 +185,13 @@ export function useInputPromptController(
 
     const validatedFiles = prepareValidatedFiles(isUpdateOrCreateRequest)
     if (validatedFiles === null) return
+
+    let token: string
+    try {
+      token = await getAccessToken()
+    } catch {
+      return
+    }
 
     const userInput = createUserInput(
       newRequestId,
@@ -241,15 +244,15 @@ export function useInputPromptController(
   // Process API response
   useEffect(() => {
     if (submitted && !isLoading) {
-      if (error) {
+      if (error != null) {
         setSubmitted(false)
       } else if (data != null) {
-        const { role, reply, protocol_content } = data as ChatData
+        const { role, reply, protocolContent } = data as ChatData
         const assistantResponse: ChatData = {
           requestId,
           role,
           reply,
-          protocol_content,
+          protocolContent,
         }
 
         setChatHistory(prev => [
@@ -257,8 +260,8 @@ export function useInputPromptController(
           {
             role: 'assistant',
             content: reply,
-            protocol_content: JSON.stringify(
-              protocol_content
+            protocolContent: JSON.stringify(
+              protocolContent
             ) as unknown as string,
           },
         ])

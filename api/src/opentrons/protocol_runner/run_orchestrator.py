@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import enum
 from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
 
-from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -50,31 +48,18 @@ from ..protocol_engine.types import (
 from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
 from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from .run_coordinator import (
+    AbstractRunCoordinator,
+    ParseMode,
+    RunNotFound,
+    UnknownProtocolParseMode,
+)
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation
 from opentrons.types import NozzleMapInterface
 
 
-class NoProtocolRunAvailable(RuntimeError):
-    """An error raised if there is no protocol run available."""
-
-
-class UnknownProtocolParseMode(RuntimeError):
-    """An error raised if given an unknown protocol parse mode."""
-
-
-class RunNotFound(GeneralError):
-    """An error raised if there is no run associated."""
-
-
-class ParseMode(enum.Enum):
-    """Configure optional rules for when `opentrons.protocols.parse.parse()` parses protocols."""
-
-    NORMAL = enum.auto()
-    ALLOW_LEGACY_METADATA_AND_REQUIREMENTS = enum.auto()
-
-
-class RunOrchestrator:
+class RunOrchestrator(AbstractRunCoordinator):
     """Provider for runners and associated protocol engine.
 
     Build runners, manage command execution, run state and in-memory protocol engine associated to the runners.

@@ -7,20 +7,21 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "test": "playwright test",
-    "test:update-snapshots": "playwright test --update-snapshots"
+    "test": "playwright test"
   },
   "dependencies": {
+    "@applitools/eyes-playwright": "1.46.2",
     "@opentrons/components": "link:pack/opentrons-components",
     "@opentrons/shared-data": "link:pack/opentrons-shared-data",
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.58.2",
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.2.0",
+    "dotenv": "^16.6.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.3.3",
     "vite": "7.1.1"
   },
-  "packageManager": "pnpm@10.22.0"
+  "packageManager": "pnpm@10.32.1"
 }

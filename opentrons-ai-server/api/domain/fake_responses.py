@@ -59,8 +59,15 @@ NoMarkdown = FakeResponse(key="no markdown", chat_response=no_markdown, descript
 EmptyReply = FakeResponse(key="empty reply", chat_response=empty_reply, description="Reply field has empty string ''")
 PDSerialDilution = FakeResponse(key="pd serial diliution", chat_response=pd_serial_dilution, description="PD v8 Protocol")
 
-
-fake_responses: List[FakeResponse] = [ReagentTransfer, ReagentTransferFlex, PCR, PCRFlex, NoMarkdown, EmptyReply, PDSerialDilution]
+fake_responses: List[FakeResponse] = [
+    ReagentTransfer,
+    ReagentTransferFlex,
+    PCR,
+    PCRFlex,
+    NoMarkdown,
+    EmptyReply,
+    PDSerialDilution,
+]
 fake_keys: List[str] = [response.key.lower() for response in fake_responses]
 
 

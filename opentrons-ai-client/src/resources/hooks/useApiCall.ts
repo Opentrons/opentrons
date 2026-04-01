@@ -2,11 +2,13 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAtom } from 'jotai'
 
-import { featureFlagsAtom } from '../atoms'
+import { emailVerifiedAtom, featureFlagsAtom } from '../atoms'
 import { isApiErrorResponse } from '../utils'
 
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ApiErrorResponse } from '../types'
+
+const EMAIL_NOT_VERIFIED_SUBSTRING = 'not been verified'
 
 interface UseApiCallResult<T> {
   data: T | null
@@ -21,6 +23,7 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
   const [error, setError] = useState<ApiErrorResponse | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [featureFlags] = useAtom(featureFlagsAtom)
+  const [, setEmailVerified] = useAtom(emailVerifiedAtom)
 
   const clearError = (): void => {
     setError(null)
@@ -48,19 +51,27 @@ export const useApiCall = <T>(): UseApiCallResult<T> => {
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<unknown>
         const responseData = axiosError.response?.data
+        const detail = (responseData as Record<string, unknown>)?.detail
+        if (
+          axiosError.response?.status === 401 &&
+          typeof detail === 'string' &&
+          detail.includes(EMAIL_NOT_VERIFIED_SUBSTRING)
+        ) {
+          setEmailVerified(false)
+        }
         if (isApiErrorResponse(responseData)) {
           setError(responseData)
         } else {
           setError({
             message: axiosError.message,
-            error_type: 'network_error',
+            errorType: 'network_error',
           })
         }
       } else {
         setError({
           message:
             err instanceof Error ? err.message : 'An unexpected error occurred',
-          error_type: 'unknown',
+          errorType: 'unknown',
         })
       }
     } finally {

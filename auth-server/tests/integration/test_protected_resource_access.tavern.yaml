@@ -5,10 +5,10 @@ marks:
       - run_server
 
 stages:
-  - name: Enable access control so protected resources require a valid token
+  - name: Enable access control enabled so protected resources require a valid token
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       json:
         data:
           accessControlEnabled: true

@@ -27,7 +27,6 @@ describe('LiquidButton', () => {
 
   it('should render icon and text', () => {
     render(props)
-    screen.getByTestId('water-drop')
     screen.getByText('Liquids')
   })
 

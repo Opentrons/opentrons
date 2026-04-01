@@ -43,6 +43,24 @@ export function getRequiredLabwareDetailsFromLoadCommands(
           'flexStacker/setStoredLabware',
         ].includes(command.commandType)
     ) ?? []
+
+  const stackerStoredLabwareIds = new Set(
+    loadLabwareCommands.flatMap(command => {
+      if (command.commandType !== 'flexStacker/setStoredLabware') {
+        return []
+      }
+      return (
+        command.result?.storedLabware.flatMap(storedLabwareGroup =>
+          [
+            storedLabwareGroup.primaryLabwareId,
+            storedLabwareGroup.adapterLabwareId,
+            storedLabwareGroup.lidLabwareId,
+          ].filter((labwareId): labwareId is string => labwareId != null)
+        ) ?? []
+      )
+    })
+  )
+
   const labwareSetupItems = loadLabwareCommands.reduce((acc, command) => {
     if (command.commandType === 'flexStacker/setStoredLabware') {
       if (command.result == null) return acc
@@ -82,6 +100,7 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       return acc
     } else {
       if (command.result?.definition.parameters.format === 'trash') return acc
+      if (stackerStoredLabwareIds.has(command.result.labwareId)) return acc
       const lidCommand = loadLabwareCommands.find(
         (c): c is LoadLidRunTimeCommand =>
           c.commandType === 'loadLid' &&
@@ -127,6 +146,6 @@ export function getRequiredLabwareDetailsFromLoadCommands(
         acc.get(defUri).quantity += stackCount
       }
       return acc
-    }, labwareSetupItems) as ProtocolDetailMap
+    }, labwareSetupItems)
   return Array.from(setupItemsWithStackerFillAdded.values())
 }
