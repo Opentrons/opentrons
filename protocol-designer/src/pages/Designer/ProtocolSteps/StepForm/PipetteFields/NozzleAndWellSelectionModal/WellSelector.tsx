@@ -290,7 +290,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         primaryNozzle,
         channels
       )
-      highlightedWells.push(wellSelection)
+      const noOverlapInList = highlightedWells
+        .flat()
+        .some(well => wellSelection.includes(well))
+      if (!noOverlapInList) {
+        highlightedWells.push(wellSelection)
+      }
     }
     return highlightedWells
   }
