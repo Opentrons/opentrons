@@ -4,16 +4,29 @@ Implements the Resource Owner Password Credentials (ROPC) flow
 against the auth-server and provides helpers for token introspection,
 settings management, and user CRUD. Designed for use in E2E tests.
 
-All Python attributes use snake_case; Pydantic models use aliases to
-serialize/deserialize the API's camelCase JSON.
+Response bodies are validated with Pydantic models in ``auth_models``.
 """
 
 from __future__ import annotations
 
-from typing import Any, Literal
+import json
+from typing import Any
 
 import httpx
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationError
+
+from automation.clients.auth_models import (
+    AccessControlData,
+    AccessControlSettingsResponse,
+    AccountType,
+    AuthSettingsResponse,
+    OpenApiDocument,
+    SettingsData,
+    TokenIntrospectionResponse,
+    TokenResponse,
+    UserResourceResponse,
+    UserResponse,
+)
 
 # Hardcoded client_id expected by the auth-server (see auth_server/oauth2/backend.py).
 DEFAULT_CLIENT_ID = "opentrons_app"
@@ -23,36 +36,6 @@ ADMIN_USERNAME = "test_admin"
 ADMIN_PASSWORD = "test_admin_password"
 USER_USERNAME = "test_user"
 USER_PASSWORD = "test_user_password"
-
-# Account types supported by the auth-server (auth_server/users/models.py).
-AccountType = Literal["admin", "user", "auditor", "service"]
-
-
-class TokenResponse(BaseModel):
-    """Parsed successful token response from the OAuth 2 token endpoint.
-
-    OAuth 2 RFC 6749 uses snake_case in the token response, so no aliases needed.
-    """
-
-    access_token: str
-    token_type: str
-    expires_in: int
-    refresh_token: str | None = None
-    scope: str = ""
-
-
-class UserResponse(BaseModel):
-    """Parsed user from GET /auth/users/{user_name} or create/update responses.
-
-    Python uses snake_case; API uses camelCase (via Field alias).
-    """
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    user_name: str = Field(alias="userName")
-    full_name: str = Field(alias="fullName")
-    account_type: AccountType = Field(alias="accountType")
-    scopes: list[str] = Field(default_factory=list)
 
 
 class _UserCreatePayload(BaseModel):
@@ -102,8 +85,11 @@ class _UserUpdatePayload(BaseModel):
 class AuthClient:
     """E2E test client for the auth-server.
 
-    Wraps httpx.AsyncClient to provide typed helpers for the OAuth 2 password-grant
-    flow, token refresh, introspection, and auth-settings management.
+    Wraps ``httpx.AsyncClient`` with a fixed ``base_url``. Each public method maps to
+    one HTTP request (method + path + body). Paths are relative to ``base_url``, so
+    a call like ``get("/auth/settings")`` becomes ``GET http://<host>:33950/auth/settings``.
+
+    Successful JSON responses are parsed into models from ``automation.clients.auth_models``.
 
     Usage::
 
@@ -183,42 +169,66 @@ class AuthClient:
 
     # -- Token Introspection -------------------------------------------------------
 
-    async def introspect(self, token: str) -> dict[str, Any]:
-        """Introspect a token (RFC 7662).
-
-        Returns the parsed JSON body. Check ``result["active"]`` to see if the
-        token is still valid.
-        """
+    async def introspect(self, token: str) -> TokenIntrospectionResponse:
+        """Introspect a token (RFC 7662)."""
         response = await self._client.post(
             "/auth/oauth2/introspect",
             data={"token": token, "client_id": self.client_id},
         )
         response.raise_for_status()
-        return response.json()
+        return TokenIntrospectionResponse.model_validate(response.json())
 
-    async def get_openapi(self) -> dict[str, Any]:
-        """GET /auth/openapi.json and return the parsed OpenAPI document."""
+    async def get_openapi(self) -> OpenApiDocument:
+        """GET /auth/openapi.json and return a typed OpenAPI document."""
         response = await self._client.get("/auth/openapi.json")
         response.raise_for_status()
-        return response.json()
+        return OpenApiDocument.model_validate(response.json())
 
     # -- Auth Settings -------------------------------------------------------------
 
-    async def get_settings(self) -> dict[str, Any]:
+    async def is_alive(self) -> bool:
+        """Return True if the auth-server answers GET /auth/settings with 2xx JSON.
+
+        The body must validate as :class:`AuthSettingsResponse` (including a
+        ``data`` object that parses as :class:`SettingsData`). Use this instead
+        of a bare TCP or ``/health`` check when you need to confirm the API is
+        actually serving auth settings.
+        """
+        try:
+            await self.get_settings()
+            return True
+        except (
+            httpx.HTTPStatusError,
+            httpx.RequestError,
+            ValidationError,
+            json.JSONDecodeError,
+        ):
+            return False
+
+    async def get_settings(self) -> SettingsData:
         """GET /auth/settings (no auth required)."""
         response = await self._client.get("/auth/settings")
         response.raise_for_status()
-        return response.json()
+        envelope = AuthSettingsResponse.model_validate(response.json())
+        return envelope.data
+
+    async def get_access_control_settings(self) -> AccessControlData:
+        """GET /auth/settings/accessControlEnabled (no auth required)."""
+        response = await self._client.get("/auth/settings/accessControlEnabled")
+        response.raise_for_status()
+        envelope = AccessControlSettingsResponse.model_validate(response.json())
+        return envelope.data
 
     async def patch_settings(
         self,
         data: dict[str, Any],
         token: TokenResponse | None = None,
-    ) -> dict[str, Any]:
+    ) -> SettingsData:
         """PATCH /auth/settings. Requires auth when access control is enabled."""
         response = await self.patch_settings_response(data, token=token)
         response.raise_for_status()
-        return response.json()
+        envelope = AuthSettingsResponse.model_validate(response.json())
+        return envelope.data
 
     async def patch_settings_response(
         self,
@@ -236,12 +246,13 @@ class AuthClient:
     async def reset_settings(
         self,
         token: TokenResponse | None = None,
-    ) -> dict[str, Any]:
+    ) -> SettingsData:
         """DELETE /auth/settings (reset to defaults). Requires auth when access control is enabled."""
         headers = AuthClient.auth_header(token) if token else {}
         response = await self._client.delete("/auth/settings", headers=headers)
         response.raise_for_status()
-        return response.json()
+        envelope = AuthSettingsResponse.model_validate(response.json())
+        return envelope.data
 
     # -- Users (protected; require Bearer token) -----------------------------------
 
@@ -266,7 +277,7 @@ class AuthClient:
             {"data": payload_data.model_dump(by_alias=True)},
         )
         response.raise_for_status()
-        return UserResponse.model_validate(response.json()["data"])
+        return UserResourceResponse.model_validate(response.json()).data
 
     async def post_users_request(
         self,
@@ -287,7 +298,7 @@ class AuthClient:
             headers=AuthClient.auth_header(token),
         )
         response.raise_for_status()
-        return UserResponse.model_validate(response.json()["data"])
+        return UserResourceResponse.model_validate(response.json()).data
 
     async def update_user(
         self,
@@ -307,14 +318,14 @@ class AuthClient:
             account_type=account_type,
         )
         # Drop unset fields so we only send provided ones
-        data = {k: v for k, v in payload_data.model_dump(by_alias=True).items() if v is not None}
+        patch = {k: v for k, v in payload_data.model_dump(by_alias=True).items() if v is not None}
         response = await self._client.patch(
             f"/auth/users/{user_name}",
-            json={"data": data},
+            json={"data": patch},
             headers=AuthClient.auth_header(token),
         )
         response.raise_for_status()
-        return UserResponse.model_validate(response.json()["data"])
+        return UserResourceResponse.model_validate(response.json()).data
 
     async def patch_user_request(
         self,
