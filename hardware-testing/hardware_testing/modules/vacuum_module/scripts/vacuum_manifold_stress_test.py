@@ -22,7 +22,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 # Tunables (can move some to parameters)
 SETTLE_SEC = 21
 RUN_SEC = 60 * 2
-DECAY_SEC = 25
+DECAY_SEC = 10
 VENT_SEC = 5
 ASPIRATE_OFFSET_MM = 5
 # Dispense_offset_mm = 8 for the 96 deep well
@@ -95,6 +95,7 @@ async def read_continuous_data(
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
     run_time: float,
+    ctx: protocol_api.ProtocolContext,
 ) -> None:
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
@@ -106,6 +107,7 @@ async def read_continuous_data(
             pressure_dict = dataclasses.asdict(line)
             # Timestamp
             ts = time.perf_counter() - start_time
+            ctx.comment(f'Pump time: {time.perf_counter()- loop_st}')
             # Record Pressure Data
             await _write_to_csv(f_name, head_writer, ts, pressure_dict)
             head_writer = False
@@ -118,10 +120,11 @@ async def read_data(
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
     duration: int,
+    ctx: protocol_api.ProtocolContext
 ) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
-        await read_continuous_data(f_name, pump, start_time, duration)
+        await read_continuous_data(f_name, pump, start_time, duration, ctx)
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         logging.info(f"continuous read duration reached ({duration}s)")
@@ -204,7 +207,7 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1023
     # Start the filling of the water pump while the vacuum is running
-    # await water_pump_fixture.water_fill_timer(trough_fill_time)
+    await water_pump_fixture.water_fill_timer(trough_fill_time)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
@@ -223,7 +226,7 @@ async def _run_single_pump_api_cycle(
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC)
+        await read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx)
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
@@ -243,7 +246,7 @@ async def _run_single_pump_api_cycle(
         guage_pressure_mbar=target_to_pump,
     )
     try:
-        await read_data(str(trial_csv), pump, start_time, DECAY_SEC)
+        await read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
@@ -253,7 +256,7 @@ async def _run_single_pump_api_cycle(
         raise
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
-    # await asyncio.sleep(DECAY_SEC)
+    await asyncio.sleep(DECAY_SEC)
     await pump.set_vent_state(VentState.CLOSED)
 
 
@@ -278,8 +281,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
 
     # pip.pick_up_tip()
-    # loop = asyncio.get_event_loop()
-    # asyncio.set_event_loop(loop)
 
     pump = None
     pump_fixture = None
@@ -300,8 +301,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             # pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
             # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
             # pip.move_to(filter_plate["A1"].top(10))  # Move away again
-
-            # ctx.comment(f"[cycle {cycle}] skipped — pump not initialised")
             try:
                 loop.run_until_complete(
                     _run_single_pump_api_cycle(
@@ -319,12 +318,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 ctx.comment(f"[cycle {cycle}] failed ({type(e).__name__}: {e})\n{tb}")
                 raise
         # pip.return_tip()
-        if not ctx.is_simulating() and loop is not None:
-            try:
-                if pump is not None:
-                    loop.run_until_complete(pump.disconnect())
-                if pump_fixture is not None:
-                    loop.run_until_complete(pump_fixture.disconnect())
-            except Exception:
-                raise 
-            loop.close()
+    if not ctx.is_simulating() and loop is not None:
+        try:
+            if pump is not None:
+                loop.run_until_complete(pump.disconnect())
+            if pump_fixture is not None:
+                loop.run_until_complete(pump_fixture.disconnect())
+        except Exception:
+            raise 
+        loop.close()
