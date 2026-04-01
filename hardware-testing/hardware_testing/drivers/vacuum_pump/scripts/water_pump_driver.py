@@ -187,27 +187,3 @@ class WaterPump(AbstractWaterPump):
     def enable_logging(self) -> None:
         """Re-enable logging at DEBUG level."""
         self._logger.setLevel(logging.DEBUG)
-
-
-# async def main():
-#     pump = await WaterPump.create(port ='/dev/ttyACM1', baudrate = 115200, loop = None)
-#     await pump.connect()
-#     total_time = 3
-#     off_time = 5
-#     t=1
-#     while True:
-#         await pump.turn_motor_on()
-#         while t < total_time:
-#             await asyncio.sleep(1)
-#             t+= 1
-#             print(f"\rTime(s): {t}", end="", flush=True)
-#         t= 0
-#         await pump.turn_motor_off()
-#         while t < off_time:
-#             await asyncio.sleep(1)
-#             t+= 1
-#             print(f"\rTime(s): {t}", end="", flush=True)
-#         t=0
-if __name__ == "__main__":
-
-    asyncio.run(main())

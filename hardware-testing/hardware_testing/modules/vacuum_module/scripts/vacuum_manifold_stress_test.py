@@ -107,7 +107,7 @@ async def read_continuous_data(
             pressure_dict = dataclasses.asdict(line)
             # Timestamp
             ts = time.perf_counter() - start_time
-            ctx.comment(f'Pump time: {time.perf_counter()- loop_st}')
+            ctx.comment(f"Pump time: {time.perf_counter()- loop_st}")
             # Record Pressure Data
             await _write_to_csv(f_name, head_writer, ts, pressure_dict)
             head_writer = False
@@ -120,7 +120,7 @@ async def read_data(
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
     duration: int,
-    ctx: protocol_api.ProtocolContext
+    ctx: protocol_api.ProtocolContext,
 ) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
@@ -216,7 +216,7 @@ async def _run_single_pump_api_cycle(
     ctx.comment(f"[cycle {cycle_index}] pump started at target {target_pressure} mbar")
 
     # Dynamic CSV naming per trial (date + trial index + pressure)
-    date_str = datetime.utcnow().strftime("%y-%m-%d %H:%M:%S")
+    date_str = datetime.utcnow().strftime("%y-%m-%d_%H:%M:%S")
     output_dir.mkdir(parents=True, exist_ok=True)
     ctx.comment(f"output_dir: {output_dir}")
     trial_csv = (
@@ -295,6 +295,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     output_dir = Path(OUTPUT_DIR)
     if not ctx.is_simulating():
+        assert loop is not None
+        assert pump is not None
         for cycle in range(1, cycles + 1):
             ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
             # pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
@@ -325,5 +327,5 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             if pump_fixture is not None:
                 loop.run_until_complete(pump_fixture.disconnect())
         except Exception:
-            raise 
+            raise
         loop.close()
