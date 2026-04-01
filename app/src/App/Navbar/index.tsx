@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 import debounce from 'lodash/debounce'
 
-import { Icon, LegacyStyledText, Link } from '@opentrons/components'
+import {
+  COLORS,
+  Icon,
+  LegacyStyledText,
+  Link,
+  StyledText,
+} from '@opentrons/components'
 
 import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 import logoSvg from '/app/assets/images/logo_nav.svg'
@@ -33,11 +39,16 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   return (
     <div className={styles.navbar}>
       <div className={styles.nav_container}>
-        <img
-          src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
-          alt="opentrons logo"
-          className={styles.logo_img}
-        />
+        <div className={styles.nav_header_container}>
+          <img
+            src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
+            alt="opentrons logo"
+            className={styles.logo_img}
+          />
+          <StyledText color={COLORS.white} desktopStyle="bodyDefaultRegular">
+            {t('ot2')}
+          </StyledText>
+        </div>
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavLink
             key={name}

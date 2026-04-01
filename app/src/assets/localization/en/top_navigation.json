@@ -9,6 +9,7 @@
   "instruments": "Instruments",
   "labware": "Labware",
   "modules": "modules",
+  "ot2": "OT-2",
   "pipettes": "pipettes",
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
   "please_connect_to_a_robot": "Please connect to a robot to proceed",
