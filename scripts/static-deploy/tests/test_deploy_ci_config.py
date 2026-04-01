@@ -171,6 +171,26 @@ def test_resolve_ci_config_production():
     assert config.relative_artifact_dir == "/dist"
 
 
+def test_resolve_ci_config_pd_test_tag_is_protocol_designer_sandbox():
+    """PD alpha tags pd-test* deploy to sandbox; path prefix is the full tag name."""
+    tag_name = "pd-test-8.6.0-alpha.1"
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": f"refs/tags/{tag_name}",
+        "GITHUB_REF_NAME": tag_name,
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.application == "protocol_designer"
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == tag_name
+
+
 def test_write_github_output():
     """Test writing config to GITHUB_OUTPUT file."""
     config = CIConfig(
