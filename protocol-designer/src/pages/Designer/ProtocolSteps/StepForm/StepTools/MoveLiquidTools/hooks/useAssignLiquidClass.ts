@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  ALL,
-  COLUMN,
-  getAllLiquidClassDefs,
-  PARTIAL_COLUMN,
-  PARTIAL_NOZZLE_MAP,
-  ROW,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import {
   getCurrentFormIsPresaved,
@@ -23,10 +16,6 @@ import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selector
 import { selectors as labwareIngredSelectors } from '../../../../../../../labware-ingred/selectors'
 import { getShouldUpdateForLiquidClass } from '../../../utils'
 
-import type {
-  ActiveNozzleNumber,
-  PartialPrimaryNozzles,
-} from '@opentrons/shared-data'
 import type { FormData } from '/protocol-designer/form-types'
 
 export interface LiquidClassOption {
@@ -61,18 +50,13 @@ export function useAssignLiquidClass(
     channels = 8
   } else if (nozzlesConfigured === ALL) {
     channels = 96
-  } else if (nozzlesConfigured === ROW) {
-    channels = 12
-  } else if (nozzlesConfigured === PARTIAL_COLUMN) {
-    channels =
-      PARTIAL_NOZZLE_MAP[formData.primaryNozzle as PartialPrimaryNozzles]
   }
   const allWellsAdjustedForPipette =
     channels !== 1
       ? getAllWellsFromPrimaryWells(
           formData[wellsField] as string[],
           labwareEntities[formData[labwareField]]?.def,
-          channels as ActiveNozzleNumber
+          channels as 8 | 96
         )
       : (formData[wellsField] as string[])
 
