@@ -142,9 +142,10 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
-        if new_locked is not None and not new_locked:
-            self._user_store.clear_failed_logins(username_to_update)
         try:
+            if new_locked is not None and not new_locked:
+                # Note: do this BEFORE the username is potentially changed
+                self._user_store.clear_failed_logins(username_to_update)
             updated_user = self._user_store.update(
                 username_to_update,
                 new_username=new_username,
