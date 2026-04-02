@@ -67,7 +67,6 @@
   "opt_in": "Opt in",
   "opt_in_description": "Automatically send us anonymous diagnostics and usage data. We only use this information to improve our products.",
   "opt_out": "Opt out",
-  "ot2_advanced_settings": "OT-2 Advanced Settings",
   "override_path": "override path",
   "override_path_to_python": "Override Path to Python",
   "please_update_driver": "Please update your computer's driver to ensure a reliable connection to your OT-2.",

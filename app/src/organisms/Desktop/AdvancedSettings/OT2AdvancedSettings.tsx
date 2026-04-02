@@ -52,9 +52,6 @@ export function OT2AdvancedSettings(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-      <LegacyStyledText css={TYPOGRAPHY.h3SemiBold} id="OT-2_Advanced_Settings">
-        {t('ot2_advanced_settings')}
-      </LegacyStyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}

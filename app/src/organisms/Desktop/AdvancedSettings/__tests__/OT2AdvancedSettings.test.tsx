@@ -27,7 +27,6 @@ describe('OT2AdvancedSettings', () => {
 
   it('should render text and toggle button', () => {
     render()
-    screen.getByText('OT-2 Advanced Settings')
     screen.getByText('Tip Length Calibration Method')
     screen.getByRole('radio', {
       name: 'Always use calibration block to calibrate',
