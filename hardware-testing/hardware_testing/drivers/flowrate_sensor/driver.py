@@ -206,25 +206,3 @@ async def find_port_by_id(vendorId: int, productId: int) -> str:
             print(f"port: {port.device}")
             return port.device
     return ""
-
-
-# async def main(loop):
-#     # print(f'file_name: {file_name}')
-#     sensor = await MassFlowSensor.create(port="COM7", csv_path=None, loop=loop)
-#     try:
-#         # await sensor.set_csv_filename(file_name)
-#         for x in range(1, 200):
-#             f = await sensor.get_flow_rate()
-#             print(f)
-#         await sensor.stop()
-#     except Exception as e:
-#         logging.critical("Critical failure: %s", e)
-
-
-# if __name__ == "__main__":
-#     # logging.info("Flow rate sensor initialized.")
-#     current_datetime = datetime.datetime.utcnow().strftime("%y-%m-%d %H:%M")
-#     # file_name = '/data/testing_data/example-test/FlowrateData_{current_datetime}.csv'
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     asyncio.run(main(loop))

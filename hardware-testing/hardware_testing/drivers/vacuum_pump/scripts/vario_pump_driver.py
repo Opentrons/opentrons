@@ -306,24 +306,3 @@ class VarioPump:
                 await self._write_to_csv(ts, data)
         except Exception as e:
             raise (e)
-
-
-# async def main():
-#     pump  = await VarioPump.create('COM5', V_BAUDRATE, loop=asyncio.get_running_loop())
-#     await pump.connect()
-#     await pump.initiate_pump_control()
-#     # pump.csv_path = 'C:/Users/cfern/Documents/Github/0pentrons/hardware-testing/hardware_testing/drivers/vacuum_pump/scripts/pump.csv'
-#     # await pump.vacuum_program(speed=100, seconds = 10)
-#     await pump.read_continuous_data()
-#     # await pump._set_vacuum_pressure(800)
-#     # await pump.close_vent()
-#     # await pump._select_pumpdown()
-#     # await pump._start_process()
-#     # await asyncio.sleep(10)
-#     # await pump._stop_process()
-#     await pump._stop_process()
-#     await pump.open_vent()
-
-# if __name__ == '__main__':
-#     print('Hello')
-#     asyncio.run(main())
