@@ -158,6 +158,17 @@ export const getNozzleText = (
   return nozzleTextMapping[nozzleConfiguration](primaryNozzle)
 }
 
+export const skipEveryOtherWell = (
+  hoveredWell: string,
+  wells: string[]
+): string[] => {
+  const startIndex = wells.indexOf(hoveredWell)
+  const filteredWells = wells.filter(
+    (_, index) => index >= startIndex && (index - startIndex) % 2 === 0
+  )
+  return filteredWells
+}
+
 export const getEntireWellSelection = (
   wellName: string | null,
   wellOrdering: string[][],
@@ -172,36 +183,61 @@ export const getEntireWellSelection = (
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)
   )
+  const indexInColumn = wellOrdering[columnIndex].findIndex(
+    well => well === wellName
+  )
   if (columnIndex === -1) return []
   const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
+  const is384Plate = wellOrdering.flat().length === 384
+
   switch (nozzleConfiguration) {
     case ALL:
       if (channels === 8) {
-        return wellOrdering[columnIndex]
+        return is384Plate
+          ? skipEveryOtherWell(wellName, wellOrdering[columnIndex])
+          : wellOrdering[columnIndex]
       }
       if (channels === 96) {
-        return wellOrdering.flat()
+        return is384Plate
+          ? skipEveryOtherWell(wellName, wellOrdering.flat())
+          : wellOrdering.flat()
       }
       return [wellName]
     case COLUMN:
-      return wellOrdering[columnIndex]
+      return is384Plate
+        ? skipEveryOtherWell(wellName, wellOrdering[columnIndex])
+        : wellOrdering[columnIndex]
     case ROW:
-      return wellOrdering.map(column => column[rowIndex])
+      return is384Plate
+        ? skipEveryOtherWell(
+            wellName,
+            wellOrdering.map(column => column[rowIndex])
+          )
+        : wellOrdering.map(column => column[rowIndex])
     case PARTIAL_COLUMN: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
 
       const column = wellOrdering[columnIndex]
-      const count = PARTIAL_NOZZLE_MAP[primaryNozzle]
+      const count = is384Plate
+        ? PARTIAL_NOZZLE_MAP[primaryNozzle] * 2
+        : PARTIAL_NOZZLE_MAP[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {
         const beginning = column.length - count
-        return column.slice(beginning, column.length)
+        return is384Plate
+          ? skipEveryOtherWell(wellName, column.slice(beginning, column.length))
+          : column.slice(beginning, column.length)
       }
       const end = rowIndex + count
-      return column.slice(rowIndex, Math.min(end, column.length))
+      return is384Plate
+        ? skipEveryOtherWell(
+            wellName,
+            column.slice(indexInColumn, Math.min(end, column.length))
+          )
+        : column.slice(indexInColumn, Math.min(end, column.length))
     }
     default:
       return [wellName]
