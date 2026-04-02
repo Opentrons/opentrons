@@ -67,6 +67,7 @@
   "protocol_title": "协议 -{{protocol_name}}",
   "protocol_upload_failed": "协议上传失败。请修复错误后重试",
   "protocols": "协议",
+  "quick_transfer": "快速移液",
   "required_cal_data_title": "校准数据",
   "required_quantity_title": "数量",
   "required_type_title": "类型",
