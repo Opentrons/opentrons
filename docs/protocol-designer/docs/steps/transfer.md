@@ -5,17 +5,40 @@ description: "Transfer liquids between wells with single- and multi-dispense opt
 
 Your protocol timeline includes steps the robot will peform in your protocol. To start, the timeline includes the starting and ending deck states. Click **Add Step** in the lower left to add transfer, move, mix, pause, or module-specific steps to your protocol. 
 
+Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
+
 ## The basics
 
 Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a four-part form. In the first, select basic settings for your liquid transfer: 
 
 * The pipette to perform the transfer and the tip rack it will use. 
-* The number of multi-channel pipette nozzles to use. For more, see [partial tip pickup](transfer.md#partial-tip-pickup).
-* Source and destination labware, including wells. 
+* Source and destination labware.
+* The number of multi-channel pipette nozzles and labware wells to use during the transfer.
 * Pipette path, or motion the pipette uses to perform the transfer. 
-* The volume of liquid to transfer.  
+* The volume of liquid to transfer.
 
-Click **Choose wells**, and then click and drag to select source and destination wells. Pipette path and tip handling options, shown below, are only available if they are compatible with your well selections and other transfer settings. In the fourth form, you can customize [tip management](transfer.md#tip-management) settings, like how often the pipette picks up a new tip.
+### Wells and nozzles
+
+To start, use the dropdown menus to select your source and destination labware. Next, click to select your pipette nozzles and wells. 
+
+<figure class="screenshot" markdown>
+  ![Select pipette nozzles to use in a transfer.](../images/wells_nozzles.png)
+  <figcaption>Select the nozzles the Flex 96-channel pipette will use for the transfer.</figcaption>
+</figure>
+
+For Flex 96-channel and Flex or OT-2 8-channel pipettes, choose from single, column, or row nozzle configurations, depending on your attached pipettes. For more, see [partial tip pickup](transfer.md#partial-tip-pickup).
+
+Next, select source and destination wells. Protocol Designer shows available wells based on your pipette nozzle selections. 
+
+<figure class="screenshot" markdown>
+  ![Select wells to aspirate liquid.](../images/aspirate_wells.png)
+  <figcaption>Click to select wells a Flex 1-channel pipette will aspirate from.</figcaption>
+</figure>
+
+
+### Pipette path
+
+Pipette path and tip handling options, shown below, are only available if they are compatible with your well selections and other transfer settings. In the fourth form, you can also customize [tip management](transfer.md#tip-management) settings, like how often the pipette picks up a new tip.
 
 | **Pipette Path** | **Well Ratio** | **Description** {style="width: 25%;"}| **Tip Handling** |
 | ---------------- | -------------- | --------------- | ---------------- |
@@ -23,11 +46,15 @@ Click **Choose wells**, and then click and drag to select source and destination
 | Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Always</li><li>Never</li><li>Once</li></ul> |
 | Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Always</li><li>Never</li><li>Once</li></ul> |
 
-Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
+
+## Additional settings
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
-## Additional settings
+!!! Note
+    When you apply liquid class settings, Protocol Designer automatically makes changes to additional settings, like flow rates, submerge and retract speeds, and air gaps. You can view and edit these changes in the third transfer step form.
+
+    You can read more about [liquid classes](../python-api/liquid-classes.md) and their [definitions](python-api/liquid-class-definitions.md) in the Opentrons Python Protocol API.
 
 In the third form, click the aspirate and dispense tabs to access additional settings.
 
@@ -62,7 +89,7 @@ Additional advanced pipetting settings are available in the Aspirate and Dispens
 | Delay | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Hold the pipette tip at the submerge, aspirate or dispense, or retract position for a defined amount of time after aspirating or dispensing</li><li>Customize duration and position from bottom of well</li></ul> |
 | Condition | <ul><li>Aspirate</li></ul> | <ul><li>Aspirate a small conditioning volume after aspirating the total volume to be transferred</li><li>Pipetted back into the source for a more accurate first dispense</li><li>Only available for distribute, or multi-dispenses</li></ul> |
 | Push out | <ul><li>Dispense</li><ul> | <ul><li>Dispense past the pipette's plunger bottom to ensure all liquid leaves the tip</li><li>Customize volume</li></ul> |
-| Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li></ul> |
+| Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li><li>If you'll blow out liquid into a source or destination well, customize blowout start point</li></ul> |
 | Disposal volume | <ul><li>Dispense</li></ul> | <ul><li>Aspirate a small amount of liquid before completing a multi-dispense</li><li>Ensures each dispense is the correct volume</li><li>Customize disposal volume and blowout volume and flow rate</li><li>Only available for distribute, or multi-dispenses</li></ul> |
 | Touch tip | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Touch the tip to the four sides of the well to remove droplets after aspirating or dispensing</li><li>Customize touch tip position from the top of the well</li></ul> |
 | Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li><li>Occurs at your retract location, as long as it's safe to do so (more than 2 mm above the top of the well)</li></ul> |
@@ -112,10 +139,17 @@ Protocol Designer includes warnings if your tip selections might be incompatible
 
 You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once: 
 
-* Pick up a single column or individual tip with the Flex 96-channel pipette. 
-* Pick up individual tips with Flex and OT-2 8-channel pipettes. 
+* Pick up a single column, row, or individual tip with the Flex 96-channel pipette. 
+* Pick up individual tips or a partial column (2–7 tips) with Flex and OT-2 8-channel pipettes. 
 
-When you add a transfer or mix step, start by selecting **column** or **single** from the available nozzle options in the first form.
+When you add a transfer or mix step, start by selecting one of the available nozzle options in the first form.
+
+<figure class="screenshot" markdown>
+  ![Partial tip options for the Flex 96-channel pipette.](../images/partial_nozzles.png)
+  <figcaption>Choose an individual, single column, or single row of nozzles for the Flex 96-channel pipette to use in the transfer.</figcaption>
+</figure>
+
+Next, select your source and destination wells. Protocol Designer will only let you choose wells accessible by your pipette.
 
 !!! Note
     You'll need to place tip racks directly on the starting deck for partial tip pickup with the Flex 96-channel pipette. 
@@ -124,12 +158,24 @@ When you add a transfer or mix step, start by selecting **column** or **single**
 
 In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. 
 
+### Collisions
+
+Partial tip pickup can increase the risk of collisions, so Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette.
+
+When you choose a partial tip pickup nozzle configuration, Protocol Designer includes warnings to reduce collision risk: 
+
+* **Well selection**: Incompatible wells are shown in red, and you won't be able to select them.
+*  **Tip selection**: Incompatible tips are shown in red, and you won't be able to select them.
+*  **Step warning**: Warnings for adjacent labware, including blocking a safe transfer. 
+
+Partial tip pickup requires the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
+
 <figure class="screenshot" markdown>
   ![Pipette collision risk](../images/partial-tip-collision.png)
   <figcaption>Labware in adjacent slots can cause pipette collisions.</figcaption>
 </figure> 
 
-Partial tip pickup requires the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision. Despite the tip rack being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
+Despite the tip rack in the example above being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
 
 We always recommend resolving all errors before exporting your protocol and running it on a robot. 
 
