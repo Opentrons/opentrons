@@ -48,9 +48,6 @@ def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Pa
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    settings_store = SettingsStore()
-    install_settings_store(app.state, settings_store)
-
     settings = get_settings()
     persistence_directory_root = _get_persistence_directory_root(settings)
     prepared_root = await prepare_root(persistence_directory_root)
@@ -63,14 +60,12 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         set_sql_engine(app.state, engine)
 
         user_store = UserStore(sql_engine=engine)
+        settings_store = SettingsStore(sql_engine=engine)
         oauth2_backend = build_oauth2_backend(user_store)
         install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(user_store=user_store)
         user_service.seed_initial_users()
-
-        settings_store = SettingsStore()
         install_settings_store(app.state, settings_store)
-
         authorization_checker = build_authorization_checker(
             settings_store, oauth2_backend
         )

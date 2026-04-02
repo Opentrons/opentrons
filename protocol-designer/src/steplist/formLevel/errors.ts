@@ -650,6 +650,12 @@ const VACUUM_PROFILE_REQUIRED: FormError = {
   dependentFields: ['orderedProfileIds', 'profileItemsById'],
   location: ['field'],
 }
+const VACUUM_MODULE_ID_REQUIRED: FormError = {
+  title: 'Select vacuum module',
+  dependentFields: ['moduleId'],
+  location: ['field'],
+  showOnReopen: true,
+}
 export type FormErrorChecker = (
   arg: HydratedFormData,
   moduleEntities?: ModuleEntities
@@ -1630,6 +1636,13 @@ export const vacuumDurationRequired = (
     !pumpDurationTime
     ? VACUUM_DURATION_REQUIRED
     : null
+}
+
+export const vacuumModuleIdRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { moduleId } = fields
+  return moduleId == null ? VACUUM_MODULE_ID_REQUIRED : null
 }
 
 /*******************

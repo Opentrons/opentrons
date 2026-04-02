@@ -73,6 +73,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     onOverflowMenuButtonClick,
     dataTestId,
   } = props
+  const accessibleLabel = stepNumber != null ? `${stepNumber}. ${text}` : text
 
   let backgroundColor = type === 'alt' ? COLORS.blue20 : COLORS.grey20
   let textColor = COLORS.black90
@@ -106,6 +107,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       // the inner overflow menu button somehow, because you can't have nested
       // interactable elements.)
       role="button"
+      aria-label={accessibleLabel}
       data-testid={dataTestId}
       onDoubleClick={onDoubleClick}
       onClick={onClick}
@@ -120,7 +122,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
         borderRadius={BORDERS.borderRadius8}
         backgroundColor={backgroundColor}
         opacity={semiTransparent ? '50%' : '100%'}
-        data-testid="StepContainer_buttonSansPadding"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -171,7 +172,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                 </Flex>
                 <OverflowBtn
                   flex="none"
-                  data-testid="StepContainer_OverflowBtn"
+                  aria-label={`${accessibleLabel} options`}
                   fillColor={COLORS.white}
                   onClick={onOverflowMenuButtonClick}
                   // Even when this inner OverflowBtn isn't shown, it needs to contribute to

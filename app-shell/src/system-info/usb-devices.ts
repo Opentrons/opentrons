@@ -310,12 +310,13 @@ const deviceIdFromDetails = (device: UsbDevice): string | null => {
   if (systemIdentifier !== undefined) {
     return systemIdentifier
   }
-  const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
 
   // USBDevice serialNumber is  string | undefined
-  if (serialNumber == null) {
+  // venderId and productId are number | null
+  if (vidDecimal == null || pidDecimal == null || serialNumber == null) {
     return null
   }
+  const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
   return `USB\\VID_${vid}&PID_${pid}\\${serialNumber}`
 }
 

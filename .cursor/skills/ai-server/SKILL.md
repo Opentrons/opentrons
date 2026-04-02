@@ -11,6 +11,19 @@ description: Conventions for the opentrons-ai-server FastAPI service — project
 
 Deployed environments: **staging** (`staging.opentrons.ai`) and **prod** (`ai.opentrons.com`), running on AWS ECS Fargate behind CloudFront.
 
+## API Endpoints
+
+The server exposes four chat endpoints that return JSON responses:
+
+| Endpoint                              | Purpose                                     |
+| ------------------------------------- | ------------------------------------------- |
+| `POST /api/chat/completion`           | General chat (no file attachments)          |
+| `POST /api/chat/completion-multipart` | Chat with file attachments (multipart form) |
+| `POST /api/chat/create-protocol`      | Generate a new protocol                     |
+| `POST /api/chat/update-protocol`      | Update an existing protocol                 |
+
+All endpoints require a Bearer token in `Authorization`. Setting `"fake": true` in the request body bypasses the LLM and returns a canned response from `api/domain/fake_responses.py` — useful for local development without Anthropic API calls.
+
 ## Package Manager — uv
 
 This project uses **uv** for Python dependency management (not pipenv, pip-tools, or poetry).
@@ -69,6 +82,13 @@ All runtime configuration lives in `api/settings.py` via `pydantic-settings`:
 - **Deployed**: values come from AWS Secrets Manager, loaded into ECS by `deploy.py`
 - Every new env var or secret **must** be added as a field on the `Settings` class
 - Secrets use `SecretStr` type; non-secret vars are plain strings with defaults
+- Always import settings via the `get_settings()` singleton (not `Settings()` directly) to avoid re-parsing `.env` on every import
+
+Notable settings:
+
+- `allowed_origins` — comma-separated CORS origins (must be explicit; wildcard `*` is invalid with `allow_credentials=True`)
+- `request_timeout_seconds` — request timeout in seconds (default `"300"`); production proxies must be configured to allow at least this duration
+- `anthropic_max_tokens` — stored as a string, cast to `int` when used
 
 Generate a template `.env` from defaults: `make gen-env`
 

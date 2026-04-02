@@ -15,7 +15,6 @@ const render = () => {
 describe('DisabledScreen', () => {
   it('should render icon and text', () => {
     render()
-    screen.getByTestId('browser_icon_in_DisabledScreen')
     screen.getByText('Your browser size is too small')
     screen.getByText(
       'Resize your browser to at least 768px wide and 650px tall to continue editing your protocol'

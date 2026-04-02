@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     Liquid,
     ProtocolEngine,
+    StateSummary,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -340,6 +341,11 @@ async def test_run_json_runner(
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
+    )
+
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
     )
 
     assert json_runner_subject.was_started() is False
@@ -851,6 +857,14 @@ async def test_run_python_runner(
         False, True
     )
 
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
+    )
+    decoy.when(
+        protocol_engine.state_view.commands.get_all_command_annotations()
+    ).then_return([])
+
     assert python_runner_subject.was_started() is False
     await python_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert python_runner_subject.was_started() is True
@@ -873,6 +887,11 @@ async def test_run_live_runner(
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
+    )
+
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
     )
 
     assert live_runner_subject.was_started() is False

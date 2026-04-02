@@ -1,7 +1,7 @@
 """Command factories to use in tests as data fixtures."""
 
 from datetime import datetime
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -33,97 +33,81 @@ class FixtureModel(BaseModel):
 def create_queued_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
-    command_type: str = "command-type",
     intent: cmd.CommandIntent = cmd.CommandIntent.PROTOCOL,
-    params: Optional[BaseModel] = None,
 ) -> cmd.Command:
-    """Given command data, build a pending command model."""
+    """Create a queued command."""
+    params = cmd.CommentParams(message="succeeded")
 
-    class DummyParams(BaseModel):
-        pass
-
-    return cast(
-        cmd.Command,
-        cmd.BaseCommand(
-            id=command_id,
-            key=command_key,
-            commandType=command_type,
-            createdAt=datetime(year=2021, month=1, day=1),
-            status=cmd.CommandStatus.QUEUED,
-            params=params or DummyParams(),
-            intent=intent,
-        ),
+    return cmd.Comment(
+        id=command_id,
+        key=command_key,
+        status=cmd.CommandStatus.QUEUED,
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=params,
+        intent=intent,
     )
 
 
 def create_running_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
-    command_type: str = "command-type",
     created_at: datetime = datetime(year=2021, month=1, day=1),
-    params: Optional[BaseModel] = None,
 ) -> cmd.Command:
-    """Given command data, build a running command model."""
-    return cast(
-        cmd.Command,
-        cmd.BaseCommand(
-            id=command_id,
-            key=command_key,
-            createdAt=created_at,
-            commandType=command_type,
-            status=cmd.CommandStatus.RUNNING,
-            params=params or FixtureModel(),
-        ),
+    """Create a running command."""
+    params = cmd.CommentParams(message="running")
+
+    result = cmd.CommentResult()
+
+    return cmd.Comment(
+        id=command_id,
+        key=command_key,
+        status=cmd.CommandStatus.RUNNING,
+        createdAt=created_at,
+        params=params,
+        result=result,
     )
 
 
 def create_failed_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
-    command_type: str = "command-type",
     created_at: datetime = datetime(year=2021, month=1, day=1),
     completed_at: datetime = datetime(year=2022, month=2, day=2),
-    params: Optional[BaseModel] = None,
     error: Optional[ErrorOccurrence] = None,
     intent: Optional[cmd.CommandIntent] = None,
 ) -> cmd.Command:
-    """Given command data, build a failed command model."""
-    return cast(
-        cmd.Command,
-        cmd.BaseCommand(
-            id=command_id,
-            key=command_key,
-            createdAt=created_at,
-            completedAt=completed_at,
-            commandType=command_type,
-            status=cmd.CommandStatus.FAILED,
-            params=params or FixtureModel(),
-            error=error,
-            intent=intent,
-        ),
+    """Create a failed command."""
+    params = cmd.CommentParams(message="failed")
+
+    return cmd.Comment(
+        id=command_id,
+        key=command_key,
+        status=cmd.CommandStatus.FAILED,
+        createdAt=created_at,
+        completedAt=completed_at,
+        params=params,
+        error=error,
+        intent=intent,
     )
 
 
 def create_succeeded_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
-    command_type: str = "command-type",
     created_at: datetime = datetime(year=2021, month=1, day=1),
-    params: Optional[BaseModel] = None,
-    result: Optional[BaseModel] = None,
-) -> cmd.Command:
-    """Given command data and result, build a completed command model."""
-    return cast(
-        cmd.Command,
-        cmd.BaseCommand(
-            id=command_id,
-            key=command_key,
-            createdAt=created_at,
-            commandType=command_type,
-            status=cmd.CommandStatus.SUCCEEDED,
-            params=params or FixtureModel(),
-            result=result or FixtureModel(),
-        ),
+) -> cmd.Comment:
+    """Create a succeeded command."""
+    params = cmd.CommentParams(message="succeeded")
+
+    result = cmd.CommentResult()
+
+    return cmd.Comment(
+        id=command_id,
+        key=command_key,
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=created_at,
+        params=params,
+        result=result,
     )
 
 

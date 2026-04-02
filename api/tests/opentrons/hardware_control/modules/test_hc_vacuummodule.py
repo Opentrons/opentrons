@@ -194,10 +194,17 @@ async def test_set_vent_state(
 
 
 @pytest.mark.parametrize(
-    ("enable_vacuum", "guage_pressure_mbar", "duration", "rate", "vent_after"),
+    (
+        "enable_vacuum",
+        "guage_pressure_mbar",
+        "duration",
+        "timeout",
+        "rate",
+        "vent_after",
+    ),
     [
-        (True, 100.0, 67, 55.5, False),
-        (False, 99.8, 45, 54, None),
+        (True, 100.0, 67, 30, 55.5, False),
+        (False, 99.8, 45, 30, 54, None),
     ],
 )
 async def test_set_vacuum_state(
@@ -206,6 +213,7 @@ async def test_set_vacuum_state(
     enable_vacuum: bool,
     guage_pressure_mbar: Optional[float],
     duration: Optional[int],
+    timeout: Optional[int],
     rate: Optional[float],
     vent_after: Optional[bool],
     decoy: Decoy,
@@ -214,7 +222,8 @@ async def test_set_vacuum_state(
     await subject.set_vacuum_state(
         enable_vacuum=enable_vacuum,
         guage_pressure_mbar=guage_pressure_mbar,
-        duration=duration,
+        duration_s=duration,
+        timeout_s=timeout,
         rate=rate,
         vent_after=vent_after,
     )
@@ -222,7 +231,8 @@ async def test_set_vacuum_state(
         await mock_driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
             guage_pressure_mbar=guage_pressure_mbar,
-            duration=duration,
+            duration_s=duration,
+            timeout_s=timeout,
             rate=rate,
             vent_after=vent_after,
         )
@@ -249,18 +259,6 @@ async def test_set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
         )
     )
-
-
-@pytest.mark.parametrize("serial_number", ["VM111110100101", "myfunkyvacuum"])
-async def test_set_serial_number(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-    serial_number: str,
-) -> None:
-    """Ensure that the hardware controller calls the driver method w the correct arguments."""
-    await subject.set_serial_number(sn=serial_number)
-    decoy.verify(await mock_driver.set_serial_number(sn=serial_number))
 
 
 @pytest.mark.parametrize(

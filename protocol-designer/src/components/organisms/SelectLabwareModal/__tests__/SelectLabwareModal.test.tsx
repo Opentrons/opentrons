@@ -129,8 +129,15 @@ describe('SelectLabwareModal', () => {
 
   it('renders the custom labware flow', () => {
     render(props)
-    screen.getByText('Upload custom labware')
-    fireEvent.change(screen.getByTestId('customLabwareInput'))
+    fireEvent.change(screen.getByLabelText('Upload custom labware'), {
+      target: {
+        files: [
+          new File(['{}'], 'custom-labware.json', {
+            type: 'application/json',
+          }),
+        ],
+      },
+    })
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })
 
