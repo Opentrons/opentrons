@@ -90,9 +90,9 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td><strong>Input Power</strong></td>
       <td>
         <ul>
-          <li>80–264 VAC</li>
-          <li>47–63 Hz</li>
-          <li>1A at 230 VAC or 2.5A at 115 VAC</li>
+          <li>80—264 VAC</li>
+          <li>47—63 Hz</li>
+          <li>1 A at 230 VAC or 2.5 A at 115 VAC</li>
         </ul>
       </td>
     </tr>
@@ -101,13 +101,13 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>24 VDC</li>
-          <li>2.7A to 25A (varies by model and cooling method)</li>
-          <li>140W maximum with natural convection or 200W maximum with forced-air cooling</li>
+          <li>2.7 A to 25 A (varies by model and cooling method)</li>
+          <li>140 W (maximum, with convection cooling)</li>
         </ul>
       </td>
     </tr>
     <tr>
-      <td><strong>Overvoltage</strong></td>
+      <td><strong>Over-voltage</strong></td>
       <td>
         <ul>
           <li>Category III (OVC III)</li>
@@ -128,7 +128,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td><strong>Typical and Peak Consumption</strong></td>
       <td>
         <ul>
-          <li>No-load Power Consumption: <0.5W </li>
+          <li>No-load Power Consumption: < 0.5 W </li>
           <li>Peak Load: 150% of rated power for up to 3 seconds</li>
         </ul>
       </td>
