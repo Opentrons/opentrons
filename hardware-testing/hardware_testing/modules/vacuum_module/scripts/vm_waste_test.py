@@ -147,7 +147,6 @@ async def flow_rate_thread(target_pressure: int) -> None:
     sensor = await driver.MassFlowSensor.create(
         port=m_port, csv_path=file_name, loop=loop
     )
-    # await sensor.connect()
     try:
         await sensor.set_csv_filename(file_name)
         await sensor.read_continuous_data(
@@ -168,29 +167,41 @@ async def vacuum_manifold(target_pressure: int) -> None:
     f_name = f"PressureData_{target_pressure}_{current_datetime}_{args.test_name}.csv"
     file_name = path + f_name
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
+
     start_time = time.perf_counter()
     target_to_pump = target_pressure - atm_pressure
-    await pump.set_vent_state(VentState.OPENED)
-    await asyncio.sleep(1)
-    # Set Pressure and Vacuum to target for x amount of time.
-    await pump.set_vacuum_state(
-        enable_vacuum=True,
-        guage_pressure_mbar=target_to_pump,
-        duration_s=None,
-    )
-    logging.info(f"pump started at target {target_pressure} mbar")
-    # Run the continuous data reader for RUN_SEC seconds.
-    await read_data(file_name, pump, start_time, args.run_sec + args.settle_sec)
-    # Stop the pump
-    await pump.set_vacuum_state(
-        enable_vacuum=False,
-        guage_pressure_mbar=target_to_pump,
-        duration_s=None,
-    )
-    # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(VentState.CLOSED)
-    await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
-    await pump.set_vent_state(VentState.OPENED)
+    try:
+        await pump.set_vent_state(VentState.OPENED)
+        await asyncio.sleep(1)
+        # Set Pressure and Vacuum to target for x amount of time.
+        await pump.set_vacuum_state(
+            enable_vacuum=True,
+            guage_pressure_mbar=target_to_pump,
+            duration_s=None,
+        )
+        logging.info(f"pump started at target {target_pressure} mbar")
+        # Run the continuous data reader for RUN_SEC seconds.
+        await read_data(file_name, pump, start_time, args.run_sec + args.settle_sec)
+        # Stop the pump
+        await pump.set_vacuum_state(
+            enable_vacuum=False,
+            guage_pressure_mbar=target_to_pump,
+            duration_s=None,
+        )
+        # Vent the pump system to atmospheric pressure while pump is on
+        await pump.set_vent_state(VentState.CLOSED)
+        await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
+        await pump.set_vent_state(VentState.OPENED)
+    except Exception as e:
+        logging.error(f"vacuum_manifold error: {e}")
+        raise
+    finally:
+        # Always stop the pump regardless of success or failure
+        await pump.set_vacuum_state(
+            enable_vacuum=False,
+            guage_pressure_mbar=target_to_pump,
+            duration_s=None,
+        )
 
 
 async def main(args: argparse.Namespace) -> None:
