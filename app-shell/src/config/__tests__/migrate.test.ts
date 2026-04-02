@@ -34,13 +34,14 @@ import {
   MOCK_CONFIG_V28,
   MOCK_CONFIG_V29,
   MOCK_CONFIG_V30,
+  MOCK_CONFIG_V31,
 } from '../../__fixtures__'
 import { migrate } from '../migrate'
 
 vi.mock('uuid/v4')
 
-const NEWEST_VERSION = 30
-const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V30
+const NEWEST_VERSION = 31
+const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V31
 
 describe('config migration', () => {
   beforeEach(() => {
@@ -274,9 +275,16 @@ describe('config migration', () => {
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)
   })
-  it('should migrate version 30 to latest', () => {
+  it('should migrate version 30', () => {
     const v30Config = MOCK_CONFIG_V30
     const result = migrate(v30Config)
+
+    expect(result.version).toBe(NEWEST_VERSION)
+    expect(result).toEqual(NEWEST_MOCK_CONFIG)
+  })
+  it('should migrate version 31 to latest', () => {
+    const v31Config = MOCK_CONFIG_V31
+    const result = migrate(v31Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)

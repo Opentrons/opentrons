@@ -1,6 +1,9 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
+import path from 'path'
+import { app } from 'electron'
 import Store from 'electron-store'
+import fs from 'fs-extra'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
@@ -44,11 +47,70 @@ let _store: Store<Config>
 let _over: Overrides | undefined
 let _log: Logger | undefined
 
+export const OLD_OPENTRONS_CONFIG_PATH = path.join(
+  path.dirname(app.getPath('userData')),
+  'Opentrons',
+  'config.json'
+)
+
+export function mergeImportedConfig(
+  currentConfig: Config,
+  importedConfig: Config
+): Config {
+  return {
+    ...currentConfig,
+    language: importedConfig.language,
+    protocols: {
+      ...currentConfig.protocols,
+      protocolsStoredSortKey: importedConfig.protocols.protocolsStoredSortKey,
+    },
+    python: {
+      ...currentConfig.python,
+      pathToPythonOverride: importedConfig.python.pathToPythonOverride,
+    },
+    discovery: {
+      ...currentConfig.discovery,
+      candidates: importedConfig.discovery.candidates,
+      disableCache: importedConfig.discovery.disableCache,
+    },
+    migratedConfigsFromOldApp: true,
+  }
+}
+
+export function importConfigFromOldApp(currentConfig: Config): Config {
+  if (currentConfig.migratedConfigsFromOldApp) {
+    return currentConfig
+  }
+
+  if (!fs.pathExistsSync(OLD_OPENTRONS_CONFIG_PATH)) {
+    log().info('Old Opentrons config does not exist, skipping import.')
+    return {
+      ...currentConfig,
+      migratedConfigsFromOldApp: true,
+    }
+  }
+
+  try {
+    const oldConfig = fs.readJsonSync(OLD_OPENTRONS_CONFIG_PATH) as ConfigV0
+    const migratedOldConfig = migrate(oldConfig)
+
+    log().info('Importing selected settings from old Opentrons config.')
+    return mergeImportedConfig(currentConfig, migratedOldConfig)
+  } catch (error) {
+    log().warn('Failed to import old Opentrons config, skipping.', { error })
+    return {
+      ...currentConfig,
+      migratedConfigsFromOldApp: true,
+    }
+  }
+}
+
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
     _store = new Store({ defaults: DEFAULTS_V0 }) as unknown as Store<Config>
-    _store.store = migrate(_store.store as unknown as ConfigV0)
+    const currentConfig = migrate(_store.store as unknown as ConfigV0)
+    _store.store = importConfigFromOldApp(currentConfig)
   }
   return _store
 }
