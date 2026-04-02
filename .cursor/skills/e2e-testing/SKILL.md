@@ -1,6 +1,6 @@
 ---
 name: e2e-testing
-description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
+description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/, plus HTTP API clients under automation/clients/. Use when writing E2E tests, page objects, Playwright tests, or httpx-based API clients (e.g. auth-server).
 ---
 
 # E2E Testing Instructions
@@ -23,6 +23,47 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 - `tests/pd/` — PD E2E tests (marked `@pytest.mark.pdE2E`)
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
+- `automation/clients/` — **HTTP API clients** (httpx, async). Not Playwright; see below.
+
+## HTTP API clients (`automation/clients/`)
+
+Use this pattern when you add or change clients that call backend HTTP APIs from E2E tooling (robot auth-server, future services, etc.). Keep them separate from Playwright page objects.
+
+### Layout
+
+- **`automation/clients/<service>.py`** — Thin client class: wrap `httpx.AsyncClient` with a fixed `base_url`, async context manager (`__aenter__` / `__aexit__`), one public method per HTTP call (method + path + body). Parse successful JSON at the boundary; raise `httpx.HTTPStatusError` only where the helper documents it.
+- **`automation/clients/<service>_models/`** (or `auth_models/`) — Request and response shapes. **Use distinct names** so request types are never confused with response types (e.g. `SettingsPatchRequestEnvelope` vs `SettingsResponseEnvelope`).
+
+### Types: requests vs responses
+
+- **PATCH (and other partial JSON):** Prefer **`typing.TypedDict`** with `total=False` for inner `data` objects so callers can **omit** keys (unchanged on the server) and send **`None`** only when JSON `null` is intended. Do **not** model PATCH bodies as Pydantic `BaseModel` with field defaults if that would serialize values the user did not mean to send.
+- **Validation:** Use **`pydantic.TypeAdapter`** to validate incoming JSON into those `TypedDict`s (and into request envelopes like `{"data": ...}`) before sending or after receiving.
+- **Stable response-only payloads** (OAuth token JSON, simple GET bodies): Pydantic **`BaseModel`** is fine when you are not building partial PATCH documents from the same model.
+- **Envelope names:** Use `*RequestEnvelope` / `*PatchData` for outgoing bodies and `*ResponseEnvelope` / `*ResponseData` for parsed responses. Match the API’s JSON field casing (camelCase for auth-server).
+
+### Optional kwargs vs omission
+
+For high-level helpers that map to PATCH, use a private **sentinel** (not `None`) as the default for “caller did not pass this argument,” so **`None` can still mean** “send JSON null” when the API allows it.
+
+### Teaching scripts
+
+Pair a verbose script with a quiet one under `scripts/` (e.g. `check_auth.py` / `check_auth_quiet.py`): document flow in comments, run with `uv run python scripts/<script>.py <host>` from `e2e-testing/`, optional `ROBOT_IP` if the script supports it.
+
+### Example — consume the client
+
+```python
+from automation.clients.auth import AuthClient
+
+async with AuthClient(base_url="http://localhost:33950") as client:
+    settings = await client.get_settings()  # SettingsResponseData (dict)
+```
+
+### Example — PATCH only fields you change
+
+```python
+# Inner patch dict: omit keys to leave unchanged; None => JSON null where allowed.
+await client.patch_settings({"maxNumberOfLoginAttempts": None}, token=admin_token)
+```
 
 ## Architecture — Page Object Model
 

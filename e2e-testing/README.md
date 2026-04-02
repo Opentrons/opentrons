@@ -1,6 +1,6 @@
 # E2E Testing
 
-End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Library (LL)** using Playwright and pytest. Soon we will add app tests and API testing.
+End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Library (LL)** using Playwright and pytest, plus optional **HTTP API clients** under `automation/clients/` (e.g. auth-server) for integration checks and future tests.
 
 ## Prerequisites
 
@@ -97,10 +97,11 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
 
 ## Directory Layout
 
-- `automation/` — Page objects and shared helpers
+- `automation/` — Page objects, HTTP clients, and shared helpers
   - `base_page.py` — Shared `BasePage` class inherited by all page objects
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
+  - `clients/` — httpx-based API clients (see [HTTP API clients](#http-api-clients) below)
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
@@ -122,6 +123,42 @@ Tests use the **Page Object Model** pattern for maintainability:
 - **PD page objects** (`automation/pd_pages/`) — One class per PD screen/feature (landing, protocol editor, step forms, settings, etc.)
 - **LL page objects** (`automation/ll_pages/`) — Classes for LL navigation and the Labware Creator wizard
 - **Tests** (`tests/pd/`, `tests/ll/`) — Focus on test scenarios and assertions using page objects. Mark with `@pytest.mark.pdE2E` or `@pytest.mark.llE2E`.
+
+## HTTP API clients
+
+Async **httpx** clients for services you need to probe from this package (without Playwright). Reference implementation: **`automation/clients/auth.py`** (`AuthClient`) and types in **`automation/clients/auth_models/`**.
+
+### Conventions
+
+- **Client class:** `httpx.AsyncClient` with a fixed `base_url`, `async with` context manager, one method per HTTP call.
+- **Separate request and response types:** e.g. `SettingsResponseEnvelope` / `SettingsResponseData` for GET responses vs `SettingsPatchRequestEnvelope` / `SettingsPatchData` for PATCH requests. Names should say request vs response.
+- **Partial JSON (PATCH):** Prefer **`TypedDict`** with `total=False` for inner bodies so omitted keys stay omitted on the wire; use **`pydantic.TypeAdapter`** to validate. Avoid Pydantic `BaseModel` for PATCH payloads when defaults would leak into JSON. Pydantic models are still fine for many read-only response shapes.
+- **Scripts:** Verbose walkthrough plus a silent check live under `scripts/` (e.g. auth-server on port **33950**).
+
+### Run the auth client smoke scripts
+
+From **`e2e-testing/`** with dependencies installed (`make setup` or `uv sync`):
+
+```bash
+# Printed walkthrough (host required if ROBOT_IP is unset)
+uv run python scripts/check_auth.py localhost
+
+# Or
+ROBOT_IP=localhost uv run python scripts/check_auth.py
+
+# Same checks, no stdout on success (exit 0 / 1)
+uv run python scripts/check_auth_quiet.py localhost
+```
+
+Use **`AuthClient`** in code:
+
+```python
+from automation.clients.auth import AuthClient
+
+async with AuthClient(base_url="http://localhost:33950") as client:
+    ok = await client.is_alive()
+    settings = await client.get_settings()
+```
 
 ### Key Fixtures (conftest.py)
 

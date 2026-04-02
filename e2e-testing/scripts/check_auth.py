@@ -89,7 +89,8 @@ async def main() -> None:
         _step(
             "0. Auth server (GET /auth/settings)",
             Text.from_markup(
-                f"[green]is_alive[/green]: validated [bold]SettingsData[/bold] from [dim]{base_url}/auth/settings[/dim]"
+                f"[green]is_alive[/green]: validated [bold]SettingsResponseData[/bold] "
+                f"from [dim]{base_url}/auth/settings[/dim]"
             ),
         )
 
@@ -117,18 +118,18 @@ async def main() -> None:
 
         # ---------------------------------------------------------------------
         # 3) GET /auth/settings returns {"data": {...}}. AuthClient validates
-        # the envelope and returns auth_models.SettingsData.
+        # the envelope and returns auth_models.SettingsResponseData (dict, camelCase keys).
         # ---------------------------------------------------------------------
         settings = await client.get_settings()
         _step(
             "3. Settings (GET /auth/settings)",
-            Text.from_markup("[bold]SettingsData[/bold]"),
+            Text.from_markup("[bold]SettingsResponseData[/bold]"),
             Pretty(settings),
         )
 
         # ---------------------------------------------------------------------
         # 4) GET /auth/settings/accessControlEnabled is a smaller read for one
-        # flag; returns auth_models.AccessControlData via the same pattern.
+        # flag; returns auth_models.AccessControlResponseData via the same pattern.
         # ---------------------------------------------------------------------
         ac = await client.get_access_control_settings()
         _step(

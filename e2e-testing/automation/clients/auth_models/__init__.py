@@ -1,4 +1,4 @@
-"""Pydantic models for auth-server HTTP responses (e2e-testing client)."""
+"""Types for auth-server HTTP payloads (e2e-testing client)."""
 
 from __future__ import annotations
 
@@ -6,23 +6,39 @@ from automation.clients.auth_models.introspection import TokenIntrospectionRespo
 from automation.clients.auth_models.oauth import TokenResponse
 from automation.clients.auth_models.openapi import OpenApiDocument, OpenApiInfo
 from automation.clients.auth_models.settings import (
-    AccessControlData,
-    AccessControlSettingsResponse,
-    AuthSettingsResponse,
-    SettingsData,
+    AccessControlResponseData,
+    AccessControlResponseEnvelope,
+    SettingsPatchData,
+    SettingsPatchRequestEnvelope,
+    SettingsResponseData,
+    SettingsResponseEnvelope,
 )
-from automation.clients.auth_models.user import AccountType, UserResourceResponse, UserResponse
+from automation.clients.auth_models.user import (
+    AccountType,
+    UserCreateData,
+    UserCreateRequestEnvelope,
+    UserPatchData,
+    UserPatchRequestEnvelope,
+    UserResourceResponse,
+    UserResponse,
+)
 
 __all__ = [
-    "AccessControlData",
-    "AccessControlSettingsResponse",
+    "AccessControlResponseData",
+    "AccessControlResponseEnvelope",
     "AccountType",
-    "AuthSettingsResponse",
     "OpenApiDocument",
     "OpenApiInfo",
-    "SettingsData",
+    "SettingsPatchData",
+    "SettingsPatchRequestEnvelope",
+    "SettingsResponseData",
+    "SettingsResponseEnvelope",
     "TokenIntrospectionResponse",
     "TokenResponse",
+    "UserCreateData",
+    "UserCreateRequestEnvelope",
+    "UserPatchData",
+    "UserPatchRequestEnvelope",
     "UserResourceResponse",
     "UserResponse",
 ]

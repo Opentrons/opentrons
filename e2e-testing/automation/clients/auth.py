@@ -4,7 +4,9 @@ Implements the Resource Owner Password Credentials (ROPC) flow
 against the auth-server and provides helpers for token introspection,
 settings management, and user CRUD. Designed for use in E2E tests.
 
-Response bodies are validated with Pydantic models in ``auth_models``.
+Request types (``*RequestEnvelope``, ``*PatchData``, ``UserCreateData``) are
+``TypedDict`` where partial JSON matters; responses use ``TypedDict`` for
+settings envelopes and Pydantic for OAuth, users, and access-control GET bodies.
 """
 
 from __future__ import annotations
@@ -13,20 +15,37 @@ import json
 from typing import Any
 
 import httpx
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from automation.clients.auth_models import (
-    AccessControlData,
-    AccessControlSettingsResponse,
+    AccessControlResponseData,
+    AccessControlResponseEnvelope,
     AccountType,
-    AuthSettingsResponse,
     OpenApiDocument,
-    SettingsData,
+    SettingsPatchData,
+    SettingsPatchRequestEnvelope,
+    SettingsResponseData,
+    SettingsResponseEnvelope,
     TokenIntrospectionResponse,
     TokenResponse,
+    UserCreateData,
+    UserCreateRequestEnvelope,
+    UserPatchRequestEnvelope,
     UserResourceResponse,
     UserResponse,
 )
+
+_SETTINGS_RESPONSE_ENVELOPE = TypeAdapter(SettingsResponseEnvelope)
+_SETTINGS_PATCH_REQUEST = TypeAdapter(SettingsPatchRequestEnvelope)
+_USER_CREATE_REQUEST = TypeAdapter(UserCreateRequestEnvelope)
+_USER_PATCH_REQUEST = TypeAdapter(UserPatchRequestEnvelope)
+
+
+class _UnsetType:
+    __slots__ = ()
+
+
+_UNSET = _UnsetType()
 
 # Hardcoded client_id expected by the auth-server (see auth_server/oauth2/backend.py).
 DEFAULT_CLIENT_ID = "opentrons_app"
@@ -36,50 +55,6 @@ ADMIN_USERNAME = "test_admin"
 ADMIN_PASSWORD = "test_admin_password"
 USER_USERNAME = "test_user"
 USER_PASSWORD = "test_user_password"
-
-
-class _UserCreatePayload(BaseModel):
-    """Request body for POST /auth/users (camelCase in JSON)."""
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    user_name: str = Field(
-        validation_alias=AliasChoices("user_name", "userName"),
-        serialization_alias="userName",
-    )
-    password: str
-    full_name: str = Field(
-        validation_alias=AliasChoices("full_name", "fullName"),
-        serialization_alias="fullName",
-    )
-    account_type: AccountType = Field(
-        default="user",
-        validation_alias=AliasChoices("account_type", "accountType"),
-        serialization_alias="accountType",
-    )
-
-
-class _UserUpdatePayload(BaseModel):
-    """Request body for PATCH /auth/users/{user_name} (camelCase in JSON)."""
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    user_name: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("user_name", "userName"),
-        serialization_alias="userName",
-    )
-    password: str | None = None
-    full_name: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("full_name", "fullName"),
-        serialization_alias="fullName",
-    )
-    account_type: AccountType | None = Field(
-        default=None,
-        validation_alias=AliasChoices("account_type", "accountType"),
-        serialization_alias="accountType",
-    )
 
 
 class AuthClient:
@@ -189,8 +164,8 @@ class AuthClient:
     async def is_alive(self) -> bool:
         """Return True if the auth-server answers GET /auth/settings with 2xx JSON.
 
-        The body must validate as :class:`AuthSettingsResponse` (including a
-        ``data`` object that parses as :class:`SettingsData`). Use this instead
+        The body must validate as :class:`SettingsResponseEnvelope` (including a
+        ``data`` object that parses as :class:`SettingsResponseData`). Use this instead
         of a bare TCP or ``/health`` check when you need to confirm the API is
         actually serving auth settings.
         """
@@ -205,54 +180,55 @@ class AuthClient:
         ):
             return False
 
-    async def get_settings(self) -> SettingsData:
+    async def get_settings(self) -> SettingsResponseData:
         """GET /auth/settings (no auth required)."""
         response = await self._client.get("/auth/settings")
         response.raise_for_status()
-        envelope = AuthSettingsResponse.model_validate(response.json())
-        return envelope.data
+        envelope = _SETTINGS_RESPONSE_ENVELOPE.validate_python(response.json())
+        return envelope["data"]
 
-    async def get_access_control_settings(self) -> AccessControlData:
+    async def get_access_control_settings(self) -> AccessControlResponseData:
         """GET /auth/settings/accessControlEnabled (no auth required)."""
         response = await self._client.get("/auth/settings/accessControlEnabled")
         response.raise_for_status()
-        envelope = AccessControlSettingsResponse.model_validate(response.json())
+        envelope = AccessControlResponseEnvelope.model_validate(response.json())
         return envelope.data
 
     async def patch_settings(
         self,
-        data: dict[str, Any],
+        data: SettingsPatchData,
         token: TokenResponse | None = None,
-    ) -> SettingsData:
+    ) -> SettingsResponseData:
         """PATCH /auth/settings. Requires auth when access control is enabled."""
         response = await self.patch_settings_response(data, token=token)
         response.raise_for_status()
-        envelope = AuthSettingsResponse.model_validate(response.json())
-        return envelope.data
+        envelope = _SETTINGS_RESPONSE_ENVELOPE.validate_python(response.json())
+        return envelope["data"]
 
     async def patch_settings_response(
         self,
-        data: dict[str, Any],
+        data: SettingsPatchData,
         token: TokenResponse | None = None,
     ) -> httpx.Response:
         """PATCH /auth/settings without raising (for asserting error status codes)."""
         headers = AuthClient.auth_header(token) if token else {}
+        body = _SETTINGS_PATCH_REQUEST.validate_python({"data": data})
         return await self._client.patch(
             "/auth/settings",
-            json={"data": data},
+            json=body,
             headers=headers,
         )
 
     async def reset_settings(
         self,
         token: TokenResponse | None = None,
-    ) -> SettingsData:
+    ) -> SettingsResponseData:
         """DELETE /auth/settings (reset to defaults). Requires auth when access control is enabled."""
         headers = AuthClient.auth_header(token) if token else {}
         response = await self._client.delete("/auth/settings", headers=headers)
         response.raise_for_status()
-        envelope = AuthSettingsResponse.model_validate(response.json())
-        return envelope.data
+        envelope = _SETTINGS_RESPONSE_ENVELOPE.validate_python(response.json())
+        return envelope["data"]
 
     # -- Users (protected; require Bearer token) -----------------------------------
 
@@ -266,23 +242,21 @@ class AuthClient:
         account_type: AccountType = "user",
     ) -> UserResponse:
         """POST /auth/users. Create a user (requires USERS_WRITE scope)."""
-        payload_data = _UserCreatePayload(
-            user_name=user_name,
-            password=password,
-            full_name=full_name,
-            account_type=account_type,
-        )
-        response = await self.post_users_request(
-            token,
-            {"data": payload_data.model_dump(by_alias=True)},
-        )
+        create_data: UserCreateData = {
+            "userName": user_name,
+            "password": password,
+            "fullName": full_name,
+            "accountType": account_type,
+        }
+        body = _USER_CREATE_REQUEST.validate_python({"data": create_data})
+        response = await self.post_users_request(token, body)
         response.raise_for_status()
         return UserResourceResponse.model_validate(response.json()).data
 
     async def post_users_request(
         self,
         token: TokenResponse,
-        body: dict[str, Any],
+        body: UserCreateRequestEnvelope | dict[str, Any],
     ) -> httpx.Response:
         """POST /auth/users with a full JSON body (for success and error cases)."""
         return await self._client.post(
@@ -305,23 +279,30 @@ class AuthClient:
         token: TokenResponse,
         user_name: str,
         *,
-        user_name_new: str | None = None,
-        password: str | None = None,
-        full_name: str | None = None,
-        account_type: AccountType | None = None,
+        user_name_new: str | None | _UnsetType = _UNSET,
+        password: str | None | _UnsetType = _UNSET,
+        full_name: str | None | _UnsetType = _UNSET,
+        account_type: AccountType | None | _UnsetType = _UNSET,
     ) -> UserResponse:
-        """PATCH /auth/users/{user_name} (requires USERS_WRITE scope)."""
-        payload_data = _UserUpdatePayload(
-            user_name=user_name_new,
-            password=password,
-            full_name=full_name,
-            account_type=account_type,
-        )
-        # Drop unset fields so we only send provided ones
-        patch = {k: v for k, v in payload_data.model_dump(by_alias=True).items() if v is not None}
+        """PATCH /auth/users/{user_name} (requires USERS_WRITE scope).
+
+        Keyword arguments default to "not sent". Pass ``None`` only when you
+        intend JSON null for a nullable field; omit the argument to leave the
+        field unchanged.
+        """
+        raw: dict[str, Any] = {}
+        if user_name_new is not _UNSET:
+            raw["userName"] = user_name_new
+        if password is not _UNSET:
+            raw["password"] = password
+        if full_name is not _UNSET:
+            raw["fullName"] = full_name
+        if account_type is not _UNSET:
+            raw["accountType"] = account_type
+        body = _USER_PATCH_REQUEST.validate_python({"data": raw})
         response = await self._client.patch(
             f"/auth/users/{user_name}",
-            json={"data": patch},
+            json=body,
             headers=AuthClient.auth_header(token),
         )
         response.raise_for_status()

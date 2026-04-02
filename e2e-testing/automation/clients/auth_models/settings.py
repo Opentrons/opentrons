@@ -1,61 +1,80 @@
-"""Auth settings and access-control responses (``SimpleBody`` envelopes from robot auth-server)."""
+"""Auth settings shapes for the e2e-testing auth client.
+
+JSON uses camelCase keys, matching ``auth_server.settings.models``. Request and
+response types are separate: ``SettingsPatchData`` / ``SettingsPatchRequestEnvelope``
+for PATCH bodies vs ``SettingsResponseData`` / ``SettingsResponseEnvelope`` for
+GET and successful PATCH/DELETE responses.
+
+PATCH ``data`` semantics: omit a key to leave that setting unchanged; JSON null
+(``None`` here) clears or disables where the API allows; a normal value sets the
+field. Response types do not encode server defaults like
+``maxNumberOfLoginAttempts == 5``; validation only checks shape.
+"""
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 from pydantic import BaseModel, ConfigDict, Field
 
-# Aligns with auth_server.settings.models.SettingsResponseData; ``extra`` allows new server fields.
-_SETTINGS_CFG = ConfigDict(populate_by_name=True, extra="allow")
+
+class SettingsResponseData(TypedDict):
+    """``data`` object in **responses** for GET/PATCH/DELETE ``/auth/settings``."""
+
+    maxNumberOfLoginAttempts: int | None
+    passwordResetTime: float | None
+    passwordComplexityMinimumLength: int | None
+    passwordComplexitySpecialCharacters: bool | None
+    idleLogout: float
+    requireReasonForInteraction: bool
+    minLengthOfReasonForInteraction: int | None
 
 
-class SettingsData(BaseModel):
-    """``data`` object for GET/PATCH/DELETE /auth/settings."""
+class SettingsResponseEnvelope(TypedDict):
+    """Top-level **response** JSON for GET/PATCH/DELETE ``/auth/settings``."""
 
-    model_config = _SETTINGS_CFG
-
-    max_number_of_login_attempts: int | None = Field(
-        default=5,
-        alias="maxNumberOfLoginAttempts",
-    )
-    password_reset_time: float | None = Field(default=None, alias="passwordResetTime")
-    password_complexity_minimum_length: int | None = Field(
-        default=None,
-        alias="passwordComplexityMinimumLength",
-    )
-    password_complexity_special_characters: bool | None = Field(
-        default=None,
-        alias="passwordComplexitySpecialCharacters",
-    )
-    idle_logout: float = Field(default=180.0, alias="idleLogout")
-    require_reason_for_interaction: bool = Field(
-        default=True,
-        alias="requireReasonForInteraction",
-    )
-    min_length_of_reason_for_interaction: int | None = Field(
-        default=None,
-        alias="minLengthOfReasonForInteraction",
-    )
+    data: SettingsResponseData
 
 
-class AuthSettingsResponse(BaseModel):
-    """Full JSON body for /auth/settings (wrapper with ``data``)."""
+class SettingsPatchData(TypedDict, total=False):
+    """Inner ``data`` object for PATCH **requests** to ``/auth/settings``.
 
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
+    Include only keys you want to change. Aligns with
+    ``auth_server.settings.models.PatchSettingsRequestData`` (patchable fields only).
+    """
 
-    data: SettingsData
+    maxNumberOfLoginAttempts: int | None
+    passwordResetTime: float | None
+    passwordComplexityMinimumLength: int | None
+    passwordComplexitySpecialCharacters: bool | None
+    idleLogout: float | None
+    requireAdminCredsWhenUpdatingRobotSoftware: bool | None
+    requireAdminCredsWhenSendingProtocolToRobot: bool | None
+    requireAdminCredsForSignoffProtocol: bool | None
+    requireSignoffForProtocolLog: bool | None
+    requireReasonForInteraction: bool | None
+    minLengthOfReasonForInteraction: int | None
+    requireLogsToBeSavedInApp: bool | None
+    deleteOverMaxOnDiskProtocols: bool | None
 
 
-class AccessControlData(BaseModel):
-    """``data`` for GET /auth/settings/accessControlEnabled."""
+class SettingsPatchRequestEnvelope(TypedDict):
+    """Top-level **request** JSON for PATCH ``/auth/settings`` (``{"data": ...}``)."""
+
+    data: SettingsPatchData
+
+
+class AccessControlResponseData(BaseModel):
+    """``data`` in **responses** for GET ``/auth/settings/accessControlEnabled``."""
 
     model_config = ConfigDict(populate_by_name=True)
 
     access_control_enabled: bool = Field(alias="accessControlEnabled")
 
 
-class AccessControlSettingsResponse(BaseModel):
-    """Full JSON body for /auth/settings/accessControlEnabled."""
+class AccessControlResponseEnvelope(BaseModel):
+    """Top-level **response** JSON for GET ``/auth/settings/accessControlEnabled``."""
 
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
-    data: AccessControlData
+    data: AccessControlResponseData

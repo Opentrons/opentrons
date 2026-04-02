@@ -54,7 +54,7 @@ async def main() -> None:
         # -----------------------------------------------------------------
         # 0) ``AuthClient.is_alive()`` calls ``get_settings()`` internally.
         # True means GET /auth/settings returned 2xx and the JSON matched
-        # AuthSettingsResponse + SettingsData. Prefer this over /health when
+        # SettingsResponseEnvelope + SettingsResponseData. Prefer this over /health when
         # you care that the auth API (not just TCP) is healthy.
         # -----------------------------------------------------------------
         if not await client.is_alive():
@@ -73,13 +73,13 @@ async def main() -> None:
 
         # -----------------------------------------------------------------
         # 3) ``get_settings()`` -> GET /auth/settings -> validates ``{data}``
-        # envelope -> SettingsData (camelCase in JSON, snake_case on model).
+        # envelope -> SettingsResponseData (``TypedDict``, camelCase keys).
         # -----------------------------------------------------------------
         _ = await client.get_settings()
 
         # -----------------------------------------------------------------
         # 4) ``get_access_control_settings()`` -> GET
-        # /auth/settings/accessControlEnabled -> AccessControlData.
+        # /auth/settings/accessControlEnabled -> AccessControlResponseData.
         # -----------------------------------------------------------------
         _ = await client.get_access_control_settings()
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -10,8 +10,45 @@ from pydantic import BaseModel, ConfigDict, Field
 AccountType = Literal["admin", "user", "auditor", "service"]
 
 
+class UserCreateData(TypedDict):
+    """Inner ``data`` for POST **requests** to ``/auth/users``.
+
+    All fields are required in JSON. Matches ``auth_server.users.models.UserCreate``.
+    """
+
+    userName: str
+    password: str
+    fullName: str
+    accountType: AccountType
+
+
+class UserCreateRequestEnvelope(TypedDict):
+    """Top-level **request** JSON for POST ``/auth/users``."""
+
+    data: UserCreateData
+
+
+class UserPatchData(TypedDict, total=False):
+    """Inner ``data`` for PATCH **requests** to ``/auth/users/{userName}``.
+
+    Only include keys being updated. JSON null is represented as ``None``; omit
+    keys you do not want to change. Matches ``auth_server.users.models.UpdateUser``.
+    """
+
+    userName: str | None
+    password: str | None
+    fullName: str | None
+    accountType: AccountType | None
+
+
+class UserPatchRequestEnvelope(TypedDict):
+    """Top-level **request** JSON for PATCH ``/auth/users/{userName}``."""
+
+    data: UserPatchData
+
+
 class UserResponse(BaseModel):
-    """User object inside response ``data`` for GET/POST/PATCH /auth/users/..."""
+    """User inside response ``data`` for GET/POST/PATCH ``/auth/users/...`` (**responses**)."""
 
     model_config = ConfigDict(populate_by_name=True)
 
@@ -22,7 +59,7 @@ class UserResponse(BaseModel):
 
 
 class UserResourceResponse(BaseModel):
-    """Full JSON body for user single-resource responses (``{"data": {...}}``)."""
+    """Top-level **response** JSON for single-user endpoints (``{"data": {...}}``)."""
 
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
