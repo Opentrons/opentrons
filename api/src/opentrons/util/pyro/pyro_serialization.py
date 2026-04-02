@@ -1,5 +1,6 @@
 """Pyro related utilities for serialization of objects."""
 
+import builtins
 import enum
 import inspect
 from contextlib import contextmanager
@@ -176,8 +177,17 @@ class OpentronsPyroSerializer:
             cls._enum_class_name_to_model,
             cls._typed_dict_class_name_to_model,
         ]
-        key_model = None
-        value_model = None
+        # Identify the types for the key and values, if available. Check for builtin types first.
+        key_model = (
+            None
+            if "builtins" not in d["key_type"]
+            else getattr(builtins, d["key_type"].removeprefix("builtins."))
+        )
+        value_model = (
+            None
+            if "builtins" not in d["value_type"]
+            else getattr(builtins, d["value_type"].removeprefix("builtins."))
+        )
         for registry in registries:
             if d["key_type"] in registry:
                 key_model = registry[d["key_type"]]
@@ -186,7 +196,7 @@ class OpentronsPyroSerializer:
 
         if key_model is None or value_model is None:
             raise TypeError(
-                f"Could not convert Dictionary item {key_model if key_model is None else value_model} to an object, unregistered with pyro."
+                f"Could not convert Dictionary item `{d["key_type"] if key_model is None else d["value_type"]}` to an object, unregistered with pyro."
             )
         unwrapped_dictionary = {}
         # Unwrap the dictionary and format all keys and values to respective types
