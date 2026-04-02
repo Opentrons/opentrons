@@ -258,14 +258,6 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
 }
 
-QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
-    ConfigType.gravimetric: {
-        1: 10,
-        8: 10,
-        96: 9,
-    },
-}
-
 QC_TEST_SAFETY_FACTOR = 0.0
 
 QC_TEST_MIN_REQUIREMENTS: Dict[

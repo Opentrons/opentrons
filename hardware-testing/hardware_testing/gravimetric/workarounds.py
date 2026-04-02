@@ -14,26 +14,6 @@ from hardware_testing.opentrons_api.types import Point
 from opentrons.protocol_engine.types import LabwareOffset
 
 
-def is_running_in_app() -> bool:
-    """Is running in App."""
-    return False  # FIXME: how to detect if we are running in the App?
-
-
-def is_running_on_robot() -> bool:
-    """Is running on Robot."""
-    return str(platform.system()).lower() == "linux"
-
-
-def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
-    """Force prepare for aspirate."""
-    # FIXME: remove this and use latest API version once available
-    # NOTE: this MUST happen before the .move_to()
-    #       because the API automatically moves the pipette
-    #       to well.top() before beginning the .aspirate()
-    pipette.aspirate(pipette.min_volume)
-    pipette.dispense()
-
-
 def http_get_all_labware_offsets() -> List[LabwareOffset]:
     """Request (HTTP GET) from the local robot-server all runs information."""
     req = Request("http://localhost:31950/runs")
