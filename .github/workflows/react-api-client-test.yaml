@@ -56,7 +56,7 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
