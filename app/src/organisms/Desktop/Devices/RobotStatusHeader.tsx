@@ -15,9 +15,9 @@ import {
   LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   Tooltip,
   truncateString,
-  TYPOGRAPHY,
   useHoverTooltip,
   useInterval,
 } from '@opentrons/components'
@@ -157,51 +157,45 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     currentRunId != null && currentRunStatus != null && displayName != null
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          forwardedAs="h6"
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps} width="100%">
+      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing2}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing2}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
-        </LegacyStyledText>
-        <Flex alignItems={ALIGN_CENTER}>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-            <RobotNameContainer isGoToRun={isGoToRun}>
-              <LegacyStyledText
-                forwardedAs="h3"
-                id={`RobotStatusHeader_${String(name)}_robotName`}
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {name}
-              </LegacyStyledText>
-            </RobotNameContainer>
-            {iconName != null ? (
-              <Btn
-                {...targetProps}
-                marginRight={SPACING.spacing8}
-                onClick={() => {
-                  navigate(`/devices/${name}/robot-settings/networking`)
-                }}
-              >
-                <Icon
-                  aria-label={iconName}
-                  paddingTop={SPACING.spacing4}
-                  name={iconName}
-                  color={COLORS.grey60}
-                  size="1.25rem"
-                />
-              </Btn>
-            ) : null}
-            <Tooltip tooltipProps={tooltipProps} width="auto">
-              {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
-            </Tooltip>
-          </Flex>
+        </StyledText>
+        <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing8}>
+          <RobotNameContainer isGoToRun={isGoToRun}>
+            <StyledText
+              desktopStyle="bodyLargeSemiBold"
+              id={`RobotStatusHeader_${String(name)}_robotName`}
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              {name}
+            </StyledText>
+          </RobotNameContainer>
+          {iconName != null ? (
+            <Btn
+              {...targetProps}
+              onClick={() => {
+                navigate(`/devices/${name}/robot-settings/networking`)
+              }}
+            >
+              <Icon
+                aria-label={iconName}
+                paddingTop={SPACING.spacing4}
+                name={iconName}
+                color={COLORS.grey60}
+                size="1.25rem"
+              />
+            </Btn>
+          ) : null}
+          <Tooltip tooltipProps={tooltipProps} width="auto">
+            {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
+          </Tooltip>
         </Flex>
       </Flex>
       {runningProtocolBanner}

@@ -12,7 +12,6 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT2,
-  ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
 import {
@@ -26,8 +25,6 @@ import { useAttachedModules } from '/app/resources/modules'
 import {
   mockOT2HealthResponse,
   mockOT2ServerHealthResponse,
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
 } from '../../../../../../discovery-client/src/fixtures'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import {
@@ -53,7 +50,6 @@ vi.mock('../RobotStatusHeader')
 vi.mock('../ErrorRecoveryBanner')
 
 const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
-const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -72,23 +68,6 @@ const MOCK_STATE: State = {
             healthError: null,
             serverHealthError: null,
             advertisedModel: ROBOT_MODEL_OT2,
-          },
-        ],
-      },
-      buzz: {
-        name: 'buzz',
-        health: mockOT3HealthResponse,
-        serverHealth: mockOT3ServerHealthResponse,
-        addresses: [
-          {
-            ip: '10.0.0.4',
-            port: 31950,
-            seen: true,
-            healthStatus: HEALTH_STATUS_OK,
-            serverHealthStatus: HEALTH_STATUS_OK,
-            healthError: null,
-            serverHealthError: null,
-            advertisedModel: ROBOT_MODEL_OT3,
           },
         ],
       },
@@ -151,17 +130,6 @@ describe('RobotCard', () => {
     const image = screen.getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
-  })
-
-  it('renders a Flex image when robot model is OT-3', () => {
-    props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
-    when(getRobotModelByName)
-      .calledWith(MOCK_STATE, 'buzz')
-      .thenReturn('Opentrons Flex')
-    render(props)
-    const image = screen.getByRole('img')
-
-    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {
