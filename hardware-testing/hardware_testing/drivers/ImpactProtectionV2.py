@@ -1,5 +1,4 @@
-"""
-Impact protection (collision avoidance) driver.
+"""Impact protection (collision avoidance) driver.
 
 Based on Asair sensor driver architecture.
 """
@@ -19,7 +18,7 @@ from hardware_testing.data import ui
 
 log = logging.getLogger(__name__)
 
-USB_VID = None     # 如果有固定 VID / PID 可填写
+USB_VID = None  # 如果有固定 VID / PID 可填写
 USB_PID = None
 
 
@@ -36,6 +35,7 @@ class ImpactProtectionError(RuntimeError):
 @dataclass
 class ImpactState:
     """Impact protection state."""
+
     mode: str
     raw_response: str
 
@@ -48,22 +48,32 @@ class ImpactProtectionBase(ABC):
 
     @classmethod
     def vid_pid(cls) -> Tuple[Optional[int], Optional[int]]:
+        """Get vid pid."""
         return USB_VID, USB_PID
 
     @abc.abstractmethod
     def get_version(self) -> str:
+        """Get the version of this device."""
+        ...
+
+    @abc.abstractmethod
+    def port(self) -> str:
+        """Get the port this device is connected to."""
         ...
 
     @abc.abstractmethod
     def switch_mode(self, mode: str) -> ImpactState:
+        """Switch the impact protection mode."""
         ...
 
     @abc.abstractmethod
     def close_all_gratings(self) -> ImpactState:
+        """Close all gratings."""
         ...
 
     @abc.abstractmethod
     def close(self) -> None:
+        """Close connection."""
         ...
 
 
@@ -71,16 +81,20 @@ class ImpactProtectionBase(ABC):
 # Serial implementation
 # =========================
 class ImpactProtectionSerial(ImpactProtectionBase):
-    def __init__(self, baudrate: int = 115200, timeout: float = 1.0,ctx=None) -> None:
+    """Driver for the impact protection device."""
+
+    def __init__(self, baudrate: int = 115200, timeout: float = 1.0) -> None:
+        """Create driver."""
         self._baudrate = baudrate
         self._timeout = timeout
         self._ser: Optional[serial.Serial] = None
-        self.port: Optional[str] = None
-        self.ctx = ctx
-        
+        self._port: Optional[str] = None
 
     # ---------- connection ----------
-    def connect(self, autosearch: bool = True, port: str = "",skip_port:str = "") -> None:
+    def connect(
+        self, autosearch: bool = True, port: str = "", skip_port: str = ""
+    ) -> bool:
+        """Find and connect to device."""
         ports = comports()
         if not ports:
             raise ImpactProtectionError("No serial ports found")
@@ -91,7 +105,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                 continue
             elif skip_port and skip_port in p.device:
                 continue
-            self.ctx.delay(seconds=1,msg=f"p {p}")
+
             try:
                 ser = serial.Serial(
                     port=p.device,
@@ -99,35 +113,34 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                     timeout=self._timeout,
                 )
                 time.sleep(1)
-                #ser.reset_input_buffer()
+                # ser.reset_input_buffer()
                 ser.flushInput()
                 ser.flushOutput()
-                send =(str("M115") + "\r\n").encode('utf-8')
+                send = (str("M115") + "\r\n").encode("utf-8")
                 ser.write(send)
                 time.sleep(1)
-                resp1 = ''
+                resp1 = ""
                 for i in range(4):
                     resp = ser.read(500)
-                    #self.ctx.delay(seconds=1,msg=f"resp------- {resp}")
+                    # self.ctx.delay(seconds=1,msg=f"resp------- {resp}")
                     if resp:
-                        resp1 = resp.decode('utf-8', errors='ignore')
+                        resp1 = resp.decode("utf-8", errors="ignore")
                         if "Wrong Channel" in resp1:
-                            send =(str("M115") + "\r\n").encode('utf-8')
+                            send = (str("M115") + "\r\n").encode("utf-8")
                             ser.write(send)
                             time.sleep(1)
                         else:
                             break
 
-
-                    #self.ctx.delay(seconds=1,msg=f"reesp {resp1}")
-                    #resp = ser.readline().decode(errors="ignore").strip()
-                    #self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
-                    #print(resp)
+                    # self.ctx.delay(seconds=1,msg=f"reesp {resp1}")
+                    # resp = ser.readline().decode(errors="ignore").strip()
+                    # self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
+                    # print(resp)
                 if "VersionImpact" in resp1:
                     self._ser = ser
-                    self.port = p.device
+                    self._port = p.device
                     return True
-                
+
                 ser.close()
 
             except SerialException:
@@ -147,7 +160,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
     #     data1 = ''
     #     for i in range(30):
     #         data = self._ser.read(1000)
-            
+
     #         data1 = data.decode('utf-8')
     #         self.ctx.delay(seconds=1,msg=f"data- {data1}")
     #         if "OK" not in data1:
@@ -156,7 +169,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
     #         elif "Wrong Channel" in data1:
     #             break
     #     return data1
-    def _send(self, cmd: str, timeout=5) -> str:
+    def _send(self, cmd: str, timeout: float = 5.0) -> str:
         if not self._ser or not self._ser.is_open:
             raise ImpactProtectionError("Impact device not connected")
 
@@ -165,10 +178,10 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         ser.reset_output_buffer()
 
         # 打印发送的命令
-        #.delay(seconds=0.2, msg=f"send- {cmd}")
-        
+        # .delay(seconds=0.2, msg=f"send- {cmd}")
+
         ser.write((cmd.strip() + "\r\n").encode("ascii"))
-        
+
         # 增加发送后的延迟，给设备更多时间响应
         time.sleep(0.5)
 
@@ -181,7 +194,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
             chunk = ser.read(500).decode(errors="ignore")
             if chunk:
                 buf += chunk
-                #self.ctx.delay(seconds=0.2, msg=f"data- {chunk}")
+                # self.ctx.delay(seconds=0.2, msg=f"data- {chunk}")
 
                 # 先判断错误
                 if "Wrong Channel" in buf:
@@ -190,7 +203,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                 # 再判断成功
                 if "OK" in buf:
                     break
-            
+
             # 短暂休眠，避免占用过多 CPU
             time.sleep(0.1)
 
@@ -198,20 +211,28 @@ class ImpactProtectionSerial(ImpactProtectionBase):
 
     # ---------- protocol ----------
     def get_version(self) -> str:
+        """Get device version."""
         return self._send("M115")
 
     def switch_mode(self, mode: str) -> ImpactState:
+        """Switch the impact protection mode."""
         resp = self._send(mode)
         return ImpactState(mode=mode, raw_response=resp)
 
     def close_all_gratings(self) -> ImpactState:
+        """Close all gratings."""
         resp = self._send("M18")
         return ImpactState(mode="CLOSE_ALL", raw_response=resp)
 
     def close(self) -> None:
+        """Close connection."""
         if self._ser:
             self._ser.close()
             ui.print_info("Impact serial closed")
+
+    def port(self) -> str:
+        """Get the port this device is connected to."""
+        return self._port or "NOT CONNECTED"
 
 
 # =========================
@@ -231,49 +252,54 @@ class ImpactProtectionSerial(ImpactProtectionBase):
 #         dev.connect(autosearch=autosearch, port=port)
 #         return dev
 class ImpactProtectionSimulate(ImpactProtectionBase):
+    """Simulated driver."""
+
     def get_version(self) -> str:
+        """Get simulated version."""
         return "SIM-ImpactProtection v1.0"
 
     def switch_mode(self, mode: str) -> ImpactState:
+        """Simulate mode switch."""
         return ImpactState(mode=mode, raw_response="SIM_OK")
 
     def close_all_gratings(self) -> ImpactState:
+        """Simulate closing grattings."""
         return ImpactState(mode="CLOSE_ALL", raw_response="SIM_OK")
 
     def close(self) -> None:
+        """Simulate closing connection."""
         pass
 
+    def port(self) -> str:
+        """Get the port this device is connected to."""
+        return "simulated-port"
 
-def _is_protocol_environment() -> bool:
-    try:
-        import opentrons.protocol_api  # noqa
-        return True
-    except Exception:
-        return False
 
 def BuildImpactProtection(
     simulate: bool = False,
     autosearch: bool = True,
     port: str = "",
-    skip_port: str = '',
-    ctx = None
+    skip_port: str = "",
 ) -> ImpactProtectionBase:
+    """Build a impact protection driver."""
     if simulate:
         return ImpactProtectionSimulate()
 
-    dev = ImpactProtectionSerial(ctx=ctx)
-    conret = dev.connect(autosearch=autosearch, port=port,skip_port=skip_port)
+    dev = ImpactProtectionSerial()
+    conret = dev.connect(autosearch=autosearch, port=port, skip_port=skip_port)
     if conret:
         return dev
     else:
-        return False
-
+        raise RuntimeError("Could not find and connect to impact protection.")
 
 
 if __name__ == "__main__":
-    aaa=BuildImpactProtection()
-    ttttt=input("输入延时时间:")
-    #aaa.connect()
+    aaa = BuildImpactProtection()
+    if aaa is None:
+        print("Could not build impact protection.")
+        exit(1)
+    ttttt = input("输入延时时间:")
+    # aaa.connect()
     # print(aaa.get_version())
     time.sleep(int(ttttt))
     print(aaa.switch_mode("M19").raw_response)

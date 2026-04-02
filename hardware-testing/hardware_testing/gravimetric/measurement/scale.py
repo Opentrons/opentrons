@@ -79,10 +79,10 @@ class Scale:
                 radwag.connect()
                 radwag.initialize()
                 scale_serial = radwag.read_serial_number()
-                
+
                 ui.print_info(f"found scale {scale_serial} on port {port.device}")
                 return port.device
-            except Exception as errr:  # noqa: E722
+            except Exception as errr:
                 print(errr)
             finally:
                 if radwag:

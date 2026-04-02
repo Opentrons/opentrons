@@ -2,11 +2,10 @@
 from datetime import datetime
 from urllib.request import Request, urlopen
 from typing import List
-import platform
 from json import loads as json_loads
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api import InstrumentContext, ProtocolContext
+from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.opentrons_api.helpers_ot3 import start_server_ot3, stop_server_ot3
 from hardware_testing.opentrons_api.types import Point

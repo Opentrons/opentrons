@@ -8,7 +8,7 @@ import abc
 import codecs
 import logging
 import time
-from typing import Tuple,Optional
+from typing import Tuple, Optional
 from abc import ABC
 from dataclasses import dataclass
 from . import list_ports_and_select
@@ -110,6 +110,8 @@ def BuildAsairSensor(
                 raise SerialException("No sensor found")
     ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
+
+
 def BuildAsairSensorWithPort(
     simulate: bool, autosearch: bool = True, port_substr: str = ""
 ) -> Tuple[AsairSensorBase, Optional[str]]:
@@ -144,6 +146,7 @@ def BuildAsairSensorWithPort(
                 raise SerialException("No sensor found")
     ui.print_info("no sensor found returning simulator")
     return SimAsairSensor(), None
+
 
 class AsairSensor(AsairSensorBase):
     """Asair sensor driver."""
@@ -274,11 +277,13 @@ class AsairSensor(AsairSensorBase):
             log.exception("Communication error")
             error_msg = "Asair Sensor not connected. Check if port number is correct."
             raise AsairSensorError(error_msg)
+
     def close(self) -> None:
         """Close the serial connection."""
-        if self._th_sensor and hasattr(self._th_sensor, 'close'):
+        if self._th_sensor and hasattr(self._th_sensor, "close"):
             self._th_sensor.close()
             ui.print_info("Asair sensor serial connection closed")
+
 
 class SimAsairSensor(AsairSensorBase):
     """Simulating Asair sensor driver."""
