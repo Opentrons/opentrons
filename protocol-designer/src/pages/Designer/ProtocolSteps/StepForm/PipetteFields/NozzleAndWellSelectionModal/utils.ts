@@ -16,6 +16,7 @@ import {
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
+  get96Channel384WellPlateWells
 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
@@ -200,7 +201,7 @@ export const getEntireWellSelection = (
       }
       if (channels === 96) {
         return is384Plate
-          ? skipEveryOtherWell(wellName, wellOrdering.flat())
+          ? get96Channel384WellPlateWells(wellOrdering.flat(), wellName)
           : wellOrdering.flat()
       }
       return [wellName]
