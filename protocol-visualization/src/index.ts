@@ -7,6 +7,10 @@ export type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
+export { AnnotatedSteps } from './organisms/AnnotatedSteps'
+
+export type { GroupedCommands, LeafNode } from './types'
+
 /**
  * Package identifier string (useful for diagnostics or feature flags).
  */
