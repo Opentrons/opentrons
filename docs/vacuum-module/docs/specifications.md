@@ -61,26 +61,80 @@ title: "Vacuum Module: Product Specifications"
 | Humidity | |
 | Altitude | Sea level to xxxx meters |
 
-## Input and output connections
+## Power supply
 
-The vacuum module has the following power requirements, which are met by the included power supply.
+The Vacuum Module requires the following power inputs, which are met by its internal power supply.
 
-!!!warning
-    Boilerplate warning text here.
-
-### Power specifications
-
-| Header | Header |
-|----|----|
-| Input | _xx_ VAC, _xx_ Hz, Amps? |
-| Output | _xx_ VDC, _xx_ A, _xx_ W max |
-| Mains supply voltage fluctuation | 100–240 VAC ±10% |
-| Anything else? | optional row, fuse? |
-
-### Power consumption
-
-- Typical: _xx_ W
-- Peak: _xx_ W
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Manufacturer</strong></td>
+      <td>Mean Well</td>
+    </tr>
+    <tr>
+        <td><strong>Model</strong></td>
+        <td>
+          <ul>
+            <li>LOP-200-24</li>
+            <li>Low-profile, open-frame internal power supply</li>
+          </ul>
+        </td>
+    </tr>
+    <tr>
+      <td><strong>Input Power</strong></td>
+      <td>
+        <ul>
+          <li>80–264 VAC</li>
+          <li>47–63 Hz</li>
+          <li>1A at 230 VAC or 2.5A at 115 VAC</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Output Power</strong></td>
+      <td>
+        <ul>
+          <li>24 VDC</li>
+          <li>2.7A to 25A (varies by model and cooling method)</li>
+          <li>140W maximum with natural convection or 200W maximum with forced-air cooling</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Overvoltage</strong></td>
+      <td>
+        <ul>
+          <li>Category III (OVC III)</li>
+          <li>Protection Type: Shutdown output voltage; requires re-powering to recover</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Mains Fluctuation</strong></td>
+      <td>
+        <ul>
+          <li>Line Regulation: ±0.5%</li>
+          <li>Voltage Tolerance: ±1.0% to ±3.0%</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Typical and Peak Consumption</strong></td>
+      <td>
+        <ul>
+          <li>No-load Power Consumption: <0.5W </li>
+          <li>Peak Load: 150% of rated power for up to 3 seconds</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## LED Status Light
 
