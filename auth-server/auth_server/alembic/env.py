@@ -1,4 +1,3 @@
-from logging.config import fileConfig
 from pathlib import Path
 
 from alembic import context
@@ -7,21 +6,27 @@ from sqlalchemy import engine_from_config, pool
 from server_utils import sql_utils
 
 from auth_server.persistence import orm_models as _orm_models  # noqa: F401
-from auth_server.persistence.database import Base
 from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
 )
+from auth_server.persistence.orm_models import Base
 from auth_server.server_settings import get_settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# FIXME(mm, 2026-03-27):
+#
+# When locally running Alembic's CLI, this log config needs to be uncommented to get output.
+# But, when running the dev server or production server, this needs to stay commented
+# to avoid clobbering the server's logging config.
+#
+# We might need to change how the server calls Alembic. https://stackoverflow.com/a/54402853/497934
+#
+# if config.config_file_name is not None:
+#     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

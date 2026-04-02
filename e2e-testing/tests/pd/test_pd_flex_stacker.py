@@ -219,11 +219,12 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     transfer_page.destination_labware_select(DESTINATION_LABWARE)
     transfer_page.open_nozzle_and_well_selector()
     transfer_page.select_nozzles()
-    transfer_page.wells_select("Source", SOURCE_LABWARE, [])
+    transfer_page.wells_select("Source", SOURCE_LABWARE, [], False)
     transfer_page.wells_select(
         "Destination",
         DESTINATION_LABWARE,
         ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"],
+        True,
     )
     transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("50")

@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler Module: G-Code Essentials"
+title: "Thermocycler Module: G-Code Concepts"
 description: "Thermocycler G-code syntax, examples, and configuration information."
 ---
 

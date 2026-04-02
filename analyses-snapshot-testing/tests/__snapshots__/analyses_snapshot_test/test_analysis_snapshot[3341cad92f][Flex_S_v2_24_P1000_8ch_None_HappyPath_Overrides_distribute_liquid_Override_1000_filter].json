@@ -9409,6 +9409,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [
     {
       "aspirate": {

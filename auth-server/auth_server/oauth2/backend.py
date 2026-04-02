@@ -166,12 +166,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if some user credentials are valid to log in, and if so, return that user."""
         user = self.__user_store.get(username)
-        # todo(tz, 2026-02-27): remove this check when we upgrade to sqlalchemy 2.0.
-        if (
-            user is not None
-            and user.hashed_password is not None
-            and password_hash.verify(password, user.hashed_password)
-        ):
+        if user is not None and password_hash.verify(password, user.hashed_password):
             request.user = UserResponse.from_orm_user(user)  # type: ignore[attr-defined]
             return True
         return False

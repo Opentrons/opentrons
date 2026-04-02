@@ -8,14 +8,14 @@ import {
   robotMassStorageDeviceEnumerated,
   robotMassStorageDeviceRemoved,
   sendFilePaths,
-} from './actions'
+} from '../actions'
 import {
   ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
-} from './constants'
-import { createLogger } from './log'
+} from '../constants'
+import { createLogger } from '../log'
 
-import type { Action, Dispatch } from './types'
+import type { Action, Dispatch } from '../types'
 
 const FLEX_USB_MOUNT_DIR = '/media/'
 const FLEX_USB_DEVICE_DIR = '/dev/'

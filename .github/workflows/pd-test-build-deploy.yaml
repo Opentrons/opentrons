@@ -22,10 +22,10 @@ on:
     branches:
       - 'edge'
       - 'chore_release*'
-      - 'pd-test*'
     tags:
       - 'protocol-designer*'
       - 'staging-protocol-designer*'
+      - 'pd-test*'
   workflow_dispatch: {}
 
 concurrency:

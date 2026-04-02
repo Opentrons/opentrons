@@ -72,7 +72,6 @@
   "required_type_title": "类型",
   "requires_csv": "需要CSV",
   "robot_name_last_run": "{{robot_name}}的上次运行",
-  "robot_type_first": "{{robotType}}协议优先",
   "run_again": "再次运行",
   "run_protocol": "运行协议",
   "run_timestamp_title": "运行时间戳",
