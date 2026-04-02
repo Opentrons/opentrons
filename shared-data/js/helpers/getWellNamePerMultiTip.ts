@@ -83,7 +83,8 @@ export function getWellNamePerMultiTip(
   let ninetySixChannelWells = orderedWells
   //  special casing 384 well plates to be every other well
   //  both on the x and y ases.
-  if (orderedWells.length === 384) {
+  const is384Plate = orderedWells.length === 384
+  if (is384Plate) {
     ninetySixChannelWells = get96Channel384WellPlateWells(
       orderedWells,
       topWellName
@@ -91,12 +92,30 @@ export function getWellNamePerMultiTip(
   }
   // get row
   if (channels === 12) {
-    const columnIndex = wellOrdering.findIndex(column =>
-      column.includes(topWellName)
-    )
+    const columnIndex = wellOrdering.findIndex(column => {
+      return column.includes(topWellName)
+    })
     const rowIndex = wellOrdering[columnIndex].indexOf(topWellName)
-    return wellOrdering.map(column => column[rowIndex])
+    if (!is384Plate) {
+      return wellOrdering.map(column => column[rowIndex])
+    } else {
+      return skipEveryOtherWell(
+        topWellName,
+        wellOrdering.map(column => column[rowIndex])
+      )
+    }
   }
-
+  if (channels < 8 && is384Plate && wellsAccessed !== null) {
+    return skipEveryOtherWell(topWellName, wellsAccessed)
+  }
   return channels === 8 ? wellsAccessed : ninetySixChannelWells
+}
+
+const skipEveryOtherWell = (hoveredWell: string, wells: string[]): string[] => {
+  const startIndex = wells.indexOf(hoveredWell)
+  const firstWell = startIndex % 2 === 0 ? 0 : 1
+  const filteredWells = wells.filter(
+    (_, index) => index >= firstWell && (index - firstWell) % 2 === 0
+  )
+  return filteredWells
 }

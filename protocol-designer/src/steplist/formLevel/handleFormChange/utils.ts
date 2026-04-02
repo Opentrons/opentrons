@@ -34,6 +34,7 @@ import {
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 
 import type {
+  ActiveNozzleNumber,
   BlowoutProperties,
   ByTipTypeSetting,
   DelayProperties,
@@ -118,7 +119,7 @@ export function chainPatchUpdaters(
 export function getAllWellsFromPrimaryWells(
   primaryWells: string[],
   labwareDef: LabwareDefinition2,
-  channels: 8 | 96
+  channels: ActiveNozzleNumber
 ): string[] {
   const allWells = primaryWells.reduce((acc: string[], well: string) => {
     const nextWellSet = getWellSetForMultichannel({
