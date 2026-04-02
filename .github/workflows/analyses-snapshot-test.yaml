@@ -42,7 +42,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Setup UV
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.12'
           enable-cache: true
@@ -97,7 +97,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Setup UV
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.12'
           enable-cache: true
@@ -134,7 +134,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Setup UV
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.12'
           enable-cache: true
