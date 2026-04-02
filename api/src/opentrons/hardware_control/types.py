@@ -26,6 +26,8 @@ from opentrons.config import feature_flags
 # to live in this file
 from opentrons.config.types import OT3AxisKind as OT3AxisKind
 
+from pydantic import BaseModel
+
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
 
@@ -302,15 +304,13 @@ class UpdateState(enum.Enum):
         return self.value
 
 
-@dataclass(frozen=True)
-class UpdateStatus:
+class UpdateStatus(BaseModel):
     subsystem: SubSystem
     state: UpdateState
     progress: int
 
 
-@dataclass
-class SubSystemState:
+class SubSystemState(BaseModel):
     ok: bool
     current_fw_version: int
     next_fw_version: int

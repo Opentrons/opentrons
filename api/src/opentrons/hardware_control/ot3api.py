@@ -143,6 +143,7 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
+    convert_result_to_wrapped_dict,
     pyro_behavior,
 )
 
@@ -386,7 +387,8 @@ class OT3API(
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
-
+    
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_deck_from_machine(
         self, machine_pos: Dict[Axis, float]
     ) -> Dict[Axis, float]:
@@ -724,6 +726,7 @@ class OT3API(
         self._gripper_handler.gripper = g
         return skipped
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
         # NOTE (spp, 2023-03-07): The return type of this method indicates that
         #  if a particular mount has no attached instrument then it will provide a
@@ -1046,6 +1049,7 @@ class OT3API(
     def _carriage_offset(self) -> top_types.Point:
         return top_types.Point(*self._config.carriage_offset)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1057,6 +1061,7 @@ class OT3API(
         ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
         return ot3_pos
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def current_position_ot3(
         self,
         mount: OT3Mount,
@@ -1143,6 +1148,7 @@ class OT3API(
     def encoder_status_ok(self, axis: Axis) -> bool:
         return self._backend.check_encoder_status([axis])
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1154,6 +1160,7 @@ class OT3API(
         """
         return await self.encoder_current_position_ot3(mount, critical_point, refresh)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def encoder_current_position_ot3(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1742,11 +1749,13 @@ class OT3API(
         async with self._motion_lock:
             await self._home(home_seq)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
         return self._backend.engaged_axes()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def engaged_axes(self) -> Dict[Axis, bool]:
         return self.get_engaged_axes()
 
@@ -1761,6 +1770,7 @@ class OT3API(
     def axis_is_present(self, axis: Axis) -> bool:
         return self._backend.axis_is_present(axis)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def get_limit_switches(self) -> Dict[Axis, bool]:
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
@@ -2520,6 +2530,7 @@ class OT3API(
         # Warning: don't use this in new code, used `hardware_pipettes` instead
         return self.hardware_pipettes
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): pd
@@ -2527,6 +2538,7 @@ class OT3API(
             if m != OT3Mount.GRIPPER
         }
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `get_attached_pipettes` instead
         return self.get_attached_pipettes()
@@ -2653,6 +2665,7 @@ class OT3API(
         return self.attached_pipettes
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): d
@@ -3223,6 +3236,7 @@ class OT3API(
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
         return self._backend.subsystems
