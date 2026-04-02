@@ -151,7 +151,6 @@ Run from the `protocol-designer/` directory:
 | `make test`            | Run PD tests (delegates to root `make test-js-protocol-designer`) |
 | `make test-cov`        | Tests with coverage                                               |
 | `make bundle-analyzer` | Analyze production bundle size                                    |
-| `make benchmarks`      | Run performance benchmarks (output in `benchmarks/output/`)       |
 
 ```bash
 # Run a specific test file
