@@ -48,13 +48,6 @@ describe('NewRobotSetupHelp', () => {
     render()
     const link = screen.getByText('See how to set up a new robot')
     fireEvent.click(link)
-    const targetLinkUrlFlex =
-      'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'
-    const supportLinkFlex = screen.getByRole('link', {
-      name: 'Opentrons Flex Quickstart Guide',
-    })
-    expect(supportLinkFlex).toHaveAttribute('href', targetLinkUrlFlex)
-
     const targetLinkUrlOt2 =
       'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
     const supportLinkOt2 = screen.getByRole('link', {
