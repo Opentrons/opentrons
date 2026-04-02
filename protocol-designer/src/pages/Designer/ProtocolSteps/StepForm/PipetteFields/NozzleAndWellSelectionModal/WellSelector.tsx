@@ -349,14 +349,14 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     switch (stepType) {
       case 'mix':
         return (
-          <StyledText desktopStyle="headingMediumBold">
+          <StyledText desktopStyle="headingSmallBold">
             {t('select_wells_to_mix_liquid_in', { labware: displayName })}
           </StyledText>
         )
 
       case 'aspirate':
         return (
-          <StyledText desktopStyle="headingMediumBold">
+          <StyledText desktopStyle="headingSmallBold">
             {t('select_wells_to_aspirate_liquid_from', {
               labware: displayName,
             })}
@@ -365,7 +365,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
       case 'dispense':
         return (
-          <StyledText desktopStyle="headingMediumBold">
+          <StyledText desktopStyle="headingSmallBold">
             {t('select_wells_to_dispense_liquid_into', {
               labware: displayName,
             })}
@@ -374,7 +374,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
       default:
         return (
-          <StyledText desktopStyle="headingMediumBold">
+          <StyledText desktopStyle="headingSmallBold">
             {displayName}
           </StyledText>
         )
