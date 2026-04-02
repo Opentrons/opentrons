@@ -10,13 +10,13 @@ import {
   E1_NOZZLE,
   F1_NOZZLE,
   G1_NOZZLE,
+  get96Channel384WellPlateWells,
   H1_NOZZLE,
   H12_NOZZLE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
-  get96Channel384WellPlateWells
 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
