@@ -1,4 +1,4 @@
-# Lint, test, and build @opentrons/protocol-visualization (modeled on components CI).
+# Test and build @opentrons/protocol-visualization (modeled on components CI).
 
 name: 'Protocol visualization — lint, test, build'
 
@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/js/setup
       - name: 'typescript project build'
-        run: make -C protocol-visualization check-ts
+        run: make -C protocol-visualization build-ts
       - name: 'unit tests with coverage'
         run: make -C protocol-visualization test-cov
       - name: 'vite lib build'

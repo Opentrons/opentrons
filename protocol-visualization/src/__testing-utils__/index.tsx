@@ -1,6 +1,8 @@
 import { I18nextProvider, initReactI18next } from 'react-i18next'
-import { render, RenderResult } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import i18n from 'i18next'
+
+import type { RenderResult } from '@testing-library/react'
 
 // minimal i18n instance - returns key as value
 const testI18n = i18n.createInstance()

@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { AnnotatedStepsRowItem } from '../AnnotatedStepsRowItem'
-import { ItemData } from '../index'
 
 import type { RowComponentProps } from 'react-window'
+import type { ItemData } from '../index'
 
 vi.mock('../AnnotatedGroup', () => ({
   AnnotatedGroup: () => <div>mock AnnotatedGroup</div>,
