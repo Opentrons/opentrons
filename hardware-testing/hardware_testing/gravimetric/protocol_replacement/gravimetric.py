@@ -458,6 +458,17 @@ class FixtureSettings(CSVSettings):
             )
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
+        # do LPC when it is simulating
+        if fast_simulate:
+            for volume, slot_list in csv_settings.tips.items():
+                for slot in slot_list:
+                    _labware = ctx.load_labware(
+                        f"opentrons_flex_96_tiprack_{volume}uL", slot
+                    )
+                    pipette.pick_up_tip(_labware.wells()[0])
+                    pipette.aspirate(volume, source_well)
+                    pipette.dispense(volume, source_well)
+                    pipette.drop_tip()
 
         test_report = report.create_csv_test_report(
             volumes=csv_settings.volumes_flat,
@@ -1847,7 +1858,7 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
-    if fixture_settings.ctx.is_simulating():
+    if fixture_settings.fast_simulate:
         print_info("Simulating. Not running actual tests and stopping analysis.")
         return
     try:
