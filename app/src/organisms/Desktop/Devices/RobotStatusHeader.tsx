@@ -182,7 +182,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           {iconName != null ? (
             <Btn
               {...targetProps}
-              marginRight={SPACING.spacing8}
               onClick={() => {
                 navigate(`/devices/${name}/robot-settings/networking`)
               }}
