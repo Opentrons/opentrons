@@ -33,7 +33,7 @@ jobs:
       CI: true
     steps:
       - name: Checkout target branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 1
@@ -41,7 +41,7 @@ jobs:
       - uses: ./.github/actions/js/setup
 
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: '3.12'
 
@@ -52,7 +52,7 @@ jobs:
         run: uv run scripts/locize_sync.py ${{ inputs.locize_action }}
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
           base: ${{ inputs.target_branch }}
