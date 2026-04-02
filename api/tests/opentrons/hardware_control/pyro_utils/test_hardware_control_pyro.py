@@ -10,9 +10,8 @@ from decoy import Decoy
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.hardware_control import ThreadManager, modules
+from opentrons.hardware_control import HardwareControlAPI, ThreadManager, modules
 from opentrons.hardware_control import types as hw_types
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.modules import (
@@ -28,12 +27,12 @@ from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
+from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 
 
 @pytest.fixture
@@ -209,25 +208,36 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> Non
     await ot3api.home()
 
     assert ot3api.get_all_attached_instr() == managed_obj.get_all_attached_instr()
-    data: Dict[hw_types.Axis, float] = {hw_types.Axis.X: 0.0}
-    #assert ot3api.get_deck_from_machine(machine_pos = data) == managed_obj.get_deck_from_machine(machine_pos=data)
+    data: Dict[hw_types.Axis, float] = {
+        hw_types.Axis.X: 0,
+        hw_types.Axis.Y: 0,
+        hw_types.Axis.Z_L: 0,
+        hw_types.Axis.Z_R: 0,
+        hw_types.Axis.P_L: 0,
+        hw_types.Axis.P_R: 0,
+        hw_types.Axis.Z_G: 0,
+        hw_types.Axis.G: 0,
+    }
+    assert ot3api.get_deck_from_machine(
+        machine_pos=data
+    ) == managed_obj.get_deck_from_machine(machine_pos=data)
 
     assert ot3api.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert await ot3api.current_position_ot3(
+    assert ot3_proxy.current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert await ot3api.encoder_current_position(
+    assert ot3_proxy.encoder_current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert await ot3api.encoder_current_position_ot3(
+    assert ot3_proxy.encoder_current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
@@ -235,11 +245,9 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> Non
     assert ot3api.get_engaged_axes() == managed_obj.get_engaged_axes()
     assert ot3api.engaged_axes == managed_obj.engaged_axes
 
-    assert await ot3api.get_limit_switches() == await managed_obj.get_limit_switches()
+    assert ot3_proxy.get_limit_switches() == await managed_obj.get_limit_switches()
     assert ot3api.get_attached_pipettes() == managed_obj.get_attached_pipettes()
-    assert (
-        ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
-    )
+    assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
     assert ot3api.attached_pipettes == managed_obj.attached_pipettes
     assert ot3api.attached_subsystems == managed_obj.attached_subsystems
 

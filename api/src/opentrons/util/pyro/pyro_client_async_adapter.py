@@ -5,6 +5,8 @@ from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
 
+from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
+
 T = TypeVar("T")
 P = ParamSpec("P")
 
@@ -58,7 +60,7 @@ def _build_classdict(
             yield (method, async_method)
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, attribute)
+            yield (method, wrap_parameter_validation(attribute))
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -91,7 +93,8 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             # This must be done because Pyro only accepts proxy calls from the thread that owns the proxy
             thread_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
             func = getattr(thread_proxy, func_name)
-            return func(*args, **kwargs)
+            validated_func = wrap_parameter_validation(func)
+            return validated_func(self, *args, **kwargs)
 
         # Return a Coroutine that may be awaited, it will execute the `_thread_call` when called
         return await asyncio.to_thread(
@@ -111,3 +114,52 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
 def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
     """Wrapper to produce a call forward to a specified attribute of a Proxy object."""
     return lambda self, current_attr=attr: getattr(proxy, current_attr)
+
+
+def wrap_parameter_validation(attr: Any) -> Any:
+    """Validate outbound parameter requests before allowing serialization."""
+
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        # Validate individual arguments before forwarding the call
+        def _validations(arg: Any) -> Any:
+            # Extend this as further validations are needed
+            arg = _validate_hashable(arg)
+            return arg
+        if len(args) > 0:
+            validated_args = tuple()
+            for arg in args:
+                validated_args = (*validated_args, _validations(arg))
+        else:
+            validated_args = args
+        if len(kwargs) > 0:
+            for key in kwargs.keys():
+                kwargs[key] = _validations(kwargs[key])
+
+        return attr(*validated_args, **kwargs)
+
+    return wrapper
+
+
+# Hashable dictionary parameter validation
+def _validate_hashable(arg: Any) -> Any:
+    if isinstance(arg, dict):
+        try:
+            hash(arg)
+        except TypeError:
+            if all(
+                isinstance(key, type(list(arg.keys())[0])) for key in arg.keys()
+            ) and all(
+                isinstance(value, type(list(arg.values())[0])) for value in arg.values()
+            ):
+                key_type = type(list(arg.keys())[0])
+                value_type = type(list(arg.values())[0])
+            else:
+                raise KeyError(
+                    "Async Client Pyro Object does not support transmission of multitype unhashable dictionaries."
+                )
+            return UnhashableDictWrapper(
+                dictionary=arg,
+                key_type=".".join((key_type.__module__, key_type.__qualname__)),
+                value_type=".".join((value_type.__module__, value_type.__qualname__)),
+            )
+    return arg

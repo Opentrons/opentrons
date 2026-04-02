@@ -196,7 +196,7 @@ class OpentronsPyroSerializer:
 
         if key_model is None or value_model is None:
             raise TypeError(
-                f"Could not convert Dictionary item `{d["key_type"] if key_model is None else d["value_type"]}` to an object, unregistered with pyro."
+                f"Could not convert Dictionary item `{d['key_type'] if key_model is None else d['value_type']}` to an object, unregistered with pyro."
             )
         unwrapped_dictionary = {}
         # Unwrap the dictionary and format all keys and values to respective types
