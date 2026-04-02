@@ -387,7 +387,7 @@ class OT3API(
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
-    
+
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_deck_from_machine(
         self, machine_pos: Dict[Axis, float]
@@ -1058,7 +1058,9 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
-        ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
+        ot3_pos: Dict[Axis, float] = await self.current_position_ot3(
+            realmount, critical_point, refresh
+        )
         return ot3_pos
 
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
@@ -1158,7 +1160,10 @@ class OT3API(
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        return await self.encoder_current_position_ot3(mount, critical_point, refresh)
+        ot3_encoder_position: Dict[
+            Axis, float
+        ] = await self.encoder_current_position_ot3(mount, critical_point, refresh)
+        return ot3_encoder_position
 
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def encoder_current_position_ot3(
@@ -1757,7 +1762,8 @@ class OT3API(
     @property
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def engaged_axes(self) -> Dict[Axis, bool]:
-        return self.get_engaged_axes()
+        axes: Dict[Axis, bool] = self.get_engaged_axes()
+        return axes
 
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes(which)
@@ -2541,7 +2547,8 @@ class OT3API(
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `get_attached_pipettes` instead
-        return self.get_attached_pipettes()
+        pipettes: Dict[top_types.Mount, PipetteDict] = self.get_attached_pipettes()
+        return pipettes
 
     async def get_instrument_state(
         self,
@@ -2821,7 +2828,8 @@ class OT3API(
         )
         machine_pos = await self._backend.update_position()
         machine_pos[Axis.by_mount(mount)] = end_z
-        deck_end_z = self.get_deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        deck_from_machine: Dict[Axis, float] = self.get_deck_from_machine(machine_pos)
+        deck_end_z = deck_from_machine[Axis.by_mount(mount)]
         offset = offset_for_mount(
             mount,
             top_types.Point(*self._config.left_mount_offset),

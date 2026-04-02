@@ -14,6 +14,7 @@ from typing import (
     cast,
 )
 
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import Literal
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
@@ -25,8 +26,6 @@ from opentrons.config import feature_flags
 # this is an explicit re-export that exists for backward compatibility - this type used
 # to live in this file
 from opentrons.config.types import OT3AxisKind as OT3AxisKind
-
-from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
@@ -305,6 +304,8 @@ class UpdateState(enum.Enum):
 
 
 class UpdateStatus(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     subsystem: SubSystem
     state: UpdateState
     progress: int

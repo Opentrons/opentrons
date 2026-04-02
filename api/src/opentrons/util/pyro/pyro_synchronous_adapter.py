@@ -5,10 +5,11 @@ import functools
 import inspect
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
-from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
 
 from pydantic import BaseModel
 from Pyro5 import api as pyro
+
+from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -332,7 +333,7 @@ def convert_result_to_proxy(  # noqa: C901
     """
 
     @functools.wraps(attr)
-    def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
@@ -367,32 +368,33 @@ def convert_result_to_proxy(  # noqa: C901
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
         return property(wrapper)
-    return wrapper
+    return wrapper  # type: ignore
 
 
-def convert_result_to_wrapped_dict(
-        utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+def convert_result_to_wrapped_dict(  # noqa: C901
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
 ) -> Callable[P, T]:
-    """Wrapper that ensures a result of a method call through Pyro is a wrapped dictionary, which
-    is later deserialzed by serpent using special registries for UnhashableDictWrapper.
+    """Wrapper that ensures a result of a method call through Pyro is a wrapped dictionary.
 
-    This particularly pretains to dictionary results that may contain keys which are mutable, such as SubSystem.
+    The result of this is later deserialzed by serpent using special registries for UnhashableDictWrapper. This
+    particularly pretains to dictionary results that may contain keys which are mutable, such as SubSystem.
     """
+
     @functools.wraps(attr)
-    def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
             result = bound_method(*args, **kwargs)
-            return_types = attr.__annotations__['return']
+            return_types = attr.__annotations__["return"]
         elif isinstance(attr, FunctionType):
             bound_method = MethodType(attr, core_obj)
             result = bound_method(*args, **kwargs)
-            return_types = attr.__annotations__['return']
+            return_types = attr.__annotations__["return"]
         elif isinstance(attr, property):
             result = getattr(core_obj, name)
-            return_types = attr.fget.__annotations__['return']
+            return_types = attr.fget.__annotations__["return"]
         else:
             raise ValueError(
                 "Provided base attribute must be a Property, a Method or an Async method."
@@ -407,24 +409,33 @@ def convert_result_to_wrapped_dict(
                 except AttributeError:
                     pass
                 try:
-                    value_type = next(a for a in value_type.__args__ if a is not type(None))
+                    value_type = next(
+                        a for a in value_type.__args__ if a is not type(None)
+                    )
                 except AttributeError:
                     pass
                 wrapped_dict = UnhashableDictWrapper(
                     dictionary=result,
                     key_type=".".join((key_type.__module__, key_type.__qualname__)),
-                    value_type=".".join((value_type.__module__, value_type.__qualname__))
+                    value_type=".".join(
+                        (value_type.__module__, value_type.__qualname__)
+                    ),
                 )
                 return wrapped_dict
             else:
-                raise ValueError("Pyro behavior for dictionary wrapping requires function return types.")
+                raise ValueError(
+                    "Pyro behavior for dictionary wrapping requires function return types."
+                )
         else:
-            raise ValueError("Pyro behavior for dictionary wrapping is only available for use with dictionaries.")
+            raise ValueError(
+                "Pyro behavior for dictionary wrapping is only available for use with dictionaries."
+            )
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
         return property(wrapper)
-    return wrapper
+    return wrapper  # type: ignore
+
 
 ## Local Specialty Functions - Used to wrap attributes on the original instance
 

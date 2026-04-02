@@ -3,8 +3,8 @@
 from typing import Dict
 
 import opentrons.config.types
-import opentrons.hardware_control.types
 import opentrons.hardware_control.dev_types
+import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
@@ -46,7 +46,12 @@ def register_hardware_types() -> None:
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
     opentrons_types = find_enums_in_packages(
-        [opentrons.types, opentrons.config.types, opentrons.hardware_control.types, opentrons.hardware_control.dev_types]
+        [
+            opentrons.types,
+            opentrons.config.types,
+            opentrons.hardware_control.types,
+            opentrons.hardware_control.dev_types,
+        ]
     )
 
     with serpent_enum_registration():
@@ -66,7 +71,6 @@ def register_hardware_types() -> None:
         OpentronsPyroSerializer.register_typed_dict(typed_dict)
 
     OpentronsPyroSerializer.register_unhashable_dicts()
-
 
     # E-Stop Overall registration
     register_type_to_serpent(
