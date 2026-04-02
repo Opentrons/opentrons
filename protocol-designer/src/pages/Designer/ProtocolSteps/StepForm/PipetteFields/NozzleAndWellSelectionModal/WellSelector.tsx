@@ -374,9 +374,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
       default:
         return (
-          <StyledText desktopStyle="headingSmallBold">
-            {displayName}
-          </StyledText>
+          <StyledText desktopStyle="headingSmallBold">{displayName}</StyledText>
         )
     }
   }
@@ -444,7 +442,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       </>
     )
   }
-
   return (
     <>
       <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>

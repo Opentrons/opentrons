@@ -163,8 +163,9 @@ export const skipEveryOtherWell = (
   wells: string[]
 ): string[] => {
   const startIndex = wells.indexOf(hoveredWell)
+  const firstWell = startIndex % 2 === 0 ? 0 : 1
   const filteredWells = wells.filter(
-    (_, index) => index >= startIndex && (index - startIndex) % 2 === 0
+    (_, index) => index >= firstWell && (index - firstWell) % 2 === 0
   )
   return filteredWells
 }
@@ -218,7 +219,6 @@ export const getEntireWellSelection = (
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
-
       const column = wellOrdering[columnIndex]
       const count = is384Plate
         ? PARTIAL_NOZZLE_MAP[primaryNozzle] * 2
@@ -252,7 +252,7 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
 ): string[] => {
   const inaccessible: string[] = []
   const selectedFlat = selectedWells.flat()
-
+  const is384Plate = wellDefMap.flat().length === 384
   for (const column of wellDefMap) {
     // Find indices of selected wells within the column
     const selectedIndices = selectedFlat
@@ -270,7 +270,7 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
         .slice(start, end)
         .filter(well => allWellsWithState[well] !== INACCESSIBLE)
       // Only mark inaccessible if chunk is smaller than channels
-      if (chunk.length > 0 && chunk.length < channels) {
+      if (chunk.length > 0 && chunk.length < channels && !is384Plate) {
         chunk.forEach(well => {
           if (!inaccessible.includes(well)) inaccessible.push(well)
         })

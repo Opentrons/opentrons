@@ -340,4 +340,16 @@ describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
       )
     ).toStrictEqual(['A1', 'H1'])
   })
+  it('marks does not mark wells as inaccessible during 384 plate', () => {
+    const twoChannels = 4
+    const selectedWells4Grouping = [['A1', 'C1', 'E1', 'G1']]
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells4Grouping,
+        fixture384Plate.ordering,
+        allWellsWithState,
+        twoChannels
+      )
+    ).toStrictEqual([])
+  })
 })
