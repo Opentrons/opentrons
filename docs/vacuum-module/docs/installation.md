@@ -8,23 +8,46 @@ Follow these instructions to install the Vacuum Module.
 !!! warning
     Turn off the power to your Flex before you begin. This prevents someone from using the robot while you're working in the enclosure.
 
+<!-- tube inner diameter in inches (&frac14;, &frac38;), for now. Will use metric later.-->
+
 <div class="instruction-list" markdown>
 
 ## Part 1: Deck preparation
 
-1. Clear the deck: Remove any attached modules and labware. Also, the deck plate adapter and other pieces install in slot A3 only. Remove the waste bin or any labware or modules from this location.
+!!! info "Deck slot requirement"
+    The Vacuum Module and its adapter components must be installed in slots A3—A4 only.
+    ![Deck map with slot A3 and A4 highlighted](images/vacuum-module-deck-slot.svg)
 
-2. Install the deck plate: Place the adapter plate in slot A3 so the open part provides access to the space below the deck. Use the provided screwdriver and screws to fasten the plate securely to the deck.
+1. **Clear the deck:** Remove all modules and labware from the robot. Ensure Slot A3 is completely empty, including the default waste bin.
 
-    <font color="red">IMAGE PLACEHOLDER?</font>
+2. **Install the deck plate:** Attach the adapter plate to Slot A3. Secure it to the deck using the included screwdriver and screws. The plate extends into the next column to provide storage in slot A4. 
 
-3. 
+    <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
+    ![Placeholder for deck plate installation](../../../stacker/images/deck-plate-attaching.png)
+    <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
 
-## External parts setup
+3. **Install the manifold:** Seat the base plate and collar firmly into the adapter.
 
+4. **Route tubing:** Secure one end of the 6 mm (&frac14;") vacuum tube to the base plate. Feed the rest of the tube through the deck opening to the area where your collection jar will sit.
 
-## Connect power part
+## Part 2: External parts setup
 
+5. **Place jar:** Position the waste collection jar on the lab bench. For best results, put it at or below the level of the vacuum pump.
 
+6. **Secure cap:** Hand tighten the GL60 cap to the jar. Do not over-tighten. This is not a trial of strength.
+
+7. **Connect waste tube:** Attach the free end of the 6 mm (&frac14;") tube from the manifold base to the jar inlet. You can measure and cut the tube to length as needed.
+
+8. **Connect vacuum tube:** Attach the 9.5 mm (&frac38;") tube from the jar outlet to the vacuum pump. You can measure and cut the tube to length as needed.
+
+## Part 3: Data and power connections
+
+9. **Data connection:** Connect the USB cable to the pump and to an available USB port on the Flex.
+
+10. **Power connection:** Connect the power cable to the pump and power outlet.
+
+11. **Initialize module:** Turn on power to your robot. After it starts, turn on the power to the vacuum module. The LED light on the vacuum pump <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>
+
+12. **Verify installation:** Follow the instructions and animations on the touchscreen or in the Opentrons App to complete the installation.
 
 </div>
