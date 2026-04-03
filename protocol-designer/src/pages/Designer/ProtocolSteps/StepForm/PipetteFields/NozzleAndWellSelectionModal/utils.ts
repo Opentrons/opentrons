@@ -122,7 +122,7 @@ export const getAvailablePrimaryNozzles = (
         F1_NOZZLE,
       ],
     },
-    1: { ALL: [A1_NOZZLE] },
+    1: { ALL: [A1_NOZZLE], SINGLE: [A1_NOZZLE] },
   }
   const filteredAllowedNozzles =
     allowedNozzlesMapping[channels][nozzleConfiguration]
