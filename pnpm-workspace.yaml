@@ -21,3 +21,5 @@ onlyBuiltDependencies:
   - esbuild
   - '@serialport/bindings-cpp'
   - usb
+
+minimumReleaseAge: 10080 # 1 week
