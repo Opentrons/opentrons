@@ -126,15 +126,13 @@ def wrap_parameter_validation(attr: Any) -> Any:
             arg = _validate_hashable(arg)
             return arg
 
-        if len(args) > 0:
-            validated_args = tuple()  # type: ignore
-            for arg in args:
-                validated_args = (*validated_args, _validations(arg))
-        else:
-            validated_args = args
-        if len(kwargs) > 0:
-            for key in kwargs.keys():
-                kwargs[key] = _validations(kwargs[key])
+        validated_args = tuple()  # type: ignore
+        for arg in args:
+            # Validate each non-keyword argument and reconstruct the argument tuple
+            validated_args = (*validated_args, _validations(arg))
+        # Validate each keyword argument and reconstruct the kwargs dictionary
+        kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
+
         return attr(*validated_args, **kwargs)
 
     return wrapper
@@ -142,6 +140,12 @@ def wrap_parameter_validation(attr: Any) -> Any:
 
 # Hashable dictionary parameter validation
 def _validate_hashable(arg: Any) -> Any:
+    """Handle an argument which is a dictionary and is not hashable (uses mutable Opentrons types as keys).
+
+    This function will do the above by stripping out the types for a given key and value (multityped dictionaries
+    not supported) and wrapping the entire dictionary and these known types into an UnhashableDictWrapper. This
+    will then be deserialized back into it's original form by the OpentronsPyroSerializer library.
+    """
     if isinstance(arg, dict):
         try:
             hash(arg)

@@ -221,9 +221,12 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
         hw_types.Axis.Z_G: 0,
         hw_types.Axis.G: 0,
     }
+    # test with kwargs
     assert ot3api.get_deck_from_machine(
         machine_pos=data
     ) == managed_obj.get_deck_from_machine(machine_pos=data)
+    # test with args, no kwargs
+    assert ot3api.get_deck_from_machine(data) == managed_obj.get_deck_from_machine(data)
 
     await managed_obj.home()
     assert await ot3api.current_position(
