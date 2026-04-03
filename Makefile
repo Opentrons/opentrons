@@ -63,6 +63,15 @@ setup-js:
 	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 
+# front-end dependencies install for CI
+.PHONY: setup-js-ci
+setup-js-ci:
+	yarn config set network-timeout 60000
+	yarn install --frozen-lockfile
+	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
+
+
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py

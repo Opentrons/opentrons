@@ -67,7 +67,7 @@ from opentrons.protocol_runner import RunResult
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 
 OutputKind = Literal["json", "human-json"]

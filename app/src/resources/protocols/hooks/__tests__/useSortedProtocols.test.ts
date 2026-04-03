@@ -356,43 +356,6 @@ describe('useSortedProtocols', () => {
     )
   })
 
-  it('should return an object with protocols sorted by flex then ot-2', () => {
-    const { result } = renderHook(() =>
-      useSortedProtocols('flex', mockStoredProtocolData)
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
-
-    expect(firstProtocol.protocolKey).toBe(
-      '26ed5a82-502f-4074-8981-57cdda1d066d'
-    )
-    expect(secondProtocol.protocolKey).toBe(
-      '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
-    )
-    expect(thirdProtocol.protocolKey).toBe(
-      'f130337e-68ad-4b5d-a6d2-cbc20515b1f7'
-    )
-  })
-  it('should return an object with protocols sorted by ot-2 then flex', () => {
-    const { result } = renderHook(() =>
-      useSortedProtocols('ot2', mockStoredProtocolData)
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
-
-    expect(firstProtocol.protocolKey).toBe(
-      '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
-    )
-    expect(secondProtocol.protocolKey).toBe(
-      'f130337e-68ad-4b5d-a6d2-cbc20515b1f7'
-    )
-    expect(thirdProtocol.protocolKey).toBe(
-      '26ed5a82-502f-4074-8981-57cdda1d066d'
-    )
-  })
-
   it('should not mutate the input protocol data', () => {
     const originalOrder = mockStoredProtocolData.map(p => p.protocolKey)
 

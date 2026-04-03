@@ -18,10 +18,7 @@ def sql_engine_ctx(
     db_path: Path,
 ) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Context-managed engine that disposes itself on exit."""
-    engine = sqlalchemy.create_engine(
-        sql_utils.get_connection_url(db_path),
-        future=True,
-    )
+    engine = sqlalchemy.create_engine(sql_utils.get_connection_url(db_path))
     try:
         sql_utils.enable_foreign_key_constraints(engine)
         sql_utils.fix_transactions(engine)

@@ -58,12 +58,12 @@ jobs:
             ${{ github.workspace }}/.npm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
-      - name: 'setup-js'
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js-ci
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov
       - name: 'Upload coverage report'

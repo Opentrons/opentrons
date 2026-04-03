@@ -136,8 +136,8 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js-ci
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
       - name: 'Upload coverage report'
@@ -258,8 +258,8 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js-ci
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'

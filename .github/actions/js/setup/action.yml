@@ -39,4 +39,4 @@ runs:
 
     - name: 'Setup JS'
       shell: bash
-      run: make setup-js
+      run: make setup-js-ci

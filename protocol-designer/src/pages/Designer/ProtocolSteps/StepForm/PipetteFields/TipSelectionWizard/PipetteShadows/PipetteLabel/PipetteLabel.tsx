@@ -32,7 +32,6 @@ function PipetteLabelComponent(
       <Flex
         ref={ref}
         fontSize={isZoomed ? '5px' : '13px'}
-        data-testid={`PipetteLabel_${isError ? 'Inaccessible' : 'Accessible'}`}
         className={clsx(styles.pipette_label_base, {
           [styles[`pipette_label_${placement}`]]: placement,
           [styles.pipette_label_accessible]: !isError,

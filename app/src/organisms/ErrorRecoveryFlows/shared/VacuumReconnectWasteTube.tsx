@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
+import AttachCarboyCap from '/app/assets/videos/error-recovery/Vacuum_AttachCarboyCap.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
@@ -23,8 +24,7 @@ export function VacuumReconnectWasteTube(
           headline={t('reconnect_waste_tube_to_carboy')}
           message={t('secure_connection_needed')}
         />
-        {/* TODO(nd, 02-24-26): Add animation */}
-        <RightColumnAnimation animationSrc={''} />
+        <RightColumnAnimation animationSrc={AttachCarboyCap} />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}

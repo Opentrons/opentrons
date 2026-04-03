@@ -73,6 +73,15 @@ jobs:
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.pnpm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
+      - name: 'setup-js-ci'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
+          make setup-js-ci
+      - name: Lint
+        run: make -C g-code-testing lint
       - name: Test
         run: make -C g-code-testing test
       - name: 'Upload coverage report'

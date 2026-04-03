@@ -21,7 +21,6 @@ module.exports = {
     'app-shell-odd/**',
     '__mocks__/**',
     'protocol-designer/fixtures/**',
-    'protocol-designer/benchmarks/**',
     'components/src/__mocks__/**',
     'app/scripts/**',
     'e2e-testing/**',

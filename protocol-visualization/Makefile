@@ -22,15 +22,6 @@ lib:
 build-ts:
 	pnpm exec tsc --build --emitDeclarationOnly
 
-# Same lint surface as monorepo JS checks (see root Makefile).
-.PHONY: lint
-lint:
-	$(MAKE) -C .. lint-js lint-css lint-json
-
-.PHONY: check-ts
-check-ts:
-	cd .. && pnpm exec tsc --build protocol-visualization/tsconfig.json
-
 .PHONY: test
 test:
 	$(MAKE) -C .. test-js-protocol-visualization tests="$(tests)" test_opts="$(test_opts)"

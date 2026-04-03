@@ -1,5 +1,6 @@
 """User store – pure data access layer for user persistence."""
 
+from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -25,17 +26,17 @@ class UserStore:
         """Insert users that don't already exist (matched by username)."""
         with self._session() as session:
             for user in users:
-                if (
-                    session.query(User).filter(User.username == user.username).first()
-                    is None
-                ):
+                existing = session.scalar(
+                    select(User).where(User.username == user.username)
+                )
+                if existing is None:
                     session.add(user)
             session.commit()
 
     def get(self, username: str) -> User | None:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:
-            user = session.query(User).filter(User.username == username).first()
+            user = session.scalar(select(User).where(User.username == username))
             if user is not None:
                 session.expunge(user)
             return user
@@ -66,7 +67,7 @@ class UserStore:
         Raises ``ValueError`` if the user does not exist.
         """
         with self._session() as session:
-            user = session.query(User).filter(User.username == username).first()
+            user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             session.delete(user)
@@ -85,9 +86,7 @@ class UserStore:
         Raises ``ValueError`` if the user does not exist.
         """
         with self._session() as session:
-            user: User | None = (
-                session.query(User).filter(User.username == username).first()
-            )
+            user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             updates: dict[str, object] = {

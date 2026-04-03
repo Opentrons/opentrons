@@ -75,27 +75,27 @@ jobs:
             ${{ github.workspace }}/.npm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
-      - name: 'setup-js'
-        id: 'setup-js'
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js-ci'
+        id: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
-          make setup-js
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js-ci
         # Use the if to run all the lint checks even of some fail
         shell: bash
       - name: 'typechecks'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make check-js
       - name: 'lint js'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-js
       - name: 'circular deps'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make circular-dependencies-js
       - name: 'lint json'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-json
       - name: 'lint css'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-css

@@ -1,9 +1,12 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 
 
 class UpdateProtocol(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
     prompt: str = Field(..., description="Prompt")
     protocol_text: str = Field(..., description="Text of the protocol")
     regenerate: bool = Field(..., description="Flag to indicate if regeneration is needed")
@@ -12,4 +15,4 @@ class UpdateProtocol(BaseModel):
     ] = Field(..., description="Type of update")
     update_details: str = Field(..., description="Details of the update")
     fake: Optional[bool] = Field(False, description="Fake response?")
-    fake_key: Optional[int] = Field(None, description="type of response")
+    fake_key: Optional[str] = Field(None, description="Fake response key for testing")

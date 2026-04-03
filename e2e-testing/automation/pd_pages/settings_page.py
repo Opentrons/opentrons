@@ -14,7 +14,7 @@ class SettingsPage(BasePage):
     def navigate_to_settings(self) -> None:
         """Navigate to settings page via clicking Settings button."""
         # Cypress: cy.getByTestId('SettingsIconButton').click()
-        self.page.get_by_test_id("SettingsIconButton").click()
+        self.page.get_by_label("Settings Icon Button").click()
 
     def wait_for_settings_page(self) -> None:
         """Wait for settings page to load.
