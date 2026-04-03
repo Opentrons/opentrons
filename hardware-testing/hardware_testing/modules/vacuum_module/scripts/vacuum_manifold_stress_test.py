@@ -304,9 +304,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
     perstaltic_pump_flow_rate = 70  # mL/min
-    water_tolerance = 5
     conversion = ((perstaltic_volume_target/1000) / perstaltic_pump_flow_rate)*60 #Convert ul to ml
-    perstaltic_time = int( conversion + water_tolerance)
+    perstaltic_time = int( conversion)
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
