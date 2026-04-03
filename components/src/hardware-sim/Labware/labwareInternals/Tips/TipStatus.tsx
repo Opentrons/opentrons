@@ -50,7 +50,7 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
         />
       )
     case INACCESSIBLE:
-      return <InaccessibleTip size={size} wellName={wellName} />
+      return <InaccessibleTip size={size} />
     case SELECTED_USED:
       return (
         <SelectedWell
