@@ -240,6 +240,15 @@ def _build_classdict(  # noqa: C901
                 and specialty_behavior.apply_local is False
             ):
                 # Apply the specialty function to the attribute on this PSO instance and expose the wrapped specialty method
+                if inspect.iscoroutinefunction(attr):
+                    async_metadata = {
+                        "__module__": attr.__module__,
+                        "__name__": attr.__name__,
+                        "__qualname__": attr.__qualname__,
+                        "__doc__": attr.__doc__,
+                        "__type_params__": attr.__type_params__,
+                    }
+                    async_methods[name] = async_metadata
                 exposed = pyro.expose(
                     specialty_behavior.specialty_function(utility, core_obj, name, attr)
                 )

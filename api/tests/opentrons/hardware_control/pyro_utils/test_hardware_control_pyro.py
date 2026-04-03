@@ -11,7 +11,7 @@ from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.hardware_control import HardwareControlAPI, ThreadManager, modules
+from opentrons.hardware_control import ThreadManager, modules
 from opentrons.hardware_control import types as hw_types
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.modules import (
@@ -157,7 +157,10 @@ async def test_pyro_behavior_on_modules(
         assert utility.find_PSO(mod) is None
 
 
-async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> None:
+async def test_pyro_behavior_ot3api_unhashable_dicts(
+    managed_obj: OT3API,
+    decoy: Decoy,
+) -> None:
     """Test the pyro behavior for unhashable dictionaries with pyro by ensuring several OT3API commands have the expected results."""
     sock = socket.socket()
     sock.bind(("localhost", 0))
@@ -204,7 +207,7 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> Non
     uri = pyro.resolve(uri="PYRONAME:OT3API")
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
     ot3_async = AsyncClientPyroObject(ot3_proxy)
-    ot3api = cast(HardwareControlAPI, ot3_async)
+    ot3api = cast(OT3API, ot3_async)
     await ot3api.home()
 
     assert ot3api.get_all_attached_instr() == managed_obj.get_all_attached_instr()
@@ -222,22 +225,23 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> Non
         machine_pos=data
     ) == managed_obj.get_deck_from_machine(machine_pos=data)
 
-    assert ot3api.current_position(
+    await managed_obj.home()
+    assert await ot3api.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert ot3_proxy.current_position_ot3(
+    assert await ot3api.current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert ot3_proxy.encoder_current_position(
+    assert await ot3api.encoder_current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     )
-    assert ot3_proxy.encoder_current_position_ot3(
+    assert await ot3api.encoder_current_position_ot3(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
     ) == await managed_obj.current_position(
         mount=hw_types.OT3Mount.LEFT, critical_point=None
@@ -245,7 +249,7 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(managed_obj: OT3API) -> Non
     assert ot3api.get_engaged_axes() == managed_obj.get_engaged_axes()
     assert ot3api.engaged_axes == managed_obj.engaged_axes
 
-    assert ot3_proxy.get_limit_switches() == await managed_obj.get_limit_switches()
+    assert await ot3api.get_limit_switches() == await managed_obj.get_limit_switches()
     assert ot3api.get_attached_pipettes() == managed_obj.get_attached_pipettes()
     assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
     assert ot3api.attached_pipettes == managed_obj.attached_pipettes

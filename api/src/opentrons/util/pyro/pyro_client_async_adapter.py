@@ -119,14 +119,15 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
 def wrap_parameter_validation(attr: Any) -> Any:
     """Validate outbound parameter requests before allowing serialization."""
 
-    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         # Validate individual arguments before forwarding the call
         def _validations(arg: Any) -> Any:
-            # Extend this as further validations are needed
+            # NOTE: Extend this as further validations are needed
             arg = _validate_hashable(arg)
             return arg
+
         if len(args) > 0:
-            validated_args = tuple()
+            validated_args = tuple()  # type: ignore
             for arg in args:
                 validated_args = (*validated_args, _validations(arg))
         else:
@@ -134,7 +135,6 @@ def wrap_parameter_validation(attr: Any) -> Any:
         if len(kwargs) > 0:
             for key in kwargs.keys():
                 kwargs[key] = _validations(kwargs[key])
-
         return attr(*validated_args, **kwargs)
 
     return wrapper
