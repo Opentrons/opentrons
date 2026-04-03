@@ -297,6 +297,7 @@ def _build_classdict(  # noqa: C901
 
 ### Helpers ###
 
+
 def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
     return {
         "__module__": attr.__module__,
@@ -305,6 +306,7 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
         "__doc__": attr.__doc__,
         "__type_params__": attr.__type_params__,
     }
+
 
 def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
