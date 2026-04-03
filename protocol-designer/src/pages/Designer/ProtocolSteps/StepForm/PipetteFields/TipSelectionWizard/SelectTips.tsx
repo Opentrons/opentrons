@@ -30,9 +30,11 @@ import {
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { SelectionRect } from '/protocol-designer/components/organisms/Labware/SelectionRect'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { getCollidingWells } from '/protocol-designer/utils/index'
 
 import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
 import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
@@ -61,6 +63,7 @@ import type {
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
+import type { GenericRect } from '/protocol-designer/collision-types'
 import type {
   AccessibilityStatus,
   InaccessibleReason,
@@ -84,9 +87,9 @@ export function SelectTips(
   const { t } = useTranslation('tip_selection')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
-  const [hoveredWell, setHoveredWell] = useState<string | null>(null)
+  const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const currentHoveredWellRef = useRef<string | null>(null)
+  const currentHoveredWellRef = useRef<string[] | null>(null)
 
   const {
     pipetteSpecs,
@@ -126,13 +129,7 @@ export function SelectTips(
       ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
       : {}
 
-  const allWellsAffectedByHover = getEntireWellSelection(
-    hoveredWell,
-    labwareDef.ordering,
-    nozzles,
-    primaryNozzle,
-    channels
-  )
+  const allWellsAffectedByHover = hoveredWells ?? []
 
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
     well =>
@@ -165,6 +162,22 @@ export function SelectTips(
     }, null)
   const numPickupsRemaining = numTotalPickups - selectedTips.length
   const hasPickupsRemaining = numPickupsRemaining > 0
+
+  const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
+    const wellsInRect = getCollidingWells(rect)
+    const highlightedWells: string[][] = []
+    for (const well in wellsInRect) {
+      const wellSelection = getEntireWellSelection(
+        well,
+        labwareDef.ordering,
+        nozzles,
+        primaryNozzle,
+        channels
+      )
+      highlightedWells.push(wellSelection)
+    }
+    return highlightedWells
+  }
 
   const handleUnselectWell = (unselectIndex: number): void => {
     setSelectedTips(selectedTips.slice(0, unselectIndex))
@@ -272,8 +285,8 @@ export function SelectTips(
       clearTimeout(leaveTimeoutRef.current)
       leaveTimeoutRef.current = null
     }
-    setHoveredWell(transformedWellName)
-    currentHoveredWellRef.current = transformedWellName
+    setHoveredWells([transformedWellName])
+    currentHoveredWellRef.current = [transformedWellName]
   }
 
   const handleLeaveWell = (_: WellMouseEvent): void => {
@@ -281,14 +294,63 @@ export function SelectTips(
       clearTimeout(leaveTimeoutRef.current)
     }
     leaveTimeoutRef.current = setTimeout(() => {
-      if (currentHoveredWellRef.current === hoveredWell) {
-        setHoveredWell(null)
-        currentHoveredWellRef.current = null
-      }
+      setHoveredWells(null)
+      currentHoveredWellRef.current = null
+
       leaveTimeoutRef.current = null
     }, 300)
   }
+  const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
+    (acc, tipList, index) => {
+      const innerAcc = tipList.reduce<Record<string, number>>(
+        (acc, tip) => ({ ...acc, [tip]: index }),
+        {}
+      )
+      return { ...acc, ...innerAcc }
+    },
+    {}
+  )
+  const handleSelectionMove = (e: MouseEvent, rect: GenericRect): void => {
+    if (!e.shiftKey) {
+      const wellsUnderRect = _getWellsFromRect(rect)
+      const flat = [...new Set(wellsUnderRect.flat())]
+      setHoveredWells(flat)
+    }
+  }
+  const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
+    if (!e.shiftKey) {
+      const wellsUnderRect = _getWellsFromRect(rect)
+      setSelectedTips(prev => {
+        const next = [...prev]
+        const selectedFlat = new Set(prev.flat())
+        const allAlreadySelected = wellsUnderRect.every(group =>
+          group.every(well => selectedFlat.has(well))
+        )
 
+        let updated: string[][]
+        // Remove all wells if the entire selection is already selected
+        if (allAlreadySelected) {
+          const keysToRemove = new Set(wellsUnderRect.map(g => g[0]))
+          updated = next.filter(group => !keysToRemove.has(group[0]))
+        } else {
+          // Add additional selected wells if there is a mixture of selected and unselected
+          updated = [...next]
+          wellsUnderRect.forEach(wellGroup => {
+            const primaryWellInGroup = wellGroup[0]
+            const exists = updated.some(
+              wellGroup => wellGroup[0] === primaryWellInGroup
+            )
+            // Add to update list if the well does not currently exist in the list and is accessible
+            if (!exists && selectedWellsByIndex[primaryWellInGroup] !== 1) {
+              updated.push(wellGroup)
+            }
+          })
+        }
+        return updated
+      })
+      setHoveredWells(null)
+    }
+  }
   let controls: JSX.Element = <></>
   const labware = activeDeckSetup.labware[selectedTiprackId ?? '']
   const slot = getSlotInLocationStack(labware.stack)
@@ -299,16 +361,7 @@ export function SelectTips(
     controls = <></>
   } else {
     const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
-    const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
-      (acc, tipList, index) => {
-        const innerAcc = tipList.reduce<Record<string, number>>(
-          (acc, tip) => ({ ...acc, [tip]: index }),
-          {}
-        )
-        return { ...acc, ...innerAcc }
-      },
-      {}
-    )
+
     const is96Channel = channels === 96
     const tipStatusByWellName =
       tipState != null
@@ -363,20 +416,20 @@ export function SelectTips(
           borderStroke={COLORS.yellow40}
           ignoreMissingTips
         />
-        {hoveredWell != null ? (
+        {hoveredWells != null ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWell}
+            hoveredWell={hoveredWells[0]}
             selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()
-              .some(tip => tip === hoveredWell)}
+              .some(tip => tip === hoveredWells[0])}
             hasPickupsRemaining={hasPickupsRemaining}
             isAccessible={hoveredWellsInaccessibilityStatus == null}
-            inaccessibleReason={hoveredWellsInaccessibilityStatus}
+            inaccessibleReason={hoveredWellsInaccessibilityStatus ?? null}
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
             nozzles={nozzles}
@@ -404,12 +457,18 @@ export function SelectTips(
       </Flex>
       <div className={styles.modal_body_select_tips}>
         <div className={styles.select_tips_deck_container}>
-          <BaseDeckTipSelection
-            viewBox={viewBox}
-            showSlotLabels={false}
-            controls={controls}
-            labwareIdToHide={selectedTiprackId}
-          />
+          <SelectionRect
+            onSelectionMove={handleSelectionMove}
+            onSelectionDone={handleSelectionDone}
+            customWidth={45}
+          >
+            <BaseDeckTipSelection
+              viewBox={viewBox}
+              showSlotLabels={false}
+              controls={controls}
+              labwareIdToHide={selectedTiprackId}
+            />
+          </SelectionRect>
         </div>
         <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
       </div>

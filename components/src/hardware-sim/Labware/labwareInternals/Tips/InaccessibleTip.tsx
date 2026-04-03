@@ -1,12 +1,20 @@
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
+
 import { COLORS } from '../../../../helix-design-system'
 import { DEFAULT_TIP_SIZE } from './constants'
 
 const STROKE_WIDTH = '2'
 
-export function InaccessibleTip(props: { size?: string }): JSX.Element {
-  const { size } = props
+export function InaccessibleTip(props: {
+  wellName: string
+  size?: string
+}): JSX.Element {
+  const { size, wellName } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
+  const commonProps = {
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
+  }
   return (
     <svg
       width={width}
@@ -30,7 +38,7 @@ export function InaccessibleTip(props: { size?: string }): JSX.Element {
           stroke="black"
         />
       </mask>
-      <g mask="url(#mask0_2189_16275)">
+      <g mask="url(#mask0_2189_16275)" {...commonProps}>
         <path
           d="M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z"
           fill={COLORS.blue35}
