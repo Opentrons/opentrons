@@ -6,8 +6,8 @@ requirements = {
 }
 
 metadata = {
-    "protocolName": "96ch 20µL stacker LC partial",
-    "description": "GRIP stacker racks; ALL/COLUMN/SINGLE; liquid classes.",
+    "protocolName": "96ch 200µL stacker LC partial",
+    "description": "GRIP stacker 200µL racks; ALL/COLUMN/SINGLE; liquid classes.",
 }
 
 
@@ -21,7 +21,7 @@ def run(ctx: protocol_api.ProtocolContext):
     full_adapter = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", "D2")
 
     stacker.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_20ul",
+        load_name="opentrons_flex_96_tiprack_200ul",
         count=2,
         lid="opentrons_flex_tiprack_lid",
     )
@@ -42,8 +42,11 @@ def run(ctx: protocol_api.ProtocolContext):
 
     for liquid_class in lc:
         ctx.comment(f"Testing Liquid Class: {liquid_class.name}")
-        pipette.configure_nozzle_layout(style=protocol_api.ALL)
-        pipette.pick_up_tip(rack_full)
+        pipette.configure_nozzle_layout(
+            style=protocol_api.ALL,
+            tip_racks=[rack_full],
+        )
+        pipette.pick_up_tip(rack_full.wells_by_name()["A1"])
 
         pipette.transfer_with_liquid_class(
             volume=15,
@@ -60,7 +63,7 @@ def run(ctx: protocol_api.ProtocolContext):
             start="A12",
             tip_racks=[rack_partial],
         )
-        pipette.pick_up_tip(rack_partial)
+        pipette.pick_up_tip(rack_partial.wells_by_name()["A12"])
 
         pipette.transfer_with_liquid_class(
             volume=1,
@@ -70,9 +73,13 @@ def run(ctx: protocol_api.ProtocolContext):
             new_tip="never",
             group_wells=False,
         )
-        pipette.drop_tip()
+        pipette.return_tip()
 
-    pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1")
+    pipette.configure_nozzle_layout(
+        style=protocol_api.SINGLE,
+        start="A1",
+        tip_racks=[rack_partial],
+    )
     pipette.pick_up_tip(rack_partial.wells_by_name()["A1"])
 
     found_height = pipette.detect_liquid_presence(plate.wells()[0])
@@ -83,4 +90,7 @@ def run(ctx: protocol_api.ProtocolContext):
     pipette.blow_out()
     pipette.drop_tip()
 
-    pipette.configure_nozzle_layout(style=protocol_api.ALL)
+    pipette.configure_nozzle_layout(
+        style=protocol_api.ALL,
+        tip_racks=[rack_full],
+    )

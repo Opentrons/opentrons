@@ -297,8 +297,8 @@ class Protocols:
     Flex_S_2_28_P50M_8ch20uLLCPartial: Protocol = Protocol(
         file_stem="Flex_S_2_28_P50M_8ch20uLLCPartial", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
-    Flex_S_2_28_P50M_BlowoutPosRTP: Protocol = Protocol(
-        file_stem="Flex_S_2_28_P50M_BlowoutPosRTP", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    Flex_S_2_28_P50M_BlowoutPosSeq: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P50M_BlowoutPosSeq", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_2_28_P50S_20uLMeniscusHeight: Protocol = Protocol(
         file_stem="Flex_S_2_28_P50S_20uLMeniscusHeight", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
