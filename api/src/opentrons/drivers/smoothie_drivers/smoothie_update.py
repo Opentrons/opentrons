@@ -14,4 +14,3 @@ def ensure_programmer_executable() -> None:
     # because if it is None, we’re about to fail when we try to program
     # the smoothie, and we want the exception to bubble up.
     os.chmod(updater_executable, 0o777)
-
