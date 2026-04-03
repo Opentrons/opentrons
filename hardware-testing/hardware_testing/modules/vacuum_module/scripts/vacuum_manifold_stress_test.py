@@ -114,9 +114,9 @@ async def find_port_by_id(vendorId: int, productId: int) -> str:
     """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        print(f"port_vid: {port.vid}, port_pid: {port.pid}")
+        logging.info(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
-            print(f"port: {port.device}")
+            logging.info(f"port: {port.device}")
             return port.device
     return ""
 
@@ -199,13 +199,13 @@ async def read_data(
         await read_continuous_data(f_name, pump, start_time, duration, ctx)
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
-        logging.info(f"continuous read duration reached ({duration}s)")
+        ctx.comment(f"continuous read duration reached ({duration}s)")
     except Exception as e:
-        logging.error(f"continuous read error: {e}")
+        ctx.comment(f"continuous read error: {e}")
         raise
 
 
-async def _setup_devices() -> tuple:  # type: ignore[type-arg]
+async def _setup_devices() -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # type: ignore[type-arg]
     from hardware_testing.drivers import vacuum_pump
 
     loop = asyncio.get_event_loop()
@@ -275,7 +275,7 @@ async def _run_single_pump_api_cycle(
         guage_pressure_mbar=target_to_pump,
     )
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(VentState.OPENED)
+    await pump.set_vent_state(1)
     await asyncio.sleep(VENT_SEC)
     try:
         await read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
@@ -289,7 +289,7 @@ async def _run_single_pump_api_cycle(
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(VentState.CLOSED)
+    await pump.set_vent_state(0)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -303,11 +303,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
-    perstaltic_pump_flow_rate = 100  # mL/min
+    perstaltic_pump_flow_rate = 70  # mL/min
     water_tolerance = 5
-    perstaltic_time = (
-        int(perstaltic_volume_target / perstaltic_pump_flow_rate) + water_tolerance
-    )
+    conversion = ((perstaltic_volume_target/1000) / perstaltic_pump_flow_rate)*60 #Convert ul to ml
+    perstaltic_time = int( conversion + water_tolerance)
 
     ctx.load_trash_bin("A3")
     tips = ctx.load_labware(
@@ -321,8 +320,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
     filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
 
-    pip.pick_up_tip()
-
     pump = None
     pump_fixture = None
     loop = None
@@ -333,6 +330,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pump, pump_fixture = loop.run_until_complete(_setup_devices())
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
+            raise
+
+    pip.pick_up_tip()
 
     output_dir = Path(OUTPUT_DIR)
     if not ctx.is_simulating():
