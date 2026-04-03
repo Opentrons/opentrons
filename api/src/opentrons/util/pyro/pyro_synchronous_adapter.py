@@ -241,13 +241,7 @@ def _build_classdict(  # noqa: C901
             ):
                 # Apply the specialty function to the attribute on this PSO instance and expose the wrapped specialty method
                 if inspect.iscoroutinefunction(attr):
-                    async_metadata = {
-                        "__module__": attr.__module__,
-                        "__name__": attr.__name__,
-                        "__qualname__": attr.__qualname__,
-                        "__doc__": attr.__doc__,
-                        "__type_params__": attr.__type_params__,
-                    }
+                    async_metadata = _build_metadata_dictionary(attr)
                     async_methods[name] = async_metadata
                 exposed = pyro.expose(
                     specialty_behavior.specialty_function(utility, core_obj, name, attr)
@@ -257,13 +251,7 @@ def _build_classdict(  # noqa: C901
                 # Wrap coroutines in a synchronous function call, bound it to the original instance and expose the wrapped method
                 exposed = pyro.expose(synchronous(attr))
                 # Track the known async functions so they may be provided as metadata to a client wrapper
-                async_metadata = {
-                    "__module__": attr.__module__,
-                    "__name__": attr.__name__,
-                    "__qualname__": attr.__qualname__,
-                    "__doc__": attr.__doc__,
-                    "__type_params__": attr.__type_params__,
-                }
+                async_metadata = _build_metadata_dictionary(attr)
                 async_methods[name] = async_metadata
 
                 bound_method = MethodType(exposed, core_obj)
@@ -309,6 +297,14 @@ def _build_classdict(  # noqa: C901
 
 ### Helpers ###
 
+def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
+    return {
+        "__module__": attr.__module__,
+        "__name__": attr.__name__,
+        "__qualname__": attr.__qualname__,
+        "__doc__": attr.__doc__,
+        "__type_params__": attr.__type_params__,
+    }
 
 def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
