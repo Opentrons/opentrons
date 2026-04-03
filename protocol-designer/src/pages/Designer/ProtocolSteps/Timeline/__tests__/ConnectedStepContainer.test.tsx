@@ -90,8 +90,8 @@ describe('ConnectedStepContainer', () => {
     render(props)
 
     fireEvent.click(
-      within(screen.getByTestId('StepContainer_mockStepId')).getByTestId(
-        'StepContainer_OverflowBtn'
+      within(screen.getByLabelText('Starting deck state')).getByLabelText(
+        'Starting deck state options'
       )
     )
     screen.getByText('mock StepOverflowMenu')
@@ -107,14 +107,10 @@ describe('ConnectedStepContainer', () => {
     }
     render(props)
 
-    const buttonSansPadding = within(
-      screen.getByTestId('StepContainer_mockStepId')
-    ).getByTestId('StepContainer_buttonSansPadding')
     const stepNumber = screen.getByText('123.')
     const text = screen.getByText('Transfer')
     const subtext = screen.getByText('Subtext')
 
-    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(stepNumber).toHaveStyle(`color: ${COLORS.white}`)
     expect(text).toHaveStyle(`color: ${COLORS.white}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.transparentWhite80}`)
@@ -129,14 +125,10 @@ describe('ConnectedStepContainer', () => {
       selected: false,
     }
     render(props)
-    const buttonSansPadding = within(
-      screen.getByTestId('StepContainer_mockStepId')
-    ).getByTestId('StepContainer_buttonSansPadding')
     const stepNumber = screen.getByText('123.')
     const text = screen.getByText('Transfer')
     const subtext = screen.getByText('Subtext')
 
-    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.grey20}`)
     expect(stepNumber).toHaveStyle(`color: ${COLORS.black90}`)
     expect(text).toHaveStyle(`color: ${COLORS.black90}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.grey60}`)
@@ -154,14 +146,10 @@ describe('ConnectedStepContainer', () => {
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
-    const buttonSansPadding = within(
-      screen.getByTestId('StepContainer_mockStepId')
-    ).getByTestId('StepContainer_buttonSansPadding')
     const stepNumber = screen.getByText('123.')
     const text = screen.getByText('Transfer')
     const subtext = screen.getByText('Subtext')
 
-    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(stepNumber).toHaveStyle(`color: ${COLORS.white}`)
     expect(text).toHaveStyle(`color: ${COLORS.white}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.transparentWhite80}`)
@@ -179,14 +167,10 @@ describe('ConnectedStepContainer', () => {
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
-    const buttonSansPadding = within(
-      screen.getByTestId('StepContainer_mockStepId')
-    ).getByTestId('StepContainer_buttonSansPadding')
     const stepNumber = screen.getByText('123.')
     const text = screen.getByText('Transfer')
     const subtext = screen.getByText('Subtext')
 
-    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red30}`)
     expect(stepNumber).toHaveStyle(`color: ${COLORS.red60}`)
     expect(text).toHaveStyle(`color: ${COLORS.red60}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.red60}`)

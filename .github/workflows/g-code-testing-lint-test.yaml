@@ -70,11 +70,11 @@ jobs:
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          make setup-js-ci
       - name: Lint
         run: make -C g-code-testing lint
       - name: Test
