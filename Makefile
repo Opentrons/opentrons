@@ -3,6 +3,8 @@
 
 # make OT_PYTHON available
 include ./scripts/python.mk
+# make UV available
+include ./scripts/python-uv.mk
 
 API_CLIENT_DIR := api-client
 API_DIR := api
@@ -329,3 +331,12 @@ test-js-%:
 .PHONY: validate-codecov-yml
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
+
+# Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),
+# this sets up a reverse proxy that listens on localhost:31950 and forwards each request
+# to the appropriate dev server.
+.PHONY: dev-proxy
+dev-proxy:
+	$(UV) tool run --from mitmproxy==12.2.1  mitmdump \
+	    --mode reverse:http://localhost:31950@31950 \
+	    --script scripts/dev_proxy.py
