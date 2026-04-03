@@ -115,7 +115,10 @@ export function getWellNamePerMultiTip(
   return channels === 8 ? wellsAccessed : ninetySixChannelWells
 }
 
-const skipEveryOtherWell = (hoveredWell: string, wells: string[]): string[] => {
+export const skipEveryOtherWell = (
+  hoveredWell: string,
+  wells: string[]
+): string[] => {
   const startIndex = wells.indexOf(hoveredWell)
   const firstWell = startIndex % 2 === 0 ? 0 : 1
   const filteredWells = wells.filter(

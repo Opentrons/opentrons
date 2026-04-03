@@ -17,6 +17,7 @@ import {
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
+  skipEveryOtherWell,
 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
@@ -157,18 +158,6 @@ export const getNozzleText = (
   }
 
   return nozzleTextMapping[nozzleConfiguration](primaryNozzle)
-}
-
-export const skipEveryOtherWell = (
-  hoveredWell: string,
-  wells: string[]
-): string[] => {
-  const startIndex = wells.indexOf(hoveredWell)
-  const firstWell = startIndex % 2 === 0 ? 0 : 1
-  const filteredWells = wells.filter(
-    (_, index) => index >= firstWell && (index - firstWell) % 2 === 0
-  )
-  return filteredWells
 }
 
 export const getEntireWellSelection = (
