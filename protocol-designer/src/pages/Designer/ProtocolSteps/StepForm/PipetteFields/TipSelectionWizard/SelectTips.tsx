@@ -411,7 +411,9 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+        <div className={styles.legend_box}>
+          <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+        </div>
       </div>
     </div>
   )
