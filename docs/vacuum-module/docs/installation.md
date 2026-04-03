@@ -1,45 +1,30 @@
 ---
 title: "Vacuum Module: Installation"
+description: "Installing the Vacuum Module on a Flex robot."
 ---
 
-## Before you begin
+Follow these instructions to install the Vacuum Module.
 
-Clear the deck area so it is free from obstructions. You'll be working in and around deck slot A3 so it helps to remove any labware or module obstacles that may get in the way.
-
-The deck-mounted components for the Vacuum Module go in slot A3 only.
-
-Also, turn off power to the robot.
-
-## Procedure steps.
+!!! warning
+    Turn off the power to your Flex before you begin. This prevents someone from using the robot while you're working in the enclosure.
 
 <div class="instruction-list" markdown>
 
-### Part 1: Prepare the pump and waste collection jar
+## Part 1: Deck preparation
 
-1. Hand tighten the cap on the waste collection jar so it is secure.
+1. Clear the deck: Remove any attached modules and labware. Also, the deck plate adapter and other pieces install in slot A3 only. Remove the waste bin or any labware or modules from this location.
 
-2. Place the jar (GL60 threaded bottle) at or below the level of the pump. Recommended locations include on or under the workbench or on the floor.
+2. Install the deck plate: Place the adapter plate in slot A3 so the open part provides access to the space below the deck. Use the provided screwdriver and screws to fasten the plate securely to the deck.
 
-3. Measure the distance from deck slot A3 to the jar. Cut a piece of 1/4" hose to match plus extra for a little slack.
+    <font color="red">IMAGE PLACEHOLDER?</font>
 
-4. Measure the distance from the jar to the vacuum pump. Cut a piece of 3/8" hose to match plus extra for a little slack.
+3. 
 
-5. Measure 
+## External parts setup
 
-6.  
 
-### Part 2: Install the manifold
+## Connect power part
 
-7. Remove the waste bin or any module or labware installed in deck slot A3. 
 
-8. step
-
-9. step
-
-### Part 3: Connect to Flex
-
-10. USB
-
-11. Turn on power and follow instructions on the touchscreen or in the App.
 
 </div>
