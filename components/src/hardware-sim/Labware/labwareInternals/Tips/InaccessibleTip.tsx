@@ -7,7 +7,6 @@ export function InaccessibleTip(props: { size?: string }): JSX.Element {
   const { size } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-
   return (
     <svg
       width={width}
