@@ -23,7 +23,7 @@ Follow these instructions to install the Vacuum Module.
 2. **Install the deck plate:** Attach the adapter plate to Slot A3. Secure it to the deck using the included screwdriver and screws. The plate extends into the next column to provide storage in slot A4. 
 
     <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
-    ![Placeholder for deck plate installation](../../../stacker/images/deck-plate-attaching.png)
+    ![Placeholder for deck plate installation](./images/deck-plate-attaching.png){ width="80%" }
     <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
 
 3. **Install the manifold:** Seat the base plate and collar firmly into the adapter.
