@@ -337,6 +337,14 @@ validate-codecov-yml:
 # to the appropriate dev server.
 .PHONY: dev-proxy
 dev-proxy:
+# In this command, the first port (:2) is a placeholder for the origin server's port.
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes
+# with that, we choose port 2 because it's probably not assigned to anything.
+# `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
+# mitmproxy tries use port 2.
+#
+# The second port (@31950) is where the reverse proxy should listen.
 	$(UV) tool run --from mitmproxy==12.2.1  mitmdump \
-	    --mode reverse:http://localhost:31950@31950 \
+	    --mode reverse:http://localhost:2@31950 \
+	    --set connection_strategy=lazy \
 	    --script scripts/dev_proxy.py
