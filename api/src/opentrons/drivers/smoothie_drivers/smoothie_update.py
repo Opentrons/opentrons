@@ -4,7 +4,7 @@ import os
 import shutil
 
 
-def _ensure_programmer_executable() -> None:
+def ensure_programmer_executable() -> None:
     """Find the lpc21isp executable and ensure it is executable"""
     # Find the lpc21isp executable, explicitly allowing the case where it
     # is not executable (since that’s exactly what we’re trying to fix)
@@ -14,3 +14,4 @@ def _ensure_programmer_executable() -> None:
     # because if it is None, we’re about to fail when we try to program
     # the smoothie, and we want the exception to bubble up.
     os.chmod(updater_executable, 0o777)
+
