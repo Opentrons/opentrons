@@ -42,7 +42,6 @@ from ..types import (
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     LoadedModule,
-    MagneticModuleModel,
     ModuleDefinition,
     ModuleDimensions,
     ModuleModel,
@@ -310,37 +309,26 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
-        if state_update.vacuum_module_state_update != update_types.NO_CHANGE:
-            self._handle_vacuum_module_commands(state_update.vacuum_module_state_update)
 
     def _module_model_map(
-        self,
-        module_id: str,
-        module_live_data: Optional[LiveData] = None,
-        mag_model_v: Optional[MagneticModuleModel] = None,
-    ) -> Dict[Any, Any]:
+        self, module_id: str, actual_model: Any, module_live_data: Any
+    ) -> Any:
         live_data = module_live_data["data"] if module_live_data else None
         return {
             ModuleModel.is_magnetic_module_model: MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
-                model=mag_model_v if mag_model_v else ModuleModel.MAGNETIC_MODULE_V2,
+                model=actual_model,
             ),
-            ModuleModel.is_heater_shaker_module_model: (
-                HeaterShakerModuleSubState.from_live_data(
-                    module_id=HeaterShakerModuleId(module_id),
-                    data=live_data,
-                )
+            ModuleModel.is_heater_shaker_module_model: HeaterShakerModuleSubState.from_live_data(
+                module_id=HeaterShakerModuleId(module_id),
+                data=live_data,
             ),
-            ModuleModel.is_temperature_module_model: (
-                TemperatureModuleSubState.from_live_data(
-                    module_id=TemperatureModuleId(module_id),
-                    data=live_data,
-                )
+            ModuleModel.is_temperature_module_model: TemperatureModuleSubState.from_live_data(
+                module_id=TemperatureModuleId(module_id),
+                data=live_data,
             ),
-            ModuleModel.is_thermocycler_module_model: (
-                ThermocyclerModuleSubState.from_live_data(
-                    module_id=ThermocyclerModuleId(module_id), data=live_data
-                )
+            ModuleModel.is_thermocycler_module_model: ThermocyclerModuleSubState.from_live_data(
+                module_id=ThermocyclerModuleId(module_id), data=live_data
             ),
             ModuleModel.is_magnetic_block: MagneticBlockSubState(
                 module_id=MagneticBlockId(module_id)
@@ -395,10 +383,14 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             serial_number=serial_number,
             definition=definition,
         )
-        model_map = self._module_model_map(module_id, module_live_data)
-        for is_module_type in model_map:
+        module_model_map = self._module_model_map(
+            module_id=module_id,
+            actual_model=actual_model,
+            module_live_data=module_live_data,
+        )
+        for is_module_type in module_model_map:
             if is_module_type(actual_model):
-                substate = model_map[is_module_type]
+                substate = module_model_map[is_module_type]
                 self._state.substate_by_module_id[module_id] = substate
         if ModuleModel.is_thermocycler_module_model(actual_model):
             self._update_additional_slots_occupied_by_thermocycler(
@@ -669,17 +661,23 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             f"{module_id} is not a Flex Stacker."
         )
 
-        prev_substate.new_from_state_change(state_update)
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
     def _handle_vacuum_module_commands(
         self, state_update: VacuumModuleStateUpdate
     ) -> None:
+        """Handle Vacuum Module state updates."""
         module_id = state_update.module_id
-        vm_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(vm_substate, VacuumModuleSubState), (
+        prev_substate = self._state.substate_by_module_id[module_id]
+        assert isinstance(prev_substate, VacuumModuleSubState), (
             f"{module_id} is not a Vacuum Module."
         )
-        vm_substate.new_from_state_change(state_update)
+
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
 
 class ModuleView:
