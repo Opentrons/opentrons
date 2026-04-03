@@ -70,8 +70,6 @@ import type {
   TipSelectionBaseProps,
 } from './types'
 
-const NINETY_SIX_ALL_TARGET_WELL = 'A1'
-
 export function SelectTips(
   props: TipSelectionBaseProps & {
     pipetteSpecs: PipetteV2Specs
@@ -193,7 +191,6 @@ export function SelectTips(
       },
       {}
     )
-
     if (
       // always allow tip unselection
       !(wellName in prevSelectedTipsByIndex) &&
@@ -268,25 +265,20 @@ export function SelectTips(
 
   const handleHoverWell = (e: WellMouseEvent): void => {
     const { wellName } = e
-    let transformedWellName = wellName
-    if (
-      (channels === 8 && nozzles === ALL) ||
-      (channels === 96 && nozzles === COLUMN)
-    ) {
-      const column = wellName.slice(1, wellName.length)
-      transformedWellName = `A${column}`
-    } else if (channels === 96 && nozzles === ALL) {
-      transformedWellName = NINETY_SIX_ALL_TARGET_WELL
-    } else if (channels === 96 && nozzles === ROW) {
-      const rowName = wellName.slice(0, 1)
-      transformedWellName = `${rowName}1`
-    }
+    const allHoveredWells = getEntireWellSelection(
+      wellName,
+      labwareDef.ordering,
+      nozzles,
+      primaryNozzle,
+      channels
+    )
+
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
       leaveTimeoutRef.current = null
     }
-    setHoveredWells([transformedWellName])
-    currentHoveredWellRef.current = [transformedWellName]
+    setHoveredWells(allHoveredWells)
+    currentHoveredWellRef.current = allHoveredWells
   }
 
   const handleLeaveWell = (_: WellMouseEvent): void => {
@@ -320,10 +312,17 @@ export function SelectTips(
   const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
     if (!e.shiftKey) {
       const wellsUnderRect = _getWellsFromRect(rect)
+      const filteredWellsUnderRect = wellsUnderRect.filter(wellGroup =>
+        wellGroup.every(
+          wellName =>
+            tipAccessibileStatusByWellName[wellName].isAccessible &&
+            hasPickupsRemaining
+        )
+      )
       setSelectedTips(prev => {
         const next = [...prev]
         const selectedFlat = new Set(prev.flat())
-        const allAlreadySelected = wellsUnderRect.every(group =>
+        const allAlreadySelected = filteredWellsUnderRect.every(group =>
           group.every(well => selectedFlat.has(well))
         )
 
