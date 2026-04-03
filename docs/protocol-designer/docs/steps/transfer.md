@@ -5,7 +5,8 @@ description: "Transfer liquids between wells with single- and multi-dispense opt
 
 Your protocol timeline includes steps the robot will peform in your protocol. To start, the timeline includes the starting and ending deck states. Click **Add Step** in the lower left to add transfer, move, mix, pause, or module-specific steps to your protocol. 
 
-Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
+!!! Note
+    Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
 
 ## The basics
 
@@ -53,8 +54,6 @@ In the second form, choose whether to use liquid class settings in the transfer.
 
 !!! Note
     When you apply liquid class settings, Protocol Designer automatically makes changes to additional settings, like flow rates, submerge and retract speeds, and air gaps. You can view and edit these changes in the third transfer step form.
-
-    You can read more about [liquid classes](../python-api/liquid-classes.md) and their [definitions](python-api/liquid-class-definitions.md) in the Opentrons Python Protocol API.
 
 In the third form, click the aspirate and dispense tabs to access additional settings.
 
@@ -158,17 +157,13 @@ Next, select your source and destination wells. Protocol Designer will only let 
 
 In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. 
 
-### Collisions
+### Collision errors
 
 Partial tip pickup can increase the risk of collisions, so Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette.
 
-When you choose a partial tip pickup nozzle configuration, Protocol Designer includes warnings to reduce collision risk: 
+When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](warnings-errors.md) to reduce collision risk. You also won't be able to select incompatible wells and tips, where pickup could cause a collision with adjacent labware or modules. 
 
-* **Well selection**: Incompatible wells are shown in red, and you won't be able to select them.
-*  **Tip selection**: Incompatible tips are shown in red, and you won't be able to select them.
-*  **Step warning**: Warnings for adjacent labware, including blocking a safe transfer. 
-
-Partial tip pickup requires the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
+Partial tip pickup requires the pipette to hover above adjacent deck slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
 
 <figure class="screenshot" markdown>
   ![Pipette collision risk](../images/partial-tip-collision.png)
@@ -177,6 +172,6 @@ Partial tip pickup requires the pipette to hover above adjacent slots. Here, Pro
 
 Despite the tip rack in the example above being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
 
-We always recommend resolving all errors before exporting your protocol and running it on a robot. 
+Protocols containing errors cannot be run on the robot and will cause a run to fail. You'll need to resolve these errors before exporting your protocol. 
 
 
