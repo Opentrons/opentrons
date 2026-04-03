@@ -282,6 +282,27 @@ class Protocols:
     Flex_S_2_24_P1000S_keep_last_tip_check: Protocol = Protocol(
         file_stem="Flex_S_2_24_P1000S_keep_last_tip_check", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_2_28_NO_PIPETTES_TC_RampRate: Protocol = Protocol(
+        file_stem="Flex_S_2_28_NO_PIPETTES_TC_RampRate", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P200_96_20uLTip10Cycle: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P200_96_20uLTip10Cycle", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P200_96_ColumnReturnTip: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P200_96_ColumnReturnTip", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P200_96_GRIP_20uLLCPartial: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P200_96_GRIP_20uLLCPartial", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P50M_8ch20uLLCPartial: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P50M_8ch20uLLCPartial", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P50M_BlowoutPosRTP: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P50M_BlowoutPosRTP", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_28_P50S_20uLMeniscusHeight: Protocol = Protocol(
+        file_stem="Flex_S_2_28_P50S_20uLMeniscusHeight", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
     Flex_S_2_7_96_channel_select_tips: Protocol = Protocol(
         file_stem="Flex_S_2_7_96_channel_select_tips", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
@@ -298,7 +319,6 @@ class Protocols:
     Flex_S_2_7_p1000_dynamic_demo: Protocol = Protocol(
         file_stem="Flex_S_2_7_p1000_dynamic_demo", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
-
     Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x: Protocol = Protocol(
         file_stem="Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x", file_extension="json", robot="Flex", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
     )
