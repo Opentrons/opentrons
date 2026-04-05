@@ -38,36 +38,39 @@ class AccessControlSettingStore:
                 )
             ).all()
             for row in rows:
-                for field_name, setting_key in _ACCESS_CONTROL_KEYS.items():
-                    if row.key == setting_key.value:
-                        values[field_name] = bool(row.value)
+                values[row.key.value] = bool(row.value)
         return ResponseData.model_construct(**values)
 
-    def set(self, field_name: str, value: bool | None) -> None:
-        """Set a single access control setting.
+    def patch(self, request: RequestData) -> ResponseData:
+        """Apply a partial update to access control settings.
 
-        `None` means revert to the default.
+        Only fields explicitly provided in the request are updated.
+        A value of ``None`` reverts that setting to its default (deletes the row).
         """
-        setting_key = _ACCESS_CONTROL_KEYS[field_name]
+        provided = request.model_dump(exclude_unset=True)
+        print("provided", provided)
+        if not provided:
+            return self.get_all()
+
         with self._sql_engine.begin() as transaction:
+            keys_to_update = [_ACCESS_CONTROL_KEYS[name] for name in provided]
+            print("keys_to_update", keys_to_update)
             transaction.execute(
                 sqlalchemy.delete(boolean_setting_table).where(
-                    boolean_setting_table.c.key == setting_key
+                    boolean_setting_table.c.key.in_(keys_to_update)
                 )
             )
-            if value is not None:
+            rows_to_insert = [
+                {"key": _ACCESS_CONTROL_KEYS[name], "value": value}
+                for name, value in provided.items()
+                if value is not None
+            ]
+            print("rows_to_insert", rows_to_insert)
+            if rows_to_insert:
                 transaction.execute(
-                    sqlalchemy.insert(boolean_setting_table).values(
-                        key=setting_key,
-                        value=value,
-                    )
+                    sqlalchemy.insert(boolean_setting_table),
+                    rows_to_insert,
                 )
-
-    def patch(self, request: RequestData) -> ResponseData:
-        """Apply a partial update to access control settings."""
-        provided = request.model_dump(exclude_unset=True)
-        for field_name, value in provided.items():
-            self.set(field_name, value)
         return self.get_all()
 
     def reset_all(self) -> None:
