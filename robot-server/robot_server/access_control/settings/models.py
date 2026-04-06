@@ -36,7 +36,11 @@ class ResponseData(pydantic.BaseModel):
 
 
 class RequestData(pydantic.BaseModel):
-    """Request body data for `PATCH /accessControl/settings`."""
+    """Request body data for `PATCH /accessControl/settings`.
+
+    Omitted fields are left unchanged. A value of ``None`` reverts
+    the setting to its default (as defined in `ResponseData`).
+    """
 
     requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
         bool | None,
