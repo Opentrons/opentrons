@@ -2,9 +2,10 @@
 
 import pytest
 from playwright.sync_api import Page
-from automation.pd_pages import MixStepForm
-from utility import import_protocol_and_open_editor
+
+from automation.pd_pages import MixStepForm, ProtocolEditorPage
 from eyes import Eyes
+from utility import import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
 LABWARE_OPTION = "B4 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
@@ -16,14 +17,11 @@ TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
     """Replicate the complete mixSettings Cypress test using Playwright."""
 
-    editor = import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
-
-    # Step menu parity checks
-    editor.open_add_step_menu()
-    editor.verify_add_step_menu_options()
-    editor.select_step_type("Mix")
+    import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
+    protocol_editor = ProtocolEditorPage(page)
 
     mix_form = MixStepForm(page)
+    protocol_editor.add_step("Mix")
     # currently there is a divergence in the number of parts in the mix step form
     # between 8.6.2 prod (1/3) and what's in edge (1/4)
 
@@ -62,20 +60,20 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
         eyes.check(
             checkpoint_name="Mix Settings Form Liquid Class Modal - Part 2",
             target=eyes.Target.window().fully(),
-    )
+        )
     mix_form.open_mix_tip_modal()
     if eyes is not None:
         eyes.check(
             checkpoint_name="Mix Tip Position Modal",
             target=eyes.Target.window().fully(),
-    )
+        )
     page.get_by_role("button", name="Swap view").click()
     mix_form.set_mix_tip_position("2", "2", "4")
     if eyes is not None:
         eyes.check(
             checkpoint_name="Mix Tip Position Modal with Values",
             target=eyes.Target.window().fully(),
-    )
+        )
     mix_form.reset_settings()
     mix_form.set_mix_tip_position("2", "2", "5")
     mix_form.save_modal()
@@ -86,7 +84,7 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
         eyes.check(
             checkpoint_name="Mix Step Form Aspirate Settings - Part 3",
             target=eyes.Target.window().fully(),
-    )
+        )
 
     # Part 3 / 4 – dispense configuration
     mix_form.click_dispense_tab()
@@ -105,7 +103,7 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
         eyes.check(
             checkpoint_name="Mix Step Form Blowout Settings - Part 3",
             target=eyes.Target.window().fully(),
-    )
+        )
     mix_form.reset_settings()
     mix_form.set_blowout_position("-3")
     mix_form.save_modal()
@@ -113,7 +111,7 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
         eyes.check(
             checkpoint_name="Mix Step Form Dispense Settings - Part 3 cont..",
             target=eyes.Target.window().fully(),
-    )
+        )
 
     mix_form.click_continue()
 
@@ -126,5 +124,4 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
         eyes.check(
             checkpoint_name="Mix Step Form Tip Handling Settings - Part 4",
             target=eyes.Target.window().fully(),
-    )
-
+        )
