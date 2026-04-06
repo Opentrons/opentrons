@@ -14,11 +14,11 @@ export interface OffDeckRenderGroup {
   stackedItems: LabwareInStack[]
 }
 
-function getWellFillSignature(
+const getWellFillSignature = (
   labwareId: string,
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   labwareByLiquidId: LabwareByLiquidId
-): string {
+): string => {
   const wellFill = getWellFillFromLabwareId(
     labwareId,
     protocolAnalysis.liquids,

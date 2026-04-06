@@ -40,9 +40,9 @@ import {
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { getOffDeckRenderGroups } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabware/offDeckRenderInfo'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,

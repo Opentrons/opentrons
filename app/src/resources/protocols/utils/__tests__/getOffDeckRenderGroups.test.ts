@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getOffDeckRenderGroups } from '../offDeckRenderInfo'
+import { getOffDeckRenderGroups } from '../getOffDeckRenderGroups'
 
 import type {
   CompletedProtocolAnalysis,

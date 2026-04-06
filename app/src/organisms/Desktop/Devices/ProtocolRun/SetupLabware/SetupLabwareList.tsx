@@ -14,7 +14,7 @@ import {
   getStacksWithLabware,
 } from '@opentrons/shared-data'
 
-import { getOffDeckRenderGroups } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabware/offDeckRenderInfo'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'

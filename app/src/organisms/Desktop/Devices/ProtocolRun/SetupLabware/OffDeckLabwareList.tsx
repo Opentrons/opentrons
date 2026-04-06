@@ -12,7 +12,7 @@ import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareDefinitionsByURI, StackItem } from '@opentrons/shared-data'
-import type { OffDeckRenderGroup } from './offDeckRenderInfo'
+import type { OffDeckRenderGroup } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 
 interface OffDeckLabwareListProps {
   offDeckItems: OffDeckRenderGroup[]

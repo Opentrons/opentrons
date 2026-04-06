@@ -30,9 +30,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 
 import { OffDeckLabwareList } from './OffDeckLabwareList'
-import { getOffDeckRenderGroups } from './offDeckRenderInfo'
 import { SlotDetailModal } from './SlotDetailModal'
 
 import type { LabwareOnDeck } from '@opentrons/components'
