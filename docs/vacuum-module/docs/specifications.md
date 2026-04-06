@@ -21,8 +21,8 @@ title: "Vacuum Module: Product Specifications"
 </figure>
 
 <figure markdown>
-![Tubing](images/part-placeholder.png "Vacuum and waste tubes")
-<figcaption>(2) Vacuum and waste tubing</figcaption>
+![Vacuum hoses](images/hoses5.png "6 mm and 9.5 mm waste and vacuum tubes")
+<figcaption>(1) 6 mm and 9.5 mm vacuum hoses</figcaption>
 </figure>
 
 <figure markdown>
