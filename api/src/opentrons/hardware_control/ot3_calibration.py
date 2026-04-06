@@ -58,7 +58,7 @@ LOG = getLogger(__name__)
 
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
-GRIPPER_GRIP_FORCE: Final[float] = 20  # FIXME: (andy s) this adds error, reduce to 5N
+GRIPPER_GRIP_FORCE: Final[float] = 5
 
 SLOT_CENTER = 5
 SLOT_FRONT_LEFT = 1
