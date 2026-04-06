@@ -391,7 +391,8 @@
   "volume_per_well": {
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
-    "single": "Volume per well"
+    "single": "Volume per well",
+    "mix": "Mix volume"
   },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
