@@ -13,9 +13,9 @@ stages:
       status_code: 200
       json: &initial_get_settings_response
         data:
-          requireAdminCredsWhenUpdatingRobotSoftware: false
-          requireAdminCredsWhenSendingProtocolToRobot: false
-          requireAdminCredsForSignoffProtocol: false
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: true
           requireSignoffForProtocolLog: false
 
   - name: Change settings
@@ -24,15 +24,15 @@ stages:
       url: '{ot3_server_base_url}/accessControl/settings'
       json:
         data:
-          requireAdminCredsWhenUpdatingRobotSoftware: true
-          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: false
     response:
       status_code: 200
       json: &patch_settings_response
         data:
-          requireAdminCredsWhenUpdatingRobotSoftware: true
-          requireAdminCredsWhenSendingProtocolToRobot: true
-          requireAdminCredsForSignoffProtocol: false
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: false
+          requireAdminCredsForSignoffProtocol: true
           requireSignoffForProtocolLog: false
 
   - name: Get the settings again and make sure they're still changed
@@ -67,23 +67,7 @@ marks:
       - ot3_server_base_url
 
 stages:
-  - name: Set a setting to true
-    request:
-      method: PATCH
-      url: '{ot3_server_base_url}/accessControl/settings'
-      json:
-        data:
-          requireAdminCredsWhenUpdatingRobotSoftware: true
-    response:
-      status_code: 200
-      json:
-        data:
-          requireAdminCredsWhenUpdatingRobotSoftware: true
-          requireAdminCredsWhenSendingProtocolToRobot: false
-          requireAdminCredsForSignoffProtocol: false
-          requireSignoffForProtocolLog: false
-
-  - name: Send a no-op PATCH and make sure it doesn't change anything
+  - name: Send a no-op PATCH and make sure defaults don't change
     request:
       method: PATCH
       url: '{ot3_server_base_url}/accessControl/settings'
@@ -94,8 +78,8 @@ stages:
       json:
         data:
           requireAdminCredsWhenUpdatingRobotSoftware: true
-          requireAdminCredsWhenSendingProtocolToRobot: false
-          requireAdminCredsForSignoffProtocol: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: true
           requireSignoffForProtocolLog: false
 
 ---
@@ -106,15 +90,21 @@ marks:
       - ot3_server_base_url
 
 stages:
-  - name: Set a setting to true
+  - name: Change a setting away from its default
     request:
       method: PATCH
       url: '{ot3_server_base_url}/accessControl/settings'
       json:
         data:
-          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
+      json:
+        data:
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: true
+          requireSignoffForProtocolLog: false
 
   - name: Revert it by sending null
     request:
@@ -127,7 +117,7 @@ stages:
       status_code: 200
       json:
         data:
-          requireAdminCredsWhenUpdatingRobotSoftware: false
-          requireAdminCredsWhenSendingProtocolToRobot: false
-          requireAdminCredsForSignoffProtocol: false
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: true
           requireSignoffForProtocolLog: false

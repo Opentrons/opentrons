@@ -14,19 +14,19 @@ class ResponseData(pydantic.BaseModel):
         pydantic.Field(
             description="Whether admin credentials are required when updating robot software.",
         ),
-    ] = False
+    ] = True
     requireAdminCredsWhenSendingProtocolToRobot: Annotated[
         bool,
         pydantic.Field(
             description="Whether admin credentials are required when sending a protocol to the robot.",
         ),
-    ] = False
+    ] = True
     requireAdminCredsForSignoffProtocol: Annotated[
         bool,
         pydantic.Field(
             description="Whether admin credentials are required for signing off on a protocol.",
         ),
-    ] = False
+    ] = True
     requireSignoffForProtocolLog: Annotated[
         bool,
         pydantic.Field(
