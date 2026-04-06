@@ -74,13 +74,10 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   </thead>
   <tbody>
     <tr>
-      <td><strong>Manufacturer</strong></td>
-      <td>Mean Well</td>
-    </tr>
-    <tr>
-        <td><strong>Model</strong></td>
+      <td><strong>Manufacturer and model</strong></td>
         <td>
           <ul>
+            <li>Mean Well</li>
             <li>LOP-200-24</li>
             <li>Low-profile, open-frame internal power supply</li>
           </ul>
@@ -136,5 +133,38 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   </tbody>
 </table>
 
-## LED Status Light
+## LED Status Lights
 
+Status lights on the vacuum pump unit provide at-a-glance information about its operations. The colors and illumination patterns listed below indicate the different operating states.
+
+<table>
+    <tr>
+        <th>LED color</th>
+        <th>Module status</th>
+    </tr>
+<tr>
+    <td>
+        <div class="status-dot-container"> <!-- prevent line breaks in col 1 -->
+            <span class="status-dot white"></span> White
+        </div>
+    </td>
+    <td>A white light indicates a neutral operation state. For example:
+      <ul>
+        <li>Solid white: idle.</li>
+        <li>Pulsing white: busy (e.g., starting, updating, or canceling an operation).</li>
+            </ul>
+      </td>
+</tr>
+    <tr>
+        <td><span class="status-dot green"></span> Green</td>
+        <td>A solid green light indicates a protocol is running.</td>
+    </tr>
+    <tr>
+        <td><span class="status-dot blue"></span> Blue</td>
+        <td>A pulsing blue light indicates the module requires attention.</td>
+    </tr>
+    <tr>
+        <td><span class="status-dot red"></span> Red</td>
+        <td>A pulsing red light indicates an error condition.</td>
+    </tr>
+</table>
