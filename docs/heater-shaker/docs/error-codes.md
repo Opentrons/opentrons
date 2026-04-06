@@ -26,7 +26,7 @@ This table lists Heater-Shaker error codes. These codes are also used by other O
 | `ERR213` | Indicates the back-right thermistor is disconnected. This can happen when the thermistor reads off-scale high, indicating a disconnected or broken wire. |
 | `ERR214` | Indicates the back-right thermistor is shorted. This can happen when the thermistor reads off-scale low, indicating a short circuit. |
 | `ERR215` | Indicates the back-right thermistor is in an overtemp condition. This can happen when the thermistor reaches a temperature over its internal limits. |
-| `ERR216` | Indicates the back left thermistor is disconnected. This can happen when the thermistor reads off-scale high, indicating a disconnect or broken wire. |
+| `ERR216` | Indicates the back-left thermistor is disconnected. This can happen when the thermistor reads off-scale high, indicating a disconnect or broken wire. |
 | `ERR217` | Indicates the back-left thermistor is shorted. This can happen when the thermistor reads off-scale low, indicating a short circuit. |
 | `ERR218` | Indicates a back-left thermistor is in an overtemp condition. This can happen when the thermistor reads a temperature over internal limits. |
 | `ERR219` | Indicates the back-center thermistor is disconnected. This can happen when the thermistor reads off-scale high, indicating a disconnect or broken wire. |
