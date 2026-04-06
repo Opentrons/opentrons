@@ -396,36 +396,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
             )
-        elif ModuleModel.is_magnetic_block(actual_model):
-            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
-                module_id=MagneticBlockId(module_id)
-            )
-        elif ModuleModel.is_absorbance_reader(actual_model):
-            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
-                module_id=AbsorbanceReaderId(module_id),
-                configured=False,
-                measured=False,
-                is_lid_on=True,
-                data=None,
-                measure_mode=None,
-                configured_wavelengths=None,
-                reference_wavelength=None,
-            )
-        elif ModuleModel.is_flex_stacker(actual_model):
-            self._state.substate_by_module_id[module_id] = FlexStackerSubState(
-                module_id=FlexStackerId(module_id),
-                pool_primary_definition=None,
-                pool_adapter_definition=None,
-                pool_lid_definition=None,
-                contained_labware_bottom_first=[],
-                max_pool_count=0,
-                pool_overlap=0,
-                pool_height=0,
-            )
-        elif ModuleModel.is_vacuum_module(actual_model):
-            self._state.substate_by_module_id[module_id] = VacuumModuleSubState(
-                module_id=VacuumModuleId(module_id),
-            )
 
     def _update_additional_slots_occupied_by_thermocycler(
         self,
