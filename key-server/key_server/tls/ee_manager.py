@@ -15,7 +15,7 @@ class TLSEEManager:
 
     Unlike the CA manager, TLS end-entity certificates are very short lived and thus can be
     very frequently regenerated, including whenever we create this object - so we do not need
-    to manager loading things from disk quite as much.
+    to manage loading things from disk quite as much.
 
     We install TLS certificates that chain to the CA certificates managed by the CA manager into
     a place that nginx can see them. We keep track of when they need to be rotated (which happens
