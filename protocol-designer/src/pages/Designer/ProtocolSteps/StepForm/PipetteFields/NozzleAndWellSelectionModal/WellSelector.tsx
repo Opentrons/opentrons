@@ -141,7 +141,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stepType]
   )
-
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
@@ -157,6 +157,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     )
 
     setHoveredWells(hovered)
+    setWellShadow(hovered[0])
   }
 
   const allWellsWithStatus = useMemo(
@@ -279,6 +280,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       return next
     })
   }
+
   const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
     const wellsInRect = getCollidingWells(rect)
     const highlightedWells: string[][] = []
@@ -299,7 +301,20 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     }
     return highlightedWells
   }
-
+  const _getWellAtPosition = (x: number, y: number): string | null => {
+    for (const [wellName, well] of Object.entries(labwareDef.wells)) {
+      const wellIsCircular = well.shape === 'circular'
+      const r = wellIsCircular ? well.diameter / 2 : well.xDimension
+      const cx = well.x
+      const cy = well.y
+      const dx = x - cx
+      const dy = y - cy
+      if (dx * dx + dy * dy <= r * r) {
+        return wellName
+      }
+    }
+    return null
+  }
   const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
@@ -308,6 +323,11 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       const wellsUnderRect = _getWellsFromRect(rect)
       const flatWellList = wellsUnderRect.flat()
       setHoveredWells(flatWellList)
+      const wellUnderMouse = _getWellAtPosition(e.clientX, e.clientY)
+
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
 
@@ -422,16 +442,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
-          inWellSelectionModal
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
-        {hoveredWells?.[0] && hasMoreThanOneWell ? (
+        {hasMoreThanOneWell ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
+            hoveredWell={wellShadow ?? ''}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
