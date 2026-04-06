@@ -119,9 +119,9 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
     [
         # These expected_point values were copied from known-good analysis outputs.
         # The exact values don't matter much for this test, since we're not checking positional
-        # accuracy here. They just need to be clearly different between the OT-2 and OT-3.
-        ("2.13", "OT-2", "(196.38, 42.785, 44.04)"),
-        ("2.15", "OT-2", "(196.38, 42.785, 44.04)"),
+        # accuracy here.
+        ("2.13", "OT-3", "(196.38, 42.785, 44.04)"),
+        ("2.15", "OT-3", "(196.38, 42.785, 44.04)"),
         pytest.param(
             "2.15",
             "OT-3",
@@ -281,7 +281,7 @@ def test_run_time_parameter_setting(
     """
     python_protocol_source = textwrap.dedent(
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+            requirements = {"robotType": "OT-3", "apiLevel": "2.18"}
 
             def add_parameters(parameters):
                 parameters.add_bool(
@@ -302,7 +302,7 @@ def test_run_time_parameter_setting(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["robotType"] == "OT-3 Standard"
     assert result.json_output["result"] == AnalysisResult.OK
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
@@ -369,7 +369,7 @@ def test_run_time_parameter_error(
     python_protocol_source = textwrap.dedent(
         # Raises an exception during runner load.
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+            requirements = {"robotType": "OT-3", "apiLevel": "2.18"}  # line 1
                                                                       # line 2
             def add_parameters(parameters):                           # line 3
                 # No default value specified                          # line 4
@@ -388,7 +388,7 @@ def test_run_time_parameter_error(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["robotType"] == "OT-3 Standard"
     assert result.json_output["result"] == AnalysisResult.NOT_OK.value
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"] == []
@@ -419,7 +419,7 @@ def test_rtp_csv_file_setting(
     """
     python_protocol_source = textwrap.dedent(
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
+            requirements = {"robotType": "OT-3", "apiLevel": "2.20"}
 
             def add_parameters(parameters):
                 parameters.add_csv_file(
@@ -444,7 +444,7 @@ def test_rtp_csv_file_setting(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["robotType"] == "OT-3 Standard"
     assert result.json_output["result"] == AnalysisResult.OK
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
@@ -479,7 +479,7 @@ def test_file_required_error(
     python_protocol_source = textwrap.dedent(
         # Raises an exception during runner load.
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
+            requirements = {"robotType": "OT-3", "apiLevel": "2.20"}
 
             def add_parameters(parameters):
                 parameters.add_csv_file(
@@ -497,7 +497,7 @@ def test_file_required_error(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["robotType"] == "OT-3 Standard"
     assert result.json_output["result"] == AnalysisResult.PARAMETER_VALUE_REQUIRED.value
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"]  # There should be a home command
@@ -522,7 +522,7 @@ def test_unexpected_error(
     python_protocol_source = textwrap.dedent(
         # Raises an exception before runner load.
         """\
-            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+            requirements = {"robotType": "OT-3", "apiLevel": "2.18"}  # line 1
             x + 1 = 0                                                 # line 2
             def add_parameters(parameters):
                 parameters.add_bool()
@@ -569,7 +569,7 @@ def test_unexpected_runner_load_error(
     assert result.exit_code == 0
 
     assert result.json_output is not None
-    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["robotType"] == "OT-3 Standard"
     assert result.json_output["pipettes"] == []
     assert result.json_output["commands"] == []
     assert result.json_output["config"] == {
