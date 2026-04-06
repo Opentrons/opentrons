@@ -357,7 +357,7 @@ dev-proxy:
 # mitmproxy tries use port 2.
 #
 # The second port (@31950) is where the reverse proxy should listen.
-	$(UV) tool run --from mitmproxy==12.2.1  mitmdump \
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1  mitmdump \
 	    --mode reverse:http://localhost:2@31950 \
 	    --set connection_strategy=lazy \
 	    --script scripts/dev_proxy.py
