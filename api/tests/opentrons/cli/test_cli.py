@@ -13,10 +13,17 @@ from click.testing import CliRunner
 from opentrons.cli.analyze import AnalysisResult, analyze
 
 
-def _list_fixtures(version: int) -> Iterator[Path]:
-    return Path(__file__).parent.glob(
+def _list_fixtures(version: int, robot_type: Optional[str] = None) -> Iterator[Path]:
+    paths = Path(__file__).parent.glob(
         f"../../../../shared-data/protocol/fixtures/{version}/*.json"
     )
+    if robot_type is None:
+        yield from paths
+    else:
+        for path in paths:
+            data = json.loads(path.read_text())
+            if data.get("robot", {}).get("model") == robot_type:
+                yield path
 
 
 @dataclass
@@ -70,7 +77,7 @@ def _get_analysis_result(
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
-@pytest.mark.parametrize("fixture_path", _list_fixtures(6))
+@pytest.mark.parametrize("fixture_path", _list_fixtures(8, robot_type="OT-3 Standard"))
 def test_analyze(
     fixture_path: Path,
     output: str,
@@ -120,14 +127,7 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
         # These expected_point values were copied from known-good analysis outputs.
         # The exact values don't matter much for this test, since we're not checking positional
         # accuracy here.
-        ("2.13", "OT-3", "(196.38, 42.785, 44.04)"),
-        ("2.15", "OT-3", "(196.38, 42.785, 44.04)"),
-        pytest.param(
-            "2.15",
-            "OT-3",
-            "(227.88, 42.785, 44.04)",
-            marks=pytest.mark.ot3_only,  # Analyzing an OT-3 protocol requires an OT-3 hardware API.
-        ),
+        ("2.15", "OT-3", "(227.88, 42.785, 44.04)"),
     ],
 )
 def test_analysis_deck_definition(
@@ -208,8 +208,8 @@ def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) ->
                 # Raises an exception from outside of Opentrons code,
                 # in between two PAPI functions.
                 """\
-                requirements = {"apiLevel": "2.14"}  # line 1
-                                                     # line 2
+                requirements = {"apiLevel": "2.15", "robotType": "OT-3"}  # line 1
+                                                                     # line 2
                 def run(protocol):                   # line 3
                     protocol.comment(":^)")          # line 4
                     raise RuntimeError(">:(")        # line 5
@@ -223,14 +223,14 @@ def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) ->
                 # Raises an exception from inside a Protocol Engine command.
                 # https://opentrons.atlassian.net/browse/RSS-317
                 """\
-                requirements = {"apiLevel": "2.14"}      # line 1
-                                                         # line 2
+                requirements = {"apiLevel": "2.15", "robotType": "OT-3"}      # line 1
+                                                                     # line 2
                 def run(protocol):                       # line 3
                     tip_rack = protocol.load_labware(    # line 4
-                        "opentrons_96_tiprack_300ul", 1  # line 5
+                        "opentrons_flex_96_tiprack_1000ul", 1  # line 5
                     )                                    # line 6
                     pipette = protocol.load_instrument(  # line 7
-                        "p300_single", "left"            # line 8
+                        "flex_1channel_1000", "left"     # line 8
                     )                                    # line 9
                     pipette.pick_up_tip(tip_rack["A1"])  # line 10
                     pipette.pick_up_tip(tip_rack["A2"])  # line 11
@@ -553,7 +553,7 @@ def test_unexpected_runner_load_error(
     python_protocol_source = textwrap.dedent(
         # Raises an exception during runner load.
         """\
-            requirements = {"apiLevel": "2.18"}     # line 1
+            requirements = {"apiLevel": "2.18", "robotType": "OT-3"}     # line 1
             call_a_non_existent_func()              # line 2
 
             def add_parameters(parameters):         # line 4
@@ -595,7 +595,7 @@ def test_analyze_json_protocol(
         / "protocol"
         / "fixtures"
         / "8"
-        / "simpleV8.json"
+        / "simpleFlexV8.json"
     )
     result = _get_analysis_result([json_file], output)
 
