@@ -102,8 +102,6 @@ api/opentrons/config/*.json
 sample_protocol.py
 api/opentrons/server/endpoints/ignore.json
 
-protocol-designer/benchmarks/output
-
 # Local Calibration Data
 calibrations/
 */calibrations

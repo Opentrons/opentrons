@@ -205,10 +205,10 @@ class VacuumModule(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> LiveData:
-        # TODO: FIX THIS
         data: VacuumModuleData = {
             "vacuumState": None,
             "errorDetails": self._reader.error,
+            "pumpEngaged": self._reader.pump_state.pump_running,
         }
         return {"status": self.status.value, "data": data}
 

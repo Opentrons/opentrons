@@ -56,11 +56,11 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          make setup-js
+          make setup-js-ci
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov
       - name: 'Upload coverage report'

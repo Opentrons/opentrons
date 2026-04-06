@@ -122,6 +122,7 @@ class FlexStackerData(TypedDict):
 class VacuumModuleData(TypedDict):
     vacuumState: None
     errorDetails: str | None
+    pumpEngaged: bool | None
 
 
 ModuleData = Union[

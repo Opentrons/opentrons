@@ -1,11 +1,18 @@
 """Tests for the Pyro instance of the hardware controller."""
 
+import asyncio
+import socket
+import threading
+from typing import Dict, cast
+
 import pytest
 from decoy import Decoy
 from Pyro5 import api as pyro
+from Pyro5 import nameserver
 
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.hardware_control import ThreadManager, modules
+from opentrons.hardware_control import types as hw_types
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.modules import (
     AbsorbanceReader,
@@ -17,10 +24,23 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
+from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
+    register_hardware_types,
+)
+from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
 )
+
+
+@pytest.fixture
+def managed_obj(ot3_hardware: ThreadManager[OT3API]) -> OT3API:
+    """OT3API fixture for tests."""
+    managed = ot3_hardware.managed_obj
+    assert managed
+    return managed
 
 
 @pytest.fixture
@@ -135,3 +155,108 @@ async def test_pyro_behavior_on_modules(
         await mod.cleanup()
         # Assert this module has been removed
         assert utility.find_PSO(mod) is None
+
+
+async def test_pyro_behavior_ot3api_unhashable_dicts(
+    managed_obj: OT3API,
+    decoy: Decoy,
+) -> None:
+    """Test the pyro behavior for unhashable dictionaries with pyro by ensuring several OT3API commands have the expected results."""
+    sock = socket.socket()
+    sock.bind(("localhost", 0))
+    host, port = sock.getsockname()
+    sock.close()
+
+    pyro.config.NS_HOST = host
+    pyro.config.NS_PORT = port
+
+    name_server_ready = threading.Event()
+
+    def _nameserver_loop() -> None:
+        # start_ns returns (nameserver, daemon, uri)
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
+        name_server_ready.set()
+        # Run until the test process exits; thread is marked daemon=True.
+        ns_daemon.requestLoop()
+
+    def _pyro_daemon() -> None:
+        # Wait for the nameserver to be ready so locate_ns can succeed.
+        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
+
+    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
+    server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
+
+    ns_thread.start()
+    server_thread.start()
+
+    # Client-side requests below
+    register_hardware_types()
+    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    ns = pyro.locate_ns()
+
+    retries_counter = 0
+    while ns.count() < 2:
+        # Wait and try again, the resource isnt registered yet
+        await asyncio.sleep(0.01)
+        retries_counter += 1
+        if retries_counter > 10:
+            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
+    uri = pyro.resolve(uri="PYRONAME:OT3API")
+    ot3_proxy = pyro.Proxy(uri)  # type: ignore
+    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3api = cast(OT3API, ot3_async)
+    await ot3api.home()
+
+    assert ot3api.get_all_attached_instr() == managed_obj.get_all_attached_instr()
+    data: Dict[hw_types.Axis, float] = {
+        hw_types.Axis.X: 0,
+        hw_types.Axis.Y: 0,
+        hw_types.Axis.Z_L: 0,
+        hw_types.Axis.Z_R: 0,
+        hw_types.Axis.P_L: 0,
+        hw_types.Axis.P_R: 0,
+        hw_types.Axis.Z_G: 0,
+        hw_types.Axis.G: 0,
+    }
+    # test with kwargs
+    assert ot3api.get_deck_from_machine(
+        machine_pos=data
+    ) == managed_obj.get_deck_from_machine(machine_pos=data)
+    # test with args, no kwargs
+    assert ot3api.get_deck_from_machine(data) == managed_obj.get_deck_from_machine(data)
+
+    await managed_obj.home()
+    assert await ot3api.current_position(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    ) == await managed_obj.current_position(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    )
+    assert await ot3api.current_position_ot3(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    ) == await managed_obj.current_position_ot3(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    )
+    assert await ot3api.encoder_current_position(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    ) == await managed_obj.current_position(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    )
+    assert await ot3api.encoder_current_position_ot3(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    ) == await managed_obj.current_position(
+        mount=hw_types.OT3Mount.LEFT, critical_point=None
+    )
+    assert ot3api.get_engaged_axes() == managed_obj.get_engaged_axes()
+    assert ot3api.engaged_axes == managed_obj.engaged_axes
+
+    assert await ot3api.get_limit_switches() == await managed_obj.get_limit_switches()
+    assert ot3api.get_attached_pipettes() == managed_obj.get_attached_pipettes()
+    assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
+    assert ot3api.attached_pipettes == managed_obj.attached_pipettes
+    assert ot3api.attached_subsystems == managed_obj.attached_subsystems
+
+    # Clean up client resources.
+    ot3_proxy._pyroRelease()  # type: ignore

@@ -9,6 +9,7 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
+    LabwareOffset,
     Liquid,
     LiquidClassRecordWithId,
     LoadedLabware,
@@ -208,6 +209,10 @@ class CompletedAnalysis(BaseModel):
     commandPreconditions: Optional[CommandPreconditions] = Field(
         default=None,
         description="Optional preconditions for commands used in this run.",
+    )
+    labwareOffsets: List[LabwareOffset] = Field(
+        default_factory=list,
+        description="List of loaded labware offsets (since this is an analysis, only those set by the protocol).",
     )
 
 

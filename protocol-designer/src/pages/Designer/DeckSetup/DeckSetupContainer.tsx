@@ -289,7 +289,6 @@ export function DeckSetupContainer(
                             slotClipColor={darkFill}
                             showExpansion={cutoutId === 'cutoutA1'}
                             fixtureBaseColor={lightFill}
-                            showSlotClips={false}
                           />
                         ) : null
                       })}
@@ -305,7 +304,6 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
-                              showSlotClips={false}
                             />
                           )
                         }
@@ -321,7 +319,6 @@ export function DeckSetupContainer(
                                   deckDefinition={deckDef}
                                   slotClipColor={COLORS.transparent}
                                   fixtureBaseColor={lightFill}
-                                  showSlotClips={false}
                                 />
                                 <FlexTrash
                                   robotType={robotType}
@@ -364,7 +361,6 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
-                              showSlotClips={false}
                             />
                           )
                         }

@@ -1,14 +1,30 @@
 """Pyro related utilities for serialization of objects."""
 
+import builtins
 import enum
 import inspect
-from typing import Any, Callable
+from contextlib import contextmanager
+from types import ModuleType
+from typing import Any, Callable, Iterator
 
+import serpent
 from pydantic import BaseModel
 from Pyro5 import api as pyro
+from typing_extensions import TypedDict, is_typeddict
 
 
-def find_enums_in_packages(modules: list) -> list:  # type: ignore
+class UnhashableDictWrapper(BaseModel):
+    """This is a specialty model created to safely wrap dictionaries with mutable elements provided by Opentrons APIs.
+
+    When registering types, be sure to utilize `register_unhashable_dicts` to ensure proper serialization between processes.
+    """
+
+    dictionary: dict[Any, Any]
+    key_type: str
+    value_type: str
+
+
+def find_enums_in_packages(modules: list[ModuleType]) -> list[type[enum.Enum]]:
     """Returns a list of enums in the given list of modules."""
     enums = []
     for module in modules:
@@ -16,6 +32,51 @@ def find_enums_in_packages(modules: list) -> list:  # type: ignore
             if issubclass(obj, enum.Enum) and obj is not enum.Enum:
                 enums.append(obj)
     return enums
+
+
+def find_pydantic_classes_in_packages(
+    modules: list[ModuleType],
+) -> list[type[BaseModel]]:
+    """Returns a list of pydantic classes in the given list of modules."""
+    pydantic_classes = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, BaseModel) and obj is not BaseModel:
+                pydantic_classes.append(obj)
+    return pydantic_classes
+
+
+def find_typed_dict_classes_in_packages(
+    modules: list[ModuleType],
+) -> list[type[TypedDict]]:  # type: ignore
+    """Returns a list of typed dict classes in the given list of modules."""
+    dict_classes = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if is_typeddict(obj):
+                dict_classes.append(obj)
+    return dict_classes
+
+
+def _serpent_enum_serializer(
+    obj: Any, serializer: Any, stream: Any, level: Any
+) -> None:
+    """Serpent serializer for generic Enum values."""
+    serializer._serialize(obj.value, stream, level)
+
+
+@contextmanager
+def serpent_enum_registration() -> Iterator[None]:
+    """Context manager for registering enums correctly with pyro/serpent.
+
+    Because Serpent matches by first isinstance() in registry order, we need to unregister enums first
+    so that types like "Mount" don't automatically become strings/ints, then register the enums after.
+    """
+    serpent.unregister_class(enum.Enum)  # type: ignore[no-untyped-call]
+    try:
+        yield
+    finally:
+        serpent.register_class(enum.Enum, _serpent_enum_serializer)  # type: ignore[no-untyped-call]
 
 
 def register_type_to_serpent(
@@ -30,18 +91,49 @@ def register_type_to_serpent(
     return class_path
 
 
-class PydanticPyroSerializer:
-    """A pyro serializer for Pydantic models."""
+class OpentronsPyroSerializer:
+    """A pyro serializer for custom Opentrons classes."""
 
-    _class_name_to_model: dict[str, type[BaseModel]] = {}
+    _pydantic_class_name_to_model: dict[str, type[BaseModel]] = {}
+    _enum_class_name_to_model: dict[str, type[enum.Enum]] = {}
+    _typed_dict_class_name_to_model: dict[str, type[TypedDict]] = {}  # type: ignore
 
     @classmethod
-    def register_model(cls, model: type[BaseModel]) -> None:
+    def register_enum(cls, enum_type: type[enum.Enum]) -> None:
+        """Registers an enumerated type to be sent and received via pyro proxies."""
+        class_name = register_type_to_serpent(
+            enum_type,
+            cls._generic_enum_dict_to_class,
+            cls._generic_enum_class_to_dict,
+        )
+        cls._enum_class_name_to_model[class_name] = enum_type
+
+    @classmethod
+    def _generic_enum_class_to_dict(cls, enum_obj: enum.Enum) -> dict[str, str]:
+        return {
+            "__class__": ".".join((enum_obj.__module__, enum_obj.__class__.__name__)),
+            "value": enum_obj.value,
+        }
+
+    @classmethod
+    def _generic_enum_dict_to_class(
+        cls, class_name: str, d: dict[str, str]
+    ) -> enum.Enum:
+        try:
+            enum_type = cls._enum_class_name_to_model[class_name]
+        except KeyError:
+            raise RuntimeError(
+                f"Unsupported module processed in Pyro request: {class_name}"
+            )
+        return enum_type(d["value"])
+
+    @classmethod
+    def register_pydantic_model(cls, model: type[BaseModel]) -> None:
         """Registers a pydantic model type to be sent and received via pyro proxies."""
         class_name = register_type_to_serpent(
             model, cls._pydantic_dict_to_class, cls._pydantic_class_to_dict
         )
-        cls._class_name_to_model[class_name] = model
+        cls._pydantic_class_name_to_model[class_name] = model
 
     @classmethod
     def _pydantic_class_to_dict(cls, model: BaseModel) -> dict[str, Any]:
@@ -53,9 +145,87 @@ class PydanticPyroSerializer:
     def _pydantic_dict_to_class(cls, class_name: str, d: dict[str, Any]) -> BaseModel:
         del d["__class__"]
         try:
-            model = cls._class_name_to_model[class_name]
+            model = cls._pydantic_class_name_to_model[class_name]
         except KeyError:
             raise TypeError(
                 f"Could not convert {class_name} to an object, unregistered with pyro."
             )
         return model.model_validate(d)
+
+    @classmethod
+    def register_typed_dict(cls, typed_dict: type) -> None:
+        """Registered a TypedDict type to the OpentronsPyroSerializer for tracking and deserialization purposes only."""
+        class_name = ".".join((typed_dict.__module__, typed_dict.__qualname__))
+        cls._typed_dict_class_name_to_model[class_name] = typed_dict
+
+    @classmethod
+    def register_unhashable_dicts(cls) -> None:
+        """Registers the specialty handler for unhashable dicts using UnhashableDictWrapper."""
+        class_name = register_type_to_serpent(
+            UnhashableDictWrapper,
+            cls._unhashable_dict_wrapper_dict_to_class,
+            cls._pydantic_class_to_dict,
+        )
+        cls._pydantic_class_name_to_model[class_name] = UnhashableDictWrapper
+
+    @classmethod
+    def _unhashable_dict_wrapper_dict_to_class(  # noqa: C901
+        cls, classname: str, d: dict[str, Any]
+    ) -> dict[Any, Any]:
+        registries: list[dict[str, Any]] = [
+            cls._pydantic_class_name_to_model,
+            cls._enum_class_name_to_model,
+            cls._typed_dict_class_name_to_model,
+        ]
+        # Identify the types for the key and values, if available. Check for builtin types first.
+        key_model = (
+            None
+            if "builtins" not in d["key_type"]
+            else getattr(builtins, d["key_type"].removeprefix("builtins."))
+        )
+        value_model = (
+            None
+            if "builtins" not in d["value_type"]
+            else getattr(builtins, d["value_type"].removeprefix("builtins."))
+        )
+        for registry in registries:
+            if d["key_type"] in registry:
+                key_model = registry[d["key_type"]]
+            if d["value_type"] in registry:
+                value_model = registry[d["value_type"]]
+
+        if key_model is None or value_model is None:
+            raise TypeError(
+                f"Could not convert Dictionary item `{d['key_type'] if key_model is None else d['value_type']}` to an object, unregistered with pyro."
+            )
+        unwrapped_dictionary = {}
+        # Unwrap the dictionary and format all keys and values to respective types
+        for key in d["dictionary"]:
+            # Handle Key unwrapping
+            if issubclass(key_model, enum.Enum):
+                try:
+                    unwrapped_key = key_model(int(key))
+                except ValueError:
+                    unwrapped_key = key_model(key)
+            elif issubclass(key_model, BaseModel):
+                unwrapped_key = key_model.model_validate(key)
+            else:
+                unwrapped_key = key_model(key)
+
+            # Handle Value unwrapping
+            if d["dictionary"][key] is None:
+                # Catching values that may have been `typing.Optional`
+                unwrapped_value = d["dictionary"][key]
+            elif issubclass(value_model, enum.Enum):
+                try:
+                    unwrapped_value = value_model(int(d["dictionary"][key]))
+                except ValueError:
+                    unwrapped_value = value_model(d["dictionary"][key])
+            elif issubclass(value_model, BaseModel):
+                unwrapped_value = value_model.model_validate(d["dictionary"][key])
+            else:
+                unwrapped_value = value_model(d["dictionary"][key])
+
+            unwrapped_dictionary[unwrapped_key] = unwrapped_value
+
+        return unwrapped_dictionary

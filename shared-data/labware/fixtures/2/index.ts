@@ -8,6 +8,7 @@ import fixture_corning_96_wellplate_360_flat from './fixture_corning_96_wellplat
 import fixture_flex_96_tiprack_1000ul from './fixture_flex_96_tiprack_1000ul.json'
 import fixture_flex_96_tiprack_adapter from './fixture_flex_96_tiprack_adapter.json'
 import fixture_irregular_example_1 from './fixture_irregular_example_1.json'
+import fixture_lid from './fixture_lid.json'
 import fixture_overlappy_wellplate from './fixture_overlappy_wellplate.json'
 import fixture_regular_example_1 from './fixture_regular_example_1.json'
 import fixture_regular_example_2 from './fixture_regular_example_2.json'
@@ -18,6 +19,7 @@ import fixture_trash from './fixture_trash.json'
 import fixture_universal_flat_bottom_adapter from './fixture_universal_flat_bottom_adapter.json'
 
 export {
+  fixture_lid,
   fixture_12_trough_v2,
   fixture_12_trough,
   fixture_24_tuberack,

@@ -49,7 +49,9 @@ class TransferPage(BasePage):
         modal.locator('label:has-text("All nozzles (recommended)")').click()
         modal.get_by_role("button", name="Continue").click()
 
-    def wells_select(self, location: locations, labwareName: str, wells: Union[str, List[str]]) -> None:
+    def wells_select(
+        self, location: locations, labwareName: str, wells: Union[str, List[str]], finalStep: bool
+    ) -> None:
         """
         Select source wells.
         Args:
@@ -67,7 +69,10 @@ class TransferPage(BasePage):
 
         for well in well_list:
             modal.locator(f"#{well}").click()
-        modal.get_by_role("button", name="Continue").click()
+        if finalStep:
+            modal.get_by_role("button", name="Save").click()
+        else:
+            modal.get_by_role("button", name="Continue").click()
 
     def destination_labware_select(self, labware: str) -> None:
         """Select destination labware in transfer step."""

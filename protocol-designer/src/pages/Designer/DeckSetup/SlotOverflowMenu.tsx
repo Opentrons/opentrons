@@ -29,6 +29,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
+  getAllLabwareWithoutLids,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
@@ -111,7 +112,11 @@ export function SlotOverflowMenu(
   const { makeSnackbar } = useKitchen()
 
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
-
+  const allLabwareNotLids = getAllLabwareWithoutLids(
+    deckSetup,
+    Object.keys(deckSetupLabware)
+  )
+  const topLabwareThatIsNotALid = deckSetupLabware[allLabwareNotLids[0]]
   const isOffDeckLocation = deckSetupLabware[location] != null
 
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
@@ -210,7 +215,7 @@ export function SlotOverflowMenu(
       : TOP_SLOT_Y_POSITION_2_BUTTONS
   }
 
-  let nickNameId = topLabwareOnSlot?.id
+  let nickNameId = topLabwareThatIsNotALid?.id
   if (isOffDeckLocation) {
     nickNameId = location
   }
@@ -277,7 +282,6 @@ export function SlotOverflowMenu(
         }}
       >
         <MenuItem
-          data-testid="SlotOverflowMenu_openTools"
           onClick={() => {
             addEquipment(location)
             setShowMenuList(false)

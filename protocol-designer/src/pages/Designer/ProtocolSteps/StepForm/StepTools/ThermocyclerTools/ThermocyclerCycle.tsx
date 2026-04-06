@@ -386,11 +386,11 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
           return showEdit ? (
             <Flex
               key={cycleStepId}
+              aria-label={`Thermocycler cycle step ${cycleStepIndex + 1}`}
               gridGap={SPACING.spacing24}
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
-              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -492,6 +492,9 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
                 />
               </Flex>
               <Flex
+                aria-label={`Delete thermocycler cycle step ${
+                  cycleStepIndex + 1
+                }`}
                 css={css`
                   &:hover {
                     background-color: ${COLORS.grey40};
@@ -510,11 +513,11 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
           ) : (
             <Flex
               key={cycleStepId}
+              aria-label={`Thermocycler cycle step ${cycleStepIndex + 1}`}
               gridGap={SPACING.spacing24}
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
-              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -570,10 +573,10 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
 
   return (
     <Flex
+      aria-label={`Thermocycler cycle ${getStepIndex(steps, cycleId ?? '')}`}
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
-      data-testid="thermocyclerCycle"
     >
       {header}
       {bodyContent}

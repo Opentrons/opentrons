@@ -11,6 +11,10 @@ nav:
       - OT-2 Attachment Steps: installation-ot2.md
   - Software Control: software.md
   - Maintenance and Cleaning: maintenance.md
+  - Heater-Shaker G-Codes:
+      - Heater-Shaker G-Code Concepts: g-code-concepts.md
+      - Heater-Shaker G-Codes: g-codes.md
+      - Heater-Shaker Error Codes: error-codes.md
   - Additional Product Information: additional-info.md
 
 theme:

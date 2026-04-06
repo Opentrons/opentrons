@@ -9,8 +9,6 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 5173
 
-benchmark_output := $(shell node -e 'console.log(new Date());')
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=

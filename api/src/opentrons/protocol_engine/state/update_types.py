@@ -395,6 +395,7 @@ class VacuumModuleStateUpdate:
     """An update to the Vacuum Module state."""
 
     module_id: str
+    pump_engaged: bool | NoChangeType = NO_CHANGE
 
     @classmethod
     def create_or_override(
@@ -506,6 +507,8 @@ class StateUpdate:
     )
 
     flex_stacker_state_update: FlexStackerStateUpdate | NoChangeType = NO_CHANGE
+
+    vacuum_module_state_update: VacuumModuleStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 
