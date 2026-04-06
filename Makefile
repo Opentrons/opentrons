@@ -338,7 +338,7 @@ validate-codecov-yml:
 .PHONY: dev-proxy
 dev-proxy:
 # In this command, the first port (:2) is a placeholder for the origin server's port.
-# dev_proxy.py *should* overwrite it in all cases, but in case something goes
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes wrong
 # with that, we choose port 2 because it's probably not assigned to anything.
 # `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
 # mitmproxy tries use port 2.
