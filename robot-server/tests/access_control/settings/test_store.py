@@ -7,6 +7,7 @@ from robot_server.access_control.settings.models import RequestData, ResponseDat
 from robot_server.access_control.settings.store import AccessControlSettingStore
 
 _ALL_FIELDS = list(ResponseData.model_fields.keys())
+_DEFAULTS = ResponseData()
 
 
 @pytest.fixture
@@ -20,17 +21,19 @@ def subject(
 def test_returns_defaults_when_nothing_set(subject: AccessControlSettingStore) -> None:
     """Verify get_all returns defaults when nothing set."""
     result = subject.get_all()
-    assert result == ResponseData()
+    assert result == _DEFAULTS
 
 
 @pytest.mark.parametrize("field_name", _ALL_FIELDS)
 def test_patch_field(subject: AccessControlSettingStore, field_name: str) -> None:
-    """Verify patch sets the correct field."""
-    result = subject.patch(RequestData.model_validate({field_name: True}))
-    assert getattr(result, field_name) is True
+    """Verify patch changes a single field away from its default."""
+    default_value = getattr(_DEFAULTS, field_name)
+    new_value = not default_value
+    result = subject.patch(RequestData.model_validate({field_name: new_value}))
+    assert getattr(result, field_name) is new_value
     for other in _ALL_FIELDS:
         if other != field_name:
-            assert getattr(result, other) is False
+            assert getattr(result, other) == getattr(_DEFAULTS, other)
 
 
 @pytest.mark.parametrize("field_name", _ALL_FIELDS)
@@ -38,11 +41,12 @@ def test_patch_null_reverts_to_default(
     subject: AccessControlSettingStore, field_name: str
 ) -> None:
     """Verify patch with null reverts to default."""
-    subject.patch(RequestData.model_validate({field_name: True}))
-    assert getattr(subject.get_all(), field_name) is True
+    default_value = getattr(_DEFAULTS, field_name)
+    subject.patch(RequestData.model_validate({field_name: not default_value}))
+    assert getattr(subject.get_all(), field_name) is (not default_value)
 
     result = subject.patch(RequestData.model_validate({field_name: None}))
-    assert getattr(result, field_name) is False
+    assert getattr(result, field_name) is default_value
 
 
 @pytest.mark.parametrize("field_name", _ALL_FIELDS)
@@ -50,25 +54,26 @@ def test_patch_overrides_previous_value(
     subject: AccessControlSettingStore, field_name: str
 ) -> None:
     """Verify patch overrides previous value."""
-    subject.patch(RequestData.model_validate({field_name: True}))
-    assert getattr(subject.get_all(), field_name) is True
+    default_value = getattr(_DEFAULTS, field_name)
+    subject.patch(RequestData.model_validate({field_name: not default_value}))
+    assert getattr(subject.get_all(), field_name) is (not default_value)
 
-    subject.patch(RequestData.model_validate({field_name: False}))
-    assert getattr(subject.get_all(), field_name) is False
+    subject.patch(RequestData.model_validate({field_name: default_value}))
+    assert getattr(subject.get_all(), field_name) is default_value
 
 
 def test_patch_multiple_fields(subject: AccessControlSettingStore) -> None:
     """Verify patch with multiple fields updates the correct fields."""
     request = RequestData.model_validate(
         {
-            "requireAdminCredsWhenUpdatingRobotSoftware": True,
+            "requireAdminCredsWhenUpdatingRobotSoftware": False,
             "requireSignoffForProtocolLog": True,
         }
     )
     result = subject.patch(request)
-    assert result.requireAdminCredsWhenUpdatingRobotSoftware is True
-    assert result.requireAdminCredsWhenSendingProtocolToRobot is False
-    assert result.requireAdminCredsForSignoffProtocol is False
+    assert result.requireAdminCredsWhenUpdatingRobotSoftware is False
+    assert result.requireAdminCredsWhenSendingProtocolToRobot is True
+    assert result.requireAdminCredsForSignoffProtocol is True
     assert result.requireSignoffForProtocolLog is True
 
 
@@ -77,17 +82,23 @@ def test_patch_empty_request_changes_nothing(
 ) -> None:
     """Verify patch with empty request changes nothing."""
     subject.patch(
-        RequestData.model_validate({"requireAdminCredsWhenUpdatingRobotSoftware": True})
+        RequestData.model_validate(
+            {"requireAdminCredsWhenUpdatingRobotSoftware": False}
+        )
     )
     result = subject.patch(RequestData.model_validate({}))
-    assert result.requireAdminCredsWhenUpdatingRobotSoftware is True
+    assert result.requireAdminCredsWhenUpdatingRobotSoftware is False
 
 
 def test_reset_clears_all_settings(subject: AccessControlSettingStore) -> None:
-    """Verify reset_all clears all access control settings."""
-    subject.patch(RequestData.model_validate({name: True for name in _ALL_FIELDS}))
+    """Verify reset_all reverts all settings to defaults."""
+    subject.patch(
+        RequestData.model_validate(
+            {name: not getattr(_DEFAULTS, name) for name in _ALL_FIELDS}
+        )
+    )
     subject.reset_all()
-    assert subject.get_all() == ResponseData()
+    assert subject.get_all() == _DEFAULTS
 
 
 def test_reset_does_not_affect_other_boolean_settings(
