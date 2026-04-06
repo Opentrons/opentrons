@@ -36,10 +36,10 @@ jobs:
     name: 'Confirm G-Code (${{ matrix.command }})'
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: '12'
       - uses: './.github/actions/python/setup-uv'

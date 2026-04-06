@@ -46,12 +46,12 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: 'actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: '22.22.0'
 
@@ -68,7 +68,7 @@ jobs:
         run: make -C hardware-testing test-cov
 
       - name: Coverage
-        uses: 'codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3'
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3
         with:
           files: ./hardware-testing/coverage.xml
           flags: hardware-testing

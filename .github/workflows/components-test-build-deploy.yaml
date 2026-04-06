@@ -66,7 +66,7 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: ./.github/actions/js/setup
       - name: 'run components unit tests'
         run: make -C components test-cov
@@ -81,7 +81,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['determine-deploy-config', 'js-unit-test']
     steps:
-      - uses: 'actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: ./.github/actions/js/setup
       - name: 'build components'
         run: make -C components
@@ -121,7 +121,7 @@ jobs:
         run: |
           make setup
       - name: 'download components build'
-        uses: 'actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: components-artifact
           path: ./dist
@@ -139,7 +139,7 @@ jobs:
     needs: ['js-unit-test']
     if: startsWith(github.ref, 'refs/tags/components')
     steps:
-      - uses: 'actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -157,7 +157,7 @@ jobs:
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"
-      - uses: 'actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: '22.22.0'
           registry-url: 'https://registry.npmjs.org'
