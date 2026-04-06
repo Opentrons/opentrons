@@ -37,7 +37,9 @@ export function ExtendedPartialTipField(
   const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
+  const [isClicked, setIsClicked] = useState(false)
   const handleOpen = (): void => {
+    setIsClicked(true)
     setIsNozzleAndWellModalOpen(true)
   }
   const primaryNozzle =
@@ -107,8 +109,7 @@ export function ExtendedPartialTipField(
       (channels === 8 && nozzleConfiguration === ALL) ||
       nozzleConfiguration === COLUMN
     const isRow = nozzleConfiguration === ROW
-    const hasRequiredWells = aspWells.length > 0
-    if (!nozzleText || !hasRequiredWells) {
+    if (!nozzleText || !isClicked || isNozzleAndWellModalOpen) {
       return t('no_nozzles_and_wells_selected')
     }
     let positionType: string = 'wells'
