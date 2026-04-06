@@ -18,12 +18,14 @@ def subject(
 
 
 def test_returns_defaults_when_nothing_set(subject: AccessControlSettingStore) -> None:
+    """Verify get_all returns defaults when nothing set."""
     result = subject.get_all()
     assert result == ResponseData()
 
 
 @pytest.mark.parametrize("field_name", _ALL_FIELDS)
 def test_patch_field(subject: AccessControlSettingStore, field_name: str) -> None:
+    """Verify patch sets the correct field."""
     result = subject.patch(RequestData.model_validate({field_name: True}))
     assert getattr(result, field_name) is True
     for other in _ALL_FIELDS:
@@ -35,6 +37,7 @@ def test_patch_field(subject: AccessControlSettingStore, field_name: str) -> Non
 def test_patch_null_reverts_to_default(
     subject: AccessControlSettingStore, field_name: str
 ) -> None:
+    """Verify patch with null reverts to default."""
     subject.patch(RequestData.model_validate({field_name: True}))
     assert getattr(subject.get_all(), field_name) is True
 
@@ -46,6 +49,7 @@ def test_patch_null_reverts_to_default(
 def test_patch_overrides_previous_value(
     subject: AccessControlSettingStore, field_name: str
 ) -> None:
+    """Verify patch overrides previous value."""
     subject.patch(RequestData.model_validate({field_name: True}))
     assert getattr(subject.get_all(), field_name) is True
 
@@ -54,6 +58,7 @@ def test_patch_overrides_previous_value(
 
 
 def test_patch_multiple_fields(subject: AccessControlSettingStore) -> None:
+    """Verify patch with multiple fields updates the correct fields."""
     request = RequestData.model_validate(
         {
             "requireAdminCredsWhenUpdatingRobotSoftware": True,
@@ -70,6 +75,7 @@ def test_patch_multiple_fields(subject: AccessControlSettingStore) -> None:
 def test_patch_empty_request_changes_nothing(
     subject: AccessControlSettingStore,
 ) -> None:
+    """Verify patch with empty request changes nothing."""
     subject.patch(
         RequestData.model_validate({"requireAdminCredsWhenUpdatingRobotSoftware": True})
     )
@@ -78,6 +84,7 @@ def test_patch_empty_request_changes_nothing(
 
 
 def test_reset_clears_all_settings(subject: AccessControlSettingStore) -> None:
+    """Verify reset_all clears all access control settings."""
     subject.patch(RequestData.model_validate({name: True for name in _ALL_FIELDS}))
     subject.reset_all()
     assert subject.get_all() == ResponseData()
