@@ -327,6 +327,37 @@ def test_run_time_parameter_setting(
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_ot2_protocol_rejected(tmp_path: Path, output: str) -> None:
+    """It should reject OT-2 protocols."""
+    protocol_source = textwrap.dedent(
+        """\
+        requirements = {
+            "apiLevel": "2.15",
+            "robotType": "OT-2",
+        }
+
+        def run(protocol):
+            pass
+        """
+    )
+
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(protocol_source, encoding="utf-8")
+
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code != 0
+
+    expected_message = (
+        "This protocol is designed for an OT-2 robot. "
+        "To utilize this protocol, please download the "
+        "most recent version of the Opentrons-OT2 app from "
+        "https://github.com/Opentrons/opentrons-ot2/releases"
+    )
+    assert expected_message in result.stdout_stderr
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 def test_run_time_parameter_error(
     tmp_path: Path,
     output: str,
