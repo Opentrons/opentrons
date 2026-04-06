@@ -81,11 +81,7 @@ export function NozzleAndWellSelectionModal(
     setCurrentStepIndex(currentStepIndex => currentStepIndex - 1)
   }
   const handleClose = (): void => {
-    if (currentStepIndex === 2 && wellValues.length === 0) {
-      setShowError(true)
-    } else {
-      showModal(false)
-    }
+    showModal(false)
   }
 
   const nozzleAndWellSelectionBaseModalProps = {
