@@ -16,7 +16,7 @@ LOG = logging.getLogger(__name__)
 class TLSManager:
     """A class for managing the combination of CAs and end-entities that allows TLS communication."""
 
-    EXPIRY_CHECKER_POLL_PERIOD: Final = timedelta(hours=23)
+    EXPIRY_CHECKER_POLL_PERIOD: Final = timedelta(hours=7)
 
     def __init__(self, ca_manager: TLSCAManager, ee_manager: TLSEEManager) -> None:
         """Build the TLSManager."""
@@ -87,12 +87,12 @@ class TLSManager:
     async def _expiry_task_inner(self, poll_time: timedelta) -> None:
         while True:
             now = datetime.now(tz=timezone.utc)
-            if self._ca_manager.must_build_next(now):
+            if self._ca_manager.must_build_next(now + poll_time):
                 self._ca_manager.build_next(now)
             # Rotating CAs means rotating EEs
-            if self._ca_manager.must_rotate(now):
+            if self._ca_manager.must_rotate(now + poll_time):
                 self._ca_manager.rotate(now)
                 self.refresh_ee()
-            if not self._ee_manager.ready(now):
+            if not self._ee_manager.ready(now + poll_time):
                 self.refresh_ee()
             await asyncio.sleep(poll_time.total_seconds())

@@ -92,6 +92,21 @@ def test_subject_becomes_unready_after_removing_a_cert(
     assert not initialized_subject.ready(datetime.now(timezone.utc))
 
 
+def test_subject_readiness_based_on_argument(
+    initialized_subject: TLSEEManager,
+) -> None:
+    """It should base its readiness assessment on the time point provided."""
+    assert not initialized_subject.ready(
+        datetime.now(timezone.utc) + timedelta(hours=23, minutes=1)
+    )
+    assert initialized_subject.ready(
+        datetime.now(timezone.utc) + timedelta(hours=22, minutes=59)
+    )
+    assert not initialized_subject.ready(
+        datetime.now(timezone.utc) - timedelta(hours=1)
+    )
+
+
 def test_subject_uses_robot_details(
     initialized_subject: TLSEEManager, hostname: str, ip_addresses: list[str]
 ) -> None:

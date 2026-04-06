@@ -36,6 +36,7 @@ class TLSEEManager:
     """
 
     EE_EXPIRY_DURATION: Final = timedelta(days=1)
+    EE_EXPIRY_GRACE_DURATION: Final = timedelta(hours=1)
 
     def __init__(
         self,
@@ -67,17 +68,23 @@ class TLSEEManager:
             self._robot_ips,
         )
 
-    def ready(self, now: datetime) -> bool:
+    def ready(self, as_of: datetime) -> bool:
         """True if the system is ready; False otherwise.
 
-        The system is ready if it has a certificate and the certificate expires in more than 1 hour.
+        The system is ready if it has a certificate and the certificate will be valid one hour after the
+        time specified.
 
         There are circumstances beyond this that would make this cert a bad choice to terminate TLS
         with - for instance, the robot's hostname or IP has changed, or the CA has rotated - but this
         system is only checking the validity of the certificate itself.
         """
-        return self._ee_pair is not None and (
-            now + timedelta(hours=1) < self._ee_pair.cert.not_valid_after_utc
+        return (
+            self._ee_pair is not None
+            and (self._ee_pair.cert.not_valid_before_utc < as_of)
+            and (
+                (as_of + self.EE_EXPIRY_GRACE_DURATION)
+                < self._ee_pair.cert.not_valid_after_utc
+            )
         )
 
     def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
