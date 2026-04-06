@@ -500,14 +500,16 @@ class BooleanSettingKey(enum.Enum):
     ENABLE_LIVE_STREAM = "enable_live_stream"
     ENABLE_ERROR_RECOVERY_CAMERA = "enable_error_recovery_camera"
     REQUIRE_ADMIN_CREDS_WHEN_UPDATING_ROBOT_SOFTWARE = (
-        "requireAdminCredsWhenUpdatingRobotSoftware"
+        "require_admin_creds_when_updating_robot_software"
     )
     REQUIRE_ADMIN_CREDS_WHEN_SENDING_PROTOCOL_TO_ROBOT = (
-        "requireAdminCredsWhenSendingProtocolToRobot"
+        "require_admin_creds_when_sending_protocol_to_robot"
     )
-    REQUIRE_ADMIN_CREDS_FOR_SIGNOFF_PROTOCOL = "requireAdminCredsForSignoffProtocol"
-    REQUIRE_SIGNOFF_FOR_PROTOCOL_LOG = "requireSignoffForProtocolLog"
-    REQUIRE_LOGS_TO_BE_SAVED_IN_APP = "requireLogsToBeSavedInApp"
+    REQUIRE_ADMIN_CREDS_FOR_SIGNOFF_PROTOCOL = (
+        "require_admin_creds_for_signoff_protocol"
+    )
+    REQUIRE_SIGNOFF_FOR_PROTOCOL_LOG = "require_signoff_for_protocol_log"
+    REQUIRE_LOGS_TO_BE_SAVED_IN_APP = "require_logs_to_be_saved_in_app"
 
 
 boolean_setting_table = sqlalchemy.Table(

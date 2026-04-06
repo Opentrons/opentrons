@@ -10,10 +10,18 @@ from .models import RequestData, ResponseData
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.persistence.tables import BooleanSettingKey, boolean_setting_table
 
-_ACCESS_CONTROL_KEYS: dict[str, BooleanSettingKey] = {
-    field_name: BooleanSettingKey(field_name)
-    for field_name in ResponseData.model_fields
-    if field_name in {k.value for k in BooleanSettingKey}
+_K = BooleanSettingKey
+
+_KEY_TO_FIELD_NAME: dict[BooleanSettingKey, str] = {
+    _K.REQUIRE_ADMIN_CREDS_WHEN_UPDATING_ROBOT_SOFTWARE: "requireAdminCredsWhenUpdatingRobotSoftware",
+    _K.REQUIRE_ADMIN_CREDS_WHEN_SENDING_PROTOCOL_TO_ROBOT: "requireAdminCredsWhenSendingProtocolToRobot",
+    _K.REQUIRE_ADMIN_CREDS_FOR_SIGNOFF_PROTOCOL: "requireAdminCredsForSignoffProtocol",
+    _K.REQUIRE_SIGNOFF_FOR_PROTOCOL_LOG: "requireSignoffForProtocolLog",
+    _K.REQUIRE_LOGS_TO_BE_SAVED_IN_APP: "requireLogsToBeSavedInApp",
+}
+
+_FIELD_NAME_TO_KEY: dict[str, BooleanSettingKey] = {
+    v: k for k, v in _KEY_TO_FIELD_NAME.items()
 }
 
 
@@ -32,13 +40,11 @@ class AccessControlSettingStore:
                     boolean_setting_table.c.key,
                     boolean_setting_table.c.value,
                 ).where(
-                    boolean_setting_table.c.key.in_(
-                        [k.value for k in _ACCESS_CONTROL_KEYS.values()]
-                    )
+                    boolean_setting_table.c.key.in_(list(_KEY_TO_FIELD_NAME.keys()))
                 )
             ).all()
             for row in rows:
-                values[row.key.value] = bool(row.value)
+                values[_KEY_TO_FIELD_NAME[row.key]] = bool(row.value)
         return ResponseData.model_construct(**values)
 
     def patch(self, request: RequestData) -> ResponseData:
@@ -52,14 +58,14 @@ class AccessControlSettingStore:
             return self.get_all()
 
         with self._sql_engine.begin() as transaction:
-            keys_to_update = [_ACCESS_CONTROL_KEYS[name] for name in provided]
+            keys_to_update = [_FIELD_NAME_TO_KEY[name] for name in provided]
             transaction.execute(
                 sqlalchemy.delete(boolean_setting_table).where(
                     boolean_setting_table.c.key.in_(keys_to_update)
                 )
             )
             rows_to_insert = [
-                {"key": _ACCESS_CONTROL_KEYS[name], "value": value}
+                {"key": _FIELD_NAME_TO_KEY[name], "value": value}
                 for name, value in provided.items()
                 if value is not None
             ]
@@ -75,9 +81,7 @@ class AccessControlSettingStore:
         with self._sql_engine.begin() as transaction:
             transaction.execute(
                 sqlalchemy.delete(boolean_setting_table).where(
-                    boolean_setting_table.c.key.in_(
-                        [k.value for k in _ACCESS_CONTROL_KEYS.values()]
-                    )
+                    boolean_setting_table.c.key.in_(list(_KEY_TO_FIELD_NAME.keys()))
                 )
             )
 
