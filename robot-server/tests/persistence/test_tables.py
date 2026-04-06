@@ -28,6 +28,7 @@ from robot_server.persistence.tables import (
     schema_13,
     schema_14,
     schema_15,
+    schema_16,
 )
 
 # The statements that we expect to emit when we create a fresh database.
@@ -42,7 +43,7 @@ from robot_server.persistence.tables import (
 #   * Adding, removing, or renaming a constraint or relation.
 #
 # Whitespace and formatting changes, on the other hand, are allowed.
-EXPECTED_STATEMENTS_LATEST = [
+EXPECTED_STATEMENTS_V16 = [
     """
     CREATE TABLE protocol (
         id VARCHAR NOT NULL,
@@ -237,7 +238,7 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
     """
     CREATE TABLE boolean_setting_extended (
-        "key" VARCHAR(28) NOT NULL,
+        "key" VARCHAR(43) NOT NULL,
         value BOOLEAN NOT NULL,
         PRIMARY KEY ("key")
     )
@@ -292,7 +293,12 @@ EXPECTED_STATEMENTS_LATEST = [
     """,
 ]
 
-EXPECTED_STATEMENTS_V15 = EXPECTED_STATEMENTS_LATEST
+EXPECTED_STATEMENTS_V15 = [
+    s.replace("VARCHAR(43)", "VARCHAR(28)") if "boolean_setting_extended" in s else s
+    for s in EXPECTED_STATEMENTS_V16
+]
+
+EXPECTED_STATEMENTS_LATEST = EXPECTED_STATEMENTS_V16
 
 EXPECTED_STATEMENTS_V14 = [
     """
@@ -1829,6 +1835,7 @@ def _normalize_statement(statement: str) -> str:
     ("metadata", "expected_statements"),
     [
         (latest_metadata, EXPECTED_STATEMENTS_LATEST),
+        (schema_16.metadata, EXPECTED_STATEMENTS_V16),
         (schema_15.metadata, EXPECTED_STATEMENTS_V15),
         (schema_14.metadata, EXPECTED_STATEMENTS_V14),
         (schema_13.metadata, EXPECTED_STATEMENTS_V13),
