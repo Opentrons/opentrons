@@ -44,12 +44,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: ./.github/actions/js/setup
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
         with:
           flags: step-generation
           token: ${{ secrets.CODECOV_TOKEN }}
