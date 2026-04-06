@@ -6,6 +6,10 @@ resolution-markers = [
     "python_full_version < '3.14'",
 ]
 
+[options]
+exclude-newer = "2026-03-30T17:27:44.113487Z"
+exclude-newer-span = "P1W"
+
 [manifest]
 
 [[manifest.dependency-metadata]]

@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from shutil import rmtree
@@ -6,7 +5,6 @@ from typing import Any, AsyncIterator, Iterator
 
 import pytest
 from cryptography import x509
-from cryptography.hazmat.primitives import hashes
 
 from key_server.tls import ca_manager, cryptography_utils
 
@@ -39,7 +37,6 @@ class SubjectFactory:
 
     async def destroy(self, *args: Any, **kwargs: Any) -> None:
         if self._manager:
-            await self._manager.teardown()
             self._manager = None
 
 
@@ -97,14 +94,14 @@ async def test_init_limits_to_two_certs(
     subject = subject_factory.create()
 
     assert subject._current_ca.certpath == current.certpath
-    assert subject._current_ca.cert.fingerprint(
-        hashes.SHA256()
-    ) == current.cert.fingerprint(hashes.SHA256())
+    assert cryptography_utils.fingerprint(
+        subject._current_ca.cert
+    ) == cryptography_utils.fingerprint(current.cert)
     assert subject._next_ca
     assert subject._next_ca.certpath == next.certpath
-    assert subject._next_ca.cert.fingerprint(hashes.SHA256()) == next.cert.fingerprint(
-        hashes.SHA256()
-    )
+    assert cryptography_utils.fingerprint(
+        subject._next_ca.cert
+    ) == cryptography_utils.fingerprint(next.cert)
     assert current.certpath.exists()
     assert current.keypath.exists()
     assert next.certpath.exists()
@@ -184,34 +181,10 @@ async def test_rotates_ca_if_necessary_on_boot(
         key_dir, ca_cert_dir, nowish - timedelta(days=30), timedelta(days=365, hours=1)
     )
     subject = subject_factory.create()
-    assert subject._current_ca.cert.fingerprint(
-        hashes.SHA256()
-    ) == next.cert.fingerprint(hashes.SHA256())
+    assert cryptography_utils.fingerprint(
+        subject._current_ca.cert
+    ) == cryptography_utils.fingerprint(next.cert)
     assert subject._next_ca is None
-
-
-async def test_rotates_ca_while_live(
-    key_dir: Path, ca_cert_dir: Path, subject_factory: SubjectFactory
-) -> None:
-    """While the manager is running, if it detects expiry it should rotate CAs."""
-    nowish = datetime.now(timezone.utc)
-    current = cryptography_utils.create_ca(
-        key_dir,
-        ca_cert_dir,
-        nowish - timedelta(days=365, minutes=59, seconds=58),
-        timedelta(days=365, hours=1),
-    )
-    subject = subject_factory.create()
-    await subject.teardown()
-    # this is a Final so we have to ignore a type error to overwrite it
-    subject.CA_EXPIRY_CHECK_POLL_PERIOD = timedelta(seconds=3)  # type: ignore[misc]
-    subject._expiry_task = asyncio.create_task(subject._expiry_task_outer())
-    await asyncio.sleep(4)
-    assert subject._current_ca.cert.fingerprint(
-        hashes.SHA256()
-    ) != current.cert.fingerprint(hashes.SHA256())
-    assert not current.certpath.exists()
-    assert not current.keypath.exists()
 
 
 async def test_signs_ee_certificates(
