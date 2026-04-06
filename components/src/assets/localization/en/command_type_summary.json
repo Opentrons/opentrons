@@ -110,6 +110,7 @@
   "unsafe/ungripLabware": "Unsafe",
   "unsafe/updatePositionEstimators": "Unsafe",
   "unsealPipetteFromTip": "Unseal pipette",
+  "vacuum_module/stopVacuum": "Stop Vacuum",
   "verifyTipPresence": "Tip presence",
   "waitForDuration": "Wait",
   "waitForResume": "Wait",
