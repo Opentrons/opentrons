@@ -83,6 +83,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

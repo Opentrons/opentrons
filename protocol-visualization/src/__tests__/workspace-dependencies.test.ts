@@ -1,3 +1,5 @@
+import { List } from 'react-window'
+import clsx from 'clsx'
 import { describe, expect, it } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
@@ -15,5 +17,13 @@ describe('workspace dependencies', () => {
   it('resolves @opentrons/step-generation', () => {
     expect(EMPTY).toBe('EMPTY')
     expect(CLEAN).toBe('CLEAN')
+  })
+
+  it('resolves react-window', () => {
+    expect(List).toBeDefined()
+  })
+
+  it('resolves clsx', () => {
+    expect(clsx('a', 'b')).toBe('a b')
   })
 })
