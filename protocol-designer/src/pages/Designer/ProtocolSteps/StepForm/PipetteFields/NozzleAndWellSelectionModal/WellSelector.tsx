@@ -448,41 +448,59 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
               ignoreMissingTips
               wellLabelOptions="SHOW_LABEL_INSIDE"
             />
+            {hoveredWells?.[0] && hasMoreThanOneWell ? (
+              <PipetteShadow
+                robotType={robotType}
+                pipetteSpec={pipetteSpecs}
+                hoveredWell={hoveredWells[0]}
+                selectedLabwareId={labwareId}
+                labwareState={deckSetup.labware}
+                hasPickupsRemaining={null}
+                isHoveredWellSelected={hoveredIsSelected}
+                isAccessible={isAccessible}
+                inaccessibleReason={inaccessibleReason}
+                primaryNozzle={primaryNozzle}
+                enclosingViewbox={viewBox}
+                nozzles={nozzleConfiguration}
+                rotate={is96Channel}
+              />
+            ) : null}
           </Module>
         ) : (
-          <LabwareOnDeck
-            labwareOnDeck={labware}
-            x={slotPosition[0]}
-            y={slotPosition[1]}
-            handleClickWell={handleClickWell}
-            onMouseEnterWell={handleHoverWell}
-            selectedTipsByIndex={allWellsWithStatus}
-            statusByWellName={allWellsWithState}
-            fill={COLORS.white}
-            inWellSelectionModal
-            ignoreMissingTips
-            wellLabelOptions="SHOW_LABEL_INSIDE"
-          />
+          <>
+            <LabwareOnDeck
+              labwareOnDeck={labware}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              handleClickWell={handleClickWell}
+              onMouseEnterWell={handleHoverWell}
+              selectedTipsByIndex={allWellsWithStatus}
+              statusByWellName={allWellsWithState}
+              fill={COLORS.white}
+              inWellSelectionModal
+              ignoreMissingTips
+              wellLabelOptions="SHOW_LABEL_INSIDE"
+            />
+            {hoveredWells?.[0] && hasMoreThanOneWell ? (
+              <PipetteShadow
+                robotType={robotType}
+                pipetteSpec={pipetteSpecs}
+                slotPosition={slotPosition}
+                hoveredWell={hoveredWells[0]}
+                selectedLabwareId={labwareId}
+                labwareState={deckSetup.labware}
+                hasPickupsRemaining={null}
+                isHoveredWellSelected={hoveredIsSelected}
+                isAccessible={isAccessible}
+                inaccessibleReason={inaccessibleReason}
+                primaryNozzle={primaryNozzle}
+                enclosingViewbox={viewBox}
+                nozzles={nozzleConfiguration}
+                rotate={is96Channel}
+              />
+            ) : null}
+          </>
         )}
-
-        {hoveredWells?.[0] && hasMoreThanOneWell ? (
-          <PipetteShadow
-            robotType={robotType}
-            pipetteSpec={pipetteSpecs}
-            slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
-            selectedLabwareId={labwareId}
-            labwareState={deckSetup.labware}
-            hasPickupsRemaining={null}
-            isHoveredWellSelected={hoveredIsSelected}
-            isAccessible={isAccessible}
-            inaccessibleReason={inaccessibleReason}
-            primaryNozzle={primaryNozzle}
-            enclosingViewbox={viewBox}
-            nozzles={nozzleConfiguration}
-            rotate={is96Channel}
-          />
-        ) : null}
       </Fragment>
     )
   }
@@ -495,7 +513,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           onSelectionDone={handleSelectionDone}
           customWidth={45}
         >
-          <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          <div className={styles.base_deck_tip_selection}>
+            <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          </div>
         </SelectionRect>
         <div className={styles.well_legend_box}>
           <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
