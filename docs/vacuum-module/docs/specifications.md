@@ -6,43 +6,46 @@ title: "Vacuum Module: Product Specifications"
 
 ## Included parts
 
-<font color="red">PARTS IMAGES PLACEHOLDERS</font>
-
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Waste collection jar](images/waste-jar-line.png "Waste collection jar")
-<figcaption>(1) GL60 collection jar</figcaption>
-</figure>
-
-<figure markdown>
-![Vacuum pump unit](images/vacuum-pump.png "Vacuum pump")
+![Vacuum pump unit](images/vacuum-pump2.png "Vacuum pump")
 <figcaption>(1) Vacuum pump</figcaption>
 </figure>
 
 <figure markdown>
+![Waste collection jar](images/waste-jar2.png "Waste collection jar")
+<figcaption>(1) Waste collection jar</figcaption>
+</figure>
+
+<figure markdown>
+![Deck plate adapter](images/deck-caddy2.png "Deck plate adapter")
+<figcaption>(1) Deck adapter</figcaption>
+</figure>
+
+<figure markdown>
+![Module spacers](images/manifold-spacer.png "Well plate spacers")
+<figcaption>(3) well plate spacers</figcaption>
+</figure>
+
+<figure markdown>
 ![Vacuum hoses](images/hoses5.png "6 mm and 9.5 mm waste and vacuum tubes")
-<figcaption>(1) 6 mm and 9.5 mm vacuum hoses</figcaption>
+<figcaption>(1 each) 6 mm and 9.5 mm vacuum hoses</figcaption>
 </figure>
 
 <figure markdown>
-![Waste collection carboy](images/deck-caddy.png "Deck caddy")
-<figcaption>(1) Deck caddy</figcaption>
-</figure>
-
-<figure markdown>
-![Bag of screws](images/deck-plate-screw.svg "Deck slot screws")
-<figcaption>( ) M4x10 Deck slot screws</figcaption>
-</figure>
-
-<figure markdown>
-![USB type A cable](images/usb-a-cable.png "USB A cable")
+![USB type A cable](images/usb-a-cable2.png "USB A cable")
 <figcaption>(1) USB A cable</figcaption>
 </figure>
 
 <figure markdown>
-![Power cable](images/iec-plugs.png "Region-specific power cable")
+![Power cable](images/iec-plugs2.png "Region-specific power cable")
 <figcaption>(1) Region specific power cable</figcaption>
+</figure>
+
+<figure markdown>
+![Bag of screws](images/deck-screws2.svg "Deck slot screws")
+<figcaption>( ) M4x10 Deck slot screws</figcaption>
 </figure>
 
 </div>
@@ -53,8 +56,7 @@ title: "Vacuum Module: Product Specifications"
 |----|----|
 | Vacuum module | L W H (include handle), weight |
 | Maximum pump rate | L/min  |
-| Measurement range (absolute) | 0 <emdash> xxx mbar |
-| Resolution | x.x mbar |
+| Measurement range (absolute) | 0—xxx mbar |
 | Tubing | Diameter, length, composition |
 | Relative humidity | xx% at C |
 | Temperature | |
@@ -75,12 +77,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   <tbody>
     <tr>
       <td><strong>Manufacturer and model</strong></td>
-        <td>
-          <ul>
-            <li>Mean Well</li>
-            <li>LOP-200-24</li>
-            <li>Low-profile, open-frame internal power supply</li>
-          </ul>
+        <td>The module is powered by a <a href="https://www.meanwell.com/index.aspx">Mean Well</a> LOP-200 series low-profile, open-frame internal power supply.
         </td>
     </tr>
     <tr>
