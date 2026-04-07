@@ -53,3 +53,7 @@ class KeyServerConfig(BaseSettings):
         description="The location at which to provide access to the mounted secure volume",
     )
     secure_volume_size_mb: int = 64
+    tls_directory: Literal["automatically_make_temporary"] | Path = Field(
+        default="automatically_make_temporary",
+        description="The location in which to store tls keys and certs for tls termination",
+    )
