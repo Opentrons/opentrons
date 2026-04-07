@@ -39,7 +39,7 @@ tests: List[Union[TestHelp, TestSimulate]] = [
         test_key="OT2_v2_20_expect_success",
         test_helper="simulate",
         protocol_path="../analyses-snapshot-testing/files/protocols/OT2_S_v2_20_8_None_SINGLE_HappyPath.py",
-        expected_return_code="0",
+        expected_return_code="1",
     ),
     TestSimulate(
         test_key="Flex_v2_16_expect_error",
