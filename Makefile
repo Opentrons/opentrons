@@ -332,7 +332,7 @@ test-js-%:
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
 
-# A convenience command for running all of our servers in dev mode, together,
+# Convenience commands for running all of our servers in dev mode, together,
 # behind a reverse proxy listening on port 31950.
 #
 # This naively amalgamates all of the logs into a single stdout stream.
@@ -341,6 +341,12 @@ validate-codecov-yml:
 dev-backend:
 	$(python) scripts/run_concurrently.py \
 		$(MAKE) -C robot-server dev BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+.PHONY: dev-backend-flex
+dev-backend-flex:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev-flex BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C auth-server dev ';' \
 		$(MAKE) -C system-server dev ';' \
 		$(MAKE) dev-proxy
