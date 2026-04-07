@@ -45,7 +45,7 @@ def build_secure_volume_manager(settings: SettingsStore) -> SecureVolumeManager:
 def install_secure_volume_manager(
     app_state: AppState, secure_volume_manager: SecureVolumeManager
 ) -> None:
-    """Place the server's singleton SecureVolumeNaager in server state, for later retrieval by get_secure_volume_manager()."""
+    """Place the server's singleton SecureVolumeManager in server state, for later retrieval by get_secure_volume_manager()."""
     _accessor.set_on(app_state, secure_volume_manager)
 
 
