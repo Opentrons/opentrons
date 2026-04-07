@@ -7,11 +7,20 @@ Intro. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec luctus hen
 
 ## Deck stack
 
-
+- Deck plate and fasteners
+- Base
+- Spacers (and sizes)
 
 ## Pump unit
 
-
+- Closer image of air/water separator. SMC AFM series mist separator.
+- Back panel connections: USB, power, vacuum in
+- Tubes/hoses (diameter and lengths): 1/4" 6 mm and 3/8" 9.5 mm inner diameter. Composition.
 
 ## Waste jar
+
+- Capacity
+- Composition
+- Lid features: splash guard, cutoff float
+- Wrench
 
