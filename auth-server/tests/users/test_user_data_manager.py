@@ -1,10 +1,10 @@
 import pytest
 from decoy import Decoy, matchers
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.persistence.orm_models import User
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
+from auth_server.settings.models import SettingsResponseData
+from auth_server.settings.store import SettingsStore
+from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
@@ -21,9 +21,18 @@ def mock_store(decoy: Decoy) -> UserStore:
 
 
 @pytest.fixture()
-def manager(mock_store: UserStore) -> UserDataManager:
+def mock_settings(decoy: Decoy) -> SettingsStore:
+    """Get a mock SettingsStore."""
+    return decoy.mock(cls=SettingsStore)
+
+
+@pytest.fixture()
+def manager(
+    decoy: Decoy, mock_store: UserStore, mock_settings: SettingsStore
+) -> UserDataManager:
     """Provide a UserDataManager backed by a mock store."""
-    return UserDataManager(user_store=mock_store)
+    decoy.when(mock_store.get_failed_login_count(matchers.Anything())).then_return(0)
+    return UserDataManager(user_store=mock_store, settings_store=mock_settings)
 
 
 def _make_orm_user(
@@ -55,8 +64,12 @@ def test_seed_calls_store_seed(
 
 
 def test_create_user_success(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     expected = _make_orm_user(
         username="new_user",
         full_name="New User",
@@ -78,29 +91,45 @@ def test_create_user_success(
         full_name="New User",
         account_type=AccountType.USER,
     )
-    assert result.userName == "new_user"
-    assert result.accountType == AccountType.USER
-    assert result.scopes == sorted(
-        scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+    assert result == UserResponse(
+        userName="new_user",
+        fullName="New User",
+        accountType=AccountType.USER,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+        ),
+        locked=False,
     )
 
 
 def test_create_user_hashes_password(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     decoy.when(mock_store.get("hash_check")).then_return(None)
 
+    created = _make_orm_user(username="hash_check", full_name="X")
     decoy.when(
         mock_store.add("hash_check", matchers.IsA(str), "X", AccountType.USER)
-    ).then_return(_make_orm_user(username="hash_check", full_name="X"))
+    ).then_return(created)
     result = manager.create_user(
         username="hash_check",
         password="plaintextpw",
         full_name="X",
         account_type=AccountType.USER,
     )
-    assert result.userName == "hash_check"
-    assert result.fullName == "X"
+    assert result == UserResponse(
+        userName="hash_check",
+        fullName="X",
+        accountType=AccountType.USER,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+        ),
+        locked=False,
+    )
 
 
 def test_create_user_duplicate_raises(
@@ -162,14 +191,50 @@ def test_create_user_empty_full_name_raises(manager: UserDataManager) -> None:
 
 
 def test_get_user_returns_existing(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     expected = _make_orm_user(username="admin", account_type=AccountType.ADMIN)
     decoy.when(mock_store.get("admin")).then_return(expected)
     result = manager.get_user("admin")
-    assert result.userName == "admin"
-    assert result.accountType == AccountType.ADMIN
-    assert result.scopes == sorted(scope.api_name for scope in Scope)
+    assert result == UserResponse(
+        userName="admin",
+        fullName="Full Name",
+        accountType=AccountType.ADMIN,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]
+        ),
+        locked=False,
+    )
+
+
+def test_get_user_locked_when_failed_logins_reach_limit(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+) -> None:
+    """``locked`` is True when failed login count meets ``maxNumberOfLoginAttempts``."""
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(maxNumberOfLoginAttempts=3)
+    )
+    decoy.when(mock_store.get_failed_login_count("alice")).then_return(3)
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(username="alice", full_name="Alice")
+    )
+    manager = UserDataManager(user_store=mock_store, settings_store=mock_settings)
+    result = manager.get_user("alice")
+    assert result == UserResponse(
+        userName="alice",
+        fullName="Alice",
+        accountType=AccountType.USER,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+        ),
+        locked=True,
+    )
 
 
 def test_get_user_not_found_raises(
@@ -204,8 +269,12 @@ def test_delete_user_not_found_raises(
 
 
 def test_update_user_username(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     expected = _make_orm_user(
         username="new_name",
         full_name="Name Test",
@@ -221,21 +290,40 @@ def test_update_user_username(
     ).then_return(expected)
 
     result = manager.update_user("old_name", new_username="new_name")
-    assert result.userName == "new_name"
-    assert result.fullName == "Name Test"
+    assert result == UserResponse(
+        userName="new_name",
+        fullName="Name Test",
+        accountType=AccountType.USER,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+        ),
+        locked=False,
+    )
 
 
 def test_update_user_password_is_hashed(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
     """Test that the password is hashed when updating a user."""
 
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    updated = _make_orm_user(username="pw_user", full_name="X")
     decoy.when(
         mock_store.update("pw_user", None, matchers.IsA(str), None, None)
-    ).then_return(_make_orm_user(username="pw_user", full_name="X"))
-    result = manager.update_user("pw_user", password="newpassword2")
-    assert result.userName == "pw_user"
-    assert result.fullName == "X"
+    ).then_return(updated)
+    result = manager.update_user("pw_user", new_password="newpassword2")
+    assert result == UserResponse(
+        userName="pw_user",
+        fullName="X",
+        accountType=AccountType.USER,
+        scopes=sorted(
+            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
+        ),
+        locked=False,
+    )
 
 
 def test_update_user_not_found_raises(
@@ -245,7 +333,7 @@ def test_update_user_not_found_raises(
         ValueError("User 'ghost' not found")
     )
     with pytest.raises(UserNotFoundError):
-        manager.update_user("ghost", full_name="Nope")
+        manager.update_user("ghost", new_full_name="Nope")
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
@@ -255,4 +343,4 @@ def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="at least 8 characters"):
-        manager.update_user("test_admin", password="short")
+        manager.update_user("test_admin", new_password="short")
