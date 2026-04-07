@@ -514,6 +514,8 @@ boolean_setting_table = sqlalchemy.Table(
             values_callable=lambda obj: [e.value for e in obj],
             validate_strings=True,
             create_constraint=False,
+            native_enum=False,
+            length=200,
         ),
         primary_key=True,
     ),
