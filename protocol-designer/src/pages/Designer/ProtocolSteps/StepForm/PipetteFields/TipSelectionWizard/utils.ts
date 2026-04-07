@@ -60,10 +60,10 @@ export const getViewboxFromSelectedLabware = (
     return null
   }
 
-  const moduleIds = new Set(Object.keys(modules))
+  const moduleIds = new Set(Object.keys(modules || {}))
 
   // find the first module location
-  const moduleLocation = selectedLabware.stack.find(loc => moduleIds.has(loc))
+  const moduleLocation = selectedLabware.stack?.find(loc => moduleIds.has(loc))
 
   const moduleDef = moduleLocation
     ? getModuleDef(modules[moduleLocation].model)

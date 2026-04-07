@@ -421,6 +421,57 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     const moduleDef = moduleLocation
       ? getModuleDef(modulesOnDeck[moduleLocation].model)
       : null
+
+    const labwarePositionProps =
+      moduleDef != null
+        ? {
+            x: 0,
+            y: 0,
+          }
+        : {
+            x: slotPosition[0],
+            y: slotPosition[1],
+          }
+    const pipettePositionProps =
+      moduleDef === null
+        ? {
+            slotPosition: slotPosition,
+          }
+        : {}
+    const labwarePipetteContent = (
+      <>
+        <LabwareOnDeck
+          labwareOnDeck={labware}
+          {...labwarePositionProps}
+          handleClickWell={handleClickWell}
+          onMouseEnterWell={handleHoverWell}
+          selectedTipsByIndex={allWellsWithStatus}
+          statusByWellName={allWellsWithState}
+          fill={COLORS.white}
+          inWellSelectionModal
+          ignoreMissingTips
+          wellLabelOptions="SHOW_LABEL_INSIDE"
+        />
+        {hoveredWells?.[0] && hasMoreThanOneWell ? (
+          <PipetteShadow
+            {...pipettePositionProps}
+            robotType={robotType}
+            pipetteSpec={pipetteSpecs}
+            hoveredWell={hoveredWells[0]}
+            selectedLabwareId={labwareId}
+            labwareState={deckSetup.labware}
+            hasPickupsRemaining={null}
+            isHoveredWellSelected={hoveredIsSelected}
+            isAccessible={isAccessible}
+            inaccessibleReason={inaccessibleReason}
+            primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
+            nozzles={nozzleConfiguration}
+            rotate={is96Channel}
+          />
+        ) : null}
+      </>
+    )
     controls = (
       <Fragment>
         {moduleDef ? (
@@ -435,71 +486,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             targetDeckId={deckDef.otId}
             childrenPositioningMode={'offsetToSlot'}
           >
-            <LabwareOnDeck
-              labwareOnDeck={labware}
-              x={0}
-              y={0}
-              handleClickWell={handleClickWell}
-              onMouseEnterWell={handleHoverWell}
-              selectedTipsByIndex={allWellsWithStatus}
-              statusByWellName={allWellsWithState}
-              fill={COLORS.white}
-              inWellSelectionModal
-              ignoreMissingTips
-              wellLabelOptions="SHOW_LABEL_INSIDE"
-            />
-            {hoveredWells?.[0] && hasMoreThanOneWell ? (
-              <PipetteShadow
-                robotType={robotType}
-                pipetteSpec={pipetteSpecs}
-                hoveredWell={hoveredWells[0]}
-                selectedLabwareId={labwareId}
-                labwareState={deckSetup.labware}
-                hasPickupsRemaining={null}
-                isHoveredWellSelected={hoveredIsSelected}
-                isAccessible={isAccessible}
-                inaccessibleReason={inaccessibleReason}
-                primaryNozzle={primaryNozzle}
-                enclosingViewbox={viewBox}
-                nozzles={nozzleConfiguration}
-                rotate={is96Channel}
-              />
-            ) : null}
+            {labwarePipetteContent}
           </Module>
         ) : (
-          <>
-            <LabwareOnDeck
-              labwareOnDeck={labware}
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              handleClickWell={handleClickWell}
-              onMouseEnterWell={handleHoverWell}
-              selectedTipsByIndex={allWellsWithStatus}
-              statusByWellName={allWellsWithState}
-              fill={COLORS.white}
-              inWellSelectionModal
-              ignoreMissingTips
-              wellLabelOptions="SHOW_LABEL_INSIDE"
-            />
-            {hoveredWells?.[0] && hasMoreThanOneWell ? (
-              <PipetteShadow
-                robotType={robotType}
-                pipetteSpec={pipetteSpecs}
-                slotPosition={slotPosition}
-                hoveredWell={hoveredWells[0]}
-                selectedLabwareId={labwareId}
-                labwareState={deckSetup.labware}
-                hasPickupsRemaining={null}
-                isHoveredWellSelected={hoveredIsSelected}
-                isAccessible={isAccessible}
-                inaccessibleReason={inaccessibleReason}
-                primaryNozzle={primaryNozzle}
-                enclosingViewbox={viewBox}
-                nozzles={nozzleConfiguration}
-                rotate={is96Channel}
-              />
-            ) : null}
-          </>
+          <>{labwarePipetteContent}</>
         )}
       </Fragment>
     )
