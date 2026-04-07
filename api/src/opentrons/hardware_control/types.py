@@ -14,6 +14,7 @@ from typing import (
     cast,
 )
 
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import Literal
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
@@ -302,15 +303,15 @@ class UpdateState(enum.Enum):
         return self.value
 
 
-@dataclass(frozen=True)
-class UpdateStatus:
+class UpdateStatus(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     subsystem: SubSystem
     state: UpdateState
     progress: int
 
 
-@dataclass
-class SubSystemState:
+class SubSystemState(BaseModel):
     ok: bool
     current_fw_version: int
     next_fw_version: int
