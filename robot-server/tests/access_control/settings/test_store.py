@@ -66,28 +66,26 @@ def test_patch_multiple_fields(subject: AccessControlSettingStore) -> None:
     """Verify patch with multiple fields updates the correct fields."""
     request = RequestData.model_validate(
         {
-            "requireAdminCredsWhenUpdatingRobotSoftware": False,
-            "requireSignoffForProtocolLog": True,
+            "requireSignoffForProtocolLog": False,
+            "requireLogsToBeSavedInApp": False,
+            "deleteOverMaxOnDiskProtocols": True,
         }
     )
     result = subject.patch(request)
-    assert result.requireAdminCredsWhenUpdatingRobotSoftware is False
-    assert result.requireAdminCredsWhenSendingProtocolToRobot is True
-    assert result.requireAdminCredsForSignoffProtocol is True
-    assert result.requireSignoffForProtocolLog is True
+    assert result.requireSignoffForProtocolLog is False
+    assert result.requireLogsToBeSavedInApp is False
+    assert result.deleteOverMaxOnDiskProtocols is True
 
 
 def test_patch_empty_request_changes_nothing(
     subject: AccessControlSettingStore,
 ) -> None:
     """Verify patch with empty request changes nothing."""
-    subject.patch(
-        RequestData.model_validate(
-            {"requireAdminCredsWhenUpdatingRobotSoftware": False}
-        )
-    )
+    subject.patch(RequestData.model_validate({"requireSignoffForProtocolLog": False}))
     result = subject.patch(RequestData.model_validate({}))
-    assert result.requireAdminCredsWhenUpdatingRobotSoftware is False
+    assert result.requireSignoffForProtocolLog is False
+    assert result.requireLogsToBeSavedInApp is True
+    assert result.deleteOverMaxOnDiskProtocols is True
 
 
 def test_reset_clears_all_settings(subject: AccessControlSettingStore) -> None:
@@ -119,9 +117,7 @@ def test_reset_does_not_affect_other_boolean_settings(
             )
         )
 
-    subject.patch(
-        RequestData.model_validate({"requireAdminCredsWhenUpdatingRobotSoftware": True})
-    )
+    subject.patch(RequestData.model_validate({"requireSignoffForProtocolLog": True}))
     subject.reset_all()
 
     with sql_engine.begin() as transaction:

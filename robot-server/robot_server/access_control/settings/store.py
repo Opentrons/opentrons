@@ -13,11 +13,9 @@ from robot_server.persistence.tables import BooleanSettingKey, boolean_setting_t
 _K = BooleanSettingKey
 
 _KEY_TO_FIELD_NAME: dict[BooleanSettingKey, str] = {
-    _K.REQUIRE_ADMIN_CREDS_WHEN_UPDATING_ROBOT_SOFTWARE: "requireAdminCredsWhenUpdatingRobotSoftware",
-    _K.REQUIRE_ADMIN_CREDS_WHEN_SENDING_PROTOCOL_TO_ROBOT: "requireAdminCredsWhenSendingProtocolToRobot",
-    _K.REQUIRE_ADMIN_CREDS_FOR_SIGNOFF_PROTOCOL: "requireAdminCredsForSignoffProtocol",
     _K.REQUIRE_SIGNOFF_FOR_PROTOCOL_LOG: "requireSignoffForProtocolLog",
     _K.REQUIRE_LOGS_TO_BE_SAVED_IN_APP: "requireLogsToBeSavedInApp",
+    _K.DELETE_OVER_MAX_ON_DISK_PROTOCOLS: "deleteOverMaxOnDiskProtocols",
 }
 
 _FIELD_NAME_TO_KEY: dict[str, BooleanSettingKey] = {

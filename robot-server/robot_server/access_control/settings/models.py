@@ -9,30 +9,24 @@ import pydantic
 class ResponseData(pydantic.BaseModel):
     """Response body data from the `/accessControl/settings` endpoints."""
 
-    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
-        bool,
-        pydantic.Field(
-            description="Whether admin credentials are required when updating robot software.",
-        ),
-    ] = True
-    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
-        bool,
-        pydantic.Field(
-            description="Whether admin credentials are required when sending a protocol to the robot.",
-        ),
-    ] = True
-    requireAdminCredsForSignoffProtocol: Annotated[
-        bool,
-        pydantic.Field(
-            description="Whether admin credentials are required for signing off on a protocol.",
-        ),
-    ] = True
     requireSignoffForProtocolLog: Annotated[
         bool,
         pydantic.Field(
-            description="Whether signoff is required for the protocol log.",
+            description="Require signoff for the protocol log.",
         ),
-    ] = False
+    ] = True
+    requireLogsToBeSavedInApp: Annotated[
+        bool,
+        pydantic.Field(
+            description="Require logs to be saved in app.",
+        ),
+    ] = True
+    deleteOverMaxOnDiskProtocols: Annotated[
+        bool,
+        pydantic.Field(
+            description="Delete protocol run logs on the robot when there are 20 protocol run records.",
+        ),
+    ] = True
 
 
 class RequestData(pydantic.BaseModel):
@@ -42,39 +36,6 @@ class RequestData(pydantic.BaseModel):
     the setting to its default (as defined in `ResponseData`).
     """
 
-    requireAdminCredsWhenUpdatingRobotSoftware: Annotated[
-        bool | None,
-        pydantic.Field(
-            description=textwrap.dedent(
-                """\
-                If provided, sets whether admin credentials are required
-                when updating robot software.
-                """
-            )
-        ),
-    ] = None
-    requireAdminCredsWhenSendingProtocolToRobot: Annotated[
-        bool | None,
-        pydantic.Field(
-            description=textwrap.dedent(
-                """\
-                If provided, sets whether admin credentials are required
-                when sending a protocol to the robot.
-                """
-            )
-        ),
-    ] = None
-    requireAdminCredsForSignoffProtocol: Annotated[
-        bool | None,
-        pydantic.Field(
-            description=textwrap.dedent(
-                """\
-                If provided, sets whether admin credentials are required
-                for signing off on a protocol.
-                """
-            )
-        ),
-    ] = None
     requireSignoffForProtocolLog: Annotated[
         bool | None,
         pydantic.Field(
@@ -82,6 +43,27 @@ class RequestData(pydantic.BaseModel):
                 """\
                 If provided, sets whether signoff is required
                 for the protocol log.
+                """
+            )
+        ),
+    ] = None
+    requireLogsToBeSavedInApp: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether logs should be saved in the app.
+                """
+            )
+        ),
+    ] = None
+    deleteOverMaxOnDiskProtocols: Annotated[
+        bool | None,
+        pydantic.Field(
+            description=textwrap.dedent(
+                """\
+                If provided, sets whether protocol run logs should be deleted
+                when there are 20 protocol run records.
                 """
             )
         ),
