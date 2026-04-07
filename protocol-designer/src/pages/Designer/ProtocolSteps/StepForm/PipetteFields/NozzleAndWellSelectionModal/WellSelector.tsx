@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,6 +6,7 @@ import {
   COLORS,
   DEFAULT_TIP_SIZE,
   INACCESSIBLE,
+  Module,
   SELECTED,
   SELECTED_ERROR,
   StyledText,
@@ -14,7 +15,9 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
+  getModuleDef,
   getPositionFromSlotId,
+  inferModuleOrientationFromXCoordinate,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
@@ -411,21 +414,57 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
     const is96Channel = channels === 96
+    const modulesOnDeck = deckSetup.modules
+    const moduleIds = new Set(Object.keys(modulesOnDeck))
+    const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
+
+    const moduleDef = moduleLocation
+      ? getModuleDef(modulesOnDeck[moduleLocation].model)
+      : null
     controls = (
-      <>
-        <LabwareOnDeck
-          labwareOnDeck={labware}
-          x={slotPosition[0]}
-          y={slotPosition[1]}
-          handleClickWell={handleClickWell}
-          onMouseEnterWell={handleHoverWell}
-          selectedTipsByIndex={allWellsWithStatus}
-          statusByWellName={allWellsWithState}
-          fill={COLORS.white}
-          inWellSelectionModal
-          ignoreMissingTips
-          wellLabelOptions="SHOW_LABEL_INSIDE"
-        />
+      <Fragment>
+        {moduleDef ? (
+          <Module
+            key={slot}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            def={moduleDef}
+            orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
+            innerProps={{ lidMotorState: 'open' }}
+            targetSlotId={slot}
+            targetDeckId={deckDef.otId}
+            childrenPositioningMode={'offsetToSlot'}
+          >
+            <LabwareOnDeck
+              labwareOnDeck={labware}
+              x={0}
+              y={0}
+              handleClickWell={handleClickWell}
+              onMouseEnterWell={handleHoverWell}
+              selectedTipsByIndex={allWellsWithStatus}
+              statusByWellName={allWellsWithState}
+              fill={COLORS.white}
+              inWellSelectionModal
+              ignoreMissingTips
+              wellLabelOptions="SHOW_LABEL_INSIDE"
+            />
+          </Module>
+        ) : (
+          <LabwareOnDeck
+            labwareOnDeck={labware}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            handleClickWell={handleClickWell}
+            onMouseEnterWell={handleHoverWell}
+            selectedTipsByIndex={allWellsWithStatus}
+            statusByWellName={allWellsWithState}
+            fill={COLORS.white}
+            inWellSelectionModal
+            ignoreMissingTips
+            wellLabelOptions="SHOW_LABEL_INSIDE"
+          />
+        )}
+
         {hoveredWells?.[0] && hasMoreThanOneWell ? (
           <PipetteShadow
             robotType={robotType}
@@ -444,7 +483,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             rotate={is96Channel}
           />
         ) : null}
-      </>
+      </Fragment>
     )
   }
   return (
