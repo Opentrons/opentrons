@@ -132,8 +132,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     useState<string[][]>(getSelectedWells())
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
+  const currentHoveredWellRef = useRef<string[] | null>(null)
+
   useEffect(
     () => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current)
+        leaveTimeoutRef.current = null
+      }
+      currentHoveredWellRef.current = null
       setSelectedWells(getSelectedWells())
       setHoveredWells(null)
     },
@@ -141,6 +148,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stepType]
   )
+
+  const handleLeaveWell = (_: WellMouseEvent): void => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+    }
+    leaveTimeoutRef.current = setTimeout(() => {
+      if (currentHoveredWellRef.current === hoveredWells) {
+        setHoveredWells(null)
+        currentHoveredWellRef.current = null
+      }
+      leaveTimeoutRef.current = null
+    }, 120)
+  }
 
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
@@ -157,6 +177,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     )
 
     setHoveredWells(hovered)
+    currentHoveredWellRef.current = hovered
   }
 
   const allWellsWithStatus = useMemo(
@@ -419,6 +440,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           y={slotPosition[1]}
           handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
+          onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
