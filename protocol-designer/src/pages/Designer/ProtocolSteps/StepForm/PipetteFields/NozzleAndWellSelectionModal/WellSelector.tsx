@@ -136,6 +136,11 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   useEffect(
     () => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current)
+        leaveTimeoutRef.current = null
+      }
+      currentHoveredWellRef.current = null
       setSelectedWells(getSelectedWells())
       setHoveredWells(null)
     },
@@ -170,10 +175,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       primaryNozzle,
       channels
     )
-    if (leaveTimeoutRef.current) {
-      clearTimeout(leaveTimeoutRef.current)
-      leaveTimeoutRef.current = null
-    }
+
     setHoveredWells(hovered)
     currentHoveredWellRef.current = hovered
   }
