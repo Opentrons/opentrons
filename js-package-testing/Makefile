@@ -30,7 +30,7 @@ setup:
 # Complete teardown: remove packages and node_modules
 .PHONY: teardown
 teardown: clean-local-packages
-	rm -rf node_modules
+	pnpm exec shx rm -rf node_modules
 
 # Build and extract local packages (must run before pnpm install due to link: entries in package.json)
 .PHONY: build-local-packages
@@ -54,7 +54,7 @@ build-local-packages:
 	@echo "Moving protocol-visualization package to pack directory..."
 	@mv ../protocol-visualization/opentrons-protocol-visualization-v0.0.0-dev.tgz $(PROTOCOL_VISUALIZATION_PACK)
 	@echo "Extracting packages..."
-	@rm -rf $(SHARED_DATA_DIR) $(STEP_GENERATION_DIR) $(COMPONENTS_DIR) $(PROTOCOL_VISUALIZATION_DIR)
+	@pnpm exec shx rm -rf $(SHARED_DATA_DIR) $(STEP_GENERATION_DIR) $(COMPONENTS_DIR) $(PROTOCOL_VISUALIZATION_DIR)
 	@mkdir -p $(SHARED_DATA_DIR) $(STEP_GENERATION_DIR) $(COMPONENTS_DIR) $(PROTOCOL_VISUALIZATION_DIR)
 	@tar -xzf $(SHARED_DATA_PACK) --strip-components=1 -C $(SHARED_DATA_DIR)
 	@tar -xzf $(STEP_GENERATION_PACK) --strip-components=1 -C $(STEP_GENERATION_DIR)
@@ -66,7 +66,7 @@ build-local-packages:
 .PHONY: clean-local-packages
 clean-local-packages:
 	@echo "Cleaning up pack directory..."
-	@rm -rf $(PACK_DIR)
+	@pnpm exec shx rm -rf $(PACK_DIR)
 	@echo "Local packages cleaned!"
 
 # Run Playwright tests (visual checkpoints go to Applitools Eyes; set APPLITOOLS_API_KEY)

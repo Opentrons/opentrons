@@ -9,6 +9,7 @@ module.exports = {
     'docs/**',
     'components/lib/**',
     'js-package-testing/pack/**',
+    'protocol-visualization/lib/**',
     'shared-data/**',
     'api-client/**',
     'react-api-client/**',

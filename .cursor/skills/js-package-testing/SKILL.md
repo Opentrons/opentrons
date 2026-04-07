@@ -30,15 +30,38 @@ js-package-testing/
 ├── Makefile
 ├── package.json
 ├── playwright.config.ts
+├── cssModulesSideEffect.ts
 ├── tests/protocolDeck.spec.ts
 ├── src/
 │   ├── App.tsx
 │   ├── main.tsx
 │   ├── i18n.ts
+│   ├── styles.css
 │   ├── locale/en/protocol_visualization.json
 │   └── StackerAnalysis.json
 └── pack/                  # gitignored
 ```
+
+## Lint and format (monorepo root)
+
+CI runs the same Stylelint, Prettier, and ESLint as the rest of the repo. **Run from the monorepo root** after `make setup-js` (or equivalent).
+
+| Check                         | Command          |
+| ----------------------------- | ---------------- |
+| Full CSS (matches CI)         | `make lint-css`  |
+| Full JS                       | `make lint-js`   |
+| Auto-format JS/TS/JSON/CSS/MD | `make format-js` |
+
+**Scoped checks** while editing only this package:
+
+```bash
+yarn stylelint "js-package-testing/**/*.css"
+yarn prettier --ignore-path .eslintignore --check "js-package-testing/**/*.{ts,tsx,js,json,css,md}"
+yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" "js-package-testing/**/*.{ts,tsx,js}"
+yarn eslint --report-unused-disable-directives-severity error --max-warnings 0 --ext .json js-package-testing/
+```
+
+Global `styles.css` uses **`stylelint-config-idiomatic-order`** (via root `.stylelintrc.js`): keep declarations in that order so `make lint-css` passes.
 
 ## Makefile targets
 

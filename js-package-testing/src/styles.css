@@ -2,8 +2,8 @@
 @import url('@opentrons/components/styles');
 
 .app_container {
-  padding: 1rem;
   max-width: 90rem;
+  padding: 1rem;
 }
 
 .demo_header {
@@ -18,8 +18,8 @@
 .demo_nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
   margin-top: 1rem;
+  gap: 1rem;
 }
 
 .demo_nav a {
@@ -27,9 +27,9 @@
 }
 
 .demo_section {
-  margin-bottom: 3rem;
   padding-bottom: 2rem;
   border-bottom: 0.0625rem solid #ddd;
+  margin-bottom: 3rem;
 }
 
 .demo_section:last-child {
@@ -58,10 +58,10 @@
 }
 
 .annotated_steps_demo {
-  height: 32rem;
   max-width: 50rem;
-  margin-top: 1rem;
+  height: 32rem;
   border: 0.0625rem solid #ccc;
   border-radius: 0.5rem;
+  margin-top: 1rem;
   background-color: #fff;
 }
