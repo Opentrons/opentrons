@@ -216,11 +216,15 @@ export function DeckSetupContainer(
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea'
   )
-
-  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
+  const stagingAreaCutoutIds = stagingAreaFixtures.map(
+    stagingArea => stagingArea.location.split('cutout')[1]
   )
 
+  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
+    aa =>
+      isAddressableAreaStandardSlot(aa.id, deckDef) &&
+      !stagingAreaCutoutIds.includes(aa.id)
+  )
   const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
   return (
     <>
@@ -281,7 +285,10 @@ export function DeckSetupContainer(
                           addressableArea.id,
                           deckDef.cutoutFixtures
                         )
-                        return cutoutId != null ? (
+                        return cutoutId != null &&
+                          !Object.keys(stagingAreaFixtures).includes(
+                            cutoutId
+                          ) ? (
                           <SingleSlotFixture
                             key={addressableArea.id}
                             cutoutId={cutoutId}
