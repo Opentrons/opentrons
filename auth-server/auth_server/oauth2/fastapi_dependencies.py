@@ -10,6 +10,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from .backend import Backend, build
+from auth_server.settings.store import SettingsStore
 from auth_server.users.store import UserStore
 
 _app_state_accessor = AppStateAccessor[Backend]("oauth2_backend")
@@ -29,7 +30,8 @@ def install_oath2_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None
     This should be called once at server startup.
     """
     user_store = UserStore(sql_engine=sql_engine)
-    backend = build(user_store)
+    settings_store = SettingsStore(sql_engine=sql_engine)
+    backend = build(user_store, settings_store)
     _app_state_accessor.set_on(app_state, backend)
 
 
