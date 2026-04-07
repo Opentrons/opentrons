@@ -38,7 +38,7 @@ export function request<ResData, ReqData = null>(
   method: Method,
   url: string,
   data: ReqData,
-  config: HostConfig,
+  hostConfig: HostConfig,
   axiosConfig?: BrandedAxiosConfig
 ): ResponsePromise<ResData> {
   const {
@@ -47,9 +47,9 @@ export function request<ResData, ReqData = null>(
     requestor = (...args) => Axios.request(...args),
     token,
     secure,
-  } = config
+  } = hostConfig
 
-  const tokenHeader = token != null ? { authenticationBearer: token } : {}
+  const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
   const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
 
   const protocol = (secure ?? false) ? 'https' : 'http'
