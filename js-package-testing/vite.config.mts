@@ -17,7 +17,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@opentrons/components/styles/global': path.resolve(
-        './node_modules/@opentrons/components/lib/style.css'
+        __dirname,
+        'node_modules/@opentrons/components/src/styles/global.css'
       ),
       '@opentrons/components/styles': path.resolve(
         './node_modules/@opentrons/components/lib/style.css'
