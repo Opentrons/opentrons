@@ -111,6 +111,7 @@ from .wells import WellView
 from opentrons.types import (
     DeckSlotName,
     MeniscusTrackingTarget,
+    ModuleFixtureLocation,
     MountType,
     Point,
     StagingSlotName,
@@ -384,7 +385,9 @@ class GeometryView:
             return self._normalize_module_calibration_offset(
                 module_location, offset_data
             )
-        elif isinstance(location, (DeckSlotLocation, AddressableAreaLocation)):
+        elif isinstance(
+            location, (DeckSlotLocation, AddressableAreaLocation, ModuleFixtureLocation)
+        ):
             # TODO we might want to do a check here to make sure addressable area location is a standard deck slot
             #   and raise if its not (or maybe we don't actually care since modules will never be loaded elsewhere)
             return Point(x=0, y=0, z=0)
@@ -933,10 +936,10 @@ class GeometryView:
         # 2. Extract the Addressable Area from the terminal (root) location
         if isinstance(current_loc, DeckSlotLocation):
             return current_loc.slotName.id
-
         elif isinstance(current_loc, AddressableAreaLocation):
             return current_loc.addressableAreaName
-
+        elif isinstance(current_loc, ModuleFixtureLocation):
+            return current_loc.addressable_area_name
         elif isinstance(current_loc, ModuleLocation):
             # The vacuum module provides exactly one addressable area
             # (e.g. 'vacuumModuleV1_area' or simply the slot id like 'A3')
@@ -948,7 +951,6 @@ class GeometryView:
                 details={"terminal-location": repr(current_loc)},
             )
 
-    # TODO: Only works for LabwareSchemaV2 rightnow
     def _is_fully_contained(
         self, resident_def: LabwareDefinition, boundary_space: ContainedSpace
     ) -> bool:
@@ -956,6 +958,9 @@ class GeometryView:
         Validates that the resident fits entirely within the boundary_space box.
         All coordinates are relative to the parent's (0,0,0).
         """
+        # TODO: Add LabwareSchemaV3 support
+        if isinstance(resident_def, LabwareDefinition3):
+            return True
         # Resident Extents (Standard labware starts at 0,0,0 relative to parent)
         res_min_x, res_max_x = 0.0, resident_def.dimensions.xDimension
         res_min_y, res_max_y = 0.0, resident_def.dimensions.yDimension

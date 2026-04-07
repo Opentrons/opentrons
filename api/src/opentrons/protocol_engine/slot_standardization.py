@@ -29,6 +29,7 @@ from .types import (
     ModuleLocation,
     OnLabwareLocation,
 )
+from opentrons.types import ModuleFixtureLocation
 
 
 def standardize_command(
@@ -113,6 +114,7 @@ def _standardize_labware_location(
                 ModuleLocation,
                 OnLabwareLocation,
                 AddressableAreaLocation,
+                ModuleFixtureLocation,
             ),
         )
         or original == OFF_DECK_LOCATION

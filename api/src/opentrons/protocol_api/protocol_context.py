@@ -558,7 +558,7 @@ class ProtocolContext(CommandPublisher):
             DeckSlotName,
             StagingSlotName,
             LabwareCore,
-            AddressableAreaLocation,
+            ModuleFixtureLocation,
         ]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
@@ -585,10 +585,8 @@ class ProtocolContext(CommandPublisher):
                 version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
-        elif isinstance(location, OffDeckType):
+        elif isinstance(location, (OffDeckType, ModuleFixtureLocation)):
             load_location = location
-        elif isinstance(location, ModuleFixtureLocation):
-            load_location = AddressableAreaLocation(addressableAreaName=str(location))
         else:
             load_location = validation.ensure_and_convert_deck_slot(
                 location, self._api_version, self._core.robot_type
@@ -764,12 +762,10 @@ class ProtocolContext(CommandPublisher):
         """
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[
-            OffDeckType, DeckSlotName, StagingSlotName, AddressableAreaLocation
+            OffDeckType, DeckSlotName, StagingSlotName, ModuleFixtureLocation
         ]
-        if isinstance(location, OffDeckType):
+        if isinstance(location, (OffDeckType, ModuleFixtureLocation)):
             load_location = location
-        elif isinstance(location, ModuleFixtureLocation):
-            load_location = AddressableAreaLocation(addressableAreaName=str(location))
         else:
             load_location = validation.ensure_and_convert_deck_slot(
                 location, self._api_version, self._core.robot_type
@@ -897,12 +893,12 @@ class ProtocolContext(CommandPublisher):
             OffDeckType,
             DeckSlotName,
             StagingSlotName,
-            AddressableAreaLocation,
+            ModuleFixtureLocation,
             TrashBin,
         ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, (OffDeckType, WasteChute)):
+        elif isinstance(new_location, (OffDeckType, WasteChute, ModuleFixtureLocation)):
             location = new_location
         elif isinstance(new_location, TrashBin):
             if labware._core.is_lid():
@@ -911,8 +907,6 @@ class ProtocolContext(CommandPublisher):
                 raise LabwareMovementNotAllowedError(
                     "Can only dispose of tips and Lid-type labware in a Trash Bin. Did you mean to use a Waste Chute?"
                 )
-        elif isinstance(new_location, ModuleFixtureLocation):
-            location = AddressableAreaLocation(addressableAreaName=str(new_location))
         else:
             location = validation.ensure_and_convert_deck_slot(
                 new_location, self._api_version, self._core.robot_type

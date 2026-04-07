@@ -1892,7 +1892,7 @@ class VacuumModuleContext(ModuleContext):
         """Load a collar adapter to the vacuum module dock."""
 
         area_name = self.manifold_dock.addressable_area_name
-        location = AddressableAreaLocation(addressableAreaName=area_name)
+        location = ModuleFixtureLocation(addressable_area_name=area_name)
         labware_core = self._protocol_core.load_adapter(
             load_name=name,
             namespace=namespace,
@@ -1934,7 +1934,7 @@ class VacuumModuleContext(ModuleContext):
             if drop_offset
             else None
         )
-        location = AddressableAreaLocation(addressableAreaName=f"{self.model}DockA4")
+        location = ModuleFixtureLocation(addressable_area_name=f"{self.model}DockA4")
         self._protocol_core.move_labware(
             labware._core,
             new_location=location,

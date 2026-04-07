@@ -87,6 +87,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     MountType,
     Point,
@@ -227,6 +228,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
         ],
@@ -302,17 +304,14 @@ class ProtocolCore(
             StagingSlotName,
             ModuleCore,
             NonConnectedModuleCore,
-            AddressableAreaLocation,
+            ModuleFixtureLocation,
             OffDeckType,
         ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
-        load_location = location
-        if not isinstance(location, AddressableAreaLocation):
-            load_location = self._get_non_stacked_location(location=location)
-
+        load_location = self._get_non_stacked_location(location=location)
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
@@ -409,9 +408,9 @@ class ProtocolCore(
         new_location: Union[
             DeckSlotName,
             StagingSlotName,
-            AddressableAreaLocation,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1316,6 +1315,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1332,8 +1332,8 @@ class ProtocolCore(
         location: Union[
             DeckSlotName,
             StagingSlotName,
-            AddressableAreaLocation,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1355,5 +1355,7 @@ class ProtocolCore(
             return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, TrashBin):
             return AddressableAreaLocation(addressableAreaName=location.area_name)
-        elif isinstance(location, AddressableAreaLocation):
-            return location
+        elif isinstance(location, ModuleFixtureLocation):
+            return AddressableAreaLocation(
+                addressableAreaName=location.addressable_area_name
+            )

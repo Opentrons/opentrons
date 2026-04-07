@@ -7,7 +7,7 @@ from typing import Literal, TypeGuard, Union
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons.types import DeckSlotName, StagingSlotName
+from opentrons.types import DeckSlotName, ModuleFixtureLocation, StagingSlotName
 
 
 class DeckSlotLocation(BaseModel):
@@ -165,6 +165,7 @@ LabwareLocationSequence = list[
 LabwareLocation = Union[
     DeckSlotLocation,
     ModuleLocation,
+    ModuleFixtureLocation,
     OnLabwareLocation,
     _OffDeckLocationType,
     _SystemLocationType,
@@ -177,6 +178,7 @@ LabwareLocation = Union[
 LoadableLabwareLocation = Union[
     DeckSlotLocation,
     ModuleLocation,
+    ModuleFixtureLocation,
     OnLabwareLocation,
     _OffDeckLocationType,
     _SystemLocationType,
@@ -188,6 +190,7 @@ LoadableLabwareLocation = Union[
 OnDeckLabwareLocation = Union[
     DeckSlotLocation,
     ModuleLocation,
+    ModuleFixtureLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
 ]
@@ -196,6 +199,7 @@ NonStackedLocation = Union[
     DeckSlotLocation,
     AddressableAreaLocation,
     ModuleLocation,
+    ModuleFixtureLocation,
     _OffDeckLocationType,
     _SystemLocationType,
     _WasteChuteLocationType,
@@ -205,6 +209,7 @@ NonStackedLocation = Union[
 AccessibleByGripperLocation = Union[
     DeckSlotLocation,
     ModuleLocation,
+    ModuleFixtureLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
     _WasteChuteLocationType,
