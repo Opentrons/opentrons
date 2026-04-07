@@ -56,7 +56,7 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
+def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
