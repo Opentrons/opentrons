@@ -1,5 +1,9 @@
 from opentrons.hardware_control.modules.types import VacuumModuleModel
-from opentrons.protocol_api import ProtocolContext, ParameterContext, VacuumModuleContext
+from opentrons.protocol_api import (
+    ProtocolContext,
+    ParameterContext,
+    VacuumModuleContext,
+)
 
 
 metadata = {
@@ -39,7 +43,9 @@ def run(ctx: ProtocolContext) -> None:
         )
 
     # Load Modules
-    vm_mod: VacuumModuleContext = ctx.load_module(module_name="vacuumModuleV1", location="A3")
+    vm_mod: VacuumModuleContext = ctx.load_module(
+        module_name="vacuumModuleV1", location="A3"
+    )
     abs_mod = ctx.load_module(module_name="absorbanceReaderV1", location="D3")
     abs_mod.open_lid()
 
@@ -57,7 +63,9 @@ def run(ctx: ProtocolContext) -> None:
 
     # Load Labware
     # TODO: DONT LET ME LOAD ANY ADAPTER/LABWARE ONTO DOCK
-    manifold_collar = ctx.load_adapter('opentrons_96_deep_well_adapter', vm_mod.manifold_dock)
+    manifold_collar = ctx.load_adapter(
+        "opentrons_96_deep_well_adapter", vm_mod.manifold_dock
+    )
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     black_flat_plate = ctx.load_labware(
         "corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid"

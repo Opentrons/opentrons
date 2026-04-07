@@ -421,19 +421,14 @@ class VacuumModuleData(BaseModel):
 class VacuumModule(
     _GenericModule[
         Literal[ModuleType.VACUUM_MODULE],
-        Literal[
-            ModuleModel.VACUUM_MODULE_MILLIPORE_V1,
-            ModuleModel.VACUUM_MODULE_OPENTRONS_V1,
-        ],
+        Literal[ModuleModel.VACUUM_MODULE_V1],
         VacuumModuleData,
     ]
 ):
     """An attached Vacuum Module."""
 
     moduleType: Literal[ModuleType.VACUUM_MODULE]
-    moduleModel: Literal[
-        ModuleModel.VACUUM_MODULE_MILLIPORE_V1, ModuleModel.VACUUM_MODULE_OPENTRONS_V1
-    ]
+    moduleModel: Literal[ModuleModel.VACUUM_MODULE_V1]
     data: VacuumModuleData
 
 
