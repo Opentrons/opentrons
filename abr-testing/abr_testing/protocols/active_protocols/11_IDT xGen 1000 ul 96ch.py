@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.27",
+    "apiLevel": "2.28",
 }
 
 
@@ -407,18 +407,12 @@ def run(protocol: ProtocolContext) -> None:
             )
             p1000.aspirate(
                 FRERATVol + 1,
-                location=FRERAT.meniscus(z=-1, target="start"),
-                end_location=FRERAT.meniscus(z=-1, target="end"),
+                location=FRERAT.bottom()
             )
             p1000.dispense(1, FRERAT.bottom(z=dot_bottom))
             p1000.dispense(
                 FRERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                location=sample_plate_1.wells_by_name()["A1"].bottom()
             )
             p1000.mix(FRERATMixRep, FRERATMixVol)
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -478,12 +472,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.aspirate(ERATVol, ERAT.bottom(z=0.5))
             p1000.dispense(
                 ERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                location=sample_plate_1.wells_by_name()["A1"].bottom()
             )
             p1000.mix(ERATMixRep, ERATMixVol, rate=0.5)
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -545,17 +534,11 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_50_2["A1"])
             p1000.aspirate(
                 AdapterVol + 1,
-                location=Adapter.meniscus(z=-1, target="start"),
-                end_location=Adapter.meniscus(z=-1, target="end"),
+                location=Adapter.bottom()
             )
             p1000.dispense(
                 AdapterVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                location=sample_plate_1.wells_by_name()["A1"].bottom()
             )
             p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -571,8 +554,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.aspirate(
                 LIGVol,
-                location=LIG.meniscus(z=-1, target="start"),
-                end_location=LIG.meniscus(z=-1, target="end"),
+                location=LIG.bottom()
             )
             p1000.default_speed = 100
             p1000.move_to(LIG.top(z=3))
@@ -580,8 +562,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.default_speed = 400
             p1000.dispense(
                 LIGVol,
-                location=sample_plate_1["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_1["A1"].meniscus(z=-1, target="end"),
+                location=sample_plate_1["A1"].bottom()
             )
             p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
             p1000.mix(LIGMixRep, LIGMixVol, rate=0.5)
@@ -767,8 +748,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_200_X["A1"])
             p1000.aspirate(
                 ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
+                location=ETOH_Reservoir["A1"].bottom()
             )
             p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
@@ -835,8 +815,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_200_X["A1"])
             p1000.aspirate(
                 ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
+                location=ETOH_Reservoir["A1"].bottom()
             )
             p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
@@ -958,8 +937,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_50_3["A1"])
             p1000.aspirate(
                 RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
+                location=RSB.bottom()
             )
             p1000.move_to(CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom))
             p1000.dispense(
@@ -1038,13 +1016,11 @@ def run(protocol: ProtocolContext) -> None:
             p1000.prepare_to_aspirate()
             p1000.aspirate(
                 PCRVol,
-                location=PCR.meniscus(z=-1, target="start"),
-                end_location=PCR.meniscus(z=-1, target="end"),
+                location=PCR.bottom()
             )
             p1000.dispense(
                 PCRVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
+                location=sample_plate_2["A1"].bottom()
             )
             p1000.mix(PCRMixRep, PCRMixVol)
             p1000.move_to(sample_plate_2["A1"].top(z=-3))
@@ -1060,13 +1036,11 @@ def run(protocol: ProtocolContext) -> None:
             p1000.prepare_to_aspirate()
             p1000.aspirate(
                 BarcodeVol,
-                location=Barcodes.meniscus(z=-1, target="start"),
-                end_location=Barcodes.meniscus(z=-1, target="end"),
+                location=Barcodes.bottom(),
             )
             p1000.dispense(
                 BarcodeVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
+                location=sample_plate_2["A1"].bottom(),
             )
             p1000.mix(BarcodeMixRep, BarcodeMixVol)
             p1000.move_to(sample_plate_2["A1"].top(z=-3))
@@ -1176,8 +1150,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.prepare_to_aspirate()
             p1000.aspirate(
                 CleanupBeadVol,
-                location=CleanupBead.meniscus(z=-1, target="start"),
-                end_location=CleanupBead.meniscus(z=-1, target="end"),
+                location=CleanupBead.bottom()
             )
             p1000.move_to(CleanupBead.top(z=-3))
             p1000.dispense(CleanupBeadVol, CleanupPlate_2["A1"].bottom(z=0.5))
@@ -1411,8 +1384,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_50_6["A1"].top(z=2))
             p1000.aspirate(
                 RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
+                location=RSB.bottom()
             )
             p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
             p1000.dispense(
