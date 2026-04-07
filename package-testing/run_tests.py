@@ -27,25 +27,13 @@ tests: List[Union[TestHelp, TestSimulate]] = [
     TestHelp(
         test_key="help",
         test_helper="help",
-        expected_output="Simulate a protocol for an Opentrons robot"
-    ),
-    TestSimulate(
-        test_key="Flex_v2_19_expect_success",
-        test_helper="simulate",
-        protocol_path="../analyses-snapshot-testing/files/protocols/Flex_S_v2_19_Illumina_DNA_Prep_48x.py",
-        expected_return_code="0",
+        expected_output="Simulate a protocol for an Opentrons robot",
     ),
     TestSimulate(
         test_key="OT2_v2_20_expect_success",
         test_helper="simulate",
         protocol_path="../analyses-snapshot-testing/files/protocols/OT2_S_v2_20_8_None_SINGLE_HappyPath.py",
         expected_return_code="0",
-    ),
-    TestSimulate(
-        test_key="Flex_v2_16_expect_error",
-        test_helper="simulate",
-        protocol_path="../analyses-snapshot-testing/files/protocols/Flex_X_v2_16_P1000_96_TM_ModuleAndWasteChuteConflict.py",
-        expected_return_code="1",
     ),
     TestSimulate(
         test_key="OT2_v6PD_expect_error",

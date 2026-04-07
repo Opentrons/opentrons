@@ -33,7 +33,7 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
-from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 import opentrons
 from .util import entrypoint_util
@@ -567,6 +567,15 @@ def simulate(
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
 
+    if RobotTypeEnum.robot_literal_to_enum(protocol.robot_type) != RobotTypeEnum.OT2:
+        raise RuntimeError(
+            "This protocol is not designed for an OT-2 robot. "
+            "If this is an OT-2 protocol, check that the protocol's robotType "
+            'is set to "OT-2". Otherwise, to utilize this '
+            "protocol, please download the most recent version of the "
+            "Opentrons app from https://github.com/Opentrons/opentrons/releases"
+        )
+
     _validate_can_simulate_for_robot_type(protocol.robot_type)
 
     with _make_hardware_simulator_cm(
@@ -847,9 +856,9 @@ def _create_live_context_pe(
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
 
     @contextmanager
-    def _cleanup_hardware_with_engine() -> Iterator[
-        tuple["ProtocolEngine", asyncio.AbstractEventLoop]
-    ]:
+    def _cleanup_hardware_with_engine() -> (
+        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
+    ):
         try:
             with create_protocol_engine_in_thread(
                 hardware_api=hardware_api_wrapped,
