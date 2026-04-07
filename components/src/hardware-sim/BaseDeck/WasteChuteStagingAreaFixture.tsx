@@ -56,18 +56,20 @@ export function WasteChuteStagingAreaFixture(
 
   return (
     <g {...restProps}>
-      <SlotBase
-        d="M314.8,96.1h329.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,94.2,312.4,96.1,314.8,96.1z"
-        fill={fixtureBaseColor}
-      />
-      {showSlotClips ? (
-        <>
-          <SlotClip d="M490,77.9v10.1h10.8" stroke={slotClipColor} />,
-          <SlotClip d="M490,8.8v-10.5h10.6" stroke={slotClipColor} />,
-          <SlotClip d="M621.8,77.9v10.1h-10.8" stroke={slotClipColor} />,
-          <SlotClip d="M621.8,8.8v-10.7h-10.8" stroke={slotClipColor} />
-        </>
-      ) : null}
+      <g transform={'translate(328, -214)'}>
+        <SlotBase
+          d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+          fill={fixtureBaseColor}
+        />
+        {showSlotClips ? (
+          <>
+            <SlotClip d="M326,398.9V409h10.8" stroke={slotClipColor} />,
+            <SlotClip d="M326,329.8v-10.5h10.6" stroke={slotClipColor} />,
+            <SlotClip d="M457.8,398.9V409H447" stroke={slotClipColor} />,
+            <SlotClip d="M457.8,329.8v-10.7H447" stroke={slotClipColor} />
+          </>
+        ) : null}
+      </g>
       <WasteChute
         wasteIconColor={fixtureBaseColor}
         backgroundColor={wasteChuteColor}
