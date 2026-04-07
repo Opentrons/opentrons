@@ -140,6 +140,3 @@ Use the `pnpm-lock.yaml` from your branch. If you changed `package.json` locally
 
 `pack/opentrons-*` must exist **before** `pnpm install`, because dependencies use `link:pack/...`. Run `make build-local-packages` (or full `make setup`), then `pnpm install` from `js-package-testing/`. If you already installed without `pack/`, rebuild packs and run `pnpm install` again.
 
-### Still stuck
-
-Copy the **full** terminal error (pack step, `pnpm install`, or `vite build`) into an issue or PR comment so we can match it to a known fix.
