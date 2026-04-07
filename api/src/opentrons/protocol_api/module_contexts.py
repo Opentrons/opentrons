@@ -36,14 +36,13 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocol_engine.types import ABSMeasureMode
-from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     UnsupportedAPIError,
     requires_version,
 )
-from opentrons.types import ModuleFixtureLocation, StagingSlotName
+from opentrons.types import ModuleFixtureLocation
 
 from . import (
     validation,

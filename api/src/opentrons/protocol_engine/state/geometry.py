@@ -911,29 +911,22 @@ class GeometryView:
                 details={"eventual-location": repr(labware.location)},
             )
 
-    def get_parent_from_location(self, location: _LabwareLocation) -> str:
-        """
-        Resolves a LabwareLocation (OnLabware, Module, or Slot)
-        down to its root Addressable Area Name.
-        """
+    def get_parent_from_location(self, location: LabwareLocation) -> str:
+        """Resolves a LabwareLocation down to its root Addressable Area Name."""
         current_loc = location
         seen: Set[str] = set()
 
-        # 1. Resolve recursive nesting (Labware on Labware)
         while isinstance(current_loc, OnLabwareLocation):
             parent_id = current_loc.labwareId
-
             if parent_id in seen:
                 raise InvalidLabwarePositionError(
                     f"Cycle detected in labware positioning at location: {location}"
                 )
 
             seen.add(parent_id)
-            # Fetch the next parent in the chain
             parent_labware = self._labware.get(parent_id)
             current_loc = parent_labware.location
 
-        # 2. Extract the Addressable Area from the terminal (root) location
         if isinstance(current_loc, DeckSlotLocation):
             return current_loc.slotName.id
         elif isinstance(current_loc, AddressableAreaLocation):
@@ -941,8 +934,6 @@ class GeometryView:
         elif isinstance(current_loc, ModuleFixtureLocation):
             return current_loc.addressable_area_name
         elif isinstance(current_loc, ModuleLocation):
-            # The vacuum module provides exactly one addressable area
-            # (e.g. 'vacuumModuleV1_area' or simply the slot id like 'A3')
             return self._modules.get_provided_addressable_area(current_loc.moduleId)
 
         else:
@@ -954,8 +945,8 @@ class GeometryView:
     def _is_fully_contained(
         self, resident_def: LabwareDefinition, boundary_space: ContainedSpace
     ) -> bool:
-        """
-        Validates that the resident fits entirely within the boundary_space box.
+        """Validates that the resident fits entirely within the boundary_space box.
+
         All coordinates are relative to the parent's (0,0,0).
         """
         # TODO: Add LabwareSchemaV3 support
@@ -986,7 +977,7 @@ class GeometryView:
             and res_max_z <= bound_max_z
         )
 
-    def ensure_location_not_occupied(
+    def ensure_location_not_occupied(  # noqa: C901
         self,
         location: _LabwareLocation,
         desired_addressable_area: Optional[str] = None,
@@ -1118,8 +1109,7 @@ class GeometryView:
                         )
                         quirks = labware_definition.parameters.quirks
                         if is_vacuum_module and quirks is not None:
-                            name = f"{module_at_location.model}Dock{location.addressableAreaName}"
-                            is_dock = f"{module_at_location.model}" in list(quirks)
+                            f"{module_at_location.model}" in list(quirks)
 
                         if not (is_vacuum_module and is_staging_area):
                             # Otherwise, proceed with standard standard collision check

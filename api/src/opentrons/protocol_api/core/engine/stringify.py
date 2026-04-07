@@ -28,7 +28,7 @@ def _module_in_location_string(module_id: str, engine_client: SyncClient) -> str
     return f"{module_name} on {module_on_string}"
 
 
-def _labware_location_string(
+def _labware_location_string(  # noqa: C901
     engine_client: SyncClient, location: LabwareLocation
 ) -> str:
     if isinstance(location, DeckSlotLocation):

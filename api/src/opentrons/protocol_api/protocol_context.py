@@ -82,7 +82,6 @@ from opentrons.legacy_commands.publisher import (
     publish_context,
 )
 from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
-from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,

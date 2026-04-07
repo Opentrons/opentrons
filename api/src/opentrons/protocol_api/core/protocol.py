@@ -21,7 +21,6 @@ from .robot import AbstractRobot
 from .tasks import TaskCoreType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
