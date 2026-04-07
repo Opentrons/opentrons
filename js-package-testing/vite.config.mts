@@ -21,14 +21,16 @@ export default defineConfig({
         'node_modules/@opentrons/components/src/styles/global.css'
       ),
       '@opentrons/components/styles': path.resolve(
-        './node_modules/@opentrons/components/lib/style.css'
+        __dirname,
+        'node_modules/@opentrons/components/lib/style.css'
       ),
       '@opentrons/protocol-visualization/styles': path.resolve(
-        './node_modules/@opentrons/protocol-visualization/lib/style.css'
+        __dirname,
+        'node_modules/@opentrons/protocol-visualization/lib/style.css'
       ),
       // Force a single instance of React
-      react: path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
+      react: path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     },
     dedupe: ['react', 'react-dom'],
   },

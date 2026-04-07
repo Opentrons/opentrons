@@ -39,13 +39,24 @@ Use the Applitools UI to accept or reject visual changes when baselines need upd
 
 ### Clean rebuild and dev server
 
+From the **monorepo root**, install JS dependencies once so `yarn pack` / `tsc` / `vite` work when this Makefile builds the four packages:
+
 ```bash
+make setup-js
+```
+
+Then from **`js-package-testing/`** (not the repo root):
+
+```bash
+cd js-package-testing
 make teardown setup dev
 ```
 
+`make setup` runs `pnpm install --frozen-lockfile` in this directory. Run all **`pnpm`** / **`make`** commands for this app from `js-package-testing/`.
+
 ## Prerequisites
 
-1. Run `make setup-js` at the monorepo root so packages can be packed.
+1. `make setup-js` at the monorepo root (required for packing `shared-data`, `step-generation`, `components`, and `protocol-visualization`; see Quick start).
 2. Install pnpm (see above).
 3. Set `APPLITOOLS_API_KEY` before visual tests.
 
@@ -114,3 +125,21 @@ js-package-testing/
 Versions align with the monorepo where applicable: React 18.2, TypeScript 5.3.3, Vite 7, Playwright ^1.58, `@applitools/eyes-playwright`, `react-i18next` 14 / `i18next` for the protocol visualization demo.
 
 After upgrading Playwright, run `make test-setup` or `pnpm exec playwright install chromium` so browser binaries match.
+
+## Troubleshooting
+
+### Pack or `make build-local-packages` fails
+
+Root `node_modules` must exist. From the monorepo root run `make setup-js` (or `yarn` with the repo’s usual workflow), then try again from `js-package-testing/`.
+
+### `pnpm install --frozen-lockfile` fails
+
+Use the `pnpm-lock.yaml` from your branch. If you changed `package.json` locally, run `pnpm install` once without `--frozen-lockfile`, then commit an updated lockfile if needed.
+
+### Vite build or dev fails resolving `@opentrons/*` or CSS
+
+`pack/opentrons-*` must exist **before** `pnpm install`, because dependencies use `link:pack/...`. Run `make build-local-packages` (or full `make setup`), then `pnpm install` from `js-package-testing/`. If you already installed without `pack/`, rebuild packs and run `pnpm install` again.
+
+### Still stuck
+
+Copy the **full** terminal error (pack step, `pnpm install`, or `vite build`) into an issue or PR comment so we can match it to a known fix.
