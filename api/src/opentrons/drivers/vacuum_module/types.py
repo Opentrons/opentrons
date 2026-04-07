@@ -32,6 +32,7 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
 
 
 @dataclass
