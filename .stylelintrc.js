@@ -8,7 +8,7 @@ module.exports = {
     '**/venv/**',
     'docs/**',
     'components/lib/**',
-    'components-testing/pack/**',
+    'js-package-testing/pack/**',
     'shared-data/**',
     'api-client/**',
     'react-api-client/**',

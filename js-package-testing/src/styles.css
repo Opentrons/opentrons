@@ -1,0 +1,67 @@
+/* Import bundled styles from components package */
+@import url('@opentrons/components/styles');
+
+.app_container {
+  padding: 1rem;
+  max-width: 90rem;
+}
+
+.demo_header {
+  margin-bottom: 2rem;
+}
+
+.demo_lead {
+  max-width: 50rem;
+  line-height: 1.5;
+}
+
+.demo_nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.demo_nav a {
+  color: #006cfa;
+}
+
+.demo_section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 0.0625rem solid #ddd;
+}
+
+.demo_section:last-child {
+  border-bottom: none;
+}
+
+.analysis_info {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f0f0f0;
+}
+
+.protocol_deck_container {
+  overflow: hidden;
+  width: 75rem;
+  height: 50rem;
+  box-sizing: border-box;
+  padding: 1rem;
+  border: 0.0625rem solid #ccc;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  background-color: #fff;
+
+  /* Fixed size for consistent screenshots */
+}
+
+.annotated_steps_demo {
+  height: 32rem;
+  max-width: 50rem;
+  margin-top: 1rem;
+  border: 0.0625rem solid #ccc;
+  border-radius: 0.5rem;
+  background-color: #fff;
+}

@@ -1,14 +1,16 @@
-# Components testing workflow - test ProtocolDeck
+# JS package testing: ProtocolDeck + protocol-visualization against packed packages
 
-name: 'Components package testing'
+name: 'JS package testing'
 
 on:
   pull_request:
     paths:
       - 'components/**'
-      - 'components-testing/**'
+      - 'js-package-testing/**'
+      - 'protocol-visualization/**'
       - 'shared-data/**'
-      - '.github/workflows/components-testing.yaml'
+      - 'step-generation/**'
+      - '.github/workflows/js-package-testing.yaml'
   push:
     branches:
       - 'edge'
@@ -27,8 +29,8 @@ env:
   CI: 'true'
 
 jobs:
-  components-testing:
-    name: 'components testing setup and validation'
+  js-package-testing:
+    name: 'js package testing setup and validation'
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
@@ -39,13 +41,13 @@ jobs:
       - uses: pnpm/action-setup@v5
         with:
           version: 10.32.1
-      - name: 'setup components-testing environment'
-        working-directory: components-testing
+      - name: 'setup js-package-testing environment'
+        working-directory: js-package-testing
         run: make test-setup
-      - name: 'run components-testing tests'
-        working-directory: components-testing
+      - name: 'run js-package-testing tests'
+        working-directory: js-package-testing
         env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }} 
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
         run: make test
       - name: 'upload playwright report'
         uses: actions/upload-artifact@v7
@@ -53,14 +55,14 @@ jobs:
         id: upload-report
         with:
           name: playwright-report
-          path: components-testing/playwright-report/
+          path: js-package-testing/playwright-report/
           retention-days: 30
       - name: 'add test results to summary'
         if: ${{ !cancelled() }}
         run: |
           echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -d "components-testing/playwright-report" ]; then
+          if [ -d "js-package-testing/playwright-report" ]; then
             echo "📊 **Test Report**: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-report.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "The detailed HTML report with screenshots and traces has been uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
