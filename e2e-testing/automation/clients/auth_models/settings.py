@@ -47,15 +47,15 @@ class SettingsPatchData(TypedDict, total=False):
     passwordResetTime: float | None
     passwordComplexityMinimumLength: int | None
     passwordComplexitySpecialCharacters: bool | None
-    idleLogout: float | None
-    requireAdminCredsWhenUpdatingRobotSoftware: bool | None
-    requireAdminCredsWhenSendingProtocolToRobot: bool | None
-    requireAdminCredsForSignoffProtocol: bool | None
-    requireSignoffForProtocolLog: bool | None
-    requireReasonForInteraction: bool | None
+    idleLogout: float
+    requireAdminCredsWhenUpdatingRobotSoftware: bool
+    requireAdminCredsWhenSendingProtocolToRobot: bool
+    requireAdminCredsForSignoffProtocol: bool
+    requireSignoffForProtocolLog: bool
+    requireReasonForInteraction: bool
     minLengthOfReasonForInteraction: int | None
-    requireLogsToBeSavedInApp: bool | None
-    deleteOverMaxOnDiskProtocols: bool | None
+    requireLogsToBeSavedInApp: bool
+    deleteOverMaxOnDiskProtocols: bool
 
 
 class SettingsPatchRequestEnvelope(TypedDict):
