@@ -11,6 +11,10 @@ from key_server.secure_volume.dependency import (
     build_secure_volume_manager,
     install_secure_volume_manager,
 )
+from key_server.tls.dependency import (
+    build_tls_manager,
+    install_tls_manager,
+)
 from key_server.settings.router import router as settings_router
 from key_server.settings.store import SettingsStore, install_settings_store
 
@@ -24,6 +28,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         install_secure_volume_manager(app.state, secure_volume_manager)
         await secure_volume_manager.mount()
         exit_stack.push_async_callback(secure_volume_manager.unmount)
+        tls_manager = await build_tls_manager(secure_volume_manager)
+        install_tls_manager(app_state, tls_manager)
+        exit_stack.push_async_callback(tls_manager.teardown)
         systemd_utils.notify_up()
         yield
 
