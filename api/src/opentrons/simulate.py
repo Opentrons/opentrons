@@ -33,7 +33,7 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
-from opentrons_shared_data.robot.types import RobotTypeEnum, RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 import opentrons
 from .util import entrypoint_util
