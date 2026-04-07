@@ -275,7 +275,7 @@ async def _run_single_pump_api_cycle(
         guage_pressure_mbar=target_to_pump,
     )
     # Vent the pump system to atmospheric pressure while pump is on
-    await pump.set_vent_state(1)
+    await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     try:
         await read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
@@ -289,7 +289,7 @@ async def _run_single_pump_api_cycle(
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
     await asyncio.sleep(DECAY_SEC)
-    await pump.set_vent_state(0)
+    await pump.set_vent_state(VentState.CLOSED)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -304,9 +304,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
     perstaltic_pump_flow_rate = 70  # mL/min
-    conversion = (
-        (perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate
-    ) * 60  # Convert ul to ml
+    conversion = ((perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate) * 60  # Convert uL volume to pump fill time (seconds)
     perstaltic_time = int(conversion)
 
     ctx.load_trash_bin("A3")
