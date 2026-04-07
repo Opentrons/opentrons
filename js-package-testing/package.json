@@ -9,9 +9,6 @@
     "preview": "vite preview",
     "test": "playwright test"
   },
-  "devDependencies": {
-    "shx": "^0.3.4"
-  },
   "dependencies": {
     "@applitools/eyes-playwright": "1.46.2",
     "@opentrons/components": "link:pack/opentrons-components",
