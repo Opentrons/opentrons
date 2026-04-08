@@ -4,7 +4,11 @@ import pytest
 import sqlalchemy
 
 from robot_server.access_control.settings.models import RequestData, ResponseData
-from robot_server.access_control.settings.store import AccessControlSettingStore
+from robot_server.access_control.settings.store import (
+    _DB_KEY_TO_FIELD_NAME,
+    _FIELD_NAME_TO_DB_KEY,
+    AccessControlSettingStore,
+)
 
 _ALL_FIELDS = list(ResponseData.model_fields.keys())
 _DEFAULTS = ResponseData().model_validate({})  # type: ignore[call-arg]
@@ -129,3 +133,16 @@ def test_reset_does_not_affect_other_boolean_settings(
     assert error_recovery_value is not None, (
         "reset_all() should not delete non-access-control settings"
     )
+
+
+def test_mapping_covers_all_model_fields() -> None:
+    """Verify every ResponseData field has a corresponding DB key mapping."""
+    model_fields = set(ResponseData.model_fields.keys())
+    mapped_fields = set(_DB_KEY_TO_FIELD_NAME.values())
+    assert mapped_fields == model_fields
+
+
+def test_mapping_is_bidirectional() -> None:
+    """Verify the forward and reverse mappings are consistent."""
+    for key, field_name in _DB_KEY_TO_FIELD_NAME.items():
+        assert _FIELD_NAME_TO_DB_KEY[field_name] is key
