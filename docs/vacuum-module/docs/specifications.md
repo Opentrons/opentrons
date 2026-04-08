@@ -50,18 +50,9 @@ title: "Vacuum Module: Product Specifications"
 
 </div>
 
-## Physical specifications
+See <font color="red"><strong>section TBD for descriptions of individual parts.</strong></font>
 
-| Header | Header |
-|----|----|
-| Vacuum module | L W H (include handle), weight |
-| Maximum pump rate | L/min  |
-| Measurement range (absolute) | 0—xxx mbar |
-| Tubing | |
-| Relative humidity | xx% at C |
-| Temperature | |
-| Humidity | |
-| Altitude | Sea level to xxxx meters |
+## Physical specifications
 
 <table>
   <thead>
@@ -73,18 +64,33 @@ title: "Vacuum Module: Product Specifications"
   <tbody>
     <tr>
       <td><strong>Pump dimensions</strong></td>
-      <td></td>
+      <td>L x W x H, weight</td>
     </tr>
     <tr>
       <td><strong>Maximum pump rate</strong></td>
-      <td></td>
+      <td>L/min</td>
     </tr>
     <tr>
       <td><strong>Vacuum range (absolute)</strong></td>
-      <td></td>
+      <td>1,013 mbar (sea level ambient) to 400 mbar (max)</td>
+    </tr>
+    <tr>
+      <td><strong>Hoses</strong></td>
+      <td>The module includes a set of polypropylene vacuum hoses:
+        <ul>
+          <li>6 mm (&frac14;"), _XX_ cm (inches) length</li>
+          <li>9.5 mm (&frac38;"), _XX_ cm (inches) length</li>
+        </ul>
+      </td>
     </tr>
   </tbody>
 </table>
+
+## Environmental specifications
+
+- Temperature range
+- Humidity
+- Altitude
 
 ## Power supply
 
