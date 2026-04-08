@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styles from './HistoricalProtocolRun.module.css'
 
 import {
   ALIGN_CENTER,
@@ -11,7 +10,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -21,6 +19,7 @@ import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import styles from './HistoricalProtocolRun.module.css'
 import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 
