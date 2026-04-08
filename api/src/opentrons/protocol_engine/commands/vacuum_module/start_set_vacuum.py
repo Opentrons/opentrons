@@ -31,8 +31,12 @@ class StartSetVacuumParams(BaseModel):
     rate: float | SkipJsonSchema[None] = Field(
         None, description="Target rate of pressure change in mbar/sec"
     )
+    timeout: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Specify timeframe in seconds that pressure must be reached in before a timeout error occurs.",
+    )
     ventAfter: bool = Field(
-        False,
+        True,
         description="Whether the system should open the vent after the target pressure is held for the duration.",
     )
 
@@ -71,10 +75,9 @@ class StartSetVacuumImpl(
                 guage_pressure_mbar=params.guagePressure,
                 duration_s=params.duration,
                 rate=params.rate if params.rate else None,
+                timeout_s=params.timeout if params.timeout else None,
                 vent_after=params.ventAfter,
             )
-        # guage pressure is a misspelling - should be gauge
-        # maybe should have all params include units
 
         return SuccessData(public=StartSetVacuumResult(), state_update=state_update)
 

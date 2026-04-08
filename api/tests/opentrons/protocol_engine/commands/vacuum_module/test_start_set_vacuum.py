@@ -31,12 +31,14 @@ async def test_start_set_vacuum(
     gauge_pressure = 444.0
     pressure_rate = 5.5
     duration_s = 100
+    timeout_s = 60
 
     data = vm_commands.StartSetVacuumParams(
         moduleId="input-vacuum-id",
         guagePressure=gauge_pressure,
         duration=duration_s,
         rate=pressure_rate,
+        timeout=timeout_s,
     )
     expected_module_id = VacuumModuleId("vacuum-id")
     expected_result = vm_commands.StartSetVacuumResult()
@@ -58,7 +60,12 @@ async def test_start_set_vacuum(
 
     decoy.verify(
         await vm_hardware.set_vacuum_state(
-            True, gauge_pressure, duration_s, rate=pressure_rate, vent_after=False
+            True,
+            gauge_pressure,
+            duration_s,
+            rate=pressure_rate,
+            timeout_s=timeout_s,
+            vent_after=True,
         )
     )
     assert result == SuccessData(

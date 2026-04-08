@@ -6576,8 +6576,14 @@
           "title": "Rate",
           "type": "number"
         },
+        "timeout": {
+          "default": null,
+          "description": "Specify timeframe in seconds that pressure must be reached in before a timeout error occurs.",
+          "title": "Timeout",
+          "type": "integer"
+        },
         "ventAfter": {
-          "default": false,
+          "default": true,
           "description": "Whether the system should open the vent after the target pressure is held for the duration.",
           "title": "Ventafter",
           "type": "boolean"
