@@ -2,6 +2,8 @@ import first from 'lodash/first'
 
 import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
 
+import { ZERO_COORDINATE_TUPLE } from './constants'
+
 import type {
   AddressableAreaName,
   CoordinateTuple,
@@ -12,8 +14,6 @@ import type {
   Vector3D,
 } from '@opentrons/shared-data'
 import type { LabwareEntities } from '@opentrons/step-generation'
-
-const ZERO_COORDINATE_TUPLE: CoordinateTuple = [0, 0, 0]
 
 export interface StackRenderingInfo {
   labwareId: string
@@ -31,12 +31,13 @@ export const getRenderingPositionFromBaseNode = (args: {
   deckConfiguration: DeckConfiguration
 }): CoordinateTuple => {
   const { baseNode, deckDef, deckConfiguration } = args
+
+  // If the base node is not a slot or addressable area, return zeros.
   if (
-    baseNode === 'offDeck' ||
-    baseNode === 'systemLocation' ||
-    baseNode === 'wasteChuteLocation' ||
-    'moduleId' in baseNode ||
-    'labwareId' in baseNode
+    !(
+      typeof baseNode === 'object' &&
+      ('addressableAreaName' in baseNode || 'slotName' in baseNode)
+    )
   ) {
     return ZERO_COORDINATE_TUPLE
   }
@@ -137,7 +138,7 @@ export const getLabwareStackRenderingInfo = (args: {
   return renderingInfos
 }
 
-const getOffsetPosition = (args: {
+export const getOffsetPosition = (args: {
   position: CoordinateTuple
   offset: Vector3D
 }): CoordinateTuple => {
