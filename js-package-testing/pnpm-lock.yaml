@@ -43,13 +43,13 @@ importers:
         version: 18.2.0
       '@vitejs/plugin-react':
         specifier: 4.2.0
-        version: 4.2.0(vite@7.1.1(@types/node@18.19.130))
+        version: 4.2.0(vite@7.1.11(@types/node@18.19.130))
       dotenv:
         specifier: ^16.6.1
         version: 16.6.1
       i18next:
-        specifier: 23.7.11
-        version: 23.7.11
+        specifier: ^19.8.3
+        version: 19.9.2
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -58,13 +58,13 @@ importers:
         version: 18.2.0(react@18.2.0)
       react-i18next:
         specifier: 14.0.0
-        version: 14.0.0(i18next@23.7.11)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       typescript:
         specifier: 5.3.3
         version: 5.3.3
       vite:
-        specifier: 7.1.1
-        version: 7.1.1(@types/node@18.19.130)
+        specifier: 7.1.11
+        version: 7.1.11(@types/node@18.19.130)
 
 packages:
 
@@ -1283,8 +1283,8 @@ packages:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
 
-  i18next@23.7.11:
-    resolution: {integrity: sha512-A/vOkw8vY99YHU9A1Td3I1dcTiYaPnwBWzrpVzfXUXSYgogK3cmBcmop/0cnXPc6QpUWIyqaugKNxRUEZVk9Nw==}
+  i18next@19.9.2:
+    resolution: {integrity: sha512-0i6cuo6ER6usEOtKajUUDj92zlG+KArFia0857xxiEHAQcUwh/RtOQocui1LPJwunSYT574Pk64aNva1kwtxZg==}
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -1702,8 +1702,8 @@ packages:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
 
-  vite@7.1.1:
-    resolution: {integrity: sha512-yJ+Mp7OyV+4S+afWo+QyoL9jFWD11QFH0i5i7JypnfTcA1rmgxCbiA8WwAICDEtZ1Z1hzrVhN8R8rGTqkTY8ZQ==}
+  vite@7.1.11:
+    resolution: {integrity: sha512-uzcxnSDVjAopEUjljkWh8EIrg6tlzrjFUfMcR1EVsRDGwf/ccef0qQPRyOrROwhrTDaApueq+ja+KLPlzR/zdg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -2657,14 +2657,14 @@ snapshots:
 
   '@types/scheduler@0.26.0': {}
 
-  '@vitejs/plugin-react@4.2.0(vite@7.1.1(@types/node@18.19.130))':
+  '@vitejs/plugin-react@4.2.0(vite@7.1.11(@types/node@18.19.130))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
       '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.5)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 7.1.1(@types/node@18.19.130)
+      vite: 7.1.11(@types/node@18.19.130)
     transitivePeerDependencies:
       - supports-color
 
@@ -3053,7 +3053,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  i18next@23.7.11:
+  i18next@19.9.2:
     dependencies:
       '@babel/runtime': 7.29.2
 
@@ -3262,11 +3262,11 @@ snapshots:
       react: 18.2.0
       scheduler: 0.23.2
 
-  react-i18next@14.0.0(i18next@23.7.11)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  react-i18next@14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@babel/runtime': 7.29.2
       html-parse-stringify: 3.0.1
-      i18next: 23.7.11
+      i18next: 19.9.2
       react: 18.2.0
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
@@ -3475,7 +3475,7 @@ snapshots:
   uuid@9.0.1:
     optional: true
 
-  vite@7.1.1(@types/node@18.19.130):
+  vite@7.1.11(@types/node@18.19.130):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)

@@ -21,12 +21,12 @@
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.2.0",
     "dotenv": "^16.6.1",
-    "i18next": "23.7.11",
+    "i18next": "^19.8.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "14.0.0",
     "typescript": "5.3.3",
-    "vite": "7.1.1"
+    "vite": "7.1.11"
   },
   "packageManager": "pnpm@10.32.1"
 }
