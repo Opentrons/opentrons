@@ -46,6 +46,8 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: ./.github/actions/js/setup
+      - name: 'build step-generation package (tsc + vite)'
+        run: make -C step-generation lib
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
       - name: 'Upload coverage report'

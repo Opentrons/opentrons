@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
     "electron-notarize": "^1.2.1",
@@ -38,7 +40,7 @@
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "4.17.24",
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
     "agent-base": "6.0.2",
@@ -56,7 +58,7 @@
     "form-data": "2.5.4",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
-    "lodash": "4.17.21",
+    "lodash": "4.18.1",
     "merge-options": "1.0.1",
     "mqtt": "4.3.8",
     "node-fetch": "2.6.7",

@@ -14,7 +14,7 @@ from _pytest.fixtures import SubRequest
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 
 from opentrons import protocols, simulate
-from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import ApiDeprecationError
@@ -27,16 +27,19 @@ if TYPE_CHECKING:
 HERE = Path(__file__).parent
 
 
-@pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
+@pytest.fixture(params=[MIN_SUPPORTED_VERSION_FOR_FLEX, APIVersion(2, 16)])
 def api_version(request: SubRequest) -> APIVersion:
-    """Return an API version to test with.
+    """Return a Flex-compatible API version to test with.
 
-    Newer API versions execute through Protocol Engine, and older API versions don't.
-    The two codepaths are very different, so we need to test them both.
+    We test two Flex-compatible API versions to cover different
+    protocol execution codepaths.
     """
     return cast(APIVersion, request.param)
 
 
+# TODO(jh, 04-07-2026): A lot of these tests are irrelevant now that the OT-2 is no longer supported in the monorepo.
+#  Out of the skipped tests, identify which to modify & keep and which to remove.
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 @pytest.mark.parametrize(
     "protocol_file",
     [
@@ -64,12 +67,14 @@ def test_simulate_function_apiv2_bundle(
     assert isinstance(bundle_contents, protocols.types.BundleContents)
 
 
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py", "testosaur_v2_14.py"])
 def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> None:
     """`simulate()` should accept a protocol without a filename."""
     simulate.simulate(protocol.filelike)  # Should not raise.
 
 
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 @pytest.mark.parametrize(
     ("protocol_file", "expected_entries"),
     [
@@ -110,6 +115,7 @@ def test_simulate_function_apiv2_run_log(
     assert [item["payload"]["text"] for item in run_log] == expected_entries
 
 
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 def test_simulate_function_json(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
 ) -> None:
@@ -130,6 +136,7 @@ def test_simulate_function_json(
     ]
 
 
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 def test_simulate_function_bundle_apiv2(
     get_bundle_fixture: Callable[[str], Bundle],
 ) -> None:
@@ -166,6 +173,7 @@ def test_simulate_function_v1(protocol: Protocol, protocol_file: str) -> None:
         simulate.simulate(protocol.filelike, "testosaur.py")
 
 
+@pytest.mark.skip(reason="OT-2 protocols are no longer supported by simulate()")
 @pytest.mark.parametrize("protocol_file", ["bug_aspirate_tip.py"])
 def test_simulate_aspirate_tip(
     protocol: Protocol,
@@ -190,7 +198,7 @@ class TestSimulatePythonLabware:
         path = tmp_path / "protocol.py"
         protocol_source = textwrap.dedent(
             f"""\
-            metadata = {{"apiLevel": "{api_version}"}}
+            requirements = {{"robotType": "Flex", "apiLevel": "{api_version}"}}
             def run(protocol):
                 protocol.load_labware(
                     load_name="{self.LW_LOAD_NAME}",

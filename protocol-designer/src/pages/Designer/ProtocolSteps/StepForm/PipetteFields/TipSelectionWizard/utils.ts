@@ -105,9 +105,12 @@ export const getHoveredOffsetFromWell = (args: {
     }
   }
   const well = labware.def.wells[wellName]
+  const labwareHasOneRowAndIsRectangular =
+    labware.def.ordering[0].length === 1 && well.shape === 'rectangular'
+  const wellHeight = labwareHasOneRowAndIsRectangular ? well.yDimension : well.y
   return {
     x: well.x + xOffset,
-    y: well.y + yOffset,
+    y: wellHeight + yOffset,
   }
 }
 

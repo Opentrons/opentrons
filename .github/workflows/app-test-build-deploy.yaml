@@ -354,7 +354,7 @@ jobs:
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - name: 'download run app builds'
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -373,7 +373,7 @@ jobs:
       - name: 'configure s3 deploy creds (GitHub OIDC)'
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
-          role-to-assume: ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }}
+          role-to-assume: ${{ vars.OT_APP_OT3_DEPLOY_ROLE }}
           aws-region: us-east-2
       - name: 'deploy release builds to s3'
         run: |
