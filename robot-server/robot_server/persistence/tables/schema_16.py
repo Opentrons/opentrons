@@ -521,7 +521,7 @@ boolean_setting_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "value",
-        sqlalchemy.String,
+        sqlalchemy.Boolean,
         nullable=False,
     ),
 )

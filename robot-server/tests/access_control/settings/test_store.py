@@ -11,7 +11,7 @@ from robot_server.access_control.settings.store import (
 )
 
 _ALL_FIELDS = list(ResponseData.model_fields.keys())
-_DEFAULTS = ResponseData().model_validate({})  # type: ignore[call-arg]
+_DEFAULTS = ResponseData().model_validate({})
 
 
 @pytest.fixture

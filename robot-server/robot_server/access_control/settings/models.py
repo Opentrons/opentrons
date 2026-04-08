@@ -13,23 +13,20 @@ class ResponseData(pydantic.BaseModel):
         bool,
         pydantic.Field(
             description="Require signoff for the protocol log.",
-            default=True,
         ),
-    ]
+    ] = True
     requireLogsToBeSavedInApp: Annotated[
         bool,
         pydantic.Field(
             description="Require logs to be saved in app.",
-            default=True,
         ),
-    ]
+    ] = True
     deleteOverMaxOnDiskProtocols: Annotated[
         bool,
         pydantic.Field(
             description="Delete protocol run logs on the robot when there are 20 protocol run records.",
-            default=True,
         ),
-    ]
+    ] = True
 
 
 class RequestData(pydantic.BaseModel):

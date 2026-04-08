@@ -239,7 +239,7 @@ EXPECTED_STATEMENTS_V16 = [
     """
     CREATE TABLE boolean_setting_extended (
         "key" VARCHAR(200) NOT NULL,
-        value VARCHAR NOT NULL,
+        value BOOLEAN NOT NULL,
         PRIMARY KEY ("key")
     )
     """,

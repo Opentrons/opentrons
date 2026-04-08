@@ -41,7 +41,7 @@ class AccessControlSettingStore:
                 )
             ).all()
             return ResponseData.model_validate(
-                {_DB_KEY_TO_FIELD_NAME[row.key]: str(row.value) for row in rows}
+                {_DB_KEY_TO_FIELD_NAME[row.key]: bool(row.value) for row in rows}
             )
 
     def patch(self, request: RequestData) -> ResponseData:
@@ -62,7 +62,7 @@ class AccessControlSettingStore:
                 )
             )
             rows_to_insert = [
-                {"key": _FIELD_NAME_TO_DB_KEY[name], "value": str(value)}
+                {"key": _FIELD_NAME_TO_DB_KEY[name], "value": bool(value)}
                 for name, value in provided.items()
                 if value is not None
             ]
