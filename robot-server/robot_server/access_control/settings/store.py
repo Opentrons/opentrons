@@ -41,7 +41,7 @@ class AccessControlSettingStore:
                 )
             ).all()
             return ResponseData.model_validate(
-                {_DB_KEY_TO_FIELD_NAME[row.key]: bool(row.value) for row in rows}
+                {_DB_KEY_TO_FIELD_NAME[row.key]: str(row.value) for row in rows}
             )
 
     def patch(self, request: RequestData) -> ResponseData:
@@ -51,21 +51,24 @@ class AccessControlSettingStore:
         A value of ``None`` reverts that setting to its default (deletes the row).
         """
         provided = request.model_dump(exclude_unset=True)
+        print("provided: ", provided)
         if not provided:
             return self.get_all()
 
         with self._sql_engine.begin() as transaction:
             keys_to_update = [_FIELD_NAME_TO_DB_KEY[name] for name in provided]
+            print("keys_to_update: ", keys_to_update)
             transaction.execute(
                 sqlalchemy.delete(boolean_setting_table).where(
                     boolean_setting_table.c.key.in_(keys_to_update)
                 )
             )
             rows_to_insert = [
-                {"key": _FIELD_NAME_TO_DB_KEY[name], "value": value}
+                {"key": _FIELD_NAME_TO_DB_KEY[name], "value": str(value)}
                 for name, value in provided.items()
                 if value is not None
             ]
+            print("rows_to_insert: ", rows_to_insert)
             if rows_to_insert:
                 transaction.execute(
                     sqlalchemy.insert(boolean_setting_table),
