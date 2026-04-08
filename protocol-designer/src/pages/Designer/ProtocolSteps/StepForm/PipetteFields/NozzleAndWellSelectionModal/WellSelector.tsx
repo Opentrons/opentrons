@@ -37,6 +37,7 @@ import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
   getInaccessibleWellsForPartialNozzleRowMap,
+  getWellNameAtClientPoint,
 } from './utils'
 
 import type { WellMouseEvent, WellType } from '@opentrons/components'
@@ -301,20 +302,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     }
     return highlightedWells
   }
-  const _getWellAtPosition = (x: number, y: number): string | null => {
-    for (const [wellName, well] of Object.entries(labwareDef.wells)) {
-      const wellIsCircular = well.shape === 'circular'
-      const r = wellIsCircular ? well.diameter / 2 : well.xDimension
-      const cx = well.x
-      const cy = well.y
-      const dx = x - cx
-      const dy = y - cy
-      if (dx * dx + dy * dy <= r * r) {
-        return wellName
-      }
-    }
-    return null
-  }
+
   const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
@@ -323,8 +311,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       const wellsUnderRect = _getWellsFromRect(rect)
       const flatWellList = wellsUnderRect.flat()
       setHoveredWells(flatWellList)
-      const wellUnderMouse = _getWellAtPosition(e.clientX, e.clientY)
-
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
       if (wellUnderMouse) {
         setWellShadow(wellUnderMouse)
       }
