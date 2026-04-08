@@ -57,11 +57,34 @@ title: "Vacuum Module: Product Specifications"
 | Vacuum module | L W H (include handle), weight |
 | Maximum pump rate | L/min  |
 | Measurement range (absolute) | 0—xxx mbar |
-| Tubing | Diameter, length, composition |
+| Tubing | |
 | Relative humidity | xx% at C |
 | Temperature | |
 | Humidity | |
 | Altitude | Sea level to xxxx meters |
+
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Pump dimensions</strong></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>Maximum pump rate</strong></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>Vacuum range (absolute)</strong></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Power supply
 
