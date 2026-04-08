@@ -39,7 +39,6 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
 
     # Landing Page
     landing_page = LandingPage(page)
-    # ToDo: Can we use applitools instead of all these timeouts?
     landing_page.goto(pd_base_url)
     landing_page.wait_for_page_load()
     print("✓ Main page loaded")
