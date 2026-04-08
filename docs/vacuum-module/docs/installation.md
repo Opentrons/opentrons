@@ -6,25 +6,17 @@ description: "Installing the Vacuum Module on a Flex robot."
 Follow these instructions to install the Vacuum Module.
 
 !!! warning
-    Turn off the power to your Flex before you begin. This prevents someone from using the robot while you're working in the enclosure.
-
-<!-- tube inner diameter in inches (&frac14;, &frac38;), for now. Will use metric later.-->
+    Turn off the power to your Flex before you begin. This prevents someone from using the robot during installation.
 
 <div class="instruction-list" markdown>
 
 ## Part 1: Deck preparation
 
-!!! info "Deck slot requirement"
-    The Vacuum Module and its adapter components must be installed in slots A3—A4 only.
+1. **Clear the deck:** Remove all modules and labware from the robot to give yourself room to work.
+
+2. **Install the deck plate adapter:** The adapter and other on-deck components must be installed in slots A3—A4 only.
+
     ![Deck map with slot A3 and A4 highlighted](images/vacuum-module-deck-slot.svg)
-
-1. **Clear the deck:** Remove all modules and labware from the robot. Ensure Slot A3 is completely empty, including the default waste bin.
-
-2. **Install the deck plate:** Attach the adapter plate to Slot A3. Secure it to the deck using the included screwdriver and screws. The plate extends into the next column to provide storage in slot A4. 
-
-    <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
-    ![Placeholder for deck plate installation](./images/deck-plate-attaching.png){ width="80%" }
-    <font color="red"><strong>DEMO PLACEHOLDER FOR REAL IMAGE</strong></font>
 
 3. **Install the manifold:** Seat the base plate and collar firmly into the adapter.
 
