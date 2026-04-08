@@ -98,17 +98,25 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       wasteChuteFixtures.length > 0
   )
 
-  const stagingAreaCutoutIds = stagingAreaFixtures.map(
-    stagingArea => stagingArea.location.split('cutout')[1]
-  )
-
   const hasWasteChute =
     wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
   const hasFlexStacker = Object.values(initialDeckSetup.modules).some(
     module => getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
   )
-
+  const flexStackerLocations = Object.values(initialDeckSetup.modules)
+    .filter(stacker => stacker.type === FLEX_STACKER_MODULE_TYPE)
+    .map(({ slot: location, ...rest }) => ({ ...rest, location }))
+  flexStackerLocations.forEach(
+    stacker => (stacker.location = `cutout${stacker.location.slice(0, 1)}3`)
+  )
+  const stagingAreaFixturesAndStacker = [
+    ...stagingAreaFixtures,
+    ...flexStackerLocations,
+  ]
+  const stagingAreaCutoutIds = stagingAreaFixturesAndStacker.map(
+    stagingArea => stagingArea.location.split('cutout')[1]
+  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa =>
       isAddressableAreaStandardSlot(aa.id, deckDef) &&
@@ -176,7 +184,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     />
                   ) : null
                 })}
-                {stagingAreaFixtures.map(fixture => (
+                {stagingAreaFixturesAndStacker.map(fixture => (
                   <StagingAreaFixture
                     key={fixture.id}
                     cutoutId={fixture.location as StagingAreaLocation}
@@ -232,7 +240,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               hover={hoverSlot}
               setHover={setHoverSlot}
               initialDeckSetup={initialDeckSetup}
-              stagingAreaCutoutIds={stagingAreaFixtures.map(
+              stagingAreaCutoutIds={stagingAreaFixturesAndStacker.map(
                 areas => areas.location as CutoutId
               )}
               {...{

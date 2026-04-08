@@ -136,6 +136,12 @@ export function DeckSetupContainer(
   const hasFlexStacker = Object.values(activeDeckSetup.modules).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
+  const flexStackerLocations = Object.values(activeDeckSetup.modules)
+    .filter(stacker => stacker.type === FLEX_STACKER_MODULE_TYPE)
+    .map(({ slot: location, ...rest }) => ({ ...rest, location }))
+  flexStackerLocations.forEach(
+    stacker => (stacker.location = `cutout${stacker.location.slice(0, 1)}3`)
+  )
   const isZoomed = Object.values(zoomIn).some(val => val != null)
   const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
   const viewBoxAdjustedNumerical = [
@@ -216,7 +222,11 @@ export function DeckSetupContainer(
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea'
   )
-  const stagingAreaCutoutIds = stagingAreaFixtures.map(
+  const stagingAreaFixturesAndStacker = [
+    ...stagingAreaFixtures,
+    ...flexStackerLocations,
+  ]
+  const stagingAreaCutoutIds = stagingAreaFixturesAndStacker.map(
     stagingArea => stagingArea.location.split('cutout')[1]
   )
 
@@ -226,6 +236,7 @@ export function DeckSetupContainer(
       !stagingAreaCutoutIds.includes(aa.id)
   )
   const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
+  console.log(zoomIn)
   return (
     <>
       <Flex
@@ -286,7 +297,7 @@ export function DeckSetupContainer(
                           deckDef.cutoutFixtures
                         )
                         return cutoutId != null &&
-                          !Object.keys(stagingAreaFixtures).includes(
+                          !Object.keys(stagingAreaFixturesAndStacker).includes(
                             cutoutId
                           ) ? (
                           <SingleSlotFixture
@@ -300,11 +311,12 @@ export function DeckSetupContainer(
                           />
                         ) : null
                       })}
-                      {stagingAreaFixtures.map(fixture => {
+                      {stagingAreaFixturesAndStacker.map(fixture => {
                         if (
                           zoomIn.cutout == null ||
                           zoomIn.cutout !== fixture.location
                         ) {
+
                           return (
                             <StagingAreaFixture
                               key={fixture.id}
@@ -386,7 +398,7 @@ export function DeckSetupContainer(
                     addEquipment={addEquipment}
                     activeDeckSetup={activeDeckSetup}
                     currentStep={currentStep}
-                    stagingAreaCutoutIds={stagingAreaFixtures.map(
+                    stagingAreaCutoutIds={stagingAreaFixturesAndStacker.map(
                       areas => areas.location as CutoutId
                     )}
                     {...{
@@ -396,7 +408,7 @@ export function DeckSetupContainer(
                   />
                   <SlotLabels
                     robotType={robotType}
-                    show4thColumn={stagingAreaFixtures.length > 0}
+                    show4thColumn={stagingAreaFixturesAndStacker.length > 0}
                   />
                 </>
               )}
