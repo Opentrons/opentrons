@@ -62,7 +62,7 @@ describe('DeckThumbnail', () => {
     })
   })
 
-  it('renders a flex deck with a labware and all single slot fixutres', () => {
+  it('renders a flex deck with a labware and all single slot fixtures', () => {
     render(props)
     screen.getByText('mock LabwareOnDeck')
     expect(screen.getAllByText('mock single slot fixture')).toHaveLength(12)

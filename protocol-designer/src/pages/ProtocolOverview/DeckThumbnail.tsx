@@ -113,7 +113,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     aa =>
       isAddressableAreaStandardSlot(aa.id, deckDef) &&
       !stagingAreaCutoutIds.includes(aa.id) &&
-      ((hasWasteChute && aa.id !== 'D3') || hasFlexStacker)
+      (!hasWasteChute || aa.id !== 'D3')
   )
   const hasRightColumnFixtures =
     stagingAreaFixtures.length + wasteChuteFixtures.length > 0 || hasFlexStacker
