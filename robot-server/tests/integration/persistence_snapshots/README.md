@@ -98,4 +98,4 @@ cd robot-server
 uv run --python 3.12 python tests/integration/persistence_snapshots/generate_schema_15_for_v16_migration_snapshot.py
 ```
 
-Integration coverage: `tests/integration/http_api/persistence/test_schema_15_to_16_migration.py`.
+Integration coverage: `tests/integration/http_api/persistence/test_schema_15_to_16_migration.py` (including legacy `GET /camera` for the three enablement flags).
