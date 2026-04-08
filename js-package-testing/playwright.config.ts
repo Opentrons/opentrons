@@ -20,7 +20,7 @@ export default defineConfig<EyesFixture>({
     video: 'retain-on-failure',
     screenshot: 'on',
     eyesConfig: {
-      appName: 'components-testing',
+      appName: 'js-package-testing',
       failTestsOnDiff: 'afterEach',
     },
   },

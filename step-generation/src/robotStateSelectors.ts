@@ -342,7 +342,7 @@ export function getPipetteWithTipMaxVol(
     )
     return NaN
   }
-  return min([tiprackTipVol, pipetteMaxVol])
+  return min([tiprackTipVol, pipetteMaxVol]) ?? NaN
 }
 export function getModuleState(
   robotState: RobotState,
