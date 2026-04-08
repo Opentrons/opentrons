@@ -48,6 +48,7 @@
   "camera": "摄像头",
   "camera_disabled": "摄像头已禁用",
   "camera_enabled": "摄像头已启用",
+  "camera_required": "运行该协议需要摄像头",
   "camera_settings": "摄像头设置",
   "camera_setup_step_description": "检查此协议运行的摄像头偏好设置。",
   "camera_setup_step_title": "摄像头",
