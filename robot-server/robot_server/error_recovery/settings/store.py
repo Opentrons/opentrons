@@ -21,13 +21,17 @@ class ErrorRecoverySettingStore:
     def get_is_enabled(self) -> bool:
         """Get the value of the "error recovery enabled" setting."""
         with self._sql_engine.begin() as transaction:
-            result: bool | None = transaction.execute(
+            result: str | None = transaction.execute(
                 sqlalchemy.select(boolean_setting_table.c.value).where(
                     boolean_setting_table.c.key
                     == BooleanSettingKey.ENABLE_ERROR_RECOVERY
                 )
             ).scalar_one_or_none()
-        return result if result is not None else _ERROR_RECOVERY_ENABLED_DEFAULT
+            return (
+                result == "True"
+                if result is not None
+                else _ERROR_RECOVERY_ENABLED_DEFAULT
+            )
 
     def set_is_enabled(self, is_enabled: bool | None) -> None:
         """Set the value of the "error recovery enabled" setting.
@@ -45,7 +49,7 @@ class ErrorRecoverySettingStore:
                 transaction.execute(
                     sqlalchemy.insert(boolean_setting_table).values(
                         key=BooleanSettingKey.ENABLE_ERROR_RECOVERY,
-                        value=is_enabled,
+                        value=str(is_enabled),
                     )
                 )
 
