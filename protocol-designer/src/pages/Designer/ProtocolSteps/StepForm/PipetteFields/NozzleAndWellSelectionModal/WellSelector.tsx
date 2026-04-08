@@ -149,6 +149,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stepType]
   )
+
+  const handleLeaveWell = (_: WellMouseEvent): void => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+    }
+    leaveTimeoutRef.current = setTimeout(() => {
+      if (currentHoveredWellRef.current === hoveredWells) {
+        setHoveredWells(null)
+        currentHoveredWellRef.current = null
+      }
+      leaveTimeoutRef.current = null
+    }, 120)
+  }
   const [wellShadow, setWellShadow] = useState<string | null>(null)
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
