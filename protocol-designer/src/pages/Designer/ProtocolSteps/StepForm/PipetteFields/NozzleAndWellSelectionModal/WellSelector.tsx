@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,6 +6,7 @@ import {
   COLORS,
   DEFAULT_TIP_SIZE,
   INACCESSIBLE,
+  Module,
   SELECTED,
   SELECTED_ERROR,
   StyledText,
@@ -14,7 +15,9 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
+  getModuleDef,
   getPositionFromSlotId,
+  inferModuleOrientationFromXCoordinate,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
@@ -438,12 +441,35 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
     const is96Channel = channels === 96
-    controls = (
+    const modulesOnDeck = deckSetup.modules
+    const moduleIds = new Set(Object.keys(modulesOnDeck))
+    const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
+
+    const moduleDef = moduleLocation
+      ? getModuleDef(modulesOnDeck[moduleLocation].model)
+      : null
+
+    const labwarePositionProps =
+      moduleDef != null
+        ? {
+            x: 0,
+            y: 0,
+          }
+        : {
+            x: slotPosition[0],
+            y: slotPosition[1],
+          }
+    const pipettePositionProps =
+      moduleDef === null
+        ? {
+            slotPosition: slotPosition,
+          }
+        : {}
+    const labwarePipetteContent = (
       <>
         <LabwareOnDeck
           labwareOnDeck={labware}
-          x={slotPosition[0]}
-          y={slotPosition[1]}
+          {...labwarePositionProps}
           handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
           onMouseLeaveWell={handleLeaveWell}
@@ -455,6 +481,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         />
         {hasMoreThanOneWell ? (
           <PipetteShadow
+            {...pipettePositionProps}
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
@@ -473,6 +500,27 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ) : null}
       </>
     )
+    controls = (
+      <Fragment>
+        {moduleDef ? (
+          <Module
+            key={slot}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            def={moduleDef}
+            orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
+            innerProps={{ lidMotorState: 'open' }}
+            targetSlotId={slot}
+            targetDeckId={deckDef.otId}
+            childrenPositioningMode={'offsetToSlot'}
+          >
+            {labwarePipetteContent}
+          </Module>
+        ) : (
+          <>{labwarePipetteContent}</>
+        )}
+      </Fragment>
+    )
   }
   return (
     <>
@@ -483,7 +531,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           onSelectionDone={handleSelectionDone}
           customWidth={45}
         >
-          <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          <div className={styles.base_deck_tip_selection}>
+            <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          </div>
         </SelectionRect>
         <div className={styles.well_legend_box}>
           <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
