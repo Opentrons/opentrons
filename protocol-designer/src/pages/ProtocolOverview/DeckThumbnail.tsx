@@ -88,9 +88,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea'
   )
-  const stagingAreaCutoutIds = stagingAreaFixtures.map(
-    stagingArea => stagingArea.location.split('cutout')[1]
-  )
   const wasteChuteStagingAreaFixtures = Object.values(
     initialDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -101,16 +98,22 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       wasteChuteFixtures.length > 0
   )
 
+  const stagingAreaCutoutIds = stagingAreaFixtures.map(
+    stagingArea => stagingArea.location.split('cutout')[1]
+  )
+
   const hasWasteChute =
     wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
   const hasFlexStacker = Object.values(initialDeckSetup.modules).some(
     module => getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
   )
+
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa =>
       isAddressableAreaStandardSlot(aa.id, deckDef) &&
-      !stagingAreaCutoutIds.includes(aa.id)
+      !stagingAreaCutoutIds.includes(aa.id) &&
+      ((hasWasteChute && aa.id !== 'D3') || hasFlexStacker)
   )
   const hasRightColumnFixtures =
     stagingAreaFixtures.length + wasteChuteFixtures.length > 0 || hasFlexStacker

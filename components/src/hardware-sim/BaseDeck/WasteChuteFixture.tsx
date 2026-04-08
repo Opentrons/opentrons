@@ -12,7 +12,6 @@ import { Icon } from '../../icons'
 import { DeckLabelSet } from '../../organisms'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import styles from './basedeck.module.css'
-import { SlotBase } from './SlotBase'
 
 import type { SVGProps } from 'react'
 import type {
@@ -68,10 +67,6 @@ export function WasteChuteFixture(
 
   return (
     <g {...restProps}>
-      <SlotBase
-        d="M314.8,96.1h238.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,94.2,312.4,96.1,314.8,96.1z"
-        fill={fixtureBaseColor}
-      />
       <WasteChute
         backgroundColor={wasteChuteColor}
         wasteIconColor={fixtureBaseColor}
@@ -105,7 +100,6 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
     overlay,
     opacity,
   } = props
-
   return (
     <>
       <RobotCoordsForeignObject
