@@ -137,10 +137,10 @@ export const getLabwareStackRenderingInfo = (args: {
   return renderingInfos
 }
 
-function getOffsetPosition(args: {
+const getOffsetPosition = (args: {
   position: CoordinateTuple
   offset: Vector3D
-}): CoordinateTuple {
+}): CoordinateTuple => {
   const { position, offset } = args
   return [
     position[0] + offset.x,
