@@ -68,6 +68,10 @@ export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
           labwareEntities,
           validTiprackIds,
         })
+        if (selectedTiprackId === null && isTiprackSelectable) {
+          setSelectedTiprackId(id)
+        }
+
         return isTiprackSelectable ? (
           <>
             {id === selectedTiprackId ? (
