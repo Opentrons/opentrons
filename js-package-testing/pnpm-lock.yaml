@@ -17,6 +17,9 @@ importers:
       '@applitools/eyes-playwright':
         specifier: 1.46.2
         version: 1.46.2(@playwright/test@1.58.2)(@types/node@18.19.130)(encoding@0.1.13)(playwright@1.58.2)(typescript@5.3.3)
+      '@fontsource/public-sans':
+        specifier: 5.0.3
+        version: 5.0.3
       '@opentrons/components':
         specifier: link:pack/opentrons-components
         version: link:pack/opentrons-components
@@ -448,6 +451,9 @@ packages:
 
   '@fastify/proxy-addr@5.1.0':
     resolution: {integrity: sha512-INS+6gh91cLUjB+PVHfu1UqcB76Sqtpyp7bnL+FYojhjygvOPA9ctiD/JDKsyD9Xgu4hUhCSJBPig/w7duNajw==}
+
+  '@fontsource/public-sans@5.0.3':
+    resolution: {integrity: sha512-qoP6K/rmKIe6TP31kV9ImR73u/R1opPA3sx+4NLH4wQWbxTOQNLbH9nDzKF2PN7IQ9xLpu5e6XnQLgwlPpjeTQ==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -2260,6 +2266,8 @@ snapshots:
       '@fastify/forwarded': 3.0.1
       ipaddr.js: 2.3.0
     optional: true
+
+  '@fontsource/public-sans@5.0.3': {}
 
   '@img/colour@1.1.0': {}
 
