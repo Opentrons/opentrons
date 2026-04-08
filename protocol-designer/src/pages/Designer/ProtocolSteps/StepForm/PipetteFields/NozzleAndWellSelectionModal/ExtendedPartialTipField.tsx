@@ -107,8 +107,7 @@ export function ExtendedPartialTipField(
       (channels === 8 && nozzleConfiguration === ALL) ||
       nozzleConfiguration === COLUMN
     const isRow = nozzleConfiguration === ROW
-    const hasRequiredWells = aspWells.length > 0
-    if (!nozzleText || !hasRequiredWells) {
+    if (!nozzleText || aspWellsLength === 0) {
       return t('no_nozzles_and_wells_selected')
     }
     let positionType: string = 'wells'
