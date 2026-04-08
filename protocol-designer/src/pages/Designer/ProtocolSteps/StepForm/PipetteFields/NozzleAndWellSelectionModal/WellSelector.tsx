@@ -40,6 +40,7 @@ import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
   getInaccessibleWellsForPartialNozzleRowMap,
+  getWellNameAtClientPoint,
 } from './utils'
 
 import type { WellMouseEvent, WellType } from '@opentrons/components'
@@ -135,8 +136,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     useState<string[][]>(getSelectedWells())
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
+  const currentHoveredWellRef = useRef<string[] | null>(null)
+
   useEffect(
     () => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current)
+        leaveTimeoutRef.current = null
+      }
+      currentHoveredWellRef.current = null
       setSelectedWells(getSelectedWells())
       setHoveredWells(null)
     },
@@ -145,6 +153,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     [stepType]
   )
 
+  const handleLeaveWell = (_: WellMouseEvent): void => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+    }
+    leaveTimeoutRef.current = setTimeout(() => {
+      if (currentHoveredWellRef.current === hoveredWells) {
+        setHoveredWells(null)
+        currentHoveredWellRef.current = null
+      }
+      leaveTimeoutRef.current = null
+    }, 120)
+  }
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
@@ -160,6 +181,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     )
 
     setHoveredWells(hovered)
+    setWellShadow(hovered[0])
   }
 
   const allWellsWithStatus = useMemo(
@@ -282,6 +304,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       return next
     })
   }
+
   const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
     const wellsInRect = getCollidingWells(rect)
     const highlightedWells: string[][] = []
@@ -311,6 +334,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       const wellsUnderRect = _getWellsFromRect(rect)
       const flatWellList = wellsUnderRect.flat()
       setHoveredWells(flatWellList)
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
 
@@ -445,19 +472,20 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           {...labwarePositionProps}
           handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
+          onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
-          inWellSelectionModal
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
-        {hoveredWells?.[0] && hasMoreThanOneWell ? (
+        {hasMoreThanOneWell ? (
           <PipetteShadow
             {...pipettePositionProps}
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
-            hoveredWell={hoveredWells[0]}
+            slotPosition={slotPosition}
+            hoveredWell={wellShadow ?? ''}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
