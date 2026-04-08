@@ -7,7 +7,7 @@ from robot_server.access_control.settings.models import RequestData, ResponseDat
 from robot_server.access_control.settings.store import AccessControlSettingStore
 
 _ALL_FIELDS = list(ResponseData.model_fields.keys())
-_DEFAULTS = ResponseData().model_validate({})
+_DEFAULTS = ResponseData().model_validate({})  # type: ignore[call-arg]
 
 
 @pytest.fixture
@@ -30,7 +30,6 @@ def test_patch_field(subject: AccessControlSettingStore, field_name: str) -> Non
     default_value = getattr(_DEFAULTS, field_name)
     new_value = not default_value
     result = subject.patch(RequestData.model_validate({field_name: new_value}))
-    print("result: ", result)
     assert getattr(result, field_name) is new_value
     for other in _ALL_FIELDS:
         if other != field_name:

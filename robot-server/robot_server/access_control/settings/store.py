@@ -51,13 +51,11 @@ class AccessControlSettingStore:
         A value of ``None`` reverts that setting to its default (deletes the row).
         """
         provided = request.model_dump(exclude_unset=True)
-        print("provided: ", provided)
         if not provided:
             return self.get_all()
 
         with self._sql_engine.begin() as transaction:
             keys_to_update = [_FIELD_NAME_TO_DB_KEY[name] for name in provided]
-            print("keys_to_update: ", keys_to_update)
             transaction.execute(
                 sqlalchemy.delete(boolean_setting_table).where(
                     boolean_setting_table.c.key.in_(keys_to_update)
@@ -68,7 +66,6 @@ class AccessControlSettingStore:
                 for name, value in provided.items()
                 if value is not None
             ]
-            print("rows_to_insert: ", rows_to_insert)
             if rows_to_insert:
                 transaction.execute(
                     sqlalchemy.insert(boolean_setting_table),
