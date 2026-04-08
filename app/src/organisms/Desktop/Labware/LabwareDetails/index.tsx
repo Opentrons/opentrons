@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import styles from './LabwareDetails.module.css'
 
 import {
   ALIGN_CENTER,
@@ -36,6 +35,7 @@ import { Dimensions } from './Dimensions'
 import { Gallery } from './Gallery'
 import { getWellLabel } from './helpers/labels'
 import { InsertDetails } from './InsertDetails'
+import styles from './LabwareDetails.module.css'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { WellCount } from './WellCount'
 import { WellDimensions } from './WellDimensions'
@@ -43,7 +43,6 @@ import { WellProperties } from './WellProperties'
 import { WellSpacing } from './WellSpacing'
 
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
-
 
 export interface LabwareDetailsProps {
   onClose: () => void
@@ -165,7 +164,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
-                <Icon size={SIZE_1} name="copy-text" className={styles.copy_icon} />
+                <Icon
+                  size={SIZE_1}
+                  name="copy-text"
+                  className={styles.copy_icon}
+                />
               </span>
             </Box>
           </Flex>
