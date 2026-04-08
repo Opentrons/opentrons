@@ -46,6 +46,18 @@ class SettingsResponseData(_StrictBaseModel):
         default=None,
         description="Minimum length of reason for interaction. Set to null to remove the requirement.",
     )
+    requireAdminCredsWhenUpdatingRobotSoftware: bool = pydantic.Field(
+        default=True,
+        description="Require admin credentials when updating robot settings.",
+    )
+    requireAdminCredsWhenSendingProtocolToRobot: bool = pydantic.Field(
+        default=True,
+        description="Require admin credentials when sending protocol to robot.",
+    )
+    requireAdminCredsForSignoffProtocol: bool = pydantic.Field(
+        default=False,
+        description="Require admin credentials for signoff protocol.",
+    )
 
 
 class PatchSettingsRequestData(_StrictBaseModel):
@@ -97,10 +109,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
         bool | None,
         pydantic.Field(description="Require admin credentials for signoff protocol."),
     ] = None
-    requireSignoffForProtocolLog: Annotated[
-        bool | None,
-        pydantic.Field(description="Require signoff for protocol log."),
-    ] = None
     requireReasonForInteraction: Annotated[
         bool | None,
         pydantic.Field(description="Require reason for interaction."),
@@ -108,18 +116,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
     minLengthOfReasonForInteraction: Annotated[
         int | None,
         pydantic.Field(description="Minimum length of reason for interaction."),
-    ] = None
-    requireLogsToBeSavedInApp: Annotated[
-        bool | None,
-        pydantic.Field(
-            description="Require logs to be saved in app. Path should be configured in the app."
-        ),
-    ] = None
-    deleteOverMaxOnDiskProtocols: Annotated[
-        bool | None,
-        pydantic.Field(
-            description="Automatically delete protocol run logs on the robot when there are 20 protocol run records."
-        ),
     ] = None
 
     _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
@@ -129,10 +125,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
             "requireAdminCredsWhenUpdatingRobotSoftware",
             "requireAdminCredsWhenSendingProtocolToRobot",
             "requireAdminCredsForSignoffProtocol",
-            "requireSignoffForProtocolLog",
             "requireReasonForInteraction",
-            "requireLogsToBeSavedInApp",
-            "deleteOverMaxOnDiskProtocols",
         }
     )
 
