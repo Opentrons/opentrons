@@ -1,6 +1,9 @@
 import { HOPPER_STACKER_LOCATION } from '@opentrons/step-generation'
 
-import type { AddressableAreaName, LoadedLabwareLocation } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  LoadedLabwareLocation,
+} from '@opentrons/shared-data'
 import type { ModuleEntities } from '../step-forms'
 
 /**
