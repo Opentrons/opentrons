@@ -50,10 +50,12 @@ Pipette path and tip handling options, shown below, are only available if they a
 
 ## Additional settings
 
-In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
+In the second form, you can choose whether to use liquid class settings to transfer liquid with a Flex pipette. Choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
 !!! Note
-    When you apply liquid class settings, Protocol Designer automatically makes changes to additional settings, like flow rates, submerge and retract speeds, and air gaps. You can view and edit these changes in the third transfer step form.
+    When you apply liquid class settings, Protocol Designer automatically makes changes to additional settings like flow rates, submerge and retract speeds, and air gaps. You can view and edit these changes in the third transfer step form.
+
+    You won't be able to choose a liquid class in an OT-2 protocol. You can still edit additional settings to customize your transfer and mix steps. 
 
 In the third form, click the aspirate and dispense tabs to access additional settings.
 
@@ -159,11 +161,11 @@ In the fourth form, you can choose between automatic and manual tip tracking for
 
 ### Collision errors
 
-Partial tip pickup can increase the risk of collisions, so Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette.
+Partial tip pickup requires the pipette to hover above adjacent deck slots, and can increase the risk of collisions.Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette. 
 
-When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](warnings-errors.md) to reduce collision risk. You also won't be able to select incompatible wells and tips, where pickup could cause a collision with adjacent labware or modules. 
+When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](warnings-errors.md) to reduce collision risk. These errors can require you to change your well, tip, or deck selections in order to avoid risky situations. 
 
-Partial tip pickup requires the pipette to hover above adjacent deck slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
+Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
 
 <figure class="screenshot" markdown>
   ![Pipette collision risk](../images/partial-tip-collision.png)
@@ -171,6 +173,8 @@ Partial tip pickup requires the pipette to hover above adjacent deck slots. Here
 </figure> 
 
 Despite the tip rack in the example above being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
+
+To fix the collision error, move the tip racks from adjacent deck slots or change your tip pickup selections.
 
 Protocols containing errors cannot be run on the robot and will cause a run to fail. You'll need to resolve these errors before exporting your protocol. 
 
