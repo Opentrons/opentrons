@@ -133,8 +133,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     useState<string[][]>(getSelectedWells())
 
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
+  const currentHoveredWellRef = useRef<string[] | null>(null)
+
   useEffect(
     () => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current)
+        leaveTimeoutRef.current = null
+      }
+      currentHoveredWellRef.current = null
       setSelectedWells(getSelectedWells())
       setHoveredWells(null)
     },
@@ -426,6 +433,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           y={slotPosition[1]}
           handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
+          onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
