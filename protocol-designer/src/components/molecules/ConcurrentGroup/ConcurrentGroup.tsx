@@ -61,7 +61,7 @@ function OrnamentalLine(props: { active: boolean }): JSX.Element {
         height="100%"
         borderRadius={SPACING.spacing2}
         backgroundColor={active ? COLORS.blue50 : COLORS.grey50}
-        data-testid="ConcurrentGroup_OrnamentalLine"
+        aria-label="ConcurrentGroup OrnamentalLine"
       />
     </Box>
   )

@@ -1,7 +1,13 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import { COLUMN, PARTIAL_COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  PARTIAL_COLUMN,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 import {
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
@@ -34,7 +40,7 @@ export const getWellsToCheck = (
       return wellOrdering[0]
     case COLUMN:
       return wellOrdering.map(row => row[0])
-
+    case ALL:
     case SINGLE:
     case PARTIAL_COLUMN:
       return wellOrdering.flat()

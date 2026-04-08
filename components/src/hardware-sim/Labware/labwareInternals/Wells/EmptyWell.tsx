@@ -1,3 +1,5 @@
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
+
 import { COLORS } from '../../../../helix-design-system'
 import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
@@ -8,11 +10,15 @@ import type { ParentType } from '../types'
 interface EmptyWellProps {
   wellMap: LabwareWellMap
   parentType: ParentType
+  wellName: string
   size?: string
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap, parentType } = props
+  const { size, wellMap, wellName, parentType } = props
+  const commonProps = {
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
+  }
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
@@ -53,9 +59,16 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
         height={isCircular ? circularDimension : height}
       >
         {isCircular ? (
-          <circle cx="10" cy="10" r="9.5" fill="white" />
+          <circle cx="10" cy="10" r="9.5" fill="white" {...commonProps} />
         ) : (
-          <rect x="0" y="0" width={width} height={height} fill="white" />
+          <rect
+            x="0"
+            y="0"
+            width={width}
+            height={height}
+            fill="white"
+            {...commonProps}
+          />
         )}
       </mask>
 
@@ -67,6 +80,7 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             r="9"
             fill="#CBCCCC"
             stroke={outlineColor}
+            {...commonProps}
             strokeWidth="3"
           />
         ) : (
@@ -77,6 +91,7 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             height={height}
             fill="#CBCCCC"
             stroke={outlineColor}
+            {...commonProps}
             strokeWidth="2"
           />
         )}

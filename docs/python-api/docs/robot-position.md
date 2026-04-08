@@ -160,7 +160,7 @@ trash.top(y=10)  # 10 mm towards back, default height
 
 *New in version 2.18*
 
-Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.protocol_api.labware.Location]. This helps prevent performing undesired actions in trash containers. For example, you can aspirate at a location or from a well, but not from a trash container. On the other hand, you can blow out at a location, well, trash bin, or waste chute.
+Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.types.Location]. This helps prevent performing undesired actions in trash containers. For example, you can aspirate at a location or from a well, but not from a trash container. On the other hand, you can blow out at a location, well, trash bin, or waste chute.
 
 ## Position relative to the deck
 
