@@ -19,6 +19,9 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
+  enrichRobotStateForStackGraphTraversals,
+  getAllLargestStacks,
+  getProvidedAddressableAreasExposed,
   getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
@@ -44,7 +47,11 @@ import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
 
-import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  LoadedLabwareLocation,
+} from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   RobotState,
@@ -374,3 +381,56 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
       }
     }
   )
+
+/** Memoized largest stacks at the active timeline item (`stack` → `stackedOnNode`; sibling `contains` when applicable). */
+export const getAllLargestStacksAtActiveItem: Selector<
+  LoadedLabwareLocation[][]
+> = createSelector(
+  getRobotStateAtActiveItem,
+  getModuleEntities,
+  getLabwareEntities,
+  (robotState, moduleEntities, labwareEntities) => {
+    if (robotState == null) {
+      return []
+    }
+    return getAllLargestStacks(
+      enrichRobotStateForStackGraphTraversals(
+        robotState,
+        moduleEntities,
+        labwareEntities
+      )
+    )
+  }
+)
+
+/** Memoized: provided addressable areas not covered by a labware stack at the timeline’s active item. */
+export const getProvidedAddressableAreasExposedAtActiveItem: Selector<
+  Set<AddressableAreaName>
+> = createSelector(
+  getRobotStateAtActiveItem,
+  getRobotType,
+  stepFormSelectors.getDeckConfiguration,
+  getModuleEntities,
+  getLabwareEntities,
+  (
+    robotState,
+    robotType,
+    deckConfigurationState,
+    moduleEntities,
+    labwareEntities
+  ) => {
+    if (robotState == null) {
+      return new Set<AddressableAreaName>()
+    }
+    return getProvidedAddressableAreasExposed({
+      robotState: enrichRobotStateForStackGraphTraversals(
+        robotState,
+        moduleEntities,
+        labwareEntities
+      ),
+      deckConfiguration: deckConfigurationState.deckConfig,
+      deckDefinition: getDeckDefFromRobotType(robotType),
+      moduleEntities,
+    })
+  }
+)
