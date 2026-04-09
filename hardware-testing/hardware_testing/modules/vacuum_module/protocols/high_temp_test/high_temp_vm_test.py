@@ -101,7 +101,7 @@ async def _run_single_pump_api_cycle(
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
-        guage_pressure_mbar=target_to_pump,
+        gauge_pressure_mbar=target_to_pump,
         duration=None,
     )
 
@@ -138,7 +138,7 @@ async def _run_single_pump_api_cycle(
     # Stop the pump
     await pump.set_vacuum_state(
         enable_vacuum=False,
-        guage_pressure_mbar=target_to_pump,
+        gauge_pressure_mbar=target_to_pump,
         duration=None,
     )
     # Close Vent
