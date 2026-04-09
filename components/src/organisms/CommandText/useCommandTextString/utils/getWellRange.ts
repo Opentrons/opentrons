@@ -14,7 +14,9 @@ const usedChannelsFromCommand = (
     ? 1
     : command?.params?.configurationParams?.style === 'COLUMN'
       ? 8
-      : defaultChannels
+      : command?.params?.configurationParams?.style === 'ROW'
+        ? 12
+        : defaultChannels
 
 const usedChannelsForPipette = (
   pipetteId: string,
@@ -60,6 +62,9 @@ export function getWellRange(
   } else if (channelCount === 8) {
     const column = wellName.substring(1)
     return `A${column} - H${column}`
+  } else if (channelCount === 12) {
+    const row = wellName.charAt(0)
+    return `${row}1 - ${row}12`
   }
   return wellName
 }
