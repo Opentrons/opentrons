@@ -53,7 +53,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                     href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}
                     width={FLEX_MAX_CONTENT}
                   >
-                    {t('ot2_quickstart_guide')}
+                    {t('branded:opentrons_ot2_quickstart_guide')}
                   </ExternalLink>
                 </Flex>
                 <PrimaryButton
