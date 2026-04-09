@@ -129,7 +129,7 @@ jobs:
         with:
           aws-region: us-east-2
           audience: sts.amazonaws.com
-          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          role-to-assume: ${{ vars.STATIC_DEPLOY_ROLE }}
       - name: Download Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
