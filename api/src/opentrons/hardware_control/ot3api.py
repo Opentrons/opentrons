@@ -41,7 +41,7 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
 
-from . import modules
+from . import modules, peripherals
 from .backends.errors import SubsystemUpdating
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
@@ -642,6 +642,11 @@ class OT3API(
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 
+    @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def attached_peripherals(self) -> List[peripherals.AbstractPeripheral]:
+        return self._backend.module_controls.available_peripherals
+
     async def create_simulating_module(
         self,
         model: modules.types.ModuleModel,
@@ -649,7 +654,7 @@ class OT3API(
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
 
-        return await self._backend.module_controls.register_simulated_module(
+        module = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.LEFT
             ),
@@ -657,6 +662,27 @@ class OT3API(
             sim_model=model.value,
             sim_serial=sim_serial,
         )
+        assert isinstance(module, modules.AbstractModule)
+        return module
+
+    async def create_simulating_peripheral(
+        self,
+        model: peripherals.types.PeripheralModel,
+    ) -> peripherals.AbstractPeripheral:
+        """Create a simulating peripheral hardware interface."""
+        assert self.is_simulator, (
+            "Cannot build simulating peripheral from non-simulating hardware control API"
+        )
+
+        peripheral = await self._backend.module_controls.register_simulated_device(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
+            type=peripherals.PeripheralType.from_model(model),
+            sim_model=model.value,
+        )
+        assert isinstance(peripheral, peripherals.AbstractPeripheral)
+        return peripheral
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
