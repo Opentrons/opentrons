@@ -160,11 +160,12 @@ async def update_user(
         updated_user = user_data_manager.update_user(
             userName,
             new_username=update_data.userName,
-            password=update_data.password.get_secret_value()
+            new_password=update_data.password.get_secret_value()
             if update_data.password is not None
             else None,
-            full_name=update_data.fullName,
-            account_type=update_data.accountType,
+            new_full_name=update_data.fullName,
+            new_account_type=update_data.accountType,
+            new_locked=update_data.locked,
         )
     except UserNotFoundError:
         raise fastapi.HTTPException(

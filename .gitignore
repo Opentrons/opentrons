@@ -58,6 +58,7 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+.pnpm-store/
 package-lock.json
 
 # Unit test / coverage reports
