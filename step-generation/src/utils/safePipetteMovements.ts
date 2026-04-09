@@ -150,10 +150,8 @@ const getPipetteCriticalPoint = (
   labwareDefinition: LabwareDefinition
 ): Point => {
   const { spec } = pipetteEntity
-  if (
-    nozzleConfiguration === COLUMN &&
-    labwareDefinition.ordering.flat().length === 1
-  ) {
+  const labwareHasOneRow = labwareDefinition.ordering[0].length === 1
+  if (nozzleConfiguration === COLUMN && labwareHasOneRow) {
     // return the XY CENTER
     const frontPoint = `H${primaryNozzle.charAt(1)}`
     const frontRightPoint = spec.nozzleMap[frontPoint]
