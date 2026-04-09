@@ -40,13 +40,17 @@ class User(Base):
     hashed_password: Mapped[str]
     full_name: Mapped[str]
     account_type: Mapped[str]
-    reset_password: Mapped[bool]
+    reset_password: Mapped[bool] = mapped_column(server_default="false", default=False)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    def __init__(self, **kwargs: object) -> None:
+        kwargs.setdefault("reset_password", False)
+        super().__init__(**kwargs)
 
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
