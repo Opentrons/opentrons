@@ -34,23 +34,23 @@ title: "Vacuum Module: Product Specifications"
 </figure>
 
 <figure markdown>
-![USB type A cable](images/usb-a-cable2.png "USB A cable")
-<figcaption>(1) USB A cable</figcaption>
+![USB type A cable](images/usb-ab-cable.png "USB A—B cable")
+<figcaption>(1) USB A—B cable</figcaption>
 </figure>
 
 <figure markdown>
-![Power cable](images/iec-plugs2.png "Region-specific power cable")
+![Power cable](images/iec-plugs.png "Region-specific power cable")
 <figcaption>(1) Region specific power cable</figcaption>
 </figure>
 
 <figure markdown>
-![Bag of screws](images/deck-screws2.svg "Deck slot screws")
-<figcaption>( ) M4x10 Deck slot screws</figcaption>
+![Bag of screws](images/deck-screws.png "Deck slot screws")
+<figcaption>(2) M4x10 Deck slot screws</figcaption>
 </figure>
 
 </div>
 
-See <font color="red"><strong>section TBD for descriptions of individual parts.</strong></font>
+See <font color="red"><strong>section TBD for descriptions of selected parts.</strong></font>
 
 ## Physical specifications
 
@@ -78,8 +78,8 @@ See <font color="red"><strong>section TBD for descriptions of individual parts.<
       <td><strong>Hoses</strong></td>
       <td>The module includes a set of polypropylene vacuum hoses:
         <ul>
-          <li>6 mm (&frac14;"), _XX_ cm (inches) length</li>
-          <li>9.5 mm (&frac38;"), _XX_ cm (inches) length</li>
+          <li>6 mm (&frac14;") diameter, _XX_ cm (inches) length</li>
+          <li>9.5 mm (&frac38;") diameter, _XX_ cm (inches) length</li>
         </ul>
       </td>
     </tr>
