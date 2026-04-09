@@ -16,18 +16,22 @@ interface StepGroupProps {
 
 export function StepGroup(props: StepGroupProps): JSX.Element {
   const { title, isExpand, subtitle, isActive, handleClick, children } = props
+
+  const handleChildrenClick: MouseEventHandler<HTMLDivElement> = event => {
+    event.stopPropagation()
+  }
+
   return (
     <div
       className={styles.step_group_container}
       style={{
+        //  color based off of designs
         backgroundColor: isActive ? '#F3E9F6' : COLORS.grey20,
       }}
     >
       <div className={styles.step_group_header} onClick={handleClick}>
         <div>
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
-            {title}
-          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
           {subtitle != null ? (
             <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
               {subtitle}
@@ -38,15 +42,7 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
           <Icon name={isExpand ? 'chevron-up' : 'chevron-down'} size="1.2rem" />
         </div>
       </div>
-      {isExpand ? (
-        <div
-          onClick={e => {
-            e.stopPropagation()
-          }}
-        >
-          {children}
-        </div>
-      ) : null}
+      {isExpand ? <div onClick={handleChildrenClick}>{children}</div> : null}
     </div>
   )
 }
