@@ -16,12 +16,12 @@ from robot_server.errors.robot_errors import (
     EstopNotAcknowledged,
     EstopNotAttached,
 )
-from robot_server.hardware import get_ot3_hardware, get_thread_manager
+from robot_server.hardware import get_hardware_resource, get_ot3_hardware
 
 
 async def require_estop_in_good_state(
     hardware_resource: Annotated[
-        ThreadManagedHardware | HardwareControlAPI, Depends(get_thread_manager)
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_hardware_resource)
     ],
 ) -> bool:
     """Check that the estop is in a good state.

@@ -2,6 +2,8 @@
 
 from typing_extensions import Protocol, Type
 
+from opentrons.util.pyro.pyro_synchronous_adapter import pyro_behavior, convert_type_to_instance
+
 from .asyncio_configurable import AsyncioConfigurable
 from .calibratable import Calibratable
 from .chassis_accessory_manager import ChassisAccessoryManager
@@ -81,6 +83,7 @@ class FlexHardwareControlInterface(
     with some additional functionality and parameterization not supported on the OT-2.
     """
 
+    @pyro_behavior(specialty_func=convert_type_to_instance, apply_local=False)
     def get_robot_type(self) -> Type[FlexRobotType]:
         return FlexRobotType
 

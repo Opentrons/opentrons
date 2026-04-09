@@ -50,11 +50,11 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
-    get_hardware,
     clean_up_hardware,
+    get_hardware,
+    get_hardware_resource,
     get_ot2_hardware,
     get_robot_type_enum,
-    get_thread_manager,
     start_initializing_hardware,
 )
 from robot_server.persistence.fastapi_dependencies import (
@@ -111,19 +111,13 @@ async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> 
     if enable:
         # cleanup state/kill any local hardware API
         await clean_up_hardware(app_state)
-        # TODO send systemD socket request
-        print("SYSTEMD SOCKET TURN ON")
-
-        # what happens to get_hardware dependency for /settings here?
-        # CASEY NOTE this is where I left off^ - I think we just refresh it
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to start subprocess
 
     else:
         # cleanup state
         await clean_up_hardware(app_state)
 
-        # TODO send systemD socket request to end pyro process
-        print("SYSTEMD SOCKET TURN OFF")
-        # TODO ensure the hardware controller resource is gone - how do this? pyro check maybe? hmm
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to end subprocess
 
     # rerun the hardware API setup
     start_initializing_hardware(
@@ -178,13 +172,10 @@ async def post_settings(
             )
 
             # Refresh the hardware dependency
-            hardware = await get_thread_manager(app_state)
+            hardware = await get_hardware_resource(app_state)
 
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
-        # CASEY NOTE ^ these hardware.**whatever** functions need to move to either the ot3 process or a new endpoint
-        # maybe that endpoint can be /settings/hardware:{...} <- this seems like a good idea
-        # or the subprocess enable flag is just flipped in its own script
     except ValueError as e:
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:

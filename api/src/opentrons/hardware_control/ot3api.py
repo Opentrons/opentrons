@@ -527,12 +527,14 @@ class OT3API(
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, OT3Simulator)
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
         self._callbacks.add(cb)
 
+        # todo(chb: 04-08-2026): Do we need to add a LOCAL @pyro_behavior to this, which will destroy the proxy object when the time comes?
         def unregister() -> None:
             self._callbacks.remove(cb)
 
@@ -2667,7 +2669,8 @@ class OT3API(
         return self.get_attached_pipette(mount)
 
     @property
-    def attached_instruments(self) -> Any:
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `attached_pipettes` instead
         return self.attached_pipettes
 

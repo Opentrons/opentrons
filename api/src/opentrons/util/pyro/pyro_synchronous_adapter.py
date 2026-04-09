@@ -225,7 +225,7 @@ def _build_classdict(  # noqa: C901
                 try:
                     # Grab the inner instance of the core object to modify
                     local_obj = core_obj.__weakref__()
-                except TypeError:
+                except (TypeError, AttributeError):
                     # Otherwise, just use the object passed in as-is
                     local_obj = core_obj
                 wrapped_attr = specialty_behavior.specialty_function(
@@ -291,7 +291,7 @@ def _build_classdict(  # noqa: C901
     try:
         # If the `core_obj` contains a weakref then for tracking we yield the inner instance
         yield ("_core_obj", core_obj.__weakref__())
-    except TypeError:
+    except (TypeError, AttributeError):
         yield ("_core_obj", core_obj)
 
 
@@ -443,6 +443,36 @@ def convert_result_to_wrapped_dict(  # noqa: C901
         return property(wrapper)
     return wrapper  # type: ignore
 
+
+def convert_type_to_instance(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper that enforces functions that return Types and not instances to return an instance of that type.
+    
+    On the other end, it is expected that the serpent serializer will have a specialized handler strip the
+    result and return the original type as intended.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            result = sync_func(self, *args, **kwargs)
+        elif isinstance(attr, FunctionType):
+            result = attr(self, *args, **kwargs)
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        if isinstance(result, type):
+            return result()
+        else:
+            raise ValueError(
+                "Pyro behavior for type to instance conversion is only available for use with pure types."
+            )
+    return wrapper
 
 ## Local Specialty Functions - Used to wrap attributes on the original instance
 

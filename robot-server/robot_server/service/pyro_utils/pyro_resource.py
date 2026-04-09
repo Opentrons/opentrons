@@ -1,0 +1,185 @@
+"""Robot-server resouce class and functions for Pyro compatibility."""
+
+import asyncio
+import logging
+import threading
+from typing import Any, Optional
+
+from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+)
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
+    pyro_behavior,
+)
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+)
+
+from robot_server.service.pyro_utils.serpent_type_registry import (
+    register_robot_server_types,
+)
+
+robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
+    "robot_server_pyro_resource"
+)
+
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+    handle_estop_event,
+)
+from robot_server.runs.run_orchestrator_store import (
+    RunOrchestratorStore,
+    handle_hardware_event,
+)
+
+log = logging.getLogger(__name__)
+
+RS_PYRONAME = "robot-server-resource"
+
+
+class RobotServerPyroResource:
+    """Class to represent the resources the robot-server hosts which can be provided over Pryo5.
+
+    This class manages each of the resources needed by the OT3API and Protocol Execution processes
+    for the lifetime of a given resource. A single instance of this class is published on a Pyro
+    Daemon and registered with the `opentrons-pyro-nameserver` service for access via remote request.
+    """
+
+    def __init__(self, loop: asyncio.AbstractEventLoop):
+        self._loop = loop
+
+        # Default the resource variables to None - these will be set as services spin up
+        self._run_orchestrator_store: Optional[RunOrchestratorStore] = None
+        self._maintenance_run_orchestrator_store: Optional[
+            MaintenanceRunOrchestratorStore
+        ] = None
+        self._camera_provider: Optional[CameraProvider] = None
+        self._file_provider: Optional[FileProvider] = None
+
+    def _set_run_orchestorator_store(
+        self, run_orchestrator_store: RunOrchestratorStore
+    ) -> None:
+        self._run_orchestrator_store = run_orchestrator_store
+
+    def _set_maintenance_run_orchestorator_store(
+        self, maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore
+    ) -> None:
+        self._maintenance_run_orchestrator_store = maintenance_run_orchestrator_store
+
+    def _set_camera_provider(self, camera_provider: CameraProvider) -> None:
+        self._camera_provider = camera_provider
+
+    def _set_file_provider(self, file_provider: FileProvider) -> None:
+        self._file_provider = file_provider
+
+    # CASEY NOTE: rename some of these hardware functions for clarity
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_hardware_listener(self) -> HardwareEventHandler:
+        """Create a callback for estop events.
+
+        The returned callback is meant to run in the hardware API's thread.
+        """
+
+        if self._run_orchestrator_store is not None:
+
+            def run_handler_in_engine_thread_from_hardware_thread(
+                event: HardwareEvent,
+            ) -> None:
+                asyncio.run_coroutine_threadsafe(
+                    handle_hardware_event(self._run_orchestrator_store, event),
+                    self._loop,
+                )
+
+            return run_handler_in_engine_thread_from_hardware_thread
+        else:
+            raise RuntimeError(
+                "Cannot provider a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
+            )
+
+    # CASEY NOTE: this behavior needs cleaning up. Do we keep this at all?
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_maintenance_run_estop_listener(self) -> HardwareEventHandler:
+        """Create a callback for estop events.
+
+        The returned callback is meant to run in the hardware API's thread.
+        """
+        if self._maintenance_run_orchestrator_store is not None:
+
+            def run_handler_in_engine_thread_from_hardware_thread(
+                event: HardwareEvent,
+            ) -> None:
+                asyncio.run_coroutine_threadsafe(
+                    handle_estop_event(self._maintenance_run_orchestrator_store, event),
+                    self._loop,
+                )
+
+            return run_handler_in_engine_thread_from_hardware_thread
+
+        else:
+            raise RuntimeError(
+                "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_camera_provider(self) -> CameraProvider:
+        """Provide a Pyro Proxy for the CameraProvider.
+
+        The returned instance is meant to execute in the Robot Server's process.
+        """
+
+        if self._camera_provider is not None:
+            return self._camera_provider
+        else:
+            raise RuntimeError(
+                "Cannot return a CameraProvider from the RobotServerPyroResource without initializing."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_file_provider(self) -> FileProvider:
+        """Provide a Pyro Proxy for the FileProvider.
+
+        The returned instance is meant to execute in the Robot Server's process.
+        """
+
+        if self._file_provider is not None:
+            return self._file_provider
+        else:
+            raise RuntimeError(
+                "Cannot return a FileProvider from the RobotServerPyroResource without initializing."
+            )
+
+
+### Utility methods for initializing and registering state within the RobotServerPyroResource
+
+
+def start_initializing_pyro_resource(app_state: AppState) -> None:
+    """Entry point for creating a hosted Robot Server Pyro Resource and serving requests on it via a Pyro5 Daemon."""
+    def _start_and_run_pyro_daemon(pyroname: str, registry: Any) -> None:
+        robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(
+            app_state
+        )
+        assert robot_server_pyro_resource is not None
+        create_pyro_daemon(
+            pyroname=pyroname, resource=robot_server_pyro_resource, registry=registry
+        )
+
+    # Create the new instance of the Robot server resource manager
+    resource = RobotServerPyroResource(loop=asyncio.get_event_loop())
+    robot_server_pyro_resource_accessor.set_on(app_state, resource)
+
+    pyro_daemon_thread = threading.Thread(
+        target=_start_and_run_pyro_daemon,
+        name="RobotServerResourceThread",
+        args=(),
+        kwargs={
+            "pyroname": RS_PYRONAME,
+            "registry": register_robot_server_types,
+        },
+        daemon=True,
+    )
+    pyro_daemon_thread.start()

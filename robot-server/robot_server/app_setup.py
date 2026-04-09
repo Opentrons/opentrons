@@ -37,6 +37,7 @@ from .service.notifications import (
     initialize_pe_publisher_notifier,
     set_up_notification_client,
 )
+from .service.pyro_utils.pyro_resource import start_initializing_pyro_resource
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
 
@@ -105,6 +106,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
+
+        # Always make an empty Robot Server Pyro Resource, and populate if appropriate
+        start_initializing_pyro_resource(app_state=app.state)
 
         yield  # Start handling HTTP requests.
 

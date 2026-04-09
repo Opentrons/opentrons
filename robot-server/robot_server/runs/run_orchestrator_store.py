@@ -71,7 +71,6 @@ from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
-
 _log = logging.getLogger(__name__)
 
 
@@ -131,7 +130,9 @@ async def handle_hardware_event(
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
-    This is meant to run in the engine's thread and asyncio event loop.
+    When in subprocess mode this executes in the RobotServerPyroResource's event loop.
+
+    Otherwise, this is meant to run in the engine's thread and asyncio event loop.
 
     This is a public function for unit-testing purposes, but it's an implementation
     detail of the store.
@@ -193,7 +194,8 @@ class RunOrchestratorStore:
         self._run_process: Optional[subprocess.Popen[bytes]] = None
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
-        hardware_api.register_callback(_get_hardware_listener(self))
+        if not feature_flags.hardware_subprocess_enabled():
+            hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
     def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:

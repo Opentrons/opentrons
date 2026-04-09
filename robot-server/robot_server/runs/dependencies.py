@@ -47,6 +47,12 @@ from robot_server.service.notifications import (
 )
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
+from opentrons.config import feature_flags
+from robot_server.service.pyro_utils.resource_utilities import (
+    get_pyro_resource,
+    register_run_orchestrator_store_to_pyro_resource,
+)
+
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
@@ -134,9 +140,19 @@ async def get_run_orchestrator_store(
 
     if run_orchestrator_store is None:
         run_orchestrator_store = RunOrchestratorStore(
-            hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+            hardware_api=hardware_api,
+            robot_type=robot_type,
+            deck_type=deck_type,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
+        # Handle remote hardware registry, if needed
+        if feature_flags.hardware_subprocess_enabled():
+            register_run_orchestrator_store_to_pyro_resource(
+                app_state=app_state, run_orchestrator_store=run_orchestrator_store
+            )
+            pyro_resource = get_pyro_resource()
+            hardware_api.register_callback(pyro_resource.get_hardware_listener())
+
         # Provide the engine store to the light controller
         light_controller.update_run_orchestrator_store(
             run_orchestrator_store=run_orchestrator_store
