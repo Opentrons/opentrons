@@ -23,7 +23,7 @@ class StartSetVacuumParams(BaseModel):
     """Input parameters to start the vacuum pump."""
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
-    guagePressure: float = Field(..., description="Target gauge pressure in mBar.")
+    gaugePressure: float = Field(..., description="Target gauge pressure in mBar.")
     duration: int = Field(
         ...,
         description="Duration in sec. to hold target pressure for after it is reached.",
@@ -72,7 +72,7 @@ class StartSetVacuumImpl(
         if vm_hardware is not None:
             await vm_hardware.set_vacuum_state(
                 enable_vacuum=True,
-                guage_pressure_mbar=params.guagePressure,
+                gauge_pressure_mbar=params.gaugePressure,
                 duration_s=params.duration,
                 rate=params.rate if params.rate else None,
                 timeout_s=params.timeout if params.timeout else None,

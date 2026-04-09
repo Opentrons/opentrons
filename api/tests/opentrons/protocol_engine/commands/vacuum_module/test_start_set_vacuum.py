@@ -35,7 +35,7 @@ async def test_start_set_vacuum(
 
     data = vm_commands.StartSetVacuumParams(
         moduleId="input-vacuum-id",
-        guagePressure=gauge_pressure,
+        gaugePressure=gauge_pressure,
         duration=duration_s,
         rate=pressure_rate,
         timeout=timeout_s,

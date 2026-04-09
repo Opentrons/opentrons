@@ -6560,9 +6560,9 @@
           "title": "Duration",
           "type": "integer"
         },
-        "guagePressure": {
+        "gaugePressure": {
           "description": "Target gauge pressure in mBar.",
-          "title": "Guagepressure",
+          "title": "Gaugepressure",
           "type": "number"
         },
         "moduleId": {
@@ -6589,7 +6589,7 @@
           "type": "boolean"
         }
       },
-      "required": ["moduleId", "guagePressure", "duration"],
+      "required": ["moduleId", "gaugePressure", "duration"],
       "title": "StartSetVacuumParams",
       "type": "object"
     },
