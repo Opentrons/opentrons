@@ -50,7 +50,7 @@ def test_mix_step_configuration_workflow(page: Page, pd_base_url: str) -> None:
 
     for label in [
         "Pipette nozzles and wells",
-        "Volume per well",
+        "Mix volume",
         "Mix repetitions",
     ]:
         mix_form.expect_text(label)

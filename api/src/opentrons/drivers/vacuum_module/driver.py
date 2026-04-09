@@ -272,7 +272,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
+        gauge_pressure_mbar: Optional[float] = None,
         duration_s: Optional[int] = None,
         timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
@@ -284,10 +284,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             "S", int(enable_vacuum)
         )
 
-        if guage_pressure_mbar is not None:
+        if gauge_pressure_mbar is not None:
             command.add_float(
                 "P",
-                min(max(guage_pressure_mbar, MAX_PRESSURE_MBAR), 0),
+                min(max(gauge_pressure_mbar, MAX_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
         if duration_s is not None:

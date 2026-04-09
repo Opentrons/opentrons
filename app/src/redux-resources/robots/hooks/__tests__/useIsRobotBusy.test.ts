@@ -196,6 +196,7 @@ describe('useIsRobotBusy', () => {
     const result = useIsRobotBusy()
     expect(result).toBe(true)
   })
+
   it('returns true when a subsystem update is in progress', () => {
     vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
       data: {
@@ -208,6 +209,14 @@ describe('useIsRobotBusy', () => {
           },
         ],
       },
+    } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
+
+  it('returns no error when data is empty', () => {
+    vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
+      data: {},
     } as any)
     const result = useIsRobotBusy()
     expect(result).toBe(true)

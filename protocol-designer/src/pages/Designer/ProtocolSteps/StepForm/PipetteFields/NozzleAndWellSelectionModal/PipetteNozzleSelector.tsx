@@ -110,13 +110,13 @@ export function PipetteNozzleSelector(
 
   if (isPartialNozzle) {
     subText = t('number_of_nozzles_used')
-  } else if (nozzleConfiguration !== ALL) {
+  } else {
     subText = t('click_on_highlighted_nozzles')
   }
   return (
     <>
       <div className={styles.header_text_wrapper}>
-        <StyledText desktopStyle="headingMediumBold">
+        <StyledText desktopStyle="headingSmallBold">
           {t('select_pipette_nozzles_to_use')}
         </StyledText>
       </div>

@@ -309,7 +309,7 @@ export function SelectTips(
       },
       {}
     )
-
+    const is96Channel = channels === 96
     const tipStatusByWellName =
       tipState != null
         ? Object.entries(tipState).reduce<Record<string, TipType>>(
@@ -380,6 +380,7 @@ export function SelectTips(
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
             nozzles={nozzles}
+            rotate={is96Channel}
           />
         ) : null}
       </>
@@ -410,7 +411,9 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+        <div className={styles.legend_box}>
+          <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+        </div>
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ description: Conventions for the analyses snapshot testing framework in analyses
 The `analyses-snapshot-testing` directory validates that protocol analysis output remains consistent across code changes by comparing JSON results against committed snapshots.
 
 - **Regression testing**: Detect unintended changes in protocol analysis behavior
-- **Protocol validation**: Ensure protocols analyze correctly for OT-2 and Flex
+- **Protocol validation**: Ensure protocols analyze correctly for Flex
 - **CI/CD**: Automated testing in GitHub Actions with matrix-based parallel execution
 - **Snapshot management**: Track expected output and flag deviations
 
@@ -22,8 +22,9 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 2. **Analysis Engine** (`automation/analyze.py`) — runs protocol analysis in subprocess, 120-second timeout, JSON output
 3. **Snapshot Storage** (`tests/__snapshots__/`) — committed JSON snapshots managed by `syrupy` with custom JSON extension
 4. **Test Suite** (`tests/`) — `analyses_snapshot_test.py` (main), `audit_snapshot_test.py` (audit), `custom_json_snapshot_extension.py` (serialization)
-5. **Protocol Registry** (`automation/data/`) — `protocols.py` (auto-generated), `protocols_with_overrides.py` (manual), `protocol_registry.py` (combined)
-6. **CI/CD** (`citools/`, `.github/workflows/`) — matrix-based parallel execution via Docker
+5. **Audit** (`automation/audit_snapshots.py`) — validates snapshots: `Flex_S` protocols must have zero errors; non-Flex (i.e., OT2) protocols are expected to have errors
+6. **Protocol Registry** (`automation/data/`) — `protocols.py` (auto-generated), `protocols_with_overrides.py` (manual), `protocol_registry.py` (combined)
+7. **CI/CD** (`citools/`, `.github/workflows/`) — matrix-based parallel execution via Docker
 
 ## Protocol Naming Convention
 
@@ -31,7 +32,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 {Robot}_{Status}_{Version}_{Source}_{Pipettes}_{Modules}_{Overrides}\_{Description}
 ```
 
-- **Robot**: `OT2` or `Flex`
+- **Robot**: `Flex` (one legacy `OT2` protocol is kept to verify it properly fails with an OT-2 compatibility error)
 - **Status**: `S` (Success) or `X` (Failure expected)
 - **Version**: API version (e.g., `v2_19`) or `PD` (Protocol Designer)
 - **Source** (optional): `PL_` (Protocol Library) or `MPL_` (Manual Protocol Library)

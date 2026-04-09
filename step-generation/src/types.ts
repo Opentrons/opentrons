@@ -8,6 +8,7 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
+  LoadedLabwareLocation,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   ModuleModel,
@@ -51,6 +52,10 @@ export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
 export interface LabwareTemporalProperties {
   // a stack of ids from top to bottom
   stack: string[]
+  // The single entity this labware is stacked on (labware, module, slot, hopper, etc.).
+  stackedOnNode?: LoadedLabwareLocation
+  // The single entity this labware is contained by when that applies.
+  containedByNode?: LoadedLabwareLocation
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
@@ -903,6 +908,7 @@ export type ErrorType =
   | 'MISSING_PROFILE_STEP'
   | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
+  | 'MOVE_LOCATION_NOT_SPECIFIED'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
   | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'

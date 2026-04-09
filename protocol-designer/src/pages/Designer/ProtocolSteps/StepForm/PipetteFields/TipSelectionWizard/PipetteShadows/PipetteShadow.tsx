@@ -112,9 +112,6 @@ export function PipetteShadow(props: {
       setLabelHeight(labelRef.current.offsetHeight)
     }
   }, [hoveredWell, labelText])
-  if (isHoveredWellSelected && !isTiprack) {
-    return <></>
-  }
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
     selectedLabwareId,
     labwareState,

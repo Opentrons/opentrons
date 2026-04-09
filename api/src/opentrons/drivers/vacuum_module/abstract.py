@@ -57,7 +57,7 @@ class AbstractVacuumModuleDriver(Protocol):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
+        gauge_pressure_mbar: Optional[float] = None,
         duration_s: Optional[int] = None,
         timeout_s: Optional[int] = None,
         rate: Optional[float] = None,

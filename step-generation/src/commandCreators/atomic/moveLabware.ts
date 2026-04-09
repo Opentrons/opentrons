@@ -158,7 +158,17 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       )
     }
   }
+  const labwareWithOffdeck = Object.entries(prevRobotState.labware)
+    .filter(([_, labware]) => labware.stack.includes('offDeck'))
+    .map(([labwareId]) => labwareId)
+  const newLocationList = Object.values(newLocation)
 
+  if (
+    labwareWithOffdeck.some(item => newLocationList.includes(item)) &&
+    useGripper
+  ) {
+    errors.push(errorCreators.moveLocationNotSpecified())
+  }
   const initialModuleState = getModuleStateFromSlotOrId(initialSlot)
   if (initialModuleState != null) {
     if (
