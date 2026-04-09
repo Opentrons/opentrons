@@ -5,12 +5,12 @@ from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 @lru_cache(maxsize=1)
-def get_config() -> KeyServerConfig:
+def calculate_config() -> KeyServerConfig:
     """Get the loaded config for the key server."""
     env = Environment()
     if env.dot_env_path:
@@ -57,3 +57,13 @@ class KeyServerConfig(BaseSettings):
         default="automatically_make_temporary",
         description="The location in which to store tls keys and certs for tls termination",
     )
+
+
+class ResolvedConfig(BaseModel):
+    """Key server configuration with optionals and defaults resolved."""
+
+    secure_storage_implementation: Literal["caam", "dev"]
+    base_directory: Path
+    image_mount_point: Path
+    secure_volume_size_mb: int
+    tls_directory: Path
