@@ -53,7 +53,7 @@ async def get_maintenance_run_orchestrator_store(
                 app_state=app_state, maintenance_run_orchestrator_store=run_orchestrator_store
             )
             pyro_resource = get_pyro_resource()
-            hardware_api.register_callback(pyro_resource.get_maintenance_run_estop_listener())
+            hardware_api.register_callback(pyro_resource.create_maintenance_run_hardware_event_callback())
 
     return run_orchestrator_store
 

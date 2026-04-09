@@ -151,7 +151,7 @@ async def get_run_orchestrator_store(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )
             pyro_resource = get_pyro_resource()
-            hardware_api.register_callback(pyro_resource.get_hardware_listener())
+            hardware_api.register_callback(pyro_resource.create_run_hardware_event_callback())
 
         # Provide the engine store to the light controller
         light_controller.update_run_orchestrator_store(

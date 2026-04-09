@@ -77,10 +77,10 @@ class RobotServerPyroResource:
     def _set_file_provider(self, file_provider: FileProvider) -> None:
         self._file_provider = file_provider
 
-    # CASEY NOTE: rename some of these hardware functions for clarity
+
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def get_hardware_listener(self) -> HardwareEventHandler:
-        """Create a callback for estop events.
+    def create_run_hardware_event_callback(self) -> HardwareEventHandler:
+        """Create a callback for estop and other events during a Run.
 
         The returned callback is meant to run in the hardware API's thread.
         """
@@ -101,10 +101,9 @@ class RobotServerPyroResource:
                 "Cannot provider a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
-    # CASEY NOTE: this behavior needs cleaning up. Do we keep this at all?
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def get_maintenance_run_estop_listener(self) -> HardwareEventHandler:
-        """Create a callback for estop events.
+    def create_maintenance_run_hardware_event_callback(self) -> HardwareEventHandler:
+        """Create a callback for estop and other events during a Maintenance Run.
 
         The returned callback is meant to run in the hardware API's thread.
         """
@@ -168,7 +167,7 @@ def start_initializing_pyro_resource(app_state: AppState) -> None:
             pyroname=pyroname, resource=robot_server_pyro_resource, registry=registry
         )
 
-    # Create the new instance of the Robot server resource manager
+    # Create the new instance of the Robot server resource manager using the Robot Server's existing event loop
     resource = RobotServerPyroResource(loop=asyncio.get_event_loop())
     robot_server_pyro_resource_accessor.set_on(app_state, resource)
 
