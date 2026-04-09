@@ -49,8 +49,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
-          aws-region: ${{ secrets.STAGING_AI_REGION }}
+          role-to-assume: ${{ vars.STAGING_AI_ROLE_ARN }}
+          aws-region: ${{ vars.STAGING_AI_REGION }}
       - name: 'deploy api to staging'
         run: |
           make -C opentrons-ai-server deploy ENV=staging
