@@ -1,5 +1,12 @@
 """Command models for Vacuum Module commands."""
 
+from .start_set_vacuum import (
+    StartSetVacuum,
+    StartSetVacuumCommandType,
+    StartSetVacuumCreate,
+    StartSetVacuumParams,
+    StartSetVacuumResult,
+)
 from .stop_vacuum import (
     StopVacuum,
     StopVacuumCommandType,
@@ -15,4 +22,10 @@ __all__ = [
     "StopVacuumCreate",
     "StopVacuumParams",
     "StopVacuumResult",
+    # start set vacuum command models
+    "StartSetVacuum",
+    "StartSetVacuumCommandType",
+    "StartSetVacuumCreate",
+    "StartSetVacuumParams",
+    "StartSetVacuumResult",
 ]
