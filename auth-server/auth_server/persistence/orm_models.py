@@ -40,6 +40,7 @@ class User(Base):
     hashed_password: Mapped[str]
     full_name: Mapped[str]
     account_type: Mapped[str]
+    reset_password: Mapped[bool]
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",

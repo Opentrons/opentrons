@@ -74,6 +74,13 @@ class UpdateUser(BaseModel):
             description="Set to false to clear a failed-login lockout for this user.",
         ),
     ] = None
+    resetPassword: Annotated[
+        bool,
+        Field(
+            description="Set to true to reset the password for this user.",
+            default=False,
+        ),
+    ] = False
 
 
 class UserResponse(BaseModel):
@@ -84,3 +91,4 @@ class UserResponse(BaseModel):
     accountType: AccountType
     scopes: list[str]
     locked: bool
+    resetPassword: bool

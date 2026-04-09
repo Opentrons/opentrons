@@ -99,6 +99,7 @@ def test_create_user_success(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -129,6 +130,7 @@ def test_create_user_hashes_password(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -208,6 +210,7 @@ def test_get_user_returns_existing(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -234,6 +237,7 @@ def test_get_user_locked_when_failed_logins_reach_limit(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=True,
+        resetPassword=False,
     )
 
 
@@ -298,6 +302,7 @@ def test_update_user_username(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -323,6 +328,7 @@ def test_update_user_password_is_hashed(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
