@@ -56,6 +56,7 @@ def resolve_config() -> ResolvedConfig:
         image_mount_point=image_mount,
         secure_volume_size_mb=base_config.secure_volume_size_mb,
         tls_directory=tls_base_dir,
+        tls_server_integration=base_config.tls_server_integration,
     )
 
 

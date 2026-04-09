@@ -57,6 +57,10 @@ class KeyServerConfig(BaseSettings):
         default="automatically_make_temporary",
         description="The location in which to store tls keys and certs for tls termination",
     )
+    tls_server_integration: Literal["systemd-nginx", "dev-none"] = Field(
+        description="How the server should notify a TLS termination layer a certificate has rotated.",
+        default="systemd-nginx",
+    )
 
 
 class ResolvedConfig(BaseModel):
@@ -67,3 +71,4 @@ class ResolvedConfig(BaseModel):
     image_mount_point: Path
     secure_volume_size_mb: int
     tls_directory: Path
+    tls_server_integration: Literal["systemd-nginx", "dev-none"]
