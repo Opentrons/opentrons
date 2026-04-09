@@ -5,6 +5,7 @@ import type {
 } from '../../../commandAnnotation/types'
 import type {
   CommandPreconditions,
+  LabwareOffsetRecord,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -206,6 +207,7 @@ export interface ProtocolAnalysisOutput {
   robotType?: RobotType
   commandAnnotations?: CommandAnnotationV1[] | CommandAnnotationV2[]
   commandPreconditions?: CommandPreconditions
+  labwareOffsets?: LabwareOffsetRecord[]
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 

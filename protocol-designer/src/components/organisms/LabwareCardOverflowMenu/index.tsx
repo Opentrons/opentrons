@@ -43,6 +43,7 @@ import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/
 
 import { getStackerModuleStateFromSlot } from '../AssignLiquidsModal/utils'
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
+import { getAllLabwareWithoutLids } from '../utils'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
@@ -80,7 +81,10 @@ export function LabwareCardOverflowMenu(
       }
     },
   })
-  const topLabwareId = labwareIds[0]
+  const stackOnlyHasLids =
+    getAllLabwareWithoutLids(deckSetup, labwareIds).length === 0
+
+  const topLabwareId = labwareIds.filter(id => id !== lidId)[0]
   const isAdapter =
     deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter')
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
@@ -105,6 +109,7 @@ export function LabwareCardOverflowMenu(
   const disallowNickname =
     isAdapter ||
     deckSetupLabware[topLabwareId].def.parameters.isTiprack ||
+    stackOnlyHasLids ||
     deckSetupLabware[topLabwareId].def.parameters.quirks?.includes(
       'tiprackAdapterFor96Channel'
     ) ||

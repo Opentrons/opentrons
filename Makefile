@@ -3,6 +3,8 @@
 
 # make OT_PYTHON available
 include ./scripts/python.mk
+# make UV available
+include ./scripts/python-uv.mk
 
 API_CLIENT_DIR := api-client
 API_DIR := api
@@ -63,6 +65,15 @@ setup-js:
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
+
+# front-end dependencies install for CI
+.PHONY: setup-js-ci
+setup-js-ci:
+	yarn config set network-timeout 60000
+	yarn install --frozen-lockfile
+	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
+
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
@@ -314,9 +325,45 @@ test-js-internal:
 	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
-test-js-%: 
+test-js-%:
 	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 .PHONY: validate-codecov-yml
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
+
+# Convenience commands for running all of our servers in dev mode, together,
+# behind a reverse proxy listening on port 31950.
+#
+# This naively amalgamates all of the logs into a single stdout stream.
+# If that's a bit much, you can also just manually run these commands in separate terminals.
+.PHONY: dev-backend
+dev-backend:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+.PHONY: dev-backend-flex
+dev-backend-flex:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev-flex BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C auth-server dev ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+
+# Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),
+# this sets up a reverse proxy that listens on localhost:31950 and forwards each request
+# to the appropriate dev server.
+.PHONY: dev-proxy
+dev-proxy:
+# In this command, the first port (:2) is a placeholder for the origin server's port.
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes wrong
+# with that, we choose port 2 because it's probably not assigned to anything.
+# `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
+# mitmproxy tries use port 2.
+#
+# The second port (@31950) is where the reverse proxy should listen.
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1  mitmdump \
+	    --mode reverse:http://localhost:2@31950 \
+	    --set connection_strategy=lazy \
+	    --script scripts/dev_proxy.py

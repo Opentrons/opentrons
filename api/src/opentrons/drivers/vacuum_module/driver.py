@@ -1,18 +1,18 @@
 import asyncio
 import re
-from typing import Optional
+from typing import Dict, Optional
+
+from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
 from .abstract import AbstractVacuumModuleDriver
 from .errors import VacuumModuleErrorCodes
 from .types import (
     GCODE,
-    HardwareRevision,
     LEDColor,
     LEDPattern,
     PressureControlTunings,
-    PressureState,
     PumpState,
-    VacuumModuleInfo,
+    VacuumState,
     VentState,
     WasteConfigParameters,
 )
@@ -41,7 +41,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     """Driver for Opentrons Vacuum Module."""
 
     @classmethod
-    def parse_device_info(cls, response: str) -> VacuumModuleInfo:
+    def parse_device_info(cls, response: str) -> Dict[str, str]:
         """Parse vacuum module info."""
         _RE = re.compile(
             f"^{GCODE.GET_DEVICE_INFO} FW:(?P<fw>\\S+) HW:Opentrons-vacuum-module-(?P<hw>\\S+) SerialNo:(?P<sn>\\S+)$"
@@ -49,9 +49,12 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         m = _RE.match(response)
         if not m:
             raise ValueError(f"Incorrect Response for device info: {response}")
-        return VacuumModuleInfo(
-            m.group("fw"), HardwareRevision(m.group("hw")), m.group("sn")
-        )
+
+        return {
+            "serial": m.group("sn"),
+            "version": m.group("fw"),
+            "model": m.group("hw"),
+        }
 
     @classmethod
     def parse_reset_reason(cls, response: str) -> int:
@@ -63,14 +66,14 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         return int(match.group("R"))
 
     @classmethod
-    def parse_get_pressure_state(cls, response: str) -> PressureState:
+    def parse_get_pressure_state(cls, response: str) -> VacuumState:
         """Parse the get pressure state."""
         pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
             raise ValueError(f"Incorrect Response for get pressure state: {response}")
-        return PressureState(
+        return VacuumState(
             float(match.group("T")),
             float(match.group("C")),
             float(match.group("A")),
@@ -83,7 +86,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
         """Parse the get pressure pid."""
-        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+)"
+        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -95,6 +98,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("O")),
             float(match.group("V")),
             float(match.group("H")),
+            float(match.group("T")),
         )
 
     @classmethod
@@ -154,6 +158,23 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         )
         return cls(connection)
 
+    @classmethod
+    async def create_from_sn(
+        cls, sn: str, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> "VacuumModuleDriver":
+        """Create a Vacuum Module driver using its usb serial number.."""
+        port_name = None
+        for port in comports():
+            if port.serial_number == sn:
+                port_name = port.device
+                break
+        if not port_name:
+            raise ValueError(
+                f"Could not find connected vacuum module with serial number {sn}"
+            )
+
+        return await cls.create(port=port_name, loop=loop)
+
     def __init__(self, connection: AsyncResponseSerialConnection) -> None:
         """
         Constructor
@@ -180,7 +201,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self._connection._serial.reset_input_buffer()
         self._connection._serial.reset_output_buffer()
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         response = await self._connection.send_command(
             GCODE.GET_DEVICE_INFO.build_command()
@@ -190,7 +211,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             GCODE.GET_RESET_REASON.build_command()
         )
         reason = self.parse_reset_reason(reason_resp)
-        device_info.rr = reason
+        device_info["reset_reason"] = str(reason)
         return device_info
 
     async def enter_programming_mode(self) -> None:
@@ -252,7 +273,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         self,
         enable_vacuum: bool,
         guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
@@ -268,8 +290,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
                 min(max(guage_pressure_mbar, MAX_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
-        if duration is not None:
-            command.add_int("D", duration)
+        if duration_s is not None:
+            command.add_int("D", duration_s)
+        if timeout_s is not None:
+            command.add_int("T", timeout_s)
         if rate is not None:
             command.add_float("R", min(max(rate, MAX_RAMP_RATE), 0))
         if vent_after is not None:
@@ -279,7 +303,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
 
-    async def get_vacuum_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
         resp = await self._connection.send_command(
             GCODE.GET_PRESSURE_STATE.build_command()
@@ -313,10 +337,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         return self.parse_get_pump_state(resp)
 
     # turns off motor, then releases, takes a timeout for buffer between turn off and vent
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
 
-        command = GCODE.SET_VENT_STATE.build_command().add_int("V", int(state))
+        command = GCODE.SET_VENT_STATE.build_command().add_int("V", state.value)
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")
@@ -329,6 +353,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         overshoot: Optional[float] = None,
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
         reset: bool = False,
     ) -> None:
         """Sets the PID tuning parameters for the pressure control."""
@@ -346,6 +371,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
         if k_holding is not None:
             command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
+        if tolerance is not None:
+            command.add_float("T", tolerance, GCODE_ROUNDING_PRECISION)
         command.add_int("R", int(reset))
 
         resp = await self._connection.send_command(command)

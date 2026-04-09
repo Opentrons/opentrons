@@ -48,13 +48,13 @@ jobs:
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: '22.22.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -65,7 +65,7 @@ jobs:
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -73,26 +73,26 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        id: 'setup-js'
+      - name: 'setup-js-ci'
+        id: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          make setup-js-ci
         # Use the if to run all the lint checks even of some fail
         shell: bash
       - name: 'typechecks'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make check-js
       - name: 'lint js'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-js
       - name: 'circular deps'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make circular-dependencies-js
       - name: 'lint json'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-json
       - name: 'lint css'
-        if: always() && steps.setup-js.outcome == 'success'
+        if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-css

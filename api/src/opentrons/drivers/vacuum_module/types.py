@@ -32,6 +32,7 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
 
 
 @dataclass
@@ -92,13 +93,13 @@ class LEDPattern(Enum):
 class VentState(Enum):
     """The State of the vent."""
 
-    OPENED = 0
-    CLOSED = 1
+    CLOSED = 0
+    OPENED = 1
 
 
 @dataclass
-class PressureState:
-    """Get the pressure state."""
+class VacuumState:
+    """Get the vacuum state."""
 
     target_guage_pressure: float
     current_guage_pressure: float
@@ -119,6 +120,7 @@ class PressureControlTunings:
     overshoot_error: float
     k_velocity: float
     k_holding: float
+    tolerance_error: float
 
 
 @dataclass

@@ -56,7 +56,7 @@
   "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact support.",
   "module_setup_failed": "<block>Module setup was unsuccessful. If you still have trouble, contact support.</block><block>{{error}}</block>",
   "network_setup_menu_description": "You’ll use this connection to run software updates and load protocols onto your robot.",
-  "new_robot_instructions": "When setting up a new robot, follow the instructions on the touchscreen. For more information, consult the Quickstart Guide for your robot.",
+  "new_robot_instructions": "Follow the instructions on the touchscreen when setting up a new robot. For more information, consult the Quickstart Guide for your robot.",
   "oem_mode_description": "Enable OEM Mode to remove all instances of Opentrons from the Flex touchscreen.",
   "opentrons_app_successfully_updated": "The app was successfully updated.",
   "opentrons_app_update": "app update",

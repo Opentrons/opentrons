@@ -15,6 +15,7 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
+    "cryptography==42.0.5"
 ]
 
 [tool.uv.dependency-groups]
@@ -29,6 +30,7 @@ robot = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
+    "cryptography==42.0.5"
 ]
 dev = [
     "ruff==0.14.10",
@@ -75,6 +77,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

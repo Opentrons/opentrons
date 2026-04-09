@@ -391,6 +391,26 @@ class FlexStackerStateUpdate:
 
 
 @dataclasses.dataclass
+class VacuumModuleStateUpdate:
+    """An update to the Vacuum Module state."""
+
+    module_id: str
+    pump_engaged: bool | NoChangeType = NO_CHANGE
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: VacuumModuleStateUpdate | NoChangeType,
+        module_id: str,
+    ) -> VacuumModuleStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return VacuumModuleStateUpdate(module_id=module_id)
+        else:
+            return maybe_inst
+
+
+@dataclasses.dataclass
 class LiquidClassLoadedUpdate:
     """The state update from loading a liquid class."""
 
@@ -487,6 +507,8 @@ class StateUpdate:
     )
 
     flex_stacker_state_update: FlexStackerStateUpdate | NoChangeType = NO_CHANGE
+
+    vacuum_module_state_update: VacuumModuleStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 

@@ -45,7 +45,7 @@ stages:
       status_code: 200
       json:
         data:
-          analyses: [ ]
+          analyses: []
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
@@ -167,3 +167,4 @@ stages:
             errors: []
             liquids: []
             liquidClasses: []
+            labwareOffsets: []

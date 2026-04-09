@@ -24,45 +24,50 @@ import type {
   UpdatePrompt,
 } from '/ai-client/resources/types'
 
-const getCreateEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_CREATE_PROTOCOL_END_POINT
-    case 'development':
-      return LOCAL_CREATE_PROTOCOL_END_POINT
-    default:
-      return STAGING_CREATE_PROTOCOL_END_POINT
-  }
+type Env = 'production' | 'development' | 'staging'
+
+interface EnvEndpoints {
+  production: string
+  development: string
+  staging: string
 }
 
-const getUpdateEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_UPDATE_PROTOCOL_END_POINT
-    case 'development':
-      return LOCAL_UPDATE_PROTOCOL_END_POINT
-    default:
-      return STAGING_UPDATE_PROTOCOL_END_POINT
-  }
-}
+const getEnv = (): Env =>
+  _NODE_ENV_ === 'production'
+    ? 'production'
+    : _NODE_ENV_ === 'development'
+      ? 'development'
+      : 'staging'
 
-const getChatEndpoint = (): string => {
-  switch (_NODE_ENV_) {
-    case 'production':
-      return PROD_END_POINT
-    case 'development':
-      return LOCAL_END_POINT
-    default:
-      return STAGING_END_POINT
-  }
-}
+const pickEndpoint = (endpoints: EnvEndpoints): string => endpoints[getEnv()]
+
+const getCreateEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_CREATE_PROTOCOL_END_POINT,
+    development: LOCAL_CREATE_PROTOCOL_END_POINT,
+    staging: STAGING_CREATE_PROTOCOL_END_POINT,
+  })
+
+const getUpdateEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_UPDATE_PROTOCOL_END_POINT,
+    development: LOCAL_UPDATE_PROTOCOL_END_POINT,
+    staging: STAGING_UPDATE_PROTOCOL_END_POINT,
+  })
+
+const getChatEndpoint = (): string =>
+  pickEndpoint({
+    production: PROD_END_POINT,
+    development: LOCAL_END_POINT,
+    staging: STAGING_END_POINT,
+  })
 
 const getCreateOrUpdateEndpoint = (isNewProtocol: boolean): string => {
   return isNewProtocol ? getCreateEndpoint() : getUpdateEndpoint()
 }
 
 export const buildRequestConfig = (
-  token: string | null,
+  token: string,
   validatedFiles: File[],
   isUpdateOrCreateRequest: boolean,
   completeHistory: ChatMessage[],
@@ -122,12 +127,11 @@ export const buildRequestConfig = (
         ? promptData
         : {
             message: watchUserPrompt,
-            history: completeHistory, // Send complete history with attachments
+            history: completeHistory,
             fake: false,
-            chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
-            pd_protocol_content: pdProtocolContent,
-            protocol_format: protocolFormat,
-            // No separate attachments parameter needed - they're in history now
+            chatOptions: isUpdateOrCreateRequest ? 'create' : 'update',
+            pdProtocolContent: pdProtocolContent,
+            protocolFormat: protocolFormat,
           },
     }
   }

@@ -74,12 +74,13 @@ describe('VolumeEntry', () => {
     screen.getByText('Set transfer volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -98,12 +99,13 @@ describe('VolumeEntry', () => {
     screen.getByText('Set dispense volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Dispense volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -122,12 +124,13 @@ describe('VolumeEntry', () => {
     screen.getByText('Set aspirate volume')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Aspirate volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -164,12 +167,13 @@ describe('VolumeEntry', () => {
     expect(continueBtn).toBeDisabled()
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
+        autoFocus: true,
         label: 'Aspirate volume per well (µL)',
         error: 'Value must be between 5 to 50',
-        readOnly: true,
         type: 'text',
         value: '90',
         onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

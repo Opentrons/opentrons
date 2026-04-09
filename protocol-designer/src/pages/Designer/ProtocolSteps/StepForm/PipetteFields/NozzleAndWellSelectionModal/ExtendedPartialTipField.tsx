@@ -37,7 +37,9 @@ export function ExtendedPartialTipField(
   const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
+  const [isClicked, setIsClicked] = useState(false)
   const handleOpen = (): void => {
+    setIsClicked(true)
     setIsNozzleAndWellModalOpen(true)
   }
   const primaryNozzle =
@@ -67,10 +69,12 @@ export function ExtendedPartialTipField(
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
-  const dspLabwareDef = propsForFields.dispense_wells
-    ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
-        .def as LabwareDefinition)
+  const dispenseLocation = propsForFields.dispense_labware?.value as string
+  const isDispenseInLabware = deckSetup.labware[dispenseLocation] !== undefined
+  const dspLabwareDef = isDispenseInLabware
+    ? (deckSetup.labware[dispenseLocation].def as LabwareDefinition)
     : null
+  const totalSteps = isDispenseInLabware ? 3 : 2
   const partialChannels =
     primaryNozzle in PARTIAL_NOZZLE_MAP
       ? PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
@@ -105,9 +109,7 @@ export function ExtendedPartialTipField(
       (channels === 8 && nozzleConfiguration === ALL) ||
       nozzleConfiguration === COLUMN
     const isRow = nozzleConfiguration === ROW
-    const hasRequiredWells =
-      aspWells.length > 0 && (!isTransfer || dspWells.length > 0)
-    if (!nozzleText || !hasRequiredWells) {
+    if (!nozzleText || !isClicked || isNozzleAndWellModalOpen) {
       return t('no_nozzles_and_wells_selected')
     }
     let positionType: string = 'wells'
@@ -126,12 +128,20 @@ export function ExtendedPartialTipField(
     }
 
     if (isTransfer) {
-      return t('transfer_nozzles_selected', {
-        nozzleSelection,
-        aspWells: aspWellsLength,
-        dispWells: dspWellsLength,
-        positionType,
-      })
+      if (dspWellsLength > 0) {
+        return t('transfer_nozzles_selected', {
+          nozzleSelection,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
+          positionType,
+        })
+      } else {
+        return t('transfer_nozzles_selected_no_dispense', {
+          nozzleSelection,
+          aspWells: aspWellsLength,
+          positionType,
+        })
+      }
     }
 
     return t('mix_nozzles_selected', {
@@ -164,7 +174,7 @@ export function ExtendedPartialTipField(
       {isNozzleAndWellModalOpen ? (
         <NozzleAndWellSelectionModal
           showModal={setIsNozzleAndWellModalOpen}
-          totalSteps={3}
+          totalSteps={totalSteps}
           pipetteSpecs={pipetteSpecs}
           deckSetup={deckSetup}
           propsForFields={propsForFields}

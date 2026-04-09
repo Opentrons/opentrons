@@ -7,7 +7,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   THERMOCYCLER_MODULE_CUTOUTS,
-  VACUUM_MODULE_MILLIPORE_V1,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
@@ -675,13 +675,13 @@ export function getFixtureDisplayName(
         : t(`${translationFileName}:module_with_mag_block`, {
             moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
           })
-    case VACUUM_MODULE_MILLIPORE_V1:
+    case VACUUM_MODULE_V1:
       return usbPortNumber != null
         ? t(`${translationFileName}:module_in_port`, {
-            moduleName: getModuleDisplayName(VACUUM_MODULE_MILLIPORE_V1),
+            moduleName: getModuleDisplayName(VACUUM_MODULE_V1),
             usbPortNumber,
           })
-        : getModuleDisplayName(VACUUM_MODULE_MILLIPORE_V1)
+        : getModuleDisplayName(VACUUM_MODULE_V1)
     case SINGLE_CENTER_SLOT_FIXTURE:
       return t(`${translationFileName}:center_slot`)
     case SINGLE_RIGHT_SLOT_FIXTURE:

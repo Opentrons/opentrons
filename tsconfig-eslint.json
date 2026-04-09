@@ -4,7 +4,10 @@
     "paths": {
       "/app/*": ["./app/src/*"],
       "/ai-client/*": ["./opentrons-ai-client/src/*"],
-      "/protocol-designer/*": ["./protocol-designer/src/*"]
+      "/protocol-designer/*": ["./protocol-designer/src/*"],
+      "@opentrons/components": ["./components/src/index.ts"],
+      "@opentrons/shared-data": ["./shared-data/js/index.ts"],
+      "@opentrons/step-generation": ["./step-generation/src/index.ts"]
     },
     "emitDeclarationOnly": false,
     "noEmit": true
@@ -18,11 +21,11 @@
     "app-shell-odd/typings",
     "components/src",
     "components/typings",
-    "components-testing/src",
-    "components-testing/tests",
-    "components-testing/typings",
-    "components-testing/cssModulesSideEffect.ts",
-    "components-testing/playwright.config.ts",
+    "js-package-testing/src",
+    "js-package-testing/tests",
+    "js-package-testing/typings",
+    "js-package-testing/cssModulesSideEffect.ts",
+    "js-package-testing/playwright.config.ts",
     "discovery-client/src",
     "discovery-client/typings",
     "labware-designer/src",
@@ -41,6 +44,7 @@
     "step-generation/typings",
     "protocol-designer/src",
     "protocol-designer/typings",
+    "protocol-visualization/src",
     "api-client/src",
     "react-api-client/src",
     "usb-bridge/node-client/src",

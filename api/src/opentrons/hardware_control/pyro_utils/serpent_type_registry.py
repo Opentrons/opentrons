@@ -1,51 +1,19 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
-import enum
-import inspect
-from typing import Any, Callable, Dict
-
-import serpent
-from Pyro5 import api as pyro
+from typing import Dict
 
 import opentrons.config.types
+import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.types
 import opentrons.types
-
-
-def _serpent_enum_serializer(obj, serializer, stream, level):  # type: ignore
-    """Serpent serializer for generic Enum values."""
-    serializer._serialize(obj.value, stream, level)
-
-
-# Opentrons Enum types registry
-def _generic_enum_class_to_dict(obj: Any) -> Dict:  # type: ignore
-    return {
-        "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-        "value": obj.value,
-    }
-
-
-def _generic_enum_dict_to_class(classname: str, d: Any) -> Any:
-    module_path, class_name = classname.rsplit(".", 1)
-    # Check type imports here, for now we only take from known opentrons modules
-    if "opentrons.hardware_control.types" in module_path:
-        opentrons_type = getattr(opentrons.hardware_control.types, class_name)
-    elif "opentrons.config.types" in module_path:
-        opentrons_type = getattr(opentrons.config.types, class_name)
-    elif "opentrons.types" in module_path:
-        opentrons_type = getattr(opentrons.types, class_name)
-    else:
-        raise RuntimeError(f"Unsupported module processed in Pyro request: {classname}")
-    return opentrons_type(d["value"])
-
-
-def find_enums_in_packages(modules: list) -> list:  # type: ignore
-    enums = []
-    for module in modules:
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, enum.Enum) and obj is not enum.Enum:
-                enums.append(obj)
-    return enums
+from opentrons.util.pyro.pyro_serialization import (
+    OpentronsPyroSerializer,
+    find_enums_in_packages,
+    find_pydantic_classes_in_packages,
+    find_typed_dict_classes_in_packages,
+    register_type_to_serpent,
+    serpent_enum_registration,
+)
 
 
 # Estop Overall Status registry
@@ -72,68 +40,41 @@ def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
     }
 
 
-# UpdateStatus registry
-def _update_status_dict_to_class(  # type: ignore
-    classname, d
-) -> opentrons.hardware_control.types.UpdateStatus:
-    return opentrons.hardware_control.types.UpdateStatus(
-        subsystem=opentrons.hardware_control.types.SubSystem(d["subsystem"]),
-        state=opentrons.hardware_control.types.UpdateState(d["state"]),
-        progress=d["progress"],
-    )
-
-
-def _update_status_class_to_dict(obj) -> Dict:  # type: ignore
-    return {
-        "__class__": "opentrons.hardware_control.types.UpdateStatus",
-        "subsystem": obj.subsystem.value,
-        "state": obj.state.value,
-        "progress": obj.progress,
-    }
-
-
-def register_type_to_serpent(
-    class_type: Any,
-    dict_to_class: Callable[[str, Any], Any],
-    class_to_dict: Callable[[Any], dict[Any, Any]],
-) -> None:
-    """Adapter function to call the serpent registries for individual types."""
-    class_path = ".".join((class_type.__module__, class_type.__qualname__))
-    pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
-    pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
-
-
 # Handy function to map all registries for the Hardware controller
 def register_hardware_types() -> None:
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
     opentrons_types = find_enums_in_packages(
+        [
+            opentrons.types,
+            opentrons.config.types,
+            opentrons.hardware_control.types,
+            opentrons.hardware_control.dev_types,
+        ]
+    )
+
+    with serpent_enum_registration():
+        for enum_type in opentrons_types:
+            OpentronsPyroSerializer.register_enum(enum_type)
+
+    opentrons_pydantic_types = find_pydantic_classes_in_packages(
         [opentrons.types, opentrons.config.types, opentrons.hardware_control.types]
     )
-    # Serpent matches by first isinstance() in registry order, so unregister enums first so that
-    # types like "Mount" don't automatically become strings/ints, then register the enums after.
-    serpent.unregister_class(enum.Enum)  # type: ignore
+    for pydantic_type in opentrons_pydantic_types:
+        OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
 
-    for enum_type in opentrons_types:
-        register_type_to_serpent(
-            class_type=enum_type,
-            dict_to_class=_generic_enum_dict_to_class,
-            class_to_dict=_generic_enum_class_to_dict,
-        )
+    opentrons_typed_dicts = find_typed_dict_classes_in_packages(
+        [opentrons.hardware_control.dev_types]
+    )
+    for typed_dict in opentrons_typed_dicts:
+        OpentronsPyroSerializer.register_typed_dict(typed_dict)
 
-    serpent.register_class(enum.Enum, _serpent_enum_serializer)  # type: ignore
+    OpentronsPyroSerializer.register_unhashable_dicts()
 
     # E-Stop Overall registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.EstopOverallStatus,
         dict_to_class=_estop_overall_status_dict_to_class,
         class_to_dict=_estop_overall_status_class_to_dict,
-    )
-
-    # UpdateStatus registration
-    register_type_to_serpent(
-        class_type=opentrons.hardware_control.types.UpdateStatus,
-        dict_to_class=_update_status_dict_to_class,
-        class_to_dict=_update_status_class_to_dict,
     )

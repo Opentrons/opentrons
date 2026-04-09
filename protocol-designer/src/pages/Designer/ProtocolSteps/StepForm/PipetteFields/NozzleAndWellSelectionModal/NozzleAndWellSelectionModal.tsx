@@ -10,6 +10,7 @@ import {
   SecondaryButton,
   WizardHeader,
 } from '@opentrons/components'
+import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -60,6 +61,12 @@ export function NozzleAndWellSelectionModal(
 
   const handleContinue = (): void => {
     setShowError(false)
+    if (currentStepIndex === 0 && propsForFields.primaryNozzle.value === null) {
+      propsForFields.primaryNozzle.updateValue(A1_NOZZLE)
+      if (pipetteSpecs.channels === 1) {
+        propsForFields.nozzles.updateValue(ALL)
+      }
+    }
     if (currentStepIndex !== 0 && activeFieldKey !== null) {
       if (wellValues.length === 0) {
         setShowError(true)
@@ -122,9 +129,7 @@ export function NozzleAndWellSelectionModal(
     />
   )
   const isLastStep = currentStepIndex + 1 === totalSteps
-  const isLastStepOfMix = isMixStep
-    ? currentStepIndex + 1 === totalSteps - 1
-    : false
+
   const footerElement = (
     <div className={styles.modal_footer}>
       {showError ? (
@@ -140,10 +145,8 @@ export function NozzleAndWellSelectionModal(
         </SecondaryButton>
       ) : null}
 
-      <PrimaryButton
-        onClick={isLastStep || isLastStepOfMix ? handleClose : handleContinue}
-      >
-        {'Continue'}
+      <PrimaryButton onClick={isLastStep ? handleClose : handleContinue}>
+        {isLastStep ? t('shared:save') : t('shared:continue')}
       </PrimaryButton>
     </div>
   )

@@ -5,6 +5,7 @@ marks:
       - run_server
       - admin_access_token
       - admin_scopes_list
+      - user_scopes_list
 
 stages:
   - name: Create a new user
@@ -26,7 +27,8 @@ stages:
           userName: test_new_user
           fullName: Test New User
           accountType: user
-          scopes: [runs.write]
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
 
   - name: Create a new user with a password less than 8 characters
     request:
@@ -58,7 +60,8 @@ stages:
           accountType: user
           fullName: Test New User
           userName: test_new_user
-          scopes: [runs.write]
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
 
   - name: Update the user
     request:
@@ -77,6 +80,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user
+          locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
 
   - name: Update the username and password
@@ -96,6 +100,7 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user_updated
+          locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
 
   - name: Get a new access token with the updated username and password

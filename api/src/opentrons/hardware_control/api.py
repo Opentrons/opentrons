@@ -1325,11 +1325,9 @@ class API(  # type: ignore[misc]
     async def create_simulating_module(
         self,
         model: modules.types.ModuleModel,
+        sim_serial: Optional[str] = None,
     ) -> modules.AbstractModule:
         """Get a simulating module hardware API interface for the given model."""
-        assert self.is_simulator, (
-            "Cannot build simulating module from non-simulating hardware control API"
-        )
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(
@@ -1337,6 +1335,7 @@ class API(  # type: ignore[misc]
             ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
 
     def get_instrument_max_height(

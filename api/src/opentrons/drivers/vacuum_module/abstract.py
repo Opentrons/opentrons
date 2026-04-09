@@ -1,12 +1,12 @@
-from typing import Optional, Protocol
+from typing import Dict, Optional, Protocol
 
-from .types import (
+from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
     PressureControlTunings,
-    PressureState,
     PumpState,
-    VacuumModuleInfo,
+    VacuumState,
+    VentState,
     WasteConfigParameters,
 )
 
@@ -26,7 +26,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Check connection to vacuum module."""
         ...
 
-    async def get_device_info(self) -> VacuumModuleInfo:
+    async def get_device_info(self) -> Dict[str, str]:
         """Get Device Info."""
         ...
 
@@ -58,14 +58,15 @@ class AbstractVacuumModuleDriver(Protocol):
         self,
         enable_vacuum: bool,
         guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def get_vacuum_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
         ...
 
@@ -82,7 +83,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Get the pump state."""
         ...
 
-    async def set_vent_state(self, state: bool) -> None:
+    async def set_vent_state(self, state: VentState) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
         ...
 
@@ -94,6 +95,7 @@ class AbstractVacuumModuleDriver(Protocol):
         overshoot: Optional[float] = None,
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
         reset: bool = False,
     ) -> None:
         """Sets the PID tuning parameters for the pressure control."""
@@ -121,3 +123,4 @@ class AbstractVacuumModuleDriver(Protocol):
 
     async def get_waste_configs(self) -> WasteConfigParameters:
         """Get the waste full detection configs"""
+        ...

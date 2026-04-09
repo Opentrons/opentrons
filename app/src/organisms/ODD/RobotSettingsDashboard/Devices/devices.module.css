@@ -1,4 +1,4 @@
-.devices_contaienr {
+.devices_container {
   display: flex;
   height: 100%;
   flex-direction: column;
@@ -24,6 +24,7 @@
 .devices_rows {
   display: flex;
   flex-direction: column;
+  padding-bottom: var(--spacing-40);
   gap: var(--spacing-8);
 }
 

@@ -138,13 +138,16 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            autoFocus
             type="number"
             value={flowRate}
             label={textEntryCopy}
             error={error}
-            readOnly
             onBlur={e => {
               e.target.focus()
+            }}
+            onChange={e => {
+              setFlowRate(Number(e.target.value))
             }}
           />
         </Flex>

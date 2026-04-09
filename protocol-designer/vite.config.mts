@@ -15,7 +15,7 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
-const REQUIRED_APP_VERSION = '8.8.0' // PD requires this robot stack version or higher
+const REQUIRED_APP_VERSION = '9.0.0' // PD requires this robot stack version or higher
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })
@@ -227,7 +227,6 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_COMMENT',
     'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
     'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-    'OT_PD_ENABLE_REACT_SCAN',
     'OT_PD_ENABLE_MULTIPLE_TEMPS_OT',
     'OT_PD_ENABLE_TIMELINE_SCRUBBER',
     'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',

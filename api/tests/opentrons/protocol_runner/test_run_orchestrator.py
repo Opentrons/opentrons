@@ -35,11 +35,8 @@ from opentrons.protocol_runner.protocol_runner import (
     LiveRunner,
     PythonAndLegacyRunner,
 )
-from opentrons.protocol_runner.run_orchestrator import (
-    ParseMode,
-    RunNotFound,
-    RunOrchestrator,
-)
+from opentrons.protocol_runner.run_coordinator import ParseMode, RunNotFound
+from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
 
