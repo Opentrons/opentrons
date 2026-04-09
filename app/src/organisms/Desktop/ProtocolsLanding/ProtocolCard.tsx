@@ -67,6 +67,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
+  const isFlex = mostRecentAnalysis?.robotType === FLEX_ROBOT_TYPE
+
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
@@ -97,6 +99,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           protocolDisplayName={protocolDisplayName}
           isAnalyzing={isAnalyzing}
           modified={modified}
+          isFlex={isFlex}
         />
       </ErrorBoundary>
       <Box
@@ -120,6 +123,7 @@ interface AnalysisInfoProps {
   modified: number
   isAnalyzing: boolean
   mostRecentAnalysis?: ProtocolAnalysisOutput | null
+  isFlex: boolean
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
@@ -128,6 +132,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     isAnalyzing,
     mostRecentAnalysis,
     modified,
+    isFlex,
   } = props
   const { t, i18n } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
@@ -140,7 +145,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   )
 
-  const isFlex = mostRecentAnalysis?.robotType === FLEX_ROBOT_TYPE
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
   const hasPeripherals =
@@ -209,7 +213,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'parameterRequired' ? (
             <ProtocolStatusBanner />
           ) : null}
-          {analysisStatus === 'error' ? (
+          {analysisStatus === 'error' && isFlex ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
               errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
@@ -223,9 +227,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <Box paddingRight={SPACING.spacing24}>
               <InlineNotification
                 type="alert"
-                heading={t('ot2_protocol_detected')}
-                message={t('ot2_protocol_detected_description')}
-                linkText={t('get_the_app')}
+                heading={t('branded:ot2_protocol_detected')}
+                message={t('branded:ot2_protocol_detected_description')}
+                linkText={t('branded:get_the_app')}
               />
             </Box>
           ) : null}
