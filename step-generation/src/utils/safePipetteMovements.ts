@@ -92,11 +92,18 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
+  labwareDefinition: LabwareDefinition,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
+  nozzleConfiguration: NozzleConfigurationStyle,
   tipOverlapOnNozzle: number
 ): Point[] => {
-  const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteEntity.spec
-  const primaryNozzlePoint = nozzleMap[primaryNozzle]
+  const { pipetteBoundingBoxOffsets } = pipetteEntity.spec
+  const primaryNozzlePoint = getPipetteCriticalPoint(
+    nozzleConfiguration,
+    pipetteEntity,
+    primaryNozzle,
+    labwareDefinition
+  )
   const pipetteBoundingBoxLeftXOffset =
     pipetteBoundingBoxOffsets.backLeftCorner[0]
   const pipetteBoundingBoxRightXOffset =
@@ -106,13 +113,13 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const pipetteBoundingBoxFrontYOffset =
     pipetteBoundingBoxOffsets.frontRightCorner[1]
   const leftX =
-    wellTargetPoint.x - (primaryNozzlePoint[0] - pipetteBoundingBoxLeftXOffset)
+    wellTargetPoint.x - (primaryNozzlePoint.x - pipetteBoundingBoxLeftXOffset)
   const rightX =
-    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint[0])
+    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint.x)
   const backY =
-    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint[1])
+    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint.y)
   const frontY =
-    wellTargetPoint.y - (primaryNozzlePoint[1] - pipetteBoundingBoxFrontYOffset)
+    wellTargetPoint.y - (primaryNozzlePoint.y - pipetteBoundingBoxFrontYOffset)
 
   const zNozzles = (wellTargetPoint.z ?? 0) + tipLength - tipOverlapOnNozzle
 
@@ -134,6 +141,43 @@ const getHasOverlappingRectangles = (
   const oneOverTwo = rectangle1[1].y > rectangle2[0].y
 
   return !(oneLeftOfTwo || oneRightOfTwo || oneUnderTwo || oneOverTwo)
+}
+
+const getPipetteCriticalPoint = (
+  nozzleConfiguration: NozzleConfigurationStyle,
+  pipetteEntity: PipetteEntity,
+  primaryNozzle: PrimaryNozzleConfigurationStyle,
+  labwareDefinition: LabwareDefinition
+): Point => {
+  const { spec } = pipetteEntity
+  if (
+    nozzleConfiguration === COLUMN &&
+    labwareDefinition.ordering.flat().length === 1
+  ) {
+    // return the XY CENTER
+    const frontPoint = `H${primaryNozzle.charAt(1)}`
+    const frontRightPoint = spec.nozzleMap[frontPoint]
+    const backLeftPoint = spec.nozzleMap[primaryNozzle]
+    const difference = frontRightPoint.map(
+      (value, index) => value - backLeftPoint[index]
+    )
+    const differenceOffset = [difference[0] / 2, difference[1] / 2, 0]
+    const newPoint = backLeftPoint.map(
+      (value, index) => value + differenceOffset[index]
+    )
+    return {
+      x: newPoint[0],
+      y: newPoint[1],
+      z: newPoint[2],
+    }
+  }
+  const defaultPosition = spec.nozzleMap[primaryNozzle]
+
+  return {
+    x: defaultPosition[0],
+    y: defaultPosition[1],
+    z: defaultPosition[2],
+  }
 }
 
 const getModuleHeightFromDeckDefinition = (
@@ -360,8 +404,7 @@ export const getIsSafePipetteMovement = (args: {
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    nozzleConfiguration == null ||
-    nozzleConfiguration === ALL
+    nozzleConfiguration == null
   ) {
     return true
   }
@@ -414,15 +457,18 @@ export const getIsSafePipetteMovement = (args: {
           nozzles: nozzleConfiguration,
         })
       : 0
-
+  const labwareDefinition = labwareEntities[labwareId].def
   const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
     pipetteEntity,
     tipLength,
     wellTargetPoint,
+    labwareDefinition,
     primaryNozzle ??
       getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    nozzleConfiguration,
     tipOverlapOnNozzle
   )
+
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
     channels,
     boundingBox: pipetteBoundsAtWellLocation,
