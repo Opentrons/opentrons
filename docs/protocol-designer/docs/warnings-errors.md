@@ -52,4 +52,4 @@ As you add hardware, labware, and protocol steps, Protocol Designer also conside
 
 On this example Flex deck, tip racks, labware, and modules are concentrated in a single corner of the deck. For any partial tip pickup step, the pipette would need to hover over an adjacent deck slot containing labware or a module, increasing collision risk.
 
-For more details, see [partial tip pickup](../steps/transfer.md#partial-tip-pickup).
+For more details, see [partial tip pickup](steps/transfer.md#partial-tip-pickup).

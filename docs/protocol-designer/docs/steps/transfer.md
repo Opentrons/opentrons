@@ -138,13 +138,15 @@ Protocol Designer includes warnings if your tip selections might be incompatible
 
 ## Partial tip pickup
 
-You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once: 
+You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once. When you add a transfer or mix step, start by clicking **Pipette nozzles and wells** in the first form. Select an available partial tip nozzle option: 
 
-* Pick up a single column, row, or individual tip with the Flex 96-channel pipette. 
-* Pick up individual tips or a partial column (2–7 tips) with Flex and OT-2 8-channel pipettes. 
+| **Pipette** | **Available Nozzle Configurations** |
+| ----------- | ----------------------------------- |  
+| Flex 96-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1, A12, H1, or H12)</li><li>Single column (column 1 or 12)</li><li>Single row (row A or H)</li></ul> |
+| Flex 8-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
+| OT-2 8-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
 
-When you add a transfer or mix step, start by selecting one of the available nozzle options in the first form.
-
+Here, choose a single column of nozzles ( 1 or 12) for the Flex 96-channel pipette to use in partial tip pickup.  
 <figure class="screenshot" markdown>
   ![Partial tip options for the Flex 96-channel pipette.](../images/partial_nozzles.png)
   <figcaption>Choose an individual, single column, or single row of nozzles for the Flex 96-channel pipette to use in the transfer.</figcaption>
@@ -163,7 +165,7 @@ In the fourth form, you can choose between automatic and manual tip tracking for
 
 Partial tip pickup requires the pipette to hover above adjacent deck slots, and can increase the risk of collisions.Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette. 
 
-When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](warnings-errors.md) to reduce collision risk. These errors can require you to change your well, tip, or deck selections in order to avoid risky situations. 
+When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](../warnings-errors.md) to reduce collision risk. These errors can require you to change your well, tip, or deck selections in order to avoid risky situations. 
 
 Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
 
@@ -172,7 +174,7 @@ Here, Protocol Designer won't allow you to select tips for manual tip tracking, 
   <figcaption>Labware in adjacent slots can cause pipette collisions.</figcaption>
 </figure> 
 
-Despite the tip rack in the example above being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
+Even though the tip rack above is full of pipette tips, the "not enough tips" warning tells you that there aren't enough tips that the pipette can safely access. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
 
 To fix the collision error, move the tip racks from adjacent deck slots or change your tip pickup selections.
 
