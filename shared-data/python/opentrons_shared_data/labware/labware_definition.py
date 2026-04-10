@@ -136,6 +136,7 @@ class Parameters2(BaseModel):
     loadName: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
     isMagneticModuleCompatible: bool
     isDeckSlotCompatible: bool | None = None
+    isMovableAdapter: bool | None = None
     magneticModuleEngageHeight: _NonNegativeNumber | None = None
 
 
@@ -568,6 +569,11 @@ class Extents(BaseModel):
     total: AxisAlignedBoundingBox3D
 
 
+class ContainedSpace(BaseModel):
+    origin: Vector3D
+    dimensions: Dimensions
+
+
 class LabwareDefinition2(BaseModel):
     schemaVersion: Literal[2]
     version: Annotated[int, Field(ge=1)]
@@ -591,6 +597,7 @@ class LabwareDefinition2(BaseModel):
     innerLabwareGeometry: dict[str, InnerWellGeometry | UserDefinedVolumes] | None = (
         None
     )
+    containedSpace: ContainedSpace | None = None
 
 
 class LabwareDefinition3(BaseModel):
@@ -618,6 +625,7 @@ class LabwareDefinition3(BaseModel):
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+    containedSpace: ContainedSpace | None = None
 
 
 LabwareDefinition = Annotated[
