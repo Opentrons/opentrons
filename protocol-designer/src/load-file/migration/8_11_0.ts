@@ -1,4 +1,5 @@
 import { getModuleType } from '@opentrons/shared-data'
+import { getStackedOnNodeFromPdStack } from '@opentrons/step-generation'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getLocationStackTopToBottom, getModulePythonName } from '../../utils'
@@ -7,31 +8,25 @@ import type {
   LoadedLabwareLocation,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import {
-  getStackedOnNodeFromPdStack,
-  type ModuleEntities,
-} from '@opentrons/step-generation'
+import type { ModuleEntities } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
 
 const moduleEntitiesFromMetadata = (
   modules: PDMetadata['modules']
 ): ModuleEntities =>
-  Object.entries(modules).reduce<ModuleEntities>(
-    (acc, [id, { model }]) => {
-      const moduleType = getModuleType(model)
-      const typeCount = Object.values(acc).filter(
-        m => m.type === moduleType
-      ).length
-      acc[id] = {
-        id,
-        type: moduleType,
-        model,
-        pythonName: getModulePythonName(moduleType, typeCount + 1),
-      }
-      return acc
-    },
-    {}
-  )
+  Object.entries(modules).reduce<ModuleEntities>((acc, [id, { model }]) => {
+    const moduleType = getModuleType(model)
+    const typeCount = Object.values(acc).filter(
+      m => m.type === moduleType
+    ).length
+    acc[id] = {
+      id,
+      type: moduleType,
+      model,
+      pythonName: getModulePythonName(moduleType, typeCount + 1),
+    }
+    return acc
+  }, {})
 
 /**
  * Adds `labwareStackedOnNodeUpdate` to the initial deck setup step (PE-shaped immediate parent per labware)
