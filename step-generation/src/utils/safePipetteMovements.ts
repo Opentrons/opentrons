@@ -406,7 +406,6 @@ export const getIsSafePipetteMovement = (args: {
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    nozzleConfiguration == null ||
     nozzleConfiguration === ALL
   ) {
     return true
@@ -449,7 +448,6 @@ export const getIsSafePipetteMovement = (args: {
     fullOffset as CoordinateTuple,
     pipetteHasTip
   )
-  console.log('🚀 ~ getIsSafePipetteMovement ~ pipetteEntity:', pipetteEntity)
 
   const { channels } = pipetteEntity.spec
 
