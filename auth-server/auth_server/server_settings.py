@@ -16,7 +16,9 @@ _ENV_PREFIX = "OT_AUTH_SERVER_"
 @lru_cache(maxsize=1)
 def get_settings() -> "AuthServerSettings":
     """Return the cached singleton settings instance."""
-    return AuthServerSettings()
+    return AuthServerSettings(
+        _env_file=get_dot_env_path(_ENV_PREFIX),  # type: ignore[call-arg]
+    )
 
 
 class AuthServerSettings(BaseSettings):
@@ -26,10 +28,7 @@ class AuthServerSettings(BaseSettings):
     ``OT_AUTH_SERVER_``, e.g. ``OT_AUTH_SERVER_persistence_directory``.
     """
 
-    model_config = SettingsConfigDict(
-        env_prefix=_ENV_PREFIX,
-        env_file=get_dot_env_path(_ENV_PREFIX),
-    )
+    model_config = SettingsConfigDict(env_prefix=_ENV_PREFIX)
     persistence_directory: typing.Union[
         typing_extensions.Literal["automatically_make_temporary"],
         Path,
