@@ -11,7 +11,7 @@ from server_utils.settings_utils import get_dot_env_path
 
 @pytest.fixture
 def env_file(tmp_path: Path) -> Path:
-    """Create a temporary .env file with a test variable."""
+    """Create a temporary .env file."""
     p = tmp_path / ".env"
     p.write_text("MY_TEST_VAR=from_dotenv\n")
     return p
@@ -32,24 +32,6 @@ def test_returns_path_when_env_var_is_set(env_file: Path) -> None:
     assert result == str(env_file)
 
 
-def test_loads_dotenv_when_path_is_set(env_file: Path) -> None:
-    """When a path is returned, load_dotenv should populate os.environ."""
-    with patch.dict(
-        os.environ,
-        {"OT_TEST_SERVER_dot_env_path": str(env_file)},
-        clear=False,
-    ):
-        get_dot_env_path("OT_TEST_SERVER_")
-        assert os.environ.get("MY_TEST_VAR") == "from_dotenv"
-
-
-def test_does_not_load_dotenv_when_no_path() -> None:
-    """When no path is set, load_dotenv should not be called."""
-    with patch("server_utils.settings_utils.load_dotenv") as mock_load:
-        get_dot_env_path("OT_NONEXISTENT_PREFIX_")
-    mock_load.assert_not_called()
-
-
 def test_respects_env_prefix() -> None:
     """Only the env var with the correct prefix is read."""
     with patch.dict(
@@ -59,3 +41,14 @@ def test_respects_env_prefix() -> None:
     ):
         result = get_dot_env_path("OT_MY_SERVER_")
     assert result is None
+
+
+def test_does_not_modify_os_environ(env_file: Path) -> None:
+    """The function should not call load_dotenv or modify os.environ."""
+    with patch.dict(
+        os.environ,
+        {"OT_TEST_SERVER_dot_env_path": str(env_file)},
+        clear=False,
+    ):
+        get_dot_env_path("OT_TEST_SERVER_")
+        assert "MY_TEST_VAR" not in os.environ

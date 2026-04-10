@@ -1,6 +1,5 @@
 """Shared helpers for server settings."""
 
-from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -13,8 +12,9 @@ def get_dot_env_path(env_prefix: str) -> str | None:
     When unset, no ``.env`` file is loaded and all settings come from
     environment variables or their defaults.
 
-    If a path is found, ``load_dotenv`` is called so the values are
-    available to anything that reads ``os.environ`` directly.
+    The returned path is intended to be passed as ``_env_file`` to a
+    Pydantic ``BaseSettings`` constructor so that Pydantic handles the
+    actual file loading (prefix matching, type coercion, etc.).
     """
 
     class _Environment(BaseSettings):
@@ -26,7 +26,4 @@ def get_dot_env_path(env_prefix: str) -> str | None:
         )
         model_config = SettingsConfigDict(env_prefix=env_prefix)
 
-    path = _Environment().dot_env_path
-    if path:
-        load_dotenv(path)
-    return path
+    return _Environment().dot_env_path
