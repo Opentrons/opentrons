@@ -183,10 +183,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           nextRows.push({
             type: 'group',
             group,
-            annotationType: group.annotation?.userSpecifiedName ?? '',
+            annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
-            annotationDescription:
-              group.annotation?.userSpecifiedDescription ?? '',
+            annotationDescription: group.annotation?.description ?? '',
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)
