@@ -8,6 +8,10 @@ import typing_extensions
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from server_utils.settings_utils import get_dot_env_path
+
+_ENV_PREFIX = "OT_AUTH_SERVER_"
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> "AuthServerSettings":
@@ -23,8 +27,8 @@ class AuthServerSettings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_prefix="OT_AUTH_SERVER_",
-        env_file=Path(__file__).resolve().parent.parent / ".env",
+        env_prefix=_ENV_PREFIX,
+        env_file=get_dot_env_path(_ENV_PREFIX),
     )
     persistence_directory: typing.Union[
         typing_extensions.Literal["automatically_make_temporary"],
