@@ -18,42 +18,39 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
 )
 
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+)
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.service.pyro_utils.pyro_resource import (
     RS_PYRONAME,
     RobotServerPyroResource,
     robot_server_pyro_resource_accessor,
 )
 
-from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
-    MaintenanceRunOrchestratorStore,
-)
-from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 
 # Pyro Resource Retreival for local processes (recieve proxies, etc)
-def get_pyro_resource() -> RobotServerPyroResource | None:
-    """Get a Proxy of the hosted Robot Server Pyro Resource if hardware subprocess is enabled."""
+# todo(chb, 04-09-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate
+def get_pyro_resource() -> RobotServerPyroResource:
+    """Get a Proxy of the hosted Robot Server Pyro Resource."""
 
-    if ff.hardware_subprocess_enabled():
-        # todo(chb, 04-09-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate
-        robot_server_proxy = None
-        start_time = time.monotonic()
-        with pyro.locate_ns() as ns:
-            while time.monotonic() - start_time < 60:
-                if RS_PYRONAME in ns.list():
-                    robot_server_proxy = pyro.Proxy(ns.list()[RS_PYRONAME])  # type: ignore[no-untyped-call]
-                    break
+    robot_server_proxy = None
+    start_time = time.monotonic()
+    with pyro.locate_ns() as ns:
+        while time.monotonic() - start_time < 60:
+            if RS_PYRONAME in ns.list():
+                robot_server_proxy = pyro.Proxy(ns.list()[RS_PYRONAME])  # type: ignore[no-untyped-call]
+                break
 
-        if robot_server_proxy is None:
-            raise pyro_errors.CommunicationError(
-                "Opentrons-robot-server could not find robot-server-resource URI on Pyro5 Nameserver."
-            )
-        else:
-            robot_server_resource = cast(
-                RobotServerPyroResource, AsyncClientPyroObject(robot_server_proxy)
-            )
-            return robot_server_resource
+    if robot_server_proxy is None:
+        raise pyro_errors.CommunicationError(
+            "Opentrons-robot-server could not find robot-server-resource URI on Pyro5 Nameserver."
+        )
     else:
-        return None
+        robot_server_resource = cast(
+            RobotServerPyroResource, AsyncClientPyroObject(robot_server_proxy)
+        )
+        return robot_server_resource
 
 
 # Setters for the state stored Robot Server resource

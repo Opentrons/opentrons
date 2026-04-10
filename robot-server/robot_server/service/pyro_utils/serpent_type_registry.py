@@ -1,13 +1,12 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Robot-Server types and classes."""
 
-import opentrons.types
+import opentrons.protocol_engine.resources.camera_provider
+import opentrons.protocol_engine.resources.file_provider
+import opentrons_shared_data.data_files
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
-    find_typed_dict_classes_in_packages,
-    register_type_to_serpent,
-    serpent_enum_registration,
 )
 
 
@@ -16,4 +15,17 @@ def register_robot_server_types() -> None:
 
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
-    return None
+
+    opentrons_enum_types = find_enums_in_packages([opentrons_shared_data.data_files])
+    for enum_type in opentrons_enum_types:
+        OpentronsPyroSerializer.register_enum(enum_type)
+
+    opentrons_pydantic_types = find_pydantic_classes_in_packages(
+        [
+            opentrons.protocol_engine.resources.camera_provider,
+            opentrons.protocol_engine.resources.file_provider,
+            opentrons_shared_data.data_files,
+        ]
+    )
+    for pydantic_type in opentrons_pydantic_types:
+        OpentronsPyroSerializer.register_pydantic_model(pydantic_type)

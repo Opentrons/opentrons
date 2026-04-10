@@ -30,7 +30,12 @@ from opentrons.config import (
 from opentrons.config import (
     feature_flags as ff,
 )
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadManagedHardware
+from opentrons.hardware_control import (
+    API,
+    HardwareControlAPI,
+    ThreadManagedHardware,
+    ThreadManager,
+)
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import StatusBarState
 from opentrons.protocol_engine import DeckType
@@ -248,7 +253,7 @@ async def get_hardware_resource(
 
     elif initialize_task is None or not initialize_task.done():
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
-    
+
     if initialize_task.cancelled():
         raise HardwareFailedToInitialize(
             detail="Hardware initialization cancelled."

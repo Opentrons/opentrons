@@ -71,6 +71,7 @@ from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+
 _log = logging.getLogger(__name__)
 
 

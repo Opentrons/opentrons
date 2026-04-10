@@ -361,6 +361,9 @@ def convert_result_to_proxy(  # noqa: C901
             for r in result:
                 pyro_synchronous_obj = utility.find_PSO(r)
                 if pyro_synchronous_obj is None:
+                    if not hasattr(r, "_loop"):
+                        # Append the parents event loop to the child object for PSO forwarding
+                        setattr(r, "_loop", core_obj._loop)
                     pyro_synchronous_obj = PyroSynchronousObject(r, utility)
                     utility.add_PSO(pyro_synchronous_obj)
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
@@ -368,6 +371,9 @@ def convert_result_to_proxy(  # noqa: C901
         except TypeError:
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
+                if not hasattr(result, "_loop"):
+                    # Append the parents event loop to the child object for PSO forwarding
+                    setattr(result, "_loop", core_obj._loop)
                 pyro_synchronous_obj = PyroSynchronousObject(result, utility)
                 utility.add_PSO(pyro_synchronous_obj)
             return utility.proxy_for(pyro_synchronous_obj)

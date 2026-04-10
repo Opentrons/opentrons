@@ -77,21 +77,20 @@ class RobotServerPyroResource:
     def _set_file_provider(self, file_provider: FileProvider) -> None:
         self._file_provider = file_provider
 
-
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_run_hardware_event_callback(self) -> HardwareEventHandler:
         """Create a callback for estop and other events during a Run.
 
         The returned callback is meant to run in the hardware API's thread.
         """
-
-        if self._run_orchestrator_store is not None:
+        orchestrator_store = self._run_orchestrator_store
+        if orchestrator_store is not None:
 
             def run_handler_in_engine_thread_from_hardware_thread(
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_hardware_event(self._run_orchestrator_store, event),
+                    handle_hardware_event(orchestrator_store, event),
                     self._loop,
                 )
 
@@ -107,13 +106,14 @@ class RobotServerPyroResource:
 
         The returned callback is meant to run in the hardware API's thread.
         """
-        if self._maintenance_run_orchestrator_store is not None:
+        orchestrator_store = self._maintenance_run_orchestrator_store
+        if orchestrator_store is not None:
 
             def run_handler_in_engine_thread_from_hardware_thread(
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_estop_event(self._maintenance_run_orchestrator_store, event),
+                    handle_estop_event(orchestrator_store, event),
                     self._loop,
                 )
 
@@ -158,6 +158,7 @@ class RobotServerPyroResource:
 
 def start_initializing_pyro_resource(app_state: AppState) -> None:
     """Entry point for creating a hosted Robot Server Pyro Resource and serving requests on it via a Pyro5 Daemon."""
+
     def _start_and_run_pyro_daemon(pyroname: str, registry: Any) -> None:
         robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(
             app_state
