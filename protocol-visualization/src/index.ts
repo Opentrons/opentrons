@@ -11,6 +11,8 @@ export { AnnotatedSteps } from './organisms/AnnotatedSteps'
 
 export type { GroupedCommands, LeafNode } from './types'
 
+export { SlotDetailsEmptyState } from './molecules/SlotDetailsEmptyState'
+
 /**
  * Package identifier string (useful for diagnostics or feature flags).
  */
