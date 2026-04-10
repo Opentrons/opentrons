@@ -107,6 +107,7 @@ def test_update_persists(user_store: UserStore) -> None:
 
     user_store.update("persist_test", reset_password=False)
     fetched = user_store.get("persist_test")
+    assert fetched is not None
     assert fetched.reset_password == False
 
 

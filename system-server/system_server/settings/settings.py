@@ -14,9 +14,7 @@ _ENV_PREFIX = "OT_SYSTEM_SERVER_"
 @lru_cache(maxsize=1)
 def get_settings() -> "SystemServerSettings":
     """Get the settings."""
-    return SystemServerSettings(
-        _env_file=get_dot_env_path(_ENV_PREFIX),  # type: ignore[call-arg]
-    )
+    return SystemServerSettings()
 
 
 class SystemServerSettings(BaseSettings):
@@ -26,7 +24,10 @@ class SystemServerSettings(BaseSettings):
     ``OT_SYSTEM_SERVER_``, e.g. ``OT_SYSTEM_SERVER_persistence_directory``.
     """
 
-    model_config = SettingsConfigDict(env_prefix=_ENV_PREFIX)
+    model_config = SettingsConfigDict(
+        env_prefix=_ENV_PREFIX,
+        env_file=get_dot_env_path(_ENV_PREFIX),
+    )
 
     persistence_directory: Annotated[
         str | None,
