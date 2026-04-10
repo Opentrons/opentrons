@@ -43,7 +43,7 @@ RS_PYRONAME = "robot-server-resource"
 
 
 class RobotServerPyroResource:
-    """Class to represent the resources the robot-server hosts which can be provided over Pryo5.
+    """Class to represent the resources the robot-server hosts which can be provided over Pyro5.
 
     This class manages each of the resources needed by the OT3API and Protocol Execution processes
     for the lifetime of a given resource. A single instance of this class is published on a Pyro
@@ -61,21 +61,34 @@ class RobotServerPyroResource:
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
 
-    def _set_run_orchestorator_store(
+    ### Setters for procedural state gathering - Not to be used from remote process ###
+    def set_run_orchestrator_store(
         self, run_orchestrator_store: RunOrchestratorStore
     ) -> None:
-        self._run_orchestrator_store = run_orchestrator_store
+        """Set the RunOrchestratorStore of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._run_orchestrator_store is None:
+            self._run_orchestrator_store = run_orchestrator_store
 
-    def _set_maintenance_run_orchestorator_store(
+    def set_maintenance_run_orchestorator_store(
         self, maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore
     ) -> None:
-        self._maintenance_run_orchestrator_store = maintenance_run_orchestrator_store
+        """Set the MaintenanceRunOrchestratorStore of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._maintenance_run_orchestrator_store is None:
+            self._maintenance_run_orchestrator_store = (
+                maintenance_run_orchestrator_store
+            )
 
-    def _set_camera_provider(self, camera_provider: CameraProvider) -> None:
-        self._camera_provider = camera_provider
+    def set_camera_provider(self, camera_provider: CameraProvider) -> None:
+        """Set the CameraProvider of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._camera_provider is None:
+            self._camera_provider = camera_provider
 
-    def _set_file_provider(self, file_provider: FileProvider) -> None:
-        self._file_provider = file_provider
+    def set_file_provider(self, file_provider: FileProvider) -> None:
+        """Set the FileProvider of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._file_provider is None:
+            self._file_provider = file_provider
+
+    ### Interface methods for remote access ###
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_run_hardware_event_callback(self) -> HardwareEventHandler:

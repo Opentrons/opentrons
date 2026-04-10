@@ -399,6 +399,7 @@ class RunOrchestratorStore:
                         DirectedRunProcess, cast(object, proxy)
                     )
                     break
+                time.sleep(0.01)
             else:
                 self._run_process.terminate()
                 self._run_process = None

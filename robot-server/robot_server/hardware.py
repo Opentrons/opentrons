@@ -125,7 +125,7 @@ async def clean_up_hardware(app_state: AppState) -> None:
     _postinit_task_accessor.set_on(app_state, None)
     _hw_api_accessor.set_on(app_state, None)
     # NOTE: we erase the subprocess state, but do not run clean_up() on the subprocess.
-    # This is the responsibility of it's executing service.
+    # This is the responsibility of its executing service.
     _hw_subprocess_accessor.set_on(app_state, None)
 
     if initialize_task is not None:

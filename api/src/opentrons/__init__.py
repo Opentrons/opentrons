@@ -178,6 +178,7 @@ def identify_hardware_process() -> HardwareControlAPI:
                 if "OT3API" in ns.list():
                     ot3_process_proxy = pyro.Proxy(ns.list()["OT3API"])  # type: ignore[no-untyped-call]
                     break
+                time.sleep(0.01)
 
         if ot3_process_proxy is None:
             raise pyro_errors.CommunicationError(
