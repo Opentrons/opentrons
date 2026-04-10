@@ -110,6 +110,8 @@ export function PipetteNozzleSelector(
 
   if (isPartialNozzle) {
     subText = t('number_of_nozzles_used')
+  } else if (nozzleConfiguration === ALL) {
+    subText = t('all_nozzles_are_preselected')
   } else {
     subText = t('click_on_highlighted_nozzles')
   }
