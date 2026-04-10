@@ -16,9 +16,7 @@ _ENV_PREFIX = "OT_AUTH_SERVER_"
 @lru_cache(maxsize=1)
 def get_settings() -> "AuthServerSettings":
     """Return the cached singleton settings instance."""
-    return AuthServerSettings(
-        _env_file=get_dot_env_path(_ENV_PREFIX),  # type: ignore[call-arg]
-    )
+    return AuthServerSettings(_env_file=get_dot_env_path(_ENV_PREFIX))
 
 
 class AuthServerSettings(BaseSettings):
