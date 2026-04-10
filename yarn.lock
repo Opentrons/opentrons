@@ -3918,9 +3918,9 @@
   version "0.0.0-dev"
   dependencies:
     "@opentrons/shared-data" "link:shared-data"
-    "@types/lodash" "^4.14.191"
+    "@types/lodash" "4.17.24"
     axios "^0.21.1"
-    lodash "4.17.21"
+    lodash "4.18.1"
 
 "@opentrons/app@link:app":
   version "0.0.0-dev"
@@ -3947,7 +3947,7 @@
     hls.js "1.6.11"
     is-ip "3.1.0"
     jszip "3.2.2"
-    lodash "4.17.21"
+    lodash "4.18.1"
     mixpanel-browser "2.22.1"
     netmask "2.0.2"
     node-fetch "2.6.7"
@@ -3983,12 +3983,12 @@
     "@react-spring/types" "9.6.1"
     "@react-spring/web" "9.6.1"
     "@types/classnames" "2.2.5"
-    "@types/lodash" "^4.14.191"
+    "@types/lodash" "4.17.24"
     "@types/styled-components" "^5.1.26"
     "@types/webpack-env" "^1.16.0"
     classnames "2.2.5"
     interactjs "^1.10.27"
-    lodash "4.17.21"
+    lodash "4.18.1"
     react-markdown "9.0.3"
     react-popper "1.0.0"
     react-remove-scroll "2.4.3"
@@ -4000,12 +4000,12 @@
 "@opentrons/discovery-client@link:discovery-client":
   version "0.0.0-dev"
   dependencies:
-    "@types/lodash" "^4.14.191"
+    "@types/lodash" "4.17.24"
     "@types/node-fetch" "2.6.11"
     "@types/yargs" "17.0.32"
     escape-string-regexp "1.0.5"
     is-ip "3.1.0"
-    lodash "4.17.21"
+    lodash "4.18.1"
     mdns-js "1.0.1"
     node-fetch "2.6.7"
     redux "5.0.1"
@@ -4025,7 +4025,7 @@
     file-saver "2.0.1"
     formik "2.1.4"
     jszip "3.2.2"
-    lodash "4.17.21"
+    lodash "4.18.1"
     mixpanel-browser "2.29.1"
     query-string "6.2.0"
     react "18.2.0"
@@ -4045,7 +4045,7 @@
   version "0.0.0-dev"
   dependencies:
     ajv "^6.12.3"
-    lodash "4.17.21"
+    lodash "4.18.1"
     path-browserify "1.0.1"
 
 "@opentrons/step-generation@link:step-generation":
@@ -4054,7 +4054,7 @@
     "@opentrons/shared-data" "link:shared-data"
     core-js "3.2.1"
     immer "^10.1.3"
-    lodash "4.17.21"
+    lodash "4.18.1"
     uuid "3.3.2"
 
 "@opentrons/usb-bridge/node-client@link:usb-bridge/node-client":
@@ -6522,7 +6522,12 @@
   dependencies:
     "@types/node" "*"
 
-"@types/lodash@^4.14.165", "@types/lodash@^4.14.167", "@types/lodash@^4.14.191":
+"@types/lodash@4.17.24":
+  version "4.17.24"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.24.tgz#4ae334fc62c0e915ca8ed8e35dcc6d4eeb29215f"
+  integrity sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==
+
+"@types/lodash@^4.14.165", "@types/lodash@^4.14.167":
   version "4.17.0"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.0.tgz#d774355e41f372d5350a4d0714abb48194a489c3"
   integrity sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==
@@ -14737,7 +14742,12 @@ lodash.truncate@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==
 
-lodash@4.17.21, lodash@>=4.17.12, lodash@^4.13.1, lodash@^4.17, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.3:
+lodash@4.18.1:
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
+  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
+
+lodash@>=4.17.12, lodash@^4.13.1, lodash@^4.17, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.3:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==

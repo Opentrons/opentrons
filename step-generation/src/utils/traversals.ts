@@ -1,0 +1,386 @@
+import isEqual from 'lodash/isEqual'
+import last from 'lodash/last'
+
+import {
+  FLEX_CUTOUT_BY_SLOT_ID,
+  getAddressableAreaNamesFromLoadedModule,
+} from '@opentrons/shared-data'
+
+import type {
+  AddressableAreaName,
+  DeckConfiguration,
+  DeckDefinition,
+  LoadedLabwareLocation,
+} from '@opentrons/shared-data'
+import type { ModuleEntities, RobotState } from '../types'
+
+type LabwareLocationCache = Map<LoadedLabwareLocation, LoadedLabwareLocation[]>
+
+/**
+ * Recursively computes the full stack of labware nodes from the given node upwards
+ * (top-down), collecting each node until a non-labware node is reached.
+ *
+ * @param args.node The labware or location node to get the full stack for.
+ * @param args.robotState The current robot state containing all labware.
+ * @param args.stack (Optional) The stack collected so far, used in recursion.
+ * @param args.memo (Optional) A memoization map to cache computed stacks for nodes.
+ * @returns An object containing the complete stack and an updated memo map.
+ */
+export const getFullStackFromNodeTopDownRecursive = (args: {
+  node: LoadedLabwareLocation
+  robotState: RobotState
+  stack?: LoadedLabwareLocation[]
+  memo?: LabwareLocationCache
+}): {
+  stack: LoadedLabwareLocation[]
+  memo: LabwareLocationCache
+} => {
+  const {
+    node,
+    stack = [],
+    robotState,
+    memo = new Map<LoadedLabwareLocation, LoadedLabwareLocation[]>(),
+  } = args
+
+  let newStack: LoadedLabwareLocation[] = stack
+  if (!(typeof node === 'object' && 'labwareId' in node)) {
+    newStack = [...stack, node]
+    memo.set(node, newStack)
+    return { stack: newStack, memo }
+  }
+  const { labwareId: parentLabwareId } = node
+  const parentLabwareState = robotState.labware[parentLabwareId]
+  if (parentLabwareState != null && parentLabwareState.stackedOnNode != null) {
+    const { stack: parentStack, memo: updatedMemo } =
+      getFullStackFromNodeTopDownRecursive({
+        node: parentLabwareState.stackedOnNode,
+        stack: [...stack, node],
+        robotState,
+        memo,
+      })
+    updateMemo(memo, updatedMemo)
+    newStack = parentStack
+    memo.set(node, newStack)
+  }
+  return { stack: newStack, memo }
+}
+
+/**
+ * Finds the ID of the module associated with the provided node's stack, if any.
+ *
+ * @param args.node The labware/location node whose stack will be searched for a parent module.
+ * @param args.robotState The current robot state including modules.
+ * @param args.deckDef The deck definition, needed for cutout fixtures.
+ * @param args.deckConfiguration The configuration of the deck, including cutout mappings.
+ * @returns The string module id if found, or null otherwise.
+ */
+export const getNodeParentModuleId = (args: {
+  node: LoadedLabwareLocation
+  robotState: RobotState
+  deckDef: DeckDefinition
+  deckConfiguration: DeckConfiguration
+}): string | null => {
+  const { node, robotState, deckDef, deckConfiguration } = args
+  const { stack } = getFullStackFromNodeTopDownRecursive({ node, robotState })
+  const { cutoutFixtures } = deckDef
+
+  // should be the last element of the stack, but we check every stack element to be safe
+  const addressableAreaNode = stack.find(
+    location =>
+      typeof location === 'object' && 'addressableAreaName' in location
+  )
+  if (
+    addressableAreaNode != null &&
+    typeof addressableAreaNode === 'object' &&
+    'addressableAreaName' in addressableAreaNode
+  ) {
+    const { addressableAreaName } = addressableAreaNode
+    for (const { id: cfId, providesAddressableAreas } of cutoutFixtures) {
+      const [possibleCutoutId] =
+        Object.entries(providesAddressableAreas).find(([_, addressableAreas]) =>
+          addressableAreas.includes(addressableAreaName)
+        ) ?? []
+      if (possibleCutoutId != null) {
+        // grab cutout configuration in deck config
+        // this cannot be null in practice (all cutouts should be configured in deck config)
+        const cutoutConfig = deckConfiguration.find(
+          ({ cutoutId }) => cutoutId === possibleCutoutId
+        )!
+        const { cutoutFixtureId, cutoutId } = cutoutConfig
+        // check if the cutout fixture id and cutout id match, independent of possible module
+        const isDeckConfigMatch =
+          cutoutFixtureId === cfId && cutoutId === possibleCutoutId
+        // check if module is configured in the matching cutout
+        const matchingModule = Object.entries(robotState.modules).find(
+          ([_, { slot }]) => FLEX_CUTOUT_BY_SLOT_ID[slot] === cutoutId
+        )
+        if (isDeckConfigMatch && matchingModule != null) {
+          return matchingModule[0]
+        }
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * Merges entries from updatedMemo into oldMemo.
+ *
+ * @param oldMemo The original LabwareLocationCache to update.
+ * @param updatedMemo The LabwareLocationCache with new entries to copy in.
+ */
+const updateMemo = (
+  oldMemo: LabwareLocationCache,
+  updatedMemo: LabwareLocationCache
+): void => {
+  updatedMemo.forEach((value, key) => {
+    oldMemo.set(key, value)
+  })
+}
+
+/**
+ * Checks if a node is present in a stack using deep equality.
+ *
+ * @param stack The stack of LoadedLabwareLocation objects.
+ * @param node The node to check for presence in the stack.
+ * @returns True if the node is found in the stack, false otherwise.
+ */
+const getIsNodeInStack = (
+  stack: LoadedLabwareLocation[],
+  node: LoadedLabwareLocation
+): boolean => {
+  return stack.some(location => isEqual(location, node))
+}
+
+/**
+ * Finds the largest stack (with deepest nesting) that contains the specified labware.
+ *
+ * @param args.labwareId The id of the labware to search for within stacks.
+ * @param args.robotState The current robot state to extract stacks from.
+ * @returns The largest LoadedLabwareLocation[] stack that contains the target labware.
+ */
+export const getLargestStackContainingLabware = (args: {
+  labwareId: string
+  robotState: RobotState
+}): LoadedLabwareLocation[] => {
+  const { labwareId, robotState } = args
+  const memo: LabwareLocationCache = new Map()
+  const labwareNode: LoadedLabwareLocation = { labwareId }
+  let longestStack: LoadedLabwareLocation[] = []
+
+  // iterate over all labware and get the stack for each
+  // memoize such that we don't recompute the stack if a node has been encountered and its stack computed
+  for (const [id, { stackedOnNode }] of Object.entries(robotState.labware)) {
+    const currentNode: LoadedLabwareLocation = { labwareId: id }
+    // deprecate this null check once stackedOnNode is not optional
+    if (stackedOnNode == null) {
+      continue
+    }
+
+    let currentStack: LoadedLabwareLocation[]
+
+    // stack has been calculated for this node, and we need not compute it
+    const knownStack = memo.get(currentNode)
+    if (knownStack != null) {
+      currentStack = knownStack
+    } else {
+      const { stack: calculatedStack, memo: updatedMemo } =
+        getFullStackFromNodeTopDownRecursive({
+          node: currentNode,
+          robotState,
+          memo,
+        })
+      updateMemo(memo, updatedMemo)
+      if (!getIsNodeInStack(calculatedStack, labwareNode)) {
+        continue
+      }
+      memo.set(currentNode, calculatedStack)
+      currentStack = calculatedStack
+    }
+    if (currentStack.length > longestStack.length) {
+      longestStack = currentStack
+    }
+  }
+  return longestStack
+}
+
+/**
+ * Gets all unique, largest stacks of labware present in the current robot state.
+ *
+ * @param robotState The current robot state.
+ * @returns An array of LoadedLabwareLocation[]—one for each largest stack (per root).
+ */
+export const getAllLargestStacks = (
+  robotState: RobotState
+): LoadedLabwareLocation[][] => {
+  const largestStacks: LoadedLabwareLocation[][] = []
+
+  // cache to avoid recomputing the largest stack a labware whose largest stack has already been computed
+  const cache = new Set<string>()
+  for (const labwareId of Object.keys(robotState.labware)) {
+    if (cache.has(labwareId)) {
+      continue
+    }
+    const largestStack = getLargestStackContainingLabware({
+      labwareId,
+      robotState,
+    })
+    largestStack.forEach(location => {
+      if (typeof location === 'object' && 'labwareId' in location) {
+        cache.add(location.labwareId)
+      }
+    })
+    largestStacks.push(largestStack)
+  }
+  return largestStacks
+}
+
+export const getAddressableAreaFromModule = (args: {
+  moduleId: string
+  robotState: RobotState
+  moduleEntities: ModuleEntities
+  deckDef: DeckDefinition
+}): AddressableAreaName | null => {
+  const { moduleId, robotState, moduleEntities, deckDef } = args
+  const moduleState = robotState.modules[moduleId]
+  const moduleEntity = moduleEntities[moduleId]
+  if (moduleState == null || moduleEntity == null) {
+    return null
+  }
+  const { slot } = moduleState
+  const { model } = moduleEntity
+
+  const possibleAddressableAreas = getAddressableAreaNamesFromLoadedModule(
+    model,
+    slot,
+    deckDef
+  )
+  if (possibleAddressableAreas.length === 0) {
+    return null
+  }
+  // based on the stack retrieval logic, if the base of a stack is a module, the only relevant addressable area will be the first possible addressable area
+  return possibleAddressableAreas[0]
+}
+
+/**
+ * Gets the addressable area name for a given labware location.
+ *
+ * @param args.location The labware location to get the addressable area name for.
+ * @param args.robotState The current robot state.
+ * @param args.moduleEntities The module entities.
+ * @param args.deckDef The deck definition.
+ * @returns The addressable area name, or null if no addressable area name is found.
+ */
+export const getAddressableAreaNameFromLabwareLocation = (args: {
+  location: LoadedLabwareLocation
+  robotState: RobotState
+  moduleEntities: ModuleEntities
+  deckDef: DeckDefinition
+}): AddressableAreaName | null => {
+  const { location, robotState, moduleEntities, deckDef } = args
+  if (
+    location === 'offDeck' ||
+    location === 'systemLocation' ||
+    location === 'wasteChuteLocation'
+  ) {
+    return null
+  }
+  if ('slotName' in location) {
+    // each slot has a valid addressable area name, so this should be safe
+    return location.slotName as AddressableAreaName
+  }
+  if ('addressableAreaName' in location) {
+    return location.addressableAreaName
+  }
+  if ('moduleId' in location) {
+    const { moduleId } = location
+    return getAddressableAreaFromModule({
+      moduleId,
+      robotState,
+      moduleEntities,
+      deckDef,
+    })
+  }
+  return null
+}
+
+/**
+ * Gets all provided addressable areas in the deck configuration.
+ * The returned addressable areas should be the uppermost provided areas.
+ * For example, if a magnetic block is configured in slot C1, addressable
+ * area C1 should not be returned, but rather magneticBlockV1C1 should be.
+ *
+ * @param args.deckConfiguration The deck configuration.
+ * @param args.deckDefinition The deck definition.
+ * @returns An array of AddressableAreaName.
+ */
+export const getAllProvidedAddressableAreasInDeckConfig = (args: {
+  deckConfiguration: DeckConfiguration
+  deckDefinition: DeckDefinition
+}): Set<AddressableAreaName> => {
+  const { deckConfiguration, deckDefinition } = args
+  return deckConfiguration.reduce<Set<AddressableAreaName>>(
+    (
+      acc,
+      {
+        cutoutFixtureId: deckConfigCutoutFixtureId,
+        cutoutId: deckConfigCutoutId,
+      }
+    ) => {
+      const providedAddressableAreas =
+        deckDefinition.cutoutFixtures.find(
+          ({ id: deckDefCutoutFixtureId }) =>
+            deckConfigCutoutFixtureId === deckDefCutoutFixtureId
+        )?.providesAddressableAreas[deckConfigCutoutId] ?? []
+      providedAddressableAreas.forEach(area => {
+        acc.add(area)
+      })
+      return acc
+    },
+    new Set<AddressableAreaName>()
+  )
+}
+
+export const getProvidedAddressableAreasExposed = (args: {
+  labwareId: string
+  robotState: RobotState
+  deckConfiguration: DeckConfiguration
+  deckDefinition: DeckDefinition
+  moduleEntities: ModuleEntities
+}): Set<AddressableAreaName> => {
+  const { robotState, deckConfiguration, deckDefinition, moduleEntities } = args
+  const allProvededAddressableAreas =
+    getAllProvidedAddressableAreasInDeckConfig({
+      deckConfiguration,
+      deckDefinition,
+    })
+  const exposedAddressableAreas = new Set<AddressableAreaName>(
+    allProvededAddressableAreas
+  )
+  const labwareStacks = getAllLargestStacks(robotState)
+  for (const stack of labwareStacks) {
+    const bottomNode = last(stack)
+    if (typeof bottomNode === 'object' && 'addressableAreaName' in bottomNode) {
+      const { addressableAreaName } = bottomNode
+      exposedAddressableAreas.delete(addressableAreaName)
+    }
+    if (typeof bottomNode === 'object' && 'slotName' in bottomNode) {
+      // if a slot is the bottom node of a stack, it can safely be inferred as an addressable area
+      const { slotName } = bottomNode
+      exposedAddressableAreas.delete(slotName as AddressableAreaName)
+    }
+    if (typeof bottomNode === 'object' && 'moduleId' in bottomNode) {
+      const { moduleId } = bottomNode
+      const addressableAreaName = getAddressableAreaFromModule({
+        moduleId,
+        robotState,
+        moduleEntities,
+        deckDef: deckDefinition,
+      })
+      if (addressableAreaName != null) {
+        exposedAddressableAreas.delete(addressableAreaName)
+      }
+    }
+  }
+  return exposedAddressableAreas
+}

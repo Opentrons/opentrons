@@ -1316,7 +1316,7 @@ class OT3Controller(FlexBackend):
             if "ot_module" in event.name:
                 event_name = event.name
                 event_description = AionotifyEvent.build(event_name, flags)
-                await self.module_controls.handle_module_appearance(event_description)
+                await self.module_controls.handle_device_appearance(event_description)
 
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         can_watch = aionotify is not None

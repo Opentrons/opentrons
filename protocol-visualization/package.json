@@ -12,7 +12,8 @@
       "import": "./lib/index.mjs",
       "require": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./lib/style.css": "./lib/style.css"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,9 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "files": [
+    "lib"
+  ],
   "peerDependencies": {
     "react": "18.2.0",
     "react-dom": "18.2.0",
