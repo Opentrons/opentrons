@@ -3,7 +3,7 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './stepgroup.module.css'
 
-import type { ReactNode } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface StepGroupProps {
   title: string

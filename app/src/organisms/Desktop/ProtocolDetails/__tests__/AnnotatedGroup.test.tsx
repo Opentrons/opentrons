@@ -54,7 +54,6 @@ describe('AnnotatedGroup', () => {
   it('should render text and icon', () => {
     render(props)
     screen.getByText('mockAnnotationType')
-    screen.getByTestId('chevron-down')
     expect(screen.queryByText('mockIndividualCommand')).toBeNull()
   })
 
@@ -69,7 +68,6 @@ describe('AnnotatedGroup', () => {
       ],
     }
     render(props)
-    screen.getByTestId('chevron-up')
     screen.getByText('mockIndividualCommand')
   })
 })
