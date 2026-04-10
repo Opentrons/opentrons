@@ -23,6 +23,7 @@ class TLSManager:
         self._ca_manager = ca_manager
         self._ee_manager = ee_manager
         self._expiry_task: "asyncio.Task[None] | None" = None
+        self._robot_details_lock = asyncio.Lock()
 
     @classmethod
     async def create(
@@ -70,6 +71,17 @@ class TLSManager:
         """True if the expiry task is running properly. Mostly used internally and for testing."""
         return self._expiry_task is not None and not self._expiry_task.done()
 
+    async def refresh_robot_details(self) -> None:
+        """Do a refresh of the robot's IP and hostname. May be polled or called, so locks."""
+        async with self._robot_details_lock():
+            robot_hostname = await self._find_robot_hostname()
+            robot_ips = await self._find_robot_ips()
+            if not self._ee_manager.set_robot_details(datetime.now(timezone.utc)):
+                LOG.info(
+                    f"Robot details have changed to hostname: {robot_hostname}, ips: {robot_ips}. Rotating TLS EE certs"
+                )
+                await self.refresh_ee()
+
     async def cancel_expiry_task(self) -> None:
         """Cancel a running expiry task. Mostly used for testing; callers should prefer teardown()."""
         if not self._expiry_task:
@@ -105,3 +117,11 @@ class TLSManager:
             if not self._ee_manager.ready(now + poll_time):
                 await self.refresh_ee()
             await asyncio.sleep(poll_time.total_seconds())
+
+    @staticmethod
+    async def _find_robot_hostname() -> str:
+        pass
+
+    @staticmethod
+    async def _find_robot_ips() -> str:
+        pass
