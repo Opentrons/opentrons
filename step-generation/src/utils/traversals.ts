@@ -14,7 +14,6 @@ import type {
   DeckConfiguration,
   DeckDefinition,
   InStackerHopperLocation,
-  LabwareDefinition2,
   LoadedLabwareLocation,
 } from '@opentrons/shared-data'
 import type {
@@ -529,18 +528,26 @@ const assignContainsAmongSiblings = (
 
   const containsByContainerId: Record<string, string> = {}
   for (const ids of groups.values()) {
-    if (ids.length !== 2) continue
+    if (ids.length !== 2) {
+      continue
+    }
     const [idA, idB] = ids
     const entityA = labwareEntities[idA]
     const entityB = labwareEntities[idB]
-    if (entityA == null || entityB == null) continue
+    if (entityA == null || entityB == null) {
+      continue
+    }
     const relationship = getPotentiallyContainedLabwareRelationship(
       entityA,
       entityB
     )
-    if (relationship == null) continue
+    if (relationship == null) {
+      continue
+    }
     const { containerLabwareId, containedLabwareId } = relationship
-    if (labware[containerLabwareId]?.contains != null) continue
+    if (labware[containerLabwareId]?.contains != null) {
+      continue
+    }
     containsByContainerId[containerLabwareId] = containedLabwareId
   }
 
