@@ -3,6 +3,7 @@ import {
   getPipetteNameSpecs,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
+  QUADRANT,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -22,7 +23,6 @@ const usedChannelsFromCommand = (
 ): ActiveNozzleNumber => {
   const configurationStyle: NozzleConfigurationParams | undefined =
     command?.params?.configurationParams
-
   switch (configurationStyle?.style) {
     case COLUMN:
       return 8
@@ -30,12 +30,14 @@ const usedChannelsFromCommand = (
       return 12
     case SINGLE:
       return 1
+    case QUADRANT:
     case PARTIAL_COLUMN:
-      return configurationStyle?.primaryNozzle != null
+      return configurationStyle?.backLeftNozzle != null
         ? PARTIAL_NOZZLE_MAP[
-            configurationStyle.primaryNozzle as PartialPrimaryNozzles
+            configurationStyle?.backLeftNozzle as PartialPrimaryNozzles
           ]
         : defaultChannels
+
     default:
       return defaultChannels
   }
@@ -60,9 +62,7 @@ const usedChannels = (
   commands: RunTimeCommand[],
   pipetteChannels: ActiveNozzleNumber
 ): ActiveNozzleNumber =>
-  pipetteChannels === 96
-    ? usedChannelsForPipette(pipetteId, commands, pipetteChannels)
-    : pipetteChannels
+  usedChannelsForPipette(pipetteId, commands, pipetteChannels)
 
 /**
  * @param pipetteName name of pipette being used
