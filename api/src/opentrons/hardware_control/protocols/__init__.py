@@ -2,8 +2,6 @@
 
 from typing_extensions import Protocol, Type
 
-from opentrons.util.pyro.pyro_synchronous_adapter import pyro_behavior, convert_type_to_instance
-
 from .asyncio_configurable import AsyncioConfigurable
 from .calibratable import Calibratable
 from .chassis_accessory_manager import ChassisAccessoryManager
@@ -28,6 +26,10 @@ from .types import (
     FlexRobotType,
     MountArgType,
     OT2RobotType,
+)
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_type_to_instance,
+    pyro_behavior,
 )
 
 

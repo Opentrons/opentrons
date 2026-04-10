@@ -1,12 +1,12 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
+import datetime
 from typing import Dict
 
-import datetime
 import opentrons.config.types
 import opentrons.hardware_control.dev_types
-import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
@@ -42,17 +42,34 @@ def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
         "right_physical_state": obj.right_physical_state.value,
     }
 
+
 # GRIPPER CALIBRATION
 # todo(chb, 04-08-2026): This should be consumed into an automated registry process
-def _GripperCalibrationOffset_dict_to_class(
+def _GripperCalibrationOffset_dict_to_class(  # type: ignore
     classname, d
 ) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset:
-    modified = None if d["last_modified"] is None else datetime.datetime.fromisoformat(d["last_modified"])
-    markedAt = None if d["status_markedAt"] is None else datetime.datetime.fromisoformat(d["status_markedAt"])
-    status_source = None if d["status_source"] is None else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(d["status_source"])
+    modified = (
+        None
+        if d["last_modified"] is None
+        else datetime.datetime.fromisoformat(d["last_modified"])
+    )
+    markedAt = (
+        None
+        if d["status_markedAt"] is None
+        else datetime.datetime.fromisoformat(d["status_markedAt"])
+    )
+    status_source = (
+        None
+        if d["status_source"] is None
+        else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["status_source"]
+        )
+    )
     return opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset(
         offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
-        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(d["source"]),
+        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["source"]
+        ),
         status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
             markedBad=(d["status_markedBad"] == "True"),
             source=status_source,
@@ -60,7 +77,9 @@ def _GripperCalibrationOffset_dict_to_class(
         ),
         last_modified=modified,
     )
-def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:
+
+
+def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:  # type: ignore
     if isinstance(obj.last_modified, datetime.datetime):
         modified = obj.last_modified.isoformat()
     else:
@@ -81,26 +100,45 @@ def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:
         "last_modified": modified,
     }
 
+
 # PIPETTER CALIBRATION
 # todo(chb, 04-08-2026): This should be consumed into an automated registry process
-def _PipetteOffsetSummary_dict_to_class(
+def _PipetteOffsetSummary_dict_to_class(  # type: ignore
     classname, d
 ) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary:
-    modified = None if d["last_modified"] is None else datetime.datetime.fromisoformat(d["last_modified"])
-    markedAt = None if d["status_markedAt"] is None else datetime.datetime.fromisoformat(d["status_markedAt"])
-    status_source = None if d["status_source"] is None else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(d["status_source"])
+    modified = (
+        None
+        if d["last_modified"] is None
+        else datetime.datetime.fromisoformat(d["last_modified"])
+    )
+    markedAt = (
+        None
+        if d["status_markedAt"] is None
+        else datetime.datetime.fromisoformat(d["status_markedAt"])
+    )
+    status_source = (
+        None
+        if d["status_source"] is None
+        else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["status_source"]
+        )
+    )
     return opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary(
         offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
-        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(d["source"]),
+        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["source"]
+        ),
         status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
             markedBad=(d["status_markedBad"] == "True"),
             source=status_source,
             markedAt=markedAt,
         ),
         last_modified=modified,
-        reasonability_check_failures=[],    # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
+        reasonability_check_failures=[],  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
     )
-def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:
+
+
+def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:  # type: ignore
     if isinstance(obj.last_modified, datetime.datetime):
         modified = obj.last_modified.isoformat()
     else:
@@ -119,17 +157,18 @@ def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:
         "status_source": obj.status.source,
         "status_markedAt": markedAt,
         "last_modified": modified,
-        "reasonability_check_failures": None,   # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
+        "reasonability_check_failures": None,  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
     }
 
+
 # Robot type registry - of note, this is meant to return a "pure" type
-def _robot_type_class_to_dict(obj) -> Dict:
+def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
     return {"__class__": ".".join((obj.__module__, obj.__class__.__name__))}
 
 
-def _robot_type_dict_to_class(
+def _robot_type_dict_to_class(  # type: ignore
     classname, d
-) -> opentrons.hardware_control.protocols.types.FlexRobotType:
+) -> type[opentrons.hardware_control.protocols.types.FlexRobotType]:
     return opentrons.hardware_control.protocols.types.FlexRobotType
 
 
@@ -177,7 +216,6 @@ def register_hardware_types() -> None:
         class_to_dict=_robot_type_class_to_dict,
     )
 
-
     # todo(chb, 04-03-2026): This one should probably be removed and classes like it converted to an appropriate, automated format
     # E-Stop Overall registration
     register_type_to_serpent(
@@ -200,4 +238,3 @@ def register_hardware_types() -> None:
         dict_to_class=_PipetteOffsetSummary_dict_to_class,
         class_to_dict=_PipetteOffsetSummary_class_to_dict,
     )
-

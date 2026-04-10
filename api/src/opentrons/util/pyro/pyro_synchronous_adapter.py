@@ -340,7 +340,7 @@ def convert_result_to_proxy(  # noqa: C901
     """
 
     @functools.wraps(attr)
-    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
@@ -454,7 +454,7 @@ def convert_type_to_instance(
     utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
 ) -> Callable[P, T]:
     """Wrapper that enforces functions that return Types and not instances to return an instance of that type.
-    
+
     On the other end, it is expected that the serpent serializer will have a specialized handler strip the
     result and return the original type as intended.
     """
@@ -478,7 +478,9 @@ def convert_type_to_instance(
             raise ValueError(
                 "Pyro behavior for type to instance conversion is only available for use with pure types."
             )
-    return wrapper
+
+    return wrapper  # type: ignore
+
 
 ## Local Specialty Functions - Used to wrap attributes on the original instance
 

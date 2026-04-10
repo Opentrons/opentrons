@@ -1,7 +1,6 @@
 """File interaction resource provider."""
 
 import csv
-from dataclasses import dataclass
 from datetime import datetime
 from io import StringIO
 from typing import Awaitable, Callable, Dict, List, Optional
@@ -39,10 +38,9 @@ SPECIAL_CHARACTERS = {
 }
 
 
-#@dataclass(frozen=True)
 class FileNameCmdMetadata(BaseModel):
     """Command metadata associated with a specific data file."""
-    
+
     model_config = ConfigDict(frozen=True)
 
     command_id: str
@@ -50,7 +48,6 @@ class FileNameCmdMetadata(BaseModel):
     file_id: Optional[str]
 
 
-#@dataclass(frozen=True)
 class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a plate reader `read` command used to build the finalized file name."""
 
@@ -60,7 +57,6 @@ class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     wavelength: int
 
 
-#@dataclass(frozen=True)
 class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a camera capture command used to build the finalized file name."""
 
@@ -71,7 +67,6 @@ class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     base_filename: Optional[str]
 
 
-#@dataclass(frozen=True)
 class UserDefinedCSVCmdFileNameMetadata(FileNameCmdMetadata):
     """Data for a user-defined csv file."""
 

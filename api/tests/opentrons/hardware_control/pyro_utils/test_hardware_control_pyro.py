@@ -256,7 +256,7 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
     assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
     assert ot3api.attached_pipettes == managed_obj.attached_pipettes
     assert ot3api.attached_subsystems == managed_obj.attached_subsystems
-    
+
     # Ensure that functions which return "types" work as intended
     value = ot3api.get_robot_type()
     assert isinstance(value, type)
