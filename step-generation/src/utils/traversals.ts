@@ -511,6 +511,7 @@ const assignContainsAmongSiblings = (
   labware: RobotState['labware'],
   labwareEntities: LabwareEntities
 ): RobotState['labware'] => {
+  // mapping of (key: stringified parent node) to (value: array of labware IDs stacked on that node)
   const groups = new Map<string, string[]>()
   for (const labwareId of Object.keys(labware)) {
     const stackedOnNode = labware[labwareId].stackedOnNode
@@ -520,6 +521,7 @@ const assignContainsAmongSiblings = (
     ) {
       continue
     }
+    // hash the stackedOnNode to group labware by the same parent
     const key = JSON.stringify(stackedOnNode)
     const bucket = groups.get(key) ?? []
     bucket.push(labwareId)
@@ -545,9 +547,7 @@ const assignContainsAmongSiblings = (
       continue
     }
     const { containerLabwareId, containedLabwareId } = relationship
-    if (labware[containerLabwareId]?.contains != null) {
-      continue
-    }
+
     containsByContainerId[containerLabwareId] = containedLabwareId
   }
 
