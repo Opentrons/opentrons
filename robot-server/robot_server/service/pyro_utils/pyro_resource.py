@@ -20,14 +20,6 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
-from robot_server.service.pyro_utils.serpent_type_registry import (
-    register_robot_server_types,
-)
-
-robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
-    "robot_server_pyro_resource"
-)
-
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
     handle_estop_event,
@@ -36,6 +28,14 @@ from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
     handle_hardware_event,
 )
+from robot_server.service.pyro_utils.serpent_type_registry import (
+    register_robot_server_types,
+)
+
+robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
+    "robot_server_pyro_resource"
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class RobotServerPyroResource:
     Daemon and registered with the `opentrons-pyro-nameserver` service for access via remote request.
     """
 
-    def __init__(self, loop: asyncio.AbstractEventLoop):
+    def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
         self._loop = loop
 
         # Default the resource variables to None - these will be set as services spin up

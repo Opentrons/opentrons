@@ -1,14 +1,11 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
 import time
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import Pyro5.api as pyro
 import Pyro5.errors as pyro_errors
 
-from opentrons.config import (
-    feature_flags as ff,
-)
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )

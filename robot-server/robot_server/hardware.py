@@ -248,10 +248,10 @@ async def get_hardware_resource(
     if ff.hardware_subprocess_enabled() and hardware_api_subprocess is None:
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    elif not ff.hardware_subprocess_enabled() and hardware_api is None:
+    elif not ff.hardware_subprocess_enabled() and hardware_api_subprocess is not None:
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    elif initialize_task is None or not initialize_task.done():
+    elif hardware_api is None or initialize_task is None or not initialize_task.done():
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
     if initialize_task.cancelled():
@@ -318,6 +318,7 @@ def get_ot3_hardware(
     if ff.hardware_subprocess_enabled():
         return cast(OT3API, hardware_resource)
 
+    assert isinstance(hardware_resource, ThreadManager)
     if not hardware_resource.wraps_instance(OT3API):
         raise NotSupportedOnOT2(
             detail="This route is only available on a Flex."
@@ -473,6 +474,7 @@ async def _postinit_ot3_tasks(
                     # In subprocess mode, hardware resource is a direct HardwareControlAPI
                     await callback[0](app_state, hardware_resource)
                 else:
+                    assert isinstance(hardware_resource, ThreadManager)
                     await callback[0](app_state, hardware_resource.wrapped())
 
     except Exception:
@@ -604,6 +606,7 @@ async def _initialize_hardware_api(
                 if ff.hardware_subprocess_enabled():
                     await callback[0](app_state, hardware)
                 else:
+                    assert isinstance(hardware, ThreadManager)
                     await callback[0](app_state, hardware.wrapped())
 
         # This ties systemd notification to hardware initialization. We might want to move
@@ -619,6 +622,7 @@ async def _initialize_hardware_api(
                 _wrap_postinit(_postinit_ot3_tasks(hardware, app_state, callbacks))
             )
         else:
+            assert isinstance(hardware, ThreadManager)
             postinit_task = asyncio.create_task(
                 _wrap_postinit(_postinit_ot2_tasks(hardware, app_state, callbacks))
             )

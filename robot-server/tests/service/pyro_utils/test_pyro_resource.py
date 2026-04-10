@@ -17,7 +17,6 @@ from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
-from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
@@ -230,9 +229,10 @@ async def test_camera_provider(
     cam_provider = cast(CameraProvider, async_cam)
     settings = await cam_provider.get_camera_settings()
 
-    assert settings.cameraEnabled == True
-    assert settings.liveStreamEnabled == True
-    assert settings.errorRecoveryCameraEnabled == True
+    # Empty Camera settings defaults all to True, assert the proxy gave us that
+    assert settings.cameraEnabled
+    assert settings.liveStreamEnabled
+    assert settings.errorRecoveryCameraEnabled
 
 
 async def test_file_provider(
