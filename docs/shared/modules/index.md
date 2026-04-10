@@ -63,7 +63,7 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../temperature-module/index.md)
 
--   :material-image-remove-outline:{ .xl .middle } __Vacuum Module__
+-   :opentrons-vacuum:{ .xl .middle } __Vacuum Module__
 
     ---
 
