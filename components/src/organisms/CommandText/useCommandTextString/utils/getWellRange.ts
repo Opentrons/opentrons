@@ -1,28 +1,51 @@
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  getPipetteNameSpecs,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import type {
+  ActiveNozzleNumber,
   ConfigureNozzleLayoutRunTimeCommand,
+  NozzleConfigurationParams,
+  PartialPrimaryNozzles,
   PipetteName,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
 const usedChannelsFromCommand = (
   command: ConfigureNozzleLayoutRunTimeCommand | undefined,
-  defaultChannels: number
-): number =>
-  command?.params?.configurationParams?.style === 'SINGLE'
-    ? 1
-    : command?.params?.configurationParams?.style === 'COLUMN'
-      ? 8
-      : command?.params?.configurationParams?.style === 'ROW'
-        ? 12
+  defaultChannels: ActiveNozzleNumber
+): ActiveNozzleNumber => {
+  const configurationStyle: NozzleConfigurationParams | undefined =
+    command?.params?.configurationParams
+
+  switch (configurationStyle?.style) {
+    case COLUMN:
+      return 8
+    case ROW:
+      return 12
+    case SINGLE:
+      return 1
+    case PARTIAL_COLUMN:
+      return configurationStyle?.primaryNozzle != null
+        ? PARTIAL_NOZZLE_MAP[
+            configurationStyle.primaryNozzle as PartialPrimaryNozzles
+          ]
         : defaultChannels
+    default:
+      return defaultChannels
+  }
+}
 
 const usedChannelsForPipette = (
   pipetteId: string,
   commands: RunTimeCommand[],
-  defaultChannels: number
-): number =>
+  defaultChannels: ActiveNozzleNumber
+): ActiveNozzleNumber =>
   usedChannelsFromCommand(
     commands.findLast(
       (c: RunTimeCommand): c is ConfigureNozzleLayoutRunTimeCommand =>
@@ -35,8 +58,8 @@ const usedChannelsForPipette = (
 const usedChannels = (
   pipetteId: string,
   commands: RunTimeCommand[],
-  pipetteChannels: number
-): number =>
+  pipetteChannels: ActiveNozzleNumber
+): ActiveNozzleNumber =>
   pipetteChannels === 96
     ? usedChannelsForPipette(pipetteId, commands, pipetteChannels)
     : pipetteChannels
@@ -56,15 +79,26 @@ export function getWellRange(
   const pipetteChannels = pipetteName
     ? (getPipetteNameSpecs(pipetteName)?.channels ?? 1)
     : 1
+
   const channelCount = usedChannels(pipetteId, commands, pipetteChannels)
-  if (channelCount === 96) {
-    return 'A1 - H12'
-  } else if (channelCount === 8) {
-    const column = wellName.substring(1)
-    return `A${column} - H${column}`
-  } else if (channelCount === 12) {
-    const row = wellName.charAt(0)
-    return `${row}1 - ${row}12`
+
+  switch (true) {
+    case channelCount === 96:
+      return 'A1 - H12'
+    case channelCount === 8: {
+      const column = wellName.substring(1)
+      return `A${column} - H${column}`
+    }
+    case channelCount === 12: {
+      const row = wellName.charAt(0)
+      return `${row}1 - ${row}12`
+    }
+    case channelCount >= 2 && channelCount <= 7: {
+      const column = wellName.substring(1)
+      const endRow = String.fromCharCode(64 + channelCount)
+      return `A${column} - ${endRow}${column}`
+    }
+    default:
+      return wellName
   }
-  return wellName
 }
