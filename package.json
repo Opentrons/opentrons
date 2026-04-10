@@ -79,7 +79,7 @@
     "decompress": "4.2.1",
     "download": "8.0.0",
     "electron": "39.1.2",
-    "electron-builder": "26.0.15",
+    "electron-builder": "26.8.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-config-standard": "^16.0.2",
