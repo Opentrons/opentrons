@@ -18,6 +18,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -92,6 +93,7 @@ from .motion_utilities import (
 from .ot3_calibration import OT3RobotCalibrationProvider, OT3Transforms
 from .pause_manager import PauseManager
 from .protocols import FlexHardwareControlInterface
+from .protocols.types import FlexRobotType
 from .types import (
     AsynchronousModuleErrorNotification,
     Axis,
@@ -144,6 +146,7 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
+    convert_type_to_instance,
     pyro_behavior,
 )
 
@@ -255,6 +258,10 @@ class OT3API(
         self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
+
+    @pyro_behavior(specialty_func=convert_type_to_instance, apply_local=False)
+    def get_robot_type(self) -> Type[FlexRobotType]:
+        return FlexRobotType
 
     def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
         """Only the gripper mount or the 96-channel pipette mount would be idle

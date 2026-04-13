@@ -27,10 +27,6 @@ from .types import (
     MountArgType,
     OT2RobotType,
 )
-from opentrons.util.pyro.pyro_synchronous_adapter import (
-    convert_type_to_instance,
-    pyro_behavior,
-)
 
 
 class HardwareControlInterface(
@@ -84,10 +80,6 @@ class FlexHardwareControlInterface(
     The interface for the Flex controller is mostly in-line with the OT-2 interface,
     with some additional functionality and parameterization not supported on the OT-2.
     """
-
-    @pyro_behavior(specialty_func=convert_type_to_instance, apply_local=False)
-    def get_robot_type(self) -> Type[FlexRobotType]:
-        return FlexRobotType
 
 
 __all__ = [
