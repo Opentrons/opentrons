@@ -127,6 +127,23 @@ stages:
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
 
+  - name: Get the user information
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+
   - name: Get a new access token with the updated username and password
     request:
       method: POST
