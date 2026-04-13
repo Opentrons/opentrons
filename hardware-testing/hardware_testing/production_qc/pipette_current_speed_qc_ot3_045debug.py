@@ -19,9 +19,6 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
-from hardware_testing.scripts.data_center_client import upload_data_to_google_drive
-
-
 
 DEFAULT_TRIALS = 5
 STALL_THRESHOLD_MM = 0.1
@@ -41,12 +38,7 @@ TEST_SPEEDS = [
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 ]
 PLUNGER_CURRENTS_SPEED_PEEK = {
-    MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
-    MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
     MUST_PASS_CURRENT - 0.3: TEST_SPEEDS,
-    MUST_PASS_CURRENT - 0.25: TEST_SPEEDS,
-    MUST_PASS_CURRENT: TEST_SPEEDS,
-    DEFAULT_CURRENT: TEST_SPEEDS,
 }
 
 PLUNGER_CURRENTS_SPEED = {
@@ -292,6 +284,7 @@ async def _test_plunger(
                             break
                         else:
                             return max_failed_current
+
     return max_failed_current
 
 
@@ -366,10 +359,12 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool,tes
             report = _build_csv_report(trials=trials,testtype=testtype)
             
             helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
-
-            await _test_plunger(
-                api, mount, report, trials=trials, continue_after_stall=continue_after_stall,testtype=testtype
-            )
+            for i in range(100000):
+                pass_val=await _test_plunger(
+                    api, mount, report, trials=trials, continue_after_stall=continue_after_stall,testtype=testtype
+                )
+                if pass_val == 0.0:
+                    break
             ui.print_title("DONE")
             report.save_to_disk()
             report.print_results()
@@ -383,7 +378,6 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool,tes
 
             if api.is_simulator:
                 break
-            upload_data_to_google_drive(report.file_path)
     except Exception as errrrr:
         #print(f"system-error {errrrr}")
         printsig = f"08-01-current-system-error:系统错误,日志:{errrrr}"

@@ -60,6 +60,7 @@ from hardware_testing.opentrons_api.types import (
 )
 
 from opentrons.config.defaults_ot3 import DEFAULT_LIQUID_PROBE_SETTINGS
+from hardware_testing.scripts.data_center_client import upload_data_to_google_drive
 
 DEFAULT_SLOT_TIP_RACK_1000 = 7
 DEFAULT_SLOT_TIP_RACK_200 = 4
@@ -2383,6 +2384,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         else:
             ui.print_test_results("诊断测试通过(ASSEMBLY QC TESTING PASS)", True)
         LOG_GING.info("done")
+        upload_data_to_google_drive(csv_props.path)
         # print("done")
     except Exception as err:
 
@@ -2466,3 +2468,4 @@ if __name__ == "__main__":
     for tag in [PressureEvent.ASPIRATE_P50, PressureEvent.ASPIRATE_P1000]:
         PRESSURE_CFG[tag].sample_count = _cfg.fixture_aspirate_sample_count
     asyncio.run(_main(_cfg))
+
