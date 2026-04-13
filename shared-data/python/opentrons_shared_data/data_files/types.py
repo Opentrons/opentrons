@@ -57,7 +57,6 @@ class CmdDataFileInfo:
     prev_command_id: str
 
 
-@dataclass(frozen=True)
 class DataFileInfoWithCommands(DataFileInfo):
     """Data file info with associated command information."""
 

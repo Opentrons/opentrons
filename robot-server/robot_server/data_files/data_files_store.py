@@ -483,7 +483,7 @@ def _convert_row_to_data_file_info_with_commands(
     row: sqlalchemy.engine.Row,
 ) -> DataFileInfoWithCommands:
     """Convert a database row to DataFileInfoWithCommands."""
-    return DataFileInfoWithCommands.model_construct(
+    return DataFileInfoWithCommands(
         id=row.id,
         name=row.name,
         path=row.path,
