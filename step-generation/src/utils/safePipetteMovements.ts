@@ -23,6 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
 import type {
@@ -44,6 +45,7 @@ import type {
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
+  Point,
   RobotState,
   TipState,
 } from '../types'
@@ -67,11 +69,6 @@ const FLEX_TC_LID_FRONT_RIGHT_PT = {
 interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
-}
-export interface Point {
-  x: number
-  y: number
-  z?: number
 }
 
 export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
@@ -141,45 +138,6 @@ const getHasOverlappingRectangles = (
   const oneOverTwo = rectangle1[1].y > rectangle2[0].y
 
   return !(oneLeftOfTwo || oneRightOfTwo || oneUnderTwo || oneOverTwo)
-}
-
-const getPipetteCriticalPoint = (
-  nozzleConfiguration: NozzleConfigurationStyle,
-  pipetteEntity: PipetteEntity,
-  primaryNozzle: PrimaryNozzleConfigurationStyle,
-  labwareDefinition: LabwareDefinition
-): Point => {
-  const { spec } = pipetteEntity
-  const isRow = nozzleConfiguration === ROW
-  const isColumn = nozzleConfiguration === COLUMN
-  const labwareHasOneRow = labwareDefinition.ordering[0].length === 1
-  if ((isColumn || isRow) && labwareHasOneRow) {
-    // return the XY CENTER
-    const frontPoint = isColumn
-      ? `H${primaryNozzle.charAt(1)}`
-      : `${primaryNozzle.charAt(0)}12`
-    const frontRightPoint = spec.nozzleMap[frontPoint]
-    const backLeftPoint = spec.nozzleMap[primaryNozzle]
-    const difference = frontRightPoint.map(
-      (value, index) => value - backLeftPoint[index]
-    )
-    const differenceOffset = [difference[0] / 2, difference[1] / 2, 0]
-    const newPoint = backLeftPoint.map(
-      (value, index) => value + differenceOffset[index]
-    )
-    return {
-      x: newPoint[0],
-      y: newPoint[1],
-      z: newPoint[2],
-    }
-  }
-  const defaultPosition = spec.nozzleMap[primaryNozzle]
-
-  return {
-    x: defaultPosition[0],
-    y: defaultPosition[1],
-    z: defaultPosition[2],
-  }
 }
 
 const getModuleHeightFromDeckDefinition = (
