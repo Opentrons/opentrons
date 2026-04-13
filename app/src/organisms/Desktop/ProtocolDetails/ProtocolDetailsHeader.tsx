@@ -144,8 +144,6 @@ export function ProtocolDetailsHeader({
     navigate(`/protocols/${protocolKey}/visualization`)
   }
 
-  console.log('robotType', robotType)
-
   return (
     <Flex
       backgroundColor={COLORS.white}
