@@ -1,4 +1,4 @@
-"""Command models to start the vacuum pump."""
+"""Command models to operate the vacuum pump with respect to pressure."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ StartSetVacuumPressureCommandType = Literal["vacuum_module/StartSetVacuumPressur
 
 
 class StartSetVacuumPressureParams(BaseModel):
-    """Input parameters to start the vacuum pump."""
+    """Input parameters to set the internal vacuum pressure."""
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     gaugePressure: float = Field(..., description="Target gauge pressure in mBar.")

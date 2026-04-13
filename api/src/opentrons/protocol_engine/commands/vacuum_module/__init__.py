@@ -7,6 +7,13 @@ from .start_set_vacuum_pressure import (
     StartSetVacuumPressureParams,
     StartSetVacuumPressureResult,
 )
+from .start_set_vacuum_pump import (
+    StartSetVacuumPump,
+    StartSetVacuumPumpCommandType,
+    StartSetVacuumPumpCreate,
+    StartSetVacuumPumpParams,
+    StartSetVacuumPumpResult,
+)
 from .stop_vacuum import (
     StopVacuum,
     StopVacuumCommandType,
@@ -22,10 +29,16 @@ __all__ = [
     "StopVacuumCreate",
     "StopVacuumParams",
     "StopVacuumResult",
-    # start set vacuum command models
+    # start set vacuum pressure command models
     "StartSetVacuumPressure",
     "StartSetVacuumPressureCommandType",
     "StartSetVacuumPressureCreate",
     "StartSetVacuumPressureParams",
     "StartSetVacuumPressureResult",
+    # start set vacuum pump command models
+    "StartSetVacuumPump",
+    "StartSetVacuumPumpCommandType",
+    "StartSetVacuumPumpCreate",
+    "StartSetVacuumPumpParams",
+    "StartSetVacuumPumpResult",
 ]
