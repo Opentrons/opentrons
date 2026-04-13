@@ -422,7 +422,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     ? getModuleDef(modulesOnDeck[moduleLocation].model)
     : null
   const isLabwareOnModule = moduleDef !== null
-  const defaultSlot: [number, number, number] = [0, 0, 0]
+  const defaultSlotPosition: [number, number, number] = [0, 0, 0]
   const slotPosition = getPositionFromSlotId(slot, deckDef)
 
   if (slotPosition && labware && robotState) {
@@ -460,11 +460,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           x: slotPosition[0],
           y: slotPosition[1],
         }
-    const pipettePositionProps = isLabwareOnModule
-      ? {
-          slotPosition: slotPosition,
-        }
-      : {}
     const labwarePipetteContent = (
       <>
         <LabwareOnDeck
@@ -481,10 +476,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         />
         {hasMoreThanOneWell ? (
           <PipetteShadow
-            {...pipettePositionProps}
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
-            slotPosition={isLabwareOnModule ? defaultSlot : slotPosition}
+            slotPosition={isLabwareOnModule ? defaultSlotPosition : slotPosition}
             hoveredWell={wellShadow ?? ''}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
