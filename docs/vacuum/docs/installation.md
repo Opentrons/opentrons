@@ -38,8 +38,8 @@ Follow these instructions to install the Vacuum Module.
 
 10. **Power connection:** Connect the power cable to the pump and power outlet.
 
-11. **Initialize module:** Turn on power to your robot. After it starts, turn on the power to the vacuum module. The LED light on the vacuum pump <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>
+11. **Initialize module:** Turn on power to your robot. After it starts, turn on the power to the vacuum module. The LED light on the vacuum pump <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>.
 
-12. **Verify installation:** Follow the instructions and animations on the touchscreen or in the Opentrons App to complete the installation.
+12. **Touchscreen instructions:** After attaching and powering on the Flex and Vacuum Module, additional instructions on the touchscreen will guide you through any final steps such as updating the module's firmware (if required) and mapping its deck location.
 
 </div>
