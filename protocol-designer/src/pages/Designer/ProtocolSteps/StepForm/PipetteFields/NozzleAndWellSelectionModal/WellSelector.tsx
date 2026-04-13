@@ -1,4 +1,11 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -102,7 +109,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const hasMoreThanOneWell = allWells.length > 1
   const displayName = labwareDef.metadata.displayName
 
-  const getWellsField = (): FieldProps | null => {
+  const getWellsField = useCallback((): FieldProps | null => {
     switch (stepType) {
       case 'mix':
         return propsForFields.wells
@@ -113,14 +120,16 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       default:
         return null
     }
-  }
+  }, [stepType, propsForFields])
 
-  const getSelectedWells = (): string[][] => {
+  const computedSelectedWells = useMemo((): string[][] => {
     const wellsField = getWellsField()
     const wells = (wellsField?.value as string[]) || []
+
     if (!hasMoreThanOneWell) {
       return allWells
     }
+
     return wells.map(well =>
       getEntireWellSelection(
         well,
@@ -130,38 +139,42 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         channels
       )
     )
-  }
+  }, [
+    getWellsField,
+    hasMoreThanOneWell,
+    allWells,
+    labwareDef.ordering,
+    nozzleConfiguration,
+    primaryNozzle,
+    channels,
+  ])
 
-  const [selectedWells, setSelectedWells] =
-    useState<string[][]>(getSelectedWells())
-
+  const [selectedWells, setSelectedWells] = useState<string[][]>(
+    computedSelectedWells
+  )
   const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
   const currentHoveredWellRef = useRef<string[] | null>(null)
 
-  useEffect(
-    () => {
-      if (leaveTimeoutRef.current) {
-        clearTimeout(leaveTimeoutRef.current)
-        leaveTimeoutRef.current = null
-      }
-      currentHoveredWellRef.current = null
-      setSelectedWells(getSelectedWells())
-      setHoveredWells(null)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stepType]
-  )
+  useEffect(() => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+      leaveTimeoutRef.current = null
+    }
 
-  const handleLeaveWell = (_: WellMouseEvent): void => {
+    currentHoveredWellRef.current = null
+    setSelectedWells(computedSelectedWells)
+    setHoveredWells(null)
+  }, [stepType, computedSelectedWells])
+
+  const handleLeaveWell = (): void => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
     }
+
     leaveTimeoutRef.current = setTimeout(() => {
-      if (currentHoveredWellRef.current === hoveredWells) {
-        setHoveredWells(null)
-        currentHoveredWellRef.current = null
-      }
+      setHoveredWells(null)
+      setWellShadow(null)
+      currentHoveredWellRef.current = null
       leaveTimeoutRef.current = null
     }, 120)
   }
@@ -485,7 +498,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={wellShadow ?? ''}
+            hoveredWell={wellShadow}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}

@@ -50,7 +50,7 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
   slotPosition?: CoordinateTuple
-  hoveredWell: string
+  hoveredWell: string | null
   selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
@@ -165,17 +165,23 @@ export function PipetteShadow(props: {
     isOt2EightChannel,
   })
   return (
-    <g className={styles.shadow_overlay}>
-      <PipetteLabel
-        ref={labelRef}
-        text={labelText}
-        isZoomed
-        x={slotX + xOffset + labelOffsetX}
-        y={slotY + yOffset + labelOffsetY}
-        placement={labelPlacement}
-        isError={isError}
-      />
-      <ShadowComponent {...shadowProps} />
-    </g>
+    <>
+      {hoveredWell !== null ? (
+        <g className={styles.shadow_overlay}>
+          <PipetteLabel
+            ref={labelRef}
+            text={labelText}
+            isZoomed
+            x={slotX + xOffset + labelOffsetX}
+            y={slotY + yOffset + labelOffsetY}
+            placement={labelPlacement}
+            isError={isError}
+          />
+          <ShadowComponent {...shadowProps} />
+        </g>
+      ) : (
+        <></>
+      )}
+    </>
   )
 }
