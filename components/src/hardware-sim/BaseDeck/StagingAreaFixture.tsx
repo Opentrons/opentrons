@@ -28,7 +28,7 @@ export function StagingAreaFixture(
     deckDefinition,
     fixtureBaseColor,
     slotClipColor,
-    showSlotClips = true,
+    showSlotClips = false,
     ...restProps
   } = props
 
