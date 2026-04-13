@@ -492,7 +492,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
-        {hasMoreThanOneWell ? (
+        {hasMoreThanOneWell && wellShadow !== null ? (
           <PipetteShadow
             {...pipettePositionProps}
             robotType={robotType}
