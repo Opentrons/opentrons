@@ -5,7 +5,7 @@ import logging
 import socket
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Final, Self, Type
+from typing import Final, Literal, Self, Type
 
 from .ca_manager import TLSCAManager
 from .ee_manager import TLSEEManager
@@ -26,7 +26,11 @@ class TLSManager:
 
     @classmethod
     async def create(
-        cls: Type[Self], ca_cert_dir: Path, ca_key_dir: Path, tls_ee_dir: Path
+        cls: Type[Self],
+        ca_cert_dir: Path,
+        ca_key_dir: Path,
+        tls_ee_dir: Path,
+        terminator_reload: Literal["systemd-nginx", "dev-none"],
     ) -> Self:
         """Create a TLS manager, taking several useful setup steps."""
         hostname = socket.gethostname()
@@ -40,9 +44,14 @@ class TLSManager:
             # the easiest way is to start with no IP addresses and then to let the system that configures
             # IP addresses tell us when they start to exist.
             robot_ips=[],
+            rotate_fn=(
+                TLSEEManager.rotate_cert_nginx
+                if terminator_reload == "systemd-nginx"
+                else TLSEEManager.rotate_cert_none
+            ),
         )
         obj = cls(ca_manager=ca_manager, ee_manager=ee_manager)
-        obj.refresh_ee()
+        await obj.refresh_ee()
         await obj.schedule_expiry_task(cls.EXPIRY_CHECKER_POLL_PERIOD)
         return obj
 
@@ -51,11 +60,11 @@ class TLSManager:
         await self.cancel_expiry_task()
         self._ee_manager.remove_cert("shutting down")
 
-    def refresh_ee(self) -> None:
+    async def refresh_ee(self) -> None:
         """Refresh the end-entity cert that we're presenting."""
         precert = self._ee_manager.generate_precert()
         signed = self._ca_manager.sign_precert(precert)
-        self._ee_manager.install_cert(signed)
+        await self._ee_manager.install_cert(signed)
 
     def expiry_task_running(self) -> bool:
         """True if the expiry task is running properly. Mostly used internally and for testing."""
@@ -92,7 +101,7 @@ class TLSManager:
             # Rotating CAs means rotating EEs
             if self._ca_manager.must_rotate(now + poll_time):
                 self._ca_manager.rotate(now)
-                self.refresh_ee()
+                await self.refresh_ee()
             if not self._ee_manager.ready(now + poll_time):
-                self.refresh_ee()
+                await self.refresh_ee()
             await asyncio.sleep(poll_time.total_seconds())
