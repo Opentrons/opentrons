@@ -11,8 +11,8 @@ interface WellStatusProps {
   wellName: string
   type: WellType
   parentType: ParentType
+  size: string
   showStroke?: boolean
-  size?: string
 }
 
 export function WellStatus(props: WellStatusProps): JSX.Element {
