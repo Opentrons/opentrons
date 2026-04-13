@@ -205,13 +205,6 @@
     "y": 0,
     "z": 0
   },
-  "stackingOffsetWithLabware": {
-    "opentrons_12_well_adapter": {
-      "x": 0,
-      "y": 0,
-      "z": 23.75
-    }
-  },
   "innerLabwareGeometry": {
     "MainWellGeometry": {
       "sections": [
