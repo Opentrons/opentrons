@@ -29,7 +29,7 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 
 ## Opening Issues
 
-Please note that the issues tab on this repo is disabled. This doesn't mean we don't want to hear from you; it just means that our [support page][support] is a much better way to do so. 
+Please note that the issues tab on this repo is disabled. This doesn't mean we don't want to hear from you; it just means that our [support page][support] is a much better way to do so.
 
 ## Opening Pull Requests
 
@@ -143,14 +143,16 @@ This will launch the commitizen wizard, which will ask you to:
 
 ## LLM system usage guidelines
 
-When submitting pull requests to the Opentrons repo, please keep the following rule in mind: **don't make anybody else interact with your LLM**. The code you submit is under your name, no matter what tools were used to generate it, and questions asked about it are asked to you. 
+When submitting pull requests to the Opentrons repo, please keep the following rule in mind: **don't make anybody else interact with your LLM**. The code you submit is under your name, no matter what tools were used to generate it, and questions asked about it are asked to you.
 
 That means:
-- Look over the code before you submit it and make sure you're comfortable with it going out under your name 
+
+- Look over the code before you submit it and make sure you're comfortable with it going out under your name
 - Don't respond to reviews or questions with LLM output
 - Don't cite "this is how the LLM did it" in response to a review
 
 That doesn't mean:
+
 - Every pull request must be perfect
 - Anything with an em-dash will be rejected
 
