@@ -2,6 +2,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { act, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
@@ -101,6 +103,7 @@ describe('ProtocolDetails', () => {
     })
     screen.getByText('fakeProtocolDisplayName')
   })
+
   it('renders protocol title as file name if not in metadata', () => {
     render({
       mostRecentAnalysis: {
@@ -119,6 +122,7 @@ describe('ProtocolDetails', () => {
     })
     expect(screen.getByText('fakeSrcFileName')).toBeInTheDocument()
   })
+
   it('renders deck view section', () => {
     render({
       mostRecentAnalysis: {
@@ -137,6 +141,7 @@ describe('ProtocolDetails', () => {
     screen.getByText('Deck View')
     screen.getByText('close ChooseRobotToRunProtocolSlideout')
   })
+
   it('opens choose robot to run protocol slideout when Start setup button is clicked', async () => {
     vi.mocked(ChooseRobotToRunProtocolSlideout).mockReturnValue(
       <div>open ChooseRobotToRunProtocolSlideout</div>
@@ -144,6 +149,7 @@ describe('ProtocolDetails', () => {
     render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
+        robotType: FLEX_ROBOT_TYPE,
         createdAt,
         metadata: {
           ...mockMostRecentAnalysis.metadata,
@@ -169,6 +175,7 @@ describe('ProtocolDetails', () => {
     })
     screen.getByText('open ChooseRobotToRunProtocolSlideout')
   })
+
   it('renders the protocol creation method', () => {
     render({
       mostRecentAnalysis: {
@@ -186,6 +193,7 @@ describe('ProtocolDetails', () => {
     })
     screen.getByText('Protocol Designer 6.0')
   })
+
   it('renders the protocol creation method for py protocol made in PD', () => {
     render({
       mostRecentAnalysis: {
@@ -202,6 +210,7 @@ describe('ProtocolDetails', () => {
     })
     screen.getByText('Protocol Designer 8.0')
   })
+
   it('renders the protocol description', () => {
     render({
       mostRecentAnalysis: {
@@ -219,5 +228,27 @@ describe('ProtocolDetails', () => {
       },
     })
     screen.getByText('fake protocol description')
+  })
+
+  it('when a protocol is OT-2 protocol, the setup button is disabled', () => {
+    render({
+      mostRecentAnalysis: {
+        ...mockMostRecentAnalysis,
+        robotType: OT2_ROBOT_TYPE,
+        createdAt,
+        metadata: {
+          ...mockMostRecentAnalysis.metadata,
+        },
+        config: {
+          ...mockMostRecentAnalysis.config,
+          protocolType,
+          schemaVersion,
+        },
+      },
+    })
+    const runProtocolButton = screen.getByRole('button', {
+      name: 'Start setup',
+    })
+    expect(runProtocolButton).toBeDisabled()
   })
 })
