@@ -1,4 +1,4 @@
-site_name: vacuum-module
+site_name: vacuum
 
 nav:
   - Opentrons Vacuum Module GEN1 Instruction Manual: index.md
@@ -6,7 +6,6 @@ nav:
   - Product Specifications: specifications.md
   - Module Components: components.md
   - Installing the Vacuum Module: installation.md
-  - Using the Vacuum Module: use.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: additional-info.md
 

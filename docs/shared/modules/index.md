@@ -69,6 +69,6 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     An on-deck vacuum filtration and purification module.
 
-    [:octicons-arrow-right-24: Instruction Manual](../vacuum-module/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../vacuum/index.md)
 
 </div>
