@@ -144,6 +144,8 @@ export function ProtocolDetailsHeader({
     navigate(`/protocols/${protocolKey}/visualization`)
   }
 
+  console.log('robotType', robotType)
+
   return (
     <Flex
       backgroundColor={COLORS.white}
@@ -198,7 +200,11 @@ export function ProtocolDetailsHeader({
                     handleRunProtocolButtonClick()
                   }}
                   data-testid="ProtocolDetails_runProtocol"
-                  disabled={analysisStatus === 'loading'}
+                  disabled={
+                    analysisStatus === 'loading' ||
+                    robotType === OT2_ROBOT_TYPE ||
+                    robotType === null
+                  }
                   whiteSpace="nowrap"
                 >
                   {t('start_setup')}
