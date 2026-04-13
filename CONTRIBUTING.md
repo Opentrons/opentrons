@@ -154,7 +154,7 @@ That means:
 That doesn't mean:
 
 - Every pull request must be perfect
-- Anything with an em-dash will be rejected
+- Anything with an em dash will be rejected
 
 Maintainers of the repo follow the same rules, and will never ask you to respond to their LLM outputs.
 
