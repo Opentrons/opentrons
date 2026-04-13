@@ -346,9 +346,9 @@ dev-backend:
 .PHONY: dev-backend-flex
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
-		$(MAKE) -C robot-server dev-flex BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C auth-server dev ';' \
-		$(MAKE) -C system-server dev ';' \
+		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
 		$(MAKE) dev-proxy
 
 # Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),

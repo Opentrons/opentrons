@@ -1,6 +1,7 @@
 import {
   ALL,
   getIsTiprack,
+  getModuleDef,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import {
@@ -53,17 +54,30 @@ export const getViewboxFromSelectedLabware = (
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   deckDef: DeckDefinition
 ): string | null => {
-  const { labware } = activeDeckSetup
+  const { labware, modules } = activeDeckSetup
   const selectedLabware = labware[selectedLabwareId]
   if (selectedLabware == null) {
     return null
   }
+
+  const moduleIds = new Set(Object.keys(modules || {}))
+
+  // find the first module location
+  const moduleLocation = selectedLabware.stack?.find(loc => moduleIds.has(loc))
+
+  const moduleDef = moduleLocation
+    ? getModuleDef(modules[moduleLocation].model)
+    : null
+
   const [deckXDimension, deckYDimension] = deckDef.dimensions
   const ratio = deckYDimension / deckXDimension
 
   // preserve aspect ratio
   const paddingMmY = PADDING_MM_X * ratio
-  const { xDimension, yDimension } = selectedLabware.def.dimensions
+
+  const { xDimension, yDimension } = moduleDef
+    ? moduleDef.dimensions
+    : selectedLabware.def.dimensions
   const slot = getSlotInLocationStack(selectedLabware.stack)
   const slotPosition = getPositionFromSlotId(slot, deckDef)
   if (slotPosition == null) {
