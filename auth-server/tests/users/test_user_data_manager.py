@@ -91,7 +91,6 @@ def test_create_user_success(
         full_name="New User",
         account_type=AccountType.USER,
     )
-    print("result: ", result)
     assert result == UserResponse(
         userName="new_user",
         fullName="New User",
@@ -320,7 +319,6 @@ def test_update_user_password_is_hashed(
 
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     updated = _make_orm_user(username="pw_user", full_name="X")
-    print("updated: ", updated)
     decoy.when(
         mock_store.update("pw_user", None, matchers.IsA(str), None, None, True)
     ).then_return(updated)
