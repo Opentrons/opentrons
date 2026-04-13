@@ -182,6 +182,7 @@ async def main(args: argparse.Namespace) -> None:  # noqa: C901
         print(f"Found mod: {mod.name} at {mod.port}")
         module = await build_module(mod, loop)
         if module is None:
+            print(f"ERROR: No abstract module exists for {mod.name}.")
             continue
 
         name = module.name()

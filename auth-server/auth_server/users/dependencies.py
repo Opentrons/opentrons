@@ -12,6 +12,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
+from auth_server.settings.store import SettingsStore, get_settings_store
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import UserDataManager
 
@@ -34,6 +35,7 @@ async def get_user_store(
 
 async def get_user_data_manager(
     user_store: Annotated[UserStore, Depends(get_user_store)],
+    settings_store: Annotated[SettingsStore, Depends(get_settings_store)],
 ) -> UserDataManager:
     """Get a UserDataManager backed by the singleton UserStore."""
-    return UserDataManager(user_store=user_store)
+    return UserDataManager(user_store=user_store, settings_store=settings_store)

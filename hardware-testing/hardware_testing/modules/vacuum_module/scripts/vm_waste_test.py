@@ -70,8 +70,8 @@ async def _write_to_csv(
                 writer.writerow(
                     [
                         "Time(s)",
-                        "target_guage_pressure",
-                        "current_guage_pressure",
+                        "target_gauge_pressure",
+                        "current_gauge_pressure",
                         "pressure_abs_a",
                         "pressure_abs_b",
                         "pressure_atm",
@@ -82,8 +82,8 @@ async def _write_to_csv(
             writer.writerow(
                 [
                     f"{timestamp:.2f}",
-                    f"{data['target_guage_pressure']}",
-                    f"{data['current_guage_pressure']}",
+                    f"{data['target_gauge_pressure']}",
+                    f"{data['current_gauge_pressure']}",
                     f"{data['pressure_abs_a']}",
                     f"{data['pressure_abs_b']}",
                     f"{data['pressure_atm']}",
@@ -176,7 +176,7 @@ async def vacuum_manifold(target_pressure: int) -> None:
         # Set Pressure and Vacuum to target for x amount of time.
         await pump.set_vacuum_state(
             enable_vacuum=True,
-            guage_pressure_mbar=target_to_pump,
+            gauge_pressure_mbar=target_to_pump,
             duration_s=None,
         )
         logging.info(f"pump started at target {target_pressure} mbar")
@@ -185,7 +185,7 @@ async def vacuum_manifold(target_pressure: int) -> None:
         # Stop the pump
         await pump.set_vacuum_state(
             enable_vacuum=False,
-            guage_pressure_mbar=target_to_pump,
+            gauge_pressure_mbar=target_to_pump,
             duration_s=None,
         )
         # Vent the pump system to atmospheric pressure while pump is on
@@ -199,7 +199,7 @@ async def vacuum_manifold(target_pressure: int) -> None:
         # Always stop the pump regardless of success or failure
         await pump.set_vacuum_state(
             enable_vacuum=False,
-            guage_pressure_mbar=target_to_pump,
+            gauge_pressure_mbar=target_to_pump,
             duration_s=None,
         )
 
