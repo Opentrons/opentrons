@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 # TODO (lc 05-12-2021) This is pretty gross. We should think
 # of a better way to do this.
-MODULE_TYPE_BY_NAME = {
+MODULE_TYPE_BY_NAME: Dict[str, ModuleType] = {
     MagDeck.name(): MagDeck.MODULE_TYPE,
     TempDeck.name(): TempDeck.MODULE_TYPE,
     Thermocycler.name(): Thermocycler.MODULE_TYPE,

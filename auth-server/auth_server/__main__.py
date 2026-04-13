@@ -2,11 +2,14 @@
 
 import argparse
 import logging
+import sys
+import traceback
 from dataclasses import dataclass
+from logging.config import dictConfig
 
 import uvicorn
 
-_log = logging.getLogger(__name__)
+from server_utils import logging_utils
 
 
 @dataclass
@@ -63,10 +66,17 @@ def _parse_args() -> _ParsedArgs:
 if __name__ == "__main__":
     args = _parse_args()
 
-    if args.uds is not None:
-        _log.info(f"Starting auth server on {args.uds}.")
-    else:
-        _log.info(f"Starting auth server on {args.host}:{args.port}.")
+    log_config: dict[str, object] | None
+    try:
+        log_config = logging_utils.get_dict_config(
+            args.log_level, syslog_id="opentrons-auth-server"
+        )
+        dictConfig(log_config)
+    except Exception as e:
+        # needs to be a print because logging doesn't work yet!
+        print("Error: Couldn't configure logging!", file=sys.stderr)  # noqa: T201
+        traceback.print_exception(e, file=sys.stderr)
+        log_config = None
 
     uvicorn.run(
         "auth_server.app:app",
@@ -74,5 +84,13 @@ if __name__ == "__main__":
         host=args.host,
         uds=args.uds,
         reload=args.reload,
-        log_level=args.log_level,
+        # Note: We're redundantly telling uvicorn to apply our log_config even though we just
+        # applied it ourselves with dictConfig(), above. It seems like uvicorn always applies
+        # some config no matter what--it can't just leave the current config alone--so we
+        # need to do this to prevent it from clobbering our config.
+        log_config=log_config,
+        # This log_level arg is a uvicorn-specific thing that would only affect
+        # messages from uvicorn. It's superseded by our own handling of log levels
+        # in our own log config, applied above.
+        log_level=None,
     )

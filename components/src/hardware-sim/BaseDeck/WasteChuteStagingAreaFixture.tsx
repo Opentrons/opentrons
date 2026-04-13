@@ -33,7 +33,7 @@ export function WasteChuteStagingAreaFixture(
     wasteChuteColor = COLORS.grey50,
     showHighlight,
     tagInfo,
-    showSlotClips = true,
+    showSlotClips = false,
     ...restProps
   } = props
 

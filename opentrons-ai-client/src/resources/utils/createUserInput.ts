@@ -14,7 +14,7 @@ export const createUserInput = (
     requestId,
     role: 'user',
     reply: watchUserPrompt,
-    protocol_format: protocolFormat,
+    protocolFormat: protocolFormat,
     attachments:
       validatedFiles.length > 0
         ? validatedFiles.map(file => {

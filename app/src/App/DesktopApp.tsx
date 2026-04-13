@@ -35,7 +35,6 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
-import { useFeatureFlag } from '../redux/config'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
@@ -48,22 +47,6 @@ export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
-
-  // note for react-scan
-  const enableReactScan = useFeatureFlag('reactScan')
-  // Dynamically import `react-scan` to avoid build errors
-  if (typeof window !== 'undefined' && enableReactScan) {
-    import('react-scan')
-      .then(({ scan }) => {
-        scan({
-          enabled: enableReactScan,
-          log: true,
-        })
-      })
-      .catch(error => {
-        console.error('Failed to load react-scan:', error)
-      })
-  }
 
   const desktopRoutes: RouteProps[] = [
     {

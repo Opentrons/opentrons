@@ -86,7 +86,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
         """Parse the get pressure pid."""
-        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+)"
+        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -98,6 +98,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("O")),
             float(match.group("V")),
             float(match.group("H")),
+            float(match.group("T")),
         )
 
     @classmethod
@@ -271,8 +272,9 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        gauge_pressure_mbar: Optional[float] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
@@ -282,14 +284,16 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             "S", int(enable_vacuum)
         )
 
-        if guage_pressure_mbar is not None:
+        if gauge_pressure_mbar is not None:
             command.add_float(
                 "P",
-                min(max(guage_pressure_mbar, MAX_PRESSURE_MBAR), 0),
+                min(max(gauge_pressure_mbar, MAX_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
-        if duration is not None:
-            command.add_int("D", duration)
+        if duration_s is not None:
+            command.add_int("D", duration_s)
+        if timeout_s is not None:
+            command.add_int("T", timeout_s)
         if rate is not None:
             command.add_float("R", min(max(rate, MAX_RAMP_RATE), 0))
         if vent_after is not None:
@@ -349,6 +353,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         overshoot: Optional[float] = None,
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
         reset: bool = False,
     ) -> None:
         """Sets the PID tuning parameters for the pressure control."""
@@ -366,6 +371,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
         if k_holding is not None:
             command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
+        if tolerance is not None:
+            command.add_float("T", tolerance, GCODE_ROUNDING_PRECISION)
         command.add_int("R", int(reset))
 
         resp = await self._connection.send_command(command)

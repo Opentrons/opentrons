@@ -10,9 +10,14 @@ import { FeedbackModal } from '..'
 
 const mockUseTrackEvent = vi.fn()
 const mockCallApi = vi.fn().mockResolvedValue({})
+const mockGetAccessToken = vi.fn().mockResolvedValue('test-token')
 
 vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
+}))
+
+vi.mock('/ai-client/resources/hooks/useGetAccessToken', () => ({
+  useGetAccessToken: () => ({ getAccessToken: mockGetAccessToken }),
 }))
 
 vi.mock('/ai-client/hooks/useTrackEvent', () => ({

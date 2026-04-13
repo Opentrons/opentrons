@@ -200,9 +200,9 @@ class VacuumModule(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> LiveData:
-        # TODO: FIX THIS
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
+            "pumpEngaged": self._reader.pump_state.pump_running,
         }
         return {"status": self.status.value, "data": data}
 
@@ -308,21 +308,24 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
+        # TODO: Handle error
         await self._driver.set_vent_state(state=vent_state)
 
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        gauge_pressure_mbar: Optional[float] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
         """Handler for internal pressure controls."""
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
-            guage_pressure_mbar=guage_pressure_mbar,
-            duration=duration,
+            gauge_pressure_mbar=gauge_pressure_mbar,
+            duration_s=duration_s,
+            timeout_s=timeout_s,
             rate=rate,
             vent_after=vent_after,
         )
@@ -338,10 +341,6 @@ class VacuumModule(mod_abc.AbstractModule):
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
         )
 
-    async def set_serial_number(self, sn: str) -> None:
-        """Set the serial number."""
-        await self._driver.set_serial_number(sn=sn)
-
 
 class VacuumModuleReader(Reader):
     error: Optional[str]
@@ -349,8 +348,8 @@ class VacuumModuleReader(Reader):
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
         self.vacuum_state: VacuumState = VacuumState(
-            target_guage_pressure=0,
-            current_guage_pressure=0,
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
             pressure_abs_a=0,
             pressure_abs_b=0,
             pressure_atm=0,

@@ -13,6 +13,7 @@
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
   "all_nozzles": "All nozzles (recommended)",
+  "all_nozzles_are_preselected": "All nozzles are preselected",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -273,6 +274,7 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
+  "transfer_nozzles_selected_no_dispense": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
@@ -390,7 +392,8 @@
   "volume_per_well": {
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
-    "single": "Volume per well"
+    "single": "Volume per well",
+    "mix": "Mix volume"
   },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",

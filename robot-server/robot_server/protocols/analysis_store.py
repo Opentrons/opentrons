@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
     CSVParameter,
+    LabwareOffset,
     RunTimeParameter,
 )
 from opentrons_shared_data.errors import ErrorCodes
@@ -160,6 +161,7 @@ class AnalysisStore:
         liquids: List[Liquid],
         liquidClasses: List[LiquidClassRecordWithId],
         command_annotations: List[CommandAnnotation],
+        labware_offsets: List[LabwareOffset],
         command_preconditions: Optional[CommandPreconditions] = None,
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
@@ -180,6 +182,7 @@ class AnalysisStore:
             robot_type: See `CompletedAnalysis.robotType`.
             command_annotations: See `CompletedAnalysis.command_annotations`.
             command_preconditions: See `CompletedAnalysis.command_preconditions`.
+            labware_offsets: See `CompletedAnalysis.labware_offsets`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
@@ -216,6 +219,7 @@ class AnalysisStore:
             liquidClasses=liquidClasses,
             commandAnnotations=command_annotations,
             commandPreconditions=command_preconditions,
+            labwareOffsets=labware_offsets,
         )
         completed_analysis_resource = CompletedAnalysisResource(
             id=completed_analysis.id,
@@ -257,6 +261,7 @@ class AnalysisStore:
             errors=errors,
             liquids=[],
             liquidClasses=[],
+            labwareOffsets=[],
         )
         completed_analysis_resource = CompletedAnalysisResource(
             id=completed_analysis.id,

@@ -32,6 +32,7 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
 
 
 @dataclass
@@ -100,8 +101,8 @@ class VentState(Enum):
 class VacuumState:
     """Get the vacuum state."""
 
-    target_guage_pressure: float
-    current_guage_pressure: float
+    target_gauge_pressure: float
+    current_gauge_pressure: float
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float
@@ -119,6 +120,7 @@ class PressureControlTunings:
     overshoot_error: float
     k_velocity: float
     k_holding: float
+    tolerance_error: float
 
 
 @dataclass

@@ -28,8 +28,8 @@ class FlexStackerPage(BasePage):
             message: message to display in message box
         """
 
-        self.page.get_by_test_id("TextAreaField").click()
-        self.page.get_by_test_id("TextAreaField").fill(message)
+        self.page.get_by_role("textbox").click()
+        self.page.get_by_role("textbox").fill(message)
 
     def refill_stacker(self, stacker: str, refill_num: int, message: str) -> None:
         """

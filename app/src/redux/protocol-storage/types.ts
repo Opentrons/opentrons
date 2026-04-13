@@ -6,13 +6,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
 
-export type ProtocolSort =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recent'
-  | 'oldest'
-  | 'flex'
-  | 'ot2'
+export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
 
 interface ParentNode {
   annotationId: string

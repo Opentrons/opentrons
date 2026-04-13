@@ -85,18 +85,18 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         """Get the register value of the pressure sensor driver."""
         pass
 
-    # TODO: update the pressure arg with the units when we find out which unit
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
-        duration: Optional[int] = None,
+        gauge_pressure_mbar: Optional[float] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
         vent_after: Optional[bool] = None,
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         self.vacuum_on = enable_vacuum
-        self.target_pressure = guage_pressure_mbar or self.target_pressure
+        self.target_pressure = gauge_pressure_mbar or self.target_pressure
 
     async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
@@ -136,6 +136,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         overshoot: Optional[float] = None,
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
+        tolerance: Optional[float] = None,
         reset: bool = False,
     ) -> None:
         """Sets the PID tuning parameters for the pressure control."""
@@ -143,7 +144,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:
         """Get the pressure control pid tunings."""
-        return PressureControlTunings(0, 0, 0, 0, 0, 0)
+        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0)
 
     async def set_waste_configs(
         self,

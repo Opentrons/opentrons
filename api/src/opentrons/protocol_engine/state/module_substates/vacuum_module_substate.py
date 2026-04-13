@@ -19,11 +19,15 @@ class VacuumModuleSubState:
     """
 
     module_id: VacuumModuleId
+    pump_engaged: bool
 
     def new_from_state_change(
         self, update: VacuumModuleStateUpdate
     ) -> "VacuumModuleSubState":
         """Return a new state with the given update applied."""
+        new_pump_engaged = self.pump_engaged
+        if isinstance(update.pump_engaged, bool):
+            new_pump_engaged = self.pump_engaged
         return VacuumModuleSubState(
-            module_id=self.module_id,
+            module_id=self.module_id, pump_engaged=new_pump_engaged
         )
