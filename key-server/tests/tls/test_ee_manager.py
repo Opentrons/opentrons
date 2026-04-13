@@ -30,11 +30,13 @@ def ip_addresses() -> list[str]:
 @pytest.fixture
 def subject(ee_dir: Path, hostname: str, ip_addresses: list[str]) -> TLSEEManager:
     """An end-entity manager with typical settings."""
-    return TLSEEManager(ee_dir, ee_dir, hostname, ip_addresses)
+    return TLSEEManager(
+        ee_dir, ee_dir, hostname, ip_addresses, TLSEEManager.rotate_cert_none
+    )
 
 
 @pytest.fixture
-def initialized_subject(
+async def initialized_subject(
     subject: TLSEEManager,
     ca: cryptography_utils.X509Pair,
     hostname: str,
@@ -43,7 +45,7 @@ def initialized_subject(
     """An end-entity manager with certificates built."""
     precert = subject.generate_precert()
     signed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
-    subject.install_cert(signed)
+    await subject.install_cert(signed)
     return subject
 
 
@@ -67,7 +69,9 @@ def test_subject_does_not_reuse_certs(
     )
     signed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
     cryptography_utils.install_tls_cert(ee_dir, signed)
-    subject = TLSEEManager(ee_dir, ee_dir, hostname, ip_addresses)
+    subject = TLSEEManager(
+        ee_dir, ee_dir, hostname, ip_addresses, TLSEEManager.rotate_cert_none
+    )
     assert subject._ee_pair is None
     assert not subject.ready(now)
 
