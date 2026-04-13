@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
+
 from pydantic import BaseModel, ConfigDict
 
 from ..util import StrEnum
@@ -33,7 +34,6 @@ class DataFileSource(Enum):
     GENERATED = "generated"
 
 
-#@dataclass(frozen=True)
 class DataFileInfo(BaseModel):
     """Metadata about a data file."""
 
