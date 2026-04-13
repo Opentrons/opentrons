@@ -242,7 +242,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const slot = getSlotInLocationStack(labware.stack)
-  const slotPosition = getPositionFromSlotId(slot, deckDef)
 
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
@@ -415,6 +414,16 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   let controls: JSX.Element = <></>
+  const modulesOnDeck = deckSetup.modules
+  const moduleIds = new Set(Object.keys(modulesOnDeck))
+  const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
+
+  const moduleDef = moduleLocation
+    ? getModuleDef(modulesOnDeck[moduleLocation].model)
+    : null
+  const isLabwareOnModule = moduleDef !== null
+  const defaultSlot: [number, number, number] = [0, 0, 0]
+  const slotPosition = getPositionFromSlotId(slot, deckDef)
 
   if (slotPosition && labware && robotState) {
     inaccessiblePartialWells.forEach(well => {
@@ -441,30 +450,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ? INACCESSIBLE_PARTIAL_TIP
         : INACCESSIBLE_COLLISION
     const is96Channel = channels === 96
-    const modulesOnDeck = deckSetup.modules
-    const moduleIds = new Set(Object.keys(modulesOnDeck))
-    const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
 
-    const moduleDef = moduleLocation
-      ? getModuleDef(modulesOnDeck[moduleLocation].model)
-      : null
-
-    const labwarePositionProps =
-      moduleDef != null
-        ? {
-            x: 0,
-            y: 0,
-          }
-        : {
-            x: slotPosition[0],
-            y: slotPosition[1],
-          }
-    const pipettePositionProps =
-      moduleDef === null
-        ? {
-            slotPosition: slotPosition,
-          }
-        : {}
+    const labwarePositionProps = isLabwareOnModule
+      ? {
+          x: 0,
+          y: 0,
+        }
+      : {
+          x: slotPosition[0],
+          y: slotPosition[1],
+        }
+    const pipettePositionProps = isLabwareOnModule
+      ? {
+          slotPosition: slotPosition,
+        }
+      : {}
     const labwarePipetteContent = (
       <>
         <LabwareOnDeck
@@ -484,7 +484,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             {...pipettePositionProps}
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
-            slotPosition={slotPosition}
+            slotPosition={isLabwareOnModule ? defaultSlot : slotPosition}
             hoveredWell={wellShadow ?? ''}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
