@@ -260,25 +260,37 @@ class PressureFixture(PressureFixtureBase):
     def read_all_pressure_channel_96(self) -> List[float]:
         """Reads from all the channels from the fixture."""
         cmd_str = f"{FIXTURE_CMD_GET_ALL_PRESSURE_96}{FIXTURE_CMD_TERMINATOR}"
-        self._port.write(cmd_str.encode("utf-8"))
-        response = self._port.readlines()#.decode("utf-8")
-        datalist = []
-        for res in response:
-            res_list = res.decode("utf-8").split(",")[:-1]  # ignore the last comma
-            data_str = [d.split("=")[-1].strip() for d in res_list]  # remove PRESSURE=
-            # for i in range(len(data_str)):  # replace all -0.00 with 0.00
-            #     if data_str[i] == "-0.00":
-            #         data_str[i] = "0.00"
-            data = [float(d) for d in data_str]  # convert to float
-            data.reverse
-            #print("yuans",data)
-            # datalist.extend(data)
-            datalist = data + datalist
-        # if self._slot_side == "left":
-        #     data.reverse()  # reverse order, so pipette channel 1 is at index 0
-        #print("datalist",datalist)
-        #datalist.reverse()
-        return datalist
+        last_error = ValueError("No 96-channel pressure data received from fixture.")
+        for _ in range(3):
+            self._port.reset_input_buffer()
+            self._port.write(cmd_str.encode("utf-8"))
+            response = self._port.readlines()
+            datalist = []
+            for res in response:
+                decoded = res.decode("utf-8").strip()
+                if not decoded:
+                    continue
+                res_list = decoded.split(",")[:-1]  # ignore the last comma
+                data_str = [d.split("=")[-1].strip() for d in res_list]
+                for i in range(len(data_str)):
+                    if data_str[i] == "-0.00":
+                        data_str[i] = "0.00"
+                try:
+                    data = [float(d) for d in data_str]
+                except ValueError as err:
+                    last_error = ValueError(
+                        f"Invalid 96-channel pressure response line: {decoded}"
+                    )
+                    break
+                if self._slot_side == "left":
+                    data.reverse()
+                datalist = data + datalist
+            if len(datalist) == FIXTURE_NUM_CHANNELS_96:
+                return datalist
+            last_error = ValueError(
+                f"Expected {FIXTURE_NUM_CHANNELS_96} pressure values, got {len(datalist)}"
+            )
+        raise last_error
     def print_pressure_datas(self,data_list):
         row_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         col_labels = list(range(1, 13))
