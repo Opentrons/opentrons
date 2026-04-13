@@ -176,7 +176,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       setWellShadow(null)
       currentHoveredWellRef.current = null
       leaveTimeoutRef.current = null
-    }, 120)
+    }, 350)
   }
   const [wellShadow, setWellShadow] = useState<string | null>(null)
   const handleHoverWell = (e: WellMouseEvent): void => {
