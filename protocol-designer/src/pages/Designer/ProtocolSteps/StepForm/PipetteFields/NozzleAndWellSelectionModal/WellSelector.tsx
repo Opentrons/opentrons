@@ -241,9 +241,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   )
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const slot = getSlotInLocationStack(labware.stack)
-
-  const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
+  const viewBox = getViewboxFromSelectedLabware(
+    labwareId,
+    robotState,
+    deckSetup,
+    deckDef
+  )
 
   const handleClickWell = (wellName: string): void => {
     const wellsField = getWellsField()
@@ -423,9 +426,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     : null
   const isLabwareOnModule = moduleDef !== null
   const defaultSlotPosition: [number, number, number] = [0, 0, 0]
-  const slotPosition = getPositionFromSlotId(slot, deckDef)
 
-  if (slotPosition && labware && robotState) {
+  if (labware && robotState) {
+    const activeLabware = robotState.labware[labwareId]
+    const slot = getSlotInLocationStack(activeLabware.stack)
+    const slotPosition =
+      getPositionFromSlotId(slot, deckDef) ?? defaultSlotPosition
     inaccessiblePartialWells.forEach(well => {
       if (!selectedWells.flat().includes(well)) {
         if (hoveredWells?.includes(well)) {
