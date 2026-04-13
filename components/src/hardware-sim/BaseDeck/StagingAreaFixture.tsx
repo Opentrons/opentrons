@@ -28,7 +28,7 @@ export function StagingAreaFixture(
     deckDefinition,
     fixtureBaseColor,
     slotClipColor,
-    showSlotClips = false,
+    showSlotClips = true,
     ...restProps
   } = props
 
@@ -41,16 +41,23 @@ export function StagingAreaFixture(
     )
     return null
   }
-
   const contentsByCutoutLocation: {
     [cutoutId in StagingAreaLocation]: JSX.Element
   } = {
     cutoutA3: (
       <>
-        <SlotBase
-          d="M314.8,417.1h329.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,415.1,312.4,417.1,314.8,417.1z"
-          fill={fixtureBaseColor}
-        />
+        <g transform={'translate(164, 107)'}>
+          <SlotBase
+            d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
+        <g transform={'translate(328, 107)'}>
+          <SlotBase
+            d="M163.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
         {showSlotClips ? (
           <>
             <SlotClip d="M326,398.9V409h10.8" stroke={slotClipColor} />,
@@ -65,12 +72,21 @@ export function StagingAreaFixture(
         ) : null}
       </>
     ),
+
     cutoutB3: (
       <>
-        <SlotBase
-          d="M314.8,310h329.9c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C310.5,308.1,312.4,310,314.8,310z"
-          fill={fixtureBaseColor}
-        />
+        <g transform={'translate(164, 0)'}>
+          <SlotBase
+            d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
+        <g transform={'translate(328, 0)'}>
+          <SlotBase
+            d="M163.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
         {showSlotClips ? (
           <>
             <SlotClip d="M326,291.9V302h10.8" stroke={slotClipColor} />,
@@ -87,10 +103,18 @@ export function StagingAreaFixture(
     ),
     cutoutC3: (
       <>
-        <SlotBase
-          d="M314.8,203.1h329.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,201.2,312.4,203.1,314.8,203.1z"
-          fill={fixtureBaseColor}
-        />
+        <g transform={'translate(164, -107)'}>
+          <SlotBase
+            d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
+        <g transform={'translate(328, -107)'}>
+          <SlotBase
+            d="M163.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+            fill={fixtureBaseColor}
+          />
+        </g>
         {showSlotClips ? (
           <>
             <SlotClip d="M326,185v10.1h10.8" stroke={slotClipColor} />,
@@ -107,22 +131,32 @@ export function StagingAreaFixture(
     ),
     cutoutD3: (
       <>
-        <SlotBase
-          d="M314.8,96.1h329.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,94.2,312.4,96.1,314.8,96.1z"
-          fill={fixtureBaseColor}
-        />
-        {showSlotClips ? (
-          <>
-            <SlotClip d="M326,77.9V88h10.8" stroke={slotClipColor} />
-            <SlotClip d="M326,8.8V-1.7h10.6" stroke={slotClipColor} />
-            <SlotClip d="M457.8,77.9V88H447" stroke={slotClipColor} />
-            <SlotClip d="M457.8,8.8V-1.9H447" stroke={slotClipColor} />
-            <SlotClip d="M490,77.9v10.1h10.8" stroke={slotClipColor} />,
-            <SlotClip d="M490,8.8v-10.5h10.6" stroke={slotClipColor} />,
-            <SlotClip d="M621.8,77.9v10.1h-10.8" stroke={slotClipColor} />,
-            <SlotClip d="M621.8,8.8v-10.7h-10.8" stroke={slotClipColor} />
-          </>
-        ) : null}
+        <>
+          <g transform={'translate(164, -214)'}>
+            <SlotBase
+              d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+              fill={fixtureBaseColor}
+            />
+          </g>
+          <g transform={'translate(328, -214)'}>
+            <SlotBase
+              d="M163.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
+              fill={fixtureBaseColor}
+            />
+          </g>
+          {showSlotClips ? (
+            <>
+              <SlotClip d="M326,77.9V88h10.8" stroke={slotClipColor} />
+              <SlotClip d="M326,8.8V-1.7h10.6" stroke={slotClipColor} />
+              <SlotClip d="M457.8,77.9V88H447" stroke={slotClipColor} />
+              <SlotClip d="M457.8,8.8V-1.9H447" stroke={slotClipColor} />
+              <SlotClip d="M490,77.9v10.1h10.8" stroke={slotClipColor} />,
+              <SlotClip d="M490,8.8v-10.5h10.6" stroke={slotClipColor} />,
+              <SlotClip d="M621.8,77.9v10.1h-10.8" stroke={slotClipColor} />,
+              <SlotClip d="M621.8,8.8v-10.7h-10.8" stroke={slotClipColor} />
+            </>
+          ) : null}
+        </>
       </>
     ),
   }
