@@ -478,7 +478,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
-            slotPosition={isLabwareOnModule ? defaultSlotPosition : slotPosition}
+            slotPosition={
+              isLabwareOnModule ? defaultSlotPosition : slotPosition
+            }
             hoveredWell={wellShadow ?? ''}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
