@@ -245,14 +245,29 @@ async def get_hardware_resource(
     hardware_api = _hw_api_accessor.get_from(app_state)
     hardware_api_subprocess = _hw_subprocess_accessor.get_from(app_state)
 
-    if ff.hardware_subprocess_enabled() and hardware_api_subprocess is None:
-        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    if ff.hardware_subprocess_enabled():
+        if (
+            hardware_api_subprocess is None
+            or initialize_task is None
+            or not initialize_task.done()
+        ):
+            raise HardwareNotYetInitialized().as_error(
+                status.HTTP_503_SERVICE_UNAVAILABLE
+            )
 
-    elif not ff.hardware_subprocess_enabled() and hardware_api_subprocess is not None:
-        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
-
-    elif hardware_api is None or initialize_task is None or not initialize_task.done():
-        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    else:
+        if (
+            (
+                not ff.hardware_subprocess_enabled()
+                and hardware_api_subprocess is not None
+            )
+            or hardware_api is None
+            or initialize_task is None
+            or not initialize_task.done()
+        ):
+            raise HardwareNotYetInitialized().as_error(
+                status.HTTP_503_SERVICE_UNAVAILABLE
+            )
 
     if initialize_task.cancelled():
         raise HardwareFailedToInitialize(
@@ -276,7 +291,10 @@ async def get_hardware_resource(
     if hardware_api_subprocess is not None:
         return hardware_api_subprocess
 
-    return hardware_api
+    elif hardware_api is not None:
+        return hardware_api
+    else:
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 async def get_hardware(
