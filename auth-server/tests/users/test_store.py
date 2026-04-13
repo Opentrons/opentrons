@@ -103,12 +103,12 @@ def test_update_persists(user_store: UserStore) -> None:
     fetched = user_store.get("persist_test")
     assert fetched is not None
     assert fetched.full_name == "After"
-    assert fetched.reset_password == True
+    assert fetched.reset_password
 
     user_store.update("persist_test", reset_password=False)
     fetched = user_store.get("persist_test")
     assert fetched is not None
-    assert fetched.reset_password == False
+    assert not fetched.reset_password
 
 
 def test_failed_login_counter(user_store: UserStore) -> None:

@@ -1,9 +1,8 @@
-"""added reset password flag
+"""added reset password flag.
 
 Revision ID: f37b867e27cf
 Revises: 151bf837b9f2
 Create Date: 2026-04-09 15:39:38.933216
-
 """
 
 from typing import Sequence, Union
