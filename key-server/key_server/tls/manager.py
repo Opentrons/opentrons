@@ -73,7 +73,7 @@ class TLSManager:
 
     async def refresh_robot_details(self) -> None:
         """Do a refresh of the robot's IP and hostname. May be polled or called, so locks."""
-        async with self._robot_details_lock():
+        async with self._robot_details_lock:
             robot_hostname = await self._find_robot_hostname()
             robot_ips = await self._find_robot_ips()
             if not self._ee_manager.set_robot_details(datetime.now(timezone.utc)):
@@ -117,11 +117,3 @@ class TLSManager:
             if not self._ee_manager.ready(now + poll_time):
                 await self.refresh_ee()
             await asyncio.sleep(poll_time.total_seconds())
-
-    @staticmethod
-    async def _find_robot_hostname() -> str:
-        pass
-
-    @staticmethod
-    async def _find_robot_ips() -> str:
-        pass

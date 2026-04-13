@@ -6,9 +6,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Awaitable, Callable, Final
 
+from cryptography import x509
+
 from . import cryptography_utils
 from key_server.util import subproc_wait_timeout
-from cryptography import x509
 
 LOG = logging.getLogger(__name__)
 
