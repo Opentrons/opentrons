@@ -507,7 +507,7 @@ const getPotentiallyContainedLabwareRelationship = (
  * footprint strictly exceeds the other in both X and Y, set `contains` on the **larger** labware
  * to the id of the smaller-footprint labware. Groups of size other than 2, ties, or missing defs are skipped.
  */
-const assignContainsAmongSiblings = (
+export const assignContainsAmongSiblings = (
   labware: RobotState['labware'],
   labwareEntities: LabwareEntities
 ): RobotState['labware'] => {

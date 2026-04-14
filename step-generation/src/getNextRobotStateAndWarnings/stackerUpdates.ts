@@ -1,4 +1,11 @@
-import { SYSTEM_LOCATION } from '@opentrons/shared-data'
+import {
+  FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_ROBOT_TYPE,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
+  FLEX_STACKER_V1_FIXTURE,
+  getDeckDefFromRobotType,
+  SYSTEM_LOCATION,
+} from '@opentrons/shared-data'
 
 import {
   BOTTOM_UP_LABWARE_POOL_KEYS,
@@ -7,6 +14,7 @@ import {
 import { flexStackerStateGetter } from '../robotStateSelectors'
 
 import type {
+  AddressableAreaName,
   FlexStackerEmptyCreateCommand,
   FlexStackerFillItemsParams,
   FlexStackerFillParams,
@@ -274,6 +282,20 @@ export const forFlexStackerFillItems = (
         ...robotState.labware[group.lidLabwareId],
         stack: bottomUpStack.slice(bottomUpStack.indexOf(group.lidLabwareId)),
       }
+    }
+    let prevLabwareId: string | null = null
+    for (const labwareId of bottomUpStack) {
+      if (prevLabwareId == null) {
+        robotState.labware[labwareId].stackedOnNode = {
+          kind: 'inStackerHopper',
+          moduleId,
+        }
+      } else {
+        robotState.labware[labwareId].stackedOnNode = {
+          labwareId: prevLabwareId,
+        }
+      }
+      prevLabwareId = labwareId
     }
   }
 
@@ -559,6 +581,7 @@ export const forFlexStackerRetrieve = (
 
       // build labware stacks on the deck
       const runningStack = [moduleSlot]
+      let isBottom: boolean = true
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareGroupOnShuttle[
@@ -567,6 +590,18 @@ export const forFlexStackerRetrieve = (
         if (labwareId != null) {
           runningStack.unshift(labwareId)
           robotState.labware[labwareId].stack = [...runningStack]
+          if (isBottom) {
+            const shuttleAA = _getStackerShuttleAA(moduleSlot)
+            if (shuttleAA != null) {
+              robotState.labware[labwareId].stackedOnNode = {
+                addressableAreaName: shuttleAA,
+              }
+            }
+            console.warn(
+              `Could not find an addressable area for retrieved labware in stacker module ${moduleId} at slot ${moduleSlot}`
+            )
+            isBottom = false
+          }
         }
       }
     }
@@ -592,6 +627,7 @@ export const forFlexStackerStore = (
       moduleState.labwareOnShuttle = null
 
       // build trivial stacks for stored labware group elements
+      let prevLabwareId: string | null = null
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareOnShuttle[
@@ -605,6 +641,17 @@ export const forFlexStackerStore = (
             moduleId,
             moduleSlot,
           ]
+          if (prevLabwareId == null) {
+            robotState.labware[labwareId].stackedOnNode = {
+              kind: 'inStackerHopper',
+              moduleId,
+            }
+            prevLabwareId = labwareId
+          } else {
+            robotState.labware[labwareId].stackedOnNode = {
+              labwareId: prevLabwareId,
+            }
+          }
         }
       }
       // if there are no stored labware details, set them now
@@ -628,4 +675,24 @@ export const forFlexStackerStore = (
       }
     }
   }
+}
+
+const _getStackerShuttleAA = (
+  moduleSlot: string
+): AddressableAreaName | null => {
+  // stacker only compatible with Flex
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+
+  // Flex stacker slots are currently set in column 4, so we need to transform the slot name to the correct cutout id
+  const transformedSlot = `${moduleSlot[0]}3`
+  const cutuoutId = FLEX_CUTOUT_BY_SLOT_ID[transformedSlot]
+  const flexStackerAAs = deckDef.cutoutFixtures.find(
+    ({ id }) => id === FLEX_STACKER_V1_FIXTURE
+  )?.providesAddressableAreas[cutuoutId]
+
+  // pick off the shuttle AA that is exposed by the stacker
+  return (
+    FLEX_STACKER_ADDRESSABLE_AREAS.find(aa => flexStackerAAs?.includes(aa)) ??
+    null
+  )
 }

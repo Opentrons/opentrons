@@ -12,7 +12,10 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE } from '@opentrons/step-generation'
+import {
+  getStackedOnNodeFromPdStack,
+  MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
+} from '@opentrons/step-generation'
 
 import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
 import {
@@ -37,6 +40,7 @@ import type { Selector } from 'reselect'
 import type { DropdownOption, Mount } from '@opentrons/components'
 import type {
   LabwareDefinition2,
+  LoadedLabwareLocation,
   ModuleType,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -231,6 +235,12 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+  const labwareStackedOnNodeUpdate =
+    (initialSetupStep?.labwareStackedOnNodeUpdate ?? {}) as Record<
+      string,
+      LoadedLabwareLocation
+    >
+  const labwareEntityIds = new Set(Object.keys(labwareEntities))
 
   // filtering only the additionalEquipmentEntities that are rendered on the deck
   // which for now is wasteChute, trashBin, and stagingArea
@@ -247,13 +257,23 @@ const _getInitialDeckSetup = (
     labware: mapValues<Record<string, string>, LabwareOnDeck>(
       labwareLocations as Record<string, string>,
       (id: string, labwareId: string): LabwareOnDeck => {
+        const stack = getLocationStackTopToBottom(
+          labwareId,
+          labwareLocations,
+          moduleLocations,
+          moduleEntities
+        )
+        const stackedOnNode =
+          labwareStackedOnNodeUpdate[labwareId] ??
+          getStackedOnNodeFromPdStack({
+            stack,
+            subjectLabwareId: labwareId,
+            moduleEntities,
+            labwareEntityIds,
+          })
         return {
-          stack: getLocationStackTopToBottom(
-            labwareId,
-            labwareLocations,
-            moduleLocations,
-            moduleEntities
-          ),
+          stack,
+          ...(stackedOnNode != null ? { stackedOnNode } : {}),
           ...labwareEntities[labwareId],
         }
       }

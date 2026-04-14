@@ -1,3 +1,6 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+
 import {
   FLEX_STACKER_MODULE_TYPE,
   getIsLid,
@@ -12,6 +15,7 @@ import {
   getLargestStackInSlot,
   getSlotInLocationStack,
 } from '../utils'
+import { assignContainsAmongSiblings } from '../utils/traversals'
 
 import type {
   FlexStackerStoredLabwareGroup,
@@ -32,6 +36,9 @@ export function forMoveLabware(
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const { modules, labware } = robotState
+  if (labware[labwareId] == null) {
+    return
+  }
   const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
   const fullStackFromLabwares = getFullStackFromLabwares(
     labware,
@@ -209,4 +216,19 @@ export function forMoveLabware(
       }
     }
   })
+
+  // duplicative, but we will remove the above stack logic, so keep it here for now
+  const isNewParentPipettableLabware =
+    typeof newLocation === 'object' &&
+    'labwareId' in newLocation &&
+    getIsPipettableLabware(labwareEntities[newLocation.labwareId].def)
+  robotState.labware[labwareId].stackedOnNode = newLocation
+  if (isNewParentPipettableLabware) {
+    robotState.labware[labwareId].sterility = TOUCHED_PIPETTABLE_LABWARE
+  }
+  // Sibling `contains` depends on shared `stackedOnNode`; clear existing 'contains' and re-derive after the move.
+  robotState.labware = assignContainsAmongSiblings(
+    mapValues(robotState.labware, lw => omit(lw, 'contains')),
+    labwareEntities
+  )
 }
