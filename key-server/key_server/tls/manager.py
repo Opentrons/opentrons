@@ -74,6 +74,7 @@ class TLSManager:
         )
         await obj.refresh_ee()
         await obj.schedule_expiry_task(cls.EXPIRY_CHECKER_POLL_PERIOD)
+        await obj.schedule_robot_details_task()
         return obj
 
     async def teardown(self) -> None:
@@ -91,6 +92,12 @@ class TLSManager:
     def expiry_task_running(self) -> bool:
         """True if the expiry task is running properly. Mostly used internally and for testing."""
         return self._expiry_task is not None and not self._expiry_task.done()
+
+    def robot_details_task_running(self) -> bool:
+        """True if the robot details task is running properly. Mostly used internally and for testing."""
+        return (
+            self._robot_details_task is not None and not self._robot_details_task.done()
+        )
 
     async def cancel_expiry_task(self) -> None:
         """Cancel a running expiry task. Mostly used for testing; callers should prefer teardown()."""
