@@ -23,7 +23,10 @@ def upgrade() -> None:
     with op.batch_alter_table("user", schema=None) as batch_op:
         batch_op.add_column(
             sa.Column(
-                "reset_password", sa.Boolean(), server_default="false", nullable=False
+                "reset_password",
+                sa.Boolean(),
+                server_default=sa.false(),
+                nullable=False,
             )
         )
 
