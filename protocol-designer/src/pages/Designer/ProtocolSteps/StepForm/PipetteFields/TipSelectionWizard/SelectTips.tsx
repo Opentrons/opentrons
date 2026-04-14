@@ -103,10 +103,13 @@ export function SelectTips(
     primaryNozzle,
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
+  const robotState = useSelector(getRobotStateAtActiveItem)
+
   const viewBox =
     selectedTiprackId != null
       ? getViewboxFromSelectedLabware(
           selectedTiprackId,
+          robotState,
           activeDeckSetup,
           deckDef
         )
@@ -116,7 +119,6 @@ export function SelectTips(
     console.warn(`no viewbox for selected tiprack ${selectedTiprackId}`)
   }
 
-  const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
 
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
