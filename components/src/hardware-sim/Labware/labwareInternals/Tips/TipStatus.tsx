@@ -28,9 +28,9 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
   const { type, size, text, wellMap, wellName } = props
   switch (type) {
     case NEW:
-      return <NewTip size={size} />
+      return <NewTip size={size} wellName={wellName} />
     case USED:
-      return <UsedTip size={size} />
+      return <UsedTip size={size} wellName={wellName} />
     case SELECTED:
       return (
         <SelectedWell

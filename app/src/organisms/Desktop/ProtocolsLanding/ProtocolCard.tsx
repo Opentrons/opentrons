@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  InlineNotification,
   JUSTIFY_FLEX_END,
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
@@ -22,6 +23,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getPipetteNameSpecs,
@@ -65,6 +67,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
+  const isFlex = mostRecentAnalysis?.robotType === FLEX_ROBOT_TYPE
+
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
@@ -95,6 +99,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           protocolDisplayName={protocolDisplayName}
           isAnalyzing={isAnalyzing}
           modified={modified}
+          isFlex={isFlex}
         />
       </ErrorBoundary>
       <Box
@@ -118,6 +123,7 @@ interface AnalysisInfoProps {
   modified: number
   isAnalyzing: boolean
   mostRecentAnalysis?: ProtocolAnalysisOutput | null
+  isFlex: boolean
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
@@ -126,6 +132,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     isAnalyzing,
     mostRecentAnalysis,
     modified,
+    isFlex,
   } = props
   const { t, i18n } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
@@ -184,10 +191,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               />
             ),
             complete:
-              mostRecentAnalysis != null ? (
+              mostRecentAnalysis != null && isFlex ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
-                <Box size="6rem" backgroundColor={COLORS.grey30} />
+                <Box
+                  size="6rem"
+                  backgroundColor={COLORS.grey30}
+                  borderRadius={BORDERS.borderRadius8}
+                />
               ),
           }[analysisStatus]
         }
@@ -202,7 +213,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'parameterRequired' ? (
             <ProtocolStatusBanner />
           ) : null}
-          {analysisStatus === 'error' ? (
+          {analysisStatus === 'error' && isFlex ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
               errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
@@ -210,6 +221,17 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           ) : null}
           {analysisStatus === 'stale' ? (
             <ProtocolAnalysisStale protocolKey={protocolKey} />
+          ) : null}
+
+          {!isFlex ? (
+            <Box paddingRight={SPACING.spacing24}>
+              <InlineNotification
+                type="alert"
+                heading={t('branded:ot2_protocol_detected')}
+                message={t('branded:ot2_protocol_detected_description')}
+                linkText={t('branded:get_the_app')}
+              />
+            </Box>
           ) : null}
           <Flex paddingRight={SPACING.spacing24}>
             <StyledText

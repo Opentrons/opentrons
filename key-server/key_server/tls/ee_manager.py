@@ -1,11 +1,13 @@
 """Code for managing TLS end entities."""
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Final
+from typing import Awaitable, Callable, Final
 
 from . import cryptography_utils
+from key_server.util import subproc_wait_timeout
 
 LOG = logging.getLogger(__name__)
 
@@ -38,12 +40,38 @@ class TLSEEManager:
     EE_EXPIRY_DURATION: Final = timedelta(days=1)
     EE_EXPIRY_GRACE_DURATION: Final = timedelta(hours=1)
 
+    @staticmethod
+    async def rotate_cert_nginx() -> None:
+        """Notify nginx that it should rotate certs."""
+        LOG.info("Using systemd/nginx TLS terminator cert rotation")
+        reload_proc = await asyncio.create_subprocess_exec(
+            "/usr/bin/systemctl", "reload", "nginx-https.service"
+        )
+
+        reload_code = await subproc_wait_timeout(reload_proc)
+        if reload_code != 0:
+            LOG.warning(f"nginx could not reload ({reload_code}), restarting")
+            restart_proc = await asyncio.create_subprocess_exec(
+                "/usr/bin/systemctl", "restart", "nginx-https.service"
+            )
+            restart_code = await subproc_wait_timeout(restart_proc)
+            if restart_code != 0:
+                LOG.error(
+                    f"nginx could not restart ({restart_code}), https unavailable"
+                )
+
+    @staticmethod
+    async def rotate_cert_none() -> None:
+        """Notify (quote-unquote) nothing that certs should be rotated."""
+        LOG.info("Using none TLS terminator cert rotation")
+
     def __init__(
         self,
         key_dir: Path,
         ee_cert_dir: Path,
         robot_hostname: str,
         robot_ips: list[str],
+        rotate_fn: Callable[[], Awaitable[None]],
     ) -> None:
         """Build the TLSEEManager.
 
@@ -56,6 +84,7 @@ class TLSEEManager:
         self._ee_pair: cryptography_utils.X509Pair | None = None
         self._robot_hostname = robot_hostname
         self._robot_ips = robot_ips
+        self._tls_terminator_rotate = rotate_fn
 
     def generate_precert(self) -> cryptography_utils.PartialCertWithSigningRequired:
         """Generate a new precertificate for signing."""
@@ -87,13 +116,14 @@ class TLSEEManager:
             )
         )
 
-    def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
+    async def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
         """Install a signed EE cert."""
         LOG.info(
             f"Installing TLS certificate with fingerprint {cryptography_utils.fingerprint(cert.cert)}"
         )
         self.remove_cert("EE cert outdated")
         self._ee_pair = cryptography_utils.install_tls_cert(self._ee_cert_dir, cert)
+        await self._tls_terminator_rotate()
 
     def remove_cert(self, reason: str) -> None:
         """Remove the currently-managed certificate, if there is one."""
