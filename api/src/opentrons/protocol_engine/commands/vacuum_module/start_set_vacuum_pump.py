@@ -24,7 +24,7 @@ class StartSetVacuumPumpParams(BaseModel):
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     percentPower: int = Field(
         ...,
-        description="Desired duty cycle of the vacuum pump as a percentage.",
+        description="Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
     )
 
 
@@ -54,7 +54,10 @@ class StartSetVacuumPumpImpl(
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
-
+        if params.percentPower < 0 or params.percentPower > 100:
+            raise ValueError(
+                f"pump power {params.percentPower} invalid must be between 1 and 100%"
+            )
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         if vm_hardware is not None:
             await vm_hardware.set_pump_state(

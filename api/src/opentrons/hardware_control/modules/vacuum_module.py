@@ -321,8 +321,6 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Handler for internal pressure controls."""
-        # clear any existing vacuum state before overwriting
-        await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
             gauge_pressure_mbar=gauge_pressure_mbar,
