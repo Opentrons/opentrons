@@ -53,8 +53,4 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send('secondary-window: close-self')
     },
   },
-  ot2App: {
-    open: (payload?: { filePath?: string }) =>
-      ipcRenderer.invoke('ot2-app:open', payload),
-  },
 })
