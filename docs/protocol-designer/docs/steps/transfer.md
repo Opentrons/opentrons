@@ -14,7 +14,7 @@ Transfer steps move liquid from one well or group of wells to another. Adding a 
 
 * The pipette to perform the transfer and the tip rack it will use. 
 * Source and destination labware.
-* The number of multi-channel pipette nozzles and labware wells to use during the transfer.
+* The number of pipette nozzles and labware wells to use during the transfer.
 * Pipette path, or motion the pipette uses to perform the transfer. 
 * The volume of liquid to transfer.
 
@@ -39,7 +39,7 @@ Next, select source and destination wells. Protocol Designer shows available wel
 
 ### Pipette path
 
-Pipette path and tip handling options, shown below, are only available if they are compatible with your well selections and other transfer settings. In the fourth form, you can also customize [tip management](transfer.md#tip-management) settings, like how often the pipette picks up a new tip.
+Pipette path and tip handling options depend on your well selections and other transfer settings. In the fourth form, you can also customize [tip management](transfer.md#tip-management) settings, like how often the pipette picks up a new tip.
 
 | **Pipette Path** | **Well Ratio** | **Description** {style="width: 25%;"}| **Tip Handling** |
 | ---------------- | -------------- | --------------- | ---------------- |
@@ -178,6 +178,6 @@ Even though the tip rack above is full of pipette tips, the "not enough tips" wa
 
 To fix the collision error, move the tip racks from adjacent deck slots or change your tip pickup selections.
 
-Protocols containing errors cannot be run on the robot and will cause a run to fail. You'll need to resolve these errors before exporting your protocol. 
+Fix all errors before exporting to ensure your protocol runs successfully. You won't be able to run protocols with unresolved errors. 
 
 

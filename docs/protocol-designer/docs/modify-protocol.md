@@ -9,8 +9,16 @@ Your protocol details will be visible in the protocol overview. Click **Edit pro
 
 When uploading a protocol file created in a previous version, Protocol Designer will automatically update your protocol steps and labware to the latest version. The update process lets you use all of the latest features of Protocol Designer in your protocol, such as new modules, labware, and improved pipetting behaviors. 
 
-!!! note
-    Updating a protocol, even without changing its steps, can lead to changes in protocol execution. Always perform your necessary level of testing, such as a dry or wet run, on any newly exported protocol file.
+Updating a protocol, even without changing its steps, can lead to changes in protocol execution. Always perform your necessary level of testing, such as a dry or wet run, on any newly exported protocol file.
+
+!!! tip
+    You can use protocol visualization to test new Flex protocols (API version 2.16 and newer) in the Opentrons App. 
+
+    To visualize your Protocol Designer protocol:
+
+    - Import an existing Flex protocol into Protocol Designer.
+    - Export a new version of the protocol, updated to the latest version.
+    - Import your new protocol into the Opentrons App. Click **Visualize** on the protocol's details page to get started.
 
 As of Protocol Designer 8.5.0, Protocol Designer *only* exports Python protocol files, even if you imported and modified a JSON protocol. You can expect the same level of possible behavior changes when updating from a JSON to a Python protocol as in earlier JSON-to-JSON updates. 
 
