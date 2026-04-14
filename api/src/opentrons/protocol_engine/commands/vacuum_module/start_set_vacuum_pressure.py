@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-StartSetVacuumPressureCommandType = Literal["vacuum_module/StartSetVacuumPressure"]
+StartSetVacuumPressureCommandType = Literal["vacuum_module/startSetVacuumPressure"]
 
 
 class StartSetVacuumPressureParams(BaseModel):
@@ -94,7 +94,7 @@ class StartSetVacuumPressure(
     """A command to start the vacuum pump."""
 
     commandType: StartSetVacuumPressureCommandType = (
-        "vacuum_module/StartSetVacuumPressure"
+        "vacuum_module/startSetVacuumPressure"
     )
     params: StartSetVacuumPressureParams
     result: Optional[StartSetVacuumPressureResult] = None
@@ -106,7 +106,7 @@ class StartSetVacuumPressureCreate(BaseCommandCreate[StartSetVacuumPressureParam
     """A request to start the vacuum pump."""
 
     commandType: StartSetVacuumPressureCommandType = (
-        "vacuum_module/StartSetVacuumPressure"
+        "vacuum_module/startSetVacuumPressure"
     )
     params: StartSetVacuumPressureParams
 

@@ -7057,8 +7057,8 @@
           "type": "array"
         },
         "commandType": {
-          "const": "vacuum_module/StartSetVacuumPressure",
-          "default": "vacuum_module/StartSetVacuumPressure",
+          "const": "vacuum_module/startSetVacuumPressure",
+          "default": "vacuum_module/startSetVacuumPressure",
           "title": "Commandtype",
           "type": "string"
         },
@@ -7139,8 +7139,8 @@
           "type": "array"
         },
         "commandType": {
-          "const": "vacuum_module/StartSetVacuumPump",
-          "default": "vacuum_module/StartSetVacuumPump",
+          "const": "vacuum_module/startSetVacuumPump",
+          "default": "vacuum_module/startSetVacuumPump",
           "title": "Commandtype",
           "type": "string"
         },
@@ -9184,8 +9184,8 @@
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
-      "vacuum_module/StartSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
-      "vacuum_module/StartSetVacuumPump": "#/$defs/StartSetVacuumPumpCreate",
+      "vacuum_module/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
+      "vacuum_module/startSetVacuumPump": "#/$defs/StartSetVacuumPumpCreate",
       "vacuum_module/stopVacuum": "#/$defs/StopVacuumCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
