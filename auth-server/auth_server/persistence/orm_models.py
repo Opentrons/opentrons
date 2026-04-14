@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from typing import Any, TypeAlias
 
-from sqlalchemy import ForeignKey, String, TypeDecorator
+from sqlalchemy import ForeignKey, String, TypeDecorator, false
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -40,6 +40,7 @@ class User(Base):
     hashed_password: Mapped[str]
     full_name: Mapped[str]
     account_type: Mapped[str]
+    reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",
