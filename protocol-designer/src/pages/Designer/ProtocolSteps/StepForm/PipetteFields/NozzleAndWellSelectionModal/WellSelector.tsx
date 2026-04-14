@@ -99,7 +99,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
   const allWells = labwareDef.ordering
-  const hasMoreThanOneWell = allWells.length > 1
+  const hasMoreThanOneWell = allWells.flat().length > 1
   const displayName = labwareDef.metadata.displayName
 
   const getWellsField = (): FieldProps | null => {
