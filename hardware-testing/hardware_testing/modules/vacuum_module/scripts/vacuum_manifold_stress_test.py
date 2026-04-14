@@ -108,6 +108,14 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=96000,
         description="Reservoir water fill time.",
     )
+    parameters.add_int(
+        "perstaltic_flow_rate",
+        "perstaltic_flow_rate",
+        default=76,
+        minimum=1,
+        maximum=400,
+        description="Reservoir water fill time.",
+    )
 
 
 async def find_port_by_id(vendorId: int, productId: int) -> str:
@@ -212,7 +220,7 @@ async def _setup_devices() -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # t
     # Vacuum Manifold Driver
     port = await find_port_by_id(VM_idVendor, VM_idProduct)
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
-
+    await pump.set_waste_configs(False)
     # Arduino Water pump Driver
     m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
 
@@ -303,7 +311,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
-    perstaltic_pump_flow_rate = 70  # mL/min
+    perstaltic_pump_flow_rate = ctx.params.perstaltic_flow_rate  # mL/min
     conversion = ((perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate) * 60  # Convert uL volume to pump fill time (seconds)
     perstaltic_time = int(conversion)
 
@@ -343,6 +351,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
             # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
             pip.move_to(filter_plate["A1"].top(10))  # Move away again
+            
             try:
                 loop.run_until_complete(
                     _run_single_pump_api_cycle(
