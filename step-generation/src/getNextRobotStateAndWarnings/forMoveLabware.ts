@@ -11,6 +11,7 @@ import {
 import { BOTTOM_UP_LABWARE_POOL_KEYS } from '../constants'
 import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
 import {
+  getFlexStackerShuttleAddressableArea,
   getFullStackFromLabwares,
   getLargestStackInSlot,
   getSlotInLocationStack,
@@ -175,6 +176,17 @@ export function forMoveLabware(
       FLEX_STACKER_MODULE_TYPE
     ) {
       newLocationStack.push(modules[newLocation.moduleId].slot)
+
+      // if the new location is a flex stacker shuttle, set the stackedOnNode to the shuttle addressable area
+      const shuttleAa = getFlexStackerShuttleAddressableArea(
+        modules[newLocation.moduleId].slot
+      )
+      if (shuttleAa != null) {
+        robotState.labware[labwareId].stackedOnNode = {
+          addressableAreaName: shuttleAa,
+        }
+        return
+      }
     } else {
       newLocationStack.push(
         newLocation.moduleId,
