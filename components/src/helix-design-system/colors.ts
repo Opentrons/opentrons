@@ -81,6 +81,7 @@ export const blue50 = '#006CFA'
  * */
 export const transparentWhite80 = `${white}CC`
 export const transparentWhite50 = `${white}80`
+export const transparentBlack10 = `${black90}1A`
 export const transparentBlack80 = `${black90}80`
 export const transparentBlack90 = `${black90}90`
 /**
