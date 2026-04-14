@@ -40,7 +40,9 @@ const mockTiprackId = 'mockTiprackId'
 const MOCK_ADAPTER_ID = 'mockAdapterId'
 const MOCK_ADAPTER_URI = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 const mockRobotState: RobotState = {
-  labware: { labId: { stack: ['labId', 'mockHsId', 'D1'] } },
+  labware: {
+    [MOCK_TIPRACK_URI]: { stack: ['mockTiprackId', 'mockHsId', 'D1'] },
+  },
   pipettes: {},
   modules: {},
   tipState: {} as any,
