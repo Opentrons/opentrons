@@ -66,6 +66,7 @@ import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { Dispatch } from '/app/redux/types'
+import { Login } from '../pages/ODD/Login'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.
@@ -94,6 +95,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/runs/:runId/setup',
   '/runs/:runId/summary',
   '/welcome',
+  '/login',
 ] as const
 
 function getPathComponent(
@@ -106,6 +108,8 @@ function getPathComponent(
       return <RobotDashboard />
     case '/deck-configuration':
       return <DeckConfigurationEditor />
+    case '/login':
+      return <Login />
     case '/emergency-stop':
       return <EmergencyStop />
     case '/instruments':
