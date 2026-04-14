@@ -197,7 +197,7 @@ def build_tls_precert(
     key_path = file_utils.save_key(
         key_dir,
         key,
-        constants.TLS_KEY_NAME,
+        constants.TLS_KEY_NAME + "-" + now.isoformat(),
         "<under construction>",
     )
     return PartialCertWithSigningRequired(keypath=key_path, key=key, builder=builder)
@@ -205,11 +205,18 @@ def build_tls_precert(
 
 def install_tls_cert(tls_cert_dir: Path, tls_cert: SignedCert) -> X509Pair:
     """Install a signed TLS cert by saving it to the standard path."""
-    return X509Pair(
-        keypath=tls_cert.keypath,
+    pair = X509Pair(
+        keypath=file_utils.save_key(
+            tls_cert.keypath.parent,
+            tls_cert.key,
+            constants.TLS_KEY_NAME,
+            fingerprint(tls_cert.cert),
+        ),
         certpath=file_utils.save_cert(
             tls_cert_dir, tls_cert.cert, constants.TLS_CERT_NAME, "TLS cert", "PEM"
         ),
         key=tls_cert.key,
         cert=tls_cert.cert,
     )
+    tls_cert.keypath.unlink()
+    return pair
