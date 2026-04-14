@@ -48,10 +48,6 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, **kwargs: object) -> None:
-        kwargs.setdefault("reset_password", False)
-        super().__init__(**kwargs)
-
     def __repr__(self) -> str:  # noqa: D105
         return f"<User(username={self.username!r})>"
 

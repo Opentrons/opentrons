@@ -40,6 +40,7 @@ def _make_orm_user(
     hashed_password: str = "h",
     full_name: str = "Full Name",
     account_type: AccountType = AccountType.USER,
+    reset_password: bool = False,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
     return User(
@@ -47,6 +48,7 @@ def _make_orm_user(
         hashed_password=hashed_password,
         full_name=full_name,
         account_type=account_type,
+        reset_password=reset_password,
     )
 
 
