@@ -349,7 +349,10 @@ dev-backend-flex:
 		$(MAKE) -C auth-server dev ';' \
 		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
-		$(MAKE) dev-proxy
+		$(MAKE) -C key-server dev-mitmproxy ';' \
+		$(MAKE) dev-proxy ';' \
+		$(MAKE) dev-proxy-tls
+
 
 # Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),
 # this sets up a reverse proxy that listens on localhost:31950 and forwards each request
@@ -367,3 +370,12 @@ dev-proxy:
 	    --mode reverse:http://localhost:2@31950 \
 	    --set connection_strategy=lazy \
 	    --script scripts/dev_proxy.py
+
+.PHONY: dev-proxy-tls
+dev-proxy-tls:
+	sleep 1
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1 mitmdump \
+		--mode reverse:http://localhost:2@32313 \
+		--set connection_strategy=lazy \
+		--script scripts/dev_proxy.py \
+		--certs key-server/.key-server-storage/tls/flex-certs.pem

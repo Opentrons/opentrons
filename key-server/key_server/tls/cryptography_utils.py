@@ -220,3 +220,8 @@ def install_tls_cert(tls_cert_dir: Path, tls_cert: SignedCert) -> X509Pair:
     )
     tls_cert.keypath.unlink()
     return pair
+
+
+def make_pem_bundle(ca: X509Pair, tls: X509Pair, path: Path) -> None:
+    """Write a CA and TLS pair to a single file."""
+    file_utils.make_pem_bundle(ca.cert, tls.cert, tls.key, path)
