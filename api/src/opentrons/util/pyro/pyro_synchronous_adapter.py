@@ -6,10 +6,14 @@ import inspect
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
+import numpy
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 
-from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
+from opentrons.util.pyro.pyro_serialization import (
+    SpecialDictWrapper,
+    UnhashableDictWrapper,
+)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -478,6 +482,36 @@ def convert_type_to_instance(
             raise ValueError(
                 "Pyro behavior for type to instance conversion is only available for use with pure types."
             )
+
+    return wrapper  # type: ignore
+
+
+# CASEY NOTE: REMOVE AND REPLACE FUNCTIONALITY
+def debug_attribute(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            bound_method = MethodType(sync_func, core_obj)
+            result = bound_method(*args, **kwargs)
+        elif isinstance(attr, FunctionType):
+            bound_method = MethodType(attr, core_obj)
+            result = bound_method(*args, **kwargs)
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        # log some useful things!
+        print(f"type of result: {type(result)}")
+        if isinstance(result, dict):
+            print("WE GOT A DICT")
+            return SpecialDictWrapper(dictionary=result)
+
+        return result
 
     return wrapper  # type: ignore
 

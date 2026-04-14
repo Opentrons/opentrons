@@ -1,16 +1,29 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
 import datetime
-from typing import Dict
+from importlib import util
+from typing import Any, Dict, cast
+
+import numpy
+import Pyro5.api as pyro
+import serpent
+from numpy import float64
+from pydantic import BaseModel
+
+import opentrons_shared_data.pipette.pipette_definition
+import opentrons_shared_data.pipette.types
 
 import opentrons.config.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
+    SpecialDictWrapper,
+    _serpent_enum_serializer,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
@@ -160,6 +173,128 @@ def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:  # type: ignore
         "reasonability_check_failures": None,  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
     }
 
+# CASEY TODO: the special dict wrapper should include a __class__ name and here we should check it with an if statement, and have a handler function that does the pipette dict stuff
+
+
+def _special_dict_wrapper_dict_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.dev_types.PipetteDict:
+    dictionary = d["dictionary"]
+
+    converted_supported_tips: Dict[
+        opentrons_shared_data.pipette.types.PipetteTipType,
+        opentrons_shared_data.pipette.pipette_definition.SupportedTipsDefinition,
+    ] = {}
+    for tip in dictionary["supported_tips"].keys():
+        converted_supported_tips[
+            opentrons_shared_data.pipette.types.PipetteTipType(value=int(tip))
+        ] = opentrons_shared_data.pipette.pipette_definition.SupportedTipsDefinition.model_validate(
+            dictionary["supported_tips"][tip]
+        )
+
+    converted_available_volume_modes: Dict[
+        opentrons_shared_data.pipette.types.LiquidClasses,
+        opentrons_shared_data.pipette.pipette_definition.PipetteLiquidPropertiesDefinition,
+    ] = {}
+
+
+    for liquid_class, props in dictionary["available_volume_modes"].items():
+        liquid_class_enum = opentrons_shared_data.pipette.types.LiquidClasses(int(liquid_class))
+        print(f"LQ PROPS: {props}")
+        props["supportedTips"] = {f"t{key}": value for key, value in props["supportedTips"].items()}
+        prop_model = opentrons_shared_data.pipette.pipette_definition.PipetteLiquidPropertiesDefinition.model_validate(
+            props
+        )
+        converted_available_volume_modes[liquid_class_enum] = prop_model
+
+
+    new_dict = opentrons.hardware_control.dev_types.PipetteDict(
+        display_name=str(dictionary["display_name"]),
+        name=dictionary["name"],  # TODO take a look at it
+        model=opentrons_shared_data.pipette.types.PipetteModel(dictionary["model"]),
+        back_compat_names=dictionary["back_compat_names"],
+        pipette_id=str(dictionary["pipette_id"]),
+        min_volume=float(dictionary["min_volume"]),
+        max_volume=float(dictionary["max_volume"]),
+        channels=dictionary["channels"],  # TODO here too
+        aspirate_flow_rate=float(dictionary["aspirate_flow_rate"]),
+        dispense_flow_rate=float(dictionary["dispense_flow_rate"]),
+        blow_out_flow_rate=float(dictionary["blow_out_flow_rate"]),
+        aspirate_speed=float(dictionary["aspirate_speed"]),
+        dispense_speed=float(dictionary["dispense_speed"]),
+        blow_out_speed=float(dictionary["blow_out_speed"]),
+        current_volume=float(dictionary["current_volume"]),
+        tip_length=float(dictionary["tip_length"]),
+        working_volume=float(dictionary["working_volume"]),
+        tip_overlap=dictionary["tip_overlap"],
+        versioned_tip_overlap=dictionary["versioned_tip_overlap"],
+        available_volume=float(dictionary["available_volume"]),
+        return_tip_height=float(dictionary["return_tip_height"]),
+        default_aspirate_flow_rates=dictionary["default_aspirate_flow_rates"],
+        default_dispense_flow_rates=dictionary["default_dispense_flow_rates"],
+        default_blow_out_flow_rates=dictionary["default_blow_out_flow_rates"],
+        default_aspirate_speeds=dictionary["default_aspirate_speeds"],
+        default_dispense_speeds=dictionary["default_dispense_speeds"],
+        default_blow_out_speeds=dictionary["default_blow_out_speeds"],
+        ready_to_aspirate=bool(dictionary["ready_to_aspirate"]),
+        has_tip=bool(dictionary["has_tip"]),
+        default_push_out_volume=None
+        if dictionary["default_push_out_volume"] is None
+        else float(dictionary["default_push_out_volume"]),
+        supported_tips=converted_supported_tips,
+        pipette_bounding_box_offsets=opentrons_shared_data.pipette.pipette_definition.PipetteBoundingBoxOffsetDefinition.model_validate(
+            dictionary["pipette_bounding_box_offsets"]
+        ),
+        current_nozzle_map=opentrons.hardware_control.nozzle_manager.NozzleMap.model_validate(
+            dictionary["current_nozzle_map"]
+        ),
+        lld_settings=None
+        if dictionary["lld_settings"] is None
+        else dictionary["lld_settings"],
+        plunger_positions=dictionary["plunger_positions"],
+        shaft_ul_per_mm=float(dictionary["shaft_ul_per_mm"]),
+        available_sensors=opentrons_shared_data.pipette.pipette_definition.AvailableSensorDefinition.model_validate(
+            dictionary["available_sensors"]
+        ),
+        volume_mode=opentrons_shared_data.pipette.types.LiquidClasses(
+            dictionary["volume_mode"]
+        ),
+        available_volume_modes=converted_available_volume_modes,
+    )
+    return new_dict
+
+
+# numpy float serialization
+def _numpy_float_class_to_dict(obj) -> Dict:
+    return {"__class__": "numpy.float64", "value": float(obj)}
+
+
+def _numpy_float_dict_to_class(classname, d) -> float64:
+    return float64(d["value"])
+
+
+# point named tuple
+def _point_class_to_dict(obj) -> Dict:
+    return {
+        "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
+        "x": obj.x,
+        "y": obj.y,
+        "z": obj.z,
+    }
+
+
+def _point_dict_to_class(clasname, d) -> opentrons.types.Point:
+    x_data = d["x"]
+    y_data = d["y"]
+    z_data = d["z"]
+    if isinstance(x_data, dict):
+        x_data = x_data["value"]
+    if isinstance(y_data, dict):
+        y_data = y_data["value"]
+    if isinstance(z_data, dict):
+        z_data = z_data["value"]
+    return opentrons.types.Point(x=float(x_data), y=float(y_data), z=float(z_data))
+
 
 # Robot type registry - of note, this is meant to return a "pure" type
 def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
@@ -183,6 +318,8 @@ def register_hardware_types() -> None:
             opentrons.config.types,
             opentrons.hardware_control.types,
             opentrons.hardware_control.dev_types,
+            opentrons_shared_data.pipette.pipette_definition,
+            opentrons_shared_data.pipette.types,
         ]
     )
 
@@ -196,6 +333,8 @@ def register_hardware_types() -> None:
             opentrons.config.types,
             opentrons.hardware_control.types,
             opentrons.hardware_control.protocols.types,
+            opentrons_shared_data.pipette.pipette_definition,
+            opentrons.hardware_control.nozzle_manager,
         ]
     )
     for pydantic_type in opentrons_pydantic_types:
@@ -237,4 +376,25 @@ def register_hardware_types() -> None:
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary,
         dict_to_class=_PipetteOffsetSummary_dict_to_class,
         class_to_dict=_PipetteOffsetSummary_class_to_dict,
+    )
+
+    # numpy registration
+    register_type_to_serpent(
+        class_type=float64,
+        dict_to_class=_numpy_float_dict_to_class,
+        class_to_dict=_numpy_float_class_to_dict,
+    )
+
+    # point registration
+    register_type_to_serpent(
+        class_type=opentrons.types.Point,
+        dict_to_class=_point_dict_to_class,
+        class_to_dict=_point_class_to_dict,
+    )
+
+    # handle special dicts
+    register_type_to_serpent(
+        class_type=SpecialDictWrapper,
+        dict_to_class=_special_dict_wrapper_dict_dict_to_class,
+        class_to_dict=OpentronsPyroSerializer._pydantic_class_to_dict,
     )

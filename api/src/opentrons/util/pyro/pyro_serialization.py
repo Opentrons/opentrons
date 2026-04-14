@@ -13,6 +13,10 @@ from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
 
 
+class SpecialDictWrapper(BaseModel):
+    dictionary: dict[Any, Any]
+
+
 class UnhashableDictWrapper(BaseModel):
     """This is a specialty model created to safely wrap dictionaries with mutable elements provided by Opentrons APIs.
 

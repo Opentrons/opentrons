@@ -147,6 +147,7 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_type_to_instance,
+    debug_attribute,
     pyro_behavior,
 )
 
@@ -2690,11 +2691,14 @@ class OT3API(
             module_type, serial_number
         )
 
+    # CASEY NOTE REPLACE WITH NON DEBUG BEHAVIOR
+    @pyro_behavior(specialty_func=debug_attribute, apply_local=False)
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
 
+    @pyro_behavior(specialty_func=debug_attribute, apply_local=False)
     def get_attached_instrument(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
@@ -2757,6 +2761,8 @@ class OT3API(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
+    # CASEY NOTE REMOVE DEBUG ATTRIBUTE HERE
+    @pyro_behavior(debug_attribute, False)
     def get_instrument_max_height(
         self,
         mount: Union[top_types.Mount, OT3Mount],

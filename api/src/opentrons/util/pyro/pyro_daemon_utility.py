@@ -1,6 +1,7 @@
 """Pyro related utilities for daemons and request handling."""
 
 import logging
+import os
 import socket
 from typing import Any, Callable
 
@@ -12,7 +13,13 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     PyroSynchronousObject,
 )
 
+# CASEY NOTE CLEAN UP THIS LOGGER STUFF
+os.environ["PYRO_LOGFILE"] = "pyro.log"
+os.environ["PYRO_LOGLEVEL"] = "DEBUG"
+
 log = logging.getLogger(__name__)
+logging.getLogger("Pyro5").setLevel(logging.DEBUG)
+logging.getLogger("Pyro5.core").setLevel(logging.DEBUG)
 
 PYRO_TIMEOUT = 100
 

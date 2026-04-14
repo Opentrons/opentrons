@@ -261,5 +261,7 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
     value = ot3api.get_robot_type()
     assert isinstance(value, type)
 
+    assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
+
     # Clean up client resources.
     ot3_proxy._pyroRelease()  # type: ignore
