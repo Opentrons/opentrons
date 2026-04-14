@@ -95,6 +95,7 @@ export type USB_HTTP_REQUESTS_START_TYPE = 'shell:USB_HTTP_REQUESTS_START'
 export type USB_HTTP_REQUESTS_STOP_TYPE = 'shell:USB_HTTP_REQUESTS_STOP'
 export type APP_RESTART_TYPE = 'shell:APP_RESTART'
 export type RELOAD_UI_TYPE = 'shell:RELOAD_UI'
+export type FLEX_APP_OPEN_TYPE = 'shell:FLEX_APP_OPEN'
 export type SEND_LOG_TYPE = 'shell:SEND_LOG'
 export type CAMERA_STREAM_OPEN_TYPE = 'shell:CAMERA_STREAM_OPEN'
 

@@ -3,7 +3,8 @@ import path from 'path'
 import { app, BrowserWindow, shell } from 'electron'
 
 import { getConfig } from './config'
-import { RELOAD_UI, UI_INITIALIZED } from './constants'
+import { FLEX_APP_OPEN, RELOAD_UI, UI_INITIALIZED } from './constants'
+import { openFlexAppExternal } from './flexApp'
 import { createLogger } from './log'
 
 import type { Action, Dispatch } from './types'
@@ -103,6 +104,16 @@ export function registerSystemLanguage(
 
         break
       }
+    }
+  }
+}
+
+export function registerFlexAppOpen(): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case FLEX_APP_OPEN:
+        void openFlexAppExternal(action.payload)
+        break
     }
   }
 }

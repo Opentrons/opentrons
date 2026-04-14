@@ -2,6 +2,7 @@ import type {
   AppRestartAction,
   CameraPhotoOpenAction,
   CameraStreamOpenAction,
+  FlexAppOpenAction,
   NotifySubscribeAction,
   NotifyTopic,
   ReloadUiAction,
@@ -24,6 +25,7 @@ export const USB_HTTP_REQUESTS_STOP: 'shell:USB_HTTP_REQUESTS_STOP' =
   'shell:USB_HTTP_REQUESTS_STOP'
 export const APP_RESTART: 'shell:APP_RESTART' = 'shell:APP_RESTART'
 export const RELOAD_UI: 'shell:RELOAD_UI' = 'shell:RELOAD_UI'
+export const FLEX_APP_OPEN: 'shell:FLEX_APP_OPEN' = 'shell:FLEX_APP_OPEN'
 export const SEND_LOG: 'shell:SEND_LOG' = 'shell:SEND_LOG'
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'
@@ -72,6 +74,14 @@ export const reloadUi = (message: string): ReloadUiAction => ({
   payload: {
     message: message,
   },
+  meta: { shell: true },
+})
+
+export const openFlexApp = (
+  payload?: FlexAppOpenAction['payload']
+): FlexAppOpenAction => ({
+  type: FLEX_APP_OPEN,
+  payload,
   meta: { shell: true },
 })
 

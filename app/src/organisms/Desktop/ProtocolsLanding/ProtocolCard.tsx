@@ -1,6 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 
@@ -35,6 +35,7 @@ import {
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { openFlexApp } from '/app/redux/shell'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
@@ -44,15 +45,17 @@ import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalys
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
+import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
-import type { State } from '/app/redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
   handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
+
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const navigate = useNavigate()
   const { handleRunProtocol, handleSendProtocolToFlex, storedProtocolData } =
@@ -130,6 +133,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis,
     modified,
   } = props
+  const dispatch = useDispatch<Dispatch>()
   const { t, i18n } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
@@ -147,6 +151,15 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
 
   const hasPeripherals =
     mostRecentAnalysis?.commandPreconditions?.isCameraUsed ?? false
+
+  // If Flex app is installed, Flex app will be opened.
+  // If Flex app isn't installed, a web browser will open the Flex app download page
+  // Both are handled in app-shell (see flex-app.ts).
+  const handleOpenFlexApp = (event: MouseEvent<HTMLAnchorElement>): void => {
+    event.preventDefault()
+    event.stopPropagation()
+    dispatch(openFlexApp())
+  }
 
   return (
     <Flex
@@ -227,6 +240,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 heading={t('branded:flex_protocol_detected')}
                 message={t('branded:flex_protocol_detected_description')}
                 linkText={t('branded:get_the_app')}
+                onLinkClick={handleOpenFlexApp}
               />
             </Box>
           ) : null}

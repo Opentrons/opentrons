@@ -16,6 +16,7 @@ import {
   registerDiscoverySecondaryWindow,
   unregisterDiscovery,
 } from './discovery'
+import { openFlexAppExternal } from './flexApp'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -29,12 +30,19 @@ import {
 } from './secondary-windows'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
-import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
+import {
+  createUi,
+  registerFlexAppOpen,
+  registerReloadUi,
+  registerSystemLanguage,
+} from './ui'
 import { registerUpdate } from './update'
 import { registerUsb } from './usb'
 
 import type { LogEntry } from 'winston'
 import type { Action, Dispatch, Logger } from './types'
+
+const PROTOCOL_NAME = 'com-opentrons-ot2-app'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
@@ -74,6 +82,7 @@ const handlerSets = new Map<string, HandlerSet>()
 app
   .whenReady()
   .then(async () => {
+    app.setAsDefaultProtocolClient(PROTOCOL_NAME)
     startUp()
 
     if (config.devtools) {
@@ -122,6 +131,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerUsb(dispatch),
           registerNotify(dispatch, window),
           registerReloadUi(window),
+          registerFlexAppOpen(),
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),
         ]
@@ -133,6 +143,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerSystemInfo(dispatch),
           registerNotify(dispatch, window),
           registerReloadUi(window),
+          registerFlexAppOpen(),
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),
         ]
@@ -190,6 +201,13 @@ function startUp(): void {
       senderWindow.close()
     }
   })
+
+  ipcMain.handle(
+    'flex-app:open',
+    async (_event, payload?: { filePath?: string }) => {
+      await openFlexAppExternal(payload)
+    }
+  )
 
   ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })

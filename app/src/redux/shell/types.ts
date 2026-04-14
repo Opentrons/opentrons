@@ -102,6 +102,14 @@ export interface ReloadUiAction {
   meta: { shell: true }
 }
 
+export interface FlexAppOpenAction {
+  type: 'shell:FLEX_APP_OPEN'
+  payload?: {
+    filePath?: string
+  }
+  meta: { shell: true }
+}
+
 export interface SystemLanguageAction {
   type: 'shell:SYSTEM_LANGUAGE'
   payload: {
@@ -250,6 +258,7 @@ export type ShellAction =
   | UsbRequestsAction
   | AppRestartAction
   | ReloadUiAction
+  | FlexAppOpenAction
   | SendLogAction
   | UpdateBrightnessAction
   | RobotMassStorageDeviceAdded

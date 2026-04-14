@@ -28,6 +28,12 @@ module.exports = async () => ({
       : 'com.opentrons.appinternalot2',
   electronVersion: '39.1.2',
   npmRebuild: false,
+  protocols: [
+    {
+      name: 'OT-2 App',
+      schemes: ['com-opentrons-ot2-app'],
+    },
+  ],
   releaseInfo: {
     releaseNotesFile:
       project === 'robot-stack'
