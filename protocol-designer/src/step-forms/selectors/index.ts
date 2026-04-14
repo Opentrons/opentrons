@@ -56,6 +56,7 @@ import type {
   ModuleTemporalProperties,
   NormalizedAdditionalEquipmentById,
   PipetteEntities,
+  RobotState,
   StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
@@ -242,6 +243,16 @@ const _getInitialDeckSetup = (
     >
   const labwareEntityIds = new Set(Object.keys(labwareEntities))
 
+  const modulesRobotState = Object.fromEntries(
+    Object.entries(moduleLocations).map(([moduleId, slot]) => [
+      moduleId,
+      {
+        slot,
+        moduleState: MODULE_INITIAL_STATES_MAP[moduleEntities[moduleId].type],
+      },
+    ])
+  ) as RobotState['modules']
+
   // filtering only the additionalEquipmentEntities that are rendered on the deck
   // which for now is wasteChute, trashBin, and stagingArea
   const additionalEquipmentEntitiesOnDeck = Object.values(
@@ -270,6 +281,7 @@ const _getInitialDeckSetup = (
             subjectLabwareId: labwareId,
             moduleEntities,
             labwareEntityIds,
+            modules: modulesRobotState,
           })
         return {
           stack,

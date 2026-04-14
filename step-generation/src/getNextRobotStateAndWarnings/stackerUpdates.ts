@@ -1,20 +1,13 @@
-import {
-  FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_ROBOT_TYPE,
-  FLEX_STACKER_ADDRESSABLE_AREAS,
-  FLEX_STACKER_V1_FIXTURE,
-  getDeckDefFromRobotType,
-  SYSTEM_LOCATION,
-} from '@opentrons/shared-data'
+import { SYSTEM_LOCATION } from '@opentrons/shared-data'
 
 import {
   BOTTOM_UP_LABWARE_POOL_KEYS,
   HOPPER_STACKER_LOCATION,
 } from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
+import { getFlexStackerShuttleAddressableArea } from '../utils/misc'
 
 import type {
-  AddressableAreaName,
   FlexStackerEmptyCreateCommand,
   FlexStackerFillItemsParams,
   FlexStackerFillParams,
@@ -591,15 +584,16 @@ export const forFlexStackerRetrieve = (
           runningStack.unshift(labwareId)
           robotState.labware[labwareId].stack = [...runningStack]
           if (isBottom) {
-            const shuttleAA = _getStackerShuttleAA(moduleSlot)
+            const shuttleAA = getFlexStackerShuttleAddressableArea(moduleSlot)
             if (shuttleAA != null) {
               robotState.labware[labwareId].stackedOnNode = {
                 addressableAreaName: shuttleAA,
               }
+            } else {
+              console.warn(
+                `Could not find an addressable area for retrieved labware in stacker module ${moduleId} at slot ${moduleSlot}`
+              )
             }
-            console.warn(
-              `Could not find an addressable area for retrieved labware in stacker module ${moduleId} at slot ${moduleSlot}`
-            )
             isBottom = false
           }
         }
@@ -675,24 +669,4 @@ export const forFlexStackerStore = (
       }
     }
   }
-}
-
-const _getStackerShuttleAA = (
-  moduleSlot: string
-): AddressableAreaName | null => {
-  // stacker only compatible with Flex
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
-  // Flex stacker slots are currently set in column 4, so we need to transform the slot name to the correct cutout id
-  const transformedSlot = `${moduleSlot[0]}3`
-  const cutuoutId = FLEX_CUTOUT_BY_SLOT_ID[transformedSlot]
-  const flexStackerAAs = deckDef.cutoutFixtures.find(
-    ({ id }) => id === FLEX_STACKER_V1_FIXTURE
-  )?.providesAddressableAreas[cutuoutId]
-
-  // pick off the shuttle AA that is exposed by the stacker
-  return (
-    FLEX_STACKER_ADDRESSABLE_AREAS.find(aa => flexStackerAAs?.includes(aa)) ??
-    null
-  )
 }

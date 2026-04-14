@@ -4,10 +4,15 @@ import mapValues from 'lodash/mapValues'
 
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaNamesFromLoadedModule,
 } from '@opentrons/shared-data'
 
 import { HOPPER_STACKER_LOCATION } from '../constants'
+import {
+  getFlexStackerShuttleAddressableArea,
+  resolveDeckSlotKeyForLabwareStackInSlot,
+} from './misc'
 
 import type {
   AddressableAreaName,
@@ -412,8 +417,10 @@ export const getStackedOnNodeFromPdStack = (args: {
   subjectLabwareId: string
   moduleEntities: ModuleEntities
   labwareEntityIds: ReadonlySet<string>
+  modules: RobotState['modules']
 }): LoadedLabwareLocation | undefined => {
-  const { stack, subjectLabwareId, moduleEntities, labwareEntityIds } = args
+  const { stack, subjectLabwareId, moduleEntities, labwareEntityIds, modules } =
+    args
 
   if (stack.length === 0 || stack[0] !== subjectLabwareId || stack.length < 2) {
     return undefined
@@ -451,6 +458,21 @@ export const getStackedOnNodeFromPdStack = (args: {
 
   if (shouldUseAddressableAreaNameForStackParent(parent)) {
     return { addressableAreaName: parent as AddressableAreaName }
+  }
+
+  const deckSlotForShuttleAa =
+    resolveDeckSlotKeyForLabwareStackInSlot(parent, modules, moduleEntities) ??
+    parent
+  const hasFlexStackerAtDeckSlot = Object.entries(modules).some(
+    ([moduleId, mod]) =>
+      moduleEntities[moduleId]?.type === FLEX_STACKER_MODULE_TYPE &&
+      mod.slot === deckSlotForShuttleAa
+  )
+  if (hasFlexStackerAtDeckSlot) {
+    const shuttleAa = getFlexStackerShuttleAddressableArea(deckSlotForShuttleAa)
+    if (shuttleAa != null) {
+      return { addressableAreaName: shuttleAa }
+    }
   }
 
   return { slotName: parent }
@@ -583,6 +605,7 @@ export const enrichRobotStateForStackGraphTraversals = (
         subjectLabwareId: id,
         moduleEntities,
         labwareEntityIds,
+        modules: robotState.modules,
       })
     return stackedOnNode != null ? { ...lw, stackedOnNode } : { ...lw }
   })
