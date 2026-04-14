@@ -1,4 +1,4 @@
-import { shell } from 'electron'
+import { app, shell } from 'electron'
 
 import { createLogger } from './log'
 
@@ -22,10 +22,11 @@ export async function openOT2AppExternal(payload?: {
       ? `${PROTOCOL_NAME}://open?${params.toString()}`
       : `${PROTOCOL_NAME}://open`
 
-  try {
-    await shell.openExternal(url)
-  } catch {
+  if (app.getApplicationNameForProtocol(url) === '') {
     log.debug('OT-2 App is not installed and open the download page')
     await shell.openExternal(OT2_APP_DOWNLOAD_PAGE)
+    return
   }
+
+  await shell.openExternal(url)
 }
