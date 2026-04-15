@@ -1,3 +1,14 @@
+/**
+ * Portals in which to render modals, overlays, etc.
+ *
+ * The "modal portal" is for things that should NOT occlude global navigation
+ * in the desktop app. Generally, these are things that the user is allowed to dismiss
+ * or navigate away from, or things that are scoped to a specific robot.
+ *
+ * The "top portal" is for things that SHOULD occlude global navigation
+ * in the desktop app.
+ */
+
 import { Box } from '@opentrons/components'
 
 export const TOP_PORTAL_ID = '__otAppTopPortalRoot'
