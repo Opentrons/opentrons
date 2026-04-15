@@ -51,10 +51,16 @@ const OFFSET_OT2_8_CHANNEL = 10
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
+  robotState: TimelineFrame | null,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   deckDef: DeckDefinition
 ): string | null => {
+  if (robotState == null) {
+    return null
+  }
   const { labware, modules } = activeDeckSetup
+
+  const { labware: labwareState } = robotState
   const selectedLabware = labware[selectedLabwareId]
   if (selectedLabware == null) {
     return null
@@ -78,7 +84,7 @@ export const getViewboxFromSelectedLabware = (
   const { xDimension, yDimension } = moduleDef
     ? moduleDef.dimensions
     : selectedLabware.def.dimensions
-  const slot = getSlotInLocationStack(selectedLabware.stack)
+  const slot = getSlotInLocationStack(labwareState[selectedLabwareId].stack)
   const slotPosition = getPositionFromSlotId(slot, deckDef)
   if (slotPosition == null) {
     return null

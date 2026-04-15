@@ -23,6 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
 import type {
@@ -44,6 +45,7 @@ import type {
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
+  Point,
   RobotState,
   TipState,
 } from '../types'
@@ -68,11 +70,6 @@ interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
 }
-export interface Point {
-  x: number
-  y: number
-  z?: number
-}
 
 export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   if (slotInfo.addressableArea?.areaType === 'slot') {
@@ -92,11 +89,18 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
+  labwareDefinition: LabwareDefinition,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
+  nozzleConfiguration: NozzleConfigurationStyle,
   tipOverlapOnNozzle: number
 ): Point[] => {
-  const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteEntity.spec
-  const primaryNozzlePoint = nozzleMap[primaryNozzle]
+  const { pipetteBoundingBoxOffsets } = pipetteEntity.spec
+  const primaryNozzlePoint = getPipetteCriticalPoint(
+    nozzleConfiguration,
+    pipetteEntity,
+    primaryNozzle,
+    labwareDefinition
+  )
   const pipetteBoundingBoxLeftXOffset =
     pipetteBoundingBoxOffsets.backLeftCorner[0]
   const pipetteBoundingBoxRightXOffset =
@@ -106,13 +110,13 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const pipetteBoundingBoxFrontYOffset =
     pipetteBoundingBoxOffsets.frontRightCorner[1]
   const leftX =
-    wellTargetPoint.x - (primaryNozzlePoint[0] - pipetteBoundingBoxLeftXOffset)
+    wellTargetPoint.x - (primaryNozzlePoint.x - pipetteBoundingBoxLeftXOffset)
   const rightX =
-    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint[0])
+    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint.x)
   const backY =
-    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint[1])
+    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint.y)
   const frontY =
-    wellTargetPoint.y - (primaryNozzlePoint[1] - pipetteBoundingBoxFrontYOffset)
+    wellTargetPoint.y - (primaryNozzlePoint.y - pipetteBoundingBoxFrontYOffset)
 
   const zNozzles = (wellTargetPoint.z ?? 0) + tipLength - tipOverlapOnNozzle
 
@@ -360,7 +364,6 @@ export const getIsSafePipetteMovement = (args: {
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    nozzleConfiguration == null ||
     nozzleConfiguration === ALL
   ) {
     return true
@@ -414,15 +417,18 @@ export const getIsSafePipetteMovement = (args: {
           nozzles: nozzleConfiguration,
         })
       : 0
-
+  const labwareDefinition = labwareEntities[labwareId].def
   const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
     pipetteEntity,
     tipLength,
     wellTargetPoint,
+    labwareDefinition,
     primaryNozzle ??
       getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    nozzleConfiguration,
     tipOverlapOnNozzle
   )
+
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
     channels,
     boundingBox: pipetteBoundsAtWellLocation,
