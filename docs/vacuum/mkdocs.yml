@@ -7,6 +7,8 @@ nav:
   - Module Components: components.md
   - Installing the Vacuum Module: installation.md
   - Maintenance and Cleaning: maintenance.md
+  - Vacuum Module G-Codes:
+      - Vacuum Module G-Code: g-code.md
   - Additional Product Information: additional-info.md
 
 theme:
