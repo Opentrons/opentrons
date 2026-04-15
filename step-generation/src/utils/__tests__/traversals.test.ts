@@ -440,7 +440,8 @@ describe('traversals', () => {
     it('derives stackedOnNode from PD-style stack for labware on a deck slot', () => {
       const result = enrichRobotStateForStackGraphTraversals(
         pdStyleStackRobotState,
-        {} as ModuleEntities
+        {} as ModuleEntities,
+        {} as LabwareEntities
       )
       expect(result.labware.plate).toMatchObject({
         stack: ['plate', 'B2'],
@@ -454,7 +455,8 @@ describe('traversals', () => {
       }
       const result = enrichRobotStateForStackGraphTraversals(
         pdStyleStackRobotState,
-        {} as ModuleEntities
+        {} as ModuleEntities,
+        {} as LabwareEntities
       )
       expect(result.labware.plate.stackedOnNode).toEqual({ slotName: 'C3' })
     })

@@ -589,11 +589,16 @@ export const assignContainsAmongSiblings = (
  *
  * When `labwareEntities` is passed, pairs of labware that share the same eligible parent
  * `stackedOnNode` may set `contains` on the larger footprint to the smaller labware id.
+ *
+ * **Protocol Designer:** call once when composing initial robot state (see PD
+ * {@link getInitialEnrichedRobotState}). After that, timeline `robotState` frames should keep this metadata
+ * current via command-specific updaters (`forMoveLabware`, stacker handlers, etc.), not by
+ * re-running this helper on every active step.
  */
 export const enrichRobotStateForStackGraphTraversals = (
   robotState: RobotState,
   moduleEntities: ModuleEntities,
-  labwareEntities?: LabwareEntities
+  labwareEntities: LabwareEntities
 ): RobotState => {
   const labwareIds = Object.keys(robotState.labware)
   const labwareEntityIds = new Set(labwareIds)
@@ -609,9 +614,9 @@ export const enrichRobotStateForStackGraphTraversals = (
       })
     return stackedOnNode != null ? { ...lw, stackedOnNode } : { ...lw }
   })
-  if (labwareEntities != null) {
-    labware = assignContainsAmongSiblings(labware, labwareEntities)
-  }
+  // assign contains among siblings
+  labware = assignContainsAmongSiblings(labware, labwareEntities)
+
   return {
     ...robotState,
     labware,

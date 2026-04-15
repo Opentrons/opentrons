@@ -105,7 +105,11 @@ export const getInitialRobotState: (
       pipetteLocations: pipettes,
     })
     robotState.liquidState.labware = labwareLiquidState
-    return robotState
+    return StepGeneration.enrichRobotStateForStackGraphTraversals(
+      robotState,
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
+    )
   }
 )
 
