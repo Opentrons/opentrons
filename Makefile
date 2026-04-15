@@ -373,7 +373,7 @@ dev-proxy:
 
 .PHONY: dev-proxy-tls
 dev-proxy-tls:
-	sleep 1
+	sleep 1 # give key-server time to prep certs for mitmproxy
 	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1 mitmdump \
 		--mode reverse:http://localhost:2@32313 \
 		--set connection_strategy=lazy \
