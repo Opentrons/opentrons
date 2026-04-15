@@ -1,5 +1,5 @@
 ---
-title: "Vacuum Module: G-Codes"
+title: "Vacuum Module: G-Code"
 description: "Vacuum Module G-code commands and responses."
 ---
 
@@ -31,7 +31,7 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Arguments:</strong> none <br>
         <strong>Response elements:</strong>
         <ul>
-          <li><code>R</code>: last reset reason (retrieves the RCC reset flag) </li>
+          <li><code>R</code>: last reset reason</li>
         </ul>
         <strong>Example:</strong> <code>M114</code> returns <code>M114 R:1 OK</code> 
       </td>
@@ -44,28 +44,29 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Response elements:</strong>
         <ul>
           <li><code>FW</code>: firmware version</li>
-          <li><code>HW</code>: hardware revision. Possible values include <code>nff</code> or <code>a1</code> (EVT).</li>
-          <li><code>SerialNo</code>: module serial number</li>
+          <li><code>HW</code>: hardware version</li>
+          <li><code>SerialNo</code>: serial number of the module</li>
         </ul>
-        <strong>Response:</strong> <code>M115 FW:(version) HW:nff SerialNo:(serial) OK</code>
+        <strong>Response:</strong> <code>M115 FW:&lt;version&gt; HW:&lt;version&gt; SerialNo:&lt;serial number&gt; OK</code>
       </td>
     </tr>
-    <tr>
-      <td><code>M120</code></td>
-      <td>
-        <strong>Command:</strong> set pressure state<br>
-        <strong>Arguments:</strong>
-        <ul>
-          <li><code>S</code>: start/stop control (0: Off, 1: On)</li>
-          <li><code>P</code>: target gauge pressure (-1013 to 0 mbar)</li>
-          <li><code>D</code>: duration (0–86400 s)</li>
-          <li><code>T</code>: timeout to reach target (0–86400 s)</li>
-          <li><code>R</code>: ramp rate (0–50 mbar/s)</li>
-          <li><code>V</code>: vent after cycle (0: Close, 1: Open)</li>
-        </ul>
-        <strong>Note:</strong> If the target is not reached within the timeout <code>T</code>, the module returns <code>err400: pressure not reached</code>. <br>
-        <strong>Response:</strong> <code>M120 OK</code>
-      </td>
+<tr>
+  <td><code>M120</code></td>
+  <td>
+    <strong>Command:</strong> set pressure state <br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>S</code>: Start/stop control. Accepts <code>1</code> (on) or <code>0</code> (off).</li>
+      <li><code>P</code>: Target gauge pressure in mbar. Range: <code>-1013</code> (full vacuum) to <code>0</code> (atmospheric) mbar.
+          <br><strong>Note:</strong> While the firmware accepts -1013 mbar, the hardware’s achievable vacuum will fall short of this theoretical limit and depends on local atmospheric pressure.</li>
+      <li><code>D</code>: Duration in seconds. Range: <code>0–86400</code> (up to 24 hours).</li>
+      <li><code>T</code>: Timeout in seconds to reach target pressure. Range: <code>0–86400</code> (up to 24 hours).</li>
+      <li><code>R</code>: Ramp rate in mbar/s. Range: <code>0–50</code>.</li>
+      <li><code>V</code>: Vent state after cycle. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M120 OK</code>. If the target pressure is not reached within the timeout interval <code>T</code>, the module returns <code>err400: pressure not reached</code>.
+  </td>
+</tr>
     </tr>
     <tr>
       <td><code>M121</code></td>
