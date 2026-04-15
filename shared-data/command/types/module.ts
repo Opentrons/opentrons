@@ -659,28 +659,38 @@ export interface IdentifyModuleRunTimeCommand
   result?: any
 }
 
-interface VacuumModuleSetTargetPressureParams {
-  moduleId: string
+interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
+  // in seconds
+  duration?: number
+  // in mbar/s
+  rate?: number
+  // in seconds
+  timeout?: number
+  ventAfter?: boolean
+}
+
+interface VacuumModuleSetTargetPressureParams extends BaseVacuumModulePumpParams {
+  // in mbar
   pressure: number
 }
 
-interface VacuumModuleSetTargetPowerParams {
-  moduleId: string
-  power: number
+interface VacuumModuleSetTargetPowerParams extends BaseVacuumModulePumpParams {
+  // in % between 0 and 100
+  percentPower: number
 }
 
 export interface VacuumModuleSetTargetPressureCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/setTargetPressure'
+  commandType: 'vacuumModule/startSetVacuumPressure'
   params: VacuumModuleSetTargetPressureParams
 }
 
 export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/setTargetPower'
+  commandType: 'vacuumModule/startSetVacuumPower'
   params: VacuumModuleSetTargetPowerParams
 }
 
 export interface VacuumModuleDeactivateCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/deactivate'
+  commandType: 'vacuumModule/stopVacuum'
   params: ModuleOnlyParams
 }
 

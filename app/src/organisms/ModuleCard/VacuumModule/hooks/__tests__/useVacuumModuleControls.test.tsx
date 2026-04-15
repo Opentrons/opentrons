@@ -85,7 +85,7 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/setTargetPressure',
+          commandType: 'vacuumModule/startSetVacuumPressure',
           params: {
             moduleId: 'vacuum_id',
             pressure: 500,
@@ -107,10 +107,10 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/setTargetPower',
+          commandType: 'vacuumModule/startSetVacuumPower',
           params: {
             moduleId: 'vacuum_id',
-            power: 75,
+            percentPower: 75,
           },
         },
       })
@@ -129,7 +129,7 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/deactivate',
+          commandType: 'vacuumModule/stopVacuum',
           params: {
             moduleId: 'vacuum_id',
           },
@@ -195,7 +195,7 @@ describe('useVacuumModuleControls', () => {
         expect(mockReportModuleCommand).toHaveBeenCalledWith({
           kind: 'liveCommand',
           moduleType: 'vacuumModuleType',
-          analyticCommand: 'vacuumModule/deactivate',
+          analyticCommand: 'vacuumModule/stopVacuum',
           result: { status: 'succeeded', data: undefined },
           serialNumber: 'vac123',
           errorDetails: '',

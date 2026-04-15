@@ -72,7 +72,7 @@ export function useVacuumModuleControls(
 
   const setVacuumPressure = (pressure: number): void => {
     const command: VacuumModuleSetTargetPressureCreateCommand = {
-      commandType: 'vacuumModule/setTargetPressure',
+      commandType: 'vacuumModule/startSetVacuumPressure',
       params: {
         moduleId: module.id,
         pressure,
@@ -83,15 +83,15 @@ export function useVacuumModuleControls(
 
   const setVacuumPower = (power: number): void => {
     const command: VacuumModuleSetTargetPowerCreateCommand = {
-      commandType: 'vacuumModule/setTargetPower',
-      params: { moduleId: module.id, power },
+      commandType: 'vacuumModule/startSetVacuumPower',
+      params: { moduleId: module.id, percentPower: power },
     }
     executeCommand(command)
   }
 
   const deactivateVacuum = (): void => {
     const command: VacuumModuleDeactivateCreateCommand = {
-      commandType: 'vacuumModule/deactivate',
+      commandType: 'vacuumModule/stopVacuum',
       params: { moduleId: module.id },
     }
     executeCommand(command)
