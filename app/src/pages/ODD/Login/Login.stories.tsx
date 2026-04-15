@@ -9,6 +9,7 @@ import { Login as LoginComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import { MemoryRouter } from 'react-router-dom'
 
 const dummyConfig = {
   config: {
@@ -31,7 +32,9 @@ const meta: Meta<typeof LoginComponent> = {
   decorators: [
     Story => (
       <Provider store={store}>
+        <MemoryRouter>
         <Story />
+        </MemoryRouter>
       </Provider>
     ),
   ],
