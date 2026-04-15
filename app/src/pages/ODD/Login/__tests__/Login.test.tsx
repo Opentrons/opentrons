@@ -1,11 +1,21 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { Login } from '..'
+
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof import('react-router-dom')>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 
 vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   FullKeyboard: ({
@@ -26,7 +36,7 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   ),
 }))
 
-const render = () => {
+const renderLogin = () => {
   return renderWithProviders(
     <MemoryRouter>
       <Login />
@@ -36,35 +46,71 @@ const render = () => {
 }
 
 describe('Login', () => {
+  beforeEach(() => {
+    mockNavigate.mockReset()
+  })
+
   it('renders navigation, username field, and action buttons', () => {
-    render()
+    renderLogin()
     expect(screen.getAllByText('Login').length).toBeGreaterThanOrEqual(1)
     screen.getByText('Username')
     screen.getByText('next')
     screen.getByText('cancel')
-    screen.getByRole('textbox')
+    expect(screen.getByTestId('login-field')).toHaveAttribute('type', 'text')
   })
 
-  it('shows the software keyboard when the username field is focused', () => {
-    render()
+  it('navigates back when cancel is pressed', () => {
+    renderLogin()
+    fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+    expect(mockNavigate).toHaveBeenCalledWith(-1)
+  })
+
+  it('disables next when username is empty', () => {
+    renderLogin()
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+  })
+
+  it('shows the software keyboard when the field is focused', () => {
+    renderLogin()
     expect(screen.queryByTestId('mock-full-keyboard')).not.toBeInTheDocument()
-    fireEvent.focus(screen.getByRole('textbox'))
+    fireEvent.focus(screen.getByTestId('login-field'))
     expect(screen.getByTestId('mock-full-keyboard')).toBeInTheDocument()
   })
 
   it('updates the username when typing in the text field', () => {
-    render()
-    const input = screen.getByRole('textbox')
+    renderLogin()
+    const input = screen.getByTestId('login-field')
     fireEvent.change(input, { target: { value: 'lab_user' } })
     expect(input).toHaveValue('lab_user')
   })
 
   it('updates the username when FullKeyboard reports a new value', () => {
-    render()
-    fireEvent.focus(screen.getByRole('textbox'))
+    renderLogin()
+    fireEvent.focus(screen.getByTestId('login-field'))
     fireEvent.click(
       screen.getByRole('button', { name: 'simulate keyboard input' })
     )
-    expect(screen.getByRole('textbox')).toHaveValue('from_keyboard')
+    expect(screen.getByTestId('login-field')).toHaveValue('from_keyboard')
+  })
+
+  it('switches label and input to password after next with a non-empty username', () => {
+    renderLogin()
+    fireEvent.change(screen.getByTestId('login-field'), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    screen.getByText('Password')
+    const input = screen.getByTestId('login-field')
+    expect(input).toHaveAttribute('type', 'password')
+    expect(input).toHaveValue('')
+  })
+
+  it('disables next on the password step when password is empty', () => {
+    renderLogin()
+    fireEvent.change(screen.getByTestId('login-field'), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
   })
 })
