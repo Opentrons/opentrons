@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -109,7 +102,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const hasMoreThanOneWell = allWells.flat().length > 1
   const displayName = labwareDef.metadata.displayName
 
-  const getWellsField = useCallback((): FieldProps | null => {
+  const wellsField = ((): FieldProps | null => {
     switch (stepType) {
       case 'mix':
         return propsForFields.wells
@@ -120,10 +113,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       default:
         return null
     }
-  }, [stepType, propsForFields])
+  })()
 
   const computedSelectedWells = useMemo((): string[][] => {
-    const wellsField = getWellsField()
     const wells = (wellsField?.value as string[]) || []
 
     if (!hasMoreThanOneWell) {
@@ -140,7 +132,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       )
     )
   }, [
-    getWellsField,
+    wellsField,
     hasMoreThanOneWell,
     allWells,
     labwareDef.ordering,
@@ -261,65 +253,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     deckDef
   )
 
-  const handleClickWell = (wellName: string): void => {
-    const wellsField = getWellsField()
-
-    const wellIsSelected = selectedWells.flat().includes(wellName)
-    let wellsToToggle: string[] = []
-    if (wellIsSelected) {
-      const primaryWells = wellsField?.value as string[]
-      for (const primaryWell of primaryWells) {
-        const group = getEntireWellSelection(
-          primaryWell,
-          labwareDef.ordering,
-          nozzleConfiguration,
-          primaryNozzle,
-          channels
-        )
-        if (group.includes(wellName)) {
-          wellsToToggle = group
-          break
-        }
-      }
-    } else {
-      wellsToToggle = getEntireWellSelection(
-        wellName,
-        labwareDef.ordering,
-        nozzleConfiguration,
-        primaryNozzle,
-        channels
-      )
-    }
-    const allWellsWithStatus = getAllWellsSafetyStatus({
-      allWells,
-      robotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      primaryNozzle,
-      nozzleConfiguration,
-    })
-
-    if (allWellsWithStatus[wellName] === 1) {
-      return
-    }
-
-    setSelectedWells(prev => {
-      const next = prev.filter(group => group[0] !== wellsToToggle[0])
-      const hadOverlap = next.length !== prev.length
-
-      if (!hadOverlap) {
-        next.push(wellsToToggle)
-      }
-
-      if (wellsField != null) {
-        wellsField.updateValue(next.map(group => group[0]))
-      }
-
-      return next
-    })
-  }
-
   const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
     const wellsInRect = getCollidingWells(rect)
     const highlightedWells: string[][] = []
@@ -331,10 +264,13 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         primaryNozzle,
         channels
       )
-      const noOverlapInList = highlightedWells
+      const noOverlapInInaccessibleWells = inaccessiblePartialWells
         .flat()
         .some(well => wellSelection.includes(well))
-      if (!noOverlapInList) {
+      const noOverlapInAlreadySelected = highlightedWells
+        .flat()
+        .some(well => wellSelection.includes(well))
+      if (!noOverlapInAlreadySelected && !noOverlapInInaccessibleWells) {
         highlightedWells.push(wellSelection)
       }
     }
@@ -385,7 +321,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             }
           })
         }
-        const wellsField = getWellsField()
         if (wellsField != null) {
           wellsField.updateValue(updated.map(wellGroup => wellGroup[0]))
         }
@@ -484,7 +419,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         <LabwareOnDeck
           labwareOnDeck={labware}
           {...labwarePositionProps}
-          handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
           onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={allWellsWithStatus}
@@ -500,6 +434,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             slotPosition={
               isLabwareOnModule ? defaultSlotPosition : slotPosition
             }
+            hoveredWell={wellShadow}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
