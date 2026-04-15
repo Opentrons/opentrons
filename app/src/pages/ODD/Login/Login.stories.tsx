@@ -1,5 +1,4 @@
 import { Provider } from 'react-redux'
-import { MemoryRouter } from 'react-router-dom'
 import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'

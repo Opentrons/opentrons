@@ -16,7 +16,14 @@ export function Login(): JSX.Element {
       <div className={styles.nav_container}>
         <ChildNavigation
           header="Login"
-          buttonText="Login"
+          buttonText="next"
+          secondaryButtonProps={{
+            buttonText: 'cancel',
+            buttonType: 'tertiaryLowLight',
+            onClick: () => {
+              // navigate(-1)
+            },
+          }}
           onClickButton={() => {}}
         />
       </div>
@@ -27,14 +34,16 @@ export function Login(): JSX.Element {
           size="medium"
           onFocus={() => setShowKeyboard(true)}
         />
-        {showKeyboard && (
+      </div>
+      {showKeyboard && (
+        <div className={styles.keyboard_container}>
           <FullKeyboard
             // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
-        )}
-      </div>
+        </div>
+      )}
     </>
   )
 }
