@@ -361,11 +361,7 @@ export const getIsSafePipetteMovement = (args: {
   const deckDefinition = getDeckDefFromRobotType(robotType)
 
   //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
-  if (
-    labwareEntities[labwareId] == null ||
-    wellTargetName == null ||
-    nozzleConfiguration === ALL
-  ) {
+  if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
 
