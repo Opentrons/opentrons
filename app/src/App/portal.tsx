@@ -7,6 +7,9 @@
  *
  * The "top portal" is for things that SHOULD occlude global navigation
  * in the desktop app.
+ *
+ * On the on-device display, there is no such distinction. By convention, ODD-only
+ * things should use the top portal.
  */
 
 import { Box } from '@opentrons/components'
