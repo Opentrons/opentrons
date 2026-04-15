@@ -33,7 +33,6 @@ export const Default: Story = {
     return (
       <div
         style={{
-          position: 'relative',
           width: '100%',
           height: '100vh',
           display: 'flex',
@@ -55,15 +54,13 @@ export const Default: Story = {
         >
           This is some placeholder text.
         </StyledText>
-        {showOverlay ? (
-          <div style={{ position: 'absolute', inset: 0 }}>
-            <LoggedOutOverlay
-              onClick={() => {
-                setShowOverlay(false)
-              }}
-            />
-          </div>
-        ) : null}
+        {showOverlay && (
+          <LoggedOutOverlay
+            onClick={() => {
+              setShowOverlay(false)
+            }}
+          />
+        )}
       </div>
     )
   },

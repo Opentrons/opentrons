@@ -9,7 +9,7 @@ export interface LoggedOutOverlayProps {
 /**
  * A semi-transparent overlay for when the on-device display is locked.
  *
- * Fills the dimensions of the parent component.
+ * This renders with `position: fixed` to fill the viewport, with a high z-index.
  */
 export function LoggedOutOverlay(props: LoggedOutOverlayProps): JSX.Element {
   const { onClick } = props
