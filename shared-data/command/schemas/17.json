@@ -6517,7 +6517,7 @@
       "title": "StartRunExtendedProfileParams",
       "type": "object"
     },
-    "StartSetVacuumCreate": {
+    "StartSetVacuumPressureCreate": {
       "description": "A request to start the vacuum pump.",
       "properties": {
         "commandAnnotationIds": {
@@ -6529,8 +6529,8 @@
           "type": "array"
         },
         "commandType": {
-          "const": "vacuum_module/startSetVacuum",
-          "default": "vacuum_module/startSetVacuum",
+          "const": "vacuum_module/startSetVacuumPressure",
+          "default": "vacuum_module/startSetVacuumPressure",
           "title": "Commandtype",
           "type": "string"
         },
@@ -6545,15 +6545,15 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/$defs/StartSetVacuumParams"
+          "$ref": "#/$defs/StartSetVacuumPressureParams"
         }
       },
       "required": ["params"],
-      "title": "StartSetVacuumCreate",
+      "title": "StartSetVacuumPressureCreate",
       "type": "object"
     },
-    "StartSetVacuumParams": {
-      "description": "Input parameters to start the vacuum pump.",
+    "StartSetVacuumPressureParams": {
+      "description": "Input parameters to set the internal vacuum pressure.",
       "properties": {
         "duration": {
           "description": "Duration in sec. to hold target pressure for after it is reached.",
@@ -6590,7 +6590,60 @@
         }
       },
       "required": ["moduleId", "gaugePressure", "duration"],
-      "title": "StartSetVacuumParams",
+      "title": "StartSetVacuumPressureParams",
+      "type": "object"
+    },
+    "StartSetVacuumPumpCreate": {
+      "description": "A request to start the vacuum pump.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuum_module/startSetVacuumPump",
+          "default": "vacuum_module/startSetVacuumPump",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartSetVacuumPumpParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartSetVacuumPumpCreate",
+      "type": "object"
+    },
+    "StartSetVacuumPumpParams": {
+      "description": "Input parameters to start the vacuum pump.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "percentPower": {
+          "description": "Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
+          "title": "Percentpower",
+          "type": "integer"
+        }
+      },
+      "required": ["moduleId", "percentPower"],
+      "title": "StartSetVacuumPumpParams",
       "type": "object"
     },
     "StatusBarAnimation": {
@@ -8433,7 +8486,8 @@
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
-      "vacuum_module/startSetVacuum": "#/$defs/StartSetVacuumCreate",
+      "vacuum_module/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
+      "vacuum_module/startSetVacuumPump": "#/$defs/StartSetVacuumPumpCreate",
       "vacuum_module/stopVacuum": "#/$defs/StopVacuumCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
@@ -8708,7 +8762,10 @@
       "$ref": "#/$defs/StopVacuumCreate"
     },
     {
-      "$ref": "#/$defs/StartSetVacuumCreate"
+      "$ref": "#/$defs/StartSetVacuumPressureCreate"
+    },
+    {
+      "$ref": "#/$defs/StartSetVacuumPumpCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
