@@ -138,6 +138,11 @@ plugins = ["pydantic.mypy", "decoy.mypy"]
 show_error_codes = true
 strict = true
 
+# dbus can't work off of linux in dev environments, sadly
+[[tool.mypy.overrides]]
+module = ['dbus.*']
+ignore_missing_imports = true
+
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
