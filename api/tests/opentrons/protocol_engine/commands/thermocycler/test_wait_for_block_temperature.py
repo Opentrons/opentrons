@@ -8,7 +8,7 @@ from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.wait_for_block_temperature import (
     WaitForBlockTemperatureImpl,
 )
-from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
@@ -20,9 +20,12 @@ async def test_set_target_block_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
+    task_handler: TaskHandler,
 ) -> None:
     """It should be able to wait for the specified module's target temperature."""
-    subject = WaitForBlockTemperatureImpl(state_view=state_view, equipment=equipment)
+    subject = WaitForBlockTemperatureImpl(
+        state_view=state_view, equipment=equipment, task_handler=task_handler
+    )
 
     data = tc_commands.WaitForBlockTemperatureParams(
         moduleId="input-thermocycler-id",
@@ -49,6 +52,7 @@ async def test_set_target_block_temperature(
 
     decoy.verify(
         tc_module_substate.get_target_block_temperature(),
+        await task_handler.wait_for_lock_release("thermocycler-id-block"),
         await tc_hardware.wait_for_block_target(),
     )
     assert result == SuccessData(public=expected_result)

@@ -592,3 +592,50 @@ async def test_cancel_all(
     subject.cancel_all("cancel all")
     for task in mock_tasks:
         decoy.verify(task.asyncioTask.cancel(msg="cancel all"))
+
+
+async def test_wait_for_lock_release(
+    subject: TaskHandler, decoy: Decoy, action_dispatcher: ActionDispatcher
+) -> None:
+    """Test that wait_for_lock_release waits for the lock to be released."""
+    task1_started = asyncio.Event()
+    task1_finished = asyncio.Event()
+    wait_started = asyncio.Event()
+    wait_finished = asyncio.Event()
+
+    async def task_1_method(task_handler: TaskHandler) -> None:
+        """First run method that holds the lock."""
+        async with task_handler.synchronize_cancel_latest("test"):
+            task1_started.set()
+            await asyncio.sleep(0.1)
+        task1_finished.set()
+
+    async def wait_method(task_handler: TaskHandler) -> None:
+        """Method that waits for the lock to be released."""
+        await task1_started.wait()
+        wait_started.set()
+        await task_handler.wait_for_lock_release("test")
+        wait_finished.set()
+
+    task1 = await subject.create_task(task_1_method)
+    decoy.verify(
+        action_dispatcher.dispatch(StartTaskAction(task1)),
+        times=1,
+    )
+    task2 = await subject.create_task(wait_method)
+    decoy.verify(
+        action_dispatcher.dispatch(StartTaskAction(task2)),
+        times=1,
+    )
+
+    await asyncio.wait_for(
+        asyncio.gather(task1.asyncioTask, task2.asyncioTask, return_exceptions=True),
+        timeout=1,
+    )
+
+    assert task1.asyncioTask.done()
+    assert task2.asyncioTask.done()
+    assert task1.asyncioTask.exception() is None
+    assert task2.asyncioTask.exception() is None
+    assert task1_finished.is_set()
+    assert wait_finished.is_set()
